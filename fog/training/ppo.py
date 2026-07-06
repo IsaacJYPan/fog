@@ -312,11 +312,15 @@ async def _train_async(cfg: dict) -> dict:
         else:
             watchdog = DegenerateSolutionWatchdog()
             print(
-                "[ppo] WARNING: leakage.baseline_run not set — watchdog runs on default baselines "
-                "(stalling detector disabled, diversity detector weak). Run the beta=0 control "
-                "first and point leakage.baseline_run at its log dir.",
+                "[ppo] WARNING: leakage.baseline_run not set - the diversity and stalling "
+                "detectors are OFF (they need beta=0 control baselines; fabricated defaults "
+                "false-halted fresh runs at their first update). Only the stale-probe detector "
+                "runs. Run the beta=0 control first and point leakage.baseline_run at its log dir.",
                 flush=True,
             )
+        # stale-Φ̂ exploitation needs time-against-a-frozen-Φ̂ to exist at all; don't let init-noise
+        # CE gaps halt the run (observed live: frozen−fresh ≈ 13.6 nats at update one, no staleness).
+        watchdog.warmup_decisions = int(leak_cfg.get("watchdog_warmup_decisions", 20_000))
 
     # fresh probe (§7 staleness watchdog + honest readability tracking): an independent reader
     # trained on every rollout batch. On for any leakage run; optional otherwise.

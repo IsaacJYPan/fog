@@ -1,0 +1,59 @@
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Close Combat
+- Headlong Rush
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Swords Dance
+- Low Kick
+- Iron Head
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Focus Blast
+- Nasty Plot
+- Dazzling Gleam
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- U-turn
+- Hex
+- Dragon Darts
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Trick
+- Ice Beam
+- Sludge Bomb
+- Future Sight
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Fang
+- Heavy Slam
+- Crunch
+- Close Combat

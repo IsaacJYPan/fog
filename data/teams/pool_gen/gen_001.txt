@@ -1,0 +1,59 @@
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+- Close Combat
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+- Low Kick
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Shadow Ball
+- Nasty Plot
+- Make It Rain
+- Recover
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- U-turn
+- Flamethrower
+- Dragon Dance
+- Fire Blast
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 184 Def / 28 SpA / 48 Spe
+Bold Nature
+- Chilly Reception
+- Flamethrower
+- Sludge Bomb
+- Trick
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 84 HP / 252 Atk / 172 Spe
+Jolly Nature
+- Iron Defense
+- Close Combat
+- Roar
+- Reflect

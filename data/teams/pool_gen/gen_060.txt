@@ -1,0 +1,59 @@
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Taunt
+- Stealth Rock
+- Head Smash
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Low Kick
+- Kowtow Cleave
+- Iron Head
+- Swords Dance
+
+Gholdengo @ metalcoat
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Make It Rain
+- Shadow Ball
+- Trick
+- Nasty Plot
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Shadow Ball
+- Draco Meteor
+- Fire Blast
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Ice Beam
+- Flamethrower
+- Trick
+- Chilly Reception
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- Body Press
+- Roar
+- Crunch

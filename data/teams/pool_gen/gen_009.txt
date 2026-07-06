@@ -1,0 +1,59 @@
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+- Close Combat
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+
+Gholdengo @ metalcoat
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Psyshock
+- Trick
+- Thunder Wave
+- Focus Blast
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Ghost
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Flamethrower
+- Will-O-Wisp
+- Substitute
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Psyshock
+- Future Sight
+- Psychic Noise
+- Trick
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Stone Edge
+- Ice Fang
+- Heavy Slam
+- Iron Defense

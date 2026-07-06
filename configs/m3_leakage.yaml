@@ -28,6 +28,11 @@ leakage:
   baseline_run: null                # e.g. runs/m3_beta0
   fresh_probe: true                 # independent reader trained alongside (staleness watchdog input)
   fresh_probe_steps: 4              # fit steps per PPO update
+  # Stale-Φ̂ detector arm-up: below this many decisions the check is skipped — at init both probes
+  # are near-random and their CE gap is noise, not staleness exploitation (a live smoke run halted
+  # at update ONE before this guard). Diversity/stalling detectors are simply OFF without
+  # baseline_run.
+  watchdog_warmup_decisions: 20000
   # Per-step penalty estimator: true = max(0, ΔI) (§7 default); false = signed ΔI, which telescopes
   # to CE_first − CE_final per game and is immune to the clipped form's probe-CE-noise bias.
   # Run at least one β cell with clip_delta=false as the estimator ablation.

@@ -1,0 +1,59 @@
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Headlong Rush
+- Close Combat
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Kowtow Cleave
+- Sucker Punch
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Make It Rain
+- Nasty Plot
+- Focus Blast
+
+Dragapult @ airballoon
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Dragon Darts
+- Flamethrower
+- Will-O-Wisp
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Ice Beam
+- Flamethrower
+- Sludge Bomb
+- Trick
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- Crunch
+- Heavy Slam
+- Iron Defense

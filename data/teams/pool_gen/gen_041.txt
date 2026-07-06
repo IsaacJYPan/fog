@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Close Combat
+- Headlong Rush
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+
+Gholdengo @ shucaberry
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Shadow Ball
+- Focus Blast
+- Recover
+- Nasty Plot
+
+Dragapult @ leftovers
+Ability: clearbody
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Flamethrower
+- U-turn
+- Will-O-Wisp
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Flamethrower
+- Thunder Wave
+
+Zamazenta @ choiceband
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Ice Fang
+- Crunch
+- Stone Edge
+- Body Press

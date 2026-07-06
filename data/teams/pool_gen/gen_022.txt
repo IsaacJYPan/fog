@@ -1,0 +1,59 @@
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Close Combat
+- Stealth Rock
+- Head Smash
+
+Kingambit @ lumberry
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Low Kick
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Recover
+- Focus Blast
+
+Dragapult @ choiceband
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Substitute
+- U-turn
+- Shadow Ball
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Ice Beam
+- Future Sight
+- Chilly Reception
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Fang
+- Roar
+- Light Screen
+- Body Press

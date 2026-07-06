@@ -76,14 +76,20 @@ def build_spreads(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
 
 
 def build_priors(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
-    """Per-species item/move usage priors + a teammate co-occurrence matrix (skip-gram warm-start,
-    §4.1). Normalized to distributions; only in-table ids kept."""
+    """Per-species item/move/ability/tera usage priors + a teammate co-occurrence matrix (skip-gram
+    warm-start, §4.1). Normalized to distributions; only in-table ids kept. Ability priors are
+    filtered to the species' legal abilities and tera priors to real types (the chaos file carries
+    a "nothing" tera bucket for non-terastallized games — not a sheet attribute; dropped)."""
+    from fog.constants.schema import TYPE_INDEX
+
     data = chaos.get("data", chaos)
     species_ids = [s for s in tables.species["ids"] if s in tables.species["features"]]
     sp_index = {s: i for i, s in enumerate(species_ids)}
 
     item_priors: dict[str, dict[str, float]] = {}
     move_priors: dict[str, dict[str, float]] = {}
+    ability_priors: dict[str, dict[str, float]] = {}
+    tera_priors: dict[str, dict[str, float]] = {}
     cooc = np.zeros((len(species_ids), len(species_ids)), dtype=np.float32)
 
     def norm(d: dict[str, float]) -> dict[str, float]:
@@ -94,8 +100,17 @@ def build_priors(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
         sid = to_id(name)
         if sid not in sp_index:
             continue
+        legal_abilities = set(tables.species["features"][sid].get("abilities") or [])
         item_priors[sid] = norm({to_id(k): float(v) for k, v in (row.get("Items") or {}).items()})
         move_priors[sid] = norm({to_id(k): float(v) for k, v in (row.get("Moves") or {}).items()})
+        ability_priors[sid] = norm({
+            to_id(k): float(v) for k, v in (row.get("Abilities") or {}).items()
+            if not legal_abilities or to_id(k) in legal_abilities
+        })
+        tera_priors[sid] = norm({
+            to_id(k): float(v) for k, v in (row.get("Tera Types") or {}).items()
+            if to_id(k) in TYPE_INDEX
+        })
         for mate, w in (row.get("Teammates") or {}).items():
             mid = to_id(mate)
             if mid in sp_index:
@@ -105,6 +120,8 @@ def build_priors(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
         "species_order": species_ids,
         "item_priors": item_priors,
         "move_priors": move_priors,
+        "ability_priors": ability_priors,
+        "tera_priors": tera_priors,
         "teammate_cooccurrence": cooc.tolist(),
     }
 

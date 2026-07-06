@@ -1,0 +1,59 @@
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Headlong Rush
+- Close Combat
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Low Kick
+- Swords Dance
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Shadow Ball
+- Make It Rain
+- Trick
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Fire Blast
+- Thunder Wave
+- Will-O-Wisp
+- U-turn
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Sludge Bomb
+- Chilly Reception
+- Trick
+- Psychic Noise
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Crunch
+- Iron Defense
+- Stone Edge
+- Roar

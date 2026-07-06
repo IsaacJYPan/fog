@@ -82,16 +82,30 @@ class DegenerateSolutionWatchdog:
     policy as the >2σ regression rule, spec §10).
     """
 
-    # baselines (from the β=0 control at matched training progress — see update_to)
-    baseline_win_rate: float = 0.5
-    baseline_move_entropy: float = 0.0
+    # baselines (from the β=0 control at matched training progress — see update_to). None = the
+    # detector needing them is OFF: fabricated defaults are worse than no detector — a 0.5 win-rate
+    # / 0.0 entropy default made the diversity check GUARANTEED-true on any fresh run's first
+    # update (observed live 2026-07-05 on a pool_gen smoke run).
+    baseline_win_rate: float | None = None
+    baseline_move_entropy: float | None = None
     baseline_game_length: float = 0.0
 
     # thresholds
     win_rate_crash: float = 0.10          # absolute win-rate drop that counts as a crash
     move_entropy_spike: float = 0.30      # absolute per-turn move-entropy (nats) rise that counts
-    stale_phi_gap: float = 0.5            # nats: frozen-Φ̂ CE exceeding fresh-predictor CE by this
+    stale_phi_gap: float = 0.5            # nats: absolute floor for the frozen-vs-fresh CE excess
+    stale_phi_rel: float = 0.25           # AND relative excess: frozen > fresh * (1 + this).
+    #   Both are required. leakage_ce is summed over every still-hidden attribute, so its scale is
+    #   ~tens of nats early in training — an absolute 0.5-nat gap alone fires on init noise (Φ̂ is a
+    #   copy of the untrained head at step one; measured frozen−fresh ≈ 13.6 nats on CEs of ~100,
+    #   i.e. a 15% excess, at the FIRST update of a smoke run — with no staleness to exploit).
     stall_length_ratio: float = 1.5       # avg game length vs baseline
+
+    # arm-up: exploitation of a stale Φ̂ cannot exist before the policy has trained against a frozen
+    # Φ̂ for a while; skip the stale check below this many decisions (set from config in ppo.py,
+    # tracked via update_to).
+    warmup_decisions: int = 0
+    decisions_seen: int = 0
 
     @classmethod
     def from_control_run(cls, log_dir, tail_rows: int = 10) -> "DegenerateSolutionWatchdog":
@@ -132,6 +146,8 @@ class DegenerateSolutionWatchdog:
         None -> final tail (legacy behavior). Earlier than the control's first row -> its first
         `window` rows (the closest available match). No-op when constructed without a control run.
         """
+        if decisions is not None:
+            self.decisions_seen = int(decisions)
         rows = getattr(self, "_control_rows", None)
         if not rows:
             return self
@@ -160,15 +176,25 @@ class DegenerateSolutionWatchdog:
 
     def check_move_diversity_spike(self, metrics: dict) -> bool:
         """Refusing to attack with revealing moves at the cost of tempo shows up as a win-rate crash
-        paired with a move-diversity (entropy) spike. `metrics` needs win_rate + move_entropy."""
+        paired with a move-diversity (entropy) spike. `metrics` needs win_rate + move_entropy.
+        OFF (False) until win-rate/entropy baselines exist — i.e. without a β=0 control run."""
+        if self.baseline_win_rate is None or self.baseline_move_entropy is None:
+            return False
         crashed = metrics["win_rate"] < self.baseline_win_rate - self.win_rate_crash
         spiked = metrics["move_entropy"] > self.baseline_move_entropy + self.move_entropy_spike
         return bool(crashed and spiked)
 
     def check_stale_phi_exploitation(self, fresh_ce: float, frozen_ce: float) -> bool:
         """Exploiting Φ̂ staleness: the agent looks opaque to the FROZEN predictor (high frozen CE)
-        while a freshly-trained predictor still reads it fine (low fresh CE)."""
-        return bool(frozen_ce - fresh_ce > self.stale_phi_gap)
+        while a freshly-trained predictor still reads it fine (low fresh CE). Fires only past
+        `warmup_decisions` AND when the excess clears both the absolute floor and the relative
+        threshold (see the field comments — either alone false-fires at init-scale CE)."""
+        if self.decisions_seen < self.warmup_decisions:
+            return False
+        return bool(
+            frozen_ce - fresh_ce > self.stale_phi_gap
+            and frozen_ce > fresh_ce * (1.0 + self.stale_phi_rel)
+        )
 
     def check_stalling(self, avg_game_length: float) -> bool:
         return bool(

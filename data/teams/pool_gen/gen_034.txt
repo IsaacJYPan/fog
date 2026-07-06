@@ -1,0 +1,59 @@
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Stealth Rock
+- Headlong Rush
+- Knock Off
+- Close Combat
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Low Kick
+- Iron Head
+- Sucker Punch
+- Swords Dance
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Flying
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Make It Rain
+- Shadow Ball
+- Recover
+- Trick
+
+Dragapult @ leftovers
+Ability: clearbody
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Draco Meteor
+- Hex
+- Sucker Punch
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Future Sight
+- Chilly Reception
+- Ice Beam
+- Thunder Wave
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Roar
+- Heavy Slam
+- Light Screen
+- Body Press

@@ -1,0 +1,59 @@
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 232 HP / 88 Def / 188 Spe
+Impish Nature
+- Rapid Spin
+- Ice Spinner
+- Headlong Rush
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+
+Gholdengo @ leftovers
+Ability: goodasgold
+Tera Type: Flying
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Psyshock
+- Shadow Ball
+- Trick
+- Thunder Wave
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Hex
+- Dragon Dance
+- Thunder Wave
+- Draco Meteor
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Flamethrower
+- Future Sight
+- Trick
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Body Press
+- Close Combat
+- Ice Fang
+- Crunch

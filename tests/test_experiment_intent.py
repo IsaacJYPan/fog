@@ -234,6 +234,30 @@ def test_watchdog_baselines_are_progress_matched(tmp_path):
     ] is True
 
 
+def test_watchdog_without_control_is_inert_not_trigger_happy():
+    """The OTHER false-halt (observed live 2026-07-05, pool_gen smoke run): without a control run,
+    the old defaults (win_rate 0.5 / entropy 0.0) made the diversity check guaranteed-true on any
+    fresh run's first update, and the stale-Φ̂ check fired on init-scale CE noise (frozen−fresh
+    ≈ 13.6 nats on CEs of ~100 — a 15% excess with no staleness to exploit)."""
+    from fog.training.leakage import DegenerateSolutionWatchdog
+
+    wd = DegenerateSolutionWatchdog()
+    wd.warmup_decisions = 20_000
+    first_update = {
+        "win_rate": 0.06, "move_entropy": 1.77, "avg_game_length": 28.0,
+        "fresh_ce": 88.95, "frozen_ce": 102.51,   # the exact live values
+    }
+    assert not any(wd.check_all(first_update).values())
+    # past warmup, init-scale relative noise still doesn't fire ...
+    wd.update_to(50_000)
+    assert wd.check_all(first_update)["stale_phi_exploitation"] is False
+    # ... but a genuine exploitation signature (fresh reads fine, frozen blind) does
+    assert wd.check_all({"fresh_ce": 1.0, "frozen_ce": 2.0})["stale_phi_exploitation"] is True
+    # and before warmup even that is deferred (no staleness can exist yet)
+    wd.decisions_seen = 0
+    assert wd.check_all({"fresh_ce": 1.0, "frozen_ce": 2.0})["stale_phi_exploitation"] is False
+
+
 # ------------------------------------------------------------------- leakage estimator intent (§7)
 def _leak_frag():
     return {"obs": np.zeros(2, dtype=np.float32)}

@@ -25,11 +25,20 @@ optional inference-time add-on); every phase produces a usable artifact even if 
 > pools have ~nothing to conceal — the trainer now refuses them for β>0); watchdog baselines are
 > progress-matched (final-tail baselines false-halted every fresh L-run); readability eval got its
 > own sampling temperature; L-vs-N uses a paired team schedule; `leakage.clip_delta=false` gives
-> the telescoping (noise-immune) penalty estimator. Run every M3 cell at ≥3 seeds. The poke-engine
-> volume track is an adapter + fuzz harness only — budget the partial-observability wrapper as its
-> own project before counting on engine-scale M4 volume. Hardware: GTX 1080 (sm_61), CUDA torch
-> for what remains open (notably: real training throughput is UNMEASURED — measure decisions/sec
-> before committing to the M3 grid).
+> the telescoping (noise-immune) penalty estimator. Run every M3 cell at ≥3 seeds.
+>
+> **Completion pass (2026-07-05, same day):** the two audit follow-ups that were integral to M3's
+> validity are done. (1) **Generative team pool** — `data/teams/pool_gen`: 128 validator-clean
+> teams on the POOL-A species core with items/abilities/moves/spreads/tera sampled from the pinned
+> month's usage marginals (~89 bits/team hidden-info upper bound vs POOL-A's ~3;
+> `fog/scripts/build_generative_pool.py`, config `m3_leakage_gen.yaml`, priors.json extended with
+> ability/tera priors). (2) **Real training throughput MEASURED**: ~22–32 decisions/sec on the
+> actual belief-supervised loop (GTX 1080, `runs/throughput_probe_c1`) — the M3 grid is ≈ 40 h and
+> M4 ≈ 22 h of wall-clock, so the poke-engine partial-observability wrapper is **not required**
+> and stays deferred (adapter + fuzz harness only; its own project if the program ever 10×es).
+> `env.concurrent_battles: 8` measured no faster (Python env loop is the bottleneck), so keep 1 —
+> it's also the exact belief-truth source. Hardware: GTX 1080 (sm_61), CUDA torch installed. See
+> remains open.
 
 ## Layout
 
@@ -72,6 +81,7 @@ cd server/pokemon-showdown && node pokemon-showdown start --no-security   # port
 python -m fog.scripts.build_constants --showdown server/pokemon-showdown
 python -m fog.scripts.download_usage  --month 2026-06 --rating 1695
 python -m fog.scripts.build_team_pools --pool all    # validates POOL-A/B vs the pinned server
+python -m fog.scripts.build_generative_pool --n 128 --seed 0   # usage-sampled pool_gen (committed)
 ```
 
 ## Run the milestones (spec §10)
@@ -90,8 +100,10 @@ python -m fog.training.ppo  --config configs/m1_5_belief.yaml
 # M2  set-oracle ceiling (the action oracle is not online-trainable and fails loudly)
 python -m fog.training.ppo  --config configs/m2_oracle.yaml
 
-# M3  leakage grid on POOL-A — β=0 control FIRST (watchdog baselines), then one run per β,
-#     EVERY cell at >=3 seeds (--set seed=1 ... etc.) before quoting numbers
+# M3  leakage grid — β=0 control FIRST (watchdog baselines), then one run per β,
+#     EVERY cell at >=3 seeds (--set seed=1 ... etc.) before quoting numbers.
+#     Run on BOTH pools: m3_leakage.yaml (POOL-A, coherent hand-built sets) and
+#     m3_leakage_gen.yaml (pool_gen, ~89 bits hidden info — the entropy-scaled pool)
 python -m fog.training.ppo  --config configs/m3_leakage.yaml --set leakage.beta=0.0  log.dir=runs/m3_beta0
 python -m fog.training.ppo  --config configs/m3_leakage.yaml \
     --set leakage.beta=0.03 leakage.baseline_run=runs/m3_beta0 log.dir=runs/m3_beta003

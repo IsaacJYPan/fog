@@ -1,0 +1,59 @@
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance
+- Iron Head
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Psyshock
+- Make It Rain
+- Shadow Ball
+- Nasty Plot
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Hex
+- Dragon Darts
+- Shadow Ball
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Chilly Reception
+- Future Sight
+- Thunder Wave
+- Toxic
+
+Zamazenta @ lightclay
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Body Press
+- Close Combat
+- Crunch
+- Stone Edge

@@ -16,6 +16,9 @@ data/usage/*
 # Team pools: the hand-built PASTES are irreplaceable experiment definitions — TRACKED.
 # Only the derived packaged banks (regenerable via fog.scripts.build_team_pools) stay out.
 data/teams/*.json
+# ... except the generative bank's package: its _meta IS the provenance record (seed, mass cut,
+# core, per-slot entropy report) for the committed pool_gen pastes.
+!data/teams/pool_gen.json
 
 # Generated constants are TRACKED (small JSON, pinned provenance: Showdown commit + usage month in
 # configs/default.yaml::pins). Committing them removes a regeneration failure mode — the

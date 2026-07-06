@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+- Stealth Rock
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Iron Head
+- Low Kick
+- Swords Dance
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Nasty Plot
+- Psyshock
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Ghost
+EVs: 76 Atk / 180 SpA / 252 Spe
+Hasty Nature
+- Hex
+- Will-O-Wisp
+- Substitute
+- Flamethrower
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Ice Beam
+- Flamethrower
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Heavy Slam
+- Iron Defense
+- Body Press
+- Close Combat

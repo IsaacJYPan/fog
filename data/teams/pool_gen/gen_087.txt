@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Bulk Up
+- Close Combat
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Shadow Ball
+- Recover
+- Psyshock
+- Dazzling Gleam
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Flamethrower
+- Draco Meteor
+- Shadow Ball
+- U-turn
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Chilly Reception
+- Thunder Wave
+- Future Sight
+- Flamethrower
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Crunch
+- Iron Defense
+- Body Press
+- Stone Edge

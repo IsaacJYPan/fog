@@ -1,0 +1,59 @@
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Head Smash
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Low Kick
+- Swords Dance
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Make It Rain
+- Psyshock
+- Trick
+
+Dragapult @ lightclay
+Ability: clearbody
+Tera Type: Ghost
+EVs: 8 HP / 100 Def / 148 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Sucker Punch
+- Dragon Darts
+- U-turn
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 64 HP / 220 SpD / 224 Spe
+Timid Nature
+- Psychic Noise
+- Sludge Bomb
+- Future Sight
+- Chilly Reception
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 248 HP / 104 SpD / 156 Spe
+Jolly Nature
+- Ice Fang
+- Roar
+- Body Press
+- Crunch
