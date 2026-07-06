@@ -160,15 +160,17 @@ class FogPlayer:
             ).unsqueeze(0),
             "opp_revealed": _opp_revealed_to_torch(obs.opp_revealed, device=device),
         }
+        oracle_truth = None
         if self.oracle_truth_provider is not None:
             try:
-                truth = self.oracle_truth_provider(battle)
-                if truth is not None:
-                    batch["opp_truth_tokens"] = torch.as_tensor(
-                        np.asarray(truth), dtype=torch.long, device=device
-                    ).unsqueeze(0)
+                oracle_truth = self.oracle_truth_provider(battle)
             except Exception:
-                pass
+                oracle_truth = None
+            if oracle_truth is not None:
+                oracle_truth = np.asarray(oracle_truth, dtype=np.int64)
+                batch["opp_truth_tokens"] = torch.as_tensor(
+                    oracle_truth, dtype=torch.long, device=device
+                ).unsqueeze(0)
 
         with torch.no_grad():
             out = self.agent(batch)
@@ -186,6 +188,14 @@ class FogPlayer:
                 "opp_revealed": obs.opp_revealed,
                 "turn": np.int64(getattr(battle, "turn", 0) or 0),
             }
+            if self.oracle_truth_provider is not None:
+                # The update-time forward must see what the acting forward saw (acting with truth
+                # but updating without silently breaks the PPO ratio). Key always present so frag
+                # structure is batch-constant; -1 rows merge to "no truth" in apply_set_oracle.
+                frag["opp_truth_tokens"] = (
+                    oracle_truth if oracle_truth is not None
+                    else np.full((6, 9), -1, dtype=np.int64)
+                )
             mirror = self._mirror(battle, obs, ledger)
             if mirror is not None:
                 mirror_frag, my_view = mirror
@@ -294,6 +304,12 @@ class FogPlayer:
             import torch
 
             mirror_frag, my_view = mirror
+            # Structure-preserving zero mirror (mid-game mirror failure): all labels are -1, its CE
+            # is 0 by construction, and differencing a real CE against it fabricates a large ΔI
+            # spike. No labels -> no measurement; the buffer forward-fills the gap.
+            sp_labels = np.asarray((my_view.get("labels") or {}).get("species", -1))
+            if not (sp_labels >= 0).any():
+                return None
             mb = {
                 "entities": _t1(mirror_frag["entities"], torch.float32, device),
                 "entity_ids": _t1(mirror_frag["entity_ids"], torch.long, device),

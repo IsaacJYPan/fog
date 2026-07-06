@@ -15,14 +15,21 @@ reading what the opponent conceals while controlling what you reveal of your own
 **Design constraints:** no LLM inference during battles; no search inside the training loop (search is an
 optional inference-time add-on); every phase produces a usable artifact even if the project stops there.
 
-> **Status (2026-07-05): code complete and the leakage experiment is VALID** — a review pass found
-> and fixed the defect that would have voided M3 (the self-belief measurer was never trained in
-> self-play; Φ̂ froze random weights), plus the full list of execution gaps (frozen probe = backbone
-> + head pair, final-step ΔI, live watchdogs with control-run baselines, readability/L-vs-N/Pareto
-> eval drivers, live team preview, per-battle state, encoder fidelity + golden-battle test, pools at
-> 8/16, poke-engine adapter). CUDA torch is installed (note: the GPU is a GTX 1080, not the 3070
-> older notes claimed). The remaining work is compute — run the milestones below in order. See
-> for the remaining (non-blocking) approximations.
+> **Status (2026-07-05, post-audit fix pass):** an end-to-end audit found that "code complete" was
+> wrong in the same way it had been once before — config-level experiment intent that the training
+> loop never wired up, plus a structural pool/experiment mismatch. All findings are FIXED:
+> belief-truth now comes from the recording teambuilder (the species-multiset matcher was
+> permanently ambiguous on POOL-A and silently disabled belief supervision there); the M2 set
+> oracle is actually wired in training (it silently trained an N-agent before; the action oracle
+> now fails loudly — it is not online-trainable); M3 runs on POOL-A, not pool_b (unique-species
+> pools have ~nothing to conceal — the trainer now refuses them for β>0); watchdog baselines are
+> progress-matched (final-tail baselines false-halted every fresh L-run); readability eval got its
+> own sampling temperature; L-vs-N uses a paired team schedule; `leakage.clip_delta=false` gives
+> the telescoping (noise-immune) penalty estimator. Run every M3 cell at ≥3 seeds. The poke-engine
+> volume track is an adapter + fuzz harness only — budget the partial-observability wrapper as its
+> own project before counting on engine-scale M4 volume. Hardware: GTX 1080 (sm_61), CUDA torch
+> for what remains open (notably: real training throughput is UNMEASURED — measure decisions/sec
+> before committing to the M3 grid).
 
 ## Layout
 
@@ -80,11 +87,11 @@ python -m fog.env.runner    --config configs/m0_plumbing.yaml
 python -m fog.training.ppo  --config configs/m1_poc.yaml
 # M1.5 belief-net conditioning on the hidden-pool
 python -m fog.training.ppo  --config configs/m1_5_belief.yaml
-# M2  oracle ceilings (set / action)
+# M2  set-oracle ceiling (the action oracle is not online-trainable and fails loudly)
 python -m fog.training.ppo  --config configs/m2_oracle.yaml
-python -m fog.training.ppo  --config configs/m2_oracle.yaml --set model.oracle=action
 
-# M3  leakage grid — β=0 control FIRST (it provides watchdog baselines), then one run per β
+# M3  leakage grid on POOL-A — β=0 control FIRST (watchdog baselines), then one run per β,
+#     EVERY cell at >=3 seeds (--set seed=1 ... etc.) before quoting numbers
 python -m fog.training.ppo  --config configs/m3_leakage.yaml --set leakage.beta=0.0  log.dir=runs/m3_beta0
 python -m fog.training.ppo  --config configs/m3_leakage.yaml \
     --set leakage.beta=0.03 leakage.baseline_run=runs/m3_beta0 log.dir=runs/m3_beta003
@@ -114,9 +121,9 @@ python -m fog.scripts.fuzz_sim --games 200 --pool data/teams/pool_b
 |---|---|
 | **M0** Plumbing | ≥3 battles/sec aggregate (measured **13.3** at 8 workers) |
 | **M1** PoC (POOL-A), policy/value only | beats MaxDamage ≥75%, SimpleHeuristics ≥60% |
-| **M1.5** Belief-net conditioning | ≥80% top-1 team id by turn 4; `b_vec` conditioning ≥3% win-rate gain |
-| **M2** Set-/action-oracle ceilings | oracle ≥ N-agent; record gaps |
-| **M3** Leakage experiment (β grid) | full §7 grid; readability + win-rate per cell |
+| **M1.5** Belief-net conditioning | ≥80% top-1 team id by turn 4; `b_vec` conditioning ≥3% win-rate gain — this gate is the payoff channel for all of M3: if belief conditioning doesn't move win-rate, concealment has nothing to deny |
+| **M2** Set-oracle ceiling | oracle ≥ N-agent; record the gap (action oracle: offline pathway only, unimplemented) |
+| **M3** Leakage experiment (β grid) | full §7 grid on POOL-A, ≥3 seeds/cell; readability + win-rate per cell |
 | **M4** Open Gen 9 OU (BC → self-play) | BC top-1 ≥45%; post-self-play ≥80% vs SimpleHeuristics |
 | **M5** Search add-on + final eval | §8 determinized search; §9 gauntlet/Elo/closure |
 

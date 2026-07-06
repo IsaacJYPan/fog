@@ -1,14 +1,23 @@
 """Ground-truth team labels for self-play belief supervision (spec §3.2, §5, §6).
 
 In self-play the simulator provides both full teams, so belief targets are the opponent's TRUE set
-(not just what leaked). We obtain that truth by matching a finished battle's revealed opponent species
-against the known team pool: within a small pool the 6-species multiset is effectively unique, so the
-match recovers the full team including its still-hidden items/moves/spreads/tera.
+(not just what leaked). The PREFERRED truth source is the recording `PoolTeambuilder` (env/teams.py):
+the trainer sampled the opponent's team, so with sequential battles it simply knows the paste — no
+inference. The matchers here are the fallback for concurrent battles and the progressive source for
+the eval-time set oracle:
+
+  * `match(revealed_species)` — unique species-multiset containment. Sufficient on species-distinct
+    pools (POOL-B) but PERMANENTLY AMBIGUOUS on shared-species pools (POOL-A, where all teams share
+    the same 6 species by design) — it returns None there for every battle. Do not rely on it for
+    training supervision; that mistake once disabled belief training on exactly the pool where sets
+    are hidden.
+  * `match_views(views)` — consistency match over ALL revealed attributes (species + item/ability/
+    moves/tera per slot, injective slot assignment). Disambiguates shared-species pools once any
+    set-distinguishing attribute is revealed.
 
 `truth_tokens_from_paste` parses a Showdown paste into the C1 token layout [6, 9] (SLOT_ATTRS order),
-with spread mapped to its nearest generated cluster. `PoolTruth` indexes a pool for battle-end lookup.
-Unmatched battles return None -> the caller falls back to censored (end-of-battle-revealed) labels,
-which are always available.
+with spread mapped to its nearest generated cluster. Unmatched battles return None -> the caller
+falls back to censored labels (no supervision for that game).
 """
 from __future__ import annotations
 
@@ -77,15 +86,21 @@ def truth_tokens_from_paste(paste: str, tables) -> np.ndarray:
 
 
 class PoolTruth:
-    """Match a finished battle's opponent to its pool team by revealed-species multiset."""
+    """Match a battle's opponent to its pool team (see module docstring for which matcher to use)."""
 
     def __init__(self, pool_pastes: list[str], tables) -> None:
+        from fog.constants.schema import NO_ITEM
+
         self.tables = tables
         self._truth = [truth_tokens_from_paste(p, tables) for p in pool_pastes]
         self._species: list[Counter] = [Counter(t[:, 0].tolist()) for t in self._truth]
+        self._no_item = tables.item_index(NO_ITEM)
 
     def match(self, revealed_species_idx: list[int]) -> np.ndarray | None:
-        """Return [6,9] truth for the unique pool team containing all revealed species, else None."""
+        """Return [6,9] truth for the unique pool team containing all revealed species, else None.
+
+        WARNING: always None on shared-species pools (POOL-A) — prefer `match_views`/`match_battle`.
+        """
         want = Counter(s for s in revealed_species_idx if s >= 0)
         if not want:
             return None
@@ -93,6 +108,75 @@ class PoolTruth:
             i for i, sp in enumerate(self._species) if all(sp.get(k, 0) >= v for k, v in want.items())
         ]
         return self._truth[candidates[0]].copy() if len(candidates) == 1 else None
+
+    def match_views(self, views) -> np.ndarray | None:
+        """[6,9] truth for the UNIQUE pool team consistent with the revealed per-slot views, else None.
+
+        A team is consistent when the revealed slots admit an injective assignment onto its slots with
+        species equal and every revealed attribute matching: item (skipping `<NO_ITEM>` — knock-off /
+        consumption leaves the view at <NO_ITEM> while the sheet keeps the original item), ability,
+        tera type, and revealed moves ⊆ the slot's moveset.
+        """
+        revealed = [v for v in views if v.species is not None and int(v.species) >= 0]
+        if not revealed:
+            return None
+        candidates = [i for i, t in enumerate(self._truth) if self._consistent(revealed, t)]
+        return self._truth[candidates[0]].copy() if len(candidates) == 1 else None
+
+    def match_battle(self, battle) -> np.ndarray | None:
+        """`match_views` over the battle's current opponent information state (progressive: call it
+        any turn; returns truth once the reveals disambiguate). The eval set-oracle path."""
+        from fog.encoding.reveals import opponent_views_from_battle
+
+        return self.match_views(opponent_views_from_battle(battle, self.tables))
+
+    def hidden_info_warning(self) -> str | None:
+        """None when the pool conceals something; else a message explaining why a leakage run on this
+        pool is structurally vacuous: if every team's species multiset is unique, team preview alone
+        identifies the exact team, the probe memorizes the species->set mapping, still-hidden CE
+        collapses to ~0 and the β penalty multiplies nothing."""
+        multisets = [tuple(sorted(c.items())) for c in self._species]
+        if len(set(multisets)) == len(multisets):
+            return (
+                "every team in this pool has a UNIQUE species multiset: preview identifies the team "
+                "at turn 0 and there is (almost) no hidden information to conceal. Use a shared-"
+                "species set-variant pool (POOL-A style) for belief/leakage experiments."
+            )
+        return None
+
+    def _slot_consistent(self, view, row: np.ndarray) -> bool:
+        if int(row[0]) != int(view.species):
+            return False
+        if (
+            view.item is not None and int(view.item) != self._no_item
+            and row[1] >= 0 and int(view.item) != int(row[1])
+        ):
+            return False
+        if view.ability is not None and row[2] >= 0 and int(view.ability) != int(row[2]):
+            return False
+        if view.tera is not None and row[8] >= 0 and int(view.tera) != int(row[8]):
+            return False
+        sheet_moves = {int(m) for m in row[3:7] if m >= 0}
+        if sheet_moves and any(int(m) not in sheet_moves for m in view.moves):
+            return False
+        return True
+
+    def _consistent(self, views, truth: np.ndarray) -> bool:
+        """Injective assignment of revealed views onto team slots (backtracking; <=6x6)."""
+        used = [False] * truth.shape[0]
+
+        def rec(i: int) -> bool:
+            if i == len(views):
+                return True
+            for j in range(truth.shape[0]):
+                if not used[j] and self._slot_consistent(views[i], truth[j]):
+                    used[j] = True
+                    if rec(i + 1):
+                        return True
+                    used[j] = False
+            return False
+
+        return rec(0)
 
 
 def revealed_opponent_species(battle, tables) -> list[int]:

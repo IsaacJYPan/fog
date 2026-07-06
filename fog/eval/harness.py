@@ -29,8 +29,10 @@ def _fog_from_ckpt(ckpt: str, fmt: str, team, cfg: dict, device, oracle_pool=Non
     from fog.env.player import FogPlayer, unique_account
     from fog.models.agent import FogAgent
 
-    # "oracle-set:<ckpt>" — the same checkpoint played as a READING opponent (§9: a gauntlet entry
-    # where concealment demonstrably matters): belief net fed the pool-matched opponent truth.
+    # "oracle-set:<ckpt>" — the same checkpoint played with truth injected. NOTE what this measures:
+    # the VALUE OF THE CONCEALED INFORMATION (an upper bound on what any reader could gain), not the
+    # payoff of concealment — the oracle is handed the truth, so nothing the other side does
+    # behaviorally can deny it. Concealment's payoff channel is a LEARNED reader (§7a L-vs-N).
     if ckpt.startswith("oracle-set:"):
         ckpt = ckpt[len("oracle-set:"):]
         cfg = copy.deepcopy(cfg)
@@ -40,14 +42,15 @@ def _fog_from_ckpt(ckpt: str, fmt: str, team, cfg: dict, device, oracle_pool=Non
     agent.load_state_dict(torch.load(ckpt, map_location=device))
     agent.eval()
     adapter = FogPlayer(agent, temperature=cfg.get("eval", {}).get("temperature", 0.0))
-    # set-oracle ceiling: feed the belief net the opponent's true team, matched from the pool by
-    # revealed species (progressively perfect — full truth once the multiset resolves uniquely).
+    # set-oracle ceiling: truth from the pool via attribute-consistency matching (progressive; also
+    # disambiguates shared-species pools like POOL-A once any set-distinguishing attr is revealed —
+    # the old species-only matcher was permanently ambiguous there and the oracle never fired).
     if agent.oracle in ("set", "action") and oracle_pool:
         from fog.constants.tables import TABLES
-        from fog.env.team_truth import PoolTruth, revealed_opponent_species
+        from fog.env.team_truth import PoolTruth
 
         pt = PoolTruth(oracle_pool, TABLES)
-        adapter.oracle_truth_provider = lambda b: pt.match(revealed_opponent_species(b, TABLES))
+        adapter.oracle_truth_provider = pt.match_battle
     return adapter.build(
         battle_format=fmt, max_concurrent_battles=1,
         account_configuration=unique_account("foge"), team=team,
@@ -68,16 +71,25 @@ async def _play(p1, p2, n: int) -> tuple[int, int]:
     return p1.n_won_battles, p1.n_finished_battles
 
 
-def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, device=None) -> tuple[int, int]:
-    """Play n_games between two specs. Returns (a_wins, finished). team_pool = list of pastes."""
+def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, device=None,
+              paired: bool = False) -> tuple[int, int]:
+    """Play n_games between two specs. Returns (a_wins, finished). team_pool = list of pastes.
+
+    `paired=True` plays each sampled team matchup twice with sides swapped (shared-schedule
+    teambuilders) — the variance-reduction design for head-to-head comparisons like §7a L-vs-N,
+    where on a small pool the team matchup, not the policy, dominates single-game outcomes.
+    """
     import torch
 
-    from fog.env.teams import make_pool_teambuilder
+    from fog.env.teams import make_paired_teambuilders, make_pool_teambuilder
 
     cfg = cfg or {}
     device = device or torch.device("cpu")
-    team_a = make_pool_teambuilder(team_pool, seed=1) if team_pool else None
-    team_b = make_pool_teambuilder(team_pool, seed=2) if team_pool else None
+    if team_pool and paired:
+        team_a, team_b = make_paired_teambuilders(team_pool, n_games, seed=1)
+    else:
+        team_a = make_pool_teambuilder(team_pool, seed=1) if team_pool else None
+        team_b = make_pool_teambuilder(team_pool, seed=2) if team_pool else None
     # set-oracle agents on either side read the other's team truth from the shared pool
     a = build_player(spec_a, fmt, team_a, cfg, device, oracle_pool=team_pool)
     b = build_player(spec_b, fmt, team_b, cfg, device, oracle_pool=team_pool)

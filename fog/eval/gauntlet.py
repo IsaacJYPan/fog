@@ -40,8 +40,11 @@ def run_gauntlet(
     """Run `games_per` games of `ckpt` vs each baseline (+ optional BC checkpoint). Wilson CIs (§9).
 
     `ckpt`/`bc_ckpt` are checkpoint paths; `team_pool` a list of pastes (required for gen9ou).
-    `include_reading_opponent` adds the same checkpoint as a set-oracle opponent — a gauntlet entry
-    that actually USES reads, so concealment (§7) has a measurable payoff in win-rate.
+    `include_reading_opponent` adds the same checkpoint as a set-oracle opponent. What that entry
+    measures is the VALUE OF THE CONCEALED INFORMATION (an upper bound on any reader's gain): the
+    oracle is handed the truth, so concealment cannot deny it and this number is insensitive to
+    concealment by construction. The payoff of concealment is measured against a LEARNED reader
+    (§7a L-vs-N), not here.
     """
     from fog.eval.harness import run_match
 

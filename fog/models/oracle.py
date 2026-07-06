@@ -23,18 +23,25 @@ from fog.constants.schema import N_ACTIONS
 
 
 def apply_set_oracle(opp_revealed: dict, opp_truth_tokens) -> dict:
-    """Return an opp_revealed dict with tokens replaced by full truth (epistemic = all known).
+    """Return an opp_revealed dict with tokens replaced by truth where known (epistemic = known).
 
-    `opp_truth_tokens`: [B,6,9] (or [6,9]) ground-truth opponent tokens. Masks are dropped — with full
-    truth every attribute is clamped, so the belief net just re-emits the truth (the b_vec is then a
-    perfect-information summary). Works for both the batched model path and single observations.
+    `opp_truth_tokens`: [B,6,9] (or [6,9]) ground-truth opponent tokens, -1 where truth is
+    unavailable (e.g. a decision recorded before the attribute-matcher disambiguated, or a batch row
+    without truth). Truth MERGES over the revealed tokens — a -1 truth attribute keeps whatever the
+    battle revealed, so "no truth" degrades exactly to the non-oracle input instead of blanking real
+    information. Masks are dropped: with truth clamped the belief net re-emits it (b_vec becomes a
+    perfect-information summary). Works for the batched model path and single observations.
     """
     tokens = opp_truth_tokens
     if isinstance(tokens, np.ndarray):
         tokens = torch.as_tensor(tokens, dtype=torch.long)
     if tokens.ndim == 2:
         tokens = tokens.unsqueeze(0)
-    return {"tokens": tokens.to(_ref_device(opp_revealed)), "masks": {}}
+    tokens = tokens.to(_ref_device(opp_revealed))
+    revealed = (opp_revealed or {}).get("tokens")
+    if isinstance(revealed, torch.Tensor) and revealed.shape == tokens.shape:
+        tokens = torch.where(tokens >= 0, tokens, revealed)
+    return {"tokens": tokens, "masks": {}}
 
 
 def _ref_device(opp_revealed: dict):

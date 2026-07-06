@@ -255,15 +255,38 @@ async def _train_async(cfg: dict) -> dict:
     batch_decisions = int(ppo_cfg.get("batch_decisions", 16_000))
     games_per_chunk = int(ppo_cfg.get("games_per_chunk", 8))
     lr = float(ppo_cfg.get("lr", 1e-4))
-    beta = float(cfg.get("leakage", {}).get("beta", 0.0))
+    leak_cfg = cfg.get("leakage", {})
+    beta = float(leak_cfg.get("beta", 0.0))
+    concurrent = int(env_cfg.get("concurrent_battles", 1))
     snap_every = int(cfg.get("league", {}).get("snapshot_every_decisions", 200_000))
     ckpt_dir = Path(cfg.get("log", {}).get("dir", "runs")) / "checkpoints"
     ckpt_dir.mkdir(parents=True, exist_ok=True)
 
+    oracle_mode = str(cfg.get("model", {}).get("oracle", "none"))
+    if oracle_mode == "action":
+        raise NotImplementedError(
+            "model.oracle=action cannot be trained in the online loop: the opponent's committed "
+            "action is not observable at decision time (Showdown resolves choices simultaneously). "
+            "The action-oracle ceiling needs an offline/replay pathway (spec §3.4); failing loudly "
+            "here beats silently training an N-agent and reporting a fake ~0 oracle gap."
+        )
+    if oracle_mode == "set" and pool_teams is None:
+        raise ValueError(
+            "model.oracle=set requires env.team_pool — the truth tokens come from the sampled "
+            "pool teams (recording teambuilder / attribute match)."
+        )
+
     agent = FogAgent.from_tables(cfg).to(device)
     opt = torch.optim.AdamW(agent.parameters(), lr=lr)
     league = League(snapshot_every_decisions=snap_every)
-    buf = RolloutBuffer(gamma=ppo_cfg.get("gamma", 1.0), lam=ppo_cfg.get("lam", 0.95), beta=beta)
+    # leakage.clip_delta: True = per-step max(0, ΔI) (§7 default); False = signed ΔI, whose per-game
+    # sum TELESCOPES to CE_first − CE_final — immune to the clipped estimator's CE-noise bias
+    # (E[Σ max(0,ΔI)] grows with probe-CE variance even at zero net reveal). Run at least one β cell
+    # with clip_delta=false as the estimator ablation.
+    buf = RolloutBuffer(
+        gamma=ppo_cfg.get("gamma", 1.0), lam=ppo_cfg.get("lam", 0.95), beta=beta,
+        clip_deltas=bool(leak_cfg.get("clip_delta", True)),
+    )
     dash = _Dashboard(cfg.get("log", {}).get("dir", "runs"))
 
     # BC anchor (KL penalty, §6): freeze a copy of the BC/initial policy to anchor early self-play.
@@ -277,7 +300,6 @@ async def _train_async(cfg: dict) -> dict:
     # entropy decay + leakage Φ̂ refreeze schedule (§7)
     entropy0 = float(ppo_cfg.get("entropy_coef", 0.01))
     entropy_decay_to = float(ppo_cfg.get("entropy_coef_final", entropy0))
-    leak_cfg = cfg.get("leakage", {})
     refreeze_every = int(leak_cfg.get("refreeze_every_decisions", 100_000))
     watchdog = None
     if beta > 0:
@@ -311,20 +333,46 @@ async def _train_async(cfg: dict) -> dict:
         # Φ̂ = frozen (backbone + self-belief) pair — freezing only the head leaves the reward a
         # function of the live trunk (staleness/OOD hole; see models/probe.py).
         adapter.phi_hat = FrozenProbe.from_agent(agent).to(device)
-    # self-play belief supervision: match the finished opponent to its pool team for full-truth labels
-    if pool_teams is not None and cfg.get("loss", {}).get("belief_coef", 1.0) > 0:
+    # Ground truth for belief supervision (§3.2) + the set oracle (§3.4). The EXACT source is the
+    # recording teambuilder — the trainer sampled the opponent's team, so with sequential battles it
+    # simply knows the paste. Species-multiset matching is only the concurrent-battles fallback: it
+    # is permanently ambiguous on shared-species pools (POOL-A), which once silently disabled belief
+    # supervision on exactly the pool where sets are hidden (audit 2026-07-05).
+    current_opp_tb: dict[str, object] = {"tb": None}   # set per chunk in the rollout loop
+    opp_teambuilders: dict[str, object] = {}
+    if pool_teams is not None:
         from fog.constants.tables import TABLES
-        from fog.env.team_truth import PoolTruth, revealed_opponent_species
+        from fog.env.team_truth import PoolTruth, truth_tokens_from_paste
 
         pool_truth = PoolTruth(pool_teams, TABLES)
+        _paste_tokens: dict[str, "np.ndarray"] = {}
 
         def _truth(battle):
-            return pool_truth.match(revealed_opponent_species(battle, TABLES))
+            tb = current_opp_tb.get("tb")
+            paste = getattr(tb, "last_paste", None) if tb is not None else None
+            if concurrent == 1 and paste is not None:
+                tok = _paste_tokens.get(paste)
+                if tok is None:
+                    tok = _paste_tokens[paste] = truth_tokens_from_paste(paste, TABLES)
+                return tok.copy()
+            return pool_truth.match_battle(battle)   # attribute match; None until unambiguous
 
         adapter.truth_provider = _truth
+        if oracle_mode == "set":
+            adapter.oracle_truth_provider = _truth
+
+        if beta > 0:
+            # Oxygen check (§7): a leakage run needs concealable information. On a pool whose
+            # species multisets are all unique, preview identifies the team at turn 0 and β is inert.
+            warning = pool_truth.hidden_info_warning()
+            if warning and not leak_cfg.get("allow_unique_species_pool", False):
+                raise ValueError(
+                    f"leakage run (beta={beta}) on {team_pool_path}: {warning} "
+                    "Override with leakage.allow_unique_species_pool=true if this is intentional."
+                )
     me = adapter.build(
         battle_format=fmt,
-        max_concurrent_battles=1,
+        max_concurrent_battles=concurrent,
         account_configuration=unique_account("fogppo"),
         team=team_for(1),
     )
@@ -341,21 +389,26 @@ async def _train_async(cfg: dict) -> dict:
         name = str(spec)
         if name in scripted_classes:
             if name not in scripted_instances:
+                tb = team_for(2)
+                opp_teambuilders[name] = tb
                 scripted_instances[name] = scripted_classes[name](
                     battle_format=fmt,
+                    max_concurrent_battles=concurrent,
                     account_configuration=unique_account("fogscr"),
-                    team=team_for(2),
+                    team=tb,
                 )
             return scripted_instances[name]
         if name not in ckpt_opponents:  # a checkpoint Path: frozen past self
             frozen = FogAgent.from_tables(cfg).to(device)
             frozen.load_state_dict(torch.load(spec, map_location=device))
             frozen.eval()
+            tb = team_for(3)
+            opp_teambuilders[name] = tb
             ckpt_opponents[name] = FogPlayer(frozen).build(
                 battle_format=fmt,
-                max_concurrent_battles=1,
+                max_concurrent_battles=concurrent,
                 account_configuration=unique_account("fogpast"),
-                team=team_for(3),
+                team=tb,
             )
         return ckpt_opponents[name]
 
@@ -371,6 +424,7 @@ async def _train_async(cfg: dict) -> dict:
         opp_spec = league.sample_opponent()
         opp_name = str(opp_spec) if str(opp_spec) in scripted_classes else Path(str(opp_spec)).stem
         opponent = get_opponent(opp_spec)
+        current_opp_tb["tb"] = opp_teambuilders.get(str(opp_spec))
         won0, fin0 = me.n_won_battles, me.n_finished_battles
         await me.battle_against(opponent, n_battles=games_per_chunk)
         dw, df = me.n_won_battles - won0, me.n_finished_battles - fin0
@@ -438,6 +492,10 @@ async def _train_async(cfg: dict) -> dict:
                 flush=True,
             )
             if watchdog is not None:
+                # baselines from the control run at MATCHED progress: comparing a fresh run's early
+                # win-rate/entropy against the control's FINAL values false-fires both diversity
+                # conditions on the first update of every L-run.
+                watchdog.update_to(decisions_seen)
                 flags = watchdog.check_all(metrics)
                 if any(flags.values()):
                     print(f"[ppo] WATCHDOG {flags} — HALTING for inspection (§7/§10).", flush=True)

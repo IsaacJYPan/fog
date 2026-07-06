@@ -22,6 +22,11 @@ loss:
 log:
   dir: runs/bc_ou
 gate:
+  # CAUTION: replay legality masks are reconstructed from public state (~3.5 legal actions/row, so
+  # random guessing scores ~29% — the 0.45 threshold was implicitly calibrated for a ~9-option
+  # request-based action space). Judge BC by action_top1 TOGETHER WITH avg_legal_actions and
+  # action_top1_lift (chance-normalized; 1.0 = random over the reconstructed mask), all logged by
+  # training/bc.py.
   action_top1: 0.45
   belief_item_top1_prereveal: 0.55
   vs_simple_heuristics: 0.65

@@ -114,8 +114,10 @@ def collect_trajectories(ckpt: str, opponent: str, n_games: int, fmt: str, team_
     """Play `n_games` of `ckpt` vs `opponent`, recording mirror observations + case studies.
 
     Returns (batch, case_studies): `batch` is a RolloutBuffer batch whose `opp_view`/`turn` fields
-    feed probe training; the policy plays at eval temperature (cfg eval.temperature, default 1.0 —
-    KEEP sampling on: readability of the greedy policy is a different, narrower question).
+    feed probe training. The policy samples at `eval.readability.temperature` (default 1.0) — NOT
+    the global `eval.temperature` (typically 0.0 for greedy gauntlets): readability and reveal-order
+    entropy of a deterministic policy are different, much narrower quantities, and the global greedy
+    setting silently poisoned this measurement once.
     """
     import torch
 
@@ -132,7 +134,8 @@ def collect_trajectories(ckpt: str, opponent: str, n_games: int, fmt: str, team_
 
     buf = RolloutBuffer()
     cases = CaseStudies()
-    adapter = FogPlayer(agent, temperature=float(cfg.get("eval", {}).get("temperature", 1.0)))
+    rd_temp = float(cfg.get("eval", {}).get("readability", {}).get("temperature", 1.0))
+    adapter = FogPlayer(agent, temperature=rd_temp)
     adapter.attach_buffer(buf)
     adapter.on_battle_end = cases.extend_from_battle
     me = adapter.build(
@@ -263,11 +266,15 @@ def _print_readability(r: dict) -> None:
 
 
 def lvn_match(ckpt_l: str, ckpt_n: str, n_games: int, fmt: str, team_pool, cfg: dict) -> dict:
-    """§7a headline: L-agent vs N-agent head-to-head with a Wilson CI."""
+    """§7a headline: L-agent vs N-agent head-to-head with a Wilson CI.
+
+    Paired design: each sampled team matchup is played twice with sides swapped, so the team-matchup
+    lottery (which dominates single games on a small pool) cancels out of the comparison.
+    """
     from fog.eval.harness import run_match
     from fog.eval.stats import wilson_interval
 
-    wins, finished = run_match(ckpt_l, ckpt_n, n_games, fmt, team_pool=team_pool, cfg=cfg)
+    wins, finished = run_match(ckpt_l, ckpt_n, n_games, fmt, team_pool=team_pool, cfg=cfg, paired=True)
     iv = wilson_interval(wins, finished)
     warn = "" if finished >= 1000 else "  [insufficient n: <1000, do not conclude]"
     print(f"L vs N: {wins}/{finished} = {iv.point:.3f} [{iv.low:.3f}, {iv.high:.3f}]{warn}")

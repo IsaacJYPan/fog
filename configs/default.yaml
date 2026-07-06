@@ -16,9 +16,13 @@ pins:
 env:
   server_url: "ws://localhost:8000/showdown/websocket"
   battle_format: "gen9ou"
-  num_workers: 8               # N parallel Node Showdown processes
+  num_workers: 8               # N parallel Node Showdown processes (M0 throughput probe)
   no_security: true            # local server flag for throughput
   team_pool: null              # path to a parsed team bank; null = format default
+  # Concurrent battles per player during TRAINING (poke-env max_concurrent_battles). Per-battle
+  # state is keyed by battle_tag so >1 is safe; note >1 switches belief-truth from the exact
+  # recording-teambuilder source to attribute matching (labels missing until reveals disambiguate).
+  concurrent_battles: 1
 
 # --- Encoding (§2) ---------------------------------------------------------------------------------
 encoding:

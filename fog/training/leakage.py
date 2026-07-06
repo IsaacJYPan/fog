@@ -55,9 +55,21 @@ def delta_information(phi_hat, obs_before: dict, obs_after: dict) -> torch.Tenso
     return ce_before - ce_after
 
 
-def shaped_reward(terminal_reward: float, delta_I: torch.Tensor, beta: float) -> torch.Tensor:
-    """r_t = r_game_terminal − β · max(0, ΔI_t). Real."""
-    return terminal_reward - beta * torch.clamp(delta_I, min=0.0)
+def shaped_reward(
+    terminal_reward: float, delta_I: torch.Tensor, beta: float, clip: bool = True
+) -> torch.Tensor:
+    """r_t = r_game_terminal − β · max(0, ΔI_t)  (clip=True, §7 default).
+
+    clip=False uses the signed ΔI: the per-game sum then TELESCOPES to CE_first − CE_final, so the
+    total penalty is exactly the net readability handed over, credit-assigned to the step where it
+    happened. The clipped estimator instead accumulates every upward CE fluctuation — its
+    expectation grows with probe-CE variance even at zero net reveal, and it rewards *smooth*
+    (predictable-early) CE trajectories over spiky ones. Run at least one β cell unclipped
+    (leakage.clip_delta=false) as the estimator ablation; the clip's rationale ("can't earn by
+    becoming less known") bounds the unclipped credit at total CE anyway.
+    """
+    penalty = torch.clamp(delta_I, min=0.0) if clip else delta_I
+    return terminal_reward - beta * penalty
 
 
 @dataclass
@@ -70,7 +82,7 @@ class DegenerateSolutionWatchdog:
     policy as the >2σ regression rule, spec §10).
     """
 
-    # baselines (from the β=0 control at matched training progress)
+    # baselines (from the β=0 control at matched training progress — see update_to)
     baseline_win_rate: float = 0.5
     baseline_move_entropy: float = 0.0
     baseline_game_length: float = 0.0
@@ -83,10 +95,12 @@ class DegenerateSolutionWatchdog:
 
     @classmethod
     def from_control_run(cls, log_dir, tail_rows: int = 10) -> "DegenerateSolutionWatchdog":
-        """Baselines from a finished β=0 control run's metrics.csv (mean of the last `tail_rows`).
+        """Load a finished β=0 control run's full metrics.csv and start with final-tail baselines.
 
-        Reads the win_rate / move_entropy (falls back to entropy) / avg_game_length columns written
-        by training/ppo.py's dashboard.
+        Call `update_to(decisions)` before each check so the baselines come from the control at
+        MATCHED training progress: a fresh L-run's first update naturally sits well below the
+        control's FINAL win-rate and above its FINAL (decayed) entropy — comparing against the tail
+        false-fires both diversity-spike conditions on update one.
         """
         import csv
         from pathlib import Path
@@ -94,22 +108,55 @@ class DegenerateSolutionWatchdog:
         path = Path(log_dir)
         csv_path = path if path.suffix == ".csv" else path / "metrics.csv"
         with open(csv_path, encoding="utf-8") as f:
-            rows = list(csv.DictReader(f))
-        tail = rows[-tail_rows:]
-        if not tail:
+            raw = list(csv.DictReader(f))
+        if not raw:
             raise ValueError(f"no metric rows in {csv_path}")
 
+        rows: list[tuple[int, dict]] = []
+        for r in raw:
+            try:
+                rows.append((int(float(r.get("step", 0))), r))
+            except (TypeError, ValueError):
+                continue
+        rows.sort(key=lambda x: x[0])
+
+        wd = cls()
+        wd._control_rows = rows
+        wd._tail_rows = tail_rows
+        wd.update_to(None)
+        return wd
+
+    def update_to(self, decisions: int | None, window: int = 5) -> "DegenerateSolutionWatchdog":
+        """Set baselines from the control rows at matched progress (`decisions` seen so far).
+
+        None -> final tail (legacy behavior). Earlier than the control's first row -> its first
+        `window` rows (the closest available match). No-op when constructed without a control run.
+        """
+        rows = getattr(self, "_control_rows", None)
+        if not rows:
+            return self
+        if decisions is None:
+            sel = rows[-getattr(self, "_tail_rows", 10):]
+        else:
+            upto = [r for r in rows if r[0] <= decisions]
+            sel = upto[-window:] if upto else rows[:window]
+
         def col(name: str, fallback: str | None = None) -> float:
-            key = name if name in tail[0] else (fallback if fallback and fallback in tail[0] else None)
+            key = name if name in sel[0][1] else (fallback if fallback and fallback in sel[0][1] else None)
             if key is None:
                 return 0.0
-            return float(sum(float(r[key]) for r in tail) / len(tail))
+            vals = []
+            for _, r in sel:
+                try:
+                    vals.append(float(r[key]))
+                except (TypeError, ValueError, KeyError):
+                    pass
+            return float(sum(vals) / len(vals)) if vals else 0.0
 
-        return cls(
-            baseline_win_rate=col("win_rate"),
-            baseline_move_entropy=col("move_entropy", "entropy"),
-            baseline_game_length=col("avg_game_length"),
-        )
+        self.baseline_win_rate = col("win_rate")
+        self.baseline_move_entropy = col("move_entropy", "entropy")
+        self.baseline_game_length = col("avg_game_length")
+        return self
 
     def check_move_diversity_spike(self, metrics: dict) -> bool:
         """Refusing to attack with revealing moves at the cost of tempo shows up as a win-rate crash

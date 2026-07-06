@@ -9,7 +9,11 @@ extends: m1_5_belief.yaml
 
 experiment: m3_leakage
 env:
-  team_pool: data/teams/pool_b      # diverse OU sample teams
+  # POOL-A (shared species, varied sets), NOT pool_b: pool_b's 16 teams have unique species
+  # multisets, so team preview identifies the team at turn 0, the probes memorize the
+  # species->set mapping, still-hidden CE collapses to ~0 and β multiplies nothing. The trainer
+  # refuses unique-species pools for β>0 runs (leakage.allow_unique_species_pool overrides).
+  team_pool: data/teams/pool_a
 model:
   use_belief_vec: true
 loss:
@@ -19,10 +23,17 @@ leakage:
   beta: 0.03                        # SET PER RUN from {0.0, 0.01, 0.03, 0.1}
   refreeze_every_decisions: 100000  # refreeze Phi-hat (a FrozenProbe: backbone + self-belief PAIR)
   # REQUIRED for a valid L-run: the finished beta=0 control's log dir. Without it the trainer warns
-  # and the stalling/diversity watchdogs run on weak default baselines.
+  # and the stalling/diversity watchdogs run on weak default baselines. (Baselines are read at
+  # MATCHED training progress, never the control's final tail.)
   baseline_run: null                # e.g. runs/m3_beta0
   fresh_probe: true                 # independent reader trained alongside (staleness watchdog input)
   fresh_probe_steps: 4              # fit steps per PPO update
+  # Per-step penalty estimator: true = max(0, ΔI) (§7 default); false = signed ΔI, which telescopes
+  # to CE_first − CE_final per game and is immune to the clipped form's probe-CE-noise bias.
+  # Run at least one β cell with clip_delta=false as the estimator ablation.
+  clip_delta: true
+  # Escape hatch for the unique-species-pool refusal above. Do not set casually.
+  allow_unique_species_pool: false
   # Weighted-ΔI ablation: rescale per-family leakage in the penalty (bits are not strategically
   # equal — tera/item >> a fourth filler move). null = uniform weights.
   family_weights: null              # e.g. {tera: 2.0, item: 1.5}
@@ -30,3 +41,6 @@ ppo:
   total_decisions: 300000
 log:
   dir: runs/m3_leakage
+# STATISTICS (headline validity): one run per cell is one sample from a high-variance PPO
+# distribution. Run every cell (incl. the β=0 control) at >=3 seeds (--set seed=1 log.dir=... etc.)
+# and compare across seeds before quoting any readability or L-vs-N number.

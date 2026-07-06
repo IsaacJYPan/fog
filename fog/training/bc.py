@@ -55,6 +55,14 @@ def bc_loss(agent, batch, loss_cfg: dict) -> tuple[torch.Tensor, dict]:
         "loss": float(total), "action_ce": float(action_ce), "belief": float(belief),
         "value": float(value), "action_top1": top1,
     }
+    if "legality_mask" in batch:
+        # Replay legality masks are RECONSTRUCTED from public state (~3.5 legal actions/row vs ~9
+        # from real |request| JSON), which inflates top-1: random guessing on 3.5 options is ~29%.
+        # Always read action_top1 against these two — action_top1_lift is the chance-normalized
+        # skill signal (1.0 = random over the reconstructed mask).
+        avg_legal = batch["legality_mask"].float().sum(-1).clamp(min=1.0)
+        metrics["avg_legal_actions"] = float(avg_legal.mean())
+        metrics["action_top1_lift"] = top1 * float(avg_legal.mean())
     return total, metrics
 
 

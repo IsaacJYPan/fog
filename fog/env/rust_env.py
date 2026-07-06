@@ -1,11 +1,22 @@
-"""poke-engine (Rust) self-play adapter — the M3/M4 volume track (plan §7).
+"""poke-engine (Rust) adapter — groundwork for the M3/M4 volume track (plan §7).
+
+STATUS (honest, post-audit 2026-07-05): this is an ADAPTER AND SMOKE TEST, not a training path.
+What exists: paste -> engine sides, an engine-state -> encoder proxy, action-string mapping, a
+seeded engine-only fuzz harness. What a training run additionally REQUIRES and which is UNBUILT:
+  * partial-observability reconstruction — the engine keeps no event log, so reveal state
+    (RevealLedger), turn history records and the mirror/leakage path must be tracked by a wrapper
+    around `apply_instructions`; without it `RustBattleProxy` exposes the opponent as HIDDEN-only
+    (default) or fully revealed (`reveal_opponent=True`, perfect-information — NEVER train on that);
+  * legality nuance (choice lock, trapping, disable, forced switches) beyond the basic mask;
+  * a self-play rollout loop feeding RolloutBuffer, win detection at the loop level, and the
+    divergence controls below actually wired in.
+Budget this as its own project before promising engine-scale volume for M3/M4.
 
 Verified 2026-07: `pip install poke-engine` (0.0.47) ships Windows/cp314 wheels WITH the gen-9
 terastallization feature (`Pokemon.tera_type` / `.terastallized` exist) — the load-bearing coverage
-question. The engine exposes structured state (no protocol parsing), so the adapter converts
-`poke_engine.State` into the same duck-typed battle shape our encoders already consume
-(`Observation.from_battle` works on any object with team/opponent_team/actives/...): one encoder,
-two simulators, zero drift by construction.
+question. The proxy feeds the SAME encoders as the Showdown path, but note "same encoder" does not
+mean "same inputs": every proxy field below that approximates (see _ProxyMon) is a drift source the
+cross-sim fuzz must catch.
 
 Division of labor (decided 2026-07, HANDOFF):
   * poke-engine  -> self-play rollout volume (synchronous, no websocket, orders of magnitude faster)
@@ -78,6 +89,17 @@ def paste_to_engine_side(paste: str) -> "poke_engine.Side":
 
 
 # --------------------------------------------------------------- engine state -> encoder battle proxy
+def _try_tables():
+    """Generated tables when built (base stats / weight source); None keeps the fallback path."""
+    try:
+        from fog.constants.tables import TABLES
+
+        TABLES.species  # force lazy load; raises when tables aren't generated
+        return TABLES
+    except Exception:
+        return None
+
+
 class _ProxyMove:
     def __init__(self, move_id: str, pp: int = 16, max_pp: int = 16):
         self.id = move_id
@@ -86,11 +108,18 @@ class _ProxyMove:
 
 
 class _ProxyMon:
-    """Duck-typed mon exposing the attributes fog.encoding.* reads (see tests/golden_fixture.py)."""
+    """Duck-typed mon exposing the attributes fog.encoding.* reads (see tests/golden_fixture.py).
 
-    def __init__(self, ep, revealed: bool = True):
-        import re
+    Fidelity notes (drift sources vs the Showdown path — the fuzz harness must cover these):
+      * base_stats come from the generated species table (the Showdown-path source). The engine only
+        exposes COMPUTED stats (HP 404 etc.), which are NOT base stats — encoding those under a /255
+        scale put every entity off-distribution; the computed values remain only as a last-resort
+        fallback for species missing from the table.
+      * weight likewise from the table (engine builds may omit weight_kg -> Grass Knot bucket wrong).
+      * status_counter covers sleep turns only; boosts/effects are filled by the proxy caller.
+    """
 
+    def __init__(self, ep, revealed: bool = True, tables=None):
         self.species = str(ep.id)
         self.item = str(ep.item) if revealed and str(ep.item) not in ("", "none") else None
         self.ability = str(ep.ability) if revealed else None
@@ -98,10 +127,23 @@ class _ProxyMon:
                       for m in (ep.moves or []) if revealed}
         self.tera_type = str(ep.tera_type) if getattr(ep, "terastallized", False) or revealed else None
         self.terastallized = bool(getattr(ep, "terastallized", False))
-        stats = (ep.maxhp, ep.attack, ep.defense, ep.special_attack, ep.special_defense, ep.speed)
-        self.base_stats = dict(zip(("hp", "atk", "def", "spa", "spd", "spe"), stats))
+
+        feats = None
+        if tables is not None:
+            try:
+                feats = tables.species["features"].get(self.species)
+            except Exception:
+                feats = None
+        if feats is not None:
+            self.base_stats = dict(zip(("hp", "atk", "def", "spa", "spd", "spe"),
+                                       feats["base_stats"]))
+            self.weight = float(feats.get("weightkg", 50.0) or 50.0)
+        else:  # last-resort fallback: computed stats, WRONG scale — logged as a drift source above
+            stats = (ep.maxhp, ep.attack, ep.defense, ep.special_attack, ep.special_defense, ep.speed)
+            self.base_stats = dict(zip(("hp", "atk", "def", "spa", "spd", "spe"), stats))
+            self.weight = float(getattr(ep, "weight_kg", 50.0) or 50.0)
+
         self.types = [str(t) for t in (getattr(ep, "types", None) or ()) if str(t) != "typeless"]
-        self.weight = float(getattr(ep, "weight_kg", 50.0) or 50.0)
         self.current_hp_fraction = (ep.hp / ep.maxhp) if ep.maxhp else 0.0
         self.fainted = ep.hp <= 0
         status = str(getattr(ep, "status", "none") or "none")
@@ -109,29 +151,38 @@ class _ProxyMon:
         self.status_counter = int(getattr(ep, "sleep_turns", 0) or 0)
         self.boosts = {}
         self.effects = {}
-        _ = re
 
 
 class RustBattleProxy:
     """A poke-env-battle-shaped view of a poke_engine.State, from side_one's perspective.
 
-    Feed it to `Observation.from_battle` — the SAME encoder the Showdown path uses (drift-free by
-    construction; the golden-battle test pins that encoder). History/reveal state must be tracked by
-    the caller (BattleTracker + RevealLedger fed from applied instructions), since the engine keeps
-    no event log.
+    Feed it to `Observation.from_battle` — the same encoder the Showdown path uses (the golden-battle
+    test pins that encoder; the _ProxyMon fidelity notes list where the INPUTS still differ).
+
+    PARTIAL OBSERVABILITY: the engine state is perfect-information; the engine keeps no event log,
+    so this proxy cannot know what has been revealed. Default `reveal_opponent=False` exposes the
+    opponent as species-only (preview knowledge). A real training loop must track reveals itself
+    (RevealLedger + BattleTracker fed from applied instructions) and rebuild the proxy's opponent
+    view from that ledger — that wrapper is the unbuilt core of the volume track (module docstring).
+    `reveal_opponent=True` is for debugging/fuzzing only: an agent trained on it plays
+    perfect-information Pokemon and learns nothing about the fog.
     """
 
     player_role = "p1"
 
-    def __init__(self, state: "poke_engine.State", turn: int = 1, observations: dict | None = None):
+    def __init__(self, state: "poke_engine.State", turn: int = 1, observations: dict | None = None,
+                 reveal_opponent: bool = False):
         self._state = state
         self.battle_tag = "rust-battle"
         self.turn = turn
         self.observations = observations or {}
+        tables = _try_tables()
 
         s1, s2 = state.side_one, state.side_two
-        self.team = {f"p1: {p.id}": _ProxyMon(p, revealed=True) for p in s1.pokemon}
-        self.opponent_team = {f"p2: {p.id}": _ProxyMon(p, revealed=True) for p in s2.pokemon}
+        self.team = {f"p1: {p.id}": _ProxyMon(p, revealed=True, tables=tables) for p in s1.pokemon}
+        self.opponent_team = {
+            f"p2: {p.id}": _ProxyMon(p, revealed=reveal_opponent, tables=tables) for p in s2.pokemon
+        }
         self.teampreview_opponent_team = list(self.opponent_team.values())
         mine = list(self.team.values())
         theirs = list(self.opponent_team.values())
@@ -149,7 +200,10 @@ class RustBattleProxy:
                                    if m is not self.active_pokemon and not m.fainted]
         self.can_tera = not any(p.terastallized for p in mine)
         self.force_switch = bool(getattr(s1, "force_switch", False))
-        self.won = None
+        # side_one's result once one side is out of mons; None while the battle is live
+        s1_alive = any(p.hp > 0 for p in s1.pokemon)
+        s2_alive = any(p.hp > 0 for p in s2.pokemon)
+        self.won = None if (s1_alive and s2_alive) else bool(s1_alive)
 
         self.weather = {str(state.weather): 0} if str(state.weather) not in ("none", "None") else {}
         self.fields = {}

@@ -1,13 +1,15 @@
-# M2 — Set-oracle and action-oracle ceilings on POOL-A (§3.4). One flag each; measures the gaps.
-# Train a set-oracle agent (perfect opponent info) and an action-oracle agent, compare to the
-# M1.5 N-agent. Gate: oracle >= N-agent (sanity); record both gaps.
+# M2 — Set-oracle ceiling on POOL-A (§3.4). Gate: oracle >= N-agent (sanity); record the gap.
 #   python -m fog.training.ppo --config configs/m2_oracle.yaml            # set oracle
-#   python -m fog.training.ppo --config configs/m2_oracle.yaml --set model.oracle=action
+# The ACTION oracle is NOT trainable in the online loop (the opponent's committed action is not
+# observable at decision time — Showdown resolves choices simultaneously); the trainer raises on
+# model.oracle=action rather than silently training an N-agent and reporting a fake ~0 gap. An
+# offline/replay pathway is specced in §3.4 but unimplemented.
 extends: m1_5_belief.yaml
 
 experiment: m2_oracle
 model:
-  oracle: set                       # {set, action} — see §3.4; the set oracle needs opp truth tokens
-                                    # in the batch (self-play provides them via the pool-truth match)
+  oracle: set                       # §3.4 — truth tokens come from the recording teambuilder
+                                    # (exact per-battle paste) and are stored in every frag, so the
+                                    # update-time forward sees what the acting forward saw
 log:
   dir: runs/m2_oracle

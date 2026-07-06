@@ -11,14 +11,19 @@ eval:
   games_per: 2000                  # >=1000 or the gauntlet flags "insufficient n"
   closure_games: 2000
   closure_opponent: SimpleHeuristics
-  temperature: 0.0                 # greedy for eval
-  include_reading_opponent: true   # add the same ckpt as a set-oracle opponent (reads = payoff for
-                                   # concealment; §7/§9)
-  lvn_games: 3000                  # --lvn head-to-head games (§7a)
+  temperature: 0.0                 # greedy for gauntlet/closure matches
+  # Set-oracle gauntlet entry: measures the VALUE OF THE CONCEALED INFORMATION (an upper bound on
+  # what any reader could gain — the oracle is handed the truth, concealment cannot deny it).
+  # Concealment's payoff channel is the learned reader in --lvn, not this entry.
+  include_reading_opponent: true
+  lvn_games: 3000                  # --lvn head-to-head games (§7a; paired team schedule, sides swapped)
   readability:                     # --readability (§7b/§7c): fresh-probe report
     games: 200
     opponent: SimpleHeuristics
     probe_epochs: 8
+    temperature: 1.0               # SAMPLING stays on here (independent of the greedy global
+                                   # temperature): readability/reveal-entropy of a deterministic
+                                   # policy is a different, much narrower measurement
   # --pareto: the β-grid frontier. Fill in after the M3 runs finish:
   # pareto:
   #   - {label: beta0,   ckpt: runs/m3_beta0/checkpoints/ppo_final.pt,   beta: 0.0}

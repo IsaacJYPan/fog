@@ -37,20 +37,65 @@ def load_pool(path: str | Path) -> list[str]:
 
 
 def make_pool_teambuilder(teams: list[str], seed: int | None = None):
-    """A poke-env Teambuilder sampling uniformly from `teams` per battle."""
+    """A poke-env Teambuilder sampling uniformly from `teams` per battle.
+
+    Records what it yielded (`last_index`/`last_paste`, full `history`): with sequential battles
+    (concurrent_battles == 1) the recorded paste IS the exact team of the battle in flight, which is
+    the ground-truth source for self-play belief supervision — do NOT re-infer the team from revealed
+    species (ambiguous on shared-species pools like POOL-A; that ambiguity silently disabled belief
+    supervision on exactly the pool where sets are hidden).
+    """
     from poke_env.teambuilder import Teambuilder
 
     class PoolTeambuilder(Teambuilder):
         def __init__(self) -> None:
             self._rng = random.Random(seed)
+            self._pastes = list(teams)
             self._packed = [self.join_team(self.parse_showdown_team(t)) for t in teams]
             self.last_index: int | None = None  # pool-id label for M1.5 belief metrics
+            self.last_paste: str | None = None  # exact-truth source (see docstring)
+            self.history: list[int] = []        # yield order == battle-start order (sequential play)
 
         def yield_team(self) -> str:
             self.last_index = self._rng.randrange(len(self._packed))
+            self.last_paste = self._pastes[self.last_index]
+            self.history.append(self.last_index)
             return self._packed[self.last_index]
 
     return PoolTeambuilder()
+
+
+def make_paired_teambuilders(teams: list[str], n_games: int, seed: int | None = None):
+    """Two teambuilders sharing a paired schedule: each sampled (team_i, team_j) matchup is played
+    twice in consecutive battles with sides swapped. Cuts team-matchup variance in head-to-head
+    evals (§7a L-vs-N) — on a 16-team pool the matchup, not the policy, dominates single-game
+    outcomes. Requires sequential battles (yield order == battle order)."""
+    from poke_env.teambuilder import Teambuilder
+
+    rng = random.Random(seed)
+    schedule_a: list[int] = []
+    schedule_b: list[int] = []
+    for _ in range((n_games + 1) // 2):
+        i, j = rng.randrange(len(teams)), rng.randrange(len(teams))
+        schedule_a += [i, j]
+        schedule_b += [j, i]
+
+    def _scheduled(schedule: list[int]):
+        class ScheduledTeambuilder(Teambuilder):
+            def __init__(self) -> None:
+                self._packed = [self.join_team(self.parse_showdown_team(t)) for t in teams]
+                self._schedule = schedule
+                self._n = 0
+                self.last_index: int | None = None
+
+            def yield_team(self) -> str:
+                self.last_index = self._schedule[self._n % len(self._schedule)]
+                self._n += 1
+                return self._packed[self.last_index]
+
+        return ScheduledTeambuilder()
+
+    return _scheduled(schedule_a), _scheduled(schedule_b)
 
 
 def to_packed(paste: str) -> str:

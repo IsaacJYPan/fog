@@ -57,10 +57,16 @@ class _Game:
 
 
 class RolloutBuffer:
-    def __init__(self, gamma: float = 1.0, lam: float = 0.95, beta: float = 0.0) -> None:
+    def __init__(
+        self, gamma: float = 1.0, lam: float = 0.95, beta: float = 0.0, clip_deltas: bool = True
+    ) -> None:
+        """`clip_deltas`: True = penalize max(0, ΔI) per step (§7 default); False = signed ΔI,
+        whose per-game sum telescopes to CE_first − CE_final (estimator ablation — see
+        training.leakage.shaped_reward for why the clipped form is biased by probe-CE noise)."""
         self.gamma = gamma
         self.lam = lam
         self.beta = beta
+        self.clip_deltas = clip_deltas
         self._games: dict[int, _Game] = {}
         self._next_id = 0
 
@@ -158,14 +164,18 @@ class RolloutBuffer:
             # and t+1 contributes its full surprisal under Φ̂ at time t. The post-game measurement
             # (final_leak_ce) closes the last step; without it the final decision's leak is 0.
             if any(c is not None for c in g.leak_ce):
-                ce = np.array([c if c is not None else 0.0 for c in g.leak_ce], dtype=np.float32)
+                # None = measurement skipped that decision (e.g. mirror failure). Treating it as 0
+                # fabricates a full-CE ΔI spike; forward/back-fill instead, so skipped steps get
+                # ΔI=0 and the accumulated change lands when measurement resumes.
+                ce = _fill_gaps(g.leak_ce)
                 deltas = np.zeros(t, dtype=np.float32)
                 deltas[:-1] = ce[:-1] - ce[1:]
-                if g.final_leak_ce is not None and g.leak_ce[-1] is not None:
+                if g.final_leak_ce is not None:
                     deltas[-1] = ce[-1] - g.final_leak_ce
             else:
                 deltas = np.asarray(g.leak_deltas, dtype=np.float32)
-            rewards = -self.beta * np.clip(deltas, 0.0, None)
+            penalties = np.clip(deltas, 0.0, None) if self.clip_deltas else deltas
+            rewards = -self.beta * penalties
             rewards[-1] += g.outcome + g.bonus
             values = np.asarray(g.values + [0.0], dtype=np.float32)  # terminal bootstrap = 0
             dones = np.zeros(t, dtype=np.float32)
@@ -229,6 +239,18 @@ class RolloutBuffer:
                                            dtype=torch.float32, device=device),
             }
         return batch
+
+
+def _fill_gaps(values: list[float | None]) -> np.ndarray:
+    """Forward-fill None entries from the last real measurement (back-fill leading Nones)."""
+    out = np.empty(len(values), dtype=np.float32)
+    last: float | None = None
+    for i, v in enumerate(values):
+        if v is not None:
+            last = float(v)
+        out[i] = last if last is not None else np.nan
+    first = next(float(v) for v in values if v is not None)
+    return np.where(np.isnan(out), first, out).astype(np.float32)
 
 
 # ------------------------------------------------------------------------------------ frag stacking
