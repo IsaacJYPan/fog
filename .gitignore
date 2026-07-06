@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Data artifacts (immutable raw + regenerable derived) — regenerate from pinned sources
+data/raw_replays/*
+data/parsed/*
+data/usage/*
+!data/**/.gitkeep
+
+# Team pools: the hand-built PASTES are irreplaceable experiment definitions — TRACKED.
+# Only the derived packaged banks (regenerable via fog.scripts.build_team_pools) stay out.
+data/teams/*.json
+
+# Generated constants are TRACKED (small JSON, pinned provenance: Showdown commit + usage month in
+# configs/default.yaml::pins). Committing them removes a regeneration failure mode — the
+# "_meta commit unknown" bridge bug already bit once.
+
+# Simulator checkout is a submodule at server/pokemon-showdown; build output stays inside it.
+
+# Training artifacts
+runs/
+checkpoints/
+*.ckpt
+*.pt
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+

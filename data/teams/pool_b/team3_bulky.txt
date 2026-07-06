@@ -1,0 +1,59 @@
+Landorus-Therian @ Rocky Helmet
+Ability: Intimidate
+Tera Type: Water
+EVs: 252 HP / 164 Def / 92 Spe
+Impish Nature
+- Earthquake
+- U-turn
+- Stealth Rock
+- Taunt
+
+Slowking-Galar @ Heavy-Duty Boots
+Ability: Regenerator
+Tera Type: Fairy
+EVs: 252 HP / 16 Def / 240 SpD
+Calm Nature
+- Chilly Reception
+- Future Sight
+- Sludge Bomb
+- Thunder Wave
+
+Zapdos @ Heavy-Duty Boots
+Ability: Static
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Hurricane
+- Volt Switch
+- Roost
+
+Great Tusk @ Leftovers
+Ability: Protosynthesis
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- Knock Off
+- Rapid Spin
+- Stealth Rock
+
+Kingambit @ Black Glasses
+Ability: Supreme Overlord
+Tera Type: Flying
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+- Swords Dance
+
+Dondozo @ Leftovers
+Ability: Unaware
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Wave Crash
+- Body Press
+- Rest
+- Sleep Talk

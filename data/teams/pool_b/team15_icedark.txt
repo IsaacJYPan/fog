@@ -1,0 +1,59 @@
+Weavile @ Heavy-Duty Boots
+Ability: Pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Triple Axel
+- Ice Shard
+- Swords Dance
+
+Samurott-Hisui @ Focus Sash
+Ability: Sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Razor Shell
+- Sucker Punch
+- Swords Dance
+
+Zapdos @ Heavy-Duty Boots
+Ability: Static
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Hurricane
+- Heat Wave
+- Roost
+
+Great Tusk @ Booster Energy
+Ability: Protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Close Combat
+- Ice Spinner
+- Rapid Spin
+
+Iron Valiant @ Booster Energy
+Ability: Quark Drive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Moonblast
+- Aura Sphere
+- Thunderbolt
+
+Gholdengo @ Choice Scarf
+Ability: Good as Gold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Trick
+- Focus Blast

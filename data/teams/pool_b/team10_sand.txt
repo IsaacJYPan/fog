@@ -1,0 +1,59 @@
+Tyranitar @ Leftovers
+Ability: Sand Stream
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Stealth Rock
+- Rock Blast
+- Earthquake
+- Thunder Wave
+
+Excadrill @ Leftovers
+Ability: Sand Rush
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Iron Head
+- Rapid Spin
+- Swords Dance
+
+Corviknight @ Rocky Helmet
+Ability: Pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Iron Defense
+- Roost
+- U-turn
+
+Clefable @ Leftovers
+Ability: Magic Guard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Moonlight
+- Calm Mind
+- Flamethrower
+
+Hydreigon @ Choice Specs
+Ability: Levitate
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Draco Meteor
+- Dark Pulse
+- Flash Cannon
+- U-turn
+
+Great Tusk @ Heavy-Duty Boots
+Ability: Protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Knock Off
+- Ice Spinner
+- Rapid Spin

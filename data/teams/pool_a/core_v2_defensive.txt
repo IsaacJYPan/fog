@@ -1,0 +1,59 @@
+Great Tusk @ Leftovers
+Ability: Protosynthesis
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- Knock Off
+- Rapid Spin
+- Stealth Rock
+
+Kingambit @ Leftovers
+Ability: Supreme Overlord
+Tera Type: Fairy
+EVs: 236 HP / 100 Atk / 172 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Gholdengo @ Air Balloon
+Ability: Good as Gold
+Tera Type: Fairy
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Make It Rain
+- Shadow Ball
+- Recover
+- Nasty Plot
+
+Dragapult @ Heavy-Duty Boots
+Ability: Infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Draco Meteor
+- Hex
+- Will-O-Wisp
+
+Slowking-Galar @ Heavy-Duty Boots
+Ability: Regenerator
+Tera Type: Water
+EVs: 252 HP / 16 Def / 240 SpD
+Calm Nature
+- Chilly Reception
+- Future Sight
+- Sludge Bomb
+- Thunder Wave
+
+Zamazenta @ Leftovers
+Ability: Dauntless Shield
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Body Press
+- Iron Defense
+- Crunch
+- Roar

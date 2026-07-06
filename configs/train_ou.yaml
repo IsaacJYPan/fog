@@ -1,0 +1,35 @@
+# gen9ou self-play PPO on the POOL-B team bank (the target format — spec §6, milestone M1-on-OU).
+# Start the local server first:  cd server/pokemon-showdown; node pokemon-showdown start --no-security
+# Run:                           python -m fog.training.ppo --config configs/train_ou.yaml
+extends: default.yaml
+
+experiment: train_ou
+
+env:
+  battle_format: gen9ou
+  team_pool: data/teams/pool_b   # validate after edits: fog.env.teams.validate_pool
+
+ppo:
+  total_decisions: 500000        # ~half of the spec's first serious run; raise once stable
+  batch_decisions: 4096          # smaller than the spec's 16k while on CPU torch — more frequent
+  minibatch_size: 512            #   updates make early collapse visible sooner
+  epochs: 3
+  clip: 0.2
+  lr: 1.0e-4
+  gamma: 1.0
+  lam: 0.95
+  entropy_coef: 0.01
+  games_per_chunk: 8
+
+leakage:
+  beta: 0.0                      # N-agent control; the §7 grid comes at M3
+
+league:
+  snapshot_every_decisions: 50000
+
+log:
+  dir: runs/train_ou
+
+gate:                            # spec §10 M1 gates, checked via the gauntlet once eval lands
+  vs_max_damage: 0.75
+  vs_simple_heuristics: 0.60

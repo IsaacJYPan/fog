@@ -1,0 +1,59 @@
+Great Tusk @ Rocky Helmet
+Ability: Protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Headlong Rush
+- Body Press
+- Stealth Rock
+- Rapid Spin
+
+Kingambit @ Air Balloon
+Ability: Supreme Overlord
+Tera Type: Fairy
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+
+Gholdengo @ Covert Cloak
+Ability: Good as Gold
+Tera Type: Fairy
+EVs: 252 HP / 52 SpA / 204 Spe
+Modest Nature
+- Nasty Plot
+- Make It Rain
+- Shadow Ball
+- Recover
+
+Dragapult @ Life Orb
+Ability: Infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Draco Meteor
+- Sucker Punch
+- Fire Blast
+
+Slowking-Galar @ Assault Vest
+Ability: Regenerator
+Tera Type: Fighting
+EVs: 252 HP / 80 SpA / 176 SpD
+Sassy Nature
+- Sludge Bomb
+- Psyshock
+- Flamethrower
+- Hydro Pump
+
+Zamazenta @ Choice Band
+Ability: Dauntless Shield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Psychic Fangs
+- Wild Charge

@@ -1,0 +1,32 @@
+# M3 — Leakage experiment (§7). Run the beta=0 control FIRST (it provides watchdog baselines and
+# the matched N-agent), then one run per beta:
+#   python -m fog.training.ppo --config configs/m3_leakage.yaml --set leakage.beta=0.0  log.dir=runs/m3_beta0
+#   python -m fog.training.ppo --config configs/m3_leakage.yaml --set leakage.beta=0.03 \
+#       leakage.baseline_run=runs/m3_beta0 log.dir=runs/m3_beta003
+# Then: python -m fog.eval.run_eval --config configs/eval_ou.yaml --ckpt L.pt --lvn N.pt
+#       python -m fog.eval.run_eval --config configs/eval_ou.yaml --ckpt L.pt --readability
+extends: m1_5_belief.yaml
+
+experiment: m3_leakage
+env:
+  team_pool: data/teams/pool_b      # diverse OU sample teams
+model:
+  use_belief_vec: true
+loss:
+  belief_coef: 1.0
+  self_belief_coef: 1.0             # self-belief predictor trained alongside (leakage measurer)
+leakage:
+  beta: 0.03                        # SET PER RUN from {0.0, 0.01, 0.03, 0.1}
+  refreeze_every_decisions: 100000  # refreeze Phi-hat (a FrozenProbe: backbone + self-belief PAIR)
+  # REQUIRED for a valid L-run: the finished beta=0 control's log dir. Without it the trainer warns
+  # and the stalling/diversity watchdogs run on weak default baselines.
+  baseline_run: null                # e.g. runs/m3_beta0
+  fresh_probe: true                 # independent reader trained alongside (staleness watchdog input)
+  fresh_probe_steps: 4              # fit steps per PPO update
+  # Weighted-ΔI ablation: rescale per-family leakage in the penalty (bits are not strategically
+  # equal — tera/item >> a fourth filler move). null = uniform weights.
+  family_weights: null              # e.g. {tera: 2.0, item: 1.5}
+ppo:
+  total_decisions: 300000
+log:
+  dir: runs/m3_leakage

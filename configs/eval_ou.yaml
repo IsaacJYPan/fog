@@ -1,0 +1,28 @@
+# M5 — Evaluation (§9): gauntlet vs baselines with Wilson CIs + oracle-gap closure.
+#   python -m fog.eval.run_eval --config configs/eval_ou.yaml --ckpt runs/train_ou/checkpoints/ppo_final.pt \
+#       --bc-ckpt runs/bc_ou/checkpoints/bc_final.pt
+extends: default.yaml
+
+experiment: eval_ou
+env:
+  battle_format: gen9ou
+  team_pool: data/teams/pool_b
+eval:
+  games_per: 2000                  # >=1000 or the gauntlet flags "insufficient n"
+  closure_games: 2000
+  closure_opponent: SimpleHeuristics
+  temperature: 0.0                 # greedy for eval
+  include_reading_opponent: true   # add the same ckpt as a set-oracle opponent (reads = payoff for
+                                   # concealment; §7/§9)
+  lvn_games: 3000                  # --lvn head-to-head games (§7a)
+  readability:                     # --readability (§7b/§7c): fresh-probe report
+    games: 200
+    opponent: SimpleHeuristics
+    probe_epochs: 8
+  # --pareto: the β-grid frontier. Fill in after the M3 runs finish:
+  # pareto:
+  #   - {label: beta0,   ckpt: runs/m3_beta0/checkpoints/ppo_final.pt,   beta: 0.0}
+  #   - {label: beta003, ckpt: runs/m3_beta003/checkpoints/ppo_final.pt, beta: 0.03}
+  # --ablations: labeled checkpoints from training-knob ablation runs:
+  # ablations:
+  #   - {label: no_belief_vec, ckpt: runs/ablation_nobvec/checkpoints/ppo_final.pt}

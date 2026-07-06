@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fog"
+version = "0.0.1"
+description = "FOG: a Gen 9 OU battle agent that reads the opponent's hidden team and controls its own information leakage."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "FOG" }]
+
+# Versions are intentionally left as lower bounds during scaffolding. Pin exact versions in a
+# lockfile before any experiment run (reproducibility is a hard project requirement).
+dependencies = [
+    "torch>=2.2",            # CUDA build installed separately per platform
+    "poke-env>=0.8",
+    "numpy>=1.26",
+    "polars>=0.20",
+    "pyarrow>=15",           # parquet
+    "pyyaml>=6",
+    "tensorboard>=2.16",
+    "aiohttp>=3.9",          # replay scraping
+    "scikit-learn>=1.4",     # k-means for spread clustering (§1.6)
+    "tqdm>=4.66",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-asyncio>=0.23",
+    "hypothesis>=6",         # parser fuzzing (§4.3)
+    "ruff>=0.4",
+    "mypy>=1.9",
+]
+
+[project.scripts]
+fog-build-constants = "fog.scripts.build_constants:main"
+fog-scrape          = "fog.scripts.scrape_replays:main"
+fog-parse           = "fog.scripts.parse_replays:main"
+
+[tool.setuptools.packages.find]
+include = ["fog*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

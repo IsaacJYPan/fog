@@ -1,0 +1,59 @@
+Great Tusk @ Booster Energy
+Ability: Protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Close Combat
+- Ice Spinner
+- Rapid Spin
+
+Kingambit @ Black Glasses
+Ability: Supreme Overlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+- Swords Dance
+
+Gholdengo @ Choice Scarf
+Ability: Good as Gold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Trick
+- Focus Blast
+
+Dragapult @ Choice Band
+Ability: Clear Body
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Darts
+- U-turn
+- Phantom Force
+- Sucker Punch
+
+Slowking-Galar @ Assault Vest
+Ability: Regenerator
+Tera Type: Poison
+EVs: 252 HP / 80 SpA / 176 SpD
+Sassy Nature
+- Sludge Bomb
+- Flamethrower
+- Psyshock
+- Ice Beam
+
+Zamazenta @ Choice Band
+Ability: Dauntless Shield
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Stone Edge
+- Heavy Slam

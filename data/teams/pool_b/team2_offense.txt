@@ -1,0 +1,59 @@
+Dragonite @ Heavy-Duty Boots
+Ability: Multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Extreme Speed
+- Earthquake
+- Outrage
+
+Iron Valiant @ Booster Energy
+Ability: Quark Drive
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Close Combat
+- Knock Off
+- Moonblast
+- Swords Dance
+
+Heatran @ Leftovers
+Ability: Flame Body
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Magma Storm
+- Earth Power
+- Taunt
+- Stealth Rock
+
+Great Tusk @ Booster Energy
+Ability: Protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Close Combat
+- Ice Spinner
+- Rapid Spin
+
+Gholdengo @ Choice Scarf
+Ability: Good as Gold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Trick
+- Focus Blast
+
+Samurott-Hisui @ Focus Sash
+Ability: Sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Razor Shell
+- Aqua Jet
+- Swords Dance

@@ -1,0 +1,19 @@
+# M4 stage 2 — self-play fine-tune from the BC anchor on the full OU team bank (§10 M4).
+# Set ppo.bc_anchor_ckpt to your BC checkpoint; the KL-to-BC anchor prevents early catastrophic
+# forgetting of human priors (annealed off after kl_anchor_decisions).
+#   python -m fog.training.ppo --config configs/m4_ou_selfplay.yaml
+extends: train_ou.yaml
+
+experiment: m4_ou_selfplay
+ppo:
+  total_decisions: 2000000
+  bc_anchor_ckpt: runs/bc_ou/checkpoints/bc_final.pt
+  kl_anchor_coef: 0.02
+  kl_anchor_decisions: 2000000     # anneal window (first 2M decisions), per §6
+loss:
+  belief_coef: 1.0
+  value_coef: 0.5
+log:
+  dir: runs/m4_ou_selfplay
+gate:
+  vs_simple_heuristics: 0.80

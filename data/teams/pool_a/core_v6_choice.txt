@@ -1,0 +1,59 @@
+Great Tusk @ Choice Band
+Ability: Protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Close Combat
+- Ice Spinner
+- Knock Off
+
+Kingambit @ Life Orb
+Ability: Supreme Overlord
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+- Swords Dance
+
+Gholdengo @ Leftovers
+Ability: Good as Gold
+Tera Type: Water
+EVs: 252 HP / 200 Def / 56 Spe
+Bold Nature
+- Hex
+- Thunder Wave
+- Recover
+- Make It Rain
+
+Dragapult @ Choice Specs
+Ability: Infiltrator
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Draco Meteor
+- Flamethrower
+- U-turn
+
+Slowking-Galar @ Black Sludge
+Ability: Regenerator
+Tera Type: Dark
+EVs: 252 HP / 16 SpA / 240 SpD
+Calm Nature
+- Toxic
+- Sludge Bomb
+- Slack Off
+- Flamethrower
+
+Zamazenta @ Rocky Helmet
+Ability: Dauntless Shield
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Heavy Slam
+- Roar
+- Iron Defense

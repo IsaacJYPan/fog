@@ -1,0 +1,14 @@
+# M0 — Plumbing. Gate: measured throughput. Two random agents, 1000 games unattended, log battles/sec.
+extends: default.yaml
+
+experiment: m0_plumbing
+env:
+  num_workers: 8               # sweep 1..16 and log battles/sec for each
+  battle_format: gen9randombattle
+run:
+  kind: throughput_probe
+  agent: random                # poke-env RandomPlayer both sides
+  num_games: 1000
+  worker_sweep: [1, 2, 4, 8, 16]
+gate:
+  min_battles_per_sec: 3.0     # kill-risk: if below, fix before writing model code

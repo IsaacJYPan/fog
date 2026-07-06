@@ -1,0 +1,15 @@
+# M1.5 — Belief-net PoC on POOL-A (shared core, hidden sets). Belief conditioning ON.
+# Gate (§10): belief identifies the opponent's pool team >=80% top-1 by turn 4; b_vec-conditioned
+# policy beats the M1 unconditioned policy by a clear margin.
+#   python -m fog.training.ppo --config configs/m1_5_belief.yaml
+extends: m1_poc.yaml
+
+experiment: m1_5_belief
+model:
+  use_belief_vec: true              # b_vec conditioning on (the hypothesis under test)
+  aux_into_trunk: true
+loss:
+  belief_coef: 1.0                  # opponent-team belief head trained on self-play truth
+  value_coef: 0.5
+log:
+  dir: runs/m1_5_belief

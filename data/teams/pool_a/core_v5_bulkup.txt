@@ -1,0 +1,59 @@
+Great Tusk @ Leftovers
+Ability: Protosynthesis
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Bulk Up
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+
+Kingambit @ Leftovers
+Ability: Supreme Overlord
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Substitute
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+
+Gholdengo @ Choice Specs
+Ability: Good as Gold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Thunderbolt
+- Trick
+
+Dragapult @ Heavy-Duty Boots
+Ability: Clear Body
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Dragon Darts
+- Phantom Force
+- Quick Attack
+
+Slowking-Galar @ Heavy-Duty Boots
+Ability: Regenerator
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Sassy Nature
+- Future Sight
+- Sludge Bomb
+- Slack Off
+- Chilly Reception
+
+Zamazenta @ Leftovers
+Ability: Dauntless Shield
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Crunch
+- Substitute

@@ -1,0 +1,54 @@
+# Base config. Every experiment yaml inherits these and overrides a subset.
+# Every run is fully reproducible from (this resolved config + seed). The loader records a config hash.
+
+seed: 0
+device: cuda
+mixed_precision: true
+
+# --- Pinned external sources (reproducibility; §0) -------------------------------------------------
+pins:
+  showdown_commit: e440c4a18385274f10c405d0b158b6a962ce6d94
+  ou_banlist_date: "2026-06"   # metagame snapshot the usage month corresponds to
+  usage_month: "2026-06"       # Smogon chaos month (data/usage + generated spreads/priors)
+  usage_rating_cut: 1695       # gen9ou chaos rating bucket
+
+# --- Simulator / environment (§0, §10 M0) ----------------------------------------------------------
+env:
+  server_url: "ws://localhost:8000/showdown/websocket"
+  battle_format: "gen9ou"
+  num_workers: 8               # N parallel Node Showdown processes
+  no_security: true            # local server flag for throughput
+  team_pool: null              # path to a parsed team bank; null = format default
+
+# --- Encoding (§2) ---------------------------------------------------------------------------------
+encoding:
+  history_cap: 60              # turns; pad/truncate from the front
+  history_encoder: gru         # {gru, transformer}
+  species_embed_dim: 64
+  entity_hidden: 128
+  state_dim: 256
+
+# --- Model (§3) ------------------------------------------------------------------------------------
+model:
+  entity_transformer_layers: 2
+  entity_heads: 4
+  history_gru_hidden: 256
+  belief_decoder_layers: 2
+  belief_dim: 128
+  aux_into_trunk: true         # belief/self-belief losses backprop into backbone (ablation switch)
+  use_belief_vec: true         # concat b_vec into policy/value input
+  oracle: none                 # {none, set, action} — §3.4 evaluation ceilings
+
+# --- Losses / training shared ----------------------------------------------------------------------
+loss:
+  value_coef: 0.5
+  belief_coef: 1.0
+  self_belief_coef: 1.0
+  preview_coef: 0.5
+
+# --- Logging ---------------------------------------------------------------------------------------
+log:
+  dir: runs
+  tensorboard: true
+  checkpoint_every_decisions: 200000
+  halt_on_regression_sigma: 2.0

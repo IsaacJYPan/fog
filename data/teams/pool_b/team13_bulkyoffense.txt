@@ -1,0 +1,59 @@
+Garganacl @ Leftovers
+Ability: Purifying Salt
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Salt Cure
+- Recover
+- Stealth Rock
+- Body Press
+
+Iron Crown @ Assault Vest
+Ability: Quark Drive
+Tera Type: Steel
+EVs: 252 HP / 252 SpA / 4 Spe
+Modest Nature
+- Tachyon Cutter
+- Psyshock
+- Focus Blast
+- Volt Switch
+
+Rillaboom @ Choice Band
+Ability: Grassy Surge
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Wood Hammer
+- Grassy Glide
+- Knock Off
+- U-turn
+
+Moltres @ Heavy-Duty Boots
+Ability: Flame Body
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Flamethrower
+- U-turn
+- Roost
+- Will-O-Wisp
+
+Great Tusk @ Booster Energy
+Ability: Protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Close Combat
+- Rapid Spin
+
+Primarina @ Leftovers
+Ability: Torrent
+Tera Type: Steel
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Calm Mind
+- Moonblast
+- Sparkling Aria
+- Psychic

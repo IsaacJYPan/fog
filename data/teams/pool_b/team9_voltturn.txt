@@ -1,0 +1,59 @@
+Rotom-Wash @ Leftovers
+Ability: Levitate
+Tera Type: Electric
+EVs: 252 HP / 4 SpA / 252 Def
+Bold Nature
+- Volt Switch
+- Hydro Pump
+- Will-O-Wisp
+- Protect
+
+Landorus-Therian @ Rocky Helmet
+Ability: Intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Earthquake
+- U-turn
+- Taunt
+
+Cinderace @ Heavy-Duty Boots
+Ability: Blaze
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- U-turn
+- Court Change
+- Sucker Punch
+
+Slowking-Galar @ Heavy-Duty Boots
+Ability: Regenerator
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Sassy Nature
+- Future Sight
+- Sludge Bomb
+- Slack Off
+- Chilly Reception
+
+Meowscarada @ Choice Scarf
+Ability: Protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flower Trick
+- Knock Off
+- U-turn
+- Triple Axel
+
+Kingambit @ Leftovers
+Ability: Supreme Overlord
+Tera Type: Dark
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance

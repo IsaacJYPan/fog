@@ -1,0 +1,59 @@
+Ting-Lu @ Leftovers
+Ability: Vessel of Ruin
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Ruination
+- Whirlwind
+
+Gholdengo @ Heavy-Duty Boots
+Ability: Good as Gold
+Tera Type: Fairy
+EVs: 252 HP / 52 SpA / 204 Spe
+Modest Nature
+- Make It Rain
+- Shadow Ball
+- Recover
+- Nasty Plot
+
+Garganacl @ Leftovers
+Ability: Purifying Salt
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Salt Cure
+- Recover
+- Protect
+- Curse
+
+Dragapult @ Choice Band
+Ability: Clear Body
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Darts
+- U-turn
+- Phantom Force
+- Sucker Punch
+
+Ogerpon-Wellspring @ Wellspring Mask
+Ability: Water Absorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Power Whip
+- U-turn
+- Encore
+
+Zamazenta @ Leftovers
+Ability: Dauntless Shield
+Tera Type: Fire
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Crunch
+- Roar

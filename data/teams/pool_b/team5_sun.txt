@@ -1,0 +1,59 @@
+Torkoal @ Heat Rock
+Ability: Drought
+Tera Type: Fire
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Stealth Rock
+- Lava Plume
+- Rapid Spin
+- Body Press
+
+Venusaur @ Life Orb
+Ability: Chlorophyll
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Growth
+- Giga Drain
+- Weather Ball
+- Sludge Bomb
+
+Walking Wake @ Choice Specs
+Ability: Protosynthesis
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hydro Steam
+- Draco Meteor
+- Flamethrower
+- Flip Turn
+
+Great Tusk @ Heavy-Duty Boots
+Ability: Protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Knock Off
+- Close Combat
+- Rapid Spin
+
+Hatterene @ Leftovers
+Ability: Magic Bounce
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Calm Mind
+- Draining Kiss
+- Psyshock
+- Mystical Fire
+
+Kingambit @ Black Glasses
+Ability: Supreme Overlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance

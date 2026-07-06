@@ -1,0 +1,59 @@
+Great Tusk @ Loaded Dice
+Ability: Protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+- Bulk Up
+
+Kingambit @ Lum Berry
+Ability: Supreme Overlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+
+Gholdengo @ Metal Coat
+Ability: Good as Gold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Nasty Plot
+- Make It Rain
+- Shadow Ball
+- Recover
+
+Dragapult @ Expert Belt
+Ability: Infiltrator
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Draco Meteor
+- Shadow Ball
+- Fire Blast
+- U-turn
+
+Slowking-Galar @ Leftovers
+Ability: Regenerator
+Tera Type: Fairy
+EVs: 252 HP / 168 Def / 88 SpD
+Bold Nature
+- Future Sight
+- Chilly Reception
+- Ice Beam
+- Sludge Bomb
+
+Zamazenta @ Assault Vest
+Ability: Dauntless Shield
+Tera Type: Water
+EVs: 168 HP / 88 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Heavy Slam
+- Stone Edge

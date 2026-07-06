@@ -1,0 +1,59 @@
+Grimmsnarl @ Light Clay
+Ability: Prankster
+Tera Type: Ghost
+EVs: 248 HP / 8 Atk / 252 SpD
+Careful Nature
+- Reflect
+- Light Screen
+- Spirit Break
+- Taunt
+
+Iron Valiant @ Booster Energy
+Ability: Quark Drive
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Close Combat
+- Knock Off
+- Shadow Sneak
+
+Dragapult @ Heavy-Duty Boots
+Ability: Clear Body
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Dragon Darts
+- Phantom Force
+- Quick Attack
+
+Kingambit @ Air Balloon
+Ability: Supreme Overlord
+Tera Type: Flying
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+
+Iron Moth @ Booster Energy
+Ability: Quark Drive
+Tera Type: Grass
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Sludge Wave
+- Energy Ball
+- Agility
+
+Great Tusk @ Booster Energy
+Ability: Protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin

@@ -1,0 +1,59 @@
+Alomomola @ Rocky Helmet
+Ability: Regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Wish
+- Protect
+- Flip Turn
+- Waterfall
+
+Ting-Lu @ Leftovers
+Ability: Vessel of Ruin
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Stealth Rock
+- Spikes
+- Earthquake
+- Whirlwind
+
+Corviknight @ Leftovers
+Ability: Pressure
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- Roost
+- U-turn
+- Iron Defense
+
+Hatterene @ Leftovers
+Ability: Magic Bounce
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Calm Mind
+- Draining Kiss
+- Psyshock
+- Mystical Fire
+
+Great Tusk @ Rocky Helmet
+Ability: Protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Headlong Rush
+- Body Press
+- Knock Off
+- Rapid Spin
+
+Gholdengo @ Heavy-Duty Boots
+Ability: Good as Gold
+Tera Type: Fairy
+EVs: 252 HP / 52 SpA / 204 Spe
+Modest Nature
+- Nasty Plot
+- Make It Rain
+- Shadow Ball
+- Recover
