@@ -14,6 +14,8 @@ does need it (the binding divergence control — don't disable it, start the ser
                                                       #          no training, prints the decision)
     python -m fog.scripts.pipeline log-posteriors     # §4.2: log search posteriors (engine)
     python -m fog.scripts.pipeline finetune-value     # §4.2: value fine-tune + regression gate
+    python -m fog.scripts.pipeline gauntlet-search    # Phase 2: arm gauntlet + h2h + §5 gate
+                                                      #          (engine; §4.2 gate must be green)
     python -m fog.scripts.pipeline probe              # engine throughput probe (SIMULATION_PLAN)
 
 The M1.5 gate is the go/no-go for the whole search program (SEARCH_PLAN §3): if b_vec buys no
@@ -83,6 +85,16 @@ def cmd_finetune_value(args) -> None:
            "--data", str(args.data), "--out", str(args.out)]
     if args.ckpt:
         cmd += ["--ckpt", args.ckpt]
+    _run(cmd)
+
+
+def cmd_gauntlet_search(args) -> None:
+    cmd = [sys.executable, "-m", "fog.eval.search_gauntlet",
+           "--pool", str(args.pool), "--ckpt", args.ckpt, "--out", str(args.out),
+           "--games", str(args.games), "--h2h-games", str(args.h2h_games),
+           "--iters", str(args.iters), "--seed", str(args.seed)]
+    if args.det_k is not None:
+        cmd += ["--det-k", str(args.det_k)]
     _run(cmd)
 
 
@@ -170,6 +182,19 @@ def main() -> None:
     p.add_argument("--out", type=Path, default=Path("runs/value_finetune"))
     p.add_argument("--ckpt", type=str, default=None)
     p.set_defaults(fn=cmd_finetune_value)
+
+    p = sub.add_parser("gauntlet-search",
+                       help="Phase 2: policy/determinized/joint gauntlet + h2h + §5 gate")
+    p.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
+    p.add_argument("--ckpt", type=str, required=True,
+                   help="posterior-aware checkpoint (value_finetune output; §4.2 gate first)")
+    p.add_argument("--out", type=Path, default=Path("runs/search_gauntlet"))
+    p.add_argument("--games", type=int, default=200)
+    p.add_argument("--h2h-games", type=int, default=200)
+    p.add_argument("--det-k", type=int, default=None)
+    p.add_argument("--iters", type=int, default=16)
+    p.add_argument("--seed", type=int, default=0)
+    p.set_defaults(fn=cmd_gauntlet_search)
 
     p = sub.add_parser("probe", help="engine throughput probe")
     p.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
