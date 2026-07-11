@@ -321,12 +321,16 @@ def joint_search_action(
 
 def _public_label(fork: Any, role: str, action_idx: int) -> str:
     """What the opponent observes if `role` plays `action_idx` in this world: kind-prefixed engine
-    move string (move id / '-tera' variant, or switch-target species). Slot indices are NOT public."""
+    move string (move id / '-tera' variant, or switch-target species). Slot indices are NOT public.
+
+    Lowercased: sides built from pastes carry poke-engine's own casing while world-fork sides are
+    rebuilt from lowercase table ids, so without normalization a label computed on the live battle
+    (fog/search/posterior_log.py) never matches the fork-built label space."""
     from fog.constants.schema import ACTIONS, ActionType
 
     kind, _ = ACTIONS[action_idx]
     prefix = "s" if kind is ActionType.SWITCH else ("f" if kind is ActionType.FORCED else "m")
-    return f"{prefix}:{fork.engine_action(role, action_idx)}"
+    return f"{prefix}:{fork.engine_action(role, action_idx)}".lower()
 
 
 def _trivial_result(action: int) -> JointSearchResult:

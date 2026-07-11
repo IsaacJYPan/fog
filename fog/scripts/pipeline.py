@@ -12,6 +12,8 @@ does need it (the binding divergence control — don't disable it, start the ser
                                                       #          baseline_run wired automatically
     python -m fog.scripts.pipeline smoke-joint        # Phase 1: live joint-search smoke (engine,
                                                       #          no training, prints the decision)
+    python -m fog.scripts.pipeline log-posteriors     # §4.2: log search posteriors (engine)
+    python -m fog.scripts.pipeline finetune-value     # §4.2: value fine-tune + regression gate
     python -m fog.scripts.pipeline probe              # engine throughput probe (SIMULATION_PLAN)
 
 The M1.5 gate is the go/no-go for the whole search program (SEARCH_PLAN §3): if b_vec buys no
@@ -65,6 +67,23 @@ def cmd_m3_grid(args) -> None:
                 f"log.dir=runs/m3_engine_b{beta}_s{seed}",
                 *(args.overrides or []),
             ])
+
+
+def cmd_log_posteriors(args) -> None:
+    cmd = [sys.executable, "-m", "fog.search.posterior_log",
+           "--pool", str(args.pool), "--out", str(args.out),
+           "--games", str(args.games), "--iters", str(args.iters), "--seed", str(args.seed)]
+    if args.ckpt:
+        cmd += ["--ckpt", args.ckpt]
+    _run(cmd)
+
+
+def cmd_finetune_value(args) -> None:
+    cmd = [sys.executable, "-m", "fog.training.value_finetune",
+           "--data", str(args.data), "--out", str(args.out)]
+    if args.ckpt:
+        cmd += ["--ckpt", args.ckpt]
+    _run(cmd)
 
 
 def cmd_probe(args) -> None:
@@ -136,6 +155,21 @@ def main() -> None:
     p.add_argument("--iters", type=int, default=16)
     p.add_argument("--seed", type=int, default=0)
     p.set_defaults(fn=cmd_smoke_joint)
+
+    p = sub.add_parser("log-posteriors", help="§4.2: log search posteriors from joint-search games")
+    p.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
+    p.add_argument("--out", type=Path, default=Path("runs/posterior_log"))
+    p.add_argument("--ckpt", type=str, default=None)
+    p.add_argument("--games", type=int, default=64)
+    p.add_argument("--iters", type=int, default=16)
+    p.add_argument("--seed", type=int, default=0)
+    p.set_defaults(fn=cmd_log_posteriors)
+
+    p = sub.add_parser("finetune-value", help="§4.2: posterior-aware value fine-tune + gate")
+    p.add_argument("--data", type=Path, default=Path("runs/posterior_log"))
+    p.add_argument("--out", type=Path, default=Path("runs/value_finetune"))
+    p.add_argument("--ckpt", type=str, default=None)
+    p.set_defaults(fn=cmd_finetune_value)
 
     p = sub.add_parser("probe", help="engine throughput probe")
     p.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))

@@ -34,7 +34,6 @@ back to the root state's value (neutral: search neither favors nor buries them).
 """
 from __future__ import annotations
 
-import numpy as np
 import torch
 
 
