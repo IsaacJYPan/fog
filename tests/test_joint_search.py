@@ -326,6 +326,34 @@ def test_joint_search_action_end_to_end(agent_fixture, request):
 
 
 @engine
+def test_item_change_reveals_sheet_item_not_swapped_item():
+    """ChangeItem reveal semantics (regression, 2026-07-11): the census tracks the SHEET, so the
+    first item change records the DEPARTING item. Recording the swapped-IN item eliminated every
+    pool team (including the true one) from exact enumeration mid-game after a Trick."""
+    from fog.search.own_states import EnumeratedPoolStates
+
+    pool = [P_ME, P_ME_VARIANT]
+    battle = _battle(seed=6)
+    source = EnumeratedPoolStates(pool, battle.tables)
+
+    # P_ME's Great Tusk holds Heavy-Duty Boots; a Trick swaps in Leftovers
+    battle._record_item_change("p1", "greattusk", "heavydutyboots", "leftovers")
+    own = source.states(battle, "p1")
+    assert own.k == 1, "the sheet item (Boots) identifies P_ME; enumeration must not lose it"
+    np.testing.assert_array_equal(own.tokens[own.true_index], battle.truth_tokens("p1"))
+
+    # a later change carries no sheet information and must never overwrite
+    battle._record_item_change("p1", "greattusk", "leftovers", "none")
+    assert battle.revealed["p1"]["p1: greattusk"]["item"] == "heavydutyboots"
+
+    # consumption-first keeps the "" (<NO_ITEM>) convention, which consistency skips
+    b2 = _battle(seed=7)
+    b2._record_item_change("p1", "kingambit", "blackglasses", "none")
+    assert b2.revealed["p1"]["p1: kingambit"]["item"] == ""
+    assert EnumeratedPoolStates(pool, b2.tables).states(b2, "p1").k == 2
+
+
+@engine
 def test_public_labels_differ_across_worlds(plain_agent):
     """The label space must be PUBLIC actions: the two pool variants share revealed moves but
     differ in one hidden move each, so the union label set exceeds any single world's set."""

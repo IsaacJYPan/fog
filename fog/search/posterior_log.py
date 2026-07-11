@@ -74,10 +74,7 @@ def collect_search_decisions(
     import random
 
     from fog.constants.tables import TABLES
-    from fog.encoding.events import build_snapshot
-    from fog.encoding.observation import Observation
     from fog.env.engine_battle import EngineBattle
-    from fog.search.joint import joint_search_action
     from fog.search.own_states import EnumeratedPoolStates
 
     if tables is None:
@@ -89,7 +86,8 @@ def collect_search_decisions(
 
     rows: list[dict[str, np.ndarray]] = []
     stats = {"games": 0, "wins": 0, "decisions": 0,
-             "skipped_trivial": 0, "skipped_unlabeled": 0, "sim_failures": 0}
+             "skipped_trivial": 0, "skipped_unlabeled": 0, "sim_failures": 0,
+             "failed_games": 0}
 
     for g in range(int(n_games)):
         battle = EngineBattle(
@@ -103,38 +101,18 @@ def collect_search_decisions(
             opp_policy = EngineMaxDamagePolicy(tables=tables, seed=rng.randrange(2**31))
 
         game_rows: list[dict[str, np.ndarray]] = []
-        while not battle.finished and battle.turn <= max_turns:
-            moves: dict[str, str] = {}
-            pending = battle.pending_sides()
-            if LEARNER in pending:
-                res = joint_search_action(
-                    agent, battle, LEARNER, own_source=own_source, iters=iters,
-                    temperature=temperature, seed=rng.randrange(2**31),
-                )
-                stats["sim_failures"] += res.failures
-                if not res.labels:
-                    stats["skipped_trivial"] += 1
-                else:
-                    feats = executed_posterior_features(res, battle, LEARNER, res.action)
-                    if feats is None:
-                        stats["skipped_unlabeled"] += 1
-                    else:
-                        view = battle.view(LEARNER)
-                        obs = Observation.from_battle(view, tracker=battle.trackers[LEARNER])
-                        game_rows.append(_row(obs, feats, res, battle.turn))
-                        stats["decisions"] += 1
-                        try:  # history retro-fidelity, same as EngineRunner._agent_wave
-                            battle.trackers[LEARNER].record_decision(
-                                battle.turn, build_snapshot(view, tables), res.action
-                            )
-                        except Exception:
-                            pass
-                moves[LEARNER] = battle.engine_action(LEARNER, res.action)
-            if OPPONENT in pending:
-                moves[OPPONENT] = battle.engine_action(
-                    OPPONENT, opp_policy.choose(battle, OPPONENT)
-                )
-            battle.step(moves)
+        try:
+            _play_logged_game(battle, agent, own_source, opp_policy, game_rows, stats,
+                              iters=iters, temperature=temperature, rng=rng,
+                              max_turns=max_turns)
+        except Exception as exc:
+            # A data-generation harness must not lose a 200-game run to one pathological game
+            # (e.g. the reveal-census bug ChangeItem/Trick used to trigger) — but silence would
+            # hide real defects, so failures are counted, the game's rows are DROPPED (a partial
+            # game would bias outcomes toward 0), and a high failure rate still raises below.
+            stats["failed_games"] += 1
+            print(f"[posterior_log] game {g} failed and was dropped: {exc!r}", flush=True)
+            continue
 
         won = battle.winner
         outcome = 0.0 if won is None else (1.0 if won == LEARNER else -1.0)
@@ -145,6 +123,9 @@ def collect_search_decisions(
             r["game"] = np.int64(g)
         rows.extend(game_rows)
 
+    if stats["failed_games"] > max(1, int(n_games) // 5):
+        raise RuntimeError(f"{stats['failed_games']}/{n_games} games failed — that is a defect, "
+                           f"not noise; fix it before trusting this log. Stats: {stats}")
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     _save_rows(rows, out_dir / "decisions.npz")
@@ -155,6 +136,47 @@ def collect_search_decisions(
     }
     (out_dir / "meta.json").write_text(json.dumps(meta, indent=2))
     return meta
+
+
+def _play_logged_game(battle, agent, own_source, opp_policy, game_rows, stats, *,
+                      iters, temperature, rng, max_turns) -> None:
+    """One engine game with joint-search learner decisions, appending logged rows in place."""
+    from fog.encoding.events import build_snapshot
+    from fog.encoding.observation import Observation
+    from fog.search.joint import joint_search_action
+
+    while not battle.finished and battle.turn <= max_turns:
+        moves: dict[str, str] = {}
+        pending = battle.pending_sides()
+        if LEARNER in pending:
+            res = joint_search_action(
+                agent, battle, LEARNER, own_source=own_source, iters=iters,
+                temperature=temperature, seed=rng.randrange(2**31),
+            )
+            stats["sim_failures"] += res.failures
+            if not res.labels:
+                stats["skipped_trivial"] += 1
+            else:
+                feats = executed_posterior_features(res, battle, LEARNER, res.action)
+                if feats is None:
+                    stats["skipped_unlabeled"] += 1
+                else:
+                    view = battle.view(LEARNER)
+                    obs = Observation.from_battle(view, tracker=battle.trackers[LEARNER])
+                    game_rows.append(_row(obs, feats, res, battle.turn))
+                    stats["decisions"] += 1
+                    try:  # history retro-fidelity, same as EngineRunner._agent_wave
+                        battle.trackers[LEARNER].record_decision(
+                            battle.turn, build_snapshot(view, battle.tables), res.action
+                        )
+                    except Exception:
+                        pass
+            moves[LEARNER] = battle.engine_action(LEARNER, res.action)
+        if OPPONENT in pending:
+            moves[OPPONENT] = battle.engine_action(
+                OPPONENT, opp_policy.choose(battle, OPPONENT)
+            )
+        battle.step(moves)
 
 
 def _row(obs, feats: np.ndarray, res, turn: int) -> dict[str, np.ndarray]:

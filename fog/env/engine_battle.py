@@ -549,6 +549,21 @@ class EngineBattle:
         )
 
     # ------------------------------------------------------------------------------ reveal census
+    def _record_item_change(self, role: str, mon_id: str, old: str, new: str) -> None:
+        """Reveal census for a ChangeItem instruction. The census tracks SHEET knowledge (the
+        belief is over ORIGINAL sets), so what an item change exposes is the DEPARTING item —
+        on the first change that IS the sheet item (Trick/Knock Off announce it). Recording the
+        swapped-IN item instead contradicts every pool paste and eliminated the TRUE team from
+        exact own-state enumeration (crashed a live posterior_log run, 2026-07-11). Consumption
+        keeps the "" (<NO_ITEM>) convention; an existing sheet reveal is never overwritten."""
+        rev = self.revealed[role].get(f"{role}: {to_id(mon_id)}", {})
+        if rev.get("item") not in (None, ""):
+            return  # sheet item already known — later changes carry no sheet information
+        if new in ("none", ""):
+            self._record_reveal(role, mon_id, item="")  # consumed/knocked: <NO_ITEM> convention
+        else:
+            self._record_reveal(role, mon_id, item=(old if old not in ("none", "") else ""))
+
     def _record_reveal(self, role: str, mon_id: str, *, move: str | None = None,
                        item: str | None = None, ability: str | None = None) -> None:
         mon_id = to_id(mon_id)
@@ -943,10 +958,9 @@ class EngineBattle:
                 old, new = to_id(m.group(2)), to_id(m.group(3))
                 if new in ("none", ""):
                     events.append(["", "-enditem", name(r), old])
-                    self._record_reveal(r, str(mons[r][active[r]].id), item="")
                 else:
                     events.append(["", "-item", name(r), new])
-                    self._record_reveal(r, str(mons[r][active[r]].id), item=new)
+                self._record_item_change(r, str(mons[r][active[r]].id), old, new)
             elif m := _INSTR["volatile+"].match(rep):
                 r = "p1" if m.group(1) == "One" else "p2"
                 events.append(["", "-start", name(r), to_id(m.group(2))])
