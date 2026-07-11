@@ -46,7 +46,9 @@ def expand_state_dict_for_posterior(sd: dict, posterior_dim: int = N_POSTERIOR_F
     sd = dict(sd)
     for key in _HEAD_LAYER0:
         w = sd[key]
-        sd[key] = torch.cat([w, torch.zeros(w.shape[0], posterior_dim, dtype=w.dtype)], dim=1)
+        sd[key] = torch.cat(
+            [w, torch.zeros(w.shape[0], posterior_dim, dtype=w.dtype, device=w.device)], dim=1
+        )
     return sd
 
 

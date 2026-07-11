@@ -177,7 +177,7 @@ def joint_search_action(
     k_states = own.k
     my_obs = Observation.from_battle(battle.view(role), tracker=battle.trackers[role])
     my_batch = _stack_obs([my_obs], device)
-    gen = torch.Generator(device="cpu")
+    gen = torch.Generator(device=device)  # must live where sample_team's multinomial runs
     gen.manual_seed(seed)
     with torch.no_grad():
         s_my = agent._backbone_pass(my_batch)

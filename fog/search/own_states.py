@@ -128,7 +128,7 @@ class SampledOwnStates:
         batch = _stack_obs([obs], _device(self.agent))
 
         self._calls += 1
-        gen = torch.Generator(device="cpu")
+        gen = torch.Generator(device=_device(self.agent))  # sample_team's multinomial device
         gen.manual_seed(self.seed * 1_000_003 + self._calls)
         with torch.no_grad():
             s = self.agent._backbone_pass(batch)
