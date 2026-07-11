@@ -589,6 +589,20 @@ async def _train_async(cfg: dict) -> dict:
         rec = recent_results.setdefault(opp_name, deque(maxlen=200))
         rec.extend([1.0] * dw + [0.0] * (df - dw))
         s.chunk_battles += df
+        # poke-env retains every finished battle in Player._battles (full per-turn event
+        # observations, Pokemon objects) and n_won/n_finished are COMPUTED from it — nothing
+        # evicts. Measured live 2026-07-10: ~2 GB commit growth per ~90k decisions, enough to
+        # exhaust a 16 GB box mid-grid. Everything per-battle is already consumed by the time
+        # battle_against returns (buffer end_game + adapter state eviction run in the finished
+        # callback), and the win-rate accounting above re-baselines every chunk, so dropping the
+        # objects here is safe. Failure is downgraded to a warning: a stuck reset must not kill
+        # an hours-long run — it just resumes leaking.
+        try:
+            me.reset_battles()
+            opponent.reset_battles()
+        except Exception as exc:  # pragma: no cover - only on unfinished-battle races
+            print(f"[ppo] WARNING: reset_battles failed ({exc}); battle objects retained "
+                  "this chunk (memory will grow).", flush=True)
 
         if _maybe_chunk_update(s, adapter, recent_results) == "halt":
             return s.metrics
