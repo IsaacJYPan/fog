@@ -1,4 +1,4 @@
-"""Environment: poke-env wrappers, POC formats, and the vectorized self-play runner (spec §0).
+"""Environment: poke-env wrappers, team pools, and the vectorized self-play runner (spec §0).
 
 The Showdown simulator (Node) is the throughput bottleneck, not the GPU. The runner spins up N parallel
 Node Showdown processes via poke-env's async interface, all pushing trajectories to a single GPU

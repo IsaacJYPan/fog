@@ -9,8 +9,9 @@ Watch the §6 diagnostics dashboard from day one: win-rate vs each frozen league
 turn-bucket; belief accuracy vs turn number (MUST be monotone increasing within games); value
 calibration; tera-usage fraction; average game length.
 
-GAE and `ppo_update` are real; `train` (the rollout <-> update loop) needs the env runner and is
-specified in IMPLEMENTATION_PLAN.md.
+`train` runs the full rollout <-> update loop: league opponent sampling -> live battles into a
+RolloutBuffer -> GAE -> `ppo_update` -> league snapshots + checkpoints (+ the §7 leakage machinery
+when leakage.beta > 0).
 """
 from __future__ import annotations
 
@@ -192,21 +193,283 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
 
 
 def train(cfg: dict) -> dict:
-    """Self-play PPO loop (§6): FogPlayer collects into a RolloutBuffer against league opponents;
+    """Self-play PPO loop (§6): rollouts collect into a RolloutBuffer against league opponents;
     ppo_update consumes it; checkpoints snapshot into the league. Returns the last metrics dict.
 
-    Requires: built constant tables, a running local Showdown server, poke-env installed.
-    Config keys used (all under sensible defaults): env.battle_format, ppo.{lr, total_decisions,
-    batch_decisions, games_per_chunk, ...ppo_update keys}, league.snapshot_every_decisions,
-    leakage.beta (0 = N-agent), log.dir.
+    `env.backend` selects the simulator (SIMULATION_PLAN):
+      * "showdown" (default) — poke-env vs a live local server; ground truth. Byte-identical
+        behavior to the pre-backend-switch trainer.
+      * "engine"             — poke-engine batched lockstep self-play (fog.env.engine_runner);
+        volume track for M3/M4 grids. No server needed. Final fine-tune + all headline evals
+        stay on Showdown (divergence rules in SIMULATION_PLAN §5).
+
+    Config keys used (all under sensible defaults): env.{battle_format, team_pool, backend,
+    engine_batch}, ppo.{lr, total_decisions, batch_decisions, games_per_chunk, ...ppo_update keys},
+    league.snapshot_every_decisions, leakage.beta (0 = N-agent), log.dir.
     """
+    backend = str(cfg.get("env", {}).get("backend", "showdown")).lower()
+    if backend == "engine":
+        return _train_engine(cfg)
+    if backend != "showdown":
+        raise ValueError(f"env.backend must be 'showdown' or 'engine', got {backend!r}")
     import asyncio
 
     return asyncio.run(_train_async(cfg))
 
 
-async def _train_async(cfg: dict) -> dict:
+class _TrainSetup:
+    """Backend-agnostic training state shared by _train_async and _train_engine (one code path
+    for the update tail — drift between backends is exactly the bug class the audits punished)."""
+
+    def __init__(self, cfg: dict, *, scripted: tuple[str, ...] | None = None,
+                 require_pool: bool = False):
+        import time
+        from pathlib import Path
+
+        import torch
+
+        from fog.models.agent import FogAgent
+        from fog.models.probe import TrainableProbe
+        from fog.training.rollout import RolloutBuffer
+
+        self.cfg = cfg
+        self.seed = int(cfg.get("seed", 0))
+        torch.manual_seed(self.seed)
+        np.random.seed(self.seed)
+        self.device = torch.device(
+            cfg.get("device", "cpu") if torch.cuda.is_available() else "cpu"
+        )
+
+        self.ppo_cfg = cfg.get("ppo", {})
+        self.env_cfg = cfg.get("env", {})
+        self.fmt = self.env_cfg.get("battle_format", "gen9ou")
+        team_pool_path = self.env_cfg.get("team_pool")
+        self.pool_teams: list[str] | None = None
+        if team_pool_path:
+            from fog.env.teams import load_pool
+
+            self.pool_teams = load_pool(team_pool_path)
+        elif require_pool or "randombattle" not in self.fmt:
+            raise ValueError(
+                f"battle_format {self.fmt!r} needs teams: set env.team_pool to a paste directory "
+                "(e.g. data/teams/pool_b) — validate it first with fog.env.teams.validate_pool."
+                + (" The engine backend has no randombattle generator." if require_pool else "")
+            )
+
+        self.total = int(self.ppo_cfg.get("total_decisions", 100_000))
+        self.batch_decisions = int(self.ppo_cfg.get("batch_decisions", 16_000))
+        self.games_per_chunk = int(self.ppo_cfg.get("games_per_chunk", 8))
+        self.lr = float(self.ppo_cfg.get("lr", 1e-4))
+        self.leak_cfg = cfg.get("leakage", {})
+        self.beta = float(self.leak_cfg.get("beta", 0.0))
+        self.snap_every = int(cfg.get("league", {}).get("snapshot_every_decisions", 200_000))
+        self.ckpt_dir = Path(cfg.get("log", {}).get("dir", "runs")) / "checkpoints"
+        self.ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+        self.oracle_mode = str(cfg.get("model", {}).get("oracle", "none"))
+        if self.oracle_mode == "action":
+            raise NotImplementedError(
+                "model.oracle=action cannot be trained in the online loop: the opponent's "
+                "committed action is not observable at decision time (choices resolve "
+                "simultaneously). The action-oracle ceiling needs an offline/replay pathway "
+                "(spec §3.4); failing loudly here beats silently training an N-agent and "
+                "reporting a fake ~0 oracle gap."
+            )
+        if self.oracle_mode == "set" and self.pool_teams is None:
+            raise ValueError(
+                "model.oracle=set requires env.team_pool — the truth tokens come from the "
+                "sampled pool teams (recording teambuilder / attribute match)."
+            )
+
+        self.agent = FogAgent.from_tables(cfg).to(self.device)
+        self.opt = torch.optim.AdamW(self.agent.parameters(), lr=self.lr)
+        self.league = League(
+            snapshot_every_decisions=self.snap_every,
+            **({"scripted": tuple(scripted)} if scripted else {}),
+        )
+        # leakage.clip_delta: True = per-step max(0, ΔI) (§7 default); False = signed ΔI, whose
+        # per-game sum TELESCOPES to CE_first − CE_final — immune to the clipped estimator's
+        # CE-noise bias (E[Σ max(0,ΔI)] grows with probe-CE variance even at zero net reveal).
+        # Run at least one β cell with clip_delta=false as the estimator ablation.
+        self.buf = RolloutBuffer(
+            gamma=self.ppo_cfg.get("gamma", 1.0), lam=self.ppo_cfg.get("lam", 0.95),
+            beta=self.beta, clip_deltas=bool(self.leak_cfg.get("clip_delta", True)),
+        )
+        self.dash = _Dashboard(cfg.get("log", {}).get("dir", "runs"))
+
+        # pool truth (belief supervision fallback / oxygen check §7)
+        self.pool_truth = None
+        if self.pool_teams is not None:
+            from fog.constants.tables import TABLES
+            from fog.env.team_truth import PoolTruth
+
+            self.pool_truth = PoolTruth(self.pool_teams, TABLES)
+            if self.beta > 0:
+                warning = self.pool_truth.hidden_info_warning()
+                if warning and not self.leak_cfg.get("allow_unique_species_pool", False):
+                    raise ValueError(
+                        f"leakage run (beta={self.beta}) on {team_pool_path}: {warning} "
+                        "Override with leakage.allow_unique_species_pool=true if this is "
+                        "intentional."
+                    )
+
+        # BC anchor (KL penalty, §6): freeze a copy of the BC/initial policy for early self-play.
+        self.bc_anchor = None
+        self.kl_anchor_decisions = int(self.ppo_cfg.get("kl_anchor_decisions", 0))
+        if self.ppo_cfg.get("bc_anchor_ckpt"):
+            self.bc_anchor = FogAgent.from_tables(cfg).to(self.device)
+            self.bc_anchor.load_state_dict(
+                torch.load(self.ppo_cfg["bc_anchor_ckpt"], map_location=self.device)
+            )
+            self.bc_anchor.eval()
+
+        # entropy decay + leakage Φ̂ refreeze schedule (§7)
+        self.entropy0 = float(self.ppo_cfg.get("entropy_coef", 0.01))
+        self.entropy_decay_to = float(self.ppo_cfg.get("entropy_coef_final", self.entropy0))
+        self.refreeze_every = int(self.leak_cfg.get("refreeze_every_decisions", 100_000))
+        self.watchdog = None
+        if self.beta > 0:
+            from fog.training.leakage import DegenerateSolutionWatchdog
+
+            baseline_run = self.leak_cfg.get("baseline_run")
+            if baseline_run:
+                self.watchdog = DegenerateSolutionWatchdog.from_control_run(baseline_run)
+                print(f"[ppo] watchdog baselines from control run: {baseline_run}", flush=True)
+            else:
+                self.watchdog = DegenerateSolutionWatchdog()
+                print(
+                    "[ppo] WARNING: leakage.baseline_run not set - the diversity and stalling "
+                    "detectors are OFF (they need beta=0 control baselines; fabricated defaults "
+                    "false-halted fresh runs at their first update). Only the stale-probe "
+                    "detector runs. Run the beta=0 control first and point leakage.baseline_run "
+                    "at its log dir.",
+                    flush=True,
+                )
+            # stale-Φ̂ exploitation needs time-against-a-frozen-Φ̂ to exist at all; don't let
+            # init-noise CE gaps halt the run (observed live: frozen−fresh ≈ 13.6 nats at update
+            # one, no staleness).
+            self.watchdog.warmup_decisions = int(
+                self.leak_cfg.get("watchdog_warmup_decisions", 20_000)
+            )
+
+        # fresh probe (§7 staleness watchdog + honest readability tracking): an independent
+        # reader trained on every rollout batch. On for any leakage run; optional otherwise.
+        self.fresh_probe = None
+        self.fresh_opt = None
+        if self.beta > 0 or self.leak_cfg.get("fresh_probe", False):
+            self.fresh_probe = TrainableProbe.from_agent(self.agent, cfg).to(self.device)
+            self.fresh_opt = torch.optim.AdamW(
+                self.fresh_probe.parameters(), lr=float(self.leak_cfg.get("fresh_probe_lr", 3e-4))
+            )
+
+        # update-loop counters (mutated by _maybe_chunk_update)
+        self.decisions_seen = 0
+        self.next_snapshot = self.snap_every
+        self.next_refreeze = self.refreeze_every
+        self.metrics: dict = {}
+        self.chunk_t0 = time.monotonic()
+        self.chunk_battles = 0
+
+
+def _maybe_chunk_update(s: "_TrainSetup", phi_owner, recent_results: dict) -> str | None:
+    """The shared update tail: batch -> schedules -> probes -> ppo_update -> dashboard ->
+    watchdog -> refreeze -> snapshot. `phi_owner` is whatever holds `.phi_hat` for this backend
+    (the FogPlayer adapter / the engine runner's helper). Returns "halt" on watchdog fire."""
     import time
+
+    import torch
+
+    from fog.models.probe import FrozenProbe
+
+    if s.buf.n_decisions < min(s.batch_decisions, s.total - s.decisions_seen):
+        return None
+
+    frac = min(1.0, s.decisions_seen / max(1, s.total))
+    step_cfg = dict(s.cfg)
+    step_ppo = dict(s.ppo_cfg)
+    step_ppo["entropy_coef"] = s.entropy0 + (s.entropy_decay_to - s.entropy0) * frac
+    step_ppo["kl_anchor_coef"] = (
+        s.ppo_cfg.get("kl_anchor_coef", 0.02)
+        if (s.bc_anchor is not None and s.decisions_seen < s.kl_anchor_decisions)
+        else 0.0
+    )
+    step_cfg["ppo"] = step_ppo
+
+    n_games = s.buf.n_games
+    batch = s.buf.to_batch(s.device)
+    if s.bc_anchor is not None and step_ppo["kl_anchor_coef"] > 0:
+        with torch.no_grad():
+            batch["bc_log_probs"] = s.bc_anchor(batch).log_probs
+    n = int(batch["actions"].shape[0])
+
+    # fresh probe (§7): fit the independent reader on this batch's mirror views, then measure
+    # fresh vs frozen readability CE for the staleness watchdog.
+    probe_metrics = _fit_and_measure_probes(
+        s.fresh_probe, s.fresh_opt, phi_owner.phi_hat, batch,
+        steps=int(s.leak_cfg.get("fresh_probe_steps", 4)),
+    )
+
+    metrics = ppo_update(s.agent, s.opt, batch, step_cfg)
+    metrics.update(probe_metrics)
+    metrics.update(_belief_accuracy_vs_turn(s.agent, batch))
+    s.buf.clear()
+    s.decisions_seen += n
+
+    all_recent = [r for d in recent_results.values() for r in d]
+    win_rate = float(np.mean(all_recent)) if all_recent else 0.0
+    dt = max(1e-6, time.monotonic() - s.chunk_t0)
+    metrics.update(
+        decisions=s.decisions_seen,
+        win_rate=win_rate,
+        avg_game_length=n / max(1, n_games),
+        battles_per_sec=s.chunk_battles / dt,
+        decisions_per_sec=n / dt,
+        entropy_coef=step_ppo["entropy_coef"],
+        move_entropy=metrics.get("entropy", 0.0),
+    )
+    for name, results in recent_results.items():
+        if results:
+            metrics[f"win_rate_vs_{name}"] = float(np.mean(results))
+    s.chunk_t0, s.chunk_battles = time.monotonic(), 0
+    s.dash.log(s.decisions_seen, metrics)
+    print(
+        f"[ppo] decisions={s.decisions_seen}  win_rate={win_rate:.3f}  "
+        f"loss={metrics['loss']:.4f}  entropy={metrics['entropy']:.3f}  "
+        f"kl={metrics['approx_kl']:.4f}  clip={metrics['clip_frac']:.3f}"
+        + (f"  belief={metrics.get('belief_loss', 0):.3f}" if 'belief_loss' in metrics else "")
+        + (f"  self_belief={metrics.get('self_belief_loss', 0):.3f}"
+           if 'self_belief_loss' in metrics else ""),
+        flush=True,
+    )
+    s.metrics = metrics
+
+    if s.watchdog is not None:
+        # baselines from the control run at MATCHED progress: comparing a fresh run's early
+        # win-rate/entropy against the control's FINAL values false-fires both diversity
+        # conditions on the first update of every L-run.
+        s.watchdog.update_to(s.decisions_seen)
+        flags = s.watchdog.check_all(metrics)
+        if any(flags.values()):
+            print(f"[ppo] WATCHDOG {flags} — HALTING for inspection (§7/§10).", flush=True)
+            torch.save(s.agent.state_dict(), s.ckpt_dir / "ppo_watchdog_halt.pt")
+            metrics["watchdog_halt"] = 1.0
+            s.dash.log(s.decisions_seen, metrics)
+            return "halt"
+
+    if s.beta > 0 and s.decisions_seen >= s.next_refreeze:
+        phi_owner.phi_hat = FrozenProbe.from_agent(s.agent).to(s.device)
+        s.next_refreeze += s.refreeze_every
+
+    if s.decisions_seen >= s.next_snapshot:
+        path = s.ckpt_dir / f"ppo_{s.decisions_seen}.pt"
+        torch.save(s.agent.state_dict(), path)
+        s.league.past_ckpts.append(path)
+        s.league.latest_ckpt = path
+        s.next_snapshot += s.snap_every
+    return "updated"
+
+
+async def _train_async(cfg: dict) -> dict:
     from collections import deque
     from pathlib import Path
 
@@ -214,35 +477,20 @@ async def _train_async(cfg: dict) -> dict:
 
     from fog.env.player import FogPlayer, unique_account
     from fog.models.agent import FogAgent
-    from fog.models.probe import FrozenProbe, TrainableProbe
-    from fog.training.rollout import RolloutBuffer
+    from fog.models.probe import FrozenProbe
 
     try:
         from poke_env.player import MaxBasePowerPlayer, RandomPlayer, SimpleHeuristicsPlayer
     except ImportError as exc:  # pragma: no cover
         raise RuntimeError("poke-env is required for self-play training.") from exc
 
-    seed = int(cfg.get("seed", 0))
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-    device = torch.device(
-        cfg.get("device", "cpu") if torch.cuda.is_available() else "cpu"
-    )
-
-    ppo_cfg = cfg.get("ppo", {})
-    env_cfg = cfg.get("env", {})
-    fmt = env_cfg.get("battle_format", "gen9ou")
-    team_pool_path = env_cfg.get("team_pool")
-    pool_teams: list[str] | None = None
-    if team_pool_path:
-        from fog.env.teams import load_pool
-
-        pool_teams = load_pool(team_pool_path)
-    elif "randombattle" not in fmt:
-        raise ValueError(
-            f"battle_format {fmt!r} needs teams: set env.team_pool to a paste directory "
-            "(e.g. data/teams/pool_b) — validate it first with fog.env.teams.validate_pool."
-        )
+    s = _TrainSetup(cfg)
+    device = s.device
+    agent, league, buf = s.agent, s.league, s.buf
+    env_cfg, leak_cfg = s.env_cfg, s.leak_cfg
+    fmt, pool_teams, beta, seed = s.fmt, s.pool_teams, s.beta, s.seed
+    games_per_chunk, total = s.games_per_chunk, s.total
+    concurrent = int(env_cfg.get("concurrent_battles", 1))
 
     def team_for(seed_offset: int):
         """Per-player pool sampler (teams re-sampled every battle, spec §6)."""
@@ -251,84 +499,6 @@ async def _train_async(cfg: dict) -> dict:
         from fog.env.teams import make_pool_teambuilder
 
         return make_pool_teambuilder(pool_teams, seed=seed + seed_offset)
-    total = int(ppo_cfg.get("total_decisions", 100_000))
-    batch_decisions = int(ppo_cfg.get("batch_decisions", 16_000))
-    games_per_chunk = int(ppo_cfg.get("games_per_chunk", 8))
-    lr = float(ppo_cfg.get("lr", 1e-4))
-    leak_cfg = cfg.get("leakage", {})
-    beta = float(leak_cfg.get("beta", 0.0))
-    concurrent = int(env_cfg.get("concurrent_battles", 1))
-    snap_every = int(cfg.get("league", {}).get("snapshot_every_decisions", 200_000))
-    ckpt_dir = Path(cfg.get("log", {}).get("dir", "runs")) / "checkpoints"
-    ckpt_dir.mkdir(parents=True, exist_ok=True)
-
-    oracle_mode = str(cfg.get("model", {}).get("oracle", "none"))
-    if oracle_mode == "action":
-        raise NotImplementedError(
-            "model.oracle=action cannot be trained in the online loop: the opponent's committed "
-            "action is not observable at decision time (Showdown resolves choices simultaneously). "
-            "The action-oracle ceiling needs an offline/replay pathway (spec §3.4); failing loudly "
-            "here beats silently training an N-agent and reporting a fake ~0 oracle gap."
-        )
-    if oracle_mode == "set" and pool_teams is None:
-        raise ValueError(
-            "model.oracle=set requires env.team_pool — the truth tokens come from the sampled "
-            "pool teams (recording teambuilder / attribute match)."
-        )
-
-    agent = FogAgent.from_tables(cfg).to(device)
-    opt = torch.optim.AdamW(agent.parameters(), lr=lr)
-    league = League(snapshot_every_decisions=snap_every)
-    # leakage.clip_delta: True = per-step max(0, ΔI) (§7 default); False = signed ΔI, whose per-game
-    # sum TELESCOPES to CE_first − CE_final — immune to the clipped estimator's CE-noise bias
-    # (E[Σ max(0,ΔI)] grows with probe-CE variance even at zero net reveal). Run at least one β cell
-    # with clip_delta=false as the estimator ablation.
-    buf = RolloutBuffer(
-        gamma=ppo_cfg.get("gamma", 1.0), lam=ppo_cfg.get("lam", 0.95), beta=beta,
-        clip_deltas=bool(leak_cfg.get("clip_delta", True)),
-    )
-    dash = _Dashboard(cfg.get("log", {}).get("dir", "runs"))
-
-    # BC anchor (KL penalty, §6): freeze a copy of the BC/initial policy to anchor early self-play.
-    bc_anchor = None
-    kl_anchor_decisions = int(ppo_cfg.get("kl_anchor_decisions", 0))
-    if cfg.get("ppo", {}).get("bc_anchor_ckpt"):
-        bc_anchor = FogAgent.from_tables(cfg).to(device)
-        bc_anchor.load_state_dict(torch.load(cfg["ppo"]["bc_anchor_ckpt"], map_location=device))
-        bc_anchor.eval()
-
-    # entropy decay + leakage Φ̂ refreeze schedule (§7)
-    entropy0 = float(ppo_cfg.get("entropy_coef", 0.01))
-    entropy_decay_to = float(ppo_cfg.get("entropy_coef_final", entropy0))
-    refreeze_every = int(leak_cfg.get("refreeze_every_decisions", 100_000))
-    watchdog = None
-    if beta > 0:
-        from fog.training.leakage import DegenerateSolutionWatchdog
-
-        baseline_run = leak_cfg.get("baseline_run")
-        if baseline_run:
-            watchdog = DegenerateSolutionWatchdog.from_control_run(baseline_run)
-            print(f"[ppo] watchdog baselines from control run: {baseline_run}", flush=True)
-        else:
-            watchdog = DegenerateSolutionWatchdog()
-            print(
-                "[ppo] WARNING: leakage.baseline_run not set - the diversity and stalling "
-                "detectors are OFF (they need beta=0 control baselines; fabricated defaults "
-                "false-halted fresh runs at their first update). Only the stale-probe detector "
-                "runs. Run the beta=0 control first and point leakage.baseline_run at its log dir.",
-                flush=True,
-            )
-        # stale-Φ̂ exploitation needs time-against-a-frozen-Φ̂ to exist at all; don't let init-noise
-        # CE gaps halt the run (observed live: frozen−fresh ≈ 13.6 nats at update one, no staleness).
-        watchdog.warmup_decisions = int(leak_cfg.get("watchdog_warmup_decisions", 20_000))
-
-    # fresh probe (§7 staleness watchdog + honest readability tracking): an independent reader
-    # trained on every rollout batch. On for any leakage run; optional otherwise.
-    fresh_probe = None
-    fresh_opt = None
-    if beta > 0 or leak_cfg.get("fresh_probe", False):
-        fresh_probe = TrainableProbe.from_agent(agent, cfg).to(device)
-        fresh_opt = torch.optim.AdamW(fresh_probe.parameters(), lr=float(leak_cfg.get("fresh_probe_lr", 3e-4)))
 
     adapter = FogPlayer(agent)
     adapter.attach_buffer(buf)
@@ -346,9 +516,9 @@ async def _train_async(cfg: dict) -> dict:
     opp_teambuilders: dict[str, object] = {}
     if pool_teams is not None:
         from fog.constants.tables import TABLES
-        from fog.env.team_truth import PoolTruth, truth_tokens_from_paste
+        from fog.env.team_truth import truth_tokens_from_paste
 
-        pool_truth = PoolTruth(pool_teams, TABLES)
+        pool_truth = s.pool_truth
         _paste_tokens: dict[str, "np.ndarray"] = {}
 
         def _truth(battle):
@@ -362,18 +532,8 @@ async def _train_async(cfg: dict) -> dict:
             return pool_truth.match_battle(battle)   # attribute match; None until unambiguous
 
         adapter.truth_provider = _truth
-        if oracle_mode == "set":
+        if s.oracle_mode == "set":
             adapter.oracle_truth_provider = _truth
-
-        if beta > 0:
-            # Oxygen check (§7): a leakage run needs concealable information. On a pool whose
-            # species multisets are all unique, preview identifies the team at turn 0 and β is inert.
-            warning = pool_truth.hidden_info_warning()
-            if warning and not leak_cfg.get("allow_unique_species_pool", False):
-                raise ValueError(
-                    f"leakage run (beta={beta}) on {team_pool_path}: {warning} "
-                    "Override with leakage.allow_unique_species_pool=true if this is intentional."
-                )
     me = adapter.build(
         battle_format=fmt,
         max_concurrent_battles=concurrent,
@@ -416,15 +576,9 @@ async def _train_async(cfg: dict) -> dict:
             )
         return ckpt_opponents[name]
 
-    decisions_seen = 0
-    next_snapshot = snap_every
-    next_refreeze = refreeze_every
-    metrics: dict = {}
     # per-opponent rolling win records (dashboard §6: win-rate vs each league member, NOT cumulative)
     recent_results: dict[str, deque] = {}
-    chunk_t0 = time.monotonic()
-    chunk_battles = 0
-    while decisions_seen < total:
+    while s.decisions_seen < total:
         opp_spec = league.sample_opponent()
         opp_name = str(opp_spec) if str(opp_spec) in scripted_classes else Path(str(opp_spec)).stem
         opponent = get_opponent(opp_spec)
@@ -434,95 +588,130 @@ async def _train_async(cfg: dict) -> dict:
         dw, df = me.n_won_battles - won0, me.n_finished_battles - fin0
         rec = recent_results.setdefault(opp_name, deque(maxlen=200))
         rec.extend([1.0] * dw + [0.0] * (df - dw))
-        chunk_battles += df
+        s.chunk_battles += df
 
-        if buf.n_decisions >= min(batch_decisions, total - decisions_seen):
-            # per-update schedules
-            frac = min(1.0, decisions_seen / max(1, total))
-            step_cfg = dict(cfg)
-            step_ppo = dict(ppo_cfg)
-            step_ppo["entropy_coef"] = entropy0 + (entropy_decay_to - entropy0) * frac
-            step_ppo["kl_anchor_coef"] = (
-                ppo_cfg.get("kl_anchor_coef", 0.02)
-                if (bc_anchor is not None and decisions_seen < kl_anchor_decisions)
-                else 0.0
-            )
-            step_cfg["ppo"] = step_ppo
+        if _maybe_chunk_update(s, adapter, recent_results) == "halt":
+            return s.metrics
 
-            n_games = buf.n_games
-            batch = buf.to_batch(device)
-            if bc_anchor is not None and step_ppo["kl_anchor_coef"] > 0:
-                with torch.no_grad():
-                    batch["bc_log_probs"] = bc_anchor(batch).log_probs
-            n = int(batch["actions"].shape[0])
-
-            # fresh probe (§7): fit the independent reader on this batch's mirror views, then
-            # measure fresh vs frozen readability CE for the staleness watchdog.
-            probe_metrics = _fit_and_measure_probes(
-                fresh_probe, fresh_opt, adapter.phi_hat, batch,
-                steps=int(leak_cfg.get("fresh_probe_steps", 4)),
-            )
-
-            metrics = ppo_update(agent, opt, batch, step_cfg)
-            metrics.update(probe_metrics)
-            metrics.update(_belief_accuracy_vs_turn(agent, batch))
-            buf.clear()
-            decisions_seen += n
-
-            all_recent = [r for d in recent_results.values() for r in d]
-            win_rate = float(np.mean(all_recent)) if all_recent else 0.0
-            dt = max(1e-6, time.monotonic() - chunk_t0)
-            metrics.update(
-                decisions=decisions_seen,
-                win_rate=win_rate,
-                avg_game_length=n / max(1, n_games),
-                battles_per_sec=chunk_battles / dt,
-                decisions_per_sec=n / dt,
-                entropy_coef=step_ppo["entropy_coef"],
-                move_entropy=metrics.get("entropy", 0.0),
-            )
-            for name, results in recent_results.items():
-                if results:
-                    metrics[f"win_rate_vs_{name}"] = float(np.mean(results))
-            chunk_t0, chunk_battles = time.monotonic(), 0
-            dash.log(decisions_seen, metrics)
-            print(
-                f"[ppo] decisions={decisions_seen}  win_rate={win_rate:.3f}  "
-                f"loss={metrics['loss']:.4f}  entropy={metrics['entropy']:.3f}  "
-                f"kl={metrics['approx_kl']:.4f}  clip={metrics['clip_frac']:.3f}"
-                + (f"  belief={metrics.get('belief_loss', 0):.3f}" if 'belief_loss' in metrics else "")
-                + (f"  self_belief={metrics.get('self_belief_loss', 0):.3f}"
-                   if 'self_belief_loss' in metrics else ""),
-                flush=True,
-            )
-            if watchdog is not None:
-                # baselines from the control run at MATCHED progress: comparing a fresh run's early
-                # win-rate/entropy against the control's FINAL values false-fires both diversity
-                # conditions on the first update of every L-run.
-                watchdog.update_to(decisions_seen)
-                flags = watchdog.check_all(metrics)
-                if any(flags.values()):
-                    print(f"[ppo] WATCHDOG {flags} — HALTING for inspection (§7/§10).", flush=True)
-                    torch.save(agent.state_dict(), ckpt_dir / "ppo_watchdog_halt.pt")
-                    metrics["watchdog_halt"] = 1.0
-                    dash.log(decisions_seen, metrics)
-                    return metrics
-
-            if beta > 0 and decisions_seen >= next_refreeze:
-                adapter.phi_hat = FrozenProbe.from_agent(agent).to(device)
-                next_refreeze += refreeze_every
-
-            if decisions_seen >= next_snapshot:
-                path = ckpt_dir / f"ppo_{decisions_seen}.pt"
-                torch.save(agent.state_dict(), path)
-                league.past_ckpts.append(path)
-                league.latest_ckpt = path
-                next_snapshot += snap_every
-
-    final = ckpt_dir / "ppo_final.pt"
+    final = s.ckpt_dir / "ppo_final.pt"
     torch.save(agent.state_dict(), final)
-    print(f"[ppo] done: {decisions_seen} decisions -> {final}", flush=True)
-    return metrics
+    print(f"[ppo] done: {s.decisions_seen} decisions -> {final}", flush=True)
+    return s.metrics
+
+
+def _train_engine(cfg: dict) -> dict:
+    """Engine-backend training loop (SIMULATION_PLAN §4/§5): synchronous batched lockstep
+    self-play on poke-engine, sharing the exact update tail with the Showdown path.
+
+    Differences from _train_async, all deliberate:
+      * no server / poke-env players — EngineRunner drives EngineBattles directly;
+      * scripted league opponents are the engine ports (Random, MaxDamage). SimpleHeuristics is
+        Showdown-only and raises here (eval it on Showdown; SIMULATION_PLAN §4);
+      * belief/oracle truth is exact by construction (the runner sampled both pastes);
+      * the cross-sim divergence gauntlet (§5) runs every `cross_sim.every_decisions` when
+        enabled: engine-vs-Showdown win-rate gap > `cross_sim.halt_gap` (default 0.03) HALTS.
+    """
+    from collections import deque
+    from pathlib import Path
+
+    import torch
+
+    from fog.env.engine_battle import HAVE_ENGINE
+    from fog.env.engine_runner import EngineRunner, FrozenAgentPolicy
+    from fog.env.engine_scripted import SCRIPTED_ENGINE_POLICIES
+    from fog.models.agent import FogAgent
+    from fog.models.probe import FrozenProbe
+
+    if not HAVE_ENGINE:
+        raise RuntimeError("env.backend=engine requires poke-engine: pip install poke-engine")
+
+    engine_scripted = tuple(
+        cfg.get("league", {}).get("scripted", ("MaxDamage", "Random"))
+    )
+    unknown = [n for n in engine_scripted if n not in SCRIPTED_ENGINE_POLICIES]
+    if unknown:
+        raise ValueError(
+            f"league.scripted {unknown} cannot run on the engine backend (engine ports exist "
+            f"for {sorted(SCRIPTED_ENGINE_POLICIES)}). SimpleHeuristics and other poke-env "
+            "players are Showdown-only: evaluate against them with env.backend=showdown."
+        )
+
+    s = _TrainSetup(cfg, scripted=engine_scripted, require_pool=True)
+    total, games_per_chunk = s.total, s.games_per_chunk
+
+    phi_hat = FrozenProbe.from_agent(s.agent).to(s.device) if s.beta > 0 else None
+    runner = EngineRunner(
+        s.agent,
+        s.buf,
+        pool=s.pool_teams,
+        batch_size=int(s.env_cfg.get("engine_batch", 64)),
+        seed=s.seed,
+        phi_hat=phi_hat,
+        leak_family_weights=s.leak_cfg.get("family_weights"),
+        oracle_truth=(s.oracle_mode == "set"),
+    )
+
+    cross_cfg = cfg.get("cross_sim", {})
+    cross_every = int(cross_cfg.get("every_decisions", 0))
+    next_cross = cross_every if cross_every else None
+
+    scripted_instances = {
+        name: SCRIPTED_ENGINE_POLICIES[name](seed=s.seed + 100 + i)
+        for i, name in enumerate(engine_scripted)
+    }
+    ckpt_opponents: dict[str, FrozenAgentPolicy] = {}
+
+    def get_opponent(spec):
+        name = str(spec)
+        if name in scripted_instances:
+            return scripted_instances[name]
+        if name not in ckpt_opponents:  # a checkpoint Path: frozen past self
+            frozen = FogAgent.from_tables(cfg).to(s.device)
+            frozen.load_state_dict(torch.load(spec, map_location=s.device))
+            ckpt_opponents[name] = FrozenAgentPolicy(frozen, name=Path(name).stem)
+        return ckpt_opponents[name]
+
+    recent_results: dict[str, deque] = {}
+    while s.decisions_seen < total:
+        opp_spec = s.league.sample_opponent()
+        opp_name = str(opp_spec) if str(opp_spec) in scripted_instances else Path(str(opp_spec)).stem
+        opponent = get_opponent(opp_spec)
+        # collection runs with the agent in its live training mode — identical to the Showdown
+        # path (an eval() toggle here would silently change the PPO ratio semantics per backend)
+        stats = runner.play_games(opponent, games_per_chunk)
+        rec = recent_results.setdefault(opp_name, deque(maxlen=200))
+        rec.extend([1.0] * stats["wins"] + [0.0] * (stats["games"] - stats["wins"]))
+        s.chunk_battles += stats["games"]
+
+        if _maybe_chunk_update(s, runner._helper, recent_results) == "halt":
+            return s.metrics
+
+        if next_cross is not None and s.decisions_seen >= next_cross:
+            from fog.eval.cross_sim import cross_sim_gauntlet
+
+            report = cross_sim_gauntlet(s.agent, cfg)
+            s.metrics.update({f"cross_sim_{k}": v for k, v in report.items()
+                              if isinstance(v, (int, float))})
+            s.dash.log(s.decisions_seen, s.metrics)
+            gap = report.get("gap")
+            halt_gap = float(cross_cfg.get("halt_gap", 0.03))
+            if gap is not None and abs(gap) > halt_gap:
+                print(
+                    f"[ppo] CROSS-SIM HALT: engine-vs-Showdown win-rate gap {gap:+.3f} exceeds "
+                    f"{halt_gap:.3f} — the policy is exploiting simulator divergence "
+                    f"(SIMULATION_PLAN §5). Checkpoint saved for inspection.",
+                    flush=True,
+                )
+                torch.save(s.agent.state_dict(), s.ckpt_dir / "ppo_cross_sim_halt.pt")
+                s.metrics["cross_sim_halt"] = 1.0
+                s.dash.log(s.decisions_seen, s.metrics)
+                return s.metrics
+            next_cross += cross_every
+
+    final = s.ckpt_dir / "ppo_final.pt"
+    torch.save(s.agent.state_dict(), final)
+    print(f"[ppo] done (engine backend): {s.decisions_seen} decisions -> {final}", flush=True)
+    return s.metrics
 
 
 def _fit_and_measure_probes(fresh_probe, fresh_opt, phi_hat, batch: dict, steps: int = 4,

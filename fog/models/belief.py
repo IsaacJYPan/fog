@@ -270,7 +270,3 @@ class BeliefModel(nn.Module):
         if was_training:
             self.train()
         return cur.reshape(b, k, N_SLOTS, len(SLOT_ATTRS))
-
-    def belief_vec(self, s: torch.Tensor, opp_revealed: dict) -> torch.Tensor:
-        """Cheap path: just the pooled hidden b_vec, for policy/value conditioning."""
-        return self.forward(s, opp_revealed).b_vec

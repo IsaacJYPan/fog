@@ -1,7 +1,5 @@
-"""Tests for the fixed constants / action space (spec §1). These run without generated tables."""
+"""Tests for the fixed constants / action space (spec §1) + a load check on the committed tables."""
 from __future__ import annotations
-
-import pytest
 
 from fog.constants import schema
 
@@ -30,9 +28,8 @@ def test_type_index_roundtrip():
         assert schema.TYPES[schema.TYPE_INDEX[t]] == t
 
 
-@pytest.mark.xfail(reason="generated tables not built in scaffolding (§1 build.py stub)", strict=False)
-def test_generated_tables_roundtrip():
+def test_generated_tables_load():
+    """The generated tables are committed (pinned Showdown commit + usage month) and must load."""
     from fog.constants.tables import TABLES
 
-    # every scraped team round-trips with <2% unknown-index hits; masks nonempty; spreads within 4 pts
     assert TABLES.species is not None

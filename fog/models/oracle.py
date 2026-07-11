@@ -11,7 +11,7 @@ turning them on is a one-line config change (deliberate — §3.4). The heavy li
     truth so the belief head/b_vec are computed from perfect information, and mark every opponent
     entity's epistemic flags known. Ground truth is supplied by the caller (simulator in self-play,
     the parsed row's uncensored labels where available).
-  - `ActionOracleMixin`: a small embedding of the opponent's committed action concatenated to `s`.
+  - `ActionOracleHead`: a small embedding of the opponent's committed action concatenated to `s`.
 """
 from __future__ import annotations
 

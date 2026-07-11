@@ -1,4 +1,4 @@
-"""Encoding shape/layout tests (spec §2). Shapes are concrete even while extraction is stubbed."""
+"""Encoding shape/layout tests (spec §2): the widths every encoder and test must agree on."""
 from __future__ import annotations
 
 import numpy as np

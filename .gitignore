@@ -32,6 +32,9 @@ checkpoints/
 *.ckpt
 *.pt
 
+# Course materials (personal study track, not project source)
+course/
+
 # OS / editors
 .DS_Store
 .idea/

@@ -4,8 +4,6 @@
     the history encoder is broken)
   * calibration (ECE)
   * on replays: accuracy at least 3 turns BEFORE the actual reveal (predicts early, not just reads log)
-
-STUB: aggregation loops; ECE is real.
 """
 from __future__ import annotations
 
@@ -13,7 +11,7 @@ import numpy as np
 
 
 def expected_calibration_error(confidences: np.ndarray, correct: np.ndarray, n_bins: int = 15) -> float:
-    """Standard ECE. Real implementation.
+    """Standard ECE.
 
     confidences [N] in [0,1] (top-1 prob), correct [N] bool. Returns weighted |acc − conf| over bins.
     """

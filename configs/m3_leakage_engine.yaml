@@ -1,0 +1,19 @@
+# M3 leakage grid on the poke-engine backend (SIMULATION_PLAN §4) — POOL-A, belief-supervised,
+# leakage machinery identical to m3_leakage.yaml (same update tail, same watchdogs; belief truth
+# is exact by construction on this backend). Run the beta=0 control FIRST, then point
+# leakage.baseline_run at its log dir, exactly as on Showdown.
+#   python -m fog.training.ppo --config configs/m3_leakage_engine.yaml --set leakage.beta=0.03
+extends: m3_leakage.yaml
+
+experiment: m3_leakage_engine
+env:
+  backend: engine
+  engine_batch: 64
+league:
+  scripted: [MaxDamage, Random]
+cross_sim:
+  every_decisions: 100000
+  games: 200
+  halt_gap: 0.03
+log:
+  dir: runs/m3_leakage_engine

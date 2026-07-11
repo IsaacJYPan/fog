@@ -2,7 +2,7 @@
 
 `Observation` is the contract between the parser/env (which produce it) and the model (which consumes
 it). Tensor construction from a poke-env `Battle` (or a parsed replay row) is delegated to `entities`,
-`field`, and `history` — all partly stubbed pending the parser.
+`field`, and `history`.
 """
 from __future__ import annotations
 
@@ -59,7 +59,7 @@ class Observation:
         """
         tables = None
         try:
-            from fog.constants.tables import TABLES, TablesNotBuilt
+            from fog.constants.tables import TABLES
 
             TABLES.n_species  # trigger lazy load
             tables = TABLES
@@ -102,5 +102,5 @@ class Observation:
 
 
 def _empty_opp_revealed() -> dict[str, Any]:
-    """Temporary single-observation C1 placeholder until reveal extraction lands."""
+    """All-hidden C1 dict — the fallback when tables/battle are unavailable (shape-test path)."""
     return {"tokens": np.full((6, 9), -1, dtype=np.int64), "masks": {}}

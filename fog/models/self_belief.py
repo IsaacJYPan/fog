@@ -62,13 +62,6 @@ class SelfBeliefPredictor(BeliefModel):
     its input observation is constructed (opponent's view of me).
     """
 
-    def opponent_view_labels(self, my_team_truth: dict) -> dict[str, torch.Tensor]:
-        """Full ground-truth labels for my own attributes (I always know my team).
-
-        `my_team_truth` carries `tokens` [B, 6, 9] with every attribute filled (no -1 expected).
-        """
-        return labels_from_tokens(my_team_truth["tokens"])
-
     def leakage_ce(
         self,
         s_opp_view: torch.Tensor,
@@ -115,7 +108,9 @@ class SelfBeliefPredictor(BeliefModel):
         return by_family if per_family else total
 
     def frozen_copy(self) -> "SelfBeliefPredictor":
-        """Return a detached, eval-mode deep copy — this is `Φ̂` for the penalty (§7)."""
+        """Detached, eval-mode deep copy of the HEAD ONLY. NOT the §7 penalty probe: a frozen head
+        fed by the live trunk drifts OOD (the v1 hole) — Φ̂ is `models.probe.FrozenProbe`, which
+        freezes the (backbone + self-belief) pair together."""
         clone = copy.deepcopy(self)
         clone.eval()
         for p in clone.parameters():

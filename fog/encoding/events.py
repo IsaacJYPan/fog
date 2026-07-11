@@ -6,8 +6,8 @@ split on '|', e.g. ['', 'move', 'p1a: Garchomp', 'Earthquake', 'p2a: Corviknight
 
 Turn-record layout (offsets into DIMS.turn_dim = 108, see dims.py):
   0..29   snapshot     (start-of-turn actives/field; supplied by the caller — the live player builds
-                        it at decision time via `build_snapshot`; retro/replay callers may pass None
-                        -> zeros, documented fidelity loss until incremental tracking lands)
+                        it at decision time via `build_snapshot`, the replay parser via its tracker;
+                        None -> zeros)
   30..43  my action    14-way one-hot (caller passes the chosen index; retro mode infers move slots
                         from my known movesets where possible, leaves switches at zero)
   44..83  opp action   [moved, move_idx/1000, switched, switch_species_idx/1000, tera, <UNSEEN>]

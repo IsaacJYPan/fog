@@ -7,9 +7,10 @@ publicly-derivable info fills, with the epistemic flags derived from the C1 reve
 entity record and the belief-net input can never disagree about what is known.
 
 Fidelity notes (v1, live extraction — see KNOWN_ISSUES):
-  * booster_consumed / fallen_count / last_used_move are event-derived; the live fill is 0/UNK until
-    the incremental per-battle tracker feeds them (layout reserved, model already sized for them).
-  * spread cluster id is UNK for everyone until spreads.json exists (usage download, plan §4a).
+  * booster_consumed / fallen_count / last_used_move / volatile counters are event-derived: filled
+    from the per-battle BattleTracker when one is passed, 0/UNK otherwise.
+  * spread cluster id: my own slots stay UNK (spread inference from my sheet is not wired — a known
+    fidelity bound); opponent slots read the C1 reveal token (spreads are never directly revealed).
   * paradox_boost is best-effort from effect names containing PROTOSYNTHESIS/QUARKDRIVE + stat.
 """
 from __future__ import annotations
@@ -22,7 +23,6 @@ import numpy as np
 from fog.constants.schema import (
     N_ACTIONS,
     N_TERA_TYPES,
-    N_TYPES,
     PARADOX_BOOST_STATS,
     Status,
     TYPE_INDEX,
@@ -241,7 +241,7 @@ def encode_entities(
             else:
                 ids[3 + k] = unk["move"]
         ids[7] = unk["move"]      # last_used_move: filled from the tracker below when available
-        ids[8] = unk["spread"]    # spread cluster: needs spreads.json (plan §4a)
+        ids[8] = unk["spread"]    # own spread cluster: not wired (module-docstring fidelity note)
         # my tera type is MY sheet knowledge even before terastallizing
         tera = getattr(mon, "tera_type", None)
         if tera is not None and not getattr(mon, "terastallized", False):

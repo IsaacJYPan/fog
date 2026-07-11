@@ -61,6 +61,11 @@ class FogPlayer:
         # optional set-oracle truth injection (§3.4 eval): battle -> [6,9] opponent truth tokens fed
         # to the belief net as opp_truth_tokens (perfect-information ceiling).
         self.oracle_truth_provider: Callable[[Any], Any] | None = None
+        # optional determinized search at action time (§8): when set, act() selects via
+        # search.determinized instead of sampling the policy. Reconstructs an engine position from
+        # the live battle + belief-sampled worlds and rolls one ply each (search/engine_step). Dict:
+        # {"k": int, "prior_weight": float, "seed": int}. Inference-only; never during training.
+        self.search: dict | None = None
 
     def attach_buffer(self, buffer: "RolloutBuffer") -> None:
         """Record every decision + game outcome into `buffer` (training mode)."""
@@ -174,7 +179,10 @@ class FogPlayer:
 
         with torch.no_grad():
             out = self.agent(batch)
-        action_idx = _sample_action(out.log_probs[0], temperature=self.temperature)
+        if self.search is not None:
+            action_idx = self._search_action(battle, obs, tracker, batch, device)
+        else:
+            action_idx = _sample_action(out.log_probs[0], temperature=self.temperature)
 
         if self._buffer is not None:
             gid = self._game_id(tag)
@@ -263,6 +271,35 @@ class FogPlayer:
             return "/team " + "".join(str(i + 1) for i in order)
         except Exception:
             return "/team 123456"
+
+    # -------------------------------------------------------------------------------------- search
+    def _search_action(self, battle: Any, obs: Any, tracker: Any, batch: dict, device) -> int:
+        """Determinized action via engine rollouts reconstructed from the live battle (§8). Any
+        failure (engine missing, reconstruction/step error) falls back to policy sampling so a
+        search run never crashes a game."""
+        import torch
+
+        try:
+            from fog.search.determinized import determinized_action
+            from fog.search.engine_step import ShowdownWorldStepper
+
+            cfg = self.search or {}
+            role = getattr(battle, "player_role", None) or "p1"
+            stepper = ShowdownWorldStepper(
+                battle, tracker, role=role, seed=int(cfg.get("seed", 0)),
+            )
+            action = determinized_action(
+                self.agent, batch, step_fn=stepper,
+                k=int(cfg.get("k", 16)), prior_weight=float(cfg.get("prior_weight", 0.5)),
+            )
+            # if every world's reconstruction failed, search saw nothing — fall back to the policy
+            if stepper.failures and not stepper._bases:
+                raise RuntimeError("all search reconstructions failed")
+            return action
+        except Exception:
+            with torch.no_grad():
+                out = self.agent(batch)
+            return _sample_action(out.log_probs[0], temperature=self.temperature)
 
     # ------------------------------------------------------------------------------ mirror/leakage
     def _mirror(self, battle: Any, obs: Any, ledger: Any) -> tuple[dict, dict] | None:
@@ -397,12 +434,6 @@ class FogPlayer:
         self._trackers.pop(tag, None)
         self._fed_turns.pop(tag, None)
 
-    def reset_between_battles(self) -> None:
-        """Clear ALL per-battle state (kept for API compat; per-battle cleanup is automatic now)."""
-        self._ledgers.clear()
-        self._trackers.clear()
-        self._fed_turns.clear()
-
 
 def unique_account(prefix: str = "fog"):
     """A collision-proof poke-env AccountConfiguration (<=18 chars, Showdown's limit).
@@ -427,7 +458,6 @@ def _species_id(mon) -> str:
 
 def _own_truth_tokens(battle, tables):
     """My own full team as [6,9] truth tokens (I always know my team) for self-belief labels (§3.3)."""
-    import numpy as np
 
     from fog.constants.schema import TYPE_INDEX
     from fog.encoding.reveals import SlotView, tokens_from_views

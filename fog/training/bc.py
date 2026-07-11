@@ -95,7 +95,7 @@ def train(cfg: dict) -> dict:
     steps_per_epoch = max(1, math.ceil(len(ds) / batch_size))
     total_steps = steps_per_epoch * epochs
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=total_steps, eta_min=lr1)
-    scaler = torch.cuda.amp.GradScaler(enabled=(device.type == "cuda"))
+    scaler = torch.amp.GradScaler("cuda", enabled=(device.type == "cuda"))
 
     metrics: dict = {}
     step = 0
@@ -104,7 +104,7 @@ def train(cfg: dict) -> dict:
         for batch in ds.batches(batch_size, shuffle=True, seed=seed + epoch, device=device):
             opt.zero_grad(set_to_none=True)
             if device.type == "cuda":
-                with torch.cuda.amp.autocast():
+                with torch.amp.autocast("cuda"):
                     total, metrics = bc_loss(agent, batch, loss_cfg)
                 scaler.scale(total).backward()
                 scaler.unscale_(opt)

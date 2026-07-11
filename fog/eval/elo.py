@@ -1,8 +1,6 @@
 """Internal Elo among {BC, N-agents, L-agents×β, set oracle, action oracle} (spec §9).
 
-Round-robin on the same team pool, ≥3000 games/pair, BayesElo or a simple logistic fit.
-
-STUB: round-robin scheduling; the logistic-fit rating solver is sketched.
+Round-robin on the same team pool, ≥3000 games/pair, Bradley-Terry MLE reported on the Elo scale.
 """
 from __future__ import annotations
 

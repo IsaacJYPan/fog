@@ -20,11 +20,6 @@ class League:
     past_ckpts: list[Path] = field(default_factory=list)
     scripted: tuple[str, ...] = ("MaxDamage", "SimpleHeuristics")
 
-    def maybe_snapshot(self, decisions_seen: int, ckpt_path: Path) -> None:
-        if decisions_seen % self.snapshot_every_decisions == 0:
-            self.past_ckpts.append(ckpt_path)
-            self.latest_ckpt = ckpt_path
-
     def sample_opponent(self, rng: random.Random | None = None) -> str | Path:
         """Return an opponent spec (checkpoint path or scripted name) per the league mixture."""
         rng = rng or random

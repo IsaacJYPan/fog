@@ -16,8 +16,7 @@ numpy/python — no poke-env import.
 """
 from __future__ import annotations
 
-import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import numpy as np
 
@@ -62,6 +61,31 @@ class BattleTracker:
         self.snapshots: dict[int, np.ndarray] = {}    # turn -> [hist_snapshot] start-of-turn snapshot
         self.my_actions: dict[int, int] = {}          # turn -> chosen action index 0-13
         self.hp_at_turn_start: dict[int, dict[str, float]] = {}
+
+    def clone(self) -> "BattleTracker":
+        """A copy safe to feed one more turn without touching the original (search-fork leaves).
+
+        The dicts `feed_turn` mutates are copied; the large decision-time recordings
+        (`snapshots`, `my_actions`) are SHARED by reference — `feed_turn` never writes them and a
+        leaf encoding only reads them, so sharing is safe and keeps forks O(1) in game length.
+        """
+        import copy
+
+        new = BattleTracker.__new__(BattleTracker)
+        new.my_role = self.my_role
+        new.last_used_move = dict(self.last_used_move)
+        new.booster_consumed = set(self.booster_consumed)
+        new.fallen_at_entry = dict(self.fallen_at_entry)
+        new.faints = dict(self.faints)
+        new.effect_start = dict(self.effect_start)
+        new.delayed = {r: copy.copy(d) for r, d in self.delayed.items()}
+        new.hp = dict(self.hp)
+        new._active = dict(self._active)
+        new._fed = set(self._fed)
+        new.snapshots = self.snapshots        # shared: feed_turn never writes it
+        new.my_actions = self.my_actions      # shared: feed_turn never writes it
+        new.hp_at_turn_start = dict(self.hp_at_turn_start)
+        return new
 
     # ---------------------------------------------------------------------------- player recordings
     def record_decision(self, turn: int, snapshot: np.ndarray | None, action_idx: int | None) -> None:

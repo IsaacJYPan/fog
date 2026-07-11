@@ -59,11 +59,16 @@ def test_fuzz_trajectory_runs():
     traj2 = engine_trajectory(_paste("team1_balance.txt"), _paste("team3_bulky.txt"),
                               seed=7, max_turns=20)
     assert diff_trajectories(traj, traj2) == {}
-    # a perturbed trajectory is detected (hp change beyond tolerance)
+    # perturbations are detected and CLASSIFIED (the plan §5 divergence-by-cause requirement)
     import copy
 
     traj3 = copy.deepcopy(traj)
-    pid, hp, status = traj3[0]["s1"][0]
-    traj3[0]["s1"][0] = (pid, max(0.0, hp - 0.5), status)
+    pid, hp, status = traj3[0]["side"][0]
+    traj3[0]["side"][0] = (pid, max(0.0, hp - 0.5), status)
     d = diff_trajectories(traj, traj3)
-    assert d and d["turn"] == traj[0]["turn"] and d["side"] == "s1"
+    assert d["cause"] == "hp" and d["turn"] == traj[0]["turn"] and d["mon"] == pid
+
+    traj4 = copy.deepcopy(traj)
+    traj4[0]["mask"] = tuple(list(traj4[0]["mask"])[:-1]) or (13,)
+    assert diff_trajectories(traj, traj4)["cause"] == "mask"
+    assert diff_trajectories(traj, traj[:-1])["cause"] == "length"

@@ -6,7 +6,6 @@ returns win counts. Everything else in eval/ (gauntlet, elo) builds on this.
 from __future__ import annotations
 
 import asyncio
-from pathlib import Path
 
 SCRIPTED = {"Random", "MaxDamage", "SimpleHeuristics"}
 
@@ -21,7 +20,7 @@ def _scripted(name: str, fmt: str, team):
     return cls(battle_format=fmt, account_configuration=unique_account("fogb"), team=team)
 
 
-def _fog_from_ckpt(ckpt: str, fmt: str, team, cfg: dict, device, oracle_pool=None):
+def _fog_from_ckpt(ckpt: str, fmt: str, team, cfg: dict, device, oracle_pool=None, search=None):
     import copy
 
     import torch
@@ -42,6 +41,10 @@ def _fog_from_ckpt(ckpt: str, fmt: str, team, cfg: dict, device, oracle_pool=Non
     agent.load_state_dict(torch.load(ckpt, map_location=device))
     agent.eval()
     adapter = FogPlayer(agent, temperature=cfg.get("eval", {}).get("temperature", 0.0))
+    # §8 determinized search at action time (opt-in; reconstructs engine positions from the live
+    # battle + belief-sampled worlds). `search` is a dict {"k","prior_weight","seed"} or None.
+    if search:
+        adapter.search = dict(search)
     # set-oracle ceiling: truth from the pool via attribute-consistency matching (progressive; also
     # disambiguates shared-species pools like POOL-A once any set-distinguishing attr is revealed —
     # the old species-only matcher was permanently ambiguous there and the oracle never fired).
@@ -57,11 +60,12 @@ def _fog_from_ckpt(ckpt: str, fmt: str, team, cfg: dict, device, oracle_pool=Non
     )
 
 
-def build_player(spec, fmt: str, team, cfg: dict, device, oracle_pool=None):
-    """spec: a scripted name or a checkpoint path. Returns a poke-env Player."""
+def build_player(spec, fmt: str, team, cfg: dict, device, oracle_pool=None, search=None):
+    """spec: a scripted name or a checkpoint path. Returns a poke-env Player. `search` (dict) turns
+    on §8 determinized search for a checkpoint player (ignored for scripted baselines)."""
     if str(spec) in SCRIPTED:
         return _scripted(str(spec), fmt, team)
-    return _fog_from_ckpt(str(spec), fmt, team, cfg, device, oracle_pool=oracle_pool)
+    return _fog_from_ckpt(str(spec), fmt, team, cfg, device, oracle_pool=oracle_pool, search=search)
 
 
 async def _play(p1, p2, n: int) -> tuple[int, int]:
@@ -72,12 +76,14 @@ async def _play(p1, p2, n: int) -> tuple[int, int]:
 
 
 def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, device=None,
-              paired: bool = False) -> tuple[int, int]:
+              paired: bool = False, search=None) -> tuple[int, int]:
     """Play n_games between two specs. Returns (a_wins, finished). team_pool = list of pastes.
 
     `paired=True` plays each sampled team matchup twice with sides swapped (shared-schedule
     teambuilders) — the variance-reduction design for head-to-head comparisons like §7a L-vs-N,
     where on a small pool the team matchup, not the policy, dominates single-game outcomes.
+
+    `search` (dict) enables §8 determinized search for spec_a (the checkpoint under test).
     """
     import torch
 
@@ -91,6 +97,6 @@ def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, 
         team_a = make_pool_teambuilder(team_pool, seed=1) if team_pool else None
         team_b = make_pool_teambuilder(team_pool, seed=2) if team_pool else None
     # set-oracle agents on either side read the other's team truth from the shared pool
-    a = build_player(spec_a, fmt, team_a, cfg, device, oracle_pool=team_pool)
+    a = build_player(spec_a, fmt, team_a, cfg, device, oracle_pool=team_pool, search=search)
     b = build_player(spec_b, fmt, team_b, cfg, device, oracle_pool=team_pool)
     return asyncio.run(_play(a, b, n_games))

@@ -83,10 +83,6 @@ class Dims:
     history_cap: int = 60            # T; pad/truncate from the front
 
     @property
-    def n_move_pp(self) -> int:
-        return self.move_pp
-
-    @property
     def field_dim(self) -> int:
         return (
             self.field_weather

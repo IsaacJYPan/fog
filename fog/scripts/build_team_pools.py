@@ -5,9 +5,10 @@ every team against the PINNED simulator (the legality oracle — a rejected team
 emits a packaged JSON ({"teams": [pastes]}) for tooling that prefers a single file. Training itself
 reads the paste directory directly via env.team_pool.
 
-  * POOL-A: teams sharing a fixed species core but differing in sets — the M1.5 hidden-pool variant
-    (preview reveals species; sets stay hidden). Belief-net PoC target.
-  * POOL-B: diverse full OU sample teams — the M1/M3 self-play pool.
+  * POOL-A: teams sharing a fixed species core but differing in sets (preview reveals species; sets
+    stay hidden) — the M1/M1.5/M3 pool. Shared species are what make belief/leakage non-vacuous.
+  * POOL-B: diverse full OU sample teams (unique species multisets) — the open-OU self-play pool
+    (train_ou / M4). The trainer refuses it for leakage runs (nothing to conceal after preview).
 
     python -m fog.scripts.build_team_pools --pool all
 """

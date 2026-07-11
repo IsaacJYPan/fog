@@ -6,8 +6,8 @@ Layout (DIMS order): weather one-hot(5)+elapsed | terrain one-hot(5)+elapsed | p
 
 Counter semantics (v1, documented): poke-env stores the START turn of timed conditions, not turns
 left; we encode ELAPSED turns /8 (the model can learn duration priors — 5 vs 8-turn weather is
-item-dependent and technically hidden info anyway). Future Sight / Wish (field_delayed) need event
-tracking poke-env doesn't do; zeros in v1 live fill, layout reserved (KNOWN_ISSUES).
+item-dependent and technically hidden info anyway). Future Sight / Wish (field_delayed) come from
+the BattleTracker's event tracking (poke-env doesn't track them); zeros when no tracker is passed.
 """
 from __future__ import annotations
 

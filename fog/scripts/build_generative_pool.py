@@ -36,7 +36,7 @@ import random
 from pathlib import Path
 
 from fog.constants.schema import MAX_SPREADS_PER_SPECIES, TYPE_INDEX
-from fog.constants.tables import GENERATED_DIR, Tables
+from fog.constants.tables import Tables
 
 TEAMS_DIR = Path("data/teams")
 DEFAULT_CORE_POOL = TEAMS_DIR / "pool_a"

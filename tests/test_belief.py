@@ -7,7 +7,7 @@ import pytest
 import torch
 
 from fog.models.agent import FogAgent
-from fog.models.belief import N_ATTRS, N_SLOTS, SLOT_ATTRS, BeliefModel
+from fog.models.belief import N_SLOTS, SLOT_ATTRS, BeliefModel
 from fog.models.self_belief import (
     SelfBeliefPredictor,
     labels_from_tokens,

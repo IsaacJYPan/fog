@@ -41,6 +41,9 @@ class FogAgent(nn.Module):
         # blind_reactive (§9 closure baseline): force history to 0 and zero the belief conditioning,
         # so the agent reacts only to the current board with no memory/belief. Same weights.
         self.blind_reactive = model_cfg.get("blind_reactive", False)
+        # SEARCH_PLAN §4.2: give the policy/value head a posterior-features input (the opponent's
+        # belief over MY hidden state). Default OFF — existing checkpoints load unchanged.
+        self.use_posterior_features = model_cfg.get("use_posterior_features", False)
         belief_dim = model_cfg.get("belief_dim", 128)
         self.sizes = sizes
 
@@ -67,10 +70,13 @@ class FogAgent(nn.Module):
 
             self.action_oracle = ActionOracleHead(self.backbone.state_dim, belief_dim)
             extra = self.action_oracle.extra_dim
+        from fog.models.heads import N_POSTERIOR_FEATURES
+
         self.policy_value = PolicyValueHead(
             state_dim=self.backbone.state_dim + extra,
             belief_dim=belief_dim,
             use_belief_vec=self.use_belief_vec,
+            posterior_dim=N_POSTERIOR_FEATURES if self.use_posterior_features else 0,
         )
         # Team-preview lead selection (§3.1) — used LIVE by FogPlayer.teampreview and trained by the
         # REINFORCE-style preview term in ppo_update (game outcome as the bandit reward).
@@ -161,7 +167,10 @@ class FogAgent(nn.Module):
             s_head = self.action_oracle.augment(s, batch.get("opp_committed_action"))
 
         b_vec = belief_out.b_vec if (belief_out is not None and self.use_belief_vec) else None
-        log_probs, value = self.policy_value(s_head, batch["legality_mask"], b_vec)
+        log_probs, value = self.policy_value(
+            s_head, batch["legality_mask"], b_vec,
+            posterior_features=batch.get("posterior_features"),
+        )
 
         self_belief_out: BeliefOutput | None = None
         opp_view = batch.get("opp_view")
@@ -172,6 +181,19 @@ class FogAgent(nn.Module):
             self_belief_out = self.self_belief(s_opp, opp_view["my_view"])
 
         return AgentOutput(log_probs=log_probs, value=value, belief=belief_out, self_belief=self_belief_out)
+
+    @torch.no_grad()
+    def head_inputs(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor | None]:
+        """(s, b_vec) for direct `policy_value` calls — the cached-trunk path for joint search
+        (SEARCH_PLAN §4.3): the backbone+belief pass over a leaf batch runs ONCE; each regret-
+        matching iteration then re-scores leaves through the cheap head with fresh posterior
+        features. No oracle/blind handling — search never runs in those modes."""
+        s = self._backbone_pass(batch)
+        opp_revealed = batch.get("opp_revealed")
+        b_vec = None
+        if opp_revealed is not None:
+            b_vec = self.belief(s, opp_revealed).b_vec
+        return s, b_vec
 
     def n_params(self) -> int:
         return sum(p.numel() for p in self.parameters())

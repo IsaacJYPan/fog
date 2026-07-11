@@ -123,6 +123,20 @@ class PoolTruth:
         candidates = [i for i, t in enumerate(self._truth) if self._consistent(revealed, t)]
         return self._truth[candidates[0]].copy() if len(candidates) == 1 else None
 
+    def consistent_indices(self, views) -> list[int]:
+        """Pool indices of EVERY team consistent with the revealed per-slot views (the exact
+        enumeration source for joint search, SEARCH_PLAN §4.1). Unlike `match_views` this does not
+        require uniqueness: before anything distinguishing is revealed it returns the whole pool.
+        No revealed views => everything is consistent."""
+        revealed = [v for v in views if v.species is not None and int(v.species) >= 0]
+        if not revealed:
+            return list(range(len(self._truth)))
+        return [i for i, t in enumerate(self._truth) if self._consistent(revealed, t)]
+
+    def truth_tokens(self, index: int) -> np.ndarray:
+        """[6,9] truth tokens for pool team `index` (a copy)."""
+        return self._truth[index].copy()
+
     def match_battle(self, battle) -> np.ndarray | None:
         """`match_views` over the battle's current opponent information state (progressive: call it
         any turn; returns truth once the reveals disambiguate). The eval set-oracle path."""

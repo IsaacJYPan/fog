@@ -1,7 +1,6 @@
 """Statistics helpers for evaluation (spec §9). Pokémon is high-variance — always report CIs.
 
-Real implementation: Wilson score interval for a binomial proportion (win-rate). Never conclude from
-<1000 games.
+Wilson score interval for a binomial proportion (win-rate). Never conclude from <1000 games.
 """
 from __future__ import annotations
 

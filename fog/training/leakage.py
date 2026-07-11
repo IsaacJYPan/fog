@@ -31,13 +31,6 @@ from dataclasses import dataclass
 import torch
 
 
-@dataclass
-class LeakageConfig:
-    enabled: bool = False
-    beta: float = 0.0
-    refreeze_every_decisions: int = 100_000
-
-
 def delta_information(phi_hat, obs_before: dict, obs_after: dict) -> torch.Tensor:
     """ΔI_t = CE_before − CE_after under the frozen probe `Φ̂` (moving-mask estimator, canonical).
 

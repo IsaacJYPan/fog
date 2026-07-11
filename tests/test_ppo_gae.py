@@ -1,4 +1,4 @@
-"""Tests for GAE (spec §6). The advantage computation is real even while the PPO update is stubbed."""
+"""Tests for GAE (spec §6). The full ppo_update path is covered in test_ppo_update.py."""
 from __future__ import annotations
 
 import numpy as np

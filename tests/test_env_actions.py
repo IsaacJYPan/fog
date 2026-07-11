@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from fog.env.actions import action_legality_mask, map_action_to_order
-from fog.env.formats import hidden_pool_variant
 
 
 @dataclass
@@ -75,14 +74,3 @@ def test_action_legality_mask_forced_when_no_regular_action():
     mask = action_legality_mask(battle)
     assert sum(mask) == 1
     assert mask[13]
-
-
-def test_hidden_pool_variant_returns_team_and_pool_id():
-    class Rng:
-        def randrange(self, n):
-            assert n == 3
-            return 1
-
-    team, pool_id = hidden_pool_variant(["a", "b", "c"], rng=Rng())
-    assert team == "b"
-    assert pool_id == 1

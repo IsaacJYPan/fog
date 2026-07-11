@@ -35,13 +35,11 @@ _NON_ID = re.compile(r"[^a-z0-9]")
 def _my_movesets(battle: Any) -> dict[str, dict[str, int]]:
     """{mon_key: {move_id: slot 0-3}} for retro my-action inference (events.parse_turn_events)."""
     out: dict[str, dict[str, int]] = {}
-    role = getattr(battle, "player_role", None) or "p1"
     for key, mon in (getattr(battle, "team", None) or {}).items():
         moves = {}
         for slot, move_id in enumerate(list(getattr(mon, "moves", None) or {})[:4]):
             moves[_NON_ID.sub("", str(move_id).lower())] = slot
-        # battle.team keys are already 'p1: Name'; keep as-is, fall back to role-prefixed species
-        out[str(key)] = moves
+        out[str(key)] = moves  # battle.team keys are already 'p1: Name'
     return out
 
 
