@@ -193,6 +193,30 @@ class PoolTruth:
         return rec(0)
 
 
+def assert_uniform_slot_order(cand_tokens: np.ndarray) -> None:
+    """Guard for slot-by-slot candidate scoring (pool_id): within any group of candidates that
+    share a species MULTISET, every candidate must list those species in the SAME slot order.
+    Otherwise a set-variant of the true team sits permuted against the observation's
+    preview/paste slot order and scores as a species contradiction — silently, since the species
+    conditionals just bury it. TRUE for all committed pools (POOL-A verified 2026-07-11) but
+    unenforced until now; a regenerated pool_gen or replay-built pool could violate it.
+
+    cand_tokens [C, 6, 9]. Raises ValueError naming the first offending pair. Species-distinct
+    candidates are exempt (no slot-by-slot ambiguity to guard)."""
+    cand = np.asarray(cand_tokens, dtype=np.int64)
+    groups: dict[tuple, tuple[int, tuple]] = {}
+    for i in range(cand.shape[0]):
+        seq = tuple(int(s) for s in cand[i, :, 0])
+        key = tuple(sorted(seq))
+        first = groups.setdefault(key, (i, seq))
+        if first[1] != seq:
+            raise ValueError(
+                f"pool candidates {first[0]} and {i} share a species multiset but list it in "
+                f"different slot orders ({first[1]} vs {seq}); slot-by-slot scoring against the "
+                f"observation's preview order is invalid for such a pool. Reorder the pastes."
+            )
+
+
 def revealed_opponent_species(battle, tables) -> list[int]:
     """Species indices revealed for the opponent so far (from poke-env opponent_team)."""
     from fog.encoding.reveals import opponent_slots

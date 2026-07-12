@@ -12,6 +12,7 @@ from fog.constants.tables import Tables
 from fog.encoding.reveals import (
     RevealLedger,
     SlotView,
+    align_truth_to_views,
     build_belief_input,
     labels_from_truth,
     masks_for_tokens,
@@ -118,6 +119,65 @@ def test_labels_and_truth_roundtrip(tables):
     assert "labels" in inp and (inp["labels"]["move"] == truth[:, 3:7]).all()
 
 
+# -------------------------------------------------------- move-order alignment (fix 2026-07-12)
+def test_align_places_revealed_move_at_its_clamp_position():
+    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth[0] = [7, 2, 1, 10, 3, 8, 5, 0, 4]  # paste-order moves 10, 3, 8, 5
+    view = np.full((6, 9), -1, dtype=np.int64)
+    view[0, 0] = 7
+    view[0, 3] = 8  # revealed: paste position 2 -> clamped at subslot 0 by tokens_from_views
+    aligned, ok = align_truth_to_views(truth, view)
+    assert ok.all()
+    assert aligned[0, 3:7].tolist() == [8, 10, 3, 5]  # reveal first, remainder in paste order
+    assert (aligned[0, [0, 1, 2, 7, 8]] == truth[0, [0, 1, 2, 7, 8]]).all()  # non-move cols pass
+    assert (aligned[1:] == truth[1:]).all()
+    assert truth[0, 3] == 10  # input not mutated
+
+
+def test_align_keeps_multi_reveal_order_and_is_a_permutation():
+    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth[2, 3:7] = [10, 3, 8, 5]
+    view = np.full((6, 9), -1, dtype=np.int64)
+    view[2, 3], view[2, 4] = 5, 3  # revealed in THIS order (reveal order, packed earliest)
+    aligned, ok = align_truth_to_views(truth, view)
+    assert ok.all()
+    assert aligned[2, 3:7].tolist() == [5, 3, 10, 8]
+    assert sorted(aligned[2, 3:7].tolist()) == sorted(truth[2, 3:7].tolist())
+
+
+def test_align_flags_contradiction_only_when_provable():
+    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth[0, 3:7] = [10, 3, 8, 5]    # fully labeled sheet
+    truth[1, 3:7] = [10, 3, -1, -1]  # gap: censored labels / short set — membership unprovable
+    view = np.full((6, 9), -1, dtype=np.int64)
+    view[0, 3] = 6  # not on slot 0's sheet -> genuine contradiction
+    view[1, 3] = 6
+    aligned, ok = align_truth_to_views(truth, view)
+    assert not ok[0] and ok[1]
+    # revealed move is still placed so targets always match the input clamp
+    assert aligned[0, 3] == 6
+    assert aligned[1, 3:7].tolist() == [6, 10, 3, -1]
+
+
+def test_align_broadcasts_one_view_over_candidates():
+    cands = np.full((3, 6, 9), -1, dtype=np.int64)
+    cands[:, 0, 3:7] = [[10, 3, 8, 5], [10, 3, 8, 6], [3, 8, 10, 5]]
+    view = np.full((6, 9), -1, dtype=np.int64)
+    view[0, 3] = 5
+    aligned, ok = align_truth_to_views(cands, view)
+    assert aligned.shape == (3, 6, 9) and ok.shape == (3, 6)
+    assert aligned[0, 0, 3:7].tolist() == [5, 10, 3, 8]
+    assert not ok[1, 0]  # candidate 1 lacks move 5 on a fully-labeled sheet
+    assert aligned[2, 0, 3:7].tolist() == [5, 3, 8, 10]  # remainder keeps ITS paste order
+
+
+def test_align_without_reveals_is_identity():
+    truth = np.arange(54, dtype=np.int64).reshape(6, 9)
+    view = np.full((6, 9), -1, dtype=np.int64)
+    aligned, ok = align_truth_to_views(truth, view)
+    assert (aligned == truth).all() and ok.all()
+
+
 class _MockMon:
     def __init__(self, species, item="unknown_item", ability=None, moves=(), tera=None):
         self.species = species
@@ -151,3 +211,36 @@ def test_opponent_views_from_battle(tables):
     assert views[2].species == tables.species_index("gabite")
     assert views[3].species == tables.species_index(schema.RARE_SPECIES)
     assert views[4].species is None and views[5].species is None
+
+
+def test_view_slot_order_follows_preview_matching_paste_order(tables):
+    """Slot-order guardrail (KNOWN_ISSUES 2026-07-11): candidate/truth grids are compared
+    slot-by-slot against the observation, which is valid because view slots follow PREVIEW order
+    — not reveal/insertion order — and Showdown emits |poke| preview in packed-team (paste)
+    order. The server half of that claim can't run here; this pins OUR half: a mon revealed
+    LATER than another still lands on its preview slot, matching truth_tokens_from_paste rows."""
+    from fog.env.team_truth import truth_tokens_from_paste
+
+    paste = (
+        "Great Tusk\n"
+        "Ability: Protosynthesis\n"
+        "- Earthquake\n"
+        "- Stealth Rock\n"
+        "\n"
+        "Garchomp\n"
+        "- Earthquake\n"
+    )
+    truth = truth_tokens_from_paste(paste, tables)
+
+    class _Battle:
+        # insertion (reveal) order REVERSED vs preview: garchomp acted first
+        opponent_team = {
+            "p2: Garchomp": _MockMon("garchomp", moves=("earthquake",)),
+            "p2: Great Tusk": _MockMon("greattusk"),
+        }
+        teampreview_opponent_team = [_MockMon("greattusk"), _MockMon("garchomp")]
+
+    tokens = tokens_from_views(opponent_views_from_battle(_Battle(), tables))
+    assert tokens[0, 0] == truth[0, 0] == tables.species_index("greattusk")
+    assert tokens[1, 0] == truth[1, 0] == tables.species_index("garchomp")
+    assert tokens[1, 3] == tables.move_index("earthquake")  # reveal sits on the PREVIEW slot

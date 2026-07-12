@@ -59,15 +59,27 @@ def pool_id_logprobs(agent: Any, batch: dict, cand_tokens: np.ndarray) -> np.nda
     discriminates nothing — a real bug this replaced: a trained checkpoint scored chance-level
     while its belief loss said otherwise.
 
+    Candidate move subslots are ALIGNED to the observation's packing before the gather (the one
+    ordering rule everywhere): the chain clamps revealed moves into the earliest subslots, while
+    pastes are paste-order — gathering paste-order tokens used to pick up the move-distinctness
+    -inf and eliminate the TRUE candidate whenever a revealed move's paste position != its clamp
+    position (the runs/pool_id_m15 flat-curve bug). After alignment, -inf survives only for a
+    candidate whose moveset genuinely lacks a revealed move — a real contradiction, mapped to
+    -inf deliberately.
+
     Candidate tokens can be -1 (empty slots on short pastes): no evidence, contribute 0."""
     import torch
 
+    from fog.encoding.reveals import align_truth_to_views
+
     device = next(agent.parameters()).device
     c = cand_tokens.shape[0]
+    view_np = batch["opp_revealed"]["tokens"][0].detach().cpu().numpy()   # [6, 9]
+    cand_aligned, cand_ok = align_truth_to_views(cand_tokens, view_np)    # [C,6,9], [C,6]
     with torch.no_grad():
         s = agent._backbone_pass(batch)                                   # [1, state_dim]
         out = agent.belief(s, batch["opp_revealed"])                      # B=1, info-state input
-        cand = torch.as_tensor(cand_tokens, dtype=torch.long, device=device)  # [C, 6, 9]
+        cand = torch.as_tensor(cand_aligned, dtype=torch.long, device=device)  # [C, 6, 9]
 
         lp = torch.zeros(c, device=device)
         for fam, col in _SCALAR_ATTR_COLS.items():
@@ -81,7 +93,9 @@ def pool_id_logprobs(agent: Any, batch: dict, cand_tokens: np.ndarray) -> np.nda
         mgot = mv.unsqueeze(0).expand(c, -1, -1, -1).gather(
             -1, mtok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
         lp += torch.where(mtok >= 0, mgot, torch.zeros_like(mgot)).sum((-1, -2))
-    return lp.cpu().numpy()
+    scores = lp.cpu().numpy()
+    scores[~cand_ok.all(axis=1)] = -np.inf  # revealed move not in this candidate's moveset
+    return scores
 
 
 def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
@@ -105,6 +119,9 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
     rng = random.Random(seed)
     agent.eval()
     cand_tokens = np.stack([truth_tokens_from_paste(p, tables) for p in pool])  # [C, 6, 9]
+    from fog.env.team_truth import assert_uniform_slot_order
+
+    assert_uniform_slot_order(cand_tokens)  # slot-by-slot scoring needs a uniform paste order
     pool_truth = PoolTruth(pool, tables)
 
     records: list[tuple[int, int, bool, int]] = []  # (game, turn, correct, K_consistent)

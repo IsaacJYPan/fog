@@ -39,6 +39,47 @@ def test_belief_targets_broadcast_and_split():
     assert (tg["species"][0] == torch.as_tensor(truth[:, 0])).all()
 
 
+def test_belief_targets_aligned_to_each_decisions_clamp():
+    """Targets follow the INPUT packing convention per decision (fix 2026-07-12): a revealed
+    move — clamped into subslot 0 of the observation — whose paste position is 2 must become the
+    subslot-0 target for THAT decision, while an unrevealed decision of the same game keeps
+    paste order (the truth is broadcast per game, the reveal state is per decision)."""
+    buf = RolloutBuffer(gamma=1.0, lam=1.0)
+    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth[0] = [3, 1, 0, 10, 11, 12, 13, 0, 2]
+
+    def frag_with_view(view):
+        f = dict(_frag())
+        f["opp_revealed"] = {"tokens": view, "masks": {}}
+        return f
+
+    revealed = np.full((6, 9), -1, dtype=np.int64)
+    revealed[0, 0] = 3
+    revealed[0, 3] = 12  # paste position 2, clamped at subslot 0
+    g = buf.start_game()
+    buf.add_decision(g, frag_with_view(revealed), action=0, log_prob=-1.0, value=0.0)
+    buf.add_decision(g, frag_with_view(np.full((6, 9), -1, dtype=np.int64)),
+                     action=0, log_prob=-1.0, value=0.0)
+    buf.end_game(g, outcome=1.0, belief_targets=truth)
+
+    batch = buf.to_batch()
+    assert batch["belief_targets"]["move"][0, 0].tolist() == [12, 10, 11, 13]
+    assert batch["belief_targets"]["move"][1, 0].tolist() == [10, 11, 12, 13]
+
+
+def test_masked_cross_entropy_dropped_entry_counter():
+    from fog.training.losses import masked_cross_entropy
+
+    logits = torch.zeros(4, 3)
+    logits[1, 2] = -float("inf")  # target 2 sits on a legality-masked class -> dropped
+    target = torch.tensor([0, 2, 1, -1])
+    valid = torch.ones(4, dtype=torch.bool)
+    stats: dict = {}
+    loss = masked_cross_entropy(logits, target, valid, stats=stats)
+    assert torch.isfinite(loss)
+    assert stats == {"dropped_nonfinite": 1, "valid": 2}
+
+
 def test_belief_loss_fires_in_ppo_update():
     from fog.models.agent import FogAgent
 

@@ -16,7 +16,9 @@ probing in the style of env/actions.py.
 
 Token conventions (fog.models.belief.SLOT_ATTRS order — species, item, ability, move0..3, spread,
 tera): value = table index, -1 = hidden/unknown. Revealed moves are packed into the EARLIEST move
-slots in reveal order (a §3.2 requirement — the belief net clamps them there). `<NO_ITEM>` after
+slots in reveal order (a §3.2 requirement — the belief net clamps them there), and every
+truth/candidate grid consumed against such a view must be passed through `align_truth_to_views`
+first so targets follow the same convention (the 2026-07-12 move-order fix). `<NO_ITEM>` after
 Knock Off is a *revealed* item state (its own index), NOT -1: the opponent knowing you hold nothing
 is information.
 """
@@ -116,6 +118,61 @@ def masks_for_tokens(tokens: np.ndarray, tables) -> dict[str, np.ndarray]:
                 masks["spread"][j] = False
                 masks["spread"][j, : n_clusters + 1] = True  # clusters + <OTHER_SPREAD>
     return masks
+
+
+def align_truth_to_views(
+    truth_tokens: np.ndarray, view_tokens: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Align truth/candidate MOVE subslots to the input-packing convention (the one ordering rule
+    everywhere, decided 2026-07-11): per slot, revealed moves first — at the subslots where
+    `tokens_from_views` clamps them, in the view's subslot order — then the remaining sheet moves
+    in their original paste order. Non-move columns pass through unchanged.
+
+    Without this, chain inputs (reveal-order packing) and truth grids (paste order) disagree on
+    the same 4 subslots: training targets sit under contradictory clamps or on the move-
+    distinctness -inf (silently dropped by the loss guard), and pool_id eliminates the TRUE
+    candidate whenever a revealed move's paste position != its clamp position.
+
+    truth_tokens [..., 6, 9]; view_tokens [..., 6, 9] or a single [6, 9] observation shared by
+    every leading row (the pool_id candidates case). Returns (aligned, consistent):
+      aligned    -- new array, same shape as truth_tokens;
+      consistent -- bool [..., 6]; False where a slot's FULLY-labeled sheet lacks a revealed
+                    move — a genuine contradiction (pool_id maps the candidate to -inf; on a
+                    training truth grid it means a reveal-census bug). Slots whose sheet has any
+                    -1 move entry (censored labels, <4-move sets, off-table indices) are never
+                    marked inconsistent: membership can't be proven either way.
+
+    Revealed moves are placed even when inconsistent, so training targets always match the input
+    clamp; trailing sheet moves that no longer fit in 4 subslots are dropped (only possible in
+    the inconsistent case).
+    """
+    truth = np.asarray(truth_tokens, dtype=np.int64)
+    lead = truth.shape[:-2]
+    view = np.asarray(view_tokens, dtype=np.int64)
+    view = np.broadcast_to(view, lead + (N_SLOTS, N_ATTRS))
+
+    aligned = truth.copy().reshape(-1, N_SLOTS, N_ATTRS)
+    flat_view = view.reshape(-1, N_SLOTS, N_ATTRS)
+    consistent = np.ones((aligned.shape[0], N_SLOTS), dtype=bool)
+
+    mv = list(_MOVE_COLS)
+    for i in range(aligned.shape[0]):
+        for j in range(N_SLOTS):
+            revealed = [int(m) for m in flat_view[i, j, mv] if m >= 0]
+            if not revealed:
+                continue  # nothing clamped -> paste order is already the convention
+            sheet = [int(m) for m in aligned[i, j, mv]]
+            remaining = [m for m in sheet if m >= 0]
+            has_gap = len(remaining) < 4
+            for m in revealed:
+                if m in remaining:
+                    remaining.remove(m)
+                elif not has_gap:
+                    consistent[i, j] = False
+            new = (revealed + remaining)[:4]
+            aligned[i, j, mv] = new + [-1] * (4 - len(new))
+
+    return aligned.reshape(truth.shape), consistent.reshape(lead + (N_SLOTS,))
 
 
 def labels_from_truth(truth_tokens: np.ndarray) -> dict[str, np.ndarray]:
@@ -272,6 +329,7 @@ __all__ = [
     "RevealLedger",
     "tokens_from_views",
     "masks_for_tokens",
+    "align_truth_to_views",
     "labels_from_truth",
     "build_belief_input",
     "opponent_views_from_battle",

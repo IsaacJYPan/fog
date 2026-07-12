@@ -314,3 +314,32 @@ def test_mirror_frame_consistency():
     field[o] = 1.0             # my stealth rock
     out = mirror_field(field)
     assert out[o] == 0.0 and out[o + 6] == 1.0
+
+
+def test_mirror_labels_follow_my_view_clamp():
+    """Self-belief labels must match the mirror input packing (fix 2026-07-12): a move I revealed
+    is clamped into my_view's earliest subslot, so the subslot-0 LABEL must be that move even
+    when its paste position on my sheet is later."""
+    from fog.constants.tables import TABLES
+    from fog.encoding.mirror import build_opponent_view_np
+    from fog.encoding.observation import Observation
+
+    obs = Observation(
+        entities=np.zeros((12, ENTITY_RAW_DIM), np.float32),
+        entity_ids=np.zeros((12, N_ID_FIELDS), np.int64),
+        field=np.zeros(DIMS.field_dim, np.float32),
+        history=np.zeros((2, DIMS.turn_dim), np.float32), history_len=2,
+        legality_mask=np.array([True] + [False] * 13), active_idx=np.array([1, 8]),
+        opp_revealed={"tokens": np.full((6, 9), -1, np.int64), "masks": {}},
+    )
+    my_view = np.full((6, 9), -1, np.int64)
+    my_view[:, 0] = 1
+    my_view[0, 3] = 12  # opponent saw this move of mine; paste position on my sheet is 2
+    truth = np.zeros((6, 9), np.int64)
+    truth[:, 0] = 1
+    truth[0, 3:7] = [10, 11, 12, 13]
+    truth[1, 3:7] = [20, 21, 22, 23]
+
+    _, mv = build_opponent_view_np(obs, my_view, truth, TABLES)
+    assert mv["labels"]["move"][0].tolist() == [12, 10, 11, 13]
+    assert mv["labels"]["move"][1].tolist() == [20, 21, 22, 23]  # no reveals: paste order kept

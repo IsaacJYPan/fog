@@ -80,6 +80,54 @@ def test_pool_id_logprobs_mechanics(agent):
 
 
 @engine
+def test_pool_id_midgame_reveal_at_nonfirst_paste_position(agent):
+    """The runs/pool_id_m15 flat-curve bug, pinned: a revealed move is clamped into subslot 0 of
+    the observation, but its PASTE position in the true candidate is later (Knock Off is Great
+    Tusk's 4th move in P_ME). Pre-fix, the paste-order gather hit the move-distinctness -inf and
+    eliminated the true candidate; post-fix the candidate grid is aligned to the clamp and stays
+    finite, while a candidate whose moveset genuinely lacks the revealed move (P_ME_VARIANT
+    carries Stealth Rock instead) scores exactly -inf."""
+    import torch
+
+    from fog.encoding.observation import Observation
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.engine_runner import _stack_obs
+    from fog.env.team_truth import truth_tokens_from_paste
+    from fog.eval.pool_id import pool_id_logprobs
+
+    battle = EngineBattle(P_OPP, P_ME, seed=0, battle_tag="poolid-align")
+    obs = Observation.from_battle(battle.view("p1"), tracker=battle.trackers["p1"])
+    batch = _stack_obs([obs], torch.device("cpu"))
+    cands = np.stack([truth_tokens_from_paste(p, battle.tables)
+                      for p in (P_ME, P_ME_VARIANT)])
+
+    knock_off = int(cands[0, 0, 3 + 3])  # P_ME slot 0, paste subslot 3 (non-first)
+    assert knock_off >= 0
+    assert knock_off not in cands[1, 0, 3:7].tolist()  # variant runs Stealth Rock instead
+    toks = batch["opp_revealed"]["tokens"]
+    assert int(toks[0, 0, 3]) == -1  # turn 0: no move revealed yet
+    toks[0, 0, 3] = knock_off        # inject the reveal at its clamp position (subslot 0)
+
+    lp = pool_id_logprobs(agent, batch, cands)
+    assert np.isfinite(lp[0]), "true candidate must survive a non-first-paste-position reveal"
+    assert lp[1] == -np.inf, "a candidate whose moveset lacks the revealed move is inconsistent"
+
+
+def test_slot_order_guard_fires_on_shuffled_paste():
+    from fog.env.team_truth import assert_uniform_slot_order
+
+    a = np.full((6, 9), -1, dtype=np.int64)
+    a[:, 0] = [1, 2, 3, 4, 5, 6]
+    b = a.copy()
+    b[:, 0] = [2, 1, 3, 4, 5, 6]  # same species multiset, different slot order
+    c = np.full((6, 9), -1, dtype=np.int64)
+    c[:, 0] = [7, 8, 9, 10, 11, 12]  # distinct multiset: exempt
+    assert_uniform_slot_order(np.stack([a, a, c]))  # must not raise
+    with pytest.raises(ValueError, match="different slot orders"):
+        assert_uniform_slot_order(np.stack([a, b]))
+
+
+@engine
 def test_run_pool_id_end_to_end(agent):
     from fog.eval.pool_id import run_pool_id
 

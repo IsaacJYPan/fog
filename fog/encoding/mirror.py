@@ -90,7 +90,7 @@ def build_opponent_view_np(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.
     primary observation, so RolloutBuffer.to_batch aliases it instead of storing it twice.
     """
     from fog.constants.schema import MAX_SPREADS_PER_SPECIES
-    from fog.encoding.reveals import labels_from_truth, masks_for_tokens
+    from fog.encoding.reveals import align_truth_to_views, labels_from_truth, masks_for_tokens
 
     unk = {"item": tables.n_items, "ability": tables.n_abilities, "move": tables.n_moves,
            "spread": MAX_SPREADS_PER_SPECIES + 1}
@@ -114,12 +114,16 @@ def build_opponent_view_np(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.
         "field": mirror_field(np.asarray(obs.field, dtype=np.float32)),
         "active_idx": active,
     }
-    # my_view belief input: opponent's reveal tokens of me + masks + my truth labels
+    # my_view belief input: opponent's reveal tokens of me + masks + my truth labels. The view
+    # packs MY revealed moves into the earliest subslots (RevealLedger order), so the truth grid
+    # is aligned to that clamp before it becomes labels — an inconsistency here (revealed move
+    # not on my own sheet) can only be a census bug; targets still follow the clamp.
     masks = masks_for_tokens(my_view_tokens, tables)
+    aligned_truth, _ = align_truth_to_views(my_truth_tokens, my_view_tokens)
     my_view = {
         "tokens": my_view_tokens.astype(np.int64),
         "masks": {k: v for k, v in masks.items() if k != "item"},
-        "labels": labels_from_truth(my_truth_tokens),
+        "labels": labels_from_truth(aligned_truth),
     }
     return frag, my_view
 

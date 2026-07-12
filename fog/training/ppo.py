@@ -148,15 +148,27 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
                 log("kl_bc", kl_bc)
 
             if out.belief is not None and mb.get("belief_targets") is not None:
-                b_loss = belief_loss(out.belief.logits, mb["belief_targets"], mb["belief_valid"])
+                b_stats: dict = {}
+                b_loss = belief_loss(
+                    out.belief.logits, mb["belief_targets"], mb["belief_valid"], stats=b_stats
+                )
                 loss = loss + belief_coef * b_loss
                 log("belief_loss", b_loss)
+                # dropped-target rate: ~0 post-alignment; systematic > 0 = convention bug (see
+                # losses.masked_cross_entropy).
+                b_total = b_stats.get("valid", 0) + b_stats.get("dropped_nonfinite", 0)
+                log("belief_dropped_rate", b_stats.get("dropped_nonfinite", 0) / max(1, b_total))
             if out.self_belief is not None and mb.get("self_belief_targets") is not None:
+                sb_stats: dict = {}
                 sb_loss = belief_loss(
-                    out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"]
+                    out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"],
+                    stats=sb_stats,
                 )
                 loss = loss + self_belief_coef * sb_loss
                 log("self_belief_loss", sb_loss)
+                sb_total = sb_stats.get("valid", 0) + sb_stats.get("dropped_nonfinite", 0)
+                log("self_belief_dropped_rate",
+                    sb_stats.get("dropped_nonfinite", 0) / max(1, sb_total))
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()

@@ -201,9 +201,28 @@ class RolloutBuffer:
         batch["returns"] = torch.as_tensor(np.concatenate(rets), dtype=torch.float32, device=device)
 
         if any_belief:
-            from fog.encoding.reveals import labels_from_truth
+            from fog.encoding.reveals import align_truth_to_views, labels_from_truth
 
             toks = np.stack(belief_tok)  # [N, 6, 9]
+            # Targets must follow the INPUT packing convention (revealed moves clamped into the
+            # earliest subslots), not paste order — the truth is broadcast per game but the
+            # reveal state differs per decision, so alignment is per row against that row's own
+            # observation tokens. Frags without opp_revealed (unit-scale tests) align against an
+            # all-hidden view, which is the identity.
+            views = np.stack([
+                np.asarray(f["opp_revealed"]["tokens"])
+                if isinstance(f.get("opp_revealed"), dict) and "tokens" in f["opp_revealed"]
+                else np.full((6, 9), -1, dtype=np.int64)
+                for f in frags
+            ])
+            toks, ok = align_truth_to_views(toks, views)
+            n_bad = int((~ok).sum())
+            if n_bad:
+                print(
+                    f"[rollout] WARNING: {n_bad} slot(s) revealed a move absent from the truth "
+                    f"sheet — reveal-census bug (targets still aligned to the clamp).",
+                    flush=True,
+                )
             labels = labels_from_truth(toks)
             targets, valid = {}, {}
             for fam, arr in labels.items():

@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from fog.encoding.reveals import labels_from_truth, masks_for_tokens
+from fog.encoding.reveals import align_truth_to_views, labels_from_truth, masks_for_tokens
 
 _ARRAYS = (
     "entities", "entity_ids", "field", "history", "active_idx", "legality_mask",
@@ -43,9 +43,15 @@ def _build_batch(d: dict[str, np.ndarray], idx: np.ndarray, tables, device=None)
         "action": _t(d["action"][idx], torch.long, device),
         "outcome": _t(d["outcome"][idx], torch.float32, device),
     }
-    belief = labels_from_truth(d["belief_targets"][idx])
+    # Belief targets are stored in paste order; the chain input (opp_tokens) packs revealed moves
+    # into the earliest subslots, so align per row before splitting into label dicts.
+    aligned, _ = align_truth_to_views(d["belief_targets"][idx], opp_tokens)
+    belief = labels_from_truth(aligned)
     batch["belief_targets"] = {k: _t(v, torch.long, device) for k, v in belief.items()}
     batch["belief_valid"] = {k: _t(v >= 0, torch.bool, device) for k, v in belief.items()}
+    # self_belief_targets stay paste-order: BC has no mirror input (bc.py — self_belief_coef
+    # defaults 0, out.self_belief is None), so nothing consumes them; align against the
+    # opponent's-view-of-me tokens at consumption when a BC mirror path exists.
     self_belief = labels_from_truth(d["self_belief_targets"][idx])
     batch["self_belief_targets"] = {k: _t(v, torch.long, device) for k, v in self_belief.items()}
     batch["self_belief_valid"] = {k: _t(v >= 0, torch.bool, device) for k, v in self_belief.items()}
