@@ -3,11 +3,12 @@ opponent brought — top-1 over TEAM IDENTITY — by turn 4?
 
 This is NOT the dashboard's attribute-level top-1 (fraction of individual attributes right),
 which is a different, weaker statistic — the HANDOFF flagged exactly that confusion. Team
-identification is scored generatively: each pool candidate's joint log-probability under the
-belief model is the sum of its 54 per-attribute log-softmax scores with the candidate's OWN
-tokens teacher-forced through the AR chain (the model's factorized joint, conditioned on the
-current information state `s`). Prediction = argmax over candidates (uniform pool prior — a
-constant under uniform team sampling); correct = it is the opponent's true paste.
+identification is scored generatively: one belief forward at the observation's information state
+(the training input convention — hidden attributes feed <UNK>), then each pool candidate's joint
+log-probability is the sum of its 54 tokens' log-softmax scores under those per-position
+conditionals (see pool_id_logprobs for why candidate-token teacher forcing is wrong).
+Prediction = argmax over candidates (uniform pool prior — a constant under uniform team
+sampling); correct = it is the opponent's true paste.
 
 Measured on ENGINE games (exact truth from the sampled pastes, no server, view slot order = paste
 order so candidate token grids align with the observation by construction): the checkpoint's raw
@@ -47,30 +48,38 @@ _SCALAR_ATTR_COLS = {"species": 0, "item": 1, "ability": 2, "spread": 7, "tera":
 
 def pool_id_logprobs(agent: Any, batch: dict, cand_tokens: np.ndarray) -> np.ndarray:
     """[C] joint log-prob of each candidate team under the belief model, for ONE observation
-    (batch is B=1, built the standard way). Teacher-forces each candidate's full token grid; masks
-    come from the observation (module docstring)."""
+    (batch is B=1, built the standard way).
+
+    Scoring runs ONE forward at the observation's INFORMATION STATE (revealed tokens, hidden ->
+    <UNK>) — exactly the input convention the model was trained under — and reads every
+    candidate's tokens off those same per-position conditionals. Two consequences: candidates
+    contradicting a revealed attribute are killed by that position's (sharp) conditional, and the
+    chain's conditioning is on the revealed prefix, matching training. Teacher-forcing the
+    CANDIDATE's own tokens instead evaluates the net off its training input distribution and
+    discriminates nothing — a real bug this replaced: a trained checkpoint scored chance-level
+    while its belief loss said otherwise.
+
+    Candidate tokens can be -1 (empty slots on short pastes): no evidence, contribute 0."""
     import torch
 
     device = next(agent.parameters()).device
     c = cand_tokens.shape[0]
     with torch.no_grad():
         s = agent._backbone_pass(batch)                                   # [1, state_dim]
-        masks = {k: m.expand(c, *m.shape[1:]) for k, m in
-                 ((batch.get("opp_revealed") or {}).get("masks") or {}).items()}
+        out = agent.belief(s, batch["opp_revealed"])                      # B=1, info-state input
         cand = torch.as_tensor(cand_tokens, dtype=torch.long, device=device)  # [C, 6, 9]
-        out = agent.belief(s.expand(c, -1), {"tokens": cand, "masks": masks})
 
-        # tokens can be -1 (empty team slots on short pastes, or an attribute the truth builder
-        # could not resolve): no evidence either way — contribute exactly 0, never crash gather
         lp = torch.zeros(c, device=device)
         for fam, col in _SCALAR_ATTR_COLS.items():
-            ls = torch.log_softmax(out.logits[fam], dim=-1)               # [C, 6, n]
-            tok = cand[:, :, col]
-            got = ls.gather(-1, tok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
+            ls = torch.log_softmax(out.logits[fam][0], dim=-1)            # [6, n]
+            tok = cand[:, :, col]                                         # [C, 6]
+            got = ls.unsqueeze(0).expand(c, -1, -1).gather(
+                -1, tok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
             lp += torch.where(tok >= 0, got, torch.zeros_like(got)).sum(-1)
-        mv = torch.log_softmax(out.logits["move"], dim=-1)                # [C, 6, 4, n]
-        mtok = cand[:, :, 3:7]
-        mgot = mv.gather(-1, mtok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
+        mv = torch.log_softmax(out.logits["move"][0], dim=-1)             # [6, 4, n]
+        mtok = cand[:, :, 3:7]                                            # [C, 6, 4]
+        mgot = mv.unsqueeze(0).expand(c, -1, -1, -1).gather(
+            -1, mtok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
         lp += torch.where(mtok >= 0, mgot, torch.zeros_like(mgot)).sum((-1, -2))
     return lp.cpu().numpy()
 
@@ -90,15 +99,23 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
 
     if tables is None:
         from fog.constants.tables import TABLES as tables
+    from fog.encoding.reveals import opponent_views_from_battle
+    from fog.env.team_truth import PoolTruth
+
     rng = random.Random(seed)
     agent.eval()
     cand_tokens = np.stack([truth_tokens_from_paste(p, tables) for p in pool])  # [C, 6, 9]
+    pool_truth = PoolTruth(pool, tables)
 
-    records: list[tuple[int, int, bool]] = []  # (game, turn, correct)
+    records: list[tuple[int, int, bool, int]] = []  # (game, turn, correct, K_consistent)
     failed = 0
 
     class _ScoringArm(ArmPlayer):
-        """Policy arm that scores pool-id for the opponent's team before each real decision."""
+        """Policy arm that scores pool-id for the opponent's team before each real decision.
+        Alongside the model's prediction it records K = how many pool teams remain CONSISTENT
+        with the opponent's reveals — the hard-filter ceiling (expected top-1 = 1/K with a
+        uniform prior): it separates "the information isn't there yet" from "the model fails
+        to use it"."""
 
         def __init__(self, game_idx: int, true_idx: int, **kw):
             super().__init__("policy", agent, tables=tables, **kw)
@@ -112,8 +129,10 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
                     battle.view(role), tracker=battle.trackers[role]
                 )
                 lp = pool_id_logprobs(agent, _stack_obs([obs], _device(agent)), cand_tokens)
+                views = opponent_views_from_battle(battle.view(role), tables)
+                k_cons = len(pool_truth.consistent_indices(views))
                 records.append((self.game_idx, int(battle.turn),
-                                bool(int(lp.argmax()) == self.true_idx)))
+                                bool(int(lp.argmax()) == self.true_idx), max(1, k_cons)))
             return super().choose(battle, role)
 
     for g in range(int(games)):
@@ -140,26 +159,37 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
     print("[pool_id] top-1 by turn: "
           + "  ".join(f"t{t}{'+' if t == 10 else ''}:{a:.2f}"
                       for t, a in report["curve_by_turn"].items()))
+    if report["ceiling_by_turn"]:
+        print("[pool_id] hard-filter ceiling (1/K_consistent) by turn: "
+              + "  ".join(f"t{t}{'+' if t == 10 else ''}:{a:.2f}"
+                          for t, a in report["ceiling_by_turn"].items()))
     print(f"[pool_id] GATE (identified by turn {GATE_TURN}, >= {GATE_ACCURACY:.2f}): "
           f"{report['gate_accuracy']:.3f} over {report['gate_games']} games -> "
           f"{'PASS' if report['gate_passed'] else 'FAIL'}", flush=True)
     return report
 
 
-def aggregate_pool_id(records: list[tuple[int, int, bool]], *, games: int, failed: int,
-                      pool_size: int) -> dict:
-    """(game, turn, correct) records -> the report dict. Records must be appended in decision
-    order within each game (the game loop guarantees it); the gate reads each game's LAST
-    decision with turn <= GATE_TURN."""
+def aggregate_pool_id(records: list[tuple[int, int, bool] | tuple[int, int, bool, int]], *,
+                      games: int, failed: int, pool_size: int) -> dict:
+    """(game, turn, correct[, K_consistent]) records -> the report dict. Records must be appended
+    in decision order within each game (the game loop guarantees it); the gate reads each game's
+    LAST decision with turn <= GATE_TURN. When K_consistent is present, the report also carries
+    the hard-filter ceiling (expected top-1 = 1/K under a uniform prior over consistent teams)."""
     by_turn: dict[int, list[bool]] = {}
-    for _, turn, ok in records:
-        by_turn.setdefault(min(turn, 10), []).append(ok)  # 10 = "turn 10+"
+    ceil_by_turn: dict[int, list[float]] = {}
+    for rec in records:
+        turn, ok = rec[1], rec[2]
+        bucket = min(turn, 10)  # 10 = "turn 10+"
+        by_turn.setdefault(bucket, []).append(ok)
+        if len(rec) > 3:
+            ceil_by_turn.setdefault(bucket, []).append(1.0 / max(1, rec[3]))
     curve = {t: float(np.mean(oks)) for t, oks in sorted(by_turn.items())}
+    ceiling = {t: float(np.mean(v)) for t, v in sorted(ceil_by_turn.items())}
 
     last_by_game: dict[int, bool] = {}
-    for game, turn, ok in records:
-        if turn <= GATE_TURN:
-            last_by_game[game] = ok
+    for rec in records:
+        if rec[1] <= GATE_TURN:
+            last_by_game[rec[0]] = rec[2]
     gate_games = len(last_by_game)
     gate_acc = float(np.mean(list(last_by_game.values()))) if gate_games else float("nan")
 
@@ -167,6 +197,7 @@ def aggregate_pool_id(records: list[tuple[int, int, bool]], *, games: int, faile
         "games": games, "failed_games": failed, "decisions": len(records),
         "pool_size": pool_size, "chance": 1.0 / pool_size,
         "curve_by_turn": curve,
+        "ceiling_by_turn": ceiling,
         "gate_turn": GATE_TURN, "gate_games": gate_games,
         "gate_accuracy": gate_acc,
         "gate_passed": bool(gate_games) and gate_acc >= GATE_ACCURACY,
