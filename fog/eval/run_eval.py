@@ -34,6 +34,9 @@ def main() -> None:
     ap.add_argument("--bc-ckpt", default=None)
     ap.add_argument("--readability", action="store_true", help="§7b/§7c fresh-probe report")
     ap.add_argument("--lvn", default=None, metavar="N_CKPT", help="§7a: play --ckpt (L) vs N_CKPT")
+    ap.add_argument("--lvn-config", default=None, metavar="N_CONFIG",
+                    help="config that builds the N side, when its architecture differs from "
+                         "--config (e.g. the b_vec gate: M1.5 vs M1)")
     ap.add_argument("--pareto", action="store_true", help="β-grid frontier from cfg eval.pareto")
     ap.add_argument("--ablations", action="store_true", help="table from cfg eval.ablations")
     ap.add_argument("--set", nargs="*", dest="overrides", help="dotted config overrides")
@@ -58,8 +61,14 @@ def main() -> None:
     if args.lvn:
         from fog.eval.readability import lvn_match
 
+        cfg_n = None
+        if args.lvn_config:
+            from fog.config import load_config
+
+            cfg_n = load_config(args.lvn_config)
         print("== L vs N (§7a) ==")
-        lvn_match(args.ckpt, args.lvn, int(ev.get("lvn_games", 3000)), fmt, team_pool, cfg)
+        lvn_match(args.ckpt, args.lvn, int(ev.get("lvn_games", 3000)), fmt, team_pool, cfg,
+                  cfg_n=cfg_n)
         ran_special = True
 
     if args.pareto:

@@ -265,16 +265,22 @@ def _print_readability(r: dict) -> None:
           f"reveal-order entropy {cs['move_reveal_entropy']:.3f}")
 
 
-def lvn_match(ckpt_l: str, ckpt_n: str, n_games: int, fmt: str, team_pool, cfg: dict) -> dict:
+def lvn_match(ckpt_l: str, ckpt_n: str, n_games: int, fmt: str, team_pool, cfg: dict,
+              cfg_n: dict | None = None) -> dict:
     """§7a headline: L-agent vs N-agent head-to-head with a Wilson CI.
 
     Paired design: each sampled team matchup is played twice with sides swapped, so the team-matchup
     lottery (which dominates single games on a small pool) cancels out of the comparison.
+
+    `cfg_n` builds the N side when the two checkpoints differ architecturally (e.g. the M1.5-vs-M1
+    b_vec gate: use_belief_vec changes the head width, so one shared cfg cannot load both).
+    Defaults to `cfg`.
     """
     from fog.eval.harness import run_match
     from fog.eval.stats import wilson_interval
 
-    wins, finished = run_match(ckpt_l, ckpt_n, n_games, fmt, team_pool=team_pool, cfg=cfg, paired=True)
+    wins, finished = run_match(ckpt_l, ckpt_n, n_games, fmt, team_pool=team_pool, cfg=cfg,
+                               paired=True, cfg_b=cfg_n)
     iv = wilson_interval(wins, finished)
     warn = "" if finished >= 1000 else "  [insufficient n: <1000, do not conclude]"
     print(f"L vs N: {wins}/{finished} = {iv.point:.3f} [{iv.low:.3f}, {iv.high:.3f}]{warn}")

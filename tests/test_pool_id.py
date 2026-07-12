@@ -1,0 +1,91 @@
+"""Pool-id belief gate (M1.5, spec §10): the game-level gate bookkeeping, candidate scoring
+mechanics, and the end-to-end engine run."""
+from __future__ import annotations
+
+import numpy as np
+import pytest
+
+from fog.eval.pool_id import GATE_TURN, aggregate_pool_id
+
+# ------------------------------------------------------------------------------- aggregation
+def test_aggregate_gate_reads_last_decision_by_turn_4():
+    # game 0: wrong at t1, RIGHT at t4 (last <=4 wins) -> correct
+    # game 1: right at t2, wrong at t3, then right only at t9 (past the gate) -> wrong
+    # game 2: no decision <= 4 -> excluded from the gate
+    records = [
+        (0, 1, False), (0, 4, True), (0, 9, True),
+        (1, 2, True), (1, 3, False), (1, 9, True),
+        (2, 7, True),
+    ]
+    r = aggregate_pool_id(records, games=3, failed=0, pool_size=8)
+    assert r["gate_turn"] == GATE_TURN
+    assert r["gate_games"] == 2
+    assert r["gate_accuracy"] == pytest.approx(0.5)
+    assert not r["gate_passed"]
+    assert r["decisions"] == 7 and r["chance"] == pytest.approx(1 / 8)
+
+    # curve buckets: turn 9 lands in t9, turns >=10 merge into 10+
+    records += [(0, 15, True)]
+    r = aggregate_pool_id(records, games=3, failed=0, pool_size=8)
+    assert 10 in r["curve_by_turn"]
+    assert r["curve_by_turn"][1] == 0.0 and r["curve_by_turn"][4] == 1.0
+
+
+def test_aggregate_no_gate_games_is_not_a_pass():
+    r = aggregate_pool_id([(0, 9, True)], games=1, failed=0, pool_size=4)
+    assert r["gate_games"] == 0
+    assert np.isnan(r["gate_accuracy"])
+    assert not r["gate_passed"]
+
+
+# ------------------------------------------------------------------------------- engine-backed
+from fog.env.engine_battle import HAVE_ENGINE  # noqa: E402
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP  # noqa: E402
+
+engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
+
+
+@pytest.fixture(scope="module")
+def agent():
+    from fog.models.agent import FogAgent
+
+    a = FogAgent.from_tables({})
+    a.eval()
+    return a
+
+
+@engine
+def test_pool_id_logprobs_mechanics(agent):
+    """Scores are per-candidate joint log-probs: finite for every legal pool candidate,
+    deterministic, and DIFFERENT across candidates that differ in hidden attributes."""
+    import torch
+
+    from fog.encoding.observation import Observation
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.engine_runner import _stack_obs
+    from fog.env.team_truth import truth_tokens_from_paste
+    from fog.eval.pool_id import pool_id_logprobs
+
+    battle = EngineBattle(P_OPP, P_ME, seed=0, battle_tag="poolid-test")
+    obs = Observation.from_battle(battle.view("p1"), tracker=battle.trackers["p1"])
+    batch = _stack_obs([obs], torch.device("cpu"))
+    cands = np.stack([truth_tokens_from_paste(p, battle.tables)
+                      for p in (P_ME, P_ME_VARIANT)])
+
+    lp = pool_id_logprobs(agent, batch, cands)
+    assert lp.shape == (2,)
+    assert np.isfinite(lp).all(), "legal pool candidates must never score -inf"
+    assert lp[0] != lp[1], "hidden-set variants must not score identically"
+    np.testing.assert_array_equal(lp, pool_id_logprobs(agent, batch, cands))
+
+
+@engine
+def test_run_pool_id_end_to_end(agent):
+    from fog.eval.pool_id import run_pool_id
+
+    report = run_pool_id(agent, [P_ME, P_ME_VARIANT, P_OPP], games=2, seed=0, max_turns=8)
+    assert report["games"] == 2 and report["failed_games"] == 0
+    assert report["decisions"] > 0
+    assert report["curve_by_turn"], "at least one turn bucket must be populated"
+    assert all(0.0 <= v <= 1.0 for v in report["curve_by_turn"].values())
+    assert isinstance(report["gate_passed"], bool)

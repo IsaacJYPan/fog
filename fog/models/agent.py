@@ -182,12 +182,16 @@ class FogAgent(nn.Module):
 
         return AgentOutput(log_probs=log_probs, value=value, belief=belief_out, self_belief=self_belief_out)
 
-    @torch.no_grad()
     def head_inputs(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor | None]:
         """(s, b_vec) for direct `policy_value` calls — the cached-trunk path for joint search
         (SEARCH_PLAN §4.3): the backbone+belief pass over a leaf batch runs ONCE; each regret-
         matching iteration then re-scores leaves through the cheap head with fresh posterior
-        features. No oracle/blind handling — search never runs in those modes."""
+        features. No oracle/blind handling — search never runs in those modes.
+
+        Gradient contract: NOT decorated no_grad — full-scope distillation (training/distill.py)
+        backprops through this path. Inference callers (search, precompute loops) wrap their
+        calls in torch.no_grad(); a decorator here silently froze the trunk under distillation
+        (caught by tests/test_distill.py::test_distill_scope_freezes_correctly)."""
         s = self._backbone_pass(batch)
         opp_revealed = batch.get("opp_revealed")
         b_vec = None

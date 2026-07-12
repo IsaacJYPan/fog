@@ -75,7 +75,8 @@ class ArmPlayer:
 
     def __init__(self, arm: str, agent: Any, *, pool: list[str] | None = None, tables=None,
                  det_k: int | None = None, prior_weight: float = 0.5, iters: int = 16,
-                 temperature: float = 0.0, seed: int = 0, oracle_truth: bool = False) -> None:
+                 temperature: float = 0.0, seed: int = 0, oracle_truth: bool = False,
+                 own_source: Any | None = None) -> None:
         import random
 
         if arm not in ARMS:
@@ -97,8 +98,10 @@ class ArmPlayer:
         if oracle_truth and arm != "policy":
             raise ValueError("the reading opponent is a policy-arm ceiling; searching with "
                              "injected truth is not a §5 arm")
-        self._own_source = None
-        if arm == "joint":
+        # joint arm's own-state source: exact pool enumeration by default (Phase 2); pass a
+        # SampledOwnStates for the Phase-3 sampled arm
+        self._own_source = own_source
+        if arm == "joint" and self._own_source is None:
             from fog.search.own_states import EnumeratedPoolStates
 
             if not pool:
@@ -310,24 +313,37 @@ def run_search_gauntlet(
     games_per: int = 200, h2h_games: int = 200, arms=ARMS,
     opponents=GAUNTLET_OPPONENTS, det_k: int | None = None, iters: int = 16,
     prior_weight: float = 0.5, temperature: float = 0.0, seed: int = 0,
-    max_turns: int = 300, tables=None,
+    max_turns: int = 300, tables=None, own_source_kind: str = "enumerated",
+    sample_k: int = 16,
 ) -> dict:
     """Gauntlet rows (each arm vs each opponent) + head-to-head rows (joint vs the other arms),
-    then the §5 gate report. Returns {"rows": [...], "gate": {...}} (also printed)."""
+    then the §5 gate report. Returns {"rows": [...], "gate": {...}} (also printed).
+
+    `own_source_kind`: 'enumerated' (exact pool enumeration — Phase 2) or 'sampled' (the learned
+    SelfBeliefPredictor sampler at `sample_k` states — the Phase-3 scalability arm; only the
+    joint arm consumes it)."""
     import copy
 
     from fog.training.value_finetune import load_posterior_agent
 
     if tables is None:
         from fog.constants.tables import TABLES as tables
+    if own_source_kind not in ("enumerated", "sampled"):
+        raise ValueError(f"own_source_kind must be 'enumerated' or 'sampled', "
+                         f"got {own_source_kind!r}")
     det_k = int(det_k) if det_k is not None else len(pool)
     agent = load_posterior_agent(cfg, ckpt, device)
     agent.eval()
 
     def make_arm(arm: str, arm_seed: int) -> ArmPlayer:
+        own_source = None
+        if arm == "joint" and own_source_kind == "sampled":
+            from fog.search.own_states import SampledOwnStates
+
+            own_source = SampledOwnStates(agent, tables, k=int(sample_k), seed=arm_seed)
         return ArmPlayer(arm, agent, pool=pool, tables=tables, det_k=det_k,
                          prior_weight=prior_weight, iters=iters, temperature=temperature,
-                         seed=arm_seed)
+                         seed=arm_seed, own_source=own_source)
 
     def make_opponent(name: str, opp_seed: int):
         if name == "SetOracle":
@@ -381,7 +397,8 @@ def run_search_gauntlet(
     return {"rows": [r.as_dict() for r in rows], "gate": gate,
             "config": {"ckpt": ckpt, "pool_size": len(pool), "games_per": games_per,
                        "h2h_games": h2h_games, "det_k": det_k, "iters": iters,
-                       "prior_weight": prior_weight, "temperature": temperature, "seed": seed}}
+                       "prior_weight": prior_weight, "temperature": temperature, "seed": seed,
+                       "own_source": own_source_kind, "sample_k": sample_k}}
 
 
 def gate_report(rows: list[MatchRow]) -> dict:
@@ -447,6 +464,11 @@ def main() -> None:
     ap.add_argument("--opponents", type=str, default=",".join(GAUNTLET_OPPONENTS))
     ap.add_argument("--det-k", type=int, default=None,
                     help="determinized worlds/action (default: pool size = joint's ceiling)")
+    ap.add_argument("--own-source", choices=("enumerated", "sampled"), default="enumerated",
+                    help="joint arm's own-state source: exact enumeration (Phase 2) or the "
+                         "learned sampler (Phase 3)")
+    ap.add_argument("--sample-k", type=int, default=16,
+                    help="states per decision for --own-source sampled")
     ap.add_argument("--iters", type=int, default=16)
     ap.add_argument("--prior-weight", type=float, default=0.5)
     ap.add_argument("--temperature", type=float, default=0.0)
@@ -466,6 +488,7 @@ def main() -> None:
         opponents=tuple(o.strip() for o in args.opponents.split(",") if o.strip()),
         det_k=args.det_k, iters=args.iters, prior_weight=args.prior_weight,
         temperature=args.temperature, max_turns=args.max_turns, seed=args.seed,
+        own_source_kind=args.own_source, sample_k=args.sample_k,
     )
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "report.json").write_text(json.dumps(report, indent=2))

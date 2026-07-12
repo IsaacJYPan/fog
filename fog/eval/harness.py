@@ -76,7 +76,7 @@ async def _play(p1, p2, n: int) -> tuple[int, int]:
 
 
 def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, device=None,
-              paired: bool = False, search=None) -> tuple[int, int]:
+              paired: bool = False, search=None, cfg_b=None) -> tuple[int, int]:
     """Play n_games between two specs. Returns (a_wins, finished). team_pool = list of pastes.
 
     `paired=True` plays each sampled team matchup twice with sides swapped (shared-schedule
@@ -84,12 +84,17 @@ def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, 
     where on a small pool the team matchup, not the policy, dominates single-game outcomes.
 
     `search` (dict) enables §8 determinized search for spec_a (the checkpoint under test).
+
+    `cfg_b` builds spec_b's agent when the two checkpoints have different architectures (e.g. the
+    M1.5-vs-M1 b_vec gate: use_belief_vec true vs false changes the head width, so one shared cfg
+    cannot load both). Defaults to `cfg`.
     """
     import torch
 
     from fog.env.teams import make_paired_teambuilders, make_pool_teambuilder
 
     cfg = cfg or {}
+    cfg_b = cfg if cfg_b is None else cfg_b
     device = device or torch.device("cpu")
     if team_pool and paired:
         team_a, team_b = make_paired_teambuilders(team_pool, n_games, seed=1)
@@ -98,5 +103,5 @@ def run_match(spec_a, spec_b, n_games: int, fmt: str, team_pool=None, cfg=None, 
         team_b = make_pool_teambuilder(team_pool, seed=2) if team_pool else None
     # set-oracle agents on either side read the other's team truth from the shared pool
     a = build_player(spec_a, fmt, team_a, cfg, device, oracle_pool=team_pool, search=search)
-    b = build_player(spec_b, fmt, team_b, cfg, device, oracle_pool=team_pool)
+    b = build_player(spec_b, fmt, team_b, cfg_b, device, oracle_pool=team_pool)
     return asyncio.run(_play(a, b, n_games))

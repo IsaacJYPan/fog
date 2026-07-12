@@ -16,6 +16,13 @@ does need it (the binding divergence control — don't disable it, start the ser
     python -m fog.scripts.pipeline finetune-value     # §4.2: value fine-tune + regression gate
     python -m fog.scripts.pipeline gauntlet-search    # Phase 2: arm gauntlet + h2h + §5 gate
                                                       #          (engine; §4.2 gate must be green)
+    python -m fog.scripts.pipeline gate-bvec          # THE go/no-go: M1.5-vs-M1 paired h2h
+                                                      #          (Showdown, both runs finished)
+    python -m fog.scripts.pipeline distill            # Phase 4: distill search play -> policy
+    python -m fog.scripts.pipeline refresh-beliefs    # Phase 4: belief consistency retrain (§7)
+    python -m fog.scripts.pipeline agreement          # Phase 3: exact-vs-sampled agreement
+    python -m fog.scripts.pipeline gate-belief        # M1.5 belief gate: pool-id top-1 by turn 4
+                                                      #          (engine, no server)
     python -m fog.scripts.pipeline probe              # engine throughput probe (SIMULATION_PLAN)
 
 The M1.5 gate is the go/no-go for the whole search program (SEARCH_PLAN §3): if b_vec buys no
@@ -74,7 +81,16 @@ def cmd_m3_grid(args) -> None:
 def cmd_log_posteriors(args) -> None:
     cmd = [sys.executable, "-m", "fog.search.posterior_log",
            "--pool", str(args.pool), "--out", str(args.out),
-           "--games", str(args.games), "--iters", str(args.iters), "--seed", str(args.seed)]
+           "--games", str(args.games), "--iters", str(args.iters), "--seed", str(args.seed),
+           "--opponent", args.opponent]
+    if args.ckpt:
+        cmd += ["--ckpt", args.ckpt]
+    _run(cmd)
+
+
+def cmd_distill(args) -> None:
+    cmd = [sys.executable, "-m", "fog.training.distill",
+           "--data", str(args.data), "--out", str(args.out), "--scope", args.scope]
     if args.ckpt:
         cmd += ["--ckpt", args.ckpt]
     _run(cmd)
@@ -86,6 +102,57 @@ def cmd_finetune_value(args) -> None:
     if args.ckpt:
         cmd += ["--ckpt", args.ckpt]
     _run(cmd)
+
+
+def cmd_agreement(args) -> None:
+    cmd = [sys.executable, "-m", "fog.eval.source_agreement",
+           "--pool", str(args.pool), "--ckpt", args.ckpt, "--games", str(args.games),
+           "--ks", *[str(k) for k in args.ks], "--seed", str(args.seed)]
+    if args.out:
+        cmd += ["--out", str(args.out)]
+    _run(cmd)
+
+
+def cmd_refresh_beliefs(args) -> None:
+    cmd = [sys.executable, "-m", "fog.training.belief_refresh",
+           "--ckpt", args.ckpt, "--pool", str(args.pool), "--out", str(args.out),
+           "--games", str(args.games), "--seed", str(args.seed)]
+    _run(cmd)
+
+
+def cmd_gate_belief(args) -> None:
+    cmd = [sys.executable, "-m", "fog.eval.pool_id",
+           "--ckpt", args.ckpt, "--config", args.config, "--pool", str(args.pool),
+           "--games", str(args.games), "--seed", str(args.seed)]
+    if args.out:
+        cmd += ["--out", str(args.out)]
+    _run(cmd)
+
+
+def cmd_gate_bvec(args) -> None:
+    """THE go/no-go (SEARCH_PLAN §3 / M1.5 gate): paired head-to-head M1.5 (b_vec ON) vs M1
+    (b_vec OFF) at matched training budget, on the Showdown harness (server up). The two
+    checkpoints have different head widths, so each side is built from its own config.
+    Gate: >=3% win-rate gain, i.e. head-to-head point >= 0.53 — and quote the CI."""
+    from fog.config import load_config
+    from fog.env.teams import load_pool
+    from fog.eval.readability import lvn_match
+
+    cfg_l = load_config(args.config_l)
+    cfg_n = load_config(args.config_n)
+    pool = load_pool(cfg_l["env"]["team_pool"])
+    print(f">>> b_vec gate: {args.ckpt_l} (L, b_vec) vs {args.ckpt_n} (N) | {args.games} games")
+    r = lvn_match(args.ckpt_l, args.ckpt_n, args.games,
+                  cfg_l.get("env", {}).get("battle_format", "gen9ou"), pool, cfg_l, cfg_n=cfg_n)
+    passed = r["point"] >= 0.53
+    ci_ok = r["low"] > 0.5
+    print(f"b_vec gate (>=0.53 head-to-head): point {r['point']:.3f} "
+          f"[{r['low']:.3f}, {r['high']:.3f}] -> {'PASS' if passed else 'FAIL'}"
+          f"{' (CI-separated from 0.5)' if ci_ok else ' (CI includes 0.5 — more games)' if passed else ''}")
+    if not passed:
+        print("b_vec gate FAILED: conditioning on beliefs buys no win rate at this budget — "
+              "the payoff channel for BOTH the beta penalty and belief-space search is in doubt "
+              "(SEARCH_PLAN §3). Check whether both runs are undertrained before concluding.")
 
 
 def cmd_gauntlet_search(args) -> None:
@@ -174,14 +241,64 @@ def main() -> None:
     p.add_argument("--ckpt", type=str, default=None)
     p.add_argument("--games", type=int, default=64)
     p.add_argument("--iters", type=int, default=16)
+    p.add_argument("--opponent", type=str, default="MaxDamage",
+                   help="MaxDamage/Random, 'self' (Phase-4 self-play), or a checkpoint path")
     p.add_argument("--seed", type=int, default=0)
     p.set_defaults(fn=cmd_log_posteriors)
+
+    p = sub.add_parser("distill", help="Phase 4: distill search play into the policy (§7)")
+    p.add_argument("--data", type=Path, default=Path("runs/posterior_log"))
+    p.add_argument("--out", type=Path, default=Path("runs/distill"))
+    p.add_argument("--ckpt", type=str, default=None,
+                   help="input checkpoint (natural: the §4.2 value_finetune output)")
+    p.add_argument("--scope", choices=("heads", "full"), default="heads")
+    p.set_defaults(fn=cmd_distill)
 
     p = sub.add_parser("finetune-value", help="§4.2: posterior-aware value fine-tune + gate")
     p.add_argument("--data", type=Path, default=Path("runs/posterior_log"))
     p.add_argument("--out", type=Path, default=Path("runs/value_finetune"))
     p.add_argument("--ckpt", type=str, default=None)
     p.set_defaults(fn=cmd_finetune_value)
+
+    p = sub.add_parser("agreement",
+                       help="Phase 3: exact-vs-sampled own-state decision agreement (engine)")
+    p.add_argument("--pool", type=Path, default=Path("data/teams/pool_gen"))
+    p.add_argument("--ckpt", type=str, required=True)
+    p.add_argument("--games", type=int, default=64)
+    p.add_argument("--ks", type=int, nargs="*", default=[8, 16, 32])
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--out", type=Path, default=Path("runs/agreement/report.json"))
+    p.set_defaults(fn=cmd_agreement)
+
+    p = sub.add_parser("refresh-beliefs",
+                       help="Phase 4: retrain belief nets on the distilled agent's self-play (§7)")
+    p.add_argument("--ckpt", type=str, required=True, help="distilled checkpoint")
+    p.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
+    p.add_argument("--out", type=Path, default=Path("runs/belief_refresh"))
+    p.add_argument("--games", type=int, default=256)
+    p.add_argument("--seed", type=int, default=0)
+    p.set_defaults(fn=cmd_refresh_beliefs)
+
+    p = sub.add_parser("gate-belief",
+                       help="M1.5 belief gate: pool-id top-1 by turn 4 (engine, no server)")
+    p.add_argument("--ckpt", type=str, default="runs/m1_5_belief/checkpoints/ppo_final.pt")
+    p.add_argument("--config", type=str, default="configs/m1_5_belief.yaml")
+    p.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
+    p.add_argument("--games", type=int, default=200)
+    p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--out", type=Path, default=Path("runs/pool_id_m15/report.json"))
+    p.set_defaults(fn=cmd_gate_belief)
+
+    p = sub.add_parser("gate-bvec",
+                       help="THE go/no-go: paired M1.5-vs-M1 head-to-head (Showdown, server up)")
+    p.add_argument("--ckpt-l", type=str,
+                   default="runs/m1_5_belief/checkpoints/ppo_final.pt", help="b_vec-ON checkpoint")
+    p.add_argument("--ckpt-n", type=str,
+                   default="runs/m1_poc/checkpoints/ppo_final.pt", help="b_vec-OFF checkpoint")
+    p.add_argument("--config-l", type=str, default="configs/m1_5_belief.yaml")
+    p.add_argument("--config-n", type=str, default="configs/m1_poc.yaml")
+    p.add_argument("--games", type=int, default=1000)
+    p.set_defaults(fn=cmd_gate_bvec)
 
     p = sub.add_parser("gauntlet-search",
                        help="Phase 2: policy/determinized/joint gauntlet + h2h + §5 gate")

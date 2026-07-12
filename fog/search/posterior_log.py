@@ -173,9 +173,16 @@ def _play_logged_game(battle, agent, own_source, opp_policy, game_rows, stats, *
                         pass
             moves[LEARNER] = battle.engine_action(LEARNER, res.action)
         if OPPONENT in pending:
-            moves[OPPONENT] = battle.engine_action(
-                OPPONENT, opp_policy.choose(battle, OPPONENT)
-            )
+            opp_action = opp_policy.choose(battle, OPPONENT)
+            if getattr(opp_policy, "records_history", False):  # agent-driven opponents ('self')
+                try:
+                    battle.trackers[OPPONENT].record_decision(
+                        battle.turn,
+                        build_snapshot(battle.view(OPPONENT), battle.tables), opp_action,
+                    )
+                except Exception:
+                    pass
+            moves[OPPONENT] = battle.engine_action(OPPONENT, opp_action)
         battle.step(moves)
 
 
@@ -247,6 +254,26 @@ def batch_from_rows(data: dict[str, np.ndarray], idx: np.ndarray, device) -> dic
 
 
 # ------------------------------------------------------------------------------------------ CLI
+def _build_opponent(spec: str, agent, cfg: dict, device, temperature: float, seed: int):
+    """None (scripted MaxDamage default inside the collector), a policy-arm of the learner
+    ('self' — Phase-4 self-play), a frozen checkpoint's policy, or another scripted name."""
+    if spec == "MaxDamage":
+        return None  # the collector's default (fresh-seeded per game)
+    from fog.eval.search_gauntlet import ArmPlayer
+
+    if spec == "self":
+        return ArmPlayer("policy", agent, temperature=temperature, seed=seed)
+    from fog.env.engine_scripted import SCRIPTED_ENGINE_POLICIES
+
+    if spec in SCRIPTED_ENGINE_POLICIES:
+        return SCRIPTED_ENGINE_POLICIES[spec](seed=seed)
+    from fog.training.value_finetune import load_posterior_agent
+
+    opp_agent = load_posterior_agent(cfg, spec, device)  # a checkpoint path
+    opp_agent.eval()
+    return ArmPlayer("policy", opp_agent, temperature=temperature, seed=seed)
+
+
 def main() -> None:
     import argparse
 
@@ -265,6 +292,9 @@ def main() -> None:
     ap.add_argument("--games", type=int, default=32)
     ap.add_argument("--iters", type=int, default=16)
     ap.add_argument("--temperature", type=float, default=1.0)
+    ap.add_argument("--opponent", type=str, default="MaxDamage",
+                    help="'MaxDamage'/'Random' (scripted), 'self' (the same agent's raw policy — "
+                         "Phase-4 self-play data gen), or a checkpoint path (frozen policy)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--device", type=str, default="cuda")
     args = ap.parse_args()
@@ -284,6 +314,8 @@ def main() -> None:
     meta = collect_search_decisions(
         agent, load_pool(args.pool), args.out, n_games=args.games, iters=args.iters,
         temperature=args.temperature, seed=args.seed,
+        opponent=_build_opponent(args.opponent, agent, cfg, device, args.temperature,
+                                 args.seed + 1),
     )
     print(f"[posterior_log] {meta['stats']} -> {args.out}", flush=True)
 
