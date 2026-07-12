@@ -40,3 +40,7 @@ course/
 .idea/
 .vscode/
 
+# Root documentation is tracked explicitly.
+/*.md
+!/README.md
+server/README.md
