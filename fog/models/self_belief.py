@@ -26,7 +26,7 @@ import copy
 import torch
 import torch.nn.functional as F
 
-from fog.models.belief import BeliefModel
+from fog.models.belief import SLOT_ATTRS, BeliefModel
 
 # family -> the attr columns it occupies in a [.., 6, 9] token tensor (order = SLOT_ATTRS)
 _FAMILY_COLS = {
@@ -46,6 +46,25 @@ def labels_from_tokens(tokens: torch.Tensor) -> dict[str, torch.Tensor]:
         sel = tokens[..., list(cols)]
         out[fam] = sel if fam == "move" else sel.squeeze(-1)
     return out
+
+
+def tokens_from_labels(labels: dict[str, torch.Tensor]) -> torch.Tensor:
+    """Inverse of `labels_from_tokens`: a per-family label dict -> [B, 6, 9] token grid, -1 preserved.
+
+    Used to rebuild the true-value grid teacher-forced into the belief chain (BELIEF_PLAN §3.3 pass B).
+    A -1 label (censored/off-table) stays -1, so that tail token feeds <UNK> — exactly the pass-B
+    contract ("<UNK> appears in the tail only where the label itself is censored/missing").
+    """
+    any_fam = next(iter(labels.values()))
+    b = any_fam.shape[0]
+    grid = torch.full((b, 6, len(SLOT_ATTRS)), -1, dtype=torch.long, device=any_fam.device)
+    for fam, cols in _FAMILY_COLS.items():
+        vals = labels[fam].to(torch.long)
+        if fam == "move":
+            grid[..., list(cols)] = vals
+        else:
+            grid[..., cols[0]] = vals
+    return grid
 
 
 def still_hidden_from_tokens(view_tokens: torch.Tensor) -> dict[str, torch.Tensor]:

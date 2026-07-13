@@ -80,7 +80,11 @@ def test_to_batch_emits_self_belief_targets_and_aliases_history():
     assert "opp_view" in batch and "my_view" in batch["opp_view"]
     assert "self_belief_targets" in batch and "self_belief_valid" in batch
     assert batch["self_belief_targets"]["move"].shape == (12, 6, 4)
-    assert batch["self_belief_valid"]["species"].all()
+    # BELIEF_PLAN §4.3: only attrs the opponent still can't see are leakage targets. _my_view makes
+    # species public (preview), so species is a delta row -> invalid; item/tera stay hidden -> valid.
+    assert not batch["self_belief_valid"]["species"].any()
+    assert batch["self_belief_valid"]["item"].all()
+    assert batch["self_belief_valid"]["tera"].all()
     # history is aliased (same tensor object), not duplicated
     assert batch["opp_view"]["history"] is batch["history"]
 

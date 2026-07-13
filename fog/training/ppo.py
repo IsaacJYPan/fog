@@ -101,6 +101,9 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
     value_coef = loss_cfg.get("value_coef", 0.5)
     belief_coef = loss_cfg.get("belief_coef", 1.0)
     self_belief_coef = loss_cfg.get("self_belief_coef", 1.0)
+    # BELIEF_PLAN §4.2: pass-B chain CE, its own coefficient (start equal to the marginal's).
+    belief_chain_coef = loss_cfg.get("belief_chain_coef", belief_coef)
+    self_belief_chain_coef = loss_cfg.get("self_belief_chain_coef", self_belief_coef)
     preview_coef = loss_cfg.get("preview_coef", 0.5)
     kl_anchor_coef = ppo_cfg.get("kl_anchor_coef", 0.0)
     max_grad_norm = ppo_cfg.get("max_grad_norm", 0.5)
@@ -149,15 +152,25 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
 
             if out.belief is not None and mb.get("belief_targets") is not None:
                 b_stats: dict = {}
+                # Marginal (pass A) CE: the deployment reads, trained on every example (§3.3). Kept
+                # under the historical "belief_loss" metric name (still the pass-A marginal).
                 b_loss = belief_loss(
                     out.belief.logits, mb["belief_targets"], mb["belief_valid"], stats=b_stats
                 )
                 loss = loss + belief_coef * b_loss
                 log("belief_loss", b_loss)
+                log("belief_ce_marginal", b_loss)
                 # dropped-target rate: ~0 post-alignment; systematic > 0 = convention bug (see
                 # losses.masked_cross_entropy).
                 b_total = b_stats.get("valid", 0) + b_stats.get("dropped_nonfinite", 0)
                 log("belief_dropped_rate", b_stats.get("dropped_nonfinite", 0) / max(1, b_total))
+                # Chain (pass B) CE: the sampling/scoring reads (§4.2). Separate coefficient + metric.
+                if out.belief_chain is not None:
+                    bc_loss = belief_loss(
+                        out.belief_chain.logits, mb["belief_targets"], mb["belief_valid"]
+                    )
+                    loss = loss + belief_chain_coef * bc_loss
+                    log("belief_ce_chain", bc_loss)
             if out.self_belief is not None and mb.get("self_belief_targets") is not None:
                 sb_stats: dict = {}
                 sb_loss = belief_loss(
@@ -166,9 +179,17 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
                 )
                 loss = loss + self_belief_coef * sb_loss
                 log("self_belief_loss", sb_loss)
+                log("self_belief_ce_marginal", sb_loss)
                 sb_total = sb_stats.get("valid", 0) + sb_stats.get("dropped_nonfinite", 0)
                 log("self_belief_dropped_rate",
                     sb_stats.get("dropped_nonfinite", 0) / max(1, sb_total))
+                if out.self_belief_chain is not None:
+                    sbc_loss = belief_loss(
+                        out.self_belief_chain.logits, mb["self_belief_targets"],
+                        mb["self_belief_valid"],
+                    )
+                    loss = loss + self_belief_chain_coef * sbc_loss
+                    log("self_belief_ce_chain", sbc_loss)
 
             optimizer.zero_grad(set_to_none=True)
             loss.backward()

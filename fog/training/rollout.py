@@ -201,7 +201,11 @@ class RolloutBuffer:
         batch["returns"] = torch.as_tensor(np.concatenate(rets), dtype=torch.float32, device=device)
 
         if any_belief:
-            from fog.encoding.reveals import align_truth_to_views, labels_from_truth
+            from fog.encoding.reveals import (
+                FAMILY_COLS,
+                align_truth_to_views,
+                labels_from_truth,
+            )
 
             toks = np.stack(belief_tok)  # [N, 6, 9]
             # Targets must follow the INPUT packing convention (revealed moves clamped into the
@@ -224,10 +228,19 @@ class RolloutBuffer:
                     flush=True,
                 )
             labels = labels_from_truth(toks)
+            # BELIEF_PLAN §4.3: valid := (label >= 0) AND (attr still hidden at decision time). A
+            # revealed attr is a delta row under the new arch — 0/no-grad and meaningless to train —
+            # so it must not enter the loss. (Belief-loss SCALE therefore shifts vs the old arch;
+            # dashboards are not comparable across the change.)
+            hidden = views < 0  # [N, 6, 9]
             targets, valid = {}, {}
             for fam, arr in labels.items():
+                cols = list(FAMILY_COLS[fam])
+                h = hidden[..., cols]
+                if fam != "move":
+                    h = h.squeeze(-1)
                 targets[fam] = torch.as_tensor(arr, dtype=torch.long, device=device)
-                valid[fam] = torch.as_tensor(arr >= 0, dtype=torch.bool, device=device)
+                valid[fam] = torch.as_tensor((arr >= 0) & h, dtype=torch.bool, device=device)
             batch["belief_targets"] = targets
             batch["belief_valid"] = valid
 
@@ -240,8 +253,15 @@ class RolloutBuffer:
             opp_view.setdefault("history", batch["history"])
             labels = (opp_view.get("my_view") or {}).get("labels")
             if labels:
+                from fog.models.self_belief import still_hidden_from_tokens
+
+                # §4.3 again: only MY attrs the opponent still can't see are trainable leakage
+                # targets; the ones they've already seen are delta rows.
+                hidden = still_hidden_from_tokens(opp_view["my_view"]["tokens"])
                 batch["self_belief_targets"] = labels
-                batch["self_belief_valid"] = {k: (v >= 0) for k, v in labels.items()}
+                batch["self_belief_valid"] = {
+                    k: (v >= 0) & hidden[k] for k, v in labels.items()
+                }
 
         # preview sub-batch (§3.1): one row per game that recorded a preview pick. NOT per-decision —
         # ppo_update handles it outside the minibatch loop.

@@ -98,10 +98,92 @@ def pool_id_logprobs(agent: Any, batch: dict, cand_tokens: np.ndarray) -> np.nda
     return scores
 
 
+def pool_id_joint_logprobs(
+    agent: Any, batch: dict, cand_tokens: np.ndarray, *, tail_order: str = "canonical",
+    generator=None,
+) -> np.ndarray:
+    """[C] TRUE joint log-prob of each candidate team (BELIEF_PLAN §4.5.1, the headline score).
+
+    Unlike the fast marginal (`pool_id_logprobs`, one forward with each candidate read off the SAME
+    per-position conditionals), this feeds each candidate's own hidden values back into the chain
+    (pass-B teacher forcing) and sums the chain-rule factors: log p(hidden = candidate | R) =
+    sum_k log p(h_k = cand_k | R, cand_1..cand_{k-1}). One batched forward over the C candidates
+    (canonical tail order by default; pass a random `tail_order` + `generator` for the §4.5.3
+    order-sensitivity probe). Teacher-forcing the candidate here is CORRECT — pass B trains exactly
+    this input pattern (it was a bug only when that pattern was untrained, commit a8a96eb).
+
+    Revealed attrs are delta rows: a candidate consistent with a reveal contributes 0 there, an
+    inconsistent one hits the -inf and is eliminated (the hard filter, same as the fast path)."""
+    import torch
+
+    from fog.encoding.reveals import align_truth_to_views
+
+    device = next(agent.parameters()).device
+    c = cand_tokens.shape[0]
+    opp = batch["opp_revealed"]
+    view_np = opp["tokens"][0].detach().cpu().numpy()                     # [6, 9]
+    cand_aligned, cand_ok = align_truth_to_views(cand_tokens, view_np)    # [C,6,9], [C,6]
+    with torch.no_grad():
+        s = agent._backbone_pass(batch)                                   # [1, state_dim]
+        s_c = s.expand(c, -1).contiguous()
+        opp_c = {
+            "tokens": opp["tokens"].expand(c, -1, -1).contiguous(),
+            "masks": {k: v.expand(c, *v.shape[1:]).contiguous()
+                      for k, v in (opp.get("masks") or {}).items()},
+        }
+        cand = torch.as_tensor(cand_aligned, dtype=torch.long, device=device)  # [C, 6, 9]
+        out = agent.belief(s_c, opp_c, teacher_values=cand, tail_order=tail_order,
+                           generator=generator)
+
+        lp = torch.zeros(c, device=device)
+        for fam, col in _SCALAR_ATTR_COLS.items():
+            ls = torch.log_softmax(out.logits[fam], dim=-1)               # [C, 6, n]
+            tok = cand[:, :, col]                                         # [C, 6]
+            got = ls.gather(-1, tok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
+            lp += torch.where(tok >= 0, got, torch.zeros_like(got)).sum(-1)
+        mv = torch.log_softmax(out.logits["move"], dim=-1)               # [C, 6, 4, n]
+        mtok = cand[:, :, 3:7]
+        mgot = mv.gather(-1, mtok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
+        lp += torch.where(mtok >= 0, mgot, torch.zeros_like(mgot)).sum((-1, -2))
+    scores = lp.cpu().numpy()
+    scores[~cand_ok.all(axis=1)] = -np.inf
+    return scores
+
+
+def pool_id_order_sensitivity(
+    agent: Any, batch: dict, cand_tokens: np.ndarray, true_index: int, *, m_orders: int = 4,
+    seed: int = 0,
+) -> dict:
+    """Order-sensitivity diagnostic (§4.5.3): recompute the joint score under `m_orders` random tail
+    orders and report the dispersion of the true candidate's log-prob and how often the argmax stays
+    the true candidate. Large dispersion = the learned joint is order-inconsistent (watch it across
+    training). Returns {"true_logprob_std", "true_logprob_mean", "argmax_stability"}."""
+    import torch
+
+    device = next(agent.parameters()).device
+    scores = []
+    for i in range(int(m_orders)):
+        gen = torch.Generator(device=device).manual_seed(seed + i)
+        scores.append(pool_id_joint_logprobs(
+            agent, batch, cand_tokens, tail_order="random", generator=gen))
+    arr = np.stack(scores)                                                # [M, C]
+    true_lp = arr[:, true_index]
+    argmax_true = np.mean([int(row.argmax() == true_index) for row in arr])
+    finite = true_lp[np.isfinite(true_lp)]
+    return {
+        "true_logprob_std": float(np.std(finite)) if finite.size else float("nan"),
+        "true_logprob_mean": float(np.mean(finite)) if finite.size else float("nan"),
+        "argmax_stability": float(argmax_true),
+    }
+
+
 def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
-                temperature: float = 0.0, max_turns: int = 300, tables=None) -> dict:
+                temperature: float = 0.0, max_turns: int = 300, tables=None,
+                os_sample: int = 64) -> dict:
     """Play engine games with the agent's raw policy vs MaxDamage and score opponent pool-id at
-    every learner decision. Returns the report dict (also printed)."""
+    every learner decision. Headline = the JOINT score (§4.5.1); the fast marginal (§4.5.2) is
+    computed alongside for the joint-vs-fast argmax agreement, and order-sensitivity (§4.5.3) is
+    sampled on up to `os_sample` decisions. Returns the report dict (also printed)."""
     import random
 
     from fog.encoding.observation import Observation
@@ -124,7 +206,9 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
     assert_uniform_slot_order(cand_tokens)  # slot-by-slot scoring needs a uniform paste order
     pool_truth = PoolTruth(pool, tables)
 
-    records: list[tuple[int, int, bool, int]] = []  # (game, turn, correct, K_consistent)
+    records: list[tuple[int, int, bool, int]] = []  # (game, turn, correct_joint, K_consistent)
+    agree: list[bool] = []            # joint and fast argmax pick the same candidate
+    os_reports: list[dict] = []       # sampled order-sensitivity diagnostics (§4.5.3)
     failed = 0
 
     class _ScoringArm(ArmPlayer):
@@ -145,11 +229,17 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
                 obs = Observation.from_battle(  # choice-, driven
                     battle.view(role), tracker=battle.trackers[role]
                 )
-                lp = pool_id_logprobs(agent, _stack_obs([obs], _device(agent)), cand_tokens)
+                b = _stack_obs([obs], _device(agent))
+                joint = pool_id_joint_logprobs(agent, b, cand_tokens)     # headline
+                fast = pool_id_logprobs(agent, b, cand_tokens)           # reported alongside
                 views = opponent_views_from_battle(battle.view(role), tables)
                 k_cons = len(pool_truth.consistent_indices(views))
                 records.append((self.game_idx, int(battle.turn),
-                                bool(int(lp.argmax()) == self.true_idx), max(1, k_cons)))
+                                bool(int(joint.argmax()) == self.true_idx), max(1, k_cons)))
+                agree.append(bool(int(joint.argmax()) == int(fast.argmax())))
+                if len(os_reports) < os_sample and len(legal) > 1:
+                    os_reports.append(pool_id_order_sensitivity(
+                        agent, b, cand_tokens, self.true_idx, seed=self.game_idx))
             return super().choose(battle, role)
 
     for g in range(int(games)):
@@ -171,6 +261,20 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
 
     report = aggregate_pool_id(records, games=int(games) - failed, failed=failed,
                                pool_size=len(pool))
+    report["joint_fast_argmax_agreement"] = float(np.mean(agree)) if agree else float("nan")
+    if os_reports:
+        report["order_sensitivity"] = {
+            "n": len(os_reports),
+            "true_logprob_std_mean": float(np.nanmean([r["true_logprob_std"] for r in os_reports])),
+            "argmax_stability_mean": float(np.mean([r["argmax_stability"] for r in os_reports])),
+        }
+    print(f"[pool_id] joint-vs-fast argmax agreement: "
+          f"{report['joint_fast_argmax_agreement']:.3f}", flush=True)
+    if "order_sensitivity" in report:
+        os_ = report["order_sensitivity"]
+        print(f"[pool_id] order-sensitivity (n={os_['n']}): true-logprob std "
+              f"{os_['true_logprob_std_mean']:.3f}, argmax stability "
+              f"{os_['argmax_stability_mean']:.3f}", flush=True)
     print(f"[pool_id] {report['games']} games, {report['decisions']} scored decisions "
           f"(pool {report['pool_size']}, chance {report['chance']:.3f})")
     print("[pool_id] top-1 by turn: "

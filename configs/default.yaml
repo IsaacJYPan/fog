@@ -46,8 +46,10 @@ model:
 # --- Losses / training shared ----------------------------------------------------------------------
 loss:
   value_coef: 0.5
-  belief_coef: 1.0
+  belief_coef: 1.0              # pass-A marginal CE (deployment reads; BELIEF_PLAN §3.3)
   self_belief_coef: 1.0
+  belief_chain_coef: 1.0        # pass-B chain CE (sampling/scoring reads; §4.2). Defaults to belief_coef.
+  self_belief_chain_coef: 1.0
   preview_coef: 0.5
 
 # --- Logging ---------------------------------------------------------------------------------------

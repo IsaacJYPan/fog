@@ -23,8 +23,13 @@ PARAM_BUDGET = 5_000_000  # hard cap (≤5M); spec target ≈ 3.8M
 class AgentOutput:
     log_probs: torch.Tensor
     value: torch.Tensor
-    belief: BeliefOutput | None = None       # opponent-team belief (§3.2)
-    self_belief: BeliefOutput | None = None  # leakage measurer output (§3.3; training only)
+    belief: BeliefOutput | None = None       # opponent-team belief, pass A / marginals (§3.2)
+    self_belief: BeliefOutput | None = None  # leakage measurer output, pass A (§3.3; training only)
+    # Pass B (BELIEF_PLAN §3.3): random-order, fully-teacher-forced chain logits for the chain-rule
+    # CE. Populated only during a training-mode forward that carries belief/self-belief targets; the
+    # deployed b_vec and marginals always come from pass A above.
+    belief_chain: BeliefOutput | None = None
+    self_belief_chain: BeliefOutput | None = None
 
 
 class FogAgent(nn.Module):
@@ -155,11 +160,18 @@ class FogAgent(nn.Module):
             opp_revealed = apply_set_oracle(opp_revealed or {}, batch["opp_truth_tokens"])
 
         belief_out: BeliefOutput | None = None
+        belief_chain: BeliefOutput | None = None
+        s_aux = s if self.aux_into_trunk else s.detach()
         if opp_revealed is None and self.use_belief_vec:
             raise ValueError("use_belief_vec=True requires batch['opp_revealed'].")
         if opp_revealed is not None:
-            s_aux = s if self.aux_into_trunk else s.detach()
-            belief_out = self.belief(s_aux, opp_revealed)
+            belief_out = self.belief(s_aux, opp_revealed)                 # pass A: b_vec + marginals
+            # Pass B (§3.3): random-order teacher-forced chain, only when training against labels.
+            if self.training and batch.get("belief_targets") is not None:
+                from fog.models.self_belief import tokens_from_labels
+
+                truth = tokens_from_labels(batch["belief_targets"])       # aligned [B, 6, 9]
+                belief_chain = self.belief(s_aux, opp_revealed, teacher_values=truth)
 
         # Action oracle (§3.4): append the opponent's committed action to s before the policy head.
         s_head = s
@@ -173,14 +185,25 @@ class FogAgent(nn.Module):
         )
 
         self_belief_out: BeliefOutput | None = None
+        self_belief_chain: BeliefOutput | None = None
         opp_view = batch.get("opp_view")
         if opp_view is not None:
             s_opp = self._backbone_pass(opp_view)
             if not self.aux_into_trunk:
                 s_opp = s_opp.detach()
-            self_belief_out = self.self_belief(s_opp, opp_view["my_view"])
+            self_belief_out = self.self_belief(s_opp, opp_view["my_view"])  # pass A
+            if self.training and batch.get("self_belief_targets") is not None:
+                from fog.models.self_belief import tokens_from_labels
 
-        return AgentOutput(log_probs=log_probs, value=value, belief=belief_out, self_belief=self_belief_out)
+                my_truth = tokens_from_labels(batch["self_belief_targets"])
+                self_belief_chain = self.self_belief(
+                    s_opp, opp_view["my_view"], teacher_values=my_truth
+                )
+
+        return AgentOutput(
+            log_probs=log_probs, value=value, belief=belief_out, self_belief=self_belief_out,
+            belief_chain=belief_chain, self_belief_chain=self_belief_chain,
+        )
 
     def head_inputs(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor | None]:
         """(s, b_vec) for direct `policy_value` calls — the cached-trunk path for joint search

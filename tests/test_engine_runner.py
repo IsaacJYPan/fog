@@ -92,7 +92,10 @@ def test_runner_batch_matches_showdown_contract(pool, agent):
     assert n == stats["decisions"]
     # belief truth is exact by construction on the engine path: every decision has species labels
     assert bool((batch["belief_targets"]["species"] >= 0).all())
-    assert bool(batch["belief_valid"]["species"].all())
+    # BELIEF_PLAN §4.3: species is revealed (preview) -> a delta row, excluded from the loss; the
+    # still-hidden families carry the trainable belief targets.
+    assert not bool(batch["belief_valid"]["species"].any())
+    assert bool(batch["belief_valid"]["tera"].any())
 
     train_agent = agent.train()
     opt = torch.optim.AdamW(train_agent.parameters(), lr=1e-4)

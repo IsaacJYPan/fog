@@ -113,6 +113,39 @@ def test_pool_id_midgame_reveal_at_nonfirst_paste_position(agent):
     assert lp[1] == -np.inf, "a candidate whose moveset lacks the revealed move is inconsistent"
 
 
+@engine
+def test_pool_id_joint_and_order_sensitivity(agent):
+    """T7: the joint (headline) scorer survives a mid-game reveal at a non-first paste position (true
+    candidate finite and top-1 over the hidden-differing variant), and the order-sensitivity probe
+    emits sane values (finite std, stability in [0, 1])."""
+    import torch
+
+    from fog.encoding.observation import Observation
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.engine_runner import _stack_obs
+    from fog.env.team_truth import truth_tokens_from_paste
+    from fog.eval.pool_id import pool_id_joint_logprobs, pool_id_order_sensitivity
+
+    battle = EngineBattle(P_OPP, P_ME, seed=0, battle_tag="poolid-joint")
+    obs = Observation.from_battle(battle.view("p1"), tracker=battle.trackers["p1"])
+    batch = _stack_obs([obs], torch.device("cpu"))
+    cands = np.stack([truth_tokens_from_paste(p, battle.tables) for p in (P_ME, P_ME_VARIANT)])
+
+    knock_off = int(cands[0, 0, 3 + 3])           # P_ME Great Tusk Knock Off, paste subslot 3
+    batch["opp_revealed"]["tokens"][0, 0, 3] = knock_off   # revealed, clamped into subslot 0
+
+    lp = pool_id_joint_logprobs(agent, batch, cands)
+    assert lp.shape == (2,)
+    assert np.isfinite(lp[0]), "true candidate must survive a non-first-paste-position reveal"
+    assert lp[1] == -np.inf, "the variant lacks the revealed move -> inconsistent -> -inf"
+    # deterministic under the canonical (default) order
+    np.testing.assert_array_equal(lp, pool_id_joint_logprobs(agent, batch, cands))
+
+    os = pool_id_order_sensitivity(agent, batch, cands, true_index=0, m_orders=4, seed=0)
+    assert np.isfinite(os["true_logprob_std"]) and os["true_logprob_std"] >= 0.0
+    assert 0.0 <= os["argmax_stability"] <= 1.0
+
+
 def test_slot_order_guard_fires_on_shuffled_paste():
     from fog.env.team_truth import assert_uniform_slot_order
 
