@@ -1,4 +1,4 @@
-"""Engine-backend training dispatch tests (SIMULATION_PLAN §4/§5): `train()` must run the full
+"""Engine-backend training dispatch tests (ARCHITECTURE.md §3.2): `train()` must run the full
 rollout->update loop with NO server, and Showdown-only configs must fail loudly. Skipped without
 poke-engine."""
 from __future__ import annotations

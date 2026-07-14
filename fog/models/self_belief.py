@@ -51,7 +51,7 @@ def labels_from_tokens(tokens: torch.Tensor) -> dict[str, torch.Tensor]:
 def tokens_from_labels(labels: dict[str, torch.Tensor]) -> torch.Tensor:
     """Inverse of `labels_from_tokens`: a per-family label dict -> [B, 6, 9] token grid, -1 preserved.
 
-    Used to rebuild the true-value grid teacher-forced into the belief chain (BELIEF_PLAN §3.3 pass B).
+    Used to rebuild the true-value grid teacher-forced into the belief chain (BELIEF_POLICY_PLAN §3.3 pass B).
     A -1 label (censored/off-table) stays -1, so that tail token feeds <UNK> — exactly the pass-B
     contract ("<UNK> appears in the tail only where the label itself is censored/missing").
     """

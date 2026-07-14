@@ -228,7 +228,7 @@ class RolloutBuffer:
                     flush=True,
                 )
             labels = labels_from_truth(toks)
-            # BELIEF_PLAN §4.3: valid := (label >= 0) AND (attr still hidden at decision time). A
+            # BELIEF_POLICY_PLAN §4.5: valid := (label >= 0) AND (attr still hidden at decision time). A
             # revealed attr is a delta row under the new arch — 0/no-grad and meaningless to train —
             # so it must not enter the loss. (Belief-loss SCALE therefore shifts vs the old arch;
             # dashboards are not comparable across the change.)

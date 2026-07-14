@@ -14,11 +14,10 @@ env:
   # species->set mapping, still-hidden CE collapses to ~0 and β multiplies nothing. The trainer
   # refuses unique-species pools for β>0 runs (leakage.allow_unique_species_pool overrides).
   team_pool: data/teams/pool_a
-model:
-  use_belief_vec: true
 loss:
   belief_coef: 1.0
   self_belief_coef: 1.0             # self-belief predictor trained alongside (leakage measurer)
+  self_belief_chain_coef: 1.0       # chain CE for the self-belief net (§3.6)
 leakage:
   beta: 0.03                        # SET PER RUN from {0.0, 0.01, 0.03, 0.1}
   refreeze_every_decisions: 100000  # refreeze Phi-hat (a FrozenProbe: backbone + self-belief PAIR)

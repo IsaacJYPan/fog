@@ -1,4 +1,4 @@
-"""Cross-simulator divergence gauntlet (SIMULATION_PLAN §5).
+"""Cross-simulator divergence gauntlet (ARCHITECTURE.md §3.2).
 
 PPO will farm any mechanic poke-engine gets wrong: a policy that beats MaxDamage on the engine but
 not on Showdown has learned the ENGINE, not Pokemon. This module plays the same matchup on both

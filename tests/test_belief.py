@@ -62,7 +62,6 @@ def test_forward_shapes():
     model = make_model()
     s, opp = make_inputs()
     out = model(s, opp)
-    assert out.b_vec.shape == (B, D)
     assert out.logits["species"].shape == (B, 6, SIZES["n_species"])
     assert out.logits["item"].shape == (B, 6, SIZES["n_items"])
     assert out.logits["ability"].shape == (B, 6, SIZES["n_abilities"])
@@ -227,13 +226,13 @@ def test_agent_forward_shapes_and_budget():
     assert out.value.shape == (2,)
     assert (out.value.abs() <= 1).all()
     assert out.belief is not None and out.self_belief is not None
-    assert out.belief.b_vec.shape == (2, 128)
+    assert out.belief.logits["species"].shape == (2, 6, 320)
 
 
 @pytest.mark.parametrize("aux_into_trunk", [True, False])
 def test_aux_into_trunk_switch(aux_into_trunk):
     torch.manual_seed(4)
-    agent = FogAgent({"model": {"aux_into_trunk": aux_into_trunk, "use_belief_vec": False}})
+    agent = FogAgent({"model": {"aux_into_trunk": aux_into_trunk}})
     batch = make_agent_batch()
     out = agent(batch)
     # backprop ONLY a belief loss; check whether backbone got gradients

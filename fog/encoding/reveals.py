@@ -1,7 +1,7 @@
 """Information-state tracking: who provably knows what (spec §2.1 epistemic flags, §3.2/§3.3 inputs).
 
 This module is the single source of truth for building the C1 belief-net input dicts
-(IMPLEMENTATION_PLAN.md):
+(ARCHITECTURE.md §4):
 
   * `opp_revealed` — MY view of the OPPONENT's team: species from preview, everything else only if
     publicly revealed. Read off poke-env's opponent battle state (which is itself an information

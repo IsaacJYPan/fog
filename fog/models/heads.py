@@ -15,32 +15,34 @@ N_POSTERIOR_FEATURES = 4
 
 
 class PolicyValueHead(nn.Module):
-    """Policy: s -> 14 logits (legality-masked). Value: s -> tanh scalar = E[win] in [-1, 1].
+    """Policy: (s_board ‖ c_dyn) -> 14 logits (legality-masked). Value: -> tanh scalar = E[win].
 
-    `belief_vec` (b_vec, §3.2) is concatenated into the input when `use_belief_vec` is set — the cheap
-    default path for belief conditioning. `posterior_dim > 0` (SEARCH_PLAN §4.2, config
-    `model.use_posterior_features`) additionally concatenates posterior features describing the
-    opponent's belief over my own hidden state; absent features fall back to zeros so training
-    paths that don't compute them keep working unchanged.
+    BELIEF_POLICY_PLAN §3.2/§3.6: the head takes exactly the three plan inputs and NO explicit belief
+    summary. ``s_board`` carries (a) revealed/public info + (b) my own private info (the signaling
+    channel). ``c_dyn`` is (c) the dynamics/behavioral vector — the SAME tensor that conditions the
+    belief chain. The old mean-pooled ``b_vec`` policy input is gone (pass A is removed); the policy
+    becomes belief-aware via the belief chain's aux loss shaping the shared trunk and via distillation.
+
+    `posterior_dim > 0` (SEARCH_PLAN §4.2, config `model.use_posterior_features`) additionally
+    concatenates posterior features describing the opponent's belief over my own hidden state; absent
+    features fall back to zeros so training paths that don't compute them keep working unchanged.
     """
 
-    def __init__(self, state_dim: int = 256, belief_dim: int = 128, use_belief_vec: bool = True,
-                 posterior_dim: int = 0) -> None:
+    def __init__(self, state_dim: int = 256, dyn_dim: int = 256, posterior_dim: int = 0) -> None:
         super().__init__()
-        self.use_belief_vec = use_belief_vec
         self.posterior_dim = int(posterior_dim)
-        in_dim = state_dim + (belief_dim if use_belief_vec else 0) + self.posterior_dim
+        in_dim = state_dim + dyn_dim + self.posterior_dim
         self.policy = nn.Sequential(nn.Linear(in_dim, 256), nn.ReLU(), nn.Linear(256, N_ACTIONS))
         self.value = nn.Sequential(nn.Linear(in_dim, 256), nn.ReLU(), nn.Linear(256, 1))
 
     def forward(
         self,
-        s: torch.Tensor,                       # [B, state_dim]
+        s_board: torch.Tensor,                 # [B, state_dim] (+ oracle extra) — inputs (a)+(b)
         legality_mask: torch.Tensor,           # [B, 14] bool
-        belief_vec: torch.Tensor | None = None,
+        c_dyn: torch.Tensor,                   # [B, dyn_dim] — input (c), the dynamics vector
         posterior_features: torch.Tensor | None = None,  # [B, posterior_dim] or None -> zeros
     ) -> tuple[torch.Tensor, torch.Tensor]:
-        x = s if not self.use_belief_vec else torch.cat([s, belief_vec], dim=-1)
+        x = torch.cat([s_board, c_dyn], dim=-1)
         if self.posterior_dim:
             if posterior_features is None:
                 posterior_features = x.new_zeros(x.shape[0], self.posterior_dim)

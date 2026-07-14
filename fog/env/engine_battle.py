@@ -1,4 +1,4 @@
-"""poke-engine battle wrapper: partial observability + event synthesis (SIMULATION_PLAN §3/§4).
+"""poke-engine battle wrapper: partial observability + event synthesis (ARCHITECTURE.md §3.2).
 
 `EngineBattle` owns one poke-engine game and everything the perfect-information engine cannot:
 what each side has *seen*. It synthesizes pseudo-protocol events (the same ``['', 'move', ...]``

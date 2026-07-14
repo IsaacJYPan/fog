@@ -150,7 +150,9 @@ def test_teacher_tokens_never_change_policy_or_visible_belief_summary():
 
     assert torch.equal(out_a.log_probs, out_b.log_probs)
     assert torch.equal(out_a.value, out_b.value)
-    assert torch.equal(out_a.belief.b_vec, out_b.belief.b_vec)
+    # the visible belief summary is now the marginal logits (b_vec is gone, §3.6) — still teacher-free
+    for fam in out_a.belief.logits:
+        assert torch.equal(out_a.belief.logits[fam], out_b.belief.logits[fam])
 
 
 class _FixedPublicStateAgent:

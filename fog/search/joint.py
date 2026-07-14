@@ -180,9 +180,9 @@ def joint_search_action(
     gen = torch.Generator(device=device)  # must live where sample_team's multinomial runs
     gen.manual_seed(seed)
     with torch.no_grad():
-        s_my = agent._backbone_pass(my_batch)
+        _, c_dyn_my = agent._backbone_pass(my_batch)
         opp_worlds = agent.belief.sample_team(
-            s_my, my_batch["opp_revealed"], k=k_states, generator=gen
+            c_dyn_my, my_batch["opp_revealed"], k=k_states, generator=gen
         )[0].cpu().numpy().astype(np.int64)                                  # [K, 6, 9]
 
     # ---- root forks + the public-action label space (design decision 1) ----
@@ -247,8 +247,8 @@ def joint_search_action(
     for lo in range(0, len(leaf_obs), max_batch_forward):
         chunk = _stack_obs(leaf_obs[lo : lo + max_batch_forward], device)
         with torch.no_grad():
-            s_leaf, b_leaf = agent.head_inputs(chunk)
-        head_cache.append((s_leaf, b_leaf, chunk["legality_mask"]))
+            s_board_leaf, c_dyn_leaf = agent.head_inputs(chunk)
+        head_cache.append((s_board_leaf, c_dyn_leaf, chunk["legality_mask"]))
     posterior_dim = int(getattr(agent.policy_value, "posterior_dim", 0))
     leaf_cols = np.full(len(leaf_obs), -1, dtype=np.int64)
     for k in range(k_states):
@@ -269,12 +269,12 @@ def joint_search_action(
             ]) if leaf_obs else np.zeros((0, posterior_dim), dtype=np.float32)
         values = np.zeros(len(leaf_obs), dtype=np.float64)
         pos = 0
-        for s_leaf, b_leaf, mask in head_cache:
-            n = s_leaf.shape[0]
+        for s_board_leaf, c_dyn_leaf, mask in head_cache:
+            n = s_board_leaf.shape[0]
             pf = (torch.as_tensor(feats[pos : pos + n], device=device)
                   if feats is not None else None)
             with torch.no_grad():
-                _, v = agent.policy_value(s_leaf, mask, b_leaf, posterior_features=pf)
+                _, v = agent.policy_value(s_board_leaf, mask, c_dyn_leaf, posterior_features=pf)
             values[pos : pos + n] = v.cpu().numpy()
             pos += n
         if posterior_dim == 0:

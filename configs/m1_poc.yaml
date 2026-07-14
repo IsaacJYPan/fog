@@ -7,10 +7,9 @@ experiment: m1_poc
 env:
   battle_format: gen9ou
   team_pool: data/teams/pool_a      # shared-species core, varied sets
-model:
-  use_belief_vec: false             # M1: no belief conditioning
 loss:
-  belief_coef: 0.0                  # belief head off at M1
+  belief_coef: 0.0                  # M1 baseline: belief marginal CE off
+  belief_chain_coef: 0.0            # ...and the belief chain CE off (no belief net at M1)
   value_coef: 0.5
 ppo:
   total_decisions: 200000

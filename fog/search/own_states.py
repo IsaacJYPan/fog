@@ -131,9 +131,9 @@ class SampledOwnStates:
         gen = torch.Generator(device=_device(self.agent))  # sample_team's multinomial device
         gen.manual_seed(self.seed * 1_000_003 + self._calls)
         with torch.no_grad():
-            s = self.agent._backbone_pass(batch)
+            _, c_dyn = self.agent._backbone_pass(batch)
             draws = self.agent.self_belief.sample_team(
-                s, batch["opp_revealed"], k=self.k * self.oversample,
+                c_dyn, batch["opp_revealed"], k=self.k * self.oversample,
                 temperature=self.temperature, generator=gen,
             )[0].cpu().numpy().astype(np.int64)                       # [k*oversample, 6, 9]
 

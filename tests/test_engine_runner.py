@@ -1,4 +1,4 @@
-"""EngineRunner + engine_scripted tests (SIMULATION_PLAN §4): batched self-play must feed the
+"""EngineRunner + engine_scripted tests (ARCHITECTURE.md §3.2): batched self-play must feed the
 SAME RolloutBuffer/ppo_update contract as the Showdown path. Skipped without poke-engine."""
 from __future__ import annotations
 
@@ -92,7 +92,7 @@ def test_runner_batch_matches_showdown_contract(pool, agent):
     assert n == stats["decisions"]
     # belief truth is exact by construction on the engine path: every decision has species labels
     assert bool((batch["belief_targets"]["species"] >= 0).all())
-    # BELIEF_PLAN §4.3: species is revealed (preview) -> a delta row, excluded from the loss; the
+    # BELIEF_POLICY_PLAN §4.5: species is revealed (preview) -> a delta row, excluded from the loss; the
     # still-hidden families carry the trainable belief targets.
     assert not bool(batch["belief_valid"]["species"].any())
     assert bool(batch["belief_valid"]["tera"].any())

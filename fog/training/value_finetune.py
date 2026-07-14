@@ -12,7 +12,7 @@ weights on the same batches — one seeing the logged posterior features, one se
 posterior-blind control, exactly what the head computes when features are absent). The gate is
 held-out MSE: aware < blind. Split is BY GAME (decisions within a game share an outcome — a row
 split would leak labels into the holdout). Only the value MLP trains; the trunk/belief/policy are
-frozen, so (s, b_vec) are precomputed once and the fine-tune never risks the acting policy.
+frozen, so (s_board, c_dyn) are precomputed once and the fine-tune never risks the acting policy.
 
 Checkpoint compatibility: a posterior-blind checkpoint (posterior_dim=0, e.g. the M1.5 run) is
 loaded by zero-padding the first Linear of both head MLPs with the 4 posterior columns
@@ -148,8 +148,8 @@ def finetune_value(agent: Any, data: dict[str, np.ndarray], *, holdout_frac: flo
     for lo in range(0, n, int(precompute_batch)):
         idx = np.arange(lo, min(lo + int(precompute_batch), n))
         with torch.no_grad():
-            s, b_vec = agent.head_inputs(batch_from_rows(data, idx, device))
-        xs.append(s if b_vec is None else torch.cat([s, b_vec], dim=-1))
+            s_board, c_dyn = agent.head_inputs(batch_from_rows(data, idx, device))
+        xs.append(torch.cat([s_board, c_dyn], dim=-1))
     x_base = torch.cat(xs)
     feats = torch.as_tensor(data["posterior_features"], dtype=torch.float32, device=device)
     y = torch.as_tensor(data["outcome"], dtype=torch.float32, device=device)

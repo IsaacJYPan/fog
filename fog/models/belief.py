@@ -1,5 +1,6 @@
-"""Battle-conditioned opponent-team belief model: prefix-LM over the revealed-attribute SET plus an
-any-order causal chain over the hidden attributes (BELIEF_PLAN §3).
+"""Battle-conditioned opponent-team belief model: prefix-LM over the revealed-attribute SET plus a
+causal chain over the hidden attributes (BELIEF_POLICY_PLAN §3.3; the chain's tail is canonical-order by
+default per BELIEF_POLICY_PLAN §3.7 option (c) -- see TAIL ORDER below).
 
 WHY THIS SHAPE. The 54 opponent attributes (6 slots x 9 = SLOT_ATTRS) split, per example, into the
 ones already revealed this battle (a set R) and the ones still hidden (H). Every hidden-attribute
@@ -32,15 +33,33 @@ attrs are never read; they are delta-filled (0 at the revealed value, -inf elsew
 every downstream consumer correct for free (leakage masks them out; belief-loss on a revealed attr is
 0/dropped; pool_id gets a hard consistency filter).
 
-TWO PASSES (BELIEF_PLAN §3.3), both through this one module:
-  * Pass A -- deterministic canonical. Tail = H in canonical order, every tail value <UNK>. Produces
-    b_vec and the marginal conditionals p(h | R). This is `forward()` with no teacher_values. It is
-    what the deployed model uses everywhere (acting, policy conditioning, leakage, pool_id fast path).
-  * Pass B -- randomized training. Tail = H in a fresh per-example random order; FULL teacher forcing
-    (every tail token whose label exists carries its TRUE value). Each tail rank's loss is the exact
-    chain-rule factor p(h_k = truth | R, h_1..h_{k-1} = truth) -- byte-for-byte the input pattern that
-    ancestral sampling and joint candidate scoring later query. This is `forward()` with
-    teacher_values set.
+CONDITIONING MEMORY (BELIEF_POLICY_PLAN §3.1). The decoder cross-attends to a single vector `c_dyn`
+-- the dynamics/behavioral context from the backbone (history + current field), NOT the old full
+board summary `s`. The reveals reach the chain as prefix TOKENS; c_dyn carries only the temporal
+evidence the tokens cannot ("he switched out, so he probably lacks this move"). c_dyn is the same
+tensor the policy head consumes, so the belief aux loss shapes it for both consumers.
+
+TAIL ORDER (BELIEF_POLICY_PLAN §3.7, option (c)). The tail defaults to the CANONICAL order in both
+modes. The chain once defaulted to a fresh per-example RANDOM order (the "any-order" tail, so a hidden
+attribute could condition on a hidden source drawn earlier in a random permutation). The gate proved
+that costs sharpness: `sample_team` walks the CANONICAL tail, so the random-order chain trained a
+regime the sampler never visits and ancestral samples hedged (rule fidelity 0.30). A canonical chain
+trains exactly the conditionals the sampler traverses (fidelity -> 1.00). What is given up is
+conditioning a hidden attr on a hidden attr later in canonical order; reveal-conditioning is untouched
+because it lives in the bidirectional PREFIX, before every tail token, whatever the tail order. The
+random tail stays selectable (`tail_order="random"`) for the pool_id §4.5.3 arm and the gate ablation.
+
+TWO FORWARD MODES, both through this one module:
+  * Marginal (no teacher_values) -- deterministic canonical tail, every tail value <UNK>. Produces the
+    marginal conditionals p(h | R). No longer on the policy's critical path (BELIEF_POLICY_PLAN §3.6
+    removes the mean-pooled b_vec); kept as an on-demand diagnostic for pool_id's fast path, the
+    belief dashboards, and the leakage probe.
+  * Chain (teacher_values set) -- teacher-forced training on the canonical tail (default). Tail = H in
+    canonical order; FULL teacher forcing (every tail token whose label exists carries its TRUE value,
+    later tokens causally masked from each read). Each tail rank's loss is the exact chain-rule factor
+    p(h_k = truth | R, h_1..h_{k-1} = truth) -- byte-for-byte the input pattern that ancestral sampling
+    and joint candidate scoring later query. This is the belief auxiliary loss and the search particle
+    proposal.
 
 Batch contract for `opp_revealed` (unchanged from the old model):
   {
@@ -51,8 +70,7 @@ Batch contract for `opp_revealed` (unchanged from the old model):
     }                                 -- tera is never masked; missing keys = no mask
   }
 
-Outputs (unchanged BeliefOutput contract):
-  * b_vec in R^d       -- mean over all 55 decoder hiddens; concatenated into policy/value.
+Outputs:
   * logits             -- per-family masked logits; revealed attrs are delta rows (see above).
   * sample_team(k)     -- k concrete reveal-consistent opponent teams (search + diagnostics).
 """
@@ -74,6 +92,7 @@ _START = N_ATTRS                     # content id of the START token in the [0..
 _ATTR_FAMILY = ("species", "item", "ability", "move", "move", "move", "move", "spread", "tera")
 _MOVE_SUBSLOT = (None, None, None, 0, 1, 2, 3, None, None)
 _MOVE_COLS = (3, 4, 5, 6)  # attr columns holding the 4 move subslots within a slot
+_ITEM_COL, _ABILITY_COL, _SPREAD_COL = 1, 2, 7  # SLOT_ATTRS column indices used by the EV ordering
 
 # flat-index (0..53) lookups, precomputed once
 _POS_SLOT = tuple(p // len(SLOT_ATTRS) for p in range(N_ATTRS))
@@ -83,13 +102,16 @@ _POS_SUB = tuple(_MOVE_SUBSLOT[p % len(SLOT_ATTRS)] for p in range(N_ATTRS))
 _SLOT_MOVE_FLATS = tuple(
     tuple(j * len(SLOT_ATTRS) + c for c in _MOVE_COLS) for j in range(N_SLOTS)
 )
+# flat indices of each slot's item / ability / spread column (EV-ordering constraint, §4.2)
+_SLOT_ITEM_FLATS = tuple(j * len(SLOT_ATTRS) + _ITEM_COL for j in range(N_SLOTS))
+_SLOT_ABILITY_FLATS = tuple(j * len(SLOT_ATTRS) + _ABILITY_COL for j in range(N_SLOTS))
+_SLOT_SPREAD_FLATS = tuple(j * len(SLOT_ATTRS) + _SPREAD_COL for j in range(N_SLOTS))
 
 _NEG_INF = float("-inf")
 
 
 @dataclass
 class BeliefOutput:
-    b_vec: torch.Tensor              # [B, belief_dim] pooled hidden (cheap conditioning path)
     logits: dict[str, torch.Tensor]  # per-attribute masked logits (see forward)
 
 
@@ -116,7 +138,7 @@ class BeliefModel(nn.Module):
             "spread": n_spreads,
             "tera": n_tera,
         }
-        self.s_proj = nn.Linear(state_dim, d)
+        self.s_proj = nn.Linear(state_dim, d)  # projects the c_dyn conditioning memory to width d
         dec = nn.TransformerDecoderLayer(
             d_model=d, nhead=self.nhead, dim_feedforward=4 * d, batch_first=True
         )
@@ -157,6 +179,24 @@ class BeliefModel(nn.Module):
         tv = teacher_values.reshape(tokens.shape[0], N_ATTRS)
         return torch.where(revealed, flat, tv)
 
+    @staticmethod
+    def _spread_after_item_ability(r: torch.Tensor, revealed: torch.Tensor) -> torch.Tensor:
+        """EV-ordering constraint (BELIEF_POLICY_PLAN §4.2): within each slot, force a HIDDEN spread's
+        random tail key above its slot's item and ability keys, so the spread is generated with
+        item/ability already pinned — the precondition for the damage-consistency mask (§3.4). Only
+        HIDDEN item/ability constrain (a revealed one is in the prefix, already before every tail
+        step). Canonical order already satisfies this (spread col 7 follows item col 1, ability col 2),
+        so this touches only the random training/probe order. Everything else stays free (the +ε lands
+        the spread just after max(item, ability), never globally last)."""
+        r = r.clone()
+        it = torch.where(revealed[:, _SLOT_ITEM_FLATS], r.new_full((), float("-inf")),
+                         r[:, _SLOT_ITEM_FLATS])                          # [B, N_SLOTS]
+        ab = torch.where(revealed[:, _SLOT_ABILITY_FLATS], r.new_full((), float("-inf")),
+                         r[:, _SLOT_ABILITY_FLATS])
+        sp = r[:, _SLOT_SPREAD_FLATS]
+        r[:, _SLOT_SPREAD_FLATS] = torch.maximum(torch.maximum(it, ab), sp) + 1e-3
+        return r
+
     def _order(
         self, revealed: torch.Tensor, tail_order: str, generator: torch.Generator | None
     ) -> torch.Tensor:
@@ -164,7 +204,8 @@ class BeliefModel(nn.Module):
         Layout: revealed attrs (canonical order) | START | hidden attrs (canonical or random order).
 
         Sort keys keep the three groups separated: revealed = its canonical index (0..53); START =
-        100; hidden = 200 + (canonical index for pass A, or a per-example random float for pass B).
+        100; hidden = 200 + (canonical index for the marginal, or a per-example random float for the
+        chain). The random tail additionally enforces spread-after-item/ability per slot (§4.2).
         """
         b = revealed.shape[0]
         dev = revealed.device
@@ -173,6 +214,7 @@ class BeliefModel(nn.Module):
             tail_key = 200.0 + canon
         elif tail_order == "random":
             r = torch.rand(b, N_ATTRS, generator=generator, device=dev)
+            r = self._spread_after_item_ability(r, revealed)
             tail_key = 200.0 + r
         else:
             raise ValueError(f"tail_order must be 'canonical' or 'random', got {tail_order!r}")
@@ -215,15 +257,16 @@ class BeliefModel(nn.Module):
         return torch.cat([attr_emb, start], dim=1)                        # [B, 55, d]
 
     def _decode(
-        self, s: torch.Tensor, fed: torch.Tensor, order: torch.Tensor, revealed_count: torch.Tensor
+        self, c_dyn: torch.Tensor, fed: torch.Tensor, order: torch.Tensor,
+        revealed_count: torch.Tensor,
     ) -> torch.Tensor:
         """Run the decoder for the given per-example layout. Returns physical-position hiddens
-        [B, 55, d]."""
+        [B, 55, d]. `c_dyn` is the dynamics conditioning memory (§3.1)."""
         content = self._content_embeddings(fed)                          # [B, 55, d]
         idx = order.unsqueeze(-1).expand(-1, -1, self.d)                 # [B, 55, d]
         phys = content.gather(1, idx)                                     # content at physical pos
-        memory = self.s_proj(s).unsqueeze(1)                              # [B, 1, d]
-        mask = self._attn_mask(revealed_count, s.device)                  # [B, 55, 55]
+        memory = self.s_proj(c_dyn).unsqueeze(1)                          # [B, 1, d]
+        mask = self._attn_mask(revealed_count, c_dyn.device)             # [B, 55, 55]
         mask = mask.repeat_interleave(self.nhead, dim=0)                  # [B*nhead, 55, 55]
         return self.decoder(phys, memory, tgt_mask=mask)
 
@@ -279,33 +322,42 @@ class BeliefModel(nn.Module):
     # --------------------------------------------------------------------------------------- forward
     def forward(
         self,
-        s: torch.Tensor,
+        c_dyn: torch.Tensor,
         opp_revealed: dict,
         *,
         teacher_values: torch.Tensor | None = None,
         tail_order: str | None = None,
         generator: torch.Generator | None = None,
     ) -> BeliefOutput:
-        """Pass A (default) or pass B (with `teacher_values`). Returns masked per-family logits:
+        """Marginal (default) or chain (with `teacher_values`). Returns masked per-family logits:
 
           species/item/ability/spread/tera : [B, 6, n_family]
           move                             : [B, 6, 4, n_moves]
 
-        Pass A: `teacher_values=None`, canonical tail, every hidden token <UNK> -> marginals p(h|R).
-        Pass B: `teacher_values` a [B, 6, 9] true-value grid (aligned), random tail by default -> the
-        chain-rule conditionals p(h_k | R, h_1..h_{k-1}). Revealed attrs are delta rows in both.
+        `c_dyn` is the dynamics conditioning memory (§3.1). Marginal: `teacher_values=None`, canonical
+        tail, every hidden token <UNK> -> marginals p(h|R). Chain: `teacher_values` a [B, 6, 9]
+        true-value grid (aligned) -> the chain-rule conditionals p(h_k | R, h_1..h_{k-1}). BOTH modes
+        default to the CANONICAL tail (§3.7 option (c), so the chain trains the exact order ancestral
+        sampling walks); pass `tail_order="random"` for the any-order tail. Revealed attrs are delta
+        rows in both.
         """
         tokens: torch.Tensor = opp_revealed["tokens"]
         masks: dict = opp_revealed.get("masks") or {}
         b = tokens.shape[0]
         if tail_order is None:
-            tail_order = "canonical" if teacher_values is None else "random"
+            # Both passes default to the canonical tail (BELIEF_POLICY_PLAN §3.7, option (c)). The
+            # chain USED to default to a fresh random order per example, but that left ancestral
+            # sampling — which walks the CANONICAL tail — in a regime no loss term trained, so it
+            # hedged (gate: sample fidelity 0.30). A canonical chain trains exactly the conditionals
+            # sample_team traverses. Reveal-conditioning is unaffected: it lives in the bidirectional
+            # prefix, before every tail token, whatever the tail order. Pass `tail_order="random"`
+            # explicitly for the pool_id §4.5.3 arm / the conditioning-gate ablation.
+            tail_order = "canonical"
 
         revealed = self._revealed_mask(tokens)                            # [B, 54]
         fed = self._fed_values(tokens, teacher_values)                    # [B, 54]
         order = self._order(revealed, tail_order, generator)              # [B, 55]
-        hidden = self._decode(s, fed, order, revealed.sum(dim=1))         # [B, 55, d]
-        b_vec = hidden.mean(dim=1)                                        # [B, d]
+        hidden = self._decode(c_dyn, fed, order, revealed.sum(dim=1))     # [B, 55, d]
 
         seq_pos = self._read_positions(order)                            # [B, 55] content -> phys
         read_pos = (seq_pos[:, :N_ATTRS] - 1).clamp(min=0)               # [B, 54] read hidden pos
@@ -315,7 +367,7 @@ class BeliefModel(nn.Module):
 
         tokens_flat = tokens.reshape(b, N_ATTRS)
         logits_out = self._heads(read_hidden, tokens_flat, revealed, fed, seq_pos, masks)
-        return BeliefOutput(b_vec=b_vec, logits=logits_out)
+        return BeliefOutput(logits=logits_out)
 
     def _heads(
         self,
@@ -354,7 +406,7 @@ class BeliefModel(nn.Module):
     @torch.no_grad()
     def sample_team(
         self,
-        s: torch.Tensor,
+        c_dyn: torch.Tensor,
         opp_revealed: dict,
         k: int = 16,
         temperature: float = 1.0,
@@ -362,10 +414,13 @@ class BeliefModel(nn.Module):
     ) -> torch.Tensor:
         """Ancestral sampling of k full reveal-consistent opponent teams (search §8, diagnostics).
 
-        Walks the hidden attributes in canonical order (a valid canonical tail order); at each step
-        re-decodes with the draws so far fed back (the pass-B input pattern, so sampling meets exactly
-        the conditionals training shaped), reads the step's conditional at its shifted position, and
-        samples. Revealed attributes are clamped. Returns LongTensor [B, k, 6, 9].
+        Walks the hidden attributes in CANONICAL order; at each step re-decodes with the draws so far
+        fed back, reads the step's conditional at its shifted position, and samples. Because the chain
+        loss now trains the canonical tail too (BELIEF_POLICY_PLAN §3.7 option (c)), sampling meets
+        exactly the conditionals training shaped -- each read attends the prefix reveals plus the
+        earlier-canonical draws, and later tail tokens are causally masked (truth in training, <UNK>
+        here -- masked either way, so the two regimes coincide). Revealed attributes are clamped.
+        `c_dyn` is the dynamics conditioning memory (§3.1). Returns LongTensor [B, k, 6, 9].
         """
         tokens0: torch.Tensor = opp_revealed["tokens"]
         masks: dict = opp_revealed.get("masks") or {}
@@ -376,7 +431,7 @@ class BeliefModel(nn.Module):
         def rep(x: torch.Tensor) -> torch.Tensor:
             return x.repeat_interleave(k, dim=0)
 
-        s_k = rep(s)
+        s_k = rep(c_dyn)
         tokens_k = rep(tokens0).clone()                                   # [B*k, 6, 9]
         masks_k = {name: rep(m) for name, m in masks.items()}
         revealed = self._revealed_mask(tokens_k)                          # [B*k, 54]

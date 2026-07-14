@@ -1,4 +1,4 @@
-"""Batched lockstep self-play on poke-engine (SIMULATION_PLAN §4).
+"""Batched lockstep self-play on poke-engine (ARCHITECTURE.md §3.2).
 
 The throughput fix is architectural, not the engine alone: N `EngineBattle`s step in lockstep and
 every agent-driven decision wave becomes ONE batched forward, amortizing the Python->GPU round

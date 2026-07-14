@@ -1,4 +1,4 @@
-"""Mechanics tests for the reveal-set-conditioned any-order belief chain (BELIEF_PLAN §9, T1-T8).
+"""Mechanics tests for the reveal-set-conditioned any-order belief chain (BELIEF_POLICY_PLAN §7, T1-T8).
 
 These pin the properties the redesign exists to guarantee and that the old fixed-order chain could
 not: every hidden conditional sees every reveal (T8), the chain is causal with no self-leak (T2),
@@ -257,14 +257,14 @@ def test_t5_distinctness_follows_conditioning_set():
 # ---------------------------------------------------------------- T8: a late reveal sharpens an early
 # ---------------------------------------------------- T10: two passes leave the policy path unchanged
 def test_t10_pass_b_does_not_touch_policy():
-    """With use_belief_vec, the policy/value read pass A's b_vec; running the random-order pass-B
+    """The policy/value read (s_board, c_dyn) and NO belief summary (§3.6); running the random-order
     chain (training + targets) must not change log_probs or value -- so PPO's epoch-0 ratio stays 1."""
     from fog.encoding.dims import DIMS
     from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS
     from fog.models.agent import FogAgent
 
     torch.manual_seed(0)
-    agent = FogAgent({"model": {"use_belief_vec": True}})
+    agent = FogAgent({"model": {}})
     for mod in agent.modules():                       # deterministic train-mode forward
         if isinstance(mod, torch.nn.Dropout):
             mod.p = 0.0

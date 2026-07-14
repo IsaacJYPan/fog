@@ -52,9 +52,9 @@ class FrozenProbe(nn.Module):
         """Readability CE of the mirror observation under frozen weights. See
         `SelfBeliefPredictor.leakage_ce` for mask/label/weight semantics. Returns [B] (or a
         per-family dict of [B] when `per_family`)."""
-        s_opp = self.backbone(**_backbone_kwargs(mirror_batch))
+        _, c_dyn = self.backbone(**_backbone_kwargs(mirror_batch))
         return self.predictor.leakage_ce(
-            s_opp, my_view, still_hidden_mask=still_hidden_mask,
+            c_dyn, my_view, still_hidden_mask=still_hidden_mask,
             family_weights=family_weights, per_family=per_family,
         )
 
@@ -83,7 +83,7 @@ class TrainableProbe(nn.Module):
         )
         self.backbone = Backbone(cfg.get("encoding", {}) | model_cfg, sizes=sizes)
         self.predictor = SelfBeliefPredictor(
-            state_dim=self.backbone.state_dim, d=model_cfg.get("belief_dim", 128), **belief_kwargs
+            state_dim=self.backbone.dyn_dim, d=model_cfg.get("belief_dim", 128), **belief_kwargs
         )
 
     @classmethod
@@ -99,8 +99,8 @@ class TrainableProbe(nn.Module):
 
         my_view = opp_view_batch["my_view"]
         labels = labels if labels is not None else my_view["labels"]
-        s_opp = self.backbone(**_backbone_kwargs(opp_view_batch))
-        out = self.predictor(s_opp, my_view)
+        _, c_dyn = self.backbone(**_backbone_kwargs(opp_view_batch))
+        out = self.predictor(c_dyn, my_view)
         valid = {k: (v >= 0) for k, v in labels.items()}
         return belief_loss(out.logits, labels, valid)
 
@@ -113,8 +113,8 @@ class TrainableProbe(nn.Module):
         family_weights: dict[str, float] | None = None,
         per_family: bool = False,
     ):
-        s_opp = self.backbone(**_backbone_kwargs(mirror_batch))
+        _, c_dyn = self.backbone(**_backbone_kwargs(mirror_batch))
         return self.predictor.leakage_ce(
-            s_opp, my_view, still_hidden_mask=still_hidden_mask,
+            c_dyn, my_view, still_hidden_mask=still_hidden_mask,
             family_weights=family_weights, per_family=per_family,
         )

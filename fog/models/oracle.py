@@ -8,10 +8,11 @@
 Both are config switches (`model.oracle: {none, set, action}`) consumed inside FogAgent.forward, so
 turning them on is a one-line config change (deliberate — §3.4). The heavy lifting is:
   - `apply_set_oracle`: rewrite the belief-net input tokens (opp_revealed) to the opponent's full
-    truth so the belief head/b_vec are computed from perfect information, and mark every opponent
+    truth so the belief marginals are computed from perfect information, and mark every opponent
     entity's epistemic flags known. Ground truth is supplied by the caller (simulator in self-play,
     the parsed row's uncensored labels where available).
-  - `ActionOracleHead`: a small embedding of the opponent's committed action concatenated to `s`.
+  - `ActionOracleHead`: a small embedding of the opponent's committed action concatenated to
+    `s_board` before the policy head.
 """
 from __future__ import annotations
 
@@ -29,8 +30,8 @@ def apply_set_oracle(opp_revealed: dict, opp_truth_tokens) -> dict:
     unavailable (e.g. a decision recorded before the attribute-matcher disambiguated, or a batch row
     without truth). Truth MERGES over the revealed tokens — a -1 truth attribute keeps whatever the
     battle revealed, so "no truth" degrades exactly to the non-oracle input instead of blanking real
-    information. Masks are dropped: with truth clamped the belief net re-emits it (b_vec becomes a
-    perfect-information summary). Works for the batched model path and single observations.
+    information. Masks are dropped: with truth clamped the belief net re-emits it (its marginals
+    become a perfect-information summary). Works for the batched model path and single observations.
     """
     tokens = opp_truth_tokens
     if isinstance(tokens, np.ndarray):

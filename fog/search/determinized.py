@@ -70,9 +70,9 @@ def determinized_action(
     log_probs = out.log_probs[0]
     root_value = float(out.value[0])
 
-    s = agent._backbone_pass(batch)                                    # [1, state_dim]
+    _, c_dyn = agent._backbone_pass(batch)                             # c_dyn conditions the belief
     worlds = agent.belief.sample_team(
-        s, batch["opp_revealed"], k=k, generator=generator
+        c_dyn, batch["opp_revealed"], k=k, generator=generator
     )[0].cpu().numpy()                                                 # [k, 6, 9]
 
     # simulate every (action, world) ply; terminal outcomes score directly, fog leaves batch up

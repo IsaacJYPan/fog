@@ -101,7 +101,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
     value_coef = loss_cfg.get("value_coef", 0.5)
     belief_coef = loss_cfg.get("belief_coef", 1.0)
     self_belief_coef = loss_cfg.get("self_belief_coef", 1.0)
-    # BELIEF_PLAN §4.2: pass-B chain CE, its own coefficient (start equal to the marginal's).
+    # BELIEF_POLICY_PLAN §4.5: pass-B chain CE, its own coefficient (start equal to the marginal's).
     belief_chain_coef = loss_cfg.get("belief_chain_coef", belief_coef)
     self_belief_chain_coef = loss_cfg.get("self_belief_chain_coef", self_belief_coef)
     preview_coef = loss_cfg.get("preview_coef", 0.5)
@@ -152,8 +152,12 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
 
             if out.belief is not None and mb.get("belief_targets") is not None:
                 b_stats: dict = {}
-                # Marginal (pass A) CE: the deployment reads, trained on every example (§3.3). Kept
-                # under the historical "belief_loss" metric name (still the pass-A marginal).
+                # Marginal CE (BELIEF_POLICY_PLAN §8.2 resolution): the policy NO LONGER reads this
+                # (b_vec is gone) — it keeps the on-demand canonical marginal forward calibrated for
+                # the consumers that still read it: pool_id's fast path, the belief dashboard, and the
+                # leakage probe (which reads a marginal, not the chain). Set belief_coef=0 for a
+                # pure-chain ablation. Like the chain term it conditions on c_dyn, so with
+                # aux_into_trunk it also shapes the shared trunk.
                 b_loss = belief_loss(
                     out.belief.logits, mb["belief_targets"], mb["belief_valid"], stats=b_stats
                 )
@@ -164,7 +168,9 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
                 # losses.masked_cross_entropy).
                 b_total = b_stats.get("valid", 0) + b_stats.get("dropped_nonfinite", 0)
                 log("belief_dropped_rate", b_stats.get("dropped_nonfinite", 0) / max(1, b_total))
-                # Chain (pass B) CE: the sampling/scoring reads (§4.2). Separate coefficient + metric.
+                # Chain CE (§3.6): THE primary belief aux loss — the input pattern sampling/scoring
+                # query, and (with aux_into_trunk) the gradient that makes c_dyn belief-informative
+                # for the policy. Separate coefficient + metric.
                 if out.belief_chain is not None:
                     bc_loss = belief_loss(
                         out.belief_chain.logits, mb["belief_targets"], mb["belief_valid"]
@@ -173,6 +179,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
                     log("belief_ce_chain", bc_loss)
             if out.self_belief is not None and mb.get("self_belief_targets") is not None:
                 sb_stats: dict = {}
+                # Marginal self-belief CE — keeps the leakage probe's marginal forward calibrated
+                # (the β arm reads it, §8.2). self_belief_coef=0 for a pure-chain ablation.
                 sb_loss = belief_loss(
                     out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"],
                     stats=sb_stats,
@@ -229,12 +237,12 @@ def train(cfg: dict) -> dict:
     """Self-play PPO loop (§6): rollouts collect into a RolloutBuffer against league opponents;
     ppo_update consumes it; checkpoints snapshot into the league. Returns the last metrics dict.
 
-    `env.backend` selects the simulator (SIMULATION_PLAN):
+    `env.backend` selects the simulator (ARCHITECTURE.md §3.2):
       * "showdown" (default) — poke-env vs a live local server; ground truth. Byte-identical
         behavior to the pre-backend-switch trainer.
       * "engine"             — poke-engine batched lockstep self-play (fog.env.engine_runner);
         volume track for M3/M4 grids. No server needed. Final fine-tune + all headline evals
-        stay on Showdown (divergence rules in SIMULATION_PLAN §5).
+        stay on Showdown (divergence rules in ARCHITECTURE.md §3.2).
 
     Config keys used (all under sensible defaults): env.{battle_format, team_pool, backend,
     engine_batch}, ppo.{lr, total_decisions, batch_decisions, games_per_chunk, ...ppo_update keys},
@@ -647,13 +655,13 @@ async def _train_async(cfg: dict) -> dict:
 
 
 def _train_engine(cfg: dict) -> dict:
-    """Engine-backend training loop (SIMULATION_PLAN §4/§5): synchronous batched lockstep
+    """Engine-backend training loop (ARCHITECTURE.md §3.2): synchronous batched lockstep
     self-play on poke-engine, sharing the exact update tail with the Showdown path.
 
     Differences from _train_async, all deliberate:
       * no server / poke-env players — EngineRunner drives EngineBattles directly;
       * scripted league opponents are the engine ports (Random, MaxDamage). SimpleHeuristics is
-        Showdown-only and raises here (eval it on Showdown; SIMULATION_PLAN §4);
+        Showdown-only and raises here (eval it on Showdown; ARCHITECTURE.md §3.2);
       * belief/oracle truth is exact by construction (the runner sampled both pastes);
       * the cross-sim divergence gauntlet (§5) runs every `cross_sim.every_decisions` when
         enabled: engine-vs-Showdown win-rate gap > `cross_sim.halt_gap` (default 0.03) HALTS.
@@ -746,7 +754,7 @@ def _train_engine(cfg: dict) -> dict:
                 print(
                     f"[ppo] CROSS-SIM HALT: engine-vs-Showdown win-rate gap {gap:+.3f} exceeds "
                     f"{halt_gap:.3f} — the policy is exploiting simulator divergence "
-                    f"(SIMULATION_PLAN §5). Checkpoint saved for inspection.",
+                    f"(ARCHITECTURE.md §3.2). Checkpoint saved for inspection.",
                     flush=True,
                 )
                 torch.save(s.agent.state_dict(), s.ckpt_dir / "ppo_cross_sim_halt.pt")

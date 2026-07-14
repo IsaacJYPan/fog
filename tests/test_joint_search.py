@@ -106,15 +106,15 @@ def test_policy_value_head_posterior_input():
     from fog.models.heads import PolicyValueHead
 
     torch.manual_seed(0)
-    head = PolicyValueHead(state_dim=16, belief_dim=8, posterior_dim=4)
+    head = PolicyValueHead(state_dim=16, dyn_dim=8, posterior_dim=4)
     s = torch.randn(3, 16)
-    b = torch.randn(3, 8)
+    c_dyn = torch.randn(3, 8)
     mask = torch.ones(3, 14, dtype=torch.bool)
-    lp_none, v_none = head(s, mask, b)                                    # absent -> zeros
-    lp_zero, v_zero = head(s, mask, b, posterior_features=torch.zeros(3, 4))
+    lp_none, v_none = head(s, mask, c_dyn)                                # absent -> zeros
+    lp_zero, v_zero = head(s, mask, c_dyn, posterior_features=torch.zeros(3, 4))
     torch.testing.assert_close(v_none, v_zero)
     torch.testing.assert_close(lp_none, lp_zero)
-    _, v_feat = head(s, mask, b, posterior_features=torch.ones(3, 4))
+    _, v_feat = head(s, mask, c_dyn, posterior_features=torch.ones(3, 4))
     assert not torch.allclose(v_none, v_feat), "posterior features must reach the value"
 
 

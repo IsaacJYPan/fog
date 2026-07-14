@@ -1,4 +1,4 @@
-"""Reconstruction-fidelity fuzz (search §8 / SIMULATION_PLAN).
+"""Reconstruction-fidelity fuzz (search §8 / ARCHITECTURE.md §3.2).
 
 Round-trips many random mid-battle engine positions through the Showdown-shaped view and back
 (engine state -> EngineView -> state_recon.reconstruct_battle -> engine state) and reports how

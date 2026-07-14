@@ -1,14 +1,26 @@
-"""Shared backbone encoder (spec §2.4). Produces the state vector `s in R^256`.
+"""Shared backbone encoder (BELIEF_POLICY_PLAN §3.1, §4.1). Emits TWO vectors, one per role:
 
+  * ``s_board in R^state_dim`` — the STATIC board/entity summary. Mean-pool of the 12 contextualized
+    entity tokens + the two active-mon tokens -> MLP. Carries the team attributes (via the entity
+    embeddings) and the per-entity dynamic state (HP/status/boosts). This is policy inputs (a)+(b):
+    revealed/public info + my own private info (the signaling channel, §1). It is NOT fed to the
+    belief chain (the chain gets the reveals as tokens instead).
+  * ``c_dyn in R^dyn_dim`` — the DYNAMICS/context vector. The history sequence encoder's final state
+    concatenated with the current field vector -> MLP. Carries the temporal/behavioral evidence
+    ("he switched out while this mon was in") plus the current field. It deliberately does NOT
+    re-encode the static team attributes (§3.1). c_dyn has two consumers and is the SAME tensor for
+    both: it conditions the belief chain (its cross-attention memory) and is a direct policy input (c).
+
+Component detail:
   * entity records -> linear(->128) -> 2 transformer encoder layers over the 12 entity tokens + field
     token (13 tokens), 4 heads, d=128. Positional info comes from the positional bits in each record.
   * history records -> linear(->128) -> GRU(1 layer, hidden 256)  [or 2-layer causal transformer;
     config switch, default GRU]
-  * concat[ mean-pool(entity tokens) || active-mine token || active-opp token || history final ]
-    -> MLP -> s in R^256
 
-Backbone budget ~1.5M params. Embedding tables for species/item/ability/move/spread/tera live here so
-the belief heads and the backbone share them.
+Splitting the old single ``s`` into (s_board, c_dyn) is BELIEF_POLICY_PLAN's §9.1 recommendation:
+keep the static (a)/(b) and dynamic (c) inputs separate so they are legible and independently
+ablatable. Backbone budget ~1.5M params. Embedding tables for species/item/ability/move/spread/tera
+live here so the belief heads and the backbone share them.
 """
 from __future__ import annotations
 
@@ -66,6 +78,8 @@ class Backbone(nn.Module):
         cfg = cfg or {}
         d = cfg.get("entity_hidden", 128)
         self.state_dim = cfg.get("state_dim", 256)
+        # c_dyn width; defaults to state_dim so belief.s_proj (Linear(dyn_dim, d)) keeps its size.
+        self.dyn_dim = cfg.get("dyn_dim", self.state_dim)
 
         if sizes:
             self.embeds = EntityEmbeddings(
@@ -94,11 +108,18 @@ class Backbone(nn.Module):
             self.hist = nn.TransformerEncoder(layer, num_layers=2)
             hist_out = d
 
-        # mean-pool(entities) || active-mine || active-opp || history-final
-        self.head = nn.Sequential(
-            nn.Linear(d * 3 + hist_out, self.state_dim),
+        # (a)+(b) static board summary: mean-pool(entities) || active-mine || active-opp -> s_board
+        self.board_head = nn.Sequential(
+            nn.Linear(d * 3, self.state_dim),
             nn.ReLU(),
             nn.Linear(self.state_dim, self.state_dim),
+        )
+        # (c) dynamics vector: history-final || current field -> c_dyn (§3.1). The field is the only
+        # current-dynamic block not already summarized by the history encoder's final state.
+        self.dyn_head = nn.Sequential(
+            nn.Linear(hist_out + DIMS.field_dim, self.dyn_dim),
+            nn.ReLU(),
+            nn.Linear(self.dyn_dim, self.dyn_dim),
         )
 
     def entity_tokens(
@@ -122,7 +143,8 @@ class Backbone(nn.Module):
         field: torch.Tensor,         # [B, D_field]
         history: torch.Tensor,       # [B, T, D_turn]
         active_idx: torch.Tensor,    # [B, 2] (mine, opp) token indices into the 12 entity slots
-    ) -> torch.Tensor:
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """(s_board [B, state_dim], c_dyn [B, dyn_dim]). See the module docstring for what each is."""
         b = entities.shape[0]
         ent_tokens = self.entity_tokens(entities, entity_ids, field)
         pooled = ent_tokens.mean(dim=1)
@@ -137,5 +159,6 @@ class Backbone(nn.Module):
         else:
             hist_final = self.hist(h)[:, -1]
 
-        s = self.head(torch.cat([pooled, active_mine, active_opp, hist_final], dim=-1))
-        return s
+        s_board = self.board_head(torch.cat([pooled, active_mine, active_opp], dim=-1))
+        c_dyn = self.dyn_head(torch.cat([hist_final, field], dim=-1))
+        return s_board, c_dyn

@@ -1,4 +1,4 @@
-"""Cross-simulator fuzz harness (SIMULATION_PLAN §5): poke-engine vs local Showdown.
+"""Cross-simulator fuzz harness (ARCHITECTURE.md §3.2): poke-engine vs local Showdown.
 
 PPO will farm any mechanic the fast simulator gets wrong, so before poke-engine enters the training
 loop, run the same seeded games through BOTH simulators and diff the per-decision trajectories.
@@ -182,7 +182,7 @@ def diff_trajectories(a: list[dict], b: list[dict], hp_tol: float = 0.15) -> dic
 
 # -------------------------------------------------------------------------------------- main
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Cross-sim fuzz (SIMULATION_PLAN §5).")
+    ap = argparse.ArgumentParser(description="Cross-sim fuzz (ARCHITECTURE.md §3.2).")
     ap.add_argument("--games", type=int, default=50)
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_b"))
     ap.add_argument("--seed", type=int, default=0)

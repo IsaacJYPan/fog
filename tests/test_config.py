@@ -14,8 +14,8 @@ def test_extends_merges_and_overrides():
     cfg = load_config("m1_poc.yaml")
     # inherited from default
     assert cfg["encoding"]["state_dim"] == 256
-    # overridden in m1
-    assert cfg["model"]["use_belief_vec"] is False
+    # overridden in m1 (belief net off at the PoC baseline)
+    assert cfg["loss"]["belief_coef"] == 0.0
     assert cfg["env"]["battle_format"] == "gen9ou"
     assert cfg["env"]["team_pool"] == "data/teams/pool_a"
 

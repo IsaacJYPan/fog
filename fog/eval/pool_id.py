@@ -77,8 +77,8 @@ def pool_id_logprobs(agent: Any, batch: dict, cand_tokens: np.ndarray) -> np.nda
     view_np = batch["opp_revealed"]["tokens"][0].detach().cpu().numpy()   # [6, 9]
     cand_aligned, cand_ok = align_truth_to_views(cand_tokens, view_np)    # [C,6,9], [C,6]
     with torch.no_grad():
-        s = agent._backbone_pass(batch)                                   # [1, state_dim]
-        out = agent.belief(s, batch["opp_revealed"])                      # B=1, info-state input
+        _, c_dyn = agent._backbone_pass(batch)                            # c_dyn conditions belief
+        out = agent.belief(c_dyn, batch["opp_revealed"])                  # B=1, info-state input
         cand = torch.as_tensor(cand_aligned, dtype=torch.long, device=device)  # [C, 6, 9]
 
         lp = torch.zeros(c, device=device)
@@ -102,7 +102,7 @@ def pool_id_joint_logprobs(
     agent: Any, batch: dict, cand_tokens: np.ndarray, *, tail_order: str = "canonical",
     generator=None,
 ) -> np.ndarray:
-    """[C] TRUE joint log-prob of each candidate team (BELIEF_PLAN §4.5.1, the headline score).
+    """[C] TRUE joint log-prob of each candidate team (BELIEF_POLICY_PLAN §4.4, the headline score).
 
     Unlike the fast marginal (`pool_id_logprobs`, one forward with each candidate read off the SAME
     per-position conditionals), this feeds each candidate's own hidden values back into the chain
@@ -124,8 +124,8 @@ def pool_id_joint_logprobs(
     view_np = opp["tokens"][0].detach().cpu().numpy()                     # [6, 9]
     cand_aligned, cand_ok = align_truth_to_views(cand_tokens, view_np)    # [C,6,9], [C,6]
     with torch.no_grad():
-        s = agent._backbone_pass(batch)                                   # [1, state_dim]
-        s_c = s.expand(c, -1).contiguous()
+        _, c_dyn = agent._backbone_pass(batch)                            # c_dyn conditions belief
+        s_c = c_dyn.expand(c, -1).contiguous()
         opp_c = {
             "tokens": opp["tokens"].expand(c, -1, -1).contiguous(),
             "masks": {k: v.expand(c, *v.shape[1:]).contiguous()

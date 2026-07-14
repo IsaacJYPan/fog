@@ -85,7 +85,7 @@ def test_belief_loss_fires_in_ppo_update():
 
     torch.manual_seed(0)
     # tiny agent via placeholder sizes is fine here; we only need belief.logits to exist
-    agent = FogAgent({"model": {"use_belief_vec": False}})
+    agent = FogAgent({"model": {}})
     from fog.encoding.dims import DIMS
     from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS
 

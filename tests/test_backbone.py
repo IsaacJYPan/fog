@@ -26,17 +26,19 @@ def _random_inputs(b=2, t=7):
 
 
 def test_backbone_produces_state_vector():
-    bb = Backbone({"state_dim": 256})
-    s = bb(*_random_inputs())
-    assert s.shape == (2, 256)
+    bb = Backbone({"state_dim": 256, "dyn_dim": 256})
+    s_board, c_dyn = bb(*_random_inputs())
+    assert s_board.shape == (2, 256)
+    assert c_dyn.shape == (2, 256)
 
 
 def test_policy_masks_illegal_actions():
-    head = PolicyValueHead(state_dim=256, use_belief_vec=False)
+    head = PolicyValueHead(state_dim=256, dyn_dim=128)
     s = torch.randn(2, 256)
+    c_dyn = torch.randn(2, 128)
     mask = torch.zeros(2, 14, dtype=torch.bool)
     mask[:, [0, 1, 8]] = True  # only a few legal
-    log_probs, value = head(s, mask)
+    log_probs, value = head(s, mask, c_dyn)
     assert log_probs.shape == (2, 14)
     assert torch.isinf(log_probs[~mask]).all()      # illegal -> -inf
     assert torch.isfinite(log_probs[mask]).all()

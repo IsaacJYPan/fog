@@ -39,7 +39,7 @@ def test_apply_set_oracle_clamps_to_truth():
 
 
 def test_set_oracle_uses_truth_tokens():
-    agent = FogAgent({"model": {"oracle": "set", "use_belief_vec": True}})
+    agent = FogAgent({"model": {"oracle": "set"}})
     truth = torch.zeros(2, 6, 9, dtype=torch.long)
     truth[:, :, 0] = 5
     batch = _batch(extra={"opp_truth_tokens": truth})
@@ -50,14 +50,16 @@ def test_set_oracle_uses_truth_tokens():
 
 
 def test_action_oracle_changes_head_width_and_runs():
-    agent = FogAgent({"model": {"oracle": "action", "use_belief_vec": True}})
+    agent = FogAgent({"model": {"oracle": "action"}})
     assert agent.action_oracle is not None
     committed = torch.tensor([2, 7])
     batch = _batch(extra={"opp_committed_action": committed})
     out = agent(batch)
     assert out.log_probs.shape == (2, 14)
-    # policy head input width grew by the action-embed dim
-    assert agent.policy_value.policy[0].in_features == agent.backbone.state_dim + 128 + agent.action_oracle.extra_dim
+    # policy head input width = (s_board + action-embed) ‖ c_dyn (no belief summary, §3.6)
+    assert agent.policy_value.policy[0].in_features == (
+        agent.backbone.state_dim + agent.action_oracle.extra_dim + agent.backbone.dyn_dim
+    )
 
 
 def test_action_oracle_head_augment_handles_missing_action():

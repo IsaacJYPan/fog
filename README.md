@@ -52,8 +52,8 @@ rollout); every phase produces a usable artifact even if the project stops there
   configs/           # yaml per experiment; every run reproducible from config + seed
 ```
 
-Experiment notes, issue notes, and implementation plans are maintained locally.
-This README is the only tracked project document.
+Architecture notes, experiment notes, issue notes, and implementation plans are maintained
+locally. This README is the only tracked project document.
 
 ## Stack
 

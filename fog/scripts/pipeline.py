@@ -23,7 +23,7 @@ does need it (the binding divergence control — don't disable it, start the ser
     python -m fog.scripts.pipeline agreement          # Phase 3: exact-vs-sampled agreement
     python -m fog.scripts.pipeline gate-belief        # M1.5 belief gate: pool-id top-1 by turn 4
                                                       #          (engine, no server)
-    python -m fog.scripts.pipeline probe              # engine throughput probe (SIMULATION_PLAN)
+    python -m fog.scripts.pipeline probe              # engine throughput probe (ARCHITECTURE.md §3.2)
 
 The M1.5 gate is the go/no-go for the whole search program (SEARCH_PLAN §3): if b_vec buys no
 win rate, information has no payoff channel and neither the beta penalty nor belief-space search

@@ -30,7 +30,8 @@ encoding:
   history_encoder: gru         # {gru, transformer}
   species_embed_dim: 64
   entity_hidden: 128
-  state_dim: 256
+  state_dim: 256               # s_board width (policy inputs (a)+(b): static entity/board summary)
+  dyn_dim: 256                 # c_dyn width (input (c): dynamics vector; also the belief memory)
 
 # --- Model (§3) ------------------------------------------------------------------------------------
 model:
@@ -38,17 +39,16 @@ model:
   entity_heads: 4
   history_gru_hidden: 256
   belief_decoder_layers: 2
-  belief_dim: 128
-  aux_into_trunk: true         # belief/self-belief losses backprop into backbone (ablation switch)
-  use_belief_vec: true         # concat b_vec into policy/value input
+  belief_dim: 128              # belief/self-belief decoder width d
+  aux_into_trunk: true         # belief/self-belief losses backprop into backbone (shapes c_dyn; §3.6)
   oracle: none                 # {none, set, action} — §3.4 evaluation ceilings
 
 # --- Losses / training shared ----------------------------------------------------------------------
 loss:
   value_coef: 0.5
-  belief_coef: 1.0              # pass-A marginal CE (deployment reads; BELIEF_PLAN §3.3)
+  belief_coef: 1.0              # marginal CE: calibrates the diagnostic/leakage marginal forward (§8.2)
   self_belief_coef: 1.0
-  belief_chain_coef: 1.0        # pass-B chain CE (sampling/scoring reads; §4.2). Defaults to belief_coef.
+  belief_chain_coef: 1.0        # chain CE: THE belief aux loss; shapes c_dyn (§3.6). 0 -> pure marginal
   self_belief_chain_coef: 1.0
   preview_coef: 0.5
 
