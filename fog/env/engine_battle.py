@@ -841,9 +841,8 @@ class EngineBattle:
         return fork
 
     # -------------------------------------------------------------------------------------- step
-    def step(self, moves: dict[str, str]) -> None:
-        """Advance one engine decision round. `moves` maps role -> engine string; a side that is
-        not pending passes "none" (filled in automatically when absent)."""
+    def _resolve_moves(self, moves: dict[str, str]) -> tuple[str, str, set]:
+        """Shared step header: validate and fill the per-side engine strings."""
         if self.finished:
             raise RuntimeError("battle already finished")
         pending = set(self.pending_sides())
@@ -851,18 +850,11 @@ class EngineBattle:
         m2 = moves.get("p2", "none" if "p2" not in pending else None)
         if m1 is None or m2 is None:
             raise ValueError(f"missing action for a pending side (pending={sorted(pending)})")
+        return m1, m2, pending
 
-        pre = self.state
-        sets = pe.generate_instructions(pre, m1, m2)
-        if not sets:
-            raise RuntimeError(f"engine produced no instructions for ({m1!r}, {m2!r})")
-        r = self.rng.random() * 100.0
-        acc, chosen = 0.0, sets[-1]
-        for cand in sets:
-            acc += float(cand.percentage)
-            if r <= acc:
-                chosen = cand
-                break
+    def _apply_chosen(self, pre, chosen, m1: str, m2: str, pending: set) -> None:
+        """Advance THIS battle under one already-selected chance outcome (`chosen` is one element
+        of the pe.generate_instructions list). Shared tail of step() / step_branches()."""
         self.state = pre.apply_instructions(chosen)
 
         self._pending_events.extend(
@@ -886,6 +878,64 @@ class EngineBattle:
         if self.pending_sides() == ["p1", "p2"]:
             self._finalize_turn()
             self.turn += 1
+
+    def step(self, moves: dict[str, str]) -> None:
+        """Advance one engine decision round. `moves` maps role -> engine string; a side that is
+        not pending passes "none" (filled in automatically when absent). Chance resolves by
+        SAMPLING one outcome from the engine's enumerated branch list — the volume-play path.
+        Search must use step_branches instead (single-sample cells are interim only,
+        PROJECT_DESIGN_PROPOSAL.md §10.4 / §18)."""
+        m1, m2, pending = self._resolve_moves(moves)
+        pre = self.state
+        sets = pe.generate_instructions(pre, m1, m2)
+        if not sets:
+            raise RuntimeError(f"engine produced no instructions for ({m1!r}, {m2!r})")
+        r = self.rng.random() * 100.0
+        acc, chosen = 0.0, sets[-1]
+        for cand in sets:
+            acc += float(cand.percentage)
+            if r <= acc:
+                chosen = cand
+                break
+        self._apply_chosen(pre, chosen, m1, m2, pending)
+
+    def step_branches(
+        self, moves: dict[str, str], *, min_prob: float = 0.0, max_branches: int | None = None,
+    ) -> tuple[list[tuple[float, "EngineBattle"]], float]:
+        """Every chance outcome of one decision round, each as its own advanced fork
+        (PROJECT_DESIGN_PROPOSAL.md §10.4: enumerate and branch, never one frozen sample).
+
+        Returns `(branches, pruned_mass)`. `branches` is a list of `(probability, fork)` pairs:
+        the engine's enumerated outcomes of committing `moves` (hit/miss, critical or not,
+        secondary effect or not, and their combinations — the engine's granularity; damage rolls
+        are collapsed to the average roll, see the §10.4 backend note). Probabilities are
+        renormalized over the kept set so they always sum to one; `pruned_mass` is the total
+        probability dropped by `min_prob` / `max_branches` pruning (log it — §19.16). The most
+        likely branch is always kept. Branch order follows the engine's enumeration order.
+
+        `self` is NOT advanced (unlike step); it is mutated only through its random stream, which
+        seeds the forks. Every fork draws a fresh, independent random future — never a shared one
+        (settled decision 21.17) — so the whole call is deterministic given this battle's rng
+        state, while sibling forks stay uncorrelated if they are stepped further.
+        """
+        m1, m2, pending = self._resolve_moves(moves)
+        pre = self.state
+        sets = pe.generate_instructions(pre, m1, m2)
+        if not sets:
+            raise RuntimeError(f"engine produced no instructions for ({m1!r}, {m2!r})")
+        probs = [float(c.percentage) / 100.0 for c in sets]
+        top = max(range(len(sets)), key=lambda i: probs[i])
+        keep = [i for i in range(len(sets)) if probs[i] >= min_prob or i == top]
+        if max_branches is not None and len(keep) > max_branches:
+            keep = sorted(sorted(keep, key=lambda i: -probs[i])[:max_branches])
+        kept_mass = sum(probs[i] for i in keep)
+        pruned_mass = max(0.0, 1.0 - kept_mass)
+        branches: list[tuple[float, EngineBattle]] = []
+        for i in keep:
+            fork = self.clone_for_step(seed=self.rng.randrange(2**31))
+            fork._apply_chosen(pre, sets[i], m1, m2, pending)
+            branches.append((probs[i] / kept_mass, fork))
+        return branches, pruned_mass
 
     # ---------------------------------------------------------------------------- event synthesis
     def _synthesize(self, pre, chosen, moves: dict[str, str], pending: set[str]) -> list[list[str]]:
