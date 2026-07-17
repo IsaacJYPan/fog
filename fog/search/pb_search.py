@@ -51,6 +51,8 @@ class PBSearchResult:
     labels2: list[str]               # the opponent's (columns of sigma2)
     sigma1: np.ndarray               # [K, A] averaged solved strategy (belief updates use this)
     sigma2: np.ndarray               # [J, B] averaged solved opponent strategy
+    avail1: np.ndarray               # [K, A] bool — needed to floor likelihoods correctly: a
+    avail2: np.ndarray               # [J, B]        zero from "unavailable" must stay a zero
     rho: np.ndarray                  # [K, J] the root joint belief the solve used
     true_index: int                  # k of the real private state (its row was sampled)
     iterations: int
@@ -116,7 +118,9 @@ def _trivial(action: int, true_index: int = 0) -> PBSearchResult:
     dist[action] = 1.0
     return PBSearchResult(
         action=action, action_dist=dist, labels1=[], labels2=[],
-        sigma1=np.zeros((0, 0)), sigma2=np.zeros((0, 0)), rho=np.zeros((0, 0)),
+        sigma1=np.zeros((0, 0)), sigma2=np.zeros((0, 0)),
+        avail1=np.zeros((0, 0), dtype=bool), avail2=np.zeros((0, 0), dtype=bool),
+        rho=np.zeros((0, 0)),
         true_index=true_index, iterations=0, converged=True, j_used=0, sims_run=0,
         failed_cells=0, pruned_mass_max=0.0,
     )
@@ -230,7 +234,8 @@ def pb_search_action(
     return PBSearchResult(
         action=action, action_dist=action_dist,
         labels1=grid.labels1, labels2=grid.labels2,
-        sigma1=sol.sigma1, sigma2=sol.sigma2, rho=rho, true_index=kt,
+        sigma1=sol.sigma1, sigma2=sol.sigma2,
+        avail1=grid.avail1.copy(), avail2=grid.avail2.copy(), rho=rho, true_index=kt,
         iterations=sol.iterations, converged=sol.converged,
         j_used=grid.avail2.shape[0], sims_run=sims_total,
         failed_cells=vstats.failed_cells, pruned_mass_max=float(grid.pruned_mass.max()),
