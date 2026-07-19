@@ -32,6 +32,27 @@ Careful Nature
 - Thunder Wave
 """
 
+WEAK2 = """Great Tusk @ Heavy-Duty Boots
+Level: 5
+Ability: Protosynthesis
+EVs: 4 HP
+Serious Nature
+- Headlong Rush
+- Rapid Spin
+- Knock Off
+- Ice Spinner
+
+Kingambit @ Black Glasses
+Level: 5
+Ability: Supreme Overlord
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance
+"""
+
 
 def _battle(seed: int = 0):
     from fog.env.engine_battle import EngineBattle
@@ -126,33 +147,14 @@ def test_value_assembly_contract(grid_2x2):
     assert (np.abs(u[available]) <= 1.0 + 1e-9).all()
 
 
-def test_grid_rejects_one_sided_roots():
+def test_grid_rejects_decisions_we_do_not_own():
+    """A one-sided state the OPPONENT owns (only p2 pending) is not ours to solve — F2 accepts our
+    own one-sided decisions but the symmetric opponent-only case stays an error (proposal §10.5)."""
     from fog.search.pb_grid import build_pb_grid
     from fog.search.pb_leaves import commit_pair_branches
-
-    weak2 = """Great Tusk @ Heavy-Duty Boots
-Level: 5
-Ability: Protosynthesis
-EVs: 4 HP
-Serious Nature
-- Headlong Rush
-- Rapid Spin
-- Knock Off
-- Ice Spinner
-
-Kingambit @ Black Glasses
-Level: 5
-Ability: Supreme Overlord
-EVs: 252 HP / 252 Atk / 4 SpD
-Adamant Nature
-- Kowtow Cleave
-- Sucker Punch
-- Iron Head
-- Swords Dance
-"""
     from fog.env.engine_battle import EngineBattle
 
-    b = EngineBattle(ATTACKER, weak2, seed=0, battle_tag="pbgrid-onesided")
+    b = EngineBattle(ATTACKER, WEAK2, seed=0, battle_tag="pbgrid-onesided")
     draco = next(i for i, m in enumerate(b.active("p1").moves)
                  if str(m.id).lower().replace(" ", "") == "dracometeor")
     outcomes, _ = commit_pair_branches(b, "p1", draco,
@@ -160,8 +162,170 @@ Adamant Nature
     leaf = next(o.leaf for o in outcomes if o.leaf is not None
                 and tuple(o.leaf.pending_sides()) == ("p2",))
     own, opp = _truth_grid(leaf, 1, 1)
-    with pytest.raises(ValueError, match="simultaneous"):
+    with pytest.raises(ValueError, match="do not own"):
         build_pb_grid(leaf, "p1", own, opp)
+
+
+# A three-Pokemon level-5 team: any Specs hit knocks out the lead, leaving 2 live bench -> our
+# forced replacement is a MULTI-choice one-sided decision (F2), not a trivial single switch.
+WEAK3 = WEAK2 + """
+Dragonite @ Heavy-Duty Boots
+Level: 5
+Ability: Multiscale
+EVs: 4 HP
+Serious Nature
+- Extreme Speed
+- Earthquake
+- Dragon Dance
+- Roost
+"""
+
+
+def _p1_replacement_leaf(seed: int = 1):
+    """A leaf where OUR lead (p1) has just fainted to the opponent's Draco Meteor and we owe a
+    forced replacement with two live bench Pokemon (pending == {p1})."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.search.pb_leaves import commit_pair_branches
+
+    b = EngineBattle(WEAK3, ATTACKER, seed=seed, battle_tag=f"pbgrid-repl-{seed}")
+    draco = next(i for i, m in enumerate(b.active("p2").moves)
+                 if str(m.id).lower().replace(" ", "") == "dracometeor")
+    outcomes, _ = commit_pair_branches(
+        b, "p1", int(np.flatnonzero(b.action_mask("p1"))[0]), draco)
+    return next(o.leaf for o in outcomes if o.leaf is not None
+                and tuple(o.leaf.pending_sides()) == ("p1",))
+
+
+def test_one_sided_grid_uses_a_synthetic_observe_column():
+    """F2: our forced replacement builds a grid with a single synthetic opponent label, avail2 all
+    True at B=1, no real opponent action index, and every cell committed one-sidedly."""
+    from fog.search.pb_grid import OBSERVE_LABEL, build_pb_grid
+
+    leaf = _p1_replacement_leaf()
+    own, opp = _truth_grid(leaf, 2, 3)
+    g = build_pb_grid(leaf, "p1", own, opp, seed=4)
+
+    assert g.labels2 == [OBSERVE_LABEL]
+    assert g.avail2.shape == (3, 1) and g.avail2.all()
+    assert (g.local_action2 == -1).all(), "the observe column carries no real opponent action"
+    # our labels are the live switches; every own-world can play each (species-based, k-invariant)
+    assert all(lab.startswith("s:") for lab in g.labels1)
+    assert g.avail1.shape == (2, len(g.labels1)) and g.avail1.all()
+    # budget: one commit per (own-world k, our-label a, opp-world j), with B == 1
+    assert g.sims_run == 2 * len(g.labels1) * 3
+    # branch bookkeeping identical to the two-sided path
+    cell_mass = g.branch_prob.sum(axis=-1)
+    available = (g.avail1[:, None, :, None] & g.avail2[None, :, None, :]) & ~g.failed
+    np.testing.assert_allclose(cell_mass[available], 1.0, atol=1e-9)
+    assert not g.failed.any()
+    # leaves stay censored (19.12)
+    assert len(g.leaf_obs) > 0
+    assert (np.asarray(g.leaf_obs[0].opp_revealed["tokens"]) == -1).any()
+
+
+def test_one_sided_grid_handles_a_pivot_force_switch():
+    """A mid-turn U-turn force-switch (not a faint) is also one-sided and forks correctly — the
+    plan's explicit check that fork_for_own_world works off a decision boundary."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.search.pb_grid import OBSERVE_LABEL, build_pb_grid
+    from fog.search.pb_leaves import commit_pair_branches
+
+    pivot_p1 = """Scizor @ Heavy-Duty Boots
+Level: 50
+Ability: Technician
+EVs: 252 HP
+Adamant Nature
+- U-turn
+- Bullet Punch
+- Knock Off
+- Roost
+
+""" + WEAK3
+    pivot_p2 = """Blissey @ Leftovers
+Level: 50
+Ability: Natural Cure
+EVs: 252 HP
+Calm Nature
+- Seismic Toss
+- Soft-Boiled
+- Toxic
+- Protect
+"""
+    b = EngineBattle(pivot_p1, pivot_p2, seed=0, battle_tag="pbgrid-pivot")
+    uturn = next(i for i, m in enumerate(b.active("p1").moves)
+                 if str(m.id).lower().replace(" ", "") == "uturn")
+    softb = next(i for i, m in enumerate(b.active("p2").moves)
+                 if str(m.id).lower().replace(" ", "") == "softboiled")
+    outcomes, _ = commit_pair_branches(b, "p1", uturn, softb)
+    leaf = next(o.leaf for o in outcomes if o.leaf is not None
+                and tuple(o.leaf.pending_sides()) == ("p1",))
+    own, opp = _truth_grid(leaf, 1, 2)
+    g = build_pb_grid(leaf, "p1", own, opp, seed=1)
+    assert g.labels2 == [OBSERVE_LABEL]
+    assert all(lab.startswith("s:") for lab in g.labels1) and len(g.labels1) >= 1
+    assert g.sims_run > 0 and not g.failed.any()
+
+
+def test_double_ko_takes_the_two_sided_path():
+    """A simultaneous double faint (both sides owe a replacement) is a NORMAL two-sided decision,
+    not a one-sided one: both label spaces are real switches, never the synthetic observe column."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.search.pb_grid import OBSERVE_LABEL, build_pb_grid
+    from fog.search.pb_leaves import commit_pair_branches
+
+    dko_p1 = """Drifblim @ Life Orb
+Level: 5
+Ability: Aftermath
+EVs: 4 HP
+Serious Nature
+- Explosion
+- Shadow Ball
+- Tackle
+- Protect
+
+Kingambit @ Black Glasses
+Level: 5
+Ability: Supreme Overlord
+EVs: 252 HP
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+"""
+    dko_p2 = """Cloyster @ Life Orb
+Level: 5
+Ability: Skill Link
+EVs: 4 HP
+Serious Nature
+- Icicle Spear
+- Rock Blast
+- Tackle
+- Protect
+
+Kingambit @ Black Glasses
+Level: 5
+Ability: Supreme Overlord
+EVs: 252 HP
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+"""
+    b = EngineBattle(dko_p1, dko_p2, seed=0, battle_tag="pbgrid-dko")
+    expl = next(i for i, m in enumerate(b.active("p1").moves)
+                if str(m.id).lower().replace(" ", "") == "explosion")
+    tackle = next(i for i, m in enumerate(b.active("p2").moves)
+                  if str(m.id).lower().replace(" ", "") == "tackle")
+    outcomes, _ = commit_pair_branches(b, "p1", expl, tackle)
+    leaf = next(o.leaf for o in outcomes if o.leaf is not None
+                and tuple(o.leaf.pending_sides()) == ("p1", "p2"))
+    own, opp = _truth_grid(leaf, 2, 2)
+    g = build_pb_grid(leaf, "p1", own, opp, seed=1)
+    assert OBSERVE_LABEL not in g.labels2, "a double KO is two-sided; the opponent really chooses"
+    assert all(lab.startswith("s:") for lab in g.labels2)
+    assert (g.local_action2[g.avail2] >= 0).all(), "real opponent replacement actions committed"
 
 
 def test_grid_deterministic_given_seed():

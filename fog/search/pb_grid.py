@@ -27,8 +27,21 @@ Structure decisions carried from the proposal:
     record is deferred until Phase G defines its consumer (recorded deviation from the original
     plan sketch — the Observation already carries the reveal facts).
 
-The builder requires a normal simultaneous decision (both sides pending). One-sided decisions
-(forced replacements) are cheap single-row solves that Phase F handles outside the full grid.
+The builder handles OUR decision whether or not the opponent is also pending (PROPOSAL_IMPL_PLAN
+Phase F2, proposal §10.5):
+
+  * both sides pending  -> a normal simultaneous turn, the full K x J x A x B grid;
+  * only `role` pending -> a one-sided forced replacement / pivot (U-turn, Baton Pass, Eject, or a
+    faint with several live bench Pokemon) that only WE owe. The opponent has no choice this step,
+    so its public-label axis collapses to a single synthetic `<observe>` column (`avail2` all
+    True, B = 1) and every cell commits with `opp_action_idx=None`. The B = 1 solve degenerates to
+    a plain type-conditioned replacement strategy — but it is still a real solved decision whose
+    `sigma1` carries signaling content for the persistent belief table (a forced choice among
+    SEVERAL legal replacements DOES carry likelihood, §14), never a scripted stand-in (settled 22).
+
+A decision we do NOT own (only the opponent pending) stays an error: the caller skips the opponent's
+solo replacement (its behavioral likelihood is unmodeled there — the honest §7.2 floor) and never
+asks this builder to solve a move that is not ours.
 
 Simulation failures are tolerated the way the baseline tolerates them: the cell is marked in
 `failed` and gets no branches; the value layer (Phase E) substitutes the root value for failed
@@ -42,6 +55,11 @@ from dataclasses import dataclass
 import numpy as np
 
 from fog.search.pb_leaves import commit_pair_branches
+
+# The opponent's synthetic single public label at a one-sided (our) decision: it owes no action
+# this step, so there is exactly one "column" — the solver sees B = 1 and the belief update takes
+# no opponent likelihood (proposal §10.5, F2).
+OBSERVE_LABEL = "<observe>"
 
 
 def public_label(fork, role: str, action_idx: int) -> str:
@@ -100,9 +118,14 @@ def build_pb_grid(
 
     opp_role = "p2" if role == "p1" else "p1"
     pending = set(battle.pending_sides())
-    if pending != {"p1", "p2"}:
-        raise ValueError(f"grid needs a normal simultaneous decision; pending={sorted(pending)} "
-                         "(one-sided decisions are Phase F fast paths, not grid solves)")
+    if role not in pending:
+        raise ValueError(
+            f"grid solves the decision `role`={role} owns, but pending={sorted(pending)} does not "
+            "include it — a decision we do not own (only the opponent pending) is the caller's "
+            "belief-update skip, not a grid solve (F2)")
+    one_sided = pending == {role}
+    if not one_sided and pending != {"p1", "p2"}:
+        raise ValueError(f"unexpected pending set {sorted(pending)} for a grid on {role}")
     rng = random.Random(seed)
     own_tokens = np.asarray(own_tokens, dtype=np.int64)
     opp_tokens = np.asarray(opp_tokens, dtype=np.int64)
@@ -124,7 +147,10 @@ def build_pb_grid(
             forks[k].append(fork)
             maps1[k].append({public_label(fork, role, int(x)): int(x)
                              for x in np.flatnonzero(fork.action_mask(role))})
-            maps2[k].append({public_label(fork, opp_role, int(x)): int(x)
+            # one-sided: the opponent owes nothing this step -> a single synthetic column, no real
+            # action index (cells commit with opp_action_idx=None). Its local_action stays -1.
+            maps2[k].append({OBSERVE_LABEL: -1} if one_sided else
+                            {public_label(fork, opp_role, int(x)): int(x)
                              for x in np.flatnonzero(fork.action_mask(opp_role))})
 
     # ---- factorization checks: our labels depend on k only, theirs on j only -----------------
@@ -176,9 +202,10 @@ def build_pb_grid(
             for a in np.flatnonzero(avail1[k]):
                 for b in np.flatnonzero(avail2[j]):
                     sims_run += 1
+                    opp_idx = None if one_sided else int(local_action2[j, b])
                     try:
                         outcomes, pruned = commit_pair_branches(
-                            fork, role, int(local_action1[k, a]), int(local_action2[j, b]),
+                            fork, role, int(local_action1[k, a]), opp_idx,
                             min_prob=min_prob, max_branches=max_branches,
                         )
                     except Exception:

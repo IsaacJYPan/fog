@@ -155,6 +155,10 @@ def pb_search_action(
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
+    # Only 0/1 legal actions are trivial (no behavioral content). A one-sided forced replacement or
+    # pivot with 2+ live choices is NOT trivial: build_pb_grid collapses the absent opponent to a
+    # single synthetic label and the B=1 solve yields a real, type-conditioned replacement sigma1
+    # (F2, proposal §10.5) — it flows through the normal path below.
     if len(real_legal) == 0:
         return _trivial(13)
     if len(real_legal) == 1:

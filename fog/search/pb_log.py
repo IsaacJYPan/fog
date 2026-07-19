@@ -23,6 +23,16 @@ Belief-update discipline after each real turn (§14 step 11):
     wired (needs the mirror view; recorded limitation — exact own-pool sources already filter
     reveals internally, so on pools this loses nothing).
 
+One-sided decisions (PROPOSAL_IMPL_PLAN Phase F2, proposal §10.5) flow through the same path with
+no special-casing. When only the learner is pending (a forced replacement with several live bench,
+or a pivot force-switch), pb_search solves a degenerate B = 1 grid; `opp_label` is None (the
+opponent owed nothing), so the belief step multiplies in ONLY our replacement sigma1 — the
+signaling content of the choice — and the row is logged like any other for distillation and value
+training. When only the OPPONENT is pending (its solo replacement while we owe nothing), no solve
+exists: we log nothing and skip its behavioral likelihood (the honest §7.2 no-model stance, the
+documented F2.4 approximation until solver-vs-solver self-play supplies its sigma), applying only
+mechanical evidence.
+
 The runner requires an own_source with a STABLE candidate count across the battle (the table's
 axes are fixed identities, §7.4): the full-pool sources qualify, reveal-filtering subsets do not.
 """

@@ -106,3 +106,59 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
     assert saved["meta"]["version"] == 2
     assert saved["meta"]["opp_pool_tokens"].shape == (1, 6, 9)
     assert len(saved["rows"]) == len(rows)
+
+
+# Three level-5 Pokemon: the learner's lead is knocked out but two live bench remain, so the
+# runner must resolve a MULTI-choice forced replacement mid-game (F2). Before F2 this raised
+# inside build_pb_grid; the lone-Hydreigon whole-game test above can never reach it.
+WEAK3 = WEAK2 + """
+Dragonite @ Heavy-Duty Boots
+Level: 5
+Ability: Multiscale
+EVs: 4 HP
+Serious Nature
+- Extreme Speed
+- Earthquake
+- Dragon Dance
+- Roost
+"""
+
+
+def test_learner_faint_logs_one_sided_replacement_rows(tmp_path):
+    """F2 end-to-end: a game where the learner (p1) faints with 2+ live bench plays through the
+    runner without raising, and its forced replacement is logged as a solved one-sided row (the
+    synthetic observe column, a valid sampled replacement) with the belief update applied."""
+    from types import SimpleNamespace
+
+    from fog.env.engine_battle import EngineBattle
+    from fog.models.agent import FogAgent
+    from fog.search.pb_grid import OBSERVE_LABEL
+    from fog.search.pb_log import play_and_log_pb_games
+
+    class StubOwn:
+        # WEAK3 is the LEARNER here (p1); the opponent is the lone strong Hydreigon.
+        def states(self, battle, role):
+            t = battle.truth_tokens(role)
+            return SimpleNamespace(tokens=np.stack([t, t]),
+                                   weights=np.array([0.5, 0.5]), true_index=0, k=2)
+
+    agent = FogAgent.from_tables({})
+    proto = EngineBattle(WEAK3, ATTACKER, seed=0, battle_tag="pblog-repl-proto")
+    opp_pool = np.stack([proto.truth_tokens("p2")])
+
+    def factory(game_id, seed):
+        return EngineBattle(WEAK3, ATTACKER, seed=seed, battle_tag=f"pblog-repl-{game_id}")
+
+    rows = play_and_log_pb_games(
+        agent, factory, StubOwn(), opp_pool, n_games=1, seed=5,
+        max_decisions=40, search_kwargs={"iters": 16, "n_queried": 2})
+
+    one_sided = [r for r in rows if r["labels2"] == [OBSERVE_LABEL]]
+    assert one_sided, "the learner faints and owes a solved forced replacement (F2)"
+    for r in one_sided:
+        assert r["sigma2"].shape == (r["rho"].shape[1], 1)
+        np.testing.assert_allclose(r["sigma2"], 1.0)
+        assert r["sims_run"] > 0
+        np.testing.assert_allclose(r["action_dist"].sum(), 1.0)
+        assert r["action_dist"][r["action"]] > 0, "sampled from the solved replacement support"
+        assert r["outcome"] in (-1.0, 0.0, 1.0)

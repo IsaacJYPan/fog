@@ -168,6 +168,49 @@ def test_trivial_forced_decision_skips_the_grid(agent):
     assert r.sims_run == 0 and r.iterations == 0
 
 
+def test_one_sided_replacement_is_solved_and_sampled(agent):
+    """F2: a forced replacement with two live bench Pokemon is a real one-sided solve — the result
+    carries the synthetic single opponent column, sigma2 is the [J, 1] ones vector, and the
+    executed replacement is sampled exactly from the solved (possibly mixed) sigma1 row."""
+    from fog.search.pb_grid import OBSERVE_LABEL
+    from fog.search.pb_leaves import commit_pair_branches
+    from fog.search.pb_search import pb_search_action
+
+    weak3 = WEAK2 + """
+Dragonite @ Heavy-Duty Boots
+Level: 5
+Ability: Multiscale
+EVs: 4 HP
+Serious Nature
+- Extreme Speed
+- Earthquake
+- Dragon Dance
+- Roost
+"""
+    from fog.env.engine_battle import EngineBattle
+
+    b = EngineBattle(weak3, ATTACKER, seed=1, battle_tag="pbsearch-repl")
+    draco = next(i for i, m in enumerate(b.active("p2").moves)
+                 if str(m.id).lower().replace(" ", "") == "dracometeor")
+    outcomes, _ = commit_pair_branches(
+        b, "p1", int(np.flatnonzero(b.action_mask("p1"))[0]), draco)
+    leaf = next(o.leaf for o in outcomes if o.leaf is not None
+                and tuple(o.leaf.pending_sides()) == ("p1",))
+    assert len(np.flatnonzero(leaf.action_mask("p1"))) >= 2, "fixture: a multi-choice replacement"
+
+    opp = np.stack([leaf.truth_tokens("p2")] * 2)
+    r = pb_search_action(agent, leaf, "p1", own_source=_StubOwnStates(2), opp_tokens=opp,
+                         seed=7, iters=32)
+    assert r.labels2 == [OBSERVE_LABEL]
+    assert r.sigma2.shape == (2, 1)
+    np.testing.assert_allclose(r.sigma2, 1.0)
+    assert r.sims_run > 0 and r.iterations > 0, "a real solve ran (not the trivial fast path)"
+    assert leaf.action_mask("p1")[r.action], "the executed replacement is legal"
+    assert r.action_dist[r.action] > 0
+    np.testing.assert_allclose(r.action_dist.sum(), 1.0)
+    np.testing.assert_allclose(r.sigma1.sum(axis=1), 1.0)
+
+
 def test_adaptive_sampled_mode_terminates_and_grows(agent):
     from fog.search.pb_search import pb_search_action
 
