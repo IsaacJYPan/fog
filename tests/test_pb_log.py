@@ -99,6 +99,12 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
         assert row["opp_true_index"] == 0
         assert row["own_tokens"].shape == (row["rho"].shape[0], 6, 9)
         assert row["opp_tokens"].shape == (row["rho"].shape[1], 6, 9)
+        # G1 fields: mid-solve snapshot posteriors stored for the value trainer
+        assert 1 <= row["sample_iteration"] <= row["iterations"]
+        assert len(row["sample_beliefs"]) <= 2
+        for lab1, lab2, post in row["sample_beliefs"]:
+            assert lab1 in row["labels1"] and lab2 in row["labels2"]
+            assert post.shape == row["rho"].shape
 
     import torch
 

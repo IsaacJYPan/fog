@@ -26,7 +26,8 @@ Two candidate-supply modes, because particle persistence is only half-landed (§
 The search NEVER mutates the belief table (§14 step 11 is the runner's job, after both real
 actions are public, using this result's averaged strategies — invariant 19.6). The result
 carries a subsample of the action-pair posteriors the values were computed under
-(`queried_beliefs`) — the seed of the §9.3 value-training query log.
+(`queried_beliefs`), plus the same subsampling under one uniformly drawn solver iteration's
+CURRENT strategies (`sample_beliefs`, Phase G1) — together the §9.3 value-training query log.
 """
 from __future__ import annotations
 
@@ -62,6 +63,13 @@ class PBSearchResult:
     failed_cells: int
     pruned_mass_max: float           # worst per-cell dropped chance mass (invariant 19.16)
     queried_beliefs: list = field(default_factory=list)   # (label1, label2, rho_after [K, J])
+    # Phase G1 (§9.3 mitigation 2): action-pair posteriors under the CURRENT strategy pair of one
+    # uniformly drawn solver iteration — mid-solve belief queries the final averages never revisit
+    # (early near-uniform beliefs especially). Same entry shape as queried_beliefs; the value
+    # trainer mixes both sets (plus the root rho) as belief inputs. sample_iteration is the
+    # 1-indexed iteration the snapshot came from (-1 on trivial decisions).
+    sample_beliefs: list = field(default_factory=list)    # (label1, label2, rho_after [K, J])
+    sample_iteration: int = -1
     # The candidate identities rho / sigma / true_index index (proposal §10 shared particles). The
     # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
     own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
@@ -190,7 +198,8 @@ def pb_search_action(
                              max_branches=max_branches)
         values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
         sol = two_sided_regret_solve(values_fn, rho, grid.avail1, grid.avail2,
-                                     iters=iters, floor=floor)
+                                     iters=iters, floor=floor,
+                                     sample_seed=rng.randrange(2**31))
         return grid, vstats, sol
 
     sims_total = 0
@@ -232,12 +241,19 @@ def pb_search_action(
 
     # §9.3 seed data: a subsample of the action-pair posteriors the leaf values saw
     queried: list[tuple[str, str, np.ndarray]] = []
+    sampled: list[tuple[str, str, np.ndarray]] = []
     pairs = [(a, b) for a in range(len(grid.labels1)) for b in range(len(grid.labels2))
              if grid.avail1[:, a].any() and grid.avail2[:, b].any()]
     if pairs and n_queried > 0:
         post = pair_posteriors(rho, sol.sigma1, sol.sigma2)
         for a, b in rng.sample(pairs, min(n_queried, len(pairs))):
             queried.append((grid.labels1[a], grid.labels2[b], post[a, b].copy()))
+        # G1: the same subsampling under the random-iteration snapshot pair — the mid-solve
+        # queries (§9.3 mitigation 2). An independent pair draw widens (a, b) coverage.
+        if sol.sample_sigma1 is not None:
+            post_s = pair_posteriors(rho, sol.sample_sigma1, sol.sample_sigma2)
+            for a, b in rng.sample(pairs, min(n_queried, len(pairs))):
+                sampled.append((grid.labels1[a], grid.labels2[b], post_s[a, b].copy()))
 
     return PBSearchResult(
         action=action, action_dist=action_dist,
@@ -248,6 +264,7 @@ def pb_search_action(
         j_used=grid.avail2.shape[0], sims_run=sims_total,
         failed_cells=vstats.failed_cells, pruned_mass_max=float(grid.pruned_mass.max()),
         queried_beliefs=queried,
+        sample_beliefs=sampled, sample_iteration=sol.sample_iteration,
         # candidate identities behind rho's axes: persistent mode used `opp_tokens`, adaptive mode
         # the last-sampled `toks`. own.tokens is the K own candidates the true_index kt indexes.
         own_tokens=np.asarray(own.tokens, dtype=np.int64),

@@ -114,6 +114,13 @@ def test_persistent_mode_end_to_end(agent):
         assert lab1 in r.labels1 and lab2 in r.labels2
         assert post.shape == r.rho.shape
         assert post.sum() == pytest.approx(1.0) or post.sum() == pytest.approx(0.0)
+    # G1: the random-iteration snapshot posteriors ride alongside (§9.3 mitigation 2)
+    assert 1 <= r.sample_iteration <= r.iterations
+    assert len(r.sample_beliefs) == 4
+    for lab1, lab2, post in r.sample_beliefs:
+        assert lab1 in r.labels1 and lab2 in r.labels2
+        assert post.shape == r.rho.shape
+        assert post.sum() == pytest.approx(1.0) or post.sum() == pytest.approx(0.0)
 
 
 def test_table_mode_uses_and_validates_the_table(agent):
@@ -166,6 +173,7 @@ def test_trivial_forced_decision_skips_the_grid(agent):
     r = pb_search_action(agent, leaf, "p2", own_source=_StubOwnStates(1))
     assert r.action == int(legal[0])
     assert r.sims_run == 0 and r.iterations == 0
+    assert r.sample_iteration == -1 and r.sample_beliefs == [], "no solve ran, no snapshot"
 
 
 def test_one_sided_replacement_is_solved_and_sampled(agent):

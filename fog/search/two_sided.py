@@ -171,6 +171,14 @@ class TwoSidedSolution:
     converged: bool          # True if the stability rule fired before the cap
     root_value: float        # diagnostic: our expected payoff under the averaged strategies and
     #                          the last computed payoff tensor (exact only for fixed-u games)
+    # Random-iteration snapshot (PROPOSAL_IMPL_PLAN Phase G1; proposal §9.3 mitigation 2): the
+    # CURRENT floored strategy pair at one uniformly drawn iteration — exactly what `values_fn`
+    # received there, so posteriors under it are beliefs the leaf values were actually queried at,
+    # including the early near-uniform ones the final averages never revisit. None / -1 unless a
+    # `sample_seed` was passed. `sample_iteration` is 1-indexed (1 = the first iteration).
+    sample_sigma1: Array | None = None    # [K, A]
+    sample_sigma2: Array | None = None    # [J, B]
+    sample_iteration: int = -1
 
 
 def _regret_matched(regret: Array, avail: Array) -> Array:
@@ -205,6 +213,7 @@ def two_sided_regret_solve(
     check_every: int = 32,
     min_iters: int = 64,
     tol: float = 1e-3,
+    sample_seed: int | None = None,
 ) -> TwoSidedSolution:
     """Solve one simultaneous public-belief decision for both players (proposal §10.1).
 
@@ -223,6 +232,13 @@ def two_sided_regret_solve(
 
     The floor anneals as floor / (1 + t) — it exists to keep in-solve posterior updates away
     from exact zeros, and it is never part of the returned averages (settled decision 24).
+
+    `sample_seed` (Phase G1, proposal §9.3 mitigation 2): when given, one iteration is drawn
+    uniformly at random (reservoir sampling, so early stopping keeps the draw uniform over the
+    iterations actually run) and the CURRENT floored strategy pair of that iteration — the exact
+    arguments `values_fn` received — is returned in `sample_sigma1/sample_sigma2` with its
+    1-indexed `sample_iteration`. Value training computes posteriors under this pair so the net
+    sees the mid-solve belief queries, not only the final averages.
     """
     rho = np.asarray(rho, dtype=np.float64)
     rho = rho / rho.sum()
@@ -248,10 +264,16 @@ def two_sided_regret_solve(
     converged = False
     u = None
     t = 0
+    sample_rng = None if sample_seed is None else np.random.default_rng(int(sample_seed))
+    samp1: Array | None = None
+    samp2: Array | None = None
+    samp_iter = -1
     for t in range(max(1, int(iters))):
         floor_t = floor / (1.0 + t)
         play1 = floored_strategy(base1, avail1, floor_t)
         play2 = floored_strategy(base2, avail2, floor_t)
+        if sample_rng is not None and sample_rng.random() < 1.0 / (t + 1):
+            samp1, samp2, samp_iter = play1, play2, t + 1
 
         u = np.asarray(values_fn(play1, play2), dtype=np.float64)
         q1, q2 = type_action_values(u, rho, play1, play2)
@@ -288,4 +310,6 @@ def two_sided_regret_solve(
     p_k = rho.sum(axis=1)
     root_value = float(np.einsum("ka,k->", q1 * avg1, p_k))
     return TwoSidedSolution(sigma1=avg1, sigma2=avg2, iterations=t + 1,
-                            converged=converged, root_value=root_value)
+                            converged=converged, root_value=root_value,
+                            sample_sigma1=samp1, sample_sigma2=samp2,
+                            sample_iteration=samp_iter)

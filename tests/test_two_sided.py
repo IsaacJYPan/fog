@@ -269,3 +269,61 @@ def test_policy_prior_initialization_washes_out():
                                  np.ones((1, 2), dtype=bool), np.ones((1, 2), dtype=bool),
                                  init1=bad_init, iters=500)
     assert sol.sigma1[0, 0] > 0.99
+
+
+# ------------------------------------------------- random-iteration snapshot (Phase G1, §9.3)
+def test_snapshot_absent_without_seed():
+    u, rho, a1, a2 = _matrix_game([[1.0, -1.0], [-1.0, 1.0]])
+    sol = two_sided_regret_solve(lambda x, y: u, rho, a1, a2, iters=100)
+    assert sol.sample_sigma1 is None and sol.sample_sigma2 is None
+    assert sol.sample_iteration == -1
+
+
+def test_snapshot_is_the_current_strategy_values_fn_received():
+    """The snapshot must be EXACTLY the floored per-iteration pair passed to values_fn at the
+    reported iteration — that is what makes posteriors under it 'beliefs the values were queried
+    at' (§9.3 mitigation 2), and it is NOT the averaged answer."""
+    u, rho, a1, a2 = _matrix_game([[2.0, -1.0], [-1.0, 1.0]])
+    seen: list[tuple[np.ndarray, np.ndarray]] = []
+
+    def values_fn(s1, s2):
+        seen.append((s1.copy(), s2.copy()))
+        return u
+
+    sol = two_sided_regret_solve(values_fn, rho, a1, a2, iters=200, sample_seed=11)
+    assert 1 <= sol.sample_iteration <= sol.iterations
+    s1_seen, s2_seen = seen[sol.sample_iteration - 1]
+    np.testing.assert_array_equal(sol.sample_sigma1, s1_seen)
+    np.testing.assert_array_equal(sol.sample_sigma2, s2_seen)
+    np.testing.assert_allclose(sol.sample_sigma1.sum(axis=1), 1.0)
+    np.testing.assert_allclose(sol.sample_sigma2.sum(axis=1), 1.0)
+
+
+def test_snapshot_draw_is_uniform_and_deterministic():
+    """Reservoir sampling: over many seeds the drawn iteration is roughly uniform on
+    [1, iters] (early AND late iterations both appear — the coverage §9.3 asks for), and a
+    repeated seed reproduces the same snapshot exactly."""
+    u, rho, a1, a2 = _matrix_game([[1.0, -1.0], [-1.0, 1.0]])
+    draws = [two_sided_regret_solve(lambda x, y: u, rho, a1, a2, iters=64,
+                                    sample_seed=s).sample_iteration
+             for s in range(300)]
+    assert min(draws) <= 8 and max(draws) >= 56, "both tails of the iteration range are drawn"
+    assert abs(np.mean(draws) - 32.5) < 5.0, "mean of a uniform draw on [1, 64]"
+
+    s_a = two_sided_regret_solve(lambda x, y: u, rho, a1, a2, iters=200, sample_seed=7)
+    s_b = two_sided_regret_solve(lambda x, y: u, rho, a1, a2, iters=200, sample_seed=7)
+    assert s_a.sample_iteration == s_b.sample_iteration
+    np.testing.assert_array_equal(s_a.sample_sigma1, s_b.sample_sigma1)
+    np.testing.assert_array_equal(s_a.sample_sigma2, s_b.sample_sigma2)
+
+
+def test_snapshot_respects_early_stopping():
+    """When the stability rule fires before the cap, the reservoir draw still lands inside the
+    iterations actually run."""
+    u = np.zeros((1, 1, 2, 2))
+    u[..., 0, :] = 1.0                                   # dominant action -> fast convergence
+    sol = two_sided_regret_solve(lambda a, b: u, np.ones((1, 1)),
+                                 np.ones((1, 2), dtype=bool), np.ones((1, 2), dtype=bool),
+                                 iters=5000, sample_seed=3)
+    assert sol.converged and sol.iterations < 5000
+    assert 1 <= sol.sample_iteration <= sol.iterations

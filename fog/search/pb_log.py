@@ -105,8 +105,9 @@ def play_and_log_pb_games(
     opp_true_index (the opponent's j* in the pool, -1 if off-pool), own_tokens [K,6,9] / opp_tokens
     [J,6,9] (the candidate identities rho indexes — the Phase-G value trainer embeds these and
     labels V[k*, j*] with the outcome), j_used, sims_run, iterations, converged, pruned_mass_max,
-    queried_beliefs, outcome (+1/-1/0 for `role`, backfilled at game end). `meta` also carries
-    `opp_pool_tokens`. Trivial one-legal-action decisions are executed but not logged (no
+    queried_beliefs, sample_beliefs / sample_iteration (the G1 random-iteration mid-solve
+    posteriors, §9.3 mitigation 2), outcome (+1/-1/0 for `role`, backfilled at game end). `meta`
+    also carries `opp_pool_tokens`. Trivial one-legal-action decisions are executed but not logged (no
     behavioral content); a game hitting `max_decisions` is truncated with outcome 0."""
     from fog.encoding.observation import Observation
 
@@ -173,6 +174,8 @@ def play_and_log_pb_games(
                     "converged": result.converged,
                     "pruned_mass_max": result.pruned_mass_max,
                     "queried_beliefs": result.queried_beliefs,
+                    "sample_beliefs": result.sample_beliefs,
+                    "sample_iteration": result.sample_iteration,
                     "outcome": None,
                 })
 
