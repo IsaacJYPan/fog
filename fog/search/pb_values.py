@@ -133,8 +133,11 @@ def make_grid_values(
         if posterior_dim == 0 and static_u is not None:
             return static_u                     # values cannot react to the posterior: compute once
         v = _leaf_values(sigma1, sigma2)
-        per_branch = np.where(grid.leaf_index >= 0,
-                              v[np.maximum(grid.leaf_index, 0)], terminal_fill)
+        # A grid can be all-terminal (every branch ends the game, e.g. a KO near game end) -> no
+        # leaves and `v` is empty; np.where still evaluates the (unused) leaf lookup, so guard the
+        # index. All-terminal means per_branch is just the terminal payoffs.
+        per_branch = (np.where(grid.leaf_index >= 0, v[np.maximum(grid.leaf_index, 0)], terminal_fill)
+                      if v.size else terminal_fill)
         u = (grid.branch_prob * per_branch).sum(axis=-1)
         u[grid.failed] = float(fallback_value)
         if posterior_dim == 0:

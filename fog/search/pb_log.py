@@ -91,10 +91,13 @@ def play_and_log_pb_games(
     Returns the decision rows (and torch.saves {rows, meta} to `out_path` if given).
 
     Row fields: game_id, turn, role, obs (deployment input), action, action_dist (the
-    distillation target), labels1/labels2, sigma1, sigma2, rho, true_index, j_used, sims_run,
-    iterations, converged, pruned_mass_max, queried_beliefs, outcome (+1/-1/0 for `role`,
-    backfilled at game end). Trivial one-legal-action decisions are executed but not logged
-    (no behavioral content); a game hitting `max_decisions` is truncated with outcome 0."""
+    distillation target), labels1/labels2, sigma1, sigma2, rho, true_index (our k*),
+    opp_true_index (the opponent's j* in the pool, -1 if off-pool), own_tokens [K,6,9] / opp_tokens
+    [J,6,9] (the candidate identities rho indexes — the Phase-G value trainer embeds these and
+    labels V[k*, j*] with the outcome), j_used, sims_run, iterations, converged, pruned_mass_max,
+    queried_beliefs, outcome (+1/-1/0 for `role`, backfilled at game end). `meta` also carries
+    `opp_pool_tokens`. Trivial one-legal-action decisions are executed but not logged (no
+    behavioral content); a game hitting `max_decisions` is truncated with outcome 0."""
     from fog.encoding.observation import Observation
 
     rng = random.Random(seed)
@@ -112,6 +115,16 @@ def play_and_log_pb_games(
         k = own_source.states(battle, role).k
         table = JointBeliefTable.from_margins(
             np.zeros(k), np.zeros(len(opp_pool_tokens)))
+        # j*: the opponent's TRUE team index in the pool the belief axis is built over — the
+        # Phase-G value label is V[k*, j*] ~= outcome. -1 when the real opponent team is not in
+        # `opp_pool_tokens` (an off-pool opponent); the value trainer drops those rows.
+        opp_truth = np.asarray(battle.truth_tokens(opp_role), dtype=np.int64)
+        opp_true_index = next(
+            (j for j in range(len(opp_pool_tokens))
+             if np.array_equal(opp_pool_tokens[j], opp_truth)), -1)
+        if opp_true_index < 0:
+            print(f"[pb_log] game {game_id}: opponent team not in opp_pool_tokens — "
+                  "value rows for this game carry opp_true_index=-1 (droppable).", flush=True)
         game_rows: list[dict] = []
         outcome = 0.0
         for _ in range(int(max_decisions)):
@@ -143,7 +156,9 @@ def play_and_log_pb_games(
                     "action": result.action, "action_dist": result.action_dist,
                     "labels1": result.labels1, "labels2": result.labels2,
                     "sigma1": result.sigma1, "sigma2": result.sigma2, "rho": result.rho,
-                    "true_index": result.true_index, "j_used": result.j_used,
+                    "true_index": result.true_index, "opp_true_index": opp_true_index,
+                    "own_tokens": result.own_tokens, "opp_tokens": result.opp_tokens,
+                    "j_used": result.j_used,
                     "sims_run": result.sims_run, "iterations": result.iterations,
                     "converged": result.converged,
                     "pruned_mass_max": result.pruned_mass_max,
@@ -182,5 +197,6 @@ def play_and_log_pb_games(
 
         torch.save({"rows": all_rows,
                     "meta": {"version": 2, "n_games": int(n_games), "role": role,
-                             "seed": seed, "j_pool": len(opp_pool_tokens)}}, out_path)
+                             "seed": seed, "j_pool": len(opp_pool_tokens),
+                             "opp_pool_tokens": opp_pool_tokens}}, out_path)
     return all_rows

@@ -62,6 +62,10 @@ class PBSearchResult:
     failed_cells: int
     pruned_mass_max: float           # worst per-cell dropped chance mass (invariant 19.16)
     queried_beliefs: list = field(default_factory=list)   # (label1, label2, rho_after [K, J])
+    # The candidate identities rho / sigma / true_index index (proposal §10 shared particles). The
+    # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
+    own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
+    opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
 
 
 def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: int,
@@ -240,4 +244,8 @@ def pb_search_action(
         j_used=grid.avail2.shape[0], sims_run=sims_total,
         failed_cells=vstats.failed_cells, pruned_mass_max=float(grid.pruned_mass.max()),
         queried_beliefs=queried,
+        # candidate identities behind rho's axes: persistent mode used `opp_tokens`, adaptive mode
+        # the last-sampled `toks`. own.tokens is the K own candidates the true_index kt indexes.
+        own_tokens=np.asarray(own.tokens, dtype=np.int64),
+        opp_tokens=np.asarray(opp_tokens if opp_tokens is not None else toks, dtype=np.int64),
     )

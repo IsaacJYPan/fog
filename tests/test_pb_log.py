@@ -94,9 +94,15 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
         assert row["sigma1"].shape[0] == 2
         assert row["obs"] is not None and row["true_index"] == 0
         assert len(row["queried_beliefs"]) <= 2
+        # Phase-G value-training fields: j* found (opp team is the sole pool member), and the token
+        # grids index rho's axes (own_tokens is [K,6,9], opp_tokens is [J,6,9]).
+        assert row["opp_true_index"] == 0
+        assert row["own_tokens"].shape == (row["rho"].shape[0], 6, 9)
+        assert row["opp_tokens"].shape == (row["rho"].shape[1], 6, 9)
 
     import torch
 
     saved = torch.load(out, weights_only=False)
     assert saved["meta"]["version"] == 2
+    assert saved["meta"]["opp_pool_tokens"].shape == (1, 6, 9)
     assert len(saved["rows"]) == len(rows)
