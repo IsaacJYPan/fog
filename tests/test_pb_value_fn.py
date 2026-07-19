@@ -9,7 +9,6 @@ the network internals (those are tests/test_pb_value.py).
 from dataclasses import dataclass
 
 import numpy as np
-import pytest
 import torch
 
 from fog.models.pb_value import PBValueNet, _POS_FAMILY, N_ATTRS
@@ -110,8 +109,10 @@ def test_reference_mode_matches_independent_recompute(monkeypatch):
 
     for seed in (1, 2):
         g = torch.Generator().manual_seed(seed)
-        s1 = torch.rand(2, 2, generator=g).numpy(); s1 /= s1.sum(1, keepdims=True)
-        s2 = torch.rand(2, 2, generator=g).numpy(); s2 /= s2.sum(1, keepdims=True)
+        s1 = torch.rand(2, 2, generator=g).numpy()
+        s1 /= s1.sum(1, keepdims=True)
+        s2 = torch.rand(2, 2, generator=g).numpy()
+        s2 /= s2.sum(1, keepdims=True)
         u = values_fn(s1, s2)
         u_exp = _independent_u(grid, net, own, opp, rho, s_all, c_all, s1, s2, 0.25)
         assert u.shape == (2, 2, 2, 2)
@@ -129,10 +130,14 @@ def test_reweighting_tracks_posterior_between_refreshes(monkeypatch):
         agent, net, grid, rho, own.numpy(), opp.numpy(), recompute_every=1000)
 
     g = torch.Generator().manual_seed(7)
-    s1a = torch.rand(2, 2, generator=g).numpy(); s1a /= s1a.sum(1, keepdims=True)
-    s2a = torch.rand(2, 2, generator=g).numpy(); s2a /= s2a.sum(1, keepdims=True)
-    s1b = torch.rand(2, 2, generator=g).numpy(); s1b /= s1b.sum(1, keepdims=True)
-    s2b = torch.rand(2, 2, generator=g).numpy(); s2b /= s2b.sum(1, keepdims=True)
+    s1a = torch.rand(2, 2, generator=g).numpy()
+    s1a /= s1a.sum(1, keepdims=True)
+    s2a = torch.rand(2, 2, generator=g).numpy()
+    s2a /= s2a.sum(1, keepdims=True)
+    s1b = torch.rand(2, 2, generator=g).numpy()
+    s1b /= s1b.sum(1, keepdims=True)
+    s2b = torch.rand(2, 2, generator=g).numpy()
+    s2b /= s2b.sum(1, keepdims=True)
 
     u_a = values_fn(s1a, s2a)
     u_b = values_fn(s1b, s2b)
@@ -203,6 +208,8 @@ def test_exact_and_approx_agree_at_first_call(monkeypatch):
     approx, _ = make_pb_value_grid_values(agent, net, grid, rho, own.numpy(), opp.numpy(),
                                           recompute_every=8)
     g = torch.Generator().manual_seed(5)
-    s1 = torch.rand(2, 2, generator=g).numpy(); s1 /= s1.sum(1, keepdims=True)
-    s2 = torch.rand(2, 2, generator=g).numpy(); s2 /= s2.sum(1, keepdims=True)
+    s1 = torch.rand(2, 2, generator=g).numpy()
+    s1 /= s1.sum(1, keepdims=True)
+    s2 = torch.rand(2, 2, generator=g).numpy()
+    s2 /= s2.sum(1, keepdims=True)
     assert np.allclose(exact(s1, s2), approx(s1, s2), atol=1e-6)
