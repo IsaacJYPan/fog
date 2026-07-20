@@ -294,3 +294,27 @@ def test_truncation_is_persistent_mode_only(agent):
         pb_search_action(agent, b, "p1", own_source=_StubOwnStates(1),
                          opp_source=lambda bb, r, j, *, seed: (None, None),
                          top_j=4, iters=8)
+
+
+def test_policy_init_warm_start(agent):
+    """I.3: policy_init=True initializes both sides' strategies from the per-world policy
+    distributions — the solve still runs, the result stays valid, and the mapping helper puts
+    zero mass on unavailable labels with rows summing to one."""
+    from fog.search.pb_grid import build_pb_grid
+    from fog.search.pb_search import _policy_inits, pb_search_action
+
+    b = _battle()
+    opp = np.stack([b.truth_tokens("p2")])
+    own = _StubOwnStates(2).states(b, "p1")
+    grid = build_pb_grid(b, "p1", own.tokens, opp, seed=0)
+    init1, init2 = _policy_inits(agent, b, "p1", grid, own.tokens, opp, random.Random(0))
+    assert init1.shape == grid.avail1.shape and init2.shape == grid.avail2.shape
+    np.testing.assert_allclose(init1.sum(axis=1), 1.0)
+    np.testing.assert_allclose(init2.sum(axis=1), 1.0)
+    assert (init1[~grid.avail1] == 0).all() and (init2[~grid.avail2] == 0).all()
+
+    r = pb_search_action(agent, b, "p1", own_source=_StubOwnStates(2), opp_tokens=opp,
+                         seed=7, iters=32, policy_init=True)
+    assert b.action_mask("p1")[r.action]
+    np.testing.assert_allclose(r.sigma1.sum(axis=1), 1.0)
+    np.testing.assert_allclose(r.sigma2.sum(axis=1), 1.0)

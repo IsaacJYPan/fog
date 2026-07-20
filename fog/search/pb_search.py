@@ -149,6 +149,52 @@ def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int |
     return own_alive.astype(np.int64), opp_alive.astype(np.int64)
 
 
+def _policy_inits(agent, battle, role: str, grid, own_toks: np.ndarray, opp_toks: np.ndarray,
+                  rng: random.Random) -> tuple[np.ndarray | None, np.ndarray | None]:
+    """Phase I.3 (§10.2 initialization-not-anchoring): both sides' solver strategies initialized
+    from the CURRENT policy's masked distribution in each candidate world.
+
+    Our side: the policy evaluated on OUR censored view with our private team swapped to
+    candidate k (the own-world fork — private info is the only thing that varies with k).
+    Opponent side: the policy on the OPPONENT's censored view with ITS private team swapped to
+    candidate j. One batched forward over K+J observations; label mapping through the grid's
+    local_action tables. Linear iteration weighting in the solver keeps this a warm start whose
+    influence vanishes with iterations (pinned by the washout test) — never a payoff bonus.
+    Returns (init1 [K, A], init2 [J, B] or None at a one-sided decision)."""
+    import torch
+
+    from fog.encoding.observation import Observation
+    from fog.env.engine_runner import _device, _stack_obs
+
+    opp_role = "p2" if role == "p1" else "p1"
+    one_sided = bool((grid.local_action2 < 0).all())
+    obs = [Observation.from_battle(
+        battle.fork_for_own_world(role, own_toks[k], seed=rng.randrange(2**31)).view(role),
+        tracker=battle.trackers[role]) for k in range(len(own_toks))]
+    if not one_sided:
+        obs += [Observation.from_battle(
+            battle.fork_for_own_world(opp_role, opp_toks[j],
+                                      seed=rng.randrange(2**31)).view(opp_role),
+            tracker=battle.trackers[opp_role]) for j in range(len(opp_toks))]
+    agent.eval()
+    with torch.no_grad():
+        probs = agent(_stack_obs(obs, _device(agent))).log_probs.exp().cpu().numpy()
+
+    def _map(p: np.ndarray, local: np.ndarray, avail: np.ndarray) -> np.ndarray:
+        init = np.zeros(avail.shape, dtype=np.float64)
+        for row in range(avail.shape[0]):
+            cols = np.flatnonzero(avail[row])
+            init[row, cols] = p[row, local[row, cols]]
+            z = init[row].sum()
+            init[row] = init[row] / z if z > 0 else avail[row] / avail[row].sum()
+        return init
+
+    init1 = _map(probs[: len(own_toks)], grid.local_action1, grid.avail1)
+    init2 = (None if one_sided
+             else _map(probs[len(own_toks):], grid.local_action2, grid.avail2))
+    return init1, init2
+
+
 def _real_action_dist(row: np.ndarray, local_actions: np.ndarray, mask: np.ndarray) -> np.ndarray:
     """Map the true state's averaged label row onto real-battle action indices, then defensively
     renormalize over the REAL legality mask (the true-world fork must agree with the real battle;
@@ -196,6 +242,7 @@ def pb_search_action(
     n_queried: int = 8,
     top_k: int | None = None,
     top_j: int | None = None,
+    policy_init: bool = False,
 ) -> PBSearchResult:
     """One real decision under the two-sided solver. See the module docstring for the two
     candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
@@ -205,7 +252,12 @@ def pb_search_action(
     renormalized; dropped mass is reported and truncated-out candidates keep their FULL-axis
     table entries (the runner floors their behavior likelihood via the result's kept maps).
     Zero-mass candidates are always dropped in persistent mode regardless (exact — and required
-    before forking, see _truncate_axes)."""
+    before forking, see _truncate_axes).
+
+    `policy_init` (Phase I.3, §10.2): initialize both sides' solver strategies from the current
+    policy's per-world masked distributions (see _policy_inits) — a warm start whose influence
+    washes out under linear averaging. Default off; turning it on is a measured compute nicety
+    (iterations-to-stability), never a correctness change."""
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
@@ -242,8 +294,12 @@ def pb_search_action(
         grid = build_pb_grid(battle, role, own_toks, opp_toks,
                              seed=rng.randrange(2**31), min_prob=min_prob,
                              max_branches=max_branches)
+        init1 = init2 = None
+        if policy_init:
+            init1, init2 = _policy_inits(agent, battle, role, grid, own_toks, opp_toks, rng)
         values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
         sol = two_sided_regret_solve(values_fn, rho, grid.avail1, grid.avail2,
+                                     init1=init1, init2=init2,
                                      iters=iters, floor=floor,
                                      sample_seed=rng.randrange(2**31))
         return grid, vstats, sol
