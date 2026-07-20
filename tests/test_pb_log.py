@@ -316,3 +316,26 @@ def test_selfplay_requires_shared_axes():
     with pytest.raises(ValueError, match="shared candidate space"):
         play_and_log_pb_selfplay_games(
             None, None, src, np.ones((2, 6, 9), dtype=np.int64))
+
+
+def test_loop_generation_smoke(tmp_path):
+    """I.5: one full generation — solver self-play -> distill v2 -> belief refresh — runs
+    in-process at smoke scale, mutates the agent, and reports the §15.4 gates it ran (and
+    names the ones it did not)."""
+    from fog.models.agent import FogAgent
+    from fog.scripts.pb_loop import run_generation
+
+    agent = FogAgent.from_tables({"model": {"use_posterior_features": True}})
+    report = run_generation(
+        agent, [ATTACKER, WEAK2], tmp_path / "gen_00", games=3, seed=0,
+        search_kwargs={"iters": 12, "n_queried": 2},
+        distill_kwargs={"epochs": 2, "batch_size": 8, "holdout_frac": 0.5},
+        refresh_kwargs={"games": 4, "holdout_games": 2, "epochs": 1,
+                        "engine_batch": 2, "minibatch_size": 64})
+    assert report["rows"] > 0
+    assert (tmp_path / "gen_00" / "agent.pt").exists()
+    assert (tmp_path / "gen_00" / "report.json").exists()
+    g = report["gates"]
+    assert isinstance(g["kl_improved_within_generation"], bool)
+    assert isinstance(g["refresh_belief_ce_not_worse"], bool)
+    assert "not_run" in g["strength_vs_fixed_gauntlet"], "unran gates are named, never faked"
