@@ -133,6 +133,22 @@ def _weighted_messages(src: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
 class PBValueNet(nn.Module):
     """Public-belief value network (§9). `forward` returns V[L, K, J] (see module docstring)."""
 
+    @classmethod
+    def from_tables(cls, tables=None, *, state_dim: int = 256, dyn_dim: int = 256,
+                    d: int = 128, n_rounds: int = 2) -> "PBValueNet":
+        """Real token-family cardinalities from the generated constants — use this (not the bare
+        constructor) for anything consuming real candidate token grids: the bare defaults are
+        test-scale and silently map real indices (e.g. species 912 > 320) to <UNK>. Tera is
+        TYPE_INDEX plus the truth-tokenizer's out-of-table fallback row (18)."""
+        from fog.constants.schema import MAX_SPREADS_PER_SPECIES, TYPE_INDEX
+
+        if tables is None:
+            from fog.constants.tables import TABLES as tables
+        sizes = {"species": tables.n_species, "item": tables.n_items,
+                 "ability": tables.n_abilities, "move": tables.n_moves,
+                 "spread": MAX_SPREADS_PER_SPECIES + 1, "tera": len(TYPE_INDEX) + 1}
+        return cls(state_dim=state_dim, dyn_dim=dyn_dim, d=d, n_rounds=n_rounds, sizes=sizes)
+
     def __init__(
         self,
         state_dim: int = 256,
