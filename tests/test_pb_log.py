@@ -262,3 +262,57 @@ def test_keep_mask_consumed_item_reveals_no_item_without_eliminating():
     revealed[0, 1] = 6                       # a real revealed item still eliminates
     np.testing.assert_array_equal(
         keep_mask_from_reveals(revealed, cand, no_item_token=no_item), [True, False])
+
+
+def test_selfplay_both_sides_solve_and_update(tmp_path):
+    """I.2: solver-vs-solver self-play — both sides' decisions are solved rows over shared pool
+    axes, outcomes are mirrored per role, and each side's observed action carries the acting
+    solve's likelihood (no scripted opponent anywhere in the game)."""
+    import torch
+
+    from fog.env.engine_battle import EngineBattle
+    from fog.models.agent import FogAgent
+    from fog.search.own_states import StablePoolOwnStates
+    from fog.search.pb_log import play_and_log_pb_selfplay_games
+
+    agent = FogAgent.from_tables({})
+    pool = [ATTACKER, WEAK2]
+    src = StablePoolOwnStates(pool)
+
+    def factory(game_id, seed):
+        return EngineBattle(ATTACKER, WEAK2, seed=seed, battle_tag=f"pbsp-{game_id}")
+
+    out = str(tmp_path / "selfplay.pt")
+    rows = play_and_log_pb_selfplay_games(
+        agent, factory, src, src.tokens, n_games=1, out_path=out, seed=3,
+        max_decisions=60, search_kwargs={"iters": 16, "n_queried": 2})
+
+    by_role = {"p1": [r for r in rows if r["role"] == "p1"],
+               "p2": [r for r in rows if r["role"] == "p2"]}
+    assert by_role["p1"] and by_role["p2"], "both sides log solved decisions (2x data)"
+    outcomes = {r: {row["outcome"] for row in by_role[r]} for r in by_role}
+    assert outcomes["p1"] == {1.0} and outcomes["p2"] == {-1.0}, \
+        "Hydreigon side wins; outcomes are mirrored per role"
+    for row in rows:
+        np.testing.assert_allclose(row["action_dist"].sum(), 1.0)
+        assert row["action_dist"][row["action"]] > 0
+        assert row["sims_run"] > 0
+        # shared axes: each side's true own index is its pool position; the opponent's true
+        # index on the row's kept axis resolves (nothing was truncated at this pool size)
+        assert row["true_index"] in (0, 1) and row["opp_true_index"] in (0, 1)
+        assert row["truncated"] is False
+        assert "action_label_col" in row
+
+    saved = torch.load(out, weights_only=False)
+    assert saved["meta"]["mode"] == "selfplay"
+
+
+def test_selfplay_requires_shared_axes():
+    from types import SimpleNamespace
+
+    from fog.search.pb_log import play_and_log_pb_selfplay_games
+
+    src = SimpleNamespace(tokens=np.zeros((2, 6, 9), dtype=np.int64))
+    with pytest.raises(ValueError, match="shared candidate space"):
+        play_and_log_pb_selfplay_games(
+            None, None, src, np.ones((2, 6, 9), dtype=np.int64))

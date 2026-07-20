@@ -50,6 +50,15 @@ exists: we log nothing and skip its behavioral likelihood (the honest §7.2 no-m
 documented F2.4 approximation until solver-vs-solver self-play supplies its sigma), applying only
 mechanical evidence.
 
+**Solver-vs-solver self-play (Phase I.2)**: `play_and_log_pb_selfplay_games` runs BOTH sides
+through `pb_search_action`, each with its own perspective and battle-lifetime table over the
+SAME shared pool axes. Each side's observed action updates the other's table with the averaged
+sigma1 of the solve that ACTUALLY chose it — invariant 19.6 becomes exact for both sides,
+including one-sided replacement choices (this closes the F2.4 approximation above: an opponent
+solo replacement now carries its true solved likelihood instead of being skipped). Both sides'
+rows are logged (2x data per game); compute doubles (two solves per simultaneous decision —
+budgeted from the G2 numbers).
+
 The runner requires an own_source with a STABLE candidate count across the battle (the table's
 axes are fixed identities, §7.4): the full-pool sources qualify, reveal-filtering subsets do not.
 """
@@ -348,5 +357,169 @@ def play_and_log_pb_games(
                     "meta": {"version": 2, "n_games": int(n_games), "role": role,
                              "seed": seed, "j_pool": len(opp_pool_tokens),
                              "opp_pool_tokens": opp_pool_tokens,
+                             "search_kwargs": dict(search_kwargs or {})}}, out_path)
+    return all_rows
+
+
+def play_and_log_pb_selfplay_games(
+    agent: Any,
+    battle_factory: Any,
+    own_source: Any,
+    pool_tokens: np.ndarray,
+    *,
+    n_games: int = 1,
+    out_path: str | None = None,
+    seed: int = 0,
+    max_decisions: int = 200,
+    search_kwargs: dict | None = None,
+    solve_cache: "OpeningSolveCache | None" = None,
+) -> list[dict]:
+    """Solver-vs-solver self-play (Phase I.2; module docstring): BOTH sides decide through
+    `pb_search_action` over the same shared `pool_tokens` axes, each with its own
+    battle-lifetime table, and each side's observed action updates the OTHER side's table with
+    the averaged sigma1 that actually chose it (invariant 19.6 exact for both sides — the
+    self-play consistency target, closing the F2.4 opponent-replacement skip).
+
+    `own_source` serves both roles and MUST index exactly `pool_tokens` (both teams come from
+    the pool). Rows carry the same schema as `play_and_log_pb_games` with `role` distinguishing
+    the deciding side (2x rows per game); outcome is per-row from that role's perspective."""
+    from fog.constants.schema import NO_ITEM
+    from fog.encoding.observation import Observation
+
+    rng = random.Random(seed)
+    pool_tokens = np.asarray(pool_tokens, dtype=np.int64)
+    if not np.array_equal(np.asarray(own_source.tokens, dtype=np.int64), pool_tokens):
+        raise ValueError("self-play needs ONE shared candidate space: own_source.tokens must "
+                         "be exactly pool_tokens (both tables' axes index the same pool)")
+    roles = ("p1", "p2")
+
+    all_rows: list[dict] = []
+    for game_id in range(int(n_games)):
+        battle = battle_factory(game_id, rng.randrange(2**31))
+        no_item = int(battle.tables.item_index(NO_ITEM))
+        own0 = {r: own_source.states(battle, r) for r in roles}
+        tables = {}
+        for r in roles:
+            o = "p2" if r == "p1" else "p1"
+            with np.errstate(divide="ignore"):
+                tables[r] = JointBeliefTable.from_margins(
+                    np.log(np.asarray(own0[r].weights, dtype=np.float64)),
+                    np.log(np.asarray(own0[o].weights, dtype=np.float64)))
+
+        def _mechanical(msg: str) -> None:
+            """One reveal mask per side's public state; each table gets (own, opp) views."""
+            rev = {}
+            for r in roles:
+                o = "p2" if r == "p1" else "p1"
+                view = Observation.from_battle(battle.view(o), tracker=battle.trackers[o])
+                rev[r] = keep_mask_from_reveals(view.opp_revealed["tokens"], pool_tokens,
+                                                no_item_token=no_item)
+                if not rev[r][own0[r].true_index]:
+                    raise RuntimeError(f"{msg}: {r}'s TRUE candidate was mechanically "
+                                       "eliminated by its own reveals — a reveal-census bug")
+            for r in roles:
+                o = "p2" if r == "p1" else "p1"
+                tables[r].mechanical_step(keep_own=rev[r], keep_opp=rev[o])
+
+        _mechanical("initial mechanical step")
+
+        game_rows: list[dict] = []
+        stepped = False
+        for _ in range(int(max_decisions)):
+            if battle.finished:
+                break
+            pending = set(battle.pending_sides())
+            results: dict[str, Any] = {}
+            labels: dict[str, str | None] = {}
+            moves: dict[str, str] = {}
+            for r in roles:
+                if r not in pending:
+                    continue
+                cache_key = None
+                result = None
+                if solve_cache is not None and not stepped:
+                    cache_key = OpeningSolveCache.make_key(
+                        battle, r, pool_tokens, pool_tokens,
+                        tables[r].normalized(), search_kwargs)
+                    result = solve_cache.get(cache_key, rng)
+                if result is None:
+                    result = pb_search_action(
+                        agent, battle, r, own_source=own_source,
+                        opp_tokens=pool_tokens, table=tables[r],
+                        rng=rng, **(search_kwargs or {}))
+                    if cache_key is not None and result.sims_run > 0:
+                        solve_cache.put(cache_key, result)
+                results[r] = result
+                labels[r] = public_label(battle, r, result.action)
+                moves[r] = battle.engine_action(r, result.action)
+
+            for r, result in results.items():
+                if result.sims_run == 0:
+                    continue
+                o = "p2" if r == "p1" else "p1"
+                true_opp = own0[o].true_index          # shared axes: opp truth = its own index
+                pos = np.flatnonzero(result.opp_kept == true_opp)
+                game_rows.append({
+                    "game_id": game_id, "turn": battle.turn, "role": r,
+                    "obs": Observation.from_battle(battle.view(r),
+                                                   tracker=battle.trackers[r]),
+                    "action": result.action, "action_dist": result.action_dist,
+                    "action_label_col": (result.labels1.index(labels[r])
+                                         if labels[r] in result.labels1 else -1),
+                    "labels1": result.labels1, "labels2": result.labels2,
+                    "sigma1": result.sigma1, "sigma2": result.sigma2, "rho": result.rho,
+                    "true_index": result.true_index,
+                    "opp_true_index": int(pos[0]) if len(pos) else -1,
+                    "own_tokens": result.own_tokens, "opp_tokens": result.opp_tokens,
+                    "own_kept": result.own_kept, "opp_kept": result.opp_kept,
+                    "dropped_own_mass": result.dropped_own_mass,
+                    "dropped_opp_mass": result.dropped_opp_mass,
+                    "j_used": result.j_used,
+                    "sims_run": result.sims_run, "iterations": result.iterations,
+                    "converged": result.converged,
+                    "pruned_mass_max": result.pruned_mass_max,
+                    "queried_beliefs": result.queried_beliefs,
+                    "sample_beliefs": result.sample_beliefs,
+                    "sample_iteration": result.sample_iteration,
+                    "outcome": None, "truncated": None,
+                })
+
+            battle.step(moves)
+            stepped = True
+
+            # ---- §14 step 11, both sides: each observed action's likelihood is the sigma1 of
+            # the solve that CHOSE it (19.6 exact for both players — the I.2 point) ----------
+            def _acted(r: str):
+                """(sigma, avail, col, kept) of r's own executed action, or Nones."""
+                result = results.get(r)
+                if result is None or result.sims_run == 0:
+                    return None, None, None, None       # trivial/absent: no behavioral content
+                col = (result.labels1.index(labels[r])
+                       if labels[r] in result.labels1 else None)
+                if col is None:
+                    return None, None, None, None
+                return result.sigma1, result.avail1, col, result.own_kept
+
+            for r in roles:
+                o = "p2" if r == "p1" else "p1"
+                s1, a1, c1, k1 = _acted(r)
+                s2, a2, c2, k2 = _acted(o)
+                tables[r].behavior_step(s1, a1, c1, s2, a2, c2, kept1=k1, kept2=k2)
+            _mechanical(f"turn {battle.turn}")
+
+        winner = battle.winner if battle.finished else None
+        for row in game_rows:
+            row["outcome"] = (0.0 if winner is None
+                              else 1.0 if winner == row["role"] else -1.0)
+            row["truncated"] = not battle.finished
+        all_rows.extend(game_rows)
+
+    if out_path is not None:
+        import torch
+
+        torch.save({"rows": all_rows,
+                    "meta": {"version": 2, "n_games": int(n_games), "mode": "selfplay",
+                             "seed": seed, "j_pool": len(pool_tokens),
+                             "opp_pool_tokens": pool_tokens,
                              "search_kwargs": dict(search_kwargs or {})}}, out_path)
     return all_rows
