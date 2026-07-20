@@ -1,9 +1,21 @@
-"""Search distillation — approach A, SEARCH_PLAN §7 (Phase 4).
+"""Search distillation — approach A, SEARCH_PLAN §7 (Phase 4); v2-log reader is
+PROPOSAL_IMPL_PLAN Phase I.1.
 
-Trains the policy toward the joint search's play and the value head toward outcomes under real
-posteriors, from a `fog.search.posterior_log` decision log (that module's row format IS the
-Phase-4 log format: root obs, the search's full 14-dim distribution, the executed action's
-posterior features, outcome, game id, turn).
+Trains the policy toward the search's play and the value head toward outcomes under real
+posteriors, from either decision-log format:
+
+  * **v1** (`fog.search.posterior_log`, the frozen one-sided baseline arm's log): root obs
+    flattened to columns, the search's full 14-dim distribution, the executed action's posterior
+    features, outcome, game id, turn. Loaded by `load_decisions`.
+  * **v2** (`fog.search.pb_log`, the two-sided claim-bearing arm's log): torch-saved row dicts
+    with raw Observations, `action_dist` (the solver's executed distribution — the distillation
+    target, §11 step 6), the joint rho and averaged sigmas on the solve's kept axes, outcome and
+    the `truncated` flag. Loaded by `load_v2_decisions`, which converts rows into the SAME
+    column contract v1 uses, so `distill()` itself is format-blind. v2 posterior features are
+    the four concentration features of the ACTION-CONDITIONED own posterior
+    P(k | a) ∝ (Σ_j rho[k, j]) · σ1[k, a] (the two-sided analogue of v1's executed-label
+    posterior; the opponent's simultaneous action marginalizes out because σ2 rows sum to 1);
+    rows from cap-truncated games are DROPPED (their outcome 0 is an artifact, not a draw).
 
 Two losses, two DIFFERENT head inputs — this asymmetry is the point:
 
@@ -47,6 +59,90 @@ import numpy as np
 
 TURN_BUCKETS = ((1, 5), (6, 10), (11, 20), (21, 10**9))
 SCOPES = ("heads", "full")
+
+
+# ------------------------------------------------------------------------------ v2 log reading
+def _own_posterior_features(post_own: np.ndarray, k_index: int) -> np.ndarray:
+    """Four concentration features of an own-side posterior: [normalized entropy, mass on the
+    true candidate, top-1 mass, effective-candidate fraction]. Documented duplicate of the
+    interim formula (fog/search/pb_values.py `_posterior_features`, itself a duplicate of the
+    frozen baseline's) — distill must not couple its lifetime to the §18 interim value layer."""
+    p = np.asarray(post_own, dtype=np.float64)
+    k = len(p)
+    nz = p[p > 0]
+    h = float(-(nz * np.log(nz)).sum()) if len(nz) else 0.0
+    h_norm = h / np.log(k) if k > 1 else 0.0
+    return np.array([h_norm, float(p[k_index]), float(p.max()) if k else 0.0,
+                     float(np.exp(h)) / k if k else 0.0], dtype=np.float32)
+
+
+def _v2_row_columns(row: dict) -> dict[str, np.ndarray]:
+    """One pb_log v2 row -> the v1 column contract (posterior_log._row's schema)."""
+    from fog.encoding.history import pad_or_truncate_front
+    from fog.search.posterior_log import MASK_PREFIX
+
+    obs = row["obs"]
+    rho = np.asarray(row["rho"], dtype=np.float64)
+    margin = rho.sum(axis=1)
+    col = int(row.get("action_label_col", -1))
+    if col >= 0:
+        post = margin * np.asarray(row["sigma1"], dtype=np.float64)[:, col]
+        z = post.sum()
+        post = post / z if z > 0 else margin
+    else:  # pre-action root margin (older logs without the executed-label column)
+        post = margin / margin.sum() if margin.sum() > 0 else margin
+    out = {
+        "entities": obs.entities.astype(np.float32),
+        "entity_ids": obs.entity_ids.astype(np.int64),
+        "field": obs.field.astype(np.float32),
+        "history": pad_or_truncate_front(obs.history).astype(np.float32),
+        "active_idx": (obs.active_idx if obs.active_idx is not None
+                       else np.array([0, 6], dtype=np.int64)),
+        "legality_mask": obs.legality_mask.astype(bool),
+        "opp_tokens": (obs.opp_revealed or {}).get(
+            "tokens", np.full((6, 9), -1, dtype=np.int64)).astype(np.int64),
+        "posterior_features": _own_posterior_features(post, int(row["true_index"])),
+        "search_dist": np.asarray(row["action_dist"], dtype=np.float32),
+        "action": np.int64(row["action"]),
+        "turn": np.int64(row["turn"]),
+        "outcome": np.float32(row["outcome"]),
+    }
+    for fam, m in ((obs.opp_revealed or {}).get("masks") or {}).items():
+        out[MASK_PREFIX + fam] = m.astype(bool)
+    return out
+
+
+def load_v2_decisions(path: str | Path) -> dict[str, np.ndarray]:
+    """pb_log v2 log(s) -> the same column dict `load_decisions` returns. Accepts one .pt file
+    or a directory of shards (pb_datagen layout: shard_*.pt, else every .pt in the directory).
+    Game ids are re-keyed globally across shards (shards restart game_id at 0), and rows from
+    cap-truncated games are dropped (their outcome 0 is an artifact — the module docstring)."""
+    import torch
+
+    p = Path(path)
+    files = ([p] if p.is_file()
+             else sorted(p.glob("shard_*.pt")) or sorted(p.glob("*.pt")))
+    if not files:
+        raise FileNotFoundError(f"no v2 log .pt files under {path}")
+    rows: list[dict[str, np.ndarray]] = []
+    games: list[tuple[int, int]] = []
+    dropped = 0
+    for si, f in enumerate(files):
+        for r in torch.load(f, weights_only=False)["rows"]:
+            if r.get("truncated"):
+                dropped += 1
+                continue
+            rows.append(_v2_row_columns(r))
+            games.append((si, int(r["game_id"])))
+    if not rows:
+        raise RuntimeError(f"no usable v2 rows under {path} (dropped {dropped} truncated)")
+    key_ids = {g: i for i, g in enumerate(dict.fromkeys(games))}
+    data = {k: np.stack([r[k] for r in rows]) for k in sorted(rows[0])}
+    data["game"] = np.asarray([key_ids[g] for g in games], dtype=np.int64)
+    if dropped:
+        print(f"[distill] dropped {dropped} rows from cap-truncated games "
+              f"(outcome 0 is an artifact there)", flush=True)
+    return data
 
 
 def kl_search_policy(search_dist, log_probs):
@@ -212,9 +308,10 @@ def main() -> None:
     from fog.models.agent import FogAgent
     from fog.search.posterior_log import load_decisions
 
-    ap = argparse.ArgumentParser(description="Search distillation (SEARCH_PLAN §7).")
+    ap = argparse.ArgumentParser(description="Search distillation (SEARCH_PLAN §7 / I.1).")
     ap.add_argument("--data", type=Path, required=True,
-                    help="posterior_log output dir (or decisions.npz)")
+                    help="v1: posterior_log dir (or decisions.npz); v2: a pb_log/pb_datagen "
+                         ".pt file or shard directory (auto-detected)")
     ap.add_argument("--ckpt", type=str, default=None,
                     help="agent checkpoint (the §4.2 fine-tuned one is the natural input; "
                          "blind ones are expanded); default: fresh (smoke only)")
@@ -242,8 +339,15 @@ def main() -> None:
         print("[distill] WARNING: no --ckpt — distilling into a FRESH agent (smoke use only).",
               flush=True)
 
+    p = Path(args.data)
+    is_v2 = (p.suffix == ".pt"
+             or (p.is_dir() and not (p / "decisions.npz").exists()
+                 and (any(p.glob("shard_*.pt")) or any(p.glob("*.pt")))))
+    data = load_v2_decisions(p) if is_v2 else load_decisions(p)
+    print(f"[distill] loaded {'v2 (pb_log)' if is_v2 else 'v1 (posterior_log)'} format: "
+          f"{data['outcome'].shape[0]} rows", flush=True)
     report = distill(
-        agent, load_decisions(args.data), scope=args.scope, holdout_frac=args.holdout,
+        agent, data, scope=args.scope, holdout_frac=args.holdout,
         epochs=args.epochs, lr=args.lr, batch_size=args.batch_size,
         value_coef=args.value_coef, seed=args.seed,
     )

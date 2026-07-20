@@ -294,6 +294,10 @@ def play_and_log_pb_games(
                     "obs": Observation.from_battle(battle.view(role),
                                                    tracker=battle.trackers[role]),
                     "action": result.action, "action_dist": result.action_dist,
+                    # the executed action's column in labels1 — lets the distill-v2 loader
+                    # compute the action-conditioned own posterior P(k | a) exactly (I.1)
+                    "action_label_col": (result.labels1.index(my_label)
+                                         if my_label in result.labels1 else -1),
                     "labels1": result.labels1, "labels2": result.labels2,
                     "sigma1": result.sigma1, "sigma2": result.sigma2, "rho": result.rho,
                     "true_index": result.true_index, "opp_true_index": row_j,

@@ -15,5 +15,11 @@ experiment: g0_v2_champion
 env:
   backend: engine
   engine_batch: 64
+ppo:
+  # m1_poc's 1024 OOM'd the 8 GB GTX 1080 in the FIRST 8k-decision update under V2 (the belief
+  # chain's cross-attention is heavier than the old arch m15 trained at 1024;
+  # PYTORCH_CUDA_ALLOC_CONF=expandable_segments is unsupported on this Windows torch build).
+  # Halving the minibatch halves the update's activation peak; pure memory knob, same math.
+  minibatch_size: 512
 log:
   dir: runs/g0_v2_champion
