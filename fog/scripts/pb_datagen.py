@@ -39,7 +39,11 @@ def _run_shard(cfg: dict) -> dict:
     from fog.env.teams import load_pool
     from fog.models.agent import FogAgent
     from fog.search.own_states import StablePoolOwnStates
-    from fog.search.pb_log import OpeningSolveCache, play_and_log_pb_games
+    from fog.search.pb_log import (
+        OpeningSolveCache,
+        play_and_log_pb_games,
+        play_and_log_pb_selfplay_games,
+    )
 
     pastes = load_pool(cfg["pool"])
     n = len(pastes)
@@ -58,12 +62,22 @@ def _run_shard(cfg: dict) -> dict:
         agent.load_state_dict(torch.load(cfg["checkpoint"], map_location="cpu"))
     cache = OpeningSolveCache()
     t0 = time.perf_counter()
-    rows = play_and_log_pb_games(
-        agent, factory, own_source, opp_pool_tokens,
-        n_games=games, seed=cfg["seed"], max_decisions=cfg["max_decisions"],
-        search_kwargs=cfg["search_kwargs"], solve_cache=cache,
-        out_path=cfg["out_path"],
-    )
+    if cfg["selfplay"]:
+        # Phase I.2: both sides solve (2x rows/game, 19.6 exact for both sides) — the
+        # generation-loop distribution the PBValueNet actually serves.
+        rows = play_and_log_pb_selfplay_games(
+            agent, factory, own_source, opp_pool_tokens,
+            n_games=games, seed=cfg["seed"], max_decisions=cfg["max_decisions"],
+            search_kwargs=cfg["search_kwargs"], solve_cache=cache,
+            out_path=cfg["out_path"],
+        )
+    else:
+        rows = play_and_log_pb_games(
+            agent, factory, own_source, opp_pool_tokens,
+            n_games=games, seed=cfg["seed"], max_decisions=cfg["max_decisions"],
+            search_kwargs=cfg["search_kwargs"], solve_cache=cache,
+            out_path=cfg["out_path"],
+        )
     wall = time.perf_counter() - t0
     n_truncated_games = len({r["game_id"] for r in rows if r["truncated"]})
     return {
@@ -92,6 +106,8 @@ def main() -> None:
     ap.add_argument("--n-queried", type=int, default=8)
     ap.add_argument("--checkpoint", default=None,
                     help="agent weights (default: random weights — the blind G0-recipe path)")
+    ap.add_argument("--selfplay", action="store_true",
+                    help="solver-vs-solver self-play (Phase I.2): both sides solve, 2x rows")
     ap.add_argument("--torch-threads", type=int, default=None,
                     help="torch threads per worker (default: 20 // workers)")
     args = ap.parse_args()
@@ -112,7 +128,7 @@ def main() -> None:
         "shard": w, "games": per[w], "game_offset": offsets[w],
         "pool": args.pool, "seed": args.seed * 100_003 + w,
         "max_decisions": args.max_decisions, "search_kwargs": search_kwargs,
-        "checkpoint": args.checkpoint,
+        "checkpoint": args.checkpoint, "selfplay": args.selfplay,
         "torch_threads": args.torch_threads or max(1, (os.cpu_count() or 4) // args.workers),
         "out_path": str(out_dir / f"shard_{w:02d}.pt"),
     } for w in range(args.workers) if per[w] > 0]
@@ -140,6 +156,7 @@ def main() -> None:
         "opening_cache_hits": hits, "opening_cache_misses": misses,
         "truncated_games": truncated,
         "workers": len(shard_cfgs), "search_kwargs": search_kwargs,
+        "selfplay": args.selfplay, "checkpoint": args.checkpoint,
         "per_shard": stats,
     }
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))

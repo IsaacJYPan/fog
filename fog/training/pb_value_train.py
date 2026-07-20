@@ -197,9 +197,10 @@ def main() -> None:
         agent.load_state_dict(torch.load(args.ckpt, map_location=device))
     else:
         print("[pb_value_train] WARNING: no --ckpt — random trunk (smoke use only).", flush=True)
-    model_cfg = cfg.get("model", {})
-    net = PBValueNet.from_tables(state_dim=int(model_cfg.get("state_dim", 256)),
-                                 dyn_dim=int(model_cfg.get("dyn_dim", 256)))
+    # Dims come from the constructed agent, not config keys: the trunk's actual output widths
+    # are what PBValueNet consumes (a config-side mismatch would crash at the first forward).
+    net = PBValueNet.from_tables(state_dim=int(agent.backbone.state_dim),
+                                 dyn_dim=int(agent.backbone.dyn_dim))
 
     rows = build_pb_value_rows(args.data)
     report = train_pb_value(agent, net, rows, epochs=args.epochs, lr=args.lr,
