@@ -168,3 +168,97 @@ def test_learner_faint_logs_one_sided_replacement_rows(tmp_path):
         np.testing.assert_allclose(r["action_dist"].sum(), 1.0)
         assert r["action_dist"][r["action"]] > 0, "sampled from the solved replacement support"
         assert r["outcome"] in (-1.0, 0.0, 1.0)
+
+
+def test_keep_mask_unspecified_candidate_attribute_cannot_be_contradicted():
+    """G2 fix: a candidate sheet's -1 (paste-unspecified attribute — tera type in practice)
+    matches ANY revealed value; a specified mismatching value still eliminates."""
+    from fog.search.pb_log import keep_mask_from_reveals
+
+    cand = np.zeros((2, 6, 9), dtype=np.int64)
+    cand[0, 0, 8] = -1                      # candidate 0: no Tera Type line in the paste
+    cand[1, 0, 8] = 5                       # candidate 1: tera type 5
+    revealed = np.full((6, 9), -1, dtype=np.int64)
+    revealed[0, 8] = 3                      # we terastallized: engine default type 3 goes public
+    np.testing.assert_array_equal(keep_mask_from_reveals(revealed, cand), [True, False])
+
+
+def test_stable_pool_own_states_fixed_axes():
+    """G2: the persistent table needs a battle-lifetime-stable own axis; the stable source
+    returns the WHOLE pool every turn (no reveal filtering) with the true index located."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.search.own_states import StablePoolOwnStates
+
+    src = StablePoolOwnStates([ATTACKER, WEAK2])
+    b = EngineBattle(ATTACKER, WEAK2, seed=0, battle_tag="stable-own")
+    s = src.states(b, "p1")
+    assert s.k == 2 and s.true_index == 0
+    np.testing.assert_allclose(s.weights, [0.5, 0.5])
+    s2 = src.states(b, "p2")
+    assert s2.true_index == 1
+
+    off_pool = EngineBattle(ATTACKER, WEAK2, seed=0, battle_tag="stable-own-off")
+    with pytest.raises(RuntimeError, match="not in this pool"):
+        StablePoolOwnStates([WEAK2]).states(off_pool, "p1")
+
+
+def test_opening_solve_cache_reuses_the_matchup_solve(tmp_path):
+    """L1: the second game of the same matchup reuses the stored opening solve exactly (one
+    cache hit), the game still completes, and rows stay schema-valid."""
+    from types import SimpleNamespace
+
+    from fog.env.engine_battle import EngineBattle
+    from fog.models.agent import FogAgent
+    from fog.search.pb_log import OpeningSolveCache, play_and_log_pb_games
+
+    class StubOwn:
+        def states(self, battle, role):
+            t = battle.truth_tokens(role)
+            return SimpleNamespace(tokens=np.stack([t, t]),
+                                   weights=np.array([0.5, 0.5]), true_index=0, k=2)
+
+    agent = FogAgent.from_tables({})
+    proto = EngineBattle(ATTACKER, WEAK2, seed=0, battle_tag="pblog-cache-proto")
+    opp_pool = np.stack([proto.truth_tokens("p2")])
+
+    def factory(game_id, seed):
+        return EngineBattle(ATTACKER, WEAK2, seed=seed, battle_tag=f"pblog-cache-{game_id}")
+
+    cache = OpeningSolveCache()
+    rows = play_and_log_pb_games(
+        agent, factory, StubOwn(), opp_pool, n_games=2, seed=5,
+        max_decisions=20, search_kwargs={"iters": 16, "n_queried": 2},
+        solve_cache=cache)
+    assert cache.hits >= 1, "game 2's opening is the same matchup — it must hit"
+    assert cache.misses >= 1
+    games = {r["game_id"] for r in rows}
+    assert games == {0, 1}
+    for row in rows:
+        np.testing.assert_allclose(row["action_dist"].sum(), 1.0)
+        assert row["action_dist"][row["action"]] > 0
+        assert row["truncated"] is False
+        assert row["outcome"] in (-1.0, 0.0, 1.0)
+        # G2 kept maps ride on every row (no truncation configured -> identity maps)
+        np.testing.assert_array_equal(row["own_kept"], np.arange(row["rho"].shape[0]))
+        np.testing.assert_array_equal(row["opp_kept"], np.arange(row["rho"].shape[1]))
+        assert row["dropped_own_mass"] == pytest.approx(0.0)
+        assert row["dropped_opp_mass"] == pytest.approx(0.0)
+
+
+def test_keep_mask_consumed_item_reveals_no_item_without_eliminating():
+    """G2 fix (found by the scale smoke): the census records item STATE, so a consumed / popped /
+    knocked-off item reveals as <NO_ITEM> — which must not eliminate a candidate whose sheet has
+    an item (Air Balloon in POOL-A). A revealed REAL item still eliminates mismatched sheets."""
+    from fog.search.pb_log import keep_mask_from_reveals
+
+    no_item = 250
+    cand = np.zeros((2, 6, 9), dtype=np.int64)
+    cand[0, 0, 1] = 6                        # sheet: Air Balloon
+    cand[1, 0, 1] = 33                       # sheet: Choice Specs
+    revealed = np.full((6, 9), -1, dtype=np.int64)
+    revealed[0, 1] = no_item                 # balloon popped: current item is <NO_ITEM>
+    np.testing.assert_array_equal(
+        keep_mask_from_reveals(revealed, cand, no_item_token=no_item), [True, True])
+    revealed[0, 1] = 6                       # a real revealed item still eliminates
+    np.testing.assert_array_equal(
+        keep_mask_from_reveals(revealed, cand, no_item_token=no_item), [True, False])

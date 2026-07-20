@@ -113,3 +113,51 @@ def test_prior_construction():
                                np.outer([0.75, 0.25], [0.5, 0.5]))
     with pytest.raises(ValueError, match="support"):
         JointBeliefTable(np.full((2, 2), -np.inf))
+
+
+def test_truncated_solve_kept_maps_floor_the_unmodeled(  # Phase G2
+):
+    """G2 truncation: candidates OUTSIDE the solve's kept subset take the plain floor
+    likelihood — shrunk relative to modeled candidates that liked the action, never zeroed,
+    and never label-eliminated (their labels were never enumerated)."""
+    t = _uniform(3, 3)
+    # own solve ran over kept1 = [0, 2]; candidate 1 was truncated out
+    sigma1 = np.array([[0.9, 0.1], [0.3, 0.7]])          # rows: kept candidates 0 and 2
+    avail1 = np.ones((2, 2), dtype=bool)
+    assert t.behavior_step(sigma1, avail1, 0, None, None, None,
+                           floor=0.02, kept1=np.array([0, 2]))
+    p_own, _ = t.margins()
+    # modeled: floored 0.9 -> 0.02-floored value; unmodeled candidate 1: exactly the 0.02 floor
+    from fog.search.two_sided import floored_strategy
+
+    like_kept = floored_strategy(sigma1, avail1, 0.02)[:, 0]
+    want = np.array([like_kept[0], 0.02, like_kept[1]])
+    np.testing.assert_allclose(p_own, want / want.sum())
+    assert p_own[1] > 0, "truncated-out is unmodeled, not impossible"
+
+
+def test_truncated_solve_kept_label_elimination_stays_exact():
+    """A KEPT candidate whose label space lacks the observed action is still exactly zeroed
+    (mechanical elimination survives truncation); the truncated-out candidate is not."""
+    t = _uniform(3, 1)
+    sigma1 = np.array([[0.5, 0.5], [0.0, 1.0]])
+    avail1 = np.array([[True, True], [False, True]])     # kept candidate 2 lacks label 0
+    assert t.behavior_step(sigma1, avail1, 0, None, None, None,
+                           floor=0.02, kept1=np.array([0, 2]))
+    p_own, _ = t.margins()
+    assert p_own[2] == 0.0, "kept candidate without the label is eliminated"
+    assert p_own[1] > 0.0, "truncated-out candidate takes the floor instead"
+
+
+def test_truncated_solve_kept2_side():
+    t = _uniform(2, 3)
+    sigma2 = np.array([[0.8, 0.2]])
+    avail2 = np.ones((1, 2), dtype=bool)
+    assert t.behavior_step(None, None, None, sigma2, avail2, 1,
+                           floor=0.05, kept2=np.array([1]))
+    _, p_opp = t.margins()
+    from fog.search.two_sided import floored_strategy
+
+    like_kept = floored_strategy(sigma2, avail2, 0.05)[0, 1]
+    want = np.array([0.05, like_kept, 0.05])
+    np.testing.assert_allclose(p_opp, want / want.sum())

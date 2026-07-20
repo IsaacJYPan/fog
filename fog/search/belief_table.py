@@ -81,19 +81,37 @@ class JointBeliefTable:
         sigma2: Array | None, avail2: Array | None, observed_col2: int | None,
         *,
         floor: float = 0.02,
+        kept1: Array | None = None,
+        kept2: Array | None = None,
     ) -> bool:
         """Multiply in both sides' floored action likelihoods for one observed public pair.
         Each side is (strategy [N, cols], availability [N, cols], observed label column), or all
         None for a side with no behavioral content this step (forced single-choice actions).
-        Returns False (and leaves the table unchanged) if the step would kill every cell."""
+        Returns False (and leaves the table unchanged) if the step would kill every cell.
+
+        `kept1` / `kept2` (Phase G2 posterior-mass truncation): when a side's solve ran over a
+        SUBSET of this table's candidates, pass the kept candidates' full-axis indices; that
+        side's sigma/avail rows then correspond to the kept subset in order. Candidates OUTSIDE
+        the subset were not modeled this turn, and unmodeled is not impossible (§7.2): they take
+        the plain `floor` likelihood — shrunk relative to modeled candidates that liked the
+        action, never zeroed, and label-based elimination applies only to modeled candidates
+        (we never enumerated a truncated-out candidate's labels)."""
         with np.errstate(divide="ignore"):        # log(0) -> -inf is the intended elimination
             delta = np.zeros_like(self.log_rho)
             if observed_col1 is not None:
-                like1 = floored_strategy(sigma1, avail1, floor)[:, observed_col1]
-                delta = delta + np.log(like1)[:, None]
+                like = floored_strategy(sigma1, avail1, floor)[:, observed_col1]
+                if kept1 is not None:
+                    full = np.full(self.log_rho.shape[0], float(floor))
+                    full[np.asarray(kept1, dtype=np.int64)] = like
+                    like = full
+                delta = delta + np.log(like)[:, None]
             if observed_col2 is not None:
-                like2 = floored_strategy(sigma2, avail2, floor)[:, observed_col2]
-                delta = delta + np.log(like2)[None, :]
+                like = floored_strategy(sigma2, avail2, floor)[:, observed_col2]
+                if kept2 is not None:
+                    full = np.full(self.log_rho.shape[1], float(floor))
+                    full[np.asarray(kept2, dtype=np.int64)] = like
+                    like = full
+                delta = delta + np.log(like)[None, :]
         ok = self._apply(delta)
         self.behavior_steps += 1
         return ok

@@ -237,3 +237,60 @@ def test_adaptive_sampled_mode_terminates_and_grows(agent):
     assert calls[0] == 1
     assert r.j_used in (1, 2)
     assert len(calls) <= 2, "identical duplicate worlds must stabilize immediately"
+
+
+def test_persistent_truncation_zero_mass_always_dropped(agent):
+    """G2: zero-mass opponent candidates are dropped from the solve even without top_k/top_j —
+    exact (their strategies carry no weight) and load-bearing for fork validity."""
+    from fog.search.belief_table import JointBeliefTable
+    from fog.search.pb_search import pb_search_action
+
+    b = _battle()
+    truth = b.truth_tokens("p2")
+    opp = np.stack([truth, truth, truth])
+    log_prior = np.log(np.array([[0.45, 0.3, 0.0], [0.15, 0.1, 0.0]]))
+    with np.errstate(divide="ignore"):
+        table = JointBeliefTable(log_prior)
+    r = pb_search_action(agent, b, "p1", own_source=_StubOwnStates(2), opp_tokens=opp,
+                         table=table, seed=3, iters=24)
+    np.testing.assert_array_equal(r.opp_kept, [0, 1])
+    assert r.j_used == 2 and r.sigma2.shape[0] == 2
+    assert r.dropped_opp_mass == pytest.approx(0.0), "zero mass dropped is zero mass lost"
+    np.testing.assert_allclose(r.rho.sum(), 1.0)
+
+
+def test_persistent_truncation_top_j_and_forced_true_own(agent):
+    """G2 top-J/top-K: the solve keeps the heaviest candidates by table margin mass, renormalizes,
+    and reports dropped mass; the TRUE own candidate is always kept even when it is the lightest
+    (we must sample its row — presence is forced, weight is not inflated)."""
+    from fog.search.belief_table import JointBeliefTable
+    from fog.search.pb_search import pb_search_action
+
+    b = _battle()
+    truth = b.truth_tokens("p2")
+    opp = np.stack([truth, truth, truth])
+    # own margins [0.25, 0.75] (true index 0 is the LIGHTEST); opp margins [0.5, 0.3, 0.2]
+    table = JointBeliefTable(np.log(np.outer([0.25, 0.75], [0.5, 0.3, 0.2])))
+    r = pb_search_action(agent, b, "p1", own_source=_StubOwnStates(2), opp_tokens=opp,
+                         table=table, seed=3, iters=24, top_k=1, top_j=2)
+    np.testing.assert_array_equal(r.own_kept, [0]), "truth forced in over the heavier row"
+    np.testing.assert_array_equal(r.opp_kept, [0, 1])
+    assert r.true_index == 0 and r.sigma1.shape[0] == 1
+    assert r.dropped_own_mass == pytest.approx(0.75)
+    assert r.dropped_opp_mass == pytest.approx(0.2)
+    assert r.rho.shape == (1, 2)
+    np.testing.assert_allclose(r.rho.sum(), 1.0)
+    np.testing.assert_allclose(r.rho[0], [0.5 / 0.8, 0.3 / 0.8])
+    assert r.own_tokens.shape == (1, 6, 9) and r.opp_tokens.shape == (2, 6, 9)
+    mask = b.action_mask("p1")
+    assert mask[r.action]
+
+
+def test_truncation_is_persistent_mode_only(agent):
+    from fog.search.pb_search import pb_search_action
+
+    b = _battle()
+    with pytest.raises(ValueError, match="persistent-mode"):
+        pb_search_action(agent, b, "p1", own_source=_StubOwnStates(1),
+                         opp_source=lambda bb, r, j, *, seed: (None, None),
+                         top_j=4, iters=8)

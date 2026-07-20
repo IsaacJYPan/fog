@@ -100,6 +100,41 @@ class EnumeratedPoolStates:
         return OwnStates(tokens=tokens, weights=weights, true_index=true_pos)
 
 
+class StablePoolOwnStates:
+    """Full-pool own-state source with STABLE candidate identities (PROPOSAL_IMPL_PLAN Phase G2).
+
+    The persistent `JointBeliefTable`'s axes are fixed for the battle's lifetime (§7.4), so the
+    runner cannot use `EnumeratedPoolStates` (its reveal filtering changes K turn to turn).
+    This source always returns the WHOLE pool in pool order with the prior weights; reveal
+    filtering is the belief table's job (the runner's own-side mechanical step), and dropping
+    zero-mass candidates before forking is the search's job (pb_search truncation — forking a
+    reveal-inconsistent own world would silently build an incoherent state, since the fork
+    matches world rows to engine mons by species with a next-unused-row fallback)."""
+
+    def __init__(self, pool_pastes: list[str], tables=None, prior: np.ndarray | None = None):
+        from fog.env.team_truth import PoolTruth
+
+        if tables is None:
+            from fog.constants.tables import TABLES as tables
+        self.tables = tables
+        self.pool = PoolTruth(pool_pastes, tables)
+        n = len(pool_pastes)
+        self.tokens = np.stack([self.pool.truth_tokens(i) for i in range(n)])
+        self.prior = np.full(n, 1.0 / n) if prior is None else np.asarray(prior, dtype=np.float64)
+        if len(self.prior) != n or not np.isclose(self.prior.sum(), 1.0):
+            raise ValueError("prior must be a distribution over the pool")
+
+    def states(self, battle, role: str) -> OwnStates:
+        truth = battle.truth_tokens(role)
+        true_pos = next(
+            (i for i in range(len(self.tokens)) if np.array_equal(self.tokens[i], truth)), None)
+        if true_pos is None:
+            raise RuntimeError("the searcher's true team is not in this pool — a stable-pool "
+                               "source only makes sense when the axes contain the truth")
+        return OwnStates(tokens=self.tokens.copy(), weights=self.prior.copy(),
+                         true_index=true_pos)
+
+
 class SampledOwnStates:
     """Learned-sampler own-state source: SelfBeliefPredictor ancestral samples on the opponent's
     observation. `k` is the returned state count; `oversample` extra draws sharpen the empirical

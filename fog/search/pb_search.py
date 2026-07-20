@@ -70,6 +70,16 @@ class PBSearchResult:
     # 1-indexed iteration the snapshot came from (-1 on trivial decisions).
     sample_beliefs: list = field(default_factory=list)    # (label1, label2, rho_after [K, J])
     sample_iteration: int = -1
+    # Phase G2 posterior-mass truncation (persistent mode): which FULL-axis candidates the solve
+    # actually ran over. sigma/rho/tokens/true_index above all live on the KEPT axes; `own_kept` /
+    # `opp_kept` map them back to the passed candidate sets (and the belief table's axes — the
+    # runner passes them to behavior_step so truncated-out candidates take the floor likelihood).
+    # Dropped mass is the root-belief probability the solve did not model, logged per side
+    # (§13.1/§13.2 applied to the persistent path). Without truncation kept = arange, dropped = 0.
+    own_kept: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.int64))
+    opp_kept: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.int64))
+    dropped_own_mass: float = 0.0
+    dropped_opp_mass: float = 0.0
     # The candidate identities rho / sigma / true_index index (proposal §10 shared particles). The
     # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
     own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
@@ -110,6 +120,33 @@ def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: 
             counts.append(1)
     weights = np.asarray(counts, dtype=np.float64)
     return np.stack(tokens), np.log(weights / weights.sum())
+
+
+def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int | None,
+                   ) -> tuple[np.ndarray, np.ndarray]:
+    """Posterior-mass truncation for the persistent path (Phase G2, §13.1/§13.2 amendment A3).
+
+    Zero-mass candidates are ALWAYS dropped — exact, not an approximation (a zero-probability
+    type's strategy carries no weight in any update), and load-bearing for fork validity: a
+    candidate contradicted by reveals cannot be forked coherently. `top_k`/`top_j` then cap the
+    kept sets by current margin mass; the true own candidate is always kept (we must sample its
+    row — forcing its presence does not reweight it, the §19.5 distinction). Returns ascending
+    full-axis index arrays (own_kept, opp_kept)."""
+    row_mass = rho.sum(axis=1)
+    col_mass = rho.sum(axis=0)
+    if row_mass[true_k] <= 0.0:
+        raise RuntimeError("the true own candidate has zero belief mass — upstream evidence bug "
+                           "(the true state must never be eliminated by its own reveals)")
+    own_alive = np.flatnonzero(row_mass > 0.0)
+    opp_alive = np.flatnonzero(col_mass > 0.0)
+    if top_k is not None and len(own_alive) > int(top_k):
+        order = own_alive[np.argsort(row_mass[own_alive])[::-1]][: int(top_k)]
+        if true_k not in order:
+            order[-1] = true_k                      # replace the lightest kept with the truth
+        own_alive = np.sort(order)
+    if top_j is not None and len(opp_alive) > int(top_j):
+        opp_alive = np.sort(opp_alive[np.argsort(col_mass[opp_alive])[::-1]][: int(top_j)])
+    return own_alive.astype(np.int64), opp_alive.astype(np.int64)
 
 
 def _real_action_dist(row: np.ndarray, local_actions: np.ndarray, mask: np.ndarray) -> np.ndarray:
@@ -157,9 +194,18 @@ def pb_search_action(
     j_max: int = 40,
     j_tol: float = 0.05,
     n_queried: int = 8,
+    top_k: int | None = None,
+    top_j: int | None = None,
 ) -> PBSearchResult:
     """One real decision under the two-sided solver. See the module docstring for the two
-    candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`."""
+    candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
+
+    `top_k` / `top_j` (Phase G2, persistent mode only): posterior-mass truncation — solve over
+    the top candidates by current rho margin mass (the true own candidate always kept),
+    renormalized; dropped mass is reported and truncated-out candidates keep their FULL-axis
+    table entries (the runner floors their behavior likelihood via the result's kept maps).
+    Zero-mass candidates are always dropped in persistent mode regardless (exact — and required
+    before forking, see _truncate_axes)."""
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
@@ -192,8 +238,8 @@ def pb_search_action(
     with torch.no_grad():
         root_value = float(agent(_stack_obs([root_obs], _device(agent))).value[0])
 
-    def _solve(opp_toks: np.ndarray, rho: np.ndarray):
-        grid = build_pb_grid(battle, role, own.tokens, opp_toks,
+    def _solve(own_toks: np.ndarray, opp_toks: np.ndarray, rho: np.ndarray):
+        grid = build_pb_grid(battle, role, own_toks, opp_toks,
                              seed=rng.randrange(2**31), min_prob=min_prob,
                              max_branches=max_branches)
         values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
@@ -206,15 +252,27 @@ def pb_search_action(
     if opp_tokens is not None:                                  # ---- persistent mode ----
         opp_tokens = np.asarray(opp_tokens, dtype=np.int64)
         if table is not None:
-            rho = table.normalized()
-            if rho.shape != (len(own.tokens), len(opp_tokens)):
-                raise ValueError(f"table shape {rho.shape} does not index the candidate sets "
-                                 f"({len(own.tokens)}, {len(opp_tokens)})")
+            rho_full = table.normalized()
+            if rho_full.shape != (len(own.tokens), len(opp_tokens)):
+                raise ValueError(f"table shape {rho_full.shape} does not index the candidate "
+                                 f"sets ({len(own.tokens)}, {len(opp_tokens)})")
         else:
-            rho = np.outer(own_w, np.full(len(opp_tokens), 1.0 / len(opp_tokens)))
-        grid, vstats, sol = _solve(opp_tokens, rho)
+            rho_full = np.outer(own_w, np.full(len(opp_tokens), 1.0 / len(opp_tokens)))
+        own_kept, opp_kept = _truncate_axes(rho_full, kt, top_k, top_j)
+        dropped_own = float(1.0 - rho_full[own_kept, :].sum())
+        dropped_opp = float(1.0 - rho_full[:, opp_kept].sum())
+        rho = rho_full[np.ix_(own_kept, opp_kept)]
+        rho = rho / rho.sum()
+        own_toks_used = own.tokens[own_kept]
+        opp_toks_used = opp_tokens[opp_kept]
+        kt = int(np.flatnonzero(own_kept == own.true_index)[0])
+        grid, vstats, sol = _solve(own_toks_used, opp_toks_used, rho)
         sims_total += grid.sims_run
     else:                                                       # ---- adaptive sampled mode ----
+        if top_k is not None or top_j is not None:
+            raise ValueError("posterior-mass truncation (top_k/top_j) is a persistent-mode "
+                             "budget feature; adaptive mode already sizes J by the §13.1 "
+                             "stability rule")
         if opp_source is None:
             def _default_opp_source(b, r, j, *, seed):
                 return sample_opponent_worlds(agent, b, r, j, seed=seed)
@@ -225,7 +283,7 @@ def pb_search_action(
             toks, logw = opp_source(battle, role, j_req, seed=rng.randrange(2**31))
             rho = np.outer(own_w, np.exp(logw))
             rho = rho / rho.sum()
-            grid, vstats, sol = _solve(toks, rho)
+            grid, vstats, sol = _solve(own.tokens, toks, rho)
             sims_total += grid.sims_run
             row = _real_action_dist(sol.sigma1[kt], grid.local_action1[kt], mask)
             stable = (prev_row is not None
@@ -235,6 +293,10 @@ def pb_search_action(
                 break
             prev_row, last_count = row, len(toks)
             j_req = min(j_req * 2, j_max)
+        own_kept = np.arange(len(own.tokens), dtype=np.int64)
+        opp_kept = np.arange(len(toks), dtype=np.int64)
+        dropped_own = dropped_opp = 0.0
+        own_toks_used, opp_toks_used = own.tokens, toks
 
     action_dist = _real_action_dist(sol.sigma1[kt], grid.local_action1[kt], mask)
     action = int(rng.choices(range(N_ACTIONS), weights=action_dist)[0])
@@ -265,8 +327,11 @@ def pb_search_action(
         failed_cells=vstats.failed_cells, pruned_mass_max=float(grid.pruned_mass.max()),
         queried_beliefs=queried,
         sample_beliefs=sampled, sample_iteration=sol.sample_iteration,
-        # candidate identities behind rho's axes: persistent mode used `opp_tokens`, adaptive mode
-        # the last-sampled `toks`. own.tokens is the K own candidates the true_index kt indexes.
-        own_tokens=np.asarray(own.tokens, dtype=np.int64),
-        opp_tokens=np.asarray(opp_tokens if opp_tokens is not None else toks, dtype=np.int64),
+        # candidate identities behind rho's axes: the KEPT sets the solve actually ran over
+        # (own_kept/opp_kept map them back to the caller's full axes); true_index indexes the
+        # kept own set.
+        own_tokens=np.asarray(own_toks_used, dtype=np.int64),
+        opp_tokens=np.asarray(opp_toks_used, dtype=np.int64),
+        own_kept=own_kept, opp_kept=opp_kept,
+        dropped_own_mass=dropped_own, dropped_opp_mass=dropped_opp,
     )
