@@ -318,3 +318,21 @@ def test_policy_init_warm_start(agent):
     assert b.action_mask("p1")[r.action]
     np.testing.assert_allclose(r.sigma1.sum(axis=1), 1.0)
     np.testing.assert_allclose(r.sigma2.sum(axis=1), 1.0)
+
+
+def test_value_net_switch_drives_the_solve(agent):
+    """G5 plumbing: value_net=PBValueNet routes leaf values through the per-pair-table bridge
+    (pb_value_fn) instead of the interim head; the decision stays valid. The interim head stays
+    the default baseline arm (value_net=None)."""
+    from fog.models.pb_value import PBValueNet
+    from fog.search.pb_search import pb_search_action
+
+    b = _battle()
+    opp = np.stack([b.truth_tokens("p2")])
+    net = PBValueNet.from_tables(d=32, n_rounds=1)
+    r = pb_search_action(agent, b, "p1", own_source=_StubOwnStates(2), opp_tokens=opp,
+                         seed=7, iters=24, value_net=net, value_recompute_every=4)
+    assert b.action_mask("p1")[r.action]
+    np.testing.assert_allclose(r.sigma1.sum(axis=1), 1.0)
+    np.testing.assert_allclose(r.sigma2.sum(axis=1), 1.0)
+    assert r.sims_run > 0

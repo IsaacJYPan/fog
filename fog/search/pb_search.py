@@ -243,6 +243,8 @@ def pb_search_action(
     top_k: int | None = None,
     top_j: int | None = None,
     policy_init: bool = False,
+    value_net: Any | None = None,
+    value_recompute_every: int = 8,
 ) -> PBSearchResult:
     """One real decision under the two-sided solver. See the module docstring for the two
     candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
@@ -257,7 +259,13 @@ def pb_search_action(
     `policy_init` (Phase I.3, §10.2): initialize both sides' solver strategies from the current
     policy's per-world masked distributions (see _policy_inits) — a warm start whose influence
     washes out under linear averaging. Default off; turning it on is a measured compute nicety
-    (iterations-to-stability), never a correctness change."""
+    (iterations-to-stability), never a correctness change.
+
+    `value_net` (Phase G5 switch): a trained `PBValueNet` — leaf values come from
+    `make_pb_value_grid_values` (per-pair tables, re-weighted per iteration, refreshed every
+    `value_recompute_every` calls — the G4-drift-chosen N). Default None keeps the §18 interim
+    posterior-feature head (`make_grid_values`) as the baseline arm; the swap is claim-bearing
+    only after the G4 gates pass."""
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
@@ -297,7 +305,14 @@ def pb_search_action(
         init1 = init2 = None
         if policy_init:
             init1, init2 = _policy_inits(agent, battle, role, grid, own_toks, opp_toks, rng)
-        values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
+        if value_net is not None:
+            from fog.search.pb_value_fn import make_pb_value_grid_values
+
+            values_fn, vstats = make_pb_value_grid_values(
+                agent, value_net, grid, rho, own_toks, opp_toks,
+                recompute_every=value_recompute_every, fallback_value=root_value)
+        else:
+            values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
         sol = two_sided_regret_solve(values_fn, rho, grid.avail1, grid.avail2,
                                      init1=init1, init2=init2,
                                      iters=iters, floor=floor,
