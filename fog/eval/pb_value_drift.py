@@ -154,3 +154,135 @@ def format_report(staleness: dict[int, dict[str, float]], gap: dict[int, dict[st
         lines.append(f"  N={n:<6d} {r['sigma1_tv']:.5f}   {r['sigma2_tv']:.5f}   "
                      f"{r['root_value_gap']:.5f}      {r['net_refreshes']:<9d} {r['iterations']}")
     return "\n".join(lines)
+
+
+# ------------------------------------------------------------------------------------------ CLI
+def main() -> None:
+    """Measured drift numbers on real pool positions (the Phase G4 gate run — mechanism tests
+    live in tests/test_pb_value_drift.py; THIS produces the §15.3 NUMBERS with a trained net).
+
+    Positions: random pool matchups advanced `--depths` decision-steps by the scripted
+    max-damage policy on both sides, measured at the first decision we own. The conditioning
+    belief is the runner-style mechanical posterior (uniform prior + all reveals to date);
+    behavior-likelihood concentration is absent — recorded approximation: mechanical-only rho is
+    LESS concentrated, which makes the drift measurement conservative (wider beliefs move the
+    table more per iteration, not less).
+
+        python -m fog.eval.pb_value_drift --pool data/teams/pool_a \
+            --ckpt runs/g0_v2_champion_resume/checkpoints/ppo_final.pt \
+            --net runs/pb_value_a/pb_value.pt --out runs/pb_value_drift.json
+    """
+    import argparse
+    import json
+    import random
+    from pathlib import Path
+
+    import torch
+
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.engine_scripted import EngineMaxDamagePolicy
+    from fog.env.teams import load_pool
+    from fog.eval.pb_truncation_check import opening_table
+    from fog.models.agent import FogAgent
+    from fog.models.pb_value import PBValueNet
+    from fog.search.own_states import StablePoolOwnStates
+    from fog.search.pb_grid import build_pb_grid
+
+    ap = argparse.ArgumentParser(description="PBValueNet reweight-drift gate (§9.2/§15.3).")
+    ap.add_argument("--pool", required=True)
+    ap.add_argument("--ckpt", required=True, help="champion agent checkpoint (frozen trunk)")
+    ap.add_argument("--net", default=None,
+                    help="trained PBValueNet state dict; default random = mechanism smoke ONLY")
+    ap.add_argument("--positions", type=int, default=3)
+    ap.add_argument("--depths", default="0,4,8",
+                    help="decision-step depths positions are advanced to (cycled)")
+    ap.add_argument("--staleness", default="1,2,4,8,16")
+    ap.add_argument("--ns", default="1,2,4,8,16")
+    ap.add_argument("--iters", type=int, default=128)
+    ap.add_argument("--floor", type=float, default=0.02)
+    ap.add_argument("--min-prob", type=float, default=0.02)
+    ap.add_argument("--max-branches", type=int, default=8)
+    ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--out", default=None)
+    args = ap.parse_args()
+
+    pastes = load_pool(args.pool)
+    src = StablePoolOwnStates(pastes)
+    agent = FogAgent.from_tables({})
+    agent.load_state_dict(torch.load(args.ckpt, map_location="cpu"))
+    agent.eval()
+    net = PBValueNet.from_tables(state_dim=int(agent.backbone.state_dim),
+                                 dyn_dim=int(agent.backbone.dyn_dim))
+    if args.net:
+        net.load_state_dict(torch.load(args.net, map_location="cpu"))
+    else:
+        print("[pb_value_drift] WARNING: no --net — random net, numbers are a mechanism "
+              "smoke, NOT gate-quality (module docstring caveat).", flush=True)
+    net.eval()
+
+    depths = [int(x) for x in args.depths.split(",")]
+    staleness = tuple(int(x) for x in args.staleness.split(","))
+    ns = tuple(int(x) for x in args.ns.split(","))
+    rng = random.Random(args.seed)
+    results = []
+    built = attempts = 0
+    while built < args.positions and attempts < args.positions * 10:
+        attempts += 1
+        i, j = rng.randrange(len(pastes)), rng.randrange(len(pastes))
+        depth = depths[built % len(depths)]
+        battle = EngineBattle(pastes[i], pastes[j], seed=rng.randrange(2**31),
+                              battle_tag=f"drift-{built}")
+        policy = EngineMaxDamagePolicy(tables=battle.tables, seed=rng.randrange(2**31))
+        steps = 0
+        # advance `depth` decision-steps, then keep stepping until WE own a decision
+        while not battle.finished and (steps < depth or "p1" not in battle.pending_sides()):
+            moves = {side: battle.engine_action(side, int(policy.choose(battle, side)))
+                     for side in battle.pending_sides()}
+            battle.step(moves)
+            steps += 1
+        if battle.finished:
+            continue                                    # game ended first — resample matchup
+
+        table = opening_table(battle, "p1", src.tokens, src.tokens)
+        rho_full = table.normalized()
+        kept_k = rho_full.sum(axis=1) > 0
+        kept_j = rho_full.sum(axis=0) > 0
+        rho = rho_full[kept_k][:, kept_j]
+        rho = rho / rho.sum()
+        own_t, opp_t = src.tokens[kept_k], src.tokens[kept_j]
+        grid = build_pb_grid(battle, "p1", own_t, opp_t, seed=rng.randrange(2**31),
+                             min_prob=args.min_prob, max_branches=args.max_branches)
+        curve = reweight_staleness_curve(agent, net, grid, rho, own_t, opp_t,
+                                         grid.avail1, grid.avail2,
+                                         staleness=staleness, iters=args.iters,
+                                         floor=args.floor)
+        gap = solution_gap(agent, net, grid, rho, own_t, opp_t, grid.avail1, grid.avail2,
+                           Ns=ns, iters=args.iters, floor=args.floor)
+        print(f"--- position {built} (matchup {i}x{j}, depth {steps}, "
+              f"K={int(kept_k.sum())} J={int(kept_j.sum())}, leaves={len(grid.leaf_obs)})")
+        print(format_report(curve, gap), flush=True)
+        results.append({"matchup": [i, j], "depth": steps,
+                        "K": int(kept_k.sum()), "J": int(kept_j.sum()),
+                        "leaves": len(grid.leaf_obs),
+                        "staleness": {str(s): r for s, r in curve.items()},
+                        "solution_gap": {str(n): r for n, r in gap.items()}})
+        built += 1
+
+    summary = {
+        "per_position": results,
+        "worst_sigma1_tv_by_N": {str(n): max(r["solution_gap"][str(n)]["sigma1_tv"]
+                                             for r in results) for n in ns},
+        "worst_root_gap_by_N": {str(n): max(r["solution_gap"][str(n)]["root_value_gap"]
+                                            for r in results) for n in ns},
+        "trained_net": bool(args.net),
+        "config": vars(args),
+    }
+    print("worst sigma1 TV by N:", summary["worst_sigma1_tv_by_N"])
+    print("worst root-value gap by N:", summary["worst_root_gap_by_N"])
+    if args.out:
+        Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.out).write_text(json.dumps(summary, indent=2))
+
+
+if __name__ == "__main__":
+    main()
