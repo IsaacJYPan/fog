@@ -323,11 +323,28 @@ class _TrainSetup:
             )
 
         self.agent = FogAgent.from_tables(cfg).to(self.device)
+        # ppo.init_ckpt: warm-start the agent's weights from a saved state dict (resume after an
+        # interrupted run, or fine-tune from a prior experiment). Optimizer moments are NOT
+        # restored — set total_decisions to the REMAINING budget and entropy_coef to the schedule
+        # value at the interruption point (the decay runs over this config's own total).
+        if self.ppo_cfg.get("init_ckpt"):
+            self.agent.load_state_dict(
+                torch.load(self.ppo_cfg["init_ckpt"], map_location=self.device)
+            )
         self.opt = torch.optim.AdamW(self.agent.parameters(), lr=self.lr)
         self.league = League(
             snapshot_every_decisions=self.snap_every,
             **({"scripted": tuple(scripted)} if scripted else {}),
         )
+        # league.past_ckpts: seed past-self opponents (a resumed run keeps facing the snapshots
+        # its interrupted predecessor banked; latest = the last entry).
+        seed_past = [Path(p) for p in cfg.get("league", {}).get("past_ckpts", [])]
+        if seed_past:
+            missing = [p for p in seed_past if not p.exists()]
+            if missing:
+                raise FileNotFoundError(f"league.past_ckpts not found: {missing}")
+            self.league.past_ckpts.extend(seed_past)
+            self.league.latest_ckpt = seed_past[-1]
         # leakage.clip_delta: True = per-step max(0, ΔI) (§7 default); False = signed ΔI, whose
         # per-game sum TELESCOPES to CE_first − CE_final — immune to the clipped estimator's
         # CE-noise bias (E[Σ max(0,ΔI)] grows with probe-CE variance even at zero net reveal).

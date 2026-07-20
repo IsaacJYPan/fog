@@ -1,0 +1,26 @@
+# G0 resume — the g0_v2_champion run died at 163,239/200,000 decisions (the launching session
+# ended and took the detached-but-not-detached-enough child with it, 2026-07-19 18:39; no error
+# in the log, last checkpoint ppo_155167.pt). This finishes the remaining budget from that
+# snapshot so the champion keeps the m15-matched 200k total.
+# Faithfulness notes (recorded, all minor):
+#   * ~8k decisions past the snapshot are retrained (163k logged vs 155k checkpointed);
+#   * AdamW moments are not restored (ppo.init_ckpt loads weights only);
+#   * entropy_coef 0.0084 = the original linear schedule's value at 155k/200k, decaying to the
+#     same 0.005 endpoint over this run's own 45k;
+#   * league past-selves re-seeded from the interrupted run's snapshots.
+#   python -m fog.training.ppo --config configs/g0_v2_champion_resume.yaml
+extends: g0_v2_champion.yaml
+
+experiment: g0_v2_champion_resume
+ppo:
+  init_ckpt: runs/g0_v2_champion/checkpoints/ppo_155167.pt
+  total_decisions: 45000
+  entropy_coef: 0.0084
+  entropy_coef_final: 0.005
+league:
+  past_ckpts:
+    - runs/g0_v2_champion/checkpoints/ppo_57260.pt
+    - runs/g0_v2_champion/checkpoints/ppo_106005.pt
+    - runs/g0_v2_champion/checkpoints/ppo_155167.pt
+log:
+  dir: runs/g0_v2_champion_resume
