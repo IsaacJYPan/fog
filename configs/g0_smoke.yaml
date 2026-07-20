@@ -1,0 +1,11 @@
+# G0 pipeline smoke: 2k decisions of the champion config end-to-end (engine loop, belief-chain
+# aux, league, checkpointing) before committing the box to the full 200k run.
+#   python -m fog.training.ppo --config configs/g0_smoke.yaml
+extends: g0_v2_champion.yaml
+
+experiment: g0_smoke
+ppo:
+  total_decisions: 2000
+  batch_decisions: 1000
+log:
+  dir: runs/g0_smoke
