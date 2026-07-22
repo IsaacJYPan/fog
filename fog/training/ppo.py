@@ -240,6 +240,8 @@ def train(cfg: dict) -> dict:
     `env.backend` selects the simulator (ARCHITECTURE.md §3.2):
       * "showdown" (default) — poke-env vs a live local server; ground truth. Byte-identical
         behavior to the pre-backend-switch trainer.
+      * "showdown_direct" — the same Showdown rules and poke-env parser through a persistent
+        local Node worker. No server, accounts, HTTP, or WebSockets.
       * "engine"             — poke-engine batched lockstep self-play (fog.env.engine_runner);
         volume track for M3/M4 grids. No server needed. Final fine-tune + all headline evals
         stay on Showdown (divergence rules in ARCHITECTURE.md §3.2).
@@ -251,8 +253,13 @@ def train(cfg: dict) -> dict:
     backend = str(cfg.get("env", {}).get("backend", "showdown")).lower()
     if backend == "engine":
         return _train_engine(cfg)
+    if backend == "showdown_direct":
+        return _train_showdown_direct(cfg)
     if backend != "showdown":
-        raise ValueError(f"env.backend must be 'showdown' or 'engine', got {backend!r}")
+        raise ValueError(
+            "env.backend must be 'showdown', 'showdown_direct', or 'engine', "
+            f"got {backend!r}"
+        )
     import asyncio
 
     return asyncio.run(_train_async(cfg))
@@ -783,6 +790,121 @@ def _train_engine(cfg: dict) -> dict:
     final = s.ckpt_dir / "ppo_final.pt"
     torch.save(s.agent.state_dict(), final)
     print(f"[ppo] done (engine backend): {s.decisions_seen} decisions -> {final}", flush=True)
+    return s.metrics
+
+
+def _train_showdown_direct(cfg: dict) -> dict:
+    """Train on authoritative Showdown rules without the network/server layer.
+
+    Showdown produces player-censored protocol messages and private requests in memory. They pass
+    through poke-env's ordinary battle parser before observation construction, so this backend
+    changes transport and scheduling, not the information available to the policy.
+    """
+    import random
+    from collections import deque
+    from pathlib import Path
+
+    import torch
+
+    from fog.constants.tables import TABLES
+    from fog.env.player import FogPlayer
+    from fog.env.showdown_direct import ShowdownDirectClient
+    from fog.env.showdown_local_runner import bind_fog_player, play_local_battle
+    from fog.env.team_truth import truth_tokens_from_paste
+    from fog.env.teams import to_packed
+    from fog.models.agent import FogAgent
+    from fog.models.probe import FrozenProbe
+
+    scripted = tuple(
+        cfg.get("league", {}).get("scripted", ("MaxDamage", "SimpleHeuristics"))
+    )
+    supported = {"Random", "MaxDamage", "SimpleHeuristics"}
+    unknown = [name for name in scripted if name not in supported]
+    if unknown:
+        raise ValueError(
+            f"league.scripted {unknown} cannot run on showdown_direct; "
+            f"supported={sorted(supported)}"
+        )
+
+    s = _TrainSetup(cfg, scripted=scripted, require_pool=True)
+    assert s.pool_teams is not None
+    rng = random.Random(s.seed)
+    packed = {paste: to_packed(paste) for paste in s.pool_teams}
+    truth = {paste: truth_tokens_from_paste(paste, TABLES) for paste in s.pool_teams}
+
+    adapter = bind_fog_player(FogPlayer(s.agent))
+    adapter.attach_buffer(s.buf)
+    adapter.leak_family_weights = s.leak_cfg.get("family_weights")
+    if s.beta > 0:
+        adapter.phi_hat = FrozenProbe.from_agent(s.agent).to(s.device)
+
+    current_opponent: dict[str, str | None] = {"paste": None}
+
+    def opponent_truth(_battle):
+        paste = current_opponent["paste"]
+        return None if paste is None else truth[paste].copy()
+
+    adapter.truth_provider = opponent_truth
+    if s.oracle_mode == "set":
+        adapter.oracle_truth_provider = opponent_truth
+
+    frozen_opponents: dict[str, FogPlayer] = {}
+
+    def opponent_controller(spec):
+        name = str(spec)
+        if name in supported:
+            return name.lower()
+        if name not in frozen_opponents:
+            frozen = FogAgent.from_tables(cfg).to(s.device)
+            frozen.load_state_dict(torch.load(spec, map_location=s.device))
+            frozen.eval()
+            frozen_opponents[name] = bind_fog_player(FogPlayer(frozen))
+        return frozen_opponents[name]
+
+    recent_results: dict[str, deque] = {}
+    battle_number = 0
+    client_kwargs = {}
+    if s.env_cfg.get("showdown_root"):
+        client_kwargs["showdown_root"] = s.env_cfg["showdown_root"]
+    with ShowdownDirectClient(**client_kwargs) as client:
+        while s.decisions_seen < s.total:
+            opp_spec = s.league.sample_opponent(rng)
+            opp_name = str(opp_spec) if str(opp_spec) in supported else Path(str(opp_spec)).stem
+            controller = opponent_controller(opp_spec)
+            wins = 0
+            for _ in range(s.games_per_chunk):
+                p1_paste = rng.choice(s.pool_teams)
+                p2_paste = rng.choice(s.pool_teams)
+                current_opponent["paste"] = p2_paste
+                battle_number += 1
+                result = play_local_battle(
+                    client,
+                    {
+                        "formatid": s.fmt,
+                        "seed": f"sodium,{rng.getrandbits(256):064x}",
+                        "strictChoices": True,
+                        "p1": {"name": "FOG", "team": packed[p1_paste]},
+                        "p2": {"name": "Opponent", "team": packed[p2_paste]},
+                    },
+                    adapter,
+                    controller,
+                    seed=rng.randrange(2**31),
+                    battle_tag=f"battle-direct-{battle_number}",
+                )
+                wins += int(result.p1_won is True)
+            rec = recent_results.setdefault(opp_name, deque(maxlen=200))
+            rec.extend([1.0] * wins + [0.0] * (s.games_per_chunk - wins))
+            s.chunk_battles += s.games_per_chunk
+
+            if _maybe_chunk_update(s, adapter, recent_results) == "halt":
+                return s.metrics
+
+    final = s.ckpt_dir / "ppo_final.pt"
+    torch.save(s.agent.state_dict(), final)
+    print(
+        f"[ppo] done (direct Showdown backend): {s.decisions_seen} decisions -> {final}",
+        flush=True,
+    )
     return s.metrics
 
 

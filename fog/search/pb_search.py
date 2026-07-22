@@ -128,10 +128,10 @@ def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int |
 
     Zero-mass candidates are ALWAYS dropped — exact, not an approximation (a zero-probability
     type's strategy carries no weight in any update), and load-bearing for fork validity: a
-    candidate contradicted by reveals cannot be forked coherently. `top_k`/`top_j` then cap the
-    kept sets by current margin mass; the true own candidate is always kept (we must sample its
-    row — forcing its presence does not reweight it, the §19.5 distinction). Returns ascending
-    full-axis index arrays (own_kept, opp_kept)."""
+    candidate contradicted by reveals cannot be forked coherently. Opponent candidates may then be
+    capped by public margin mass. Own-side capping is refused when it would remove any live type:
+    forcing the actual private type back into a publicly selected subset makes the opponent model
+    depend on information the opponent does not possess. Returns ascending full-axis indices."""
     row_mass = rho.sum(axis=1)
     col_mass = rho.sum(axis=0)
     if row_mass[true_k] <= 0.0:
@@ -140,10 +140,12 @@ def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int |
     own_alive = np.flatnonzero(row_mass > 0.0)
     opp_alive = np.flatnonzero(col_mass > 0.0)
     if top_k is not None and len(own_alive) > int(top_k):
-        order = own_alive[np.argsort(row_mass[own_alive])[::-1]][: int(top_k)]
-        if true_k not in order:
-            order[-1] = true_k                      # replace the lightest kept with the truth
-        own_alive = np.sort(order)
+        raise ValueError(
+            "own-side top_k truncation would remove live public types. It is disabled because "
+            "forcing the actual private team back into the solve leaks that truth into the "
+            "calculated opponent strategy. Use top_k=None until a truth-independent private-row "
+            "query is implemented."
+        )
     if top_j is not None and len(opp_alive) > int(top_j):
         opp_alive = np.sort(opp_alive[np.argsort(col_mass[opp_alive])[::-1]][: int(top_j)])
     return own_alive.astype(np.int64), opp_alive.astype(np.int64)
@@ -234,8 +236,8 @@ def pb_search_action(
     seed: int = 0,
     iters: int = 256,
     floor: float = 0.02,
-    min_prob: float = 0.005,
-    max_branches: int | None = 12,
+    min_prob: float = 0.0,
+    max_branches: int | None = None,
     j_start: int = 8,
     j_max: int = 40,
     j_tol: float = 0.05,
@@ -249,10 +251,10 @@ def pb_search_action(
     """One real decision under the two-sided solver. See the module docstring for the two
     candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
 
-    `top_k` / `top_j` (Phase G2, persistent mode only): posterior-mass truncation — solve over
-    the top candidates by current rho margin mass (the true own candidate always kept),
-    renormalized; dropped mass is reported and truncated-out candidates keep their FULL-axis
-    table entries (the runner floors their behavior likelihood via the result's kept maps).
+    `top_j` (Phase G2, persistent mode only): opponent-axis truncation by public rho margin mass.
+    `top_k` is accepted for configuration compatibility but raises if it would remove a live own
+    type: forcing the actual private type back into support leaks truth into the opponent strategy.
+    Dropped opponent mass is reported and full-axis table entries persist.
     Zero-mass candidates are always dropped in persistent mode regardless (exact — and required
     before forking, see _truncate_axes).
 
@@ -262,7 +264,7 @@ def pb_search_action(
     (iterations-to-stability), never a correctness change.
 
     `value_net` (Phase G5 switch): a trained `PBValueNet` — leaf values come from
-    `make_pb_value_grid_values` (per-pair tables, re-weighted per iteration, refreshed every
+    `make_pb_value_grid_values` (per-pair tables, refreshed every
     `value_recompute_every` calls — the G4-drift-chosen N). Default None keeps the §18 interim
     posterior-feature head (`make_grid_values`) as the baseline arm; the swap is claim-bearing
     only after the G4 gates pass."""

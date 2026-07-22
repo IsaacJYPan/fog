@@ -1,5 +1,5 @@
 """Phase H instrumentation (fog/eval/chance_fidelity.py): the Damage-instruction matcher finds
-the engine's average-roll damage, the crit family share reproduces the engine's 1/16 branch
+the engine's average-roll damage, the Gen 9 build reproduces Showdown's 1/24 crit branch
 weighting, and roll reconstruction flags a knockout straddle exactly when HP falls inside the
 16-roll span."""
 from __future__ import annotations
@@ -51,8 +51,8 @@ def test_pair_stats_match_damage_and_crit_share():
     fams = [f for f in s["crit_families"] if f["side"] == "Two"]
     assert fams, "side two takes classified move damage"
     for f in fams:
-        assert f["crit_share"] == pytest.approx(1 / 16, abs=1e-6), \
-            "probe finding 5: the engine branches crits at 1/16 (Gen 9 real rate is 1/24)"
+        assert f["crit_share"] == pytest.approx(1 / 24, abs=1e-6), \
+            "the dependency must be compiled with poke-engine's Gen 9 Cargo feature"
 
 
 def test_roll_reconstruction_and_straddle_flag():

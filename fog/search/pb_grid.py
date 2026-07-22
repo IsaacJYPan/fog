@@ -20,12 +20,10 @@ Structure decisions carried from the proposal:
   * **Branches, not samples** (proposal §10.4/§10.5): each cell is committed with
     `commit_pair_branches`, so its outcomes are exactly-weighted chance branches stopped at the
     next pending decision, with pruned probability mass recorded per cell (invariant 19.16).
-  * **Leaves are censored observations** (invariant 19.12): each live leaf is stored as the
-    acting player's fog Observation (root reveals plus whatever the simulated turn itself
-    revealed — never the sampled world's truth). Discrete branch evidence for §10.6 leaf-belief
-    updates is recoverable from those observations' reveal tokens; a richer per-branch evidence
-    record is deferred until Phase G defines its consumer (recorded deviation from the original
-    plan sketch — the Observation already carries the reveal facts).
+  * **Leaves are public-only observations** (invariant 19.12): both private team sheets are
+    removed. Candidate sheets enter the value network only through its explicit candidate inputs.
+    Each leaf also stores a [K, J] compatibility mask derived from the new truthful reveal facts,
+    so its probability table cannot retain a team pair contradicted by the board it accompanies.
 
 The builder handles OUR decision whether or not the opponent is also pending (PROPOSAL_IMPL_PLAN
 Phase F2, proposal §10.5):
@@ -50,7 +48,7 @@ cells and reports the count. A flood of failures signals a reconstruction bug, n
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 
@@ -81,7 +79,7 @@ class PBGrid:
 
     For cell (k, j, a, b), branch m exists where `branch_prob[k, j, a, b, m] > 0`; it is terminal
     when `leaf_index[...] < 0` (payoff in `terminal_value`, our perspective), otherwise
-    `leaf_obs[leaf_index[...]]` is its censored leaf observation."""
+    `leaf_obs[leaf_index[...]]` is its public-only leaf observation."""
     labels1: list[str]           # our public-action label space (union over k)
     labels2: list[str]           # the opponent's (union over j)
     avail1: np.ndarray           # [K, A] bool — world k can play label a
@@ -91,10 +89,15 @@ class PBGrid:
     branch_prob: np.ndarray      # [K, J, A, B, M] float, 0 where no branch
     terminal_value: np.ndarray   # [K, J, A, B, M] float, NaN where not terminal
     leaf_index: np.ndarray       # [K, J, A, B, M] int into leaf_obs, -1 where terminal/absent
-    leaf_obs: list               # flat censored Observations for batched value forwards
+    leaf_obs: list               # flat public-only Observations for batched value forwards
+    leaf_evidence: np.ndarray    # [L, K, J] bool — candidate pairs compatible with leaf reveals
     pruned_mass: np.ndarray      # [K, J, A, B] float — dropped branch probability per cell
     failed: np.ndarray           # [K, J, A, B] bool — simulation raised; value layer substitutes
     sims_run: int                # committed (k, j, a, b) pairs (budget accounting — report it)
+    # What the failed cells actually raised: {"ExcType: msg": count}. A flood of failures signals
+    # a reconstruction bug (module docstring) — this makes the flood diagnosable from the grid
+    # itself instead of requiring a re-run under a debugger.
+    fail_reasons: dict[str, int] = field(default_factory=dict)
 
 
 def build_pb_grid(
@@ -104,8 +107,8 @@ def build_pb_grid(
     opp_tokens: np.ndarray,
     *,
     seed: int = 0,
-    min_prob: float = 0.005,
-    max_branches: int | None = 12,
+    min_prob: float = 0.0,
+    max_branches: int | None = None,
 ) -> PBGrid:
     """Simulate the full K x J x A x B branch table for one simultaneous decision on `battle`.
 
@@ -114,7 +117,9 @@ def build_pb_grid(
     once from the belief chain, deduplicated and weighted by the CALLER — this builder treats
     both sets as given identities so the persistent belief table keys stay stable, §7.4).
     Never mutates `battle`."""
+    from fog.constants.schema import NO_ITEM
     from fog.encoding.observation import Observation
+    from fog.search.evidence import keep_mask_from_reveals
 
     opp_role = "p2" if role == "p1" else "p1"
     pending = set(battle.pending_sides())
@@ -130,6 +135,7 @@ def build_pb_grid(
     own_tokens = np.asarray(own_tokens, dtype=np.int64)
     opp_tokens = np.asarray(opp_tokens, dtype=np.int64)
     n_k, n_j = len(own_tokens), len(opp_tokens)
+    no_item = int(battle.tables.item_index(NO_ITEM))
 
     # ---- K x J root forks + per-fork label maps for both sides -------------------------------
     forks: list[list] = []
@@ -194,6 +200,7 @@ def build_pb_grid(
     cell_outcomes: dict[tuple[int, int, int, int], list] = {}
     pruned_mass = np.zeros((n_k, n_j, n_a, n_b))
     failed = np.zeros((n_k, n_j, n_a, n_b), dtype=bool)
+    fail_reasons: dict[str, int] = {}
     sims_run = 0
     max_m = 1
     for k in range(n_k):
@@ -208,18 +215,21 @@ def build_pb_grid(
                             fork, role, int(local_action1[k, a]), opp_idx,
                             min_prob=min_prob, max_branches=max_branches,
                         )
-                    except Exception:
+                    except Exception as e:
                         failed[k, j, a, b] = True
+                        reason = f"{type(e).__name__}: {e}"[:200]
+                        fail_reasons[reason] = fail_reasons.get(reason, 0) + 1
                         continue
                     cell_outcomes[(k, j, int(a), int(b))] = outcomes
                     pruned_mass[k, j, a, b] = pruned
                     max_m = max(max_m, len(outcomes))
 
-    # ---- pack branches into padded tensors + flat censored leaf list -------------------------
+    # ---- pack branches into padded tensors + public leaves and evidence masks ----------------
     branch_prob = np.zeros((n_k, n_j, n_a, n_b, max_m))
     terminal_value = np.full((n_k, n_j, n_a, n_b, max_m), np.nan)
     leaf_index = np.full((n_k, n_j, n_a, n_b, max_m), -1, dtype=np.int64)
     leaf_obs: list = []
+    leaf_evidence: list[np.ndarray] = []
     for (k, j, a, b), outcomes in cell_outcomes.items():
         for m, o in enumerate(outcomes):
             branch_prob[k, j, a, b, m] = o.probability
@@ -227,12 +237,36 @@ def build_pb_grid(
                 terminal_value[k, j, a, b, m] = o.terminal
             else:
                 leaf_index[k, j, a, b, m] = len(leaf_obs)
-                leaf_obs.append(Observation.from_battle(
-                    o.leaf.view(role), tracker=o.leaf.trackers[role]))
+                public_obs = Observation.public_from_engine_battle(o.leaf, role)
+                reverse_obs = Observation.from_battle(
+                    o.leaf.view(opp_role), tracker=o.leaf.trackers[opp_role]
+                )
+                keep_own = keep_mask_from_reveals(
+                    reverse_obs.opp_revealed["tokens"], own_tokens,
+                    no_item_token=no_item,
+                )
+                keep_opp = keep_mask_from_reveals(
+                    public_obs.opp_revealed["tokens"], opp_tokens,
+                    no_item_token=no_item,
+                )
+                if not keep_own[k] or not keep_opp[j]:
+                    raise RuntimeError(
+                        "a simulated leaf contradicts the candidate pair that produced it; "
+                        "the reveal census or item-movement carve-out is incorrect "
+                        f"(k={k}, j={j}, a={a} {labels1[a]!r}, b={b} {labels2[b]!r}, "
+                        f"branch={m}, keep_own={bool(keep_own[k])}, "
+                        f"keep_opp={bool(keep_opp[j])})"
+                    )
+                leaf_obs.append(public_obs)
+                leaf_evidence.append(np.outer(keep_own, keep_opp))
 
     return PBGrid(
         labels1=labels1, labels2=labels2, avail1=avail1, avail2=avail2,
         local_action1=local_action1, local_action2=local_action2,
         branch_prob=branch_prob, terminal_value=terminal_value, leaf_index=leaf_index,
-        leaf_obs=leaf_obs, pruned_mass=pruned_mass, failed=failed, sims_run=sims_run,
+        leaf_obs=leaf_obs,
+        leaf_evidence=(np.stack(leaf_evidence).astype(bool, copy=False)
+                       if leaf_evidence else np.ones((0, n_k, n_j), dtype=bool)),
+        pruned_mass=pruned_mass, failed=failed, sims_run=sims_run,
+        fail_reasons=fail_reasons,
     )

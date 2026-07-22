@@ -52,10 +52,8 @@ def _collect(agent: Any, pool: list[str], games: int, *, engine_batch: int, temp
     return batch
 
 
-def _belief_ces(agent: Any, batch: dict, *, chunk: int = 512) -> tuple[float, float]:
-    """(belief CE, self-belief CE) over a batch, evaluated in eval mode. Chunk means are weighted
-    by rows (valid-label counts vary slightly per chunk; the residual bias is far below the
-    before/after deltas this report reads)."""
+def _belief_ces(agent: Any, batch: dict, *, chunk: int = 512) -> tuple[float, float, float, float]:
+    """Marginal and complete-team chain losses for both belief directions on held-out rows."""
     import torch
 
     from fog.training.losses import belief_loss
@@ -64,21 +62,30 @@ def _belief_ces(agent: Any, batch: dict, *, chunk: int = 512) -> tuple[float, fl
     was_training = agent.training
     agent.eval()
     n = batch["actions"].shape[0]
-    b_tot = sb_tot = 0.0
+    b_tot = sb_tot = bc_tot = sbc_tot = 0.0
     try:
         with torch.no_grad():
             for lo in range(0, n, chunk):
                 idx = torch.arange(lo, min(lo + chunk, n), device=batch["actions"].device)
                 mb = _index_nested(batch, idx)
+                mb["compute_belief_chain"] = True
                 out = agent(mb)
+                if out.belief_chain is None or out.self_belief_chain is None:
+                    raise RuntimeError("held-out refresh evaluation did not produce chain logits")
                 w = len(idx) / n
                 b_tot += w * float(belief_loss(
                     out.belief.logits, mb["belief_targets"], mb["belief_valid"]))
                 sb_tot += w * float(belief_loss(
                     out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"]))
+                bc_tot += w * float(belief_loss(
+                    out.belief_chain.logits, mb["belief_targets"], mb["belief_valid"]))
+                sbc_tot += w * float(belief_loss(
+                    out.self_belief_chain.logits,
+                    mb["self_belief_targets"], mb["self_belief_valid"],
+                ))
     finally:
         agent.train(was_training)
-    return b_tot, sb_tot
+    return b_tot, sb_tot, bc_tot, sbc_tot
 
 
 def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_games: int = 64,
@@ -105,7 +112,7 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
             raise RuntimeError(f"{name} collection produced no belief/self-belief labels — "
                                "the recording stack is broken, not sparse")
 
-    before_b, before_sb = _belief_ces(agent, hold_batch)
+    before_b, before_sb, before_bc, before_sbc = _belief_ces(agent, hold_batch)
 
     params = list(agent.belief.parameters()) + list(agent.self_belief.parameters())
     opt = torch.optim.Adam(params, lr=lr)
@@ -123,9 +130,15 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
                 idx = perm[lo : lo + int(minibatch_size)]
                 mb = _index_nested(train_batch, idx)
                 out = agent(mb)
+                if out.belief_chain is None or out.self_belief_chain is None:
+                    raise RuntimeError("refresh training did not produce complete-team chain logits")
                 loss = (belief_loss(out.belief.logits, mb["belief_targets"], mb["belief_valid"])
                         + belief_loss(out.self_belief.logits, mb["self_belief_targets"],
-                                      mb["self_belief_valid"]))
+                                      mb["self_belief_valid"])
+                        + belief_loss(out.belief_chain.logits,
+                                      mb["belief_targets"], mb["belief_valid"])
+                        + belief_loss(out.self_belief_chain.logits,
+                                      mb["self_belief_targets"], mb["self_belief_valid"]))
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(params, max_grad_norm)
@@ -135,7 +148,7 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
     finally:
         agent.train(was_training)
 
-    after_b, after_sb = _belief_ces(agent, hold_batch)
+    after_b, after_sb, after_bc, after_sbc = _belief_ces(agent, hold_batch)
     report = {
         "games": int(games), "holdout_games": int(holdout_games),
         "n_train": int(n), "n_holdout": int(hold_batch["actions"].shape[0]),
@@ -143,11 +156,16 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
         "seed": int(seed),
         "belief_ce_before": before_b, "belief_ce_after": after_b,
         "self_belief_ce_before": before_sb, "self_belief_ce_after": after_sb,
+        "belief_chain_ce_before": before_bc, "belief_chain_ce_after": after_bc,
+        "self_belief_chain_ce_before": before_sbc,
+        "self_belief_chain_ce_after": after_sbc,
         "train_loss_first": train_curve[0], "train_loss_last": train_curve[-1],
-        "improved": after_b <= before_b and after_sb <= before_sb,
+        "improved": (after_b <= before_b and after_sb <= before_sb
+                     and after_bc <= before_bc and after_sbc <= before_sbc),
     }
-    print(f"[belief_refresh] held-out CE: belief {before_b:.3f} -> {after_b:.3f} | "
-          f"self-belief {before_sb:.3f} -> {after_sb:.3f} | "
+    print(f"[belief_refresh] held-out CE: belief marginal {before_b:.3f} -> {after_b:.3f}, "
+          f"chain {before_bc:.3f} -> {after_bc:.3f} | self marginal "
+          f"{before_sb:.3f} -> {after_sb:.3f}, chain {before_sbc:.3f} -> {after_sbc:.3f} | "
           f"{'improved' if report['improved'] else 'NOT improved (more games?)'}", flush=True)
     return report
 

@@ -59,6 +59,31 @@ def test_keep_mask_exact_and_subset_semantics():
     assert mask[1] and not mask[0]
 
 
+def test_initial_booster_absence_is_mechanical_evidence():
+    """A turn-one automatic activation is observable in both directions: seeing it keeps only
+    candidates that predict it, while its absence eliminates a Booster Energy lead. A positive-
+    reveal-only token grid cannot express the second fact, so the dedicated entry check must."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.teams import load_pool
+    from fog.search.evidence import keep_mask_from_initial_drive_activation
+    from fog.search.own_states import StablePoolOwnStates
+
+    pool = load_pool("data/teams/pool_a")
+    candidates = StablePoolOwnStates(pool).tokens
+
+    without = EngineBattle(pool[1], pool[1], seed=0, battle_tag="entry-without")
+    keep_without = keep_mask_from_initial_drive_activation(without, "p1", candidates)
+    np.testing.assert_array_equal(
+        keep_without, [False, True, True, True, True, True, True, False]
+    )
+
+    with_booster = EngineBattle(pool[0], pool[1], seed=0, battle_tag="entry-with")
+    keep_with = keep_mask_from_initial_drive_activation(with_booster, "p1", candidates)
+    np.testing.assert_array_equal(
+        keep_with, [True, False, False, False, False, False, False, True]
+    )
+
+
 def test_whole_game_logged_with_outcome_backfill(tmp_path):
     from types import SimpleNamespace
 
@@ -290,6 +315,14 @@ def test_selfplay_both_sides_solve_and_update(tmp_path):
     by_role = {"p1": [r for r in rows if r["role"] == "p1"],
                "p2": [r for r in rows if r["role"] == "p2"]}
     assert by_role["p1"] and by_role["p2"], "both sides log solved decisions (2x data)"
+    by_turn = {r: {row["turn"]: row for row in by_role[r]} for r in by_role}
+    shared_turns = sorted(set(by_turn["p1"]) & set(by_turn["p2"]))
+    assert shared_turns, "at least one simultaneous decision must exercise the shared solve"
+    for turn in shared_turns:
+        p1, p2 = by_turn["p1"][turn], by_turn["p2"][turn]
+        np.testing.assert_allclose(p1["sigma2"], p2["sigma1"])
+        np.testing.assert_allclose(p1["sigma1"], p2["sigma2"])
+        np.testing.assert_allclose(p1["rho"].T, p2["rho"])
     outcomes = {r: {row["outcome"] for row in by_role[r]} for r in by_role}
     assert outcomes["p1"] == {1.0} and outcomes["p2"] == {-1.0}, \
         "Hydreigon side wins; outcomes are mirrored per role"
@@ -302,6 +335,7 @@ def test_selfplay_both_sides_solve_and_update(tmp_path):
         assert row["true_index"] in (0, 1) and row["opp_true_index"] in (0, 1)
         assert row["truncated"] is False
         assert "action_label_col" in row
+    assert any("value_obs" in row for row in rows), "played public leaves are logged for value"
 
     saved = torch.load(out, weights_only=False)
     assert saved["meta"]["mode"] == "selfplay"
@@ -326,13 +360,19 @@ def test_loop_generation_smoke(tmp_path):
     from fog.scripts.pb_loop import run_generation
 
     agent = FogAgent.from_tables({"model": {"use_posterior_features": True}})
-    report = run_generation(
-        agent, [ATTACKER, WEAK2], tmp_path / "gen_00", games=3, seed=0,
+    pool = tmp_path / "pool"
+    pool.mkdir()
+    (pool / "attacker.txt").write_text(ATTACKER)
+    (pool / "weak2.txt").write_text(WEAK2)
+    report, next_net = run_generation(
+        agent, str(pool), tmp_path / "gen_00", games=3, workers=1, seed=0,
+        flush_every=0, value_net_path=None,
         search_kwargs={"iters": 12, "n_queried": 2},
         distill_kwargs={"epochs": 2, "batch_size": 8, "holdout_frac": 0.5},
         refresh_kwargs={"games": 4, "holdout_games": 2, "epochs": 1,
                         "engine_batch": 2, "minibatch_size": 64})
     assert report["rows"] > 0
+    assert next_net is None
     assert (tmp_path / "gen_00" / "agent.pt").exists()
     assert (tmp_path / "gen_00" / "report.json").exists()
     g = report["gates"]

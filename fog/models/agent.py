@@ -170,7 +170,8 @@ class FogAgent(nn.Module):
         c_dyn_aux = c_dyn if self.aux_into_trunk else c_dyn.detach()
         if opp_revealed is not None:
             belief_out = self.belief(c_dyn_aux, opp_revealed)             # marginals (diagnostic)
-            if self.training and batch.get("belief_targets") is not None:
+            if ((self.training or batch.get("compute_belief_chain", False))
+                    and batch.get("belief_targets") is not None):
                 from fog.models.self_belief import tokens_from_labels
 
                 truth = tokens_from_labels(batch["belief_targets"])       # aligned [B, 6, 9]
@@ -195,7 +196,8 @@ class FogAgent(nn.Module):
             if not self.aux_into_trunk:
                 c_dyn_opp = c_dyn_opp.detach()
             self_belief_out = self.self_belief(c_dyn_opp, opp_view["my_view"])  # marginals
-            if self.training and batch.get("self_belief_targets") is not None:
+            if ((self.training or batch.get("compute_belief_chain", False))
+                    and batch.get("self_belief_targets") is not None):
                 from fog.models.self_belief import tokens_from_labels
 
                 my_truth = tokens_from_labels(batch["self_belief_targets"])

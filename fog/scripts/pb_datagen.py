@@ -8,11 +8,21 @@ is the binding constraint (16 GB), so the worker count is a measured, pinned cho
 over the K x K matchup grid so the L1 opening-solve cache and data coverage are both served) and
 writes an independent v2 log shard; the parent aggregates throughput.
 
+Durability: workers flush their shard every `--flush-every` games (atomic rewrite, heartbeat
+line per flush — pb_log's incremental-save contract), so a killed run keeps its completed games.
+An overnight batch must never be one all-or-nothing save at hour nine (the G0 session-death
+lesson, applied here after batch A ran blind).
+
 The learner is `p1` with a `StablePoolOwnStates` source (battle-lifetime-stable table axes); the
 opponent defaults to the scripted max-damage bot (the data-plumbing default — solver-vs-solver
-self-play is Phase I.2). Budget knobs (`--iters`, `--min-prob`, `--max-branches`, `--top-k`,
-`--top-j`) are logged into each shard's meta so every row's generation profile is auditable
-(lever L4 is "run this with a reduced profile", not separate code).
+self-play is `--selfplay`, Phase I.2). Budget knobs (`--iters`, `--min-prob`, `--max-branches`,
+`--top-k`, `--top-j`) are logged into each shard's meta so every row's generation profile is
+auditable (lever L4 is "run this with a reduced profile", not separate code).
+
+Phase I.5 hooks (the generation loop shells into `run_sharded_datagen` per generation):
+`posterior_aware=True` loads the checkpoint through `load_posterior_agent` (zero-pad expansion of
+a blind head — required once distillation has trained the posterior columns); `value_net=<path>`
+routes leaf values through a trained PBValueNet (the G5 switch) at `value_recompute_every`.
 
 Usage (POOL-A smoke, 4 workers):
     python -m fog.scripts.pb_datagen --pool data/teams/pool_a --games 48 --workers 4 \
@@ -57,27 +67,43 @@ def _run_shard(cfg: dict) -> dict:
         return EngineBattle(pastes[m // n], pastes[m % n], seed=seed,
                             battle_tag=f"pbgen-{shard}-{game_id}")
 
-    agent = FogAgent.from_tables({})
-    if cfg["checkpoint"] is not None:
-        agent.load_state_dict(torch.load(cfg["checkpoint"], map_location="cpu"))
+    if cfg.get("posterior_aware"):
+        # I.5 loop generations: the checkpoint may be posterior-blind (zero-pad expanded) or
+        # already aware (post-distill) — load_posterior_agent handles both layouts.
+        if cfg["checkpoint"] is None:
+            raise ValueError("posterior_aware needs a checkpoint (a fresh aware agent is "
+                             "smoke-only and should be built explicitly, not implied here)")
+        from fog.training.value_finetune import load_posterior_agent
+
+        agent = load_posterior_agent({}, cfg["checkpoint"], "cpu")
+    else:
+        agent = FogAgent.from_tables({})
+        if cfg["checkpoint"] is not None:
+            agent.load_state_dict(torch.load(cfg["checkpoint"], map_location="cpu"))
+
+    search_kwargs = dict(cfg["search_kwargs"])
+    if cfg.get("value_net"):
+        # G5 switch: leaf values from the trained PBValueNet instead of the interim head. The
+        # net OBJECT goes only into the runtime kwargs; shard meta stores its repr (pb_log
+        # sanitizes) and the parent summary stores the path.
+        from fog.models.pb_value import PBValueNet
+
+        net = PBValueNet.from_tables(state_dim=int(agent.backbone.state_dim),
+                                     dyn_dim=int(agent.backbone.dyn_dim))
+        net.load_state_dict(torch.load(cfg["value_net"], map_location="cpu"))
+        net.eval()
+        search_kwargs["value_net"] = net
+        search_kwargs["value_recompute_every"] = int(cfg.get("value_recompute_every", 8))
+
     cache = OpeningSolveCache()
     t0 = time.perf_counter()
-    if cfg["selfplay"]:
-        # Phase I.2: both sides solve (2x rows/game, 19.6 exact for both sides) — the
-        # generation-loop distribution the PBValueNet actually serves.
-        rows = play_and_log_pb_selfplay_games(
-            agent, factory, own_source, opp_pool_tokens,
-            n_games=games, seed=cfg["seed"], max_decisions=cfg["max_decisions"],
-            search_kwargs=cfg["search_kwargs"], solve_cache=cache,
-            out_path=cfg["out_path"],
-        )
-    else:
-        rows = play_and_log_pb_games(
-            agent, factory, own_source, opp_pool_tokens,
-            n_games=games, seed=cfg["seed"], max_decisions=cfg["max_decisions"],
-            search_kwargs=cfg["search_kwargs"], solve_cache=cache,
-            out_path=cfg["out_path"],
-        )
+    runner = play_and_log_pb_selfplay_games if cfg["selfplay"] else play_and_log_pb_games
+    rows = runner(
+        agent, factory, own_source, opp_pool_tokens,
+        n_games=games, seed=cfg["seed"], max_decisions=cfg["max_decisions"],
+        search_kwargs=search_kwargs, solve_cache=cache,
+        out_path=cfg["out_path"], flush_every=int(cfg.get("flush_every", 0)),
+    )
     wall = time.perf_counter() - t0
     n_truncated_games = len({r["game_id"] for r in rows if r["truncated"]})
     return {
@@ -90,6 +116,72 @@ def _run_shard(cfg: dict) -> dict:
     }
 
 
+def run_sharded_datagen(
+    *,
+    pool: str,
+    games: int,
+    workers: int,
+    out_dir: str | Path,
+    search_kwargs: dict,
+    seed: int = 0,
+    max_decisions: int = 200,
+    checkpoint: str | None = None,
+    selfplay: bool = False,
+    posterior_aware: bool = False,
+    value_net: str | None = None,
+    value_recompute_every: int = 8,
+    torch_threads: int | None = None,
+    flush_every: int = 25,
+) -> dict:
+    """Shard `games` over `workers` processes, write shard_*.pt + summary.json under `out_dir`,
+    return the summary. This is the callable core of the CLI so the I.5 generation loop can
+    reuse the exact L2 machinery per generation instead of generating single-process."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    per = [games // workers + (1 if w < games % workers else 0) for w in range(workers)]
+    offsets = [sum(per[:w]) for w in range(workers)]
+    shard_cfgs = [{
+        "shard": w, "games": per[w], "game_offset": offsets[w],
+        "pool": str(pool), "seed": seed * 100_003 + w,
+        "max_decisions": max_decisions, "search_kwargs": search_kwargs,
+        "checkpoint": checkpoint, "selfplay": selfplay,
+        "posterior_aware": posterior_aware,
+        "value_net": value_net, "value_recompute_every": value_recompute_every,
+        "flush_every": flush_every,
+        "torch_threads": torch_threads or max(1, (os.cpu_count() or 4) // max(1, workers)),
+        "out_path": str(out_dir / f"shard_{w:02d}.pt"),
+    } for w in range(workers) if per[w] > 0]
+
+    t0 = time.perf_counter()
+    if len(shard_cfgs) == 1:
+        stats = [_run_shard(shard_cfgs[0])]
+    else:
+        import multiprocessing as mp
+
+        with mp.get_context("spawn").Pool(len(shard_cfgs)) as pool_:
+            stats = pool_.map(_run_shard, shard_cfgs)
+    wall = time.perf_counter() - t0
+
+    total_games = sum(s["games"] for s in stats)
+    rows = sum(s["rows"] for s in stats)
+    summary = {
+        "games": total_games, "rows": rows, "wall_s": round(wall, 1),
+        "games_per_hour": round(total_games / (wall / 3600.0), 1),
+        "games_per_day_extrapolated": round(total_games / (wall / 86400.0)),
+        "solver_decisions_per_game": round(rows / max(1, total_games), 2),
+        "opening_cache_hits": sum(s["cache_hits"] for s in stats),
+        "opening_cache_misses": sum(s["cache_misses"] for s in stats),
+        "truncated_games": sum(s["truncated_games"] for s in stats),
+        "workers": len(shard_cfgs), "search_kwargs": search_kwargs,
+        "selfplay": selfplay, "checkpoint": checkpoint,
+        "posterior_aware": posterior_aware, "value_net": value_net,
+        "per_shard": stats,
+    }
+    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    return summary
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--pool", required=True, help="team pool directory (data/teams/pool_a)")
@@ -99,21 +191,32 @@ def main() -> None:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--max-decisions", type=int, default=200)
     ap.add_argument("--iters", type=int, default=256, help="solver iterations per decision")
-    ap.add_argument("--min-prob", type=float, default=0.005)
-    ap.add_argument("--max-branches", type=int, default=12)
-    ap.add_argument("--top-k", type=int, default=None, help="G2 own-side truncation cap")
+    ap.add_argument("--min-prob", type=float, default=0.0,
+                    help="explicit chance-pruning threshold (default 0: exact enumeration)")
+    ap.add_argument("--max-branches", type=int, default=None,
+                    help="explicit per-cell branch cap (default none: exact enumeration)")
+    ap.add_argument("--top-k", type=int, default=None,
+                    help="reserved; a cap that removes live own types is refused as truth-leaking")
     ap.add_argument("--top-j", type=int, default=None, help="G2 opponent-side truncation cap")
     ap.add_argument("--n-queried", type=int, default=8)
     ap.add_argument("--checkpoint", default=None,
                     help="agent weights (default: random weights — the blind G0-recipe path)")
     ap.add_argument("--selfplay", action="store_true",
                     help="solver-vs-solver self-play (Phase I.2): both sides solve, 2x rows")
+    ap.add_argument("--posterior-aware", action="store_true",
+                    help="load the checkpoint posterior-aware (zero-pad expanded if blind) — "
+                         "the I.5 loop path; requires --checkpoint")
+    ap.add_argument("--value-net", default=None,
+                    help="trained PBValueNet state dict: G5 leaf-value switch (default: the "
+                         "interim posterior-feature head)")
+    ap.add_argument("--value-recompute-every", type=int, default=8,
+                    help="PBValueNet table refresh cadence N (G4's drift-chosen knob)")
+    ap.add_argument("--flush-every", type=int, default=25,
+                    help="atomically save each worker's shard every N games (0 = only at end)")
     ap.add_argument("--torch-threads", type=int, default=None,
                     help="torch threads per worker (default: 20 // workers)")
     args = ap.parse_args()
 
-    out_dir = Path(args.out)
-    out_dir.mkdir(parents=True, exist_ok=True)
     search_kwargs = {"iters": args.iters, "min_prob": args.min_prob,
                      "max_branches": args.max_branches, "n_queried": args.n_queried}
     if args.top_k is not None:
@@ -121,45 +224,14 @@ def main() -> None:
     if args.top_j is not None:
         search_kwargs["top_j"] = args.top_j
 
-    per = [args.games // args.workers + (1 if w < args.games % args.workers else 0)
-           for w in range(args.workers)]
-    offsets = [sum(per[:w]) for w in range(args.workers)]
-    shard_cfgs = [{
-        "shard": w, "games": per[w], "game_offset": offsets[w],
-        "pool": args.pool, "seed": args.seed * 100_003 + w,
-        "max_decisions": args.max_decisions, "search_kwargs": search_kwargs,
-        "checkpoint": args.checkpoint, "selfplay": args.selfplay,
-        "torch_threads": args.torch_threads or max(1, (os.cpu_count() or 4) // args.workers),
-        "out_path": str(out_dir / f"shard_{w:02d}.pt"),
-    } for w in range(args.workers) if per[w] > 0]
-
-    t0 = time.perf_counter()
-    if len(shard_cfgs) == 1:
-        stats = [_run_shard(shard_cfgs[0])]
-    else:
-        import multiprocessing as mp
-
-        with mp.get_context("spawn").Pool(len(shard_cfgs)) as pool:
-            stats = pool.map(_run_shard, shard_cfgs)
-    wall = time.perf_counter() - t0
-
-    games = sum(s["games"] for s in stats)
-    rows = sum(s["rows"] for s in stats)
-    hits = sum(s["cache_hits"] for s in stats)
-    misses = sum(s["cache_misses"] for s in stats)
-    truncated = sum(s["truncated_games"] for s in stats)
-    summary = {
-        "games": games, "rows": rows, "wall_s": round(wall, 1),
-        "games_per_hour": round(games / (wall / 3600.0), 1),
-        "games_per_day_extrapolated": round(games / (wall / 86400.0)),
-        "solver_decisions_per_game": round(rows / max(1, games), 2),
-        "opening_cache_hits": hits, "opening_cache_misses": misses,
-        "truncated_games": truncated,
-        "workers": len(shard_cfgs), "search_kwargs": search_kwargs,
-        "selfplay": args.selfplay, "checkpoint": args.checkpoint,
-        "per_shard": stats,
-    }
-    (out_dir / "summary.json").write_text(json.dumps(summary, indent=2))
+    summary = run_sharded_datagen(
+        pool=args.pool, games=args.games, workers=args.workers, out_dir=args.out,
+        search_kwargs=search_kwargs, seed=args.seed, max_decisions=args.max_decisions,
+        checkpoint=args.checkpoint, selfplay=args.selfplay,
+        posterior_aware=args.posterior_aware, value_net=args.value_net,
+        value_recompute_every=args.value_recompute_every,
+        torch_threads=args.torch_threads, flush_every=args.flush_every,
+    )
     print(json.dumps({k: v for k, v in summary.items() if k != "per_shard"}, indent=2))
 
 

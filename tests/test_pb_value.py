@@ -7,7 +7,7 @@ entire reason the network takes the belief at all (a value blind to rho is the Â
 """
 import torch
 
-from fog.models.pb_value import PBValueNet
+from fog.models.pb_value import PBValueNet, TeamEncoder
 
 SIZES = {"species": 32, "item": 12, "ability": 16, "move": 40, "spread": 8, "tera": 6}
 
@@ -126,3 +126,30 @@ def test_batchable_leaves_match_singletons():
         singles = torch.cat([net(s_board[i:i + 1], c_dyn[i:i + 1], own, opp, rho[i:i + 1])
                              for i in range(6)], dim=0)
     assert torch.allclose(batched, singles, atol=1e-5)
+
+
+def test_team_encoder_binds_attributes_to_their_pokemon():
+    """Swapping items between two species changes the team; it must not be an exact collision."""
+    gen = torch.Generator().manual_seed(123)
+    encoder = TeamEncoder(32, SIZES).eval()
+    team = _rand_teams(1, gen)
+    team[0, 0, 0], team[0, 1, 0] = 1, 2                       # distinct species
+    team[0, 0, 1], team[0, 1, 1] = 3, 7                       # distinct items
+    swapped = team.clone()
+    swapped[0, 0, 1], swapped[0, 1, 1] = team[0, 1, 1], team[0, 0, 1]
+    with torch.no_grad():
+        original_embedding = encoder(team)
+        swapped_embedding = encoder(swapped)
+    assert not torch.allclose(original_embedding, swapped_embedding, atol=1e-7)
+
+
+def test_team_encoder_is_invariant_to_whole_pokemon_storage_order():
+    """Reordering complete PokÃ©mon rows changes storage only, not the team they describe."""
+    gen = torch.Generator().manual_seed(124)
+    encoder = TeamEncoder(32, SIZES).eval()
+    team = _rand_teams(2, gen)
+    order = torch.tensor([5, 2, 0, 4, 1, 3])
+    with torch.no_grad():
+        original = encoder(team)
+        reordered = encoder(team[:, order])
+    assert torch.allclose(original, reordered, atol=1e-6)

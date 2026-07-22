@@ -88,6 +88,15 @@ def make_grid_values(
     agent.eval()
     device = _device(agent)
     posterior_dim = int(getattr(agent.policy_value, "posterior_dim", 0))
+    if posterior_dim:
+        # A zero-pad-expanded checkpoint (load_posterior_agent on a blind head) has exactly-zero
+        # weights on the value MLP's posterior input columns, so the features cannot move the
+        # output — iterating the head would recompute an identical u every call. Take the static
+        # fast path until the first fine-tune/distill makes those columns nonzero. Exact-zero
+        # check on purpose: any trained column, however small, restores the aware path.
+        w = agent.policy_value.value[0].weight
+        if float(w[:, -posterior_dim:].abs().sum().item()) == 0.0:
+            posterior_dim = 0
 
     # ---- one-time trunk cache over every live leaf (the §19.13 expensive half) ----------------
     head_cache: list[tuple] = []

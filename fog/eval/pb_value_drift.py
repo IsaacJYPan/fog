@@ -1,10 +1,10 @@
-"""Drift gate for the per-pair value table: does re-weighting a stale table approximate re-running
-the network? (PROJECT_DESIGN_PROPOSAL.md §9.2 + §15.3 line "the error from re-weighting a stored
+"""Drift gate for the per-pair value table: does reusing a stale table approximate re-running
+the network? (PROJECT_DESIGN_PROPOSAL.md §9.2 + §15.3 line "the error from reusing a stored
 per-pair value table instead of re-running the network is measured against full re-evaluation on
 the exact small-pool harness"; PROPOSAL_IMPL_PLAN.md Phase G drift-vs-full-reeval measurement.)
 
 WHY THIS IS THE LOAD-BEARING MEASUREMENT. The whole Option-2 decision (per-pair table refreshed
-every N iterations, cheap re-weighting in between) is only worth anything if the re-weighting stays
+every N iterations, cheap table reuse in between) is only worth anything if the cached entries stay
 close to a full network re-evaluation. If it drifts badly at every usable N, the approximation
 collapses back to Option 1's cost (a full encoder pass per leaf per iteration). This module measures
 the drift so the choice of N is a MEASURED knob, not a hope.
@@ -14,9 +14,8 @@ Two metrics, deliberately separated:
   * `reweight_staleness_curve` — the ISOLATED approximation error. Run the exact reference solve
     (recompute_every=1, so the table is refreshed every iteration) and, along that single
     trajectory, ask: at iteration t, how wrong is the leaf value if the table were `s` iterations
-    stale? i.e. `<post_t, V_{t-s}>` vs the exact `<post_t, V_t>`. This isolates the table's staleness
-    from any change in the solve trajectory — a clean "how stale can the table get before the value
-    is off by epsilon" curve, in the same units the cell payoff sums (per-leaf value).
+    stale? Compare the originating pair's `V[leaf,k,j]` in `V_{t-s}` with the same entry in `V_t`.
+    This isolates table staleness from any change in the solve trajectory.
 
   * `solution_gap` — the END-TO-END consequence. Solve fully at recompute_every=N and compare the
     FINAL averaged strategies and root value to the exact (N=1) solve. This captures the compounding
@@ -45,11 +44,16 @@ from fog.search.two_sided import two_sided_regret_solve
 Array = np.ndarray
 
 
-def _leaf_scalar(post_leaf: Array, v_table: Array) -> Array:
-    """<post_leaf, V> per leaf: [L,K,J] . [L,K,J] -> [L] (the number the cell payoff sums)."""
-    if post_leaf.size == 0:
+def _cell_leaf_values(grid: Any, v_table: Array) -> Array:
+    """The one V[leaf,k,j] entry each live branch actually contributes to its grid cell."""
+    if v_table.size == 0:
         return np.zeros((0,))
-    return (post_leaf * v_table).sum(axis=(1, 2))
+    positions = np.argwhere(grid.leaf_index >= 0)
+    out = np.zeros((len(grid.leaf_obs),), dtype=np.float64)
+    for k, j, a, b, m in positions:
+        leaf = int(grid.leaf_index[k, j, a, b, m])
+        out[leaf] = float(v_table[leaf, k, j])
+    return out
 
 
 def reweight_staleness_curve(
@@ -78,16 +82,15 @@ def reweight_staleness_curve(
     # tol=0 => never early-stop, so the trace is a full `iters`-length trajectory.
     two_sided_regret_solve(values_fn, rho, avail1, avail2, iters=iters, floor=floor, tol=0.0)
 
-    posts = [tr["post_leaf"] for tr in trace]
     tables = [tr["v_table"] for tr in trace]        # fresh every step (recompute_every=1)
-    exact = [_leaf_scalar(posts[t], tables[t]) for t in range(len(trace))]
+    exact = [_cell_leaf_values(grid, tables[t]) for t in range(len(trace))]
 
     out: dict[int, dict[str, float]] = {}
     for s in staleness:
         maxes: list[float] = []
         means: list[float] = []
         for t in range(s, len(trace)):
-            stale = _leaf_scalar(posts[t], tables[t - s])
+            stale = _cell_leaf_values(grid, tables[t - s])
             d = np.abs(stale - exact[t])
             if d.size:
                 maxes.append(float(d.max()))
@@ -143,7 +146,7 @@ def solution_gap(
 
 def format_report(staleness: dict[int, dict[str, float]], gap: dict[int, dict[str, float]]) -> str:
     """A compact human-readable summary of both metrics (for the gate log)."""
-    lines = ["reweight drift vs full re-evaluation (§9.2/§15.3)",
+    lines = ["cached-table drift vs full re-evaluation (§9.2/§15.3)",
              "  staleness  mean_err   max_err"]
     for s in sorted(staleness):
         r = staleness[s]
@@ -200,8 +203,8 @@ def main() -> None:
     ap.add_argument("--ns", default="1,2,4,8,16")
     ap.add_argument("--iters", type=int, default=128)
     ap.add_argument("--floor", type=float, default=0.02)
-    ap.add_argument("--min-prob", type=float, default=0.02)
-    ap.add_argument("--max-branches", type=int, default=8)
+    ap.add_argument("--min-prob", type=float, default=0.0)
+    ap.add_argument("--max-branches", type=int, default=None)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=None)
     args = ap.parse_args()

@@ -12,6 +12,7 @@ from fog.env.engine_battle import HAVE_ENGINE
 pytestmark = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 
 POOL = Path(__file__).resolve().parents[1] / "data" / "teams" / "pool_b"
+POOL_A = Path(__file__).resolve().parents[1] / "data" / "teams" / "pool_a"
 
 TTAR_LEAD = """Tyranitar @ Leftovers
 Ability: Sand Stream
@@ -132,7 +133,129 @@ Jolly Nature
     assert mon.maxhp == 420          # base 108, 31 IV, 252 EVs
     assert mon.speed == 333          # Jolly 252 Spe — the spec-pinned known value
     assert tuple(str(t) for t in mon.types) == ("dragon", "ground")
+    assert tuple(str(t) for t in mon.base_types) == ("dragon", "ground")
     assert mon.weight_kg > 90
+
+
+def test_lead_booster_energy_and_dauntless_shield_are_initialized():
+    """Lead entry effects must match a real switch-in; poke-engine only fires them on Switch."""
+    offensive = (POOL_A / "core_v1_offensive.txt").read_text(encoding="utf-8")
+    defensive = (POOL_A / "core_v2_defensive.txt").read_text(encoding="utf-8")
+
+    booster = _battle(offensive, defensive)
+    assert str(booster.active("p1").item).lower() == "none"
+    assert "protosynthesisatk" in {
+        str(v).lower() for v in booster.side("p1").volatile_statuses
+    }
+    revealed = booster.revealed["p1"]["p1: greattusk"]
+    assert revealed["item"] == "boosterenergy"
+    assert revealed["ability"] == "protosynthesis"
+    true_world = booster.fork_for_own_world("p1", booster.truth_tokens("p1"), seed=31)
+    assert str(true_world.active("p1").item).lower() == "none", \
+        "a public consumption is current state and must not be undone by world substitution"
+    assert "protosynthesisatk" in {
+        str(v).lower() for v in true_world.side("p1").volatile_statuses
+    }
+
+    shield = _battle(offensive, defensive)
+    shield.set_leads(5, 5)
+    assert str(shield.active("p1").id).lower() == "zamazenta"
+    assert int(shield.side("p1").defense_boost) == 1
+    assert shield.revealed["p1"]["p1: zamazenta"]["ability"] == "dauntlessshield"
+
+
+def test_dauntless_shield_activates_only_once_per_battle():
+    defensive = (POOL_A / "core_v2_defensive.txt").read_text(encoding="utf-8")
+    battle = _battle(defensive, defensive, seed=32)
+
+    battle.step({"p1": "zamazenta", "p2": "stealthrock"})
+    assert int(battle.side("p1").defense_boost) == 1
+    assert battle.revealed["p1"]["p1: zamazenta"]["ability"] == "dauntlessshield"
+
+    battle.step({"p1": "greattusk", "p2": "earthquake"})
+    battle.step({"p1": "zamazenta", "p2": "earthquake"})
+    assert int(battle.side("p1").defense_boost) == 0, \
+        "Gen 9 does not grant a second Dauntless Shield boost after switching out and back"
+
+
+def test_trick_removing_choice_item_clears_old_choice_lock():
+    p1 = (POOL_A / "core_v1_offensive.txt").read_text(encoding="utf-8")
+    p2 = (POOL_A / "core_v5_bulkup.txt").read_text(encoding="utf-8")
+    b = _battle(p1, p2, seed=17)
+    b.step({"p1": "GHOLDENGO", "p2": "bulkup"})
+
+    branches, _ = b.step_branches({"p1": "trick-tera", "p2": "rapidspin-tera"})
+    assert branches
+    for _, fork in branches:
+        assert str(fork.active("p1").item).lower() == "leftovers"
+        assert not any(bool(move.disabled) for move in fork.active("p1").moves)
+        assert fork.action_mask("p1")[:4].all()
+
+
+def test_knock_off_removing_choice_item_clears_choice_lock():
+    choice = (POOL_A / "core_v6_choice.txt").read_text(encoding="utf-8")
+    battle = _battle(choice, choice, seed=33)
+    branches, _ = battle.step_branches({"p1": "icespinner-tera", "p2": "knockoff"})
+
+    assert branches
+    for _, fork in branches:
+        assert str(fork.active("p1").item).lower() == "none"
+        assert fork.action_mask("p1")[:4].all()
+
+
+def test_trick_user_is_not_locked_when_it_receives_another_choice_item():
+    utility = (POOL_A / "core_v7_utility.txt").read_text(encoding="utf-8")
+    offensive = (POOL_A / "core_v1_offensive.txt").read_text(encoding="utf-8")
+    battle = _battle(utility, offensive, seed=34)
+    battle.set_leads(5, 2)  # Choice Band Zamazenta vs Choice Scarf Gholdengo
+
+    branches, _ = battle.step_branches({"p1": "crunch", "p2": "trick"})
+    assert branches
+    for _, fork in branches:
+        assert str(fork.active("p2").item).lower() == "choiceband"
+        assert fork.action_mask("p2")[:4].all(), \
+            "using Trick before receiving the new Choice item does not create a choice lock"
+
+
+def test_assault_vest_received_by_trick_blocks_status_moves():
+    bulkup = (POOL_A / "core_v5_bulkup.txt").read_text(encoding="utf-8")
+    tempo = (POOL_A / "core_v8_tempo.txt").read_text(encoding="utf-8")
+    battle = _battle(bulkup, tempo, seed=35)
+    battle.set_leads(2, 0)  # Choice Specs Gholdengo; opponent switches to AV Zamazenta
+
+    branches, _ = battle.step_branches({"p1": "trick", "p2": "zamazenta"})
+    assert branches
+    for _, fork in branches:
+        assert str(fork.active("p1").item).lower() == "assaultvest"
+        assert np.flatnonzero(fork.action_mask("p1")[:4]).tolist() == [0, 1, 2]
+
+
+@pytest.mark.parametrize("target_choice", ["nastyplot", "GHOLDENGO"])
+def test_good_as_gold_blocks_trick_for_active_or_switching_target(target_choice):
+    p1 = (POOL_A / "core_v1_offensive.txt").read_text(encoding="utf-8")
+    p2 = (POOL_A / "core_v2_defensive.txt").read_text(encoding="utf-8")
+    b = _battle(p1, p2, seed=18)
+    b.set_leads(2, 2 if target_choice == "nastyplot" else 0)
+
+    branches, _ = b.step_branches({"p1": "trick", "p2": target_choice})
+    assert branches
+    for _, fork in branches:
+        assert str(fork.active("p1").item).lower() == "choicescarf"
+        assert str(fork.active("p2").item).lower() == "airballoon"
+        assert np.flatnonzero(fork.action_mask("p1")[:4]).tolist() == [2]
+        assert fork.revealed["p2"]["p2: gholdengo"]["ability"] == "goodasgold"
+
+
+def test_rapid_spin_second_into_helmet_has_one_recoil_payment():
+    utility = (POOL_A / "core_v7_utility.txt").read_text(encoding="utf-8")
+    b = _battle(utility, utility, seed=19)
+    branches, _ = b.step_branches({"p1": "rapidspin-tera", "p2": "bodypress-tera"})
+
+    assert branches
+    # Great Tusk has 434 HP. One Helmet payment is 72 HP; Body Press contributes 95 or 143.
+    # The native duplicate would create impossible 147/195-HP successors instead of 219/267.
+    p1_health = {int(fork.active("p1").hp) for _, fork in branches}
+    assert p1_health == {219, 267}
 
 
 # ----------------------------------------------------------------------- reveals + censoring
@@ -212,6 +335,18 @@ def test_choice_lock_masks_other_moves():
 
     obs = Observation.from_battle(b.view("p1"), tracker=b.trackers["p1"])
     assert (obs.legality_mask == mask).all()
+
+
+def test_two_turn_charge_forces_continuation_and_forbids_switching():
+    p1 = (POOL_A / "core_v5_bulkup.txt").read_text(encoding="utf-8")
+    p2 = (POOL_A / "core_v4_tera.txt").read_text(encoding="utf-8")
+    b = _battle(p1, p2, seed=23)
+    b.set_leads(3, 0)  # Dragapult with Phantom Force
+    b.step({"p1": "phantomforce", "p2": "bulkup"})
+
+    mask = b.action_mask("p1")
+    assert np.flatnonzero(mask).tolist() == [2]
+    assert b.engine_action("p1", 2).lower() == "phantomforce"
 
 
 def test_faint_forces_replacement():

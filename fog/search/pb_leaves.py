@@ -41,8 +41,8 @@ def commit_pair_branches(
     my_action_idx: int,
     opp_action_idx: int | None = None,
     *,
-    min_prob: float = 0.005,
-    max_branches: int | None = 12,
+    min_prob: float = 0.0,
+    max_branches: int | None = None,
 ) -> tuple[list[BranchOutcome], float]:
     """Commit both public actions on `root` and enumerate the turn's chance branches.
 
@@ -61,7 +61,10 @@ def commit_pair_branches(
     branch fork stands — a completed turn (both sides pending the next decision) or a pending
     forced replacement (§10.5). No further stepping happens here.
 
-    Returns `(outcomes, pruned_mass)` with kept probabilities summing to one.
+    Returns `(outcomes, pruned_mass)` with kept probabilities summing to one.  The low-level
+    primitive is exact by default: it keeps every native engine branch.  Search budgets may pass
+    explicit pruning limits (and must record the resulting `pruned_mass`), but merely calling this
+    function never turns a rare valid outcome into an undocumented approximation.
     """
     opp_role = "p2" if role == "p1" else "p1"
     pending = set(root.pending_sides())

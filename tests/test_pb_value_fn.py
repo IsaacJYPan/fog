@@ -25,6 +25,7 @@ class FakeGrid:
     leaf_index: np.ndarray
     leaf_obs: list
     failed: np.ndarray
+    leaf_evidence: np.ndarray
 
 
 class FakeAgent:
@@ -69,7 +70,8 @@ def _build(monkeypatch):
                     leaf_obs.append(len(leaf_obs))                    # leaf id == its own obs
     failed = np.zeros((K, J, A, B), dtype=bool)
     failed[1, 0, 1, 1] = True                                        # exercise the fallback path
-    grid = FakeGrid(branch_prob, terminal_value, leaf_index, leaf_obs, failed)
+    leaf_evidence = np.ones((len(leaf_obs), K, J), dtype=bool)
+    grid = FakeGrid(branch_prob, terminal_value, leaf_index, leaf_obs, failed, leaf_evidence)
 
     n_leaves = len(leaf_obs)
     s_all = torch.randn(n_leaves, STATE, generator=gen)
@@ -91,9 +93,13 @@ def _independent_u(grid, net, own, opp, rho, s_all, c_all, sigma1, sigma2, fallb
     post_leaf = post[leaf_ab[:, 0], leaf_ab[:, 1]]                    # [L, K, J]
     with torch.no_grad():
         V = net(s_all, c_all, own, opp, torch.as_tensor(post_leaf, dtype=torch.float32)).numpy()
-    scalar = (post_leaf * V).sum(axis=(1, 2))                        # [L]
     fill = np.where(np.isnan(grid.terminal_value), 0.0, grid.terminal_value)
-    per_branch = np.where(grid.leaf_index >= 0, scalar[np.maximum(grid.leaf_index, 0)], fill)
+    safe_leaf = np.maximum(grid.leaf_index, 0)
+    k_axis = np.arange(V.shape[1])[:, None, None, None, None]
+    j_axis = np.arange(V.shape[2])[None, :, None, None, None]
+    per_branch = np.where(
+        grid.leaf_index >= 0, V[safe_leaf, k_axis, j_axis], fill
+    )
     u = (grid.branch_prob * per_branch).sum(axis=-1)
     u[grid.failed] = fallback
     return u
@@ -120,10 +126,8 @@ def test_reference_mode_matches_independent_recompute(monkeypatch):
     assert stats.failed_cells == 1
 
 
-def test_reweighting_tracks_posterior_between_refreshes(monkeypatch):
-    """With a large N (only the first call refreshes the table), u STILL changes as the strategies
-    move, because the cheap re-weighting recomputes each leaf's posterior every call — this is the
-    coupling channel that survives without a network pass."""
+def test_cached_pair_table_stays_fixed_between_refreshes(monkeypatch):
+    """A stale table is reused verbatim; belief changes affect values only at a network refresh."""
     from fog.search.pb_value_fn import make_pb_value_grid_values
     grid, agent, net, own, opp, rho, *_ = _build(monkeypatch)
     values_fn, stats = make_pb_value_grid_values(
@@ -143,7 +147,7 @@ def test_reweighting_tracks_posterior_between_refreshes(monkeypatch):
     u_b = values_fn(s1b, s2b)
     assert stats.net_refreshes == 1                                  # only the first call refreshed
     assert stats.reweightings == 2
-    assert not np.allclose(u_a, u_b)                                 # yet the values moved
+    assert np.allclose(u_a, u_b)                                     # no second belief average
 
 
 def test_refresh_cadence_counts(monkeypatch):
@@ -213,3 +217,45 @@ def test_exact_and_approx_agree_at_first_call(monkeypatch):
     s2 = torch.rand(2, 2, generator=g).numpy()
     s2 /= s2.sum(1, keepdims=True)
     assert np.allclose(exact(s1, s2), approx(s1, s2), atol=1e-6)
+
+
+def test_pair_values_are_not_collapsed_to_a_public_average(monkeypatch):
+    """A +1 pair and a -1 pair remain different even when their public average is zero."""
+    from fog.search.pb_value_fn import make_pb_value_grid_values
+
+    grid, agent, _, own, opp, rho, *_ = _build(monkeypatch)
+    grid.branch_prob[..., 0] = 0.0
+    grid.branch_prob[..., 1] = 1.0
+    grid.terminal_value[...] = np.nan
+    grid.failed[...] = False
+
+    class PairNet(torch.nn.Module):
+        def forward(self, s_board, c_dyn, own_tokens, opp_tokens, post):
+            pair = torch.tensor([[1.0, 0.5], [-0.5, -1.0]], device=s_board.device)
+            return pair.expand(len(s_board), -1, -1)
+
+    values_fn, _ = make_pb_value_grid_values(
+        agent, PairNet(), grid, rho, own.numpy(), opp.numpy(), recompute_every=1
+    )
+    strategy = np.full((2, 2), 0.5)
+    values = values_fn(strategy, strategy)
+    for action1 in range(2):
+        for action2 in range(2):
+            np.testing.assert_allclose(
+                values[:, :, action1, action2], [[1.0, 0.5], [-0.5, -1.0]]
+            )
+
+
+def test_leaf_evidence_conditions_the_network_belief(monkeypatch):
+    from fog.search.pb_value_fn import make_pb_value_grid_values
+
+    grid, agent, net, own, opp, rho, *_ = _build(monkeypatch)
+    grid.leaf_evidence[:, 0, 1] = False
+    trace = []
+    values_fn, _ = make_pb_value_grid_values(
+        agent, net, grid, rho, own.numpy(), opp.numpy(), recompute_every=1, trace=trace
+    )
+    strategy = np.full((2, 2), 0.5)
+    values_fn(strategy, strategy)
+    assert (trace[0]["post_leaf"][:, 0, 1] == 0.0).all()
+    np.testing.assert_allclose(trace[0]["post_leaf"].sum(axis=(1, 2)), 1.0)

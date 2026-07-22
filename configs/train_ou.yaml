@@ -1,6 +1,6 @@
 # gen9ou self-play PPO on the POOL-B team bank (the target format — spec §6, milestone M1-on-OU).
-# Start the local server first:  cd server/pokemon-showdown; node pokemon-showdown start --no-security
-# Run:                           python -m fog.training.ppo --config configs/train_ou.yaml
+# Uses env.backend=showdown_direct from default.yaml: no server, login, or WebSocket is started.
+# Run: python -m fog.training.ppo --config configs/train_ou.yaml
 extends: default.yaml
 
 experiment: train_ou

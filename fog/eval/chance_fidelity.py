@@ -9,7 +9,8 @@ engineering, the two known chance-fidelity gaps of the poke-engine branch enumer
    (floor(base * r / 100), r = 85..100 — probe fact 3) and log: the straddle rate over matched
    move-damage instructions, and the probability mass the average-roll verdict gets wrong.
 
-2. **Crit rate.** The engine branches crits at 1/16 (6.25%); Gen 9's base rate is 1/24 (~4.17%).
+2. **Crit rate.** The engine must be compiled with its Gen 9 feature, which branches ordinary
+   critical hits at 1/24 (~4.17%).
    Crit branches are identified by matching branch damage against the crit base's average roll;
    the per-cell crit share is aggregated so a global constant shows up as a tight distribution
    around one value (high-crit moves and abilities would legitimately widen it — report the

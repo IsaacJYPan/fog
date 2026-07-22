@@ -14,12 +14,18 @@ pins:
 
 # --- Simulator / environment (§0, §10 M0) ----------------------------------------------------------
 env:
+  # Direct is the default research backend: Showdown is imported in-process through a persistent
+  # local worker, while observations still pass through poke-env's ordinary censored parser.
+  # The server URL remains below only for external/live-play compatibility.
+  backend: showdown_direct       # {showdown_direct, showdown, engine}
+  showdown_root: server/pokemon-showdown
   server_url: "ws://localhost:8000/showdown/websocket"
   battle_format: "gen9ou"
-  num_workers: 8               # N parallel Node Showdown processes (M0 throughput probe)
-  no_security: true            # local server flag for throughput
+  num_workers: 8               # legacy server-backed M0 throughput probe
+  no_security: true            # legacy local-server flag
   team_pool: null              # path to a parsed team bank; null = format default
-  # Concurrent battles per player during TRAINING (poke-env max_concurrent_battles). Per-battle
+  # Concurrent battles per player on env.backend=showdown (poke-env max_concurrent_battles).
+  # showdown_direct currently schedules complete games synchronously through one worker. Per-battle
   # state is keyed by battle_tag so >1 is safe; note >1 switches belief-truth from the exact
   # recording-teambuilder source to attribute matching (labels missing until reveals disambiguate).
   concurrent_battles: 1

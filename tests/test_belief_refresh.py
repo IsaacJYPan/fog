@@ -58,6 +58,8 @@ def test_refresh_trains_only_beliefs_and_improves_train_ce():
         "two epochs on the same small batch must reduce the train loss"
     )
     for k in ("belief_ce_before", "belief_ce_after",
-              "self_belief_ce_before", "self_belief_ce_after"):
+              "self_belief_ce_before", "self_belief_ce_after",
+              "belief_chain_ce_before", "belief_chain_ce_after",
+              "self_belief_chain_ce_before", "self_belief_chain_ce_after"):
         assert report[k] == report[k] and report[k] >= 0.0  # finite, non-NaN
     assert isinstance(report["improved"], bool)

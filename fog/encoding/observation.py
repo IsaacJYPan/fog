@@ -92,6 +92,44 @@ class Observation:
             opp_revealed=opp_revealed,
         )
 
+    @classmethod
+    def public_from_engine_battle(cls, battle: Any, role: str) -> "Observation":
+        """Build the public-only value view of an ``EngineBattle``.
+
+        A normal player observation contains that player's complete private sheet in entity slots
+        0-5.  A public-belief value query must not contain either private sheet: candidate sheets
+        are supplied separately to the value network.  This constructor starts from ``role``'s
+        ordinary view, then replaces its own private fields with exactly what the other player has
+        publicly observed.  The opponent side was already censored by ``EngineView``.
+
+        The legality mask is also private because it can reveal unrevealed moves, remaining PP,
+        choice locks, and trapping.  The shared value trunk does not consume it today, but storing
+        a constant mask prevents a future trunk change from silently opening that leak.
+        """
+        from fog.constants.schema import MAX_SPREADS_PER_SPECIES
+        from fog.encoding.mirror import _downgrade_my_entities
+
+        if not hasattr(battle, "view") or not hasattr(battle, "trackers"):
+            raise TypeError("public_from_engine_battle requires an EngineBattle-like object")
+        other = "p2" if role == "p1" else "p1"
+        obs = cls.from_battle(battle.view(role), tracker=battle.trackers[role])
+        reverse = cls.from_battle(battle.view(other), tracker=battle.trackers[other])
+        tables = battle.tables
+        unknown = {
+            "item": tables.n_items,
+            "ability": tables.n_abilities,
+            "move": tables.n_moves,
+            "spread": MAX_SPREADS_PER_SPECIES + 1,
+        }
+        own_public_tokens = np.asarray(reverse.opp_revealed["tokens"], dtype=np.int64)
+        own_entities, own_ids = _downgrade_my_entities(
+            obs.entities[:6], obs.entity_ids[:6], own_public_tokens, unknown
+        )
+        obs.entities[:6] = own_entities
+        obs.entity_ids[:6] = own_ids
+        obs.legality_mask = np.ones(14, dtype=bool)
+        return obs
+
     def validate(self) -> None:
         """Cheap shape assertions used in tests and the golden-battle integration test."""
         assert self.entities.shape[0] == 12

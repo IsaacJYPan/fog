@@ -16,6 +16,7 @@ authors = [{ name = "FOG" }]
 dependencies = [
     "torch>=2.2",            # CUDA build installed separately per platform
     "poke-env>=0.8",
+    "poke-engine==0.0.48",   # search/training simulator; mechanics are cross-checked vs Showdown
     "numpy>=1.26",
     "polars>=0.20",
     "pyarrow>=15",           # parquet
@@ -42,6 +43,16 @@ fog-parse           = "fog.scripts.parse_replays:main"
 
 [tool.setuptools.packages.find]
 include = ["fog*"]
+
+[tool.setuptools.package-data]
+fog = ["env/*.js"]
+
+[tool.uv]
+# poke-engine's default Cargo feature is an older battle generation. The Gen 9 build changes
+# type interactions, critical-hit rates, Terastallization, and other mechanics. Always compile
+# this dependency from source with exactly the generation this project studies.
+no-binary-package = ["poke-engine"]
+config-settings-package = { poke-engine = { build-args = "--features poke-engine/gen9 --no-default-features" } }
 
 [tool.ruff]
 line-length = 100

@@ -1,6 +1,4 @@
-"""PBValueNet outcome trainer (fog/training/pb_value_train.py, PROPOSAL_IMPL_PLAN Phase G3):
-dataset build from v2 shards (j*=-1 and truncated rows dropped, belief variants collected),
-one-labeled-cell training runs end-to-end on a real log, and from_tables sizes fit real tokens."""
+"""PBValueNet outcome trainer: aligned public leaves, beliefs, and eventual outcomes."""
 from __future__ import annotations
 
 from types import SimpleNamespace
@@ -71,7 +69,7 @@ def v2_shard(tmp_path_factory):
     return out_dir, agent
 
 
-def test_dataset_build_filters_and_belief_variants(v2_shard):
+def test_dataset_build_uses_aligned_public_leaves(v2_shard):
     import torch
 
     from fog.training.pb_value_train import build_pb_value_rows
@@ -83,22 +81,39 @@ def test_dataset_build_filters_and_belief_variants(v2_shard):
         assert r["own_tokens"].shape[0] > r["k_star"] >= 0
         assert r["opp_tokens"].shape[0] > r["j_star"] >= 0
         assert r["outcome"] in (-1.0, 0.0, 1.0)
-        assert len(r["beliefs"]) >= 1, "root rho is always present"
-        for b in r["beliefs"]:
-            assert b.shape == (r["own_tokens"].shape[0], r["opp_tokens"].shape[0])
-            assert b.sum() > 0
-    # G1 coverage actually flowed through: some row carries more than the root belief
-    assert any(len(r["beliefs"]) > 1 for r in rows)
+        assert r["belief"].shape == (r["own_tokens"].shape[0], r["opp_tokens"].shape[0])
+        np.testing.assert_allclose(r["belief"].sum(), 1.0)
+        assert r["target_kind"] == "played_leaf_outcome"
+        assert r["root_obs"] is not None
+        assert isinstance(r["one_sided"], bool)
 
-    # j* = -1 rows are dropped
+    # value j* = -1 rows are dropped
     shard = out_dir / "shard_00.pt"
     saved = torch.load(shard, weights_only=False)
     for row in saved["rows"]:
-        row["opp_true_index"] = -1
+        row["value_opp_true_index"] = -1
     torch.save(saved, out_dir / "shard_01.pt")
     rows2 = build_pb_value_rows(out_dir)
     assert len(rows2) == len(rows), "the j*=-1 duplicate shard contributes nothing"
     (out_dir / "shard_01.pt").unlink()
+
+
+def test_public_only_ablation_removes_candidate_and_belief_information(v2_shard):
+    from fog.training.pb_value_train import (
+        build_pb_value_rows,
+        public_only_ablation_rows,
+    )
+
+    out_dir, _ = v2_shard
+    original = build_pb_value_rows(out_dir)
+    ablated = public_only_ablation_rows(original)
+    assert len(ablated) == len(original)
+    for before, after in zip(original, ablated):
+        assert (after["own_tokens"] == -1).all()
+        assert (after["opp_tokens"] == -1).all()
+        np.testing.assert_allclose(after["belief"], 1.0 / after["belief"].size)
+        assert after["obs"] is before["obs"]
+        assert not np.shares_memory(after["belief"], before["belief"])
 
 
 def test_trainer_end_to_end_one_labeled_cell(v2_shard):

@@ -125,6 +125,9 @@ def test_identical_candidate_worlds_produce_identical_tables(grid_2x2):
 
 
 def test_leaves_are_censored_observations(grid_2x2):
+    from fog.encoding.dims import DIMS
+    from fog.encoding.entities import L
+
     g = grid_2x2
     assert len(g.leaf_obs) > 0
     assert max(int(g.leaf_index.max()), -1) == len(g.leaf_obs) - 1
@@ -132,6 +135,13 @@ def test_leaves_are_censored_observations(grid_2x2):
     tokens = np.asarray(obs.opp_revealed["tokens"])
     assert (tokens == -1).any(), \
         "a one-turn leaf must still hide most opponent attributes (fog semantics, 19.12)"
+    own_known = obs.entities[:6, L.epistemic:L.epistemic + DIMS.epistemic_flags]
+    assert not own_known.all(), "the value leaf must not retain the acting side's private sheet"
+    assert obs.legality_mask.all(), "private legality is replaced by a constant public placeholder"
+    assert g.leaf_evidence.shape == (len(g.leaf_obs), 2, 2)
+    for k, j, a, b, m in np.argwhere(g.leaf_index >= 0):
+        leaf = g.leaf_index[k, j, a, b, m]
+        assert g.leaf_evidence[leaf, k, j], "a leaf must retain the pair that generated it"
 
 
 def test_value_assembly_contract(grid_2x2):

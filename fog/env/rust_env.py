@@ -15,7 +15,9 @@ This proxy itself remains a smoke test / shape check. What it still does NOT do 
     `reveal_opponent=True`, perfect information — NEVER train on that);
   * legality nuance (choice lock, trapping, disable, forced switches) beyond the basic mask.
 
-Verified 2026-07: `pip install poke-engine` (0.0.47) ships Windows/cp314 wheels WITH the gen-9
+Verified 2026-07: poke-engine 0.0.48 must be built with its `gen9` Cargo feature and older
+generation defaults disabled. The ordinary prebuilt wheel does not establish that requirement;
+the locked uv configuration compiles it from source. The Gen 9 build exposes the
 terastallization feature (`Pokemon.tera_type` / `.terastallized` exist) — the load-bearing coverage
 question. The proxy feeds the SAME encoders as the Showdown path, but note "same encoder" does not
 mean "same inputs": every proxy field below that approximates (see _ProxyMon) is a drift source the
@@ -31,8 +33,9 @@ Divergence control (the real risk — PPO will farm sim bugs):
   * cross-sim gauntlet every N checkpoints; HALT if the Rust-vs-Showdown win-rate gap exceeds 3%.
   * final fine-tune (last ~200k games before any headline number) always on Showdown.
 
-Move strings (VERIFIED against poke-engine 0.0.47): a move id ("earthquake"), a bare pokemon id for
-a switch ("ironvaliant" — no "switch " prefix), and "<moveid>-tera" to terastallize with the move.
+Move strings (verified against the Gen 9 build of poke-engine 0.0.48): a move id ("earthquake"),
+a bare pokemon id for a switch ("ironvaliant" — no "switch " prefix), and "<moveid>-tera" to
+terastallize with the move.
 `generate_instructions(state, s1_move, s2_move)` returns probability-weighted StateInstructions;
 `state.apply_instructions(instructions[i])` advances (sample by `.percentage` for stochastic play).
 Re-run `smoke_roundtrip()` after any poke-engine upgrade — the string formats have drifted between
@@ -59,7 +62,7 @@ def paste_to_engine_pokemon(mon) -> "poke_engine.Pokemon":
     """poke-env TeambuilderPokemon (parsed paste mon) -> poke_engine.Pokemon.
 
     With built tables this computes REAL stats/types/weight (pe.Pokemon derives nothing from
-    id/evs/nature — verified 0.0.47: omitting them plays every mon at 100s and NORMAL/TYPELESS,
+    id/evs/nature — verified 0.0.48: omitting them plays every mon at 100s and NORMAL/TYPELESS,
     which silently voids all damage calc). The table-less fallback keeps the old approximate
     construction for shape tests only — never fuzz or train on it.
     """
@@ -286,7 +289,7 @@ def smoke_roundtrip(paste_a: str, paste_b: str) -> dict:
     instructions = poke_engine.generate_instructions(state, m1, m2)
     applied = False
     if instructions:
-        # apply_instructions RETURNS the successor state (verified 0.0.47) — it does not mutate
+        # apply_instructions RETURNS the successor state (verified 0.0.48) — it does not mutate
         new_state = state.apply_instructions(instructions[0])
         applied = new_state.to_string() != state.to_string()
     return {"obs_ok": True, "n_instruction_sets": len(instructions), "applied": applied,

@@ -6,7 +6,7 @@ value head with four scalar posterior features. Four numbers cannot say WHICH ca
 probability, and the head must re-run every solver iteration because its scalar output moves with the
 posterior. This module is the real thing the proposal §9 asks for: it reads the full K x J belief and
 each candidate team's identity, and — crucially — emits a value for EVERY candidate pair at once so
-the solver can refresh a cached leaf by re-weighting, not by re-running a network.
+the solver can reuse a cached table between periodic belief-conditioned refreshes.
 
 THE OUTPUT SHAPE IS THE COST DECISION (§9.2, settled). During one real decision the solver runs
 hundreds of regret iterations; each iteration moves both strategies, hence the action-conditioned
@@ -17,17 +17,15 @@ a decision. Instead this network runs ONCE per leaf and returns the per-pair tab
     V[leaf, k, j] = our expected continuation payoff from this leaf IF the true teams are (k, j),
                     under the belief the network was conditioned on.
 
-The solver then turns a table into the scalar the cell payoff needs by averaging over the leaf's
-current action-conditioned posterior (fog/search/pb_values.py Phase-G path):
+The simulated cell for private pair `(k, j)` receives `V[leaf, k, j]`. The two-sided solver later
+performs the single required average over the other player's possible private types. Averaging the
+table inside the bridge as well would use the belief twice and destroy type-specific decisions.
 
-    value(leaf) = sum_{k,j} post_leaf[k, j] * V[leaf, k, j]          (plain arithmetic, no net pass)
-
-Between recomputes only `post_leaf` moves; `V` is held fixed. Because a pair's true continuation
+Between recomputes `V` is held fixed. Because a pair's true continuation
 value ALSO depends on the belief carried into the leaf (continuation play is belief-dependent — the
 whole §5.1 thesis), a table conditioned once slowly drifts stale as the strategies move, so the
-bridge recomputes it every N iterations. The single-value form (dot the table with the belief it was
-conditioned on) stays the CORRECTNESS REFERENCE on the exact small-pool gate (§15.3); the drift error
-is measured against it.
+bridge recomputes it every N iterations. Refreshing every iteration stays the correctness reference
+on the exact small-pool gate (§15.3); the drift error is measured against it.
 
 THE SEVEN REQUIRED PROPERTIES (§9.1), and where each lives here:
 
@@ -80,12 +78,14 @@ _POS_FAMILY = tuple(_ATTR_FAMILY[p % len(SLOT_ATTRS)] for p in range(N_ATTRS))
 
 
 class TeamEncoder(nn.Module):
-    """A 6x9 candidate-team token grid -> one team embedding [d]. Each attribute contributes a
-    value embedding (its family's table, with an extra <UNK> row for hidden/out-of-range indices,
-    index == family size) plus a 54-way attribute-IDENTITY embedding, so the encoding is fully
-    determined by team content and attribute identity — never by particle order. The per-attribute
-    embeddings are mean-pooled and projected. Candidate teams are normally fully concrete, but the
-    <UNK> row keeps a partially specified team (a -1 entry) well-defined."""
+    """A 6x9 candidate-team grid -> one team embedding without attribute-assignment collisions.
+
+    Each field is transformed before pooling. Fields are first combined within one Pokémon, so an
+    item, ability, move set, spread, and Tera type remain bound to that Pokémon's species. The six
+    complete Pokémon representations are then pooled as a set. A prior implementation averaged all
+    54 raw embeddings before its first nonlinear transform; swapping two items between species was
+    therefore an exact collision. The staged pooling below makes that regression testable.
+    """
 
     def __init__(self, d: int, sizes: dict[str, int]) -> None:
         super().__init__()
@@ -94,26 +94,37 @@ class TeamEncoder(nn.Module):
         self.value_embeds = nn.ModuleDict(
             {name: nn.Embedding(n + 1, d) for name, n in self.sizes.items()}  # +1 == <UNK>
         )
-        self.attr_id = nn.Embedding(N_ATTRS, d)
-        self.proj = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d))
-        pos_n = torch.tensor([self.sizes[_POS_FAMILY[p]] for p in range(N_ATTRS)], dtype=torch.long)
-        self.register_buffer("pos_n", pos_n, persistent=False)
+        # species, item, ability, move (shared by all four move slots), spread, tera
+        self.field_id = nn.Embedding(6, d)
+        self.attr_proj = nn.Sequential(
+            nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d)
+        )
+        self.mon_proj = nn.Sequential(
+            nn.LayerNorm(d), nn.Linear(d, 2 * d), nn.GELU(), nn.Linear(2 * d, d)
+        )
+        self.team_proj = nn.Sequential(
+            nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d)
+        )
+        self.register_buffer(
+            "field_kind", torch.tensor([0, 1, 2, 3, 3, 3, 3, 4, 5], dtype=torch.long),
+            persistent=False,
+        )
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
         """`tokens` [N, 6, 9] long value indices (-1 or >= family size -> <UNK>). Returns [N, d]."""
-        n = tokens.shape[0]
-        flat = tokens.reshape(n, N_ATTRS)
-        dev = flat.device
-        embs = []
-        for p in range(N_ATTRS):
-            fam = _POS_FAMILY[p]
+        if tokens.ndim != 3 or tuple(tokens.shape[1:]) != (N_SLOTS, len(SLOT_ATTRS)):
+            raise ValueError(f"team tokens must be [N,6,9], got {tuple(tokens.shape)}")
+        fields = []
+        for column, fam in enumerate(_ATTR_FAMILY):
             size = self.sizes[fam]
-            idx = flat[:, p].clone()
+            idx = tokens[:, :, column].clone()
             idx[(idx < 0) | (idx >= size)] = size                         # hidden / OOB -> <UNK>
-            embs.append(self.value_embeds[fam](idx))
-        attr_emb = torch.stack(embs, dim=1)                               # [N, 54, d]
-        attr_emb = attr_emb + self.attr_id(torch.arange(N_ATTRS, device=dev)).unsqueeze(0)
-        return self.proj(attr_emb.mean(dim=1))                            # [N, d]
+            fields.append(self.value_embeds[fam](idx))                    # [N, 6, d]
+        attr = torch.stack(fields, dim=2)                                 # [N, 6, 9, d]
+        attr = attr + self.field_id(self.field_kind).view(1, 1, 9, self.d)
+        attr = self.attr_proj(attr)
+        pokemon = self.mon_proj(attr.mean(dim=2))                         # [N, 6, d]
+        return self.team_proj(pokemon.mean(dim=1))                        # [N, d]
 
 
 def _weighted_messages(src: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
