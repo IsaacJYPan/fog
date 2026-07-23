@@ -130,6 +130,7 @@ def test_leaves_are_censored_observations(grid_2x2):
 
     g = grid_2x2
     assert len(g.leaf_obs) > 0
+    assert len(g.leaf_battles) == len(g.leaf_obs)
     assert max(int(g.leaf_index.max()), -1) == len(g.leaf_obs) - 1
     obs = g.leaf_obs[0]
     tokens = np.asarray(obs.opp_revealed["tokens"])

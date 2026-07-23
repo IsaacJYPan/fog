@@ -56,7 +56,7 @@ def _belief_ces(agent: Any, batch: dict, *, chunk: int = 512) -> tuple[float, fl
     """Marginal and complete-team chain losses for both belief directions on held-out rows."""
     import torch
 
-    from fog.training.losses import belief_loss
+    from fog.training.losses import belief_loss, belief_output_loss
     from fog.training.ppo import _index_nested
 
     was_training = agent.training
@@ -77,10 +77,10 @@ def _belief_ces(agent: Any, batch: dict, *, chunk: int = 512) -> tuple[float, fl
                     out.belief.logits, mb["belief_targets"], mb["belief_valid"]))
                 sb_tot += w * float(belief_loss(
                     out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"]))
-                bc_tot += w * float(belief_loss(
-                    out.belief_chain.logits, mb["belief_targets"], mb["belief_valid"]))
-                sbc_tot += w * float(belief_loss(
-                    out.self_belief_chain.logits,
+                bc_tot += w * float(belief_output_loss(
+                    out.belief_chain, mb["belief_targets"], mb["belief_valid"]))
+                sbc_tot += w * float(belief_output_loss(
+                    out.self_belief_chain,
                     mb["self_belief_targets"], mb["self_belief_valid"],
                 ))
     finally:
@@ -96,7 +96,7 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
     Mutates `agent` in place; returns the report dict."""
     import torch
 
-    from fog.training.losses import belief_loss
+    from fog.training.losses import belief_loss, belief_output_loss
     from fog.training.ppo import _index_nested
 
     device = next(agent.parameters()).device
@@ -135,10 +135,11 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
                 loss = (belief_loss(out.belief.logits, mb["belief_targets"], mb["belief_valid"])
                         + belief_loss(out.self_belief.logits, mb["self_belief_targets"],
                                       mb["self_belief_valid"])
-                        + belief_loss(out.belief_chain.logits,
-                                      mb["belief_targets"], mb["belief_valid"])
-                        + belief_loss(out.self_belief_chain.logits,
-                                      mb["self_belief_targets"], mb["self_belief_valid"]))
+                        + belief_output_loss(out.belief_chain,
+                                             mb["belief_targets"], mb["belief_valid"])
+                        + belief_output_loss(out.self_belief_chain,
+                                             mb["self_belief_targets"],
+                                             mb["self_belief_valid"]))
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(params, max_grad_norm)

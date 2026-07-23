@@ -32,6 +32,7 @@ Two numbers reported:
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -99,21 +100,21 @@ def pool_id_logprobs(agent: Any, batch: dict, cand_tokens: np.ndarray) -> np.nda
 
 
 def pool_id_joint_logprobs(
-    agent: Any, batch: dict, cand_tokens: np.ndarray, *, tail_order: str = "canonical",
-    generator=None,
+    agent: Any, batch: dict, cand_tokens: np.ndarray, *, tail_order: str = "random",
+    generator=None, m_orders: int = 8,
 ) -> np.ndarray:
-    """[C] TRUE joint log-prob of each candidate team (BELIEF_POLICY_PLAN §4.4, the headline score).
+    """[C] order-averaged set-autoregressive score for each complete candidate team.
 
-    Unlike the fast marginal (`pool_id_logprobs`, one forward with each candidate read off the SAME
-    per-position conditionals), this feeds each candidate's own hidden values back into the chain
-    (pass-B teacher forcing) and sums the chain-rule factors: log p(hidden = candidate | R) =
-    sum_k log p(h_k = cand_k | R, cand_1..cand_{k-1}). One batched forward over the C candidates
-    (canonical tail order by default; pass a random `tail_order` + `generator` for the §4.5.3
-    order-sensitivity probe). Teacher-forcing the candidate here is CORRECT — pass B trains exactly
-    this input pattern (it was a bug only when that pattern was untrained, commit a8a96eb).
+    One route score is the exact product of matched conditionals along one dependency-valid
+    generation route. The unordered completed-team probability is a mixture over routes and over
+    permutations of each Pokemon's hidden move set. Enumerating that mixture is factorial, so the
+    headline score is a deterministic Monte Carlo average over ``m_orders`` routes:
 
-    Revealed attrs are delta rows: a candidate consistent with a reveal contributes 0 there, an
-    inconsistent one hits the -inf and is eliminated (the hard filter, same as the fast path)."""
+        log q(team | reveals) ~= logmeanexp_r log q(team | route_r, reveals).
+
+    Each route conditional and ancestral sample remains normalized exactly. A canonical route is
+    retained only as a diagnostic factorization.
+    """
     import torch
 
     from fog.encoding.reveals import align_truth_to_views
@@ -131,22 +132,26 @@ def pool_id_joint_logprobs(
             "masks": {k: v.expand(c, *v.shape[1:]).contiguous()
                       for k, v in (opp.get("masks") or {}).items()},
         }
-        cand = torch.as_tensor(cand_aligned, dtype=torch.long, device=device)  # [C, 6, 9]
-        out = agent.belief(s_c, opp_c, teacher_values=cand, tail_order=tail_order,
-                           generator=generator)
-
-        lp = torch.zeros(c, device=device)
-        for fam, col in _SCALAR_ATTR_COLS.items():
-            ls = torch.log_softmax(out.logits[fam], dim=-1)               # [C, 6, n]
-            tok = cand[:, :, col]                                         # [C, 6]
-            got = ls.gather(-1, tok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
-            lp += torch.where(tok >= 0, got, torch.zeros_like(got)).sum(-1)
-        mv = torch.log_softmax(out.logits["move"], dim=-1)               # [C, 6, 4, n]
-        mtok = cand[:, :, 3:7]
-        mgot = mv.gather(-1, mtok.clamp(min=0).unsqueeze(-1)).squeeze(-1)
-        lp += torch.where(mtok >= 0, mgot, torch.zeros_like(mgot)).sum((-1, -2))
+        cand = torch.as_tensor(cand_aligned, dtype=torch.long, device=device)
+        if generator is None:
+            generator = torch.Generator(device=device).manual_seed(0)
+        draws = 1 if tail_order == "canonical" else max(1, int(m_orders))
+        route_scores = [
+            agent.belief.path_logprob(
+                s_c, opp_c, cand, order_mode=tail_order, generator=generator
+            )
+            for _ in range(draws)
+        ]
+        lp = torch.logsumexp(torch.stack(route_scores), dim=0) - math.log(draws)
     scores = lp.cpu().numpy()
-    scores[~cand_ok.all(axis=1)] = -np.inf
+    view = np.broadcast_to(view_np, cand_aligned.shape)
+    scalar_cols = [0, 1, 2, 7, 8]
+    scalar_known = view[:, :, scalar_cols] >= 0
+    scalar_match = (
+        ~scalar_known
+        | (cand_aligned[:, :, scalar_cols] == view[:, :, scalar_cols])
+    ).all(axis=(1, 2))
+    scores[~(cand_ok.all(axis=1) & scalar_match)] = -np.inf
     return scores
 
 
@@ -165,7 +170,7 @@ def pool_id_order_sensitivity(
     for i in range(int(m_orders)):
         gen = torch.Generator(device=device).manual_seed(seed + i)
         scores.append(pool_id_joint_logprobs(
-            agent, batch, cand_tokens, tail_order="random", generator=gen))
+            agent, batch, cand_tokens, tail_order="random", generator=gen, m_orders=1))
     arr = np.stack(scores)                                                # [M, C]
     true_lp = arr[:, true_index]
     argmax_true = np.mean([int(row.argmax() == true_index) for row in arr])

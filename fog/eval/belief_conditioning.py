@@ -95,7 +95,7 @@ from pathlib import Path
 import torch
 
 from fog.models.belief import N_ATTRS, N_SLOTS, SLOT_ATTRS, BeliefModel
-from fog.training.losses import belief_loss
+from fog.training.losses import belief_loss, belief_output_loss
 
 # The designed rule: source = slot-3 item (flat 28, LATE in canonical order), dependent = slot-0
 # tera (flat 8, EARLY). A fixed left-to-right chain cannot condition flat 8 on a revealed flat 28.
@@ -188,18 +188,54 @@ class _CaptureOrder:
         self.orders: list[torch.Tensor] = []
 
     def __enter__(self) -> "_CaptureOrder":
-        self._orig = self.model._order
+        self._orig = self.model._route
 
-        def wrapped(revealed, tail_order, generator):
-            order = self._orig(revealed, tail_order, generator)
-            self.orders.append(order)
-            return order
+        def wrapped(revealed, tail_order, generator, skip=None):
+            route, length, log_q = self._orig(
+                revealed, tail_order, generator, skip=skip
+            )
+            # Preserve the old diagnostic representation: physical order contains every reveal,
+            # START, then the set-AR route.  The model itself never consumes this physical layout.
+            content = torch.full(
+                (len(revealed), N_ATTRS + 1), N_ATTRS,
+                dtype=torch.long, device=revealed.device,
+            )
+            for row in range(len(revealed)):
+                prefix = torch.nonzero(revealed[row], as_tuple=True)[0]
+                n_revealed = len(prefix)
+                content[row, :n_revealed] = prefix
+                n_hidden = int(length[row])
+                content[row, n_revealed + 1:n_revealed + 1 + n_hidden] = (
+                    route[row, :n_hidden]
+                )
+            self.orders.append(content)
+            return route, length, log_q
 
-        self.model._order = wrapped
+        self.model._route = wrapped
         return self
 
     def __exit__(self, *exc) -> None:
-        self.model._order = self._orig
+        self.model._route = self._orig
+
+
+def _seq_pos_from_route(
+    revealed: torch.Tensor, route: torch.Tensor, length: torch.Tensor
+) -> torch.Tensor:
+    """Content-id -> physical rank for reveal-set prefix plus a generated route."""
+    seq_pos = torch.full(
+        (len(revealed), N_ATTRS + 1), N_ATTRS + 1,
+        dtype=torch.long, device=revealed.device,
+    )
+    for row in range(len(revealed)):
+        prefix = torch.nonzero(revealed[row], as_tuple=True)[0]
+        seq_pos[row, prefix] = torch.arange(len(prefix), device=revealed.device)
+        seq_pos[row, N_ATTRS] = len(prefix)
+        n_hidden = int(length[row])
+        if n_hidden:
+            seq_pos[row, route[row, :n_hidden]] = (
+                torch.arange(n_hidden, device=revealed.device) + len(prefix) + 1
+            )
+    return seq_pos
 
 
 def _family_mean_sum(per_entry: torch.Tensor, valid: torch.Tensor) -> float:
@@ -330,7 +366,6 @@ def eval_rung2(model: BeliefModel, spec: GateSpec, truth: torch.Tensor, view: to
     truth_d, view_d = truth.to(device), view.to(device)
     b = truth.shape[0]
     c_dyn = _zeros_cdyn(model, b, device)
-    targets, valid = targets_and_valid(truth_d, view_d)
     hidden_flat = view_d.reshape(b, N_ATTRS) < 0
     dep_hidden = hidden_flat[:, DEP_FLAT]
     src_revealed = ~hidden_flat[:, SRC_FLAT]
@@ -340,16 +375,19 @@ def eval_rung2(model: BeliefModel, spec: GateSpec, truth: torch.Tensor, view: to
     for m in range(n_orders):
         gen = torch.Generator(device=device)
         gen.manual_seed(eval_seed * 1000 + m)
-        with _CaptureOrder(model) as cap:
-            out = model(c_dyn, {"tokens": view_d, "masks": None}, teacher_values=truth_d,
-                        tail_order=tail_order, generator=gen)
-        seq_pos = cap.orders[-1].argsort(dim=1)
-        tot["model"] += float(belief_loss(out.logits, targets, valid))
+        _, per_field_logp, route, length = model.path_logprob(
+            c_dyn, {"tokens": view_d, "masks": None}, truth_d,
+            order_mode=tail_order, generator=gen, return_steps=True,
+        )
+        seq_pos = _seq_pos_from_route(
+            model._revealed_mask(view_d), route, length
+        )
+        per_field_ce = -per_field_logp
+        tot["model"] += _family_mean_sum(per_field_ce, hidden_flat)
         marg, cond = reference_ce(spec, seq_pos)
         tot["marg"] += _family_mean_sum(marg, hidden_flat)
         tot["cond"] += _family_mean_sum(cond, hidden_flat)
-        logp = out.logits["tera"][:, DEP_SLOT].log_softmax(-1)
-        ce = -logp.gather(1, truth_d[:, DEP_SLOT, DEP_COL].unsqueeze(1)).squeeze(1)
+        ce = per_field_ce[:, DEP_FLAT]
         before = seq_pos[:, DEP_FLAT] < seq_pos[:, SRC_FLAT]
         bins["src_revealed"].append(ce[dep_hidden & src_revealed])
         bins["src_hidden_after"].append(ce[dep_hidden & ~src_revealed & ~before])
@@ -477,7 +515,6 @@ def eval_rung1(model: BeliefModel, spec: GateSpec, teams: torch.Tensor, truth: t
     truth_d, view_d = truth.to(device), view.to(device)
     b = truth.shape[0]
     c_dyn = _zeros_cdyn(model, b, device)
-    targets, valid = targets_and_valid(truth_d, view_d)
     hidden_flat = view_d.reshape(b, N_ATTRS) < 0
     teams_flat = teams.reshape(len(teams), N_ATTRS).to(device)
     truth_flat = truth_d.reshape(b, N_ATTRS)
@@ -486,11 +523,14 @@ def eval_rung1(model: BeliefModel, spec: GateSpec, teams: torch.Tensor, truth: t
     for m in range(n_orders):
         gen = torch.Generator(device=device)
         gen.manual_seed(eval_seed * 1000 + m)
-        with _CaptureOrder(model) as cap:
-            out = model(c_dyn, {"tokens": view_d, "masks": None}, teacher_values=truth_d,
-                        tail_order=tail_order, generator=gen)
-        seq_pos = cap.orders[-1].argsort(dim=1)
-        tot_model += float(belief_loss(out.logits, targets, valid))
+        _, per_field_logp, route, length = model.path_logprob(
+            c_dyn, {"tokens": view_d, "masks": None}, truth_d,
+            order_mode=tail_order, generator=gen, return_steps=True,
+        )
+        seq_pos = _seq_pos_from_route(
+            model._revealed_mask(view_d), route, length
+        )
+        tot_model += _family_mean_sum(-per_field_logp, hidden_flat)
         tot_floor += rung1_floor(teams_flat, truth_flat, hidden_flat, seq_pos)
 
     g = torch.Generator().manual_seed(eval_seed + 21)
@@ -596,7 +636,7 @@ def _train(args, spec: GateSpec, sample_batch, evaluate, header: str, row) -> li
         targets, valid = targets_and_valid(truth, view)
         out_chain = model(c_dyn, {"tokens": view, "masks": None}, teacher_values=truth,
                           tail_order=args.tail_order)
-        loss = args.chain_coef * belief_loss(out_chain.logits, targets, valid)
+        loss = args.chain_coef * belief_output_loss(out_chain, targets, valid)
         if args.marginal_coef > 0:                       # pass-A term (ppo.py's belief_coef)
             out_marg = model(c_dyn, {"tokens": view, "masks": None})
             loss = loss + args.marginal_coef * belief_loss(out_marg.logits, targets, valid)

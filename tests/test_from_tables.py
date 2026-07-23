@@ -82,3 +82,22 @@ def test_real_generated_tables_if_present():
     agent = FogAgent.from_tables()
     assert agent.backbone.embeds.species.num_embeddings == n + 1
     agent.assert_within_budget()
+
+
+def test_compatible_loader_is_explicit_about_every_tensor(agent):
+    state = agent.state_dict()
+    names = list(state)
+    loaded_name, mismatched_name = names[0], names[1]
+    checkpoint = {
+        loaded_name: torch.full_like(state[loaded_name], 0.125),
+        mismatched_name: torch.zeros(1),
+        "obsolete.decoder.weight": torch.zeros(2, 2),
+    }
+
+    manifest = agent.load_compatible_state_dict(checkpoint)
+
+    assert loaded_name in manifest["loaded"]
+    assert torch.equal(agent.state_dict()[loaded_name], checkpoint[loaded_name])
+    assert mismatched_name in manifest["mismatched"]
+    assert mismatched_name in manifest["initialized"]
+    assert manifest["obsolete"] == ["obsolete.decoder.weight"]

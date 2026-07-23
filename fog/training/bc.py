@@ -2,7 +2,8 @@
 
 Objective:
     CE(policy, human action)
-  + belief losses (censored)                     [opponent-team belief head]
+  + marginal belief loss (censored diagnostic)  [opponent-team belief head]
+  + set-AR next-field loss (censored auxiliary) [opponent-team generator]
   + value MSE against final outcome (γ=1)
   + self-belief losses (censored, own team)      [off by default in BC — see note]
 
@@ -38,22 +39,29 @@ def bc_loss(agent, batch, loss_cfg: dict) -> tuple[torch.Tensor, dict]:
     belief = out.log_probs.new_zeros(())
     if out.belief is not None and loss_cfg.get("belief_coef", 1.0) > 0:
         belief = losses.belief_loss(out.belief.logits, batch["belief_targets"], batch["belief_valid"])
+    belief_chain = out.log_probs.new_zeros(())
+    if out.belief_chain is not None and loss_cfg.get("belief_chain_coef", 0.0) > 0:
+        belief_chain = losses.belief_output_loss(
+            out.belief_chain, batch["belief_targets"], batch["belief_valid"]
+        )
     self_belief = out.log_probs.new_zeros(())
     if out.self_belief is not None and loss_cfg.get("self_belief_coef", 0.0) > 0:
         self_belief = losses.belief_loss(
             out.self_belief.logits, batch["self_belief_targets"], batch["self_belief_valid"]
         )
     total = (
-        action_ce
+        loss_cfg.get("action_coef", 1.0) * action_ce
         + loss_cfg.get("belief_coef", 1.0) * belief
+        + loss_cfg.get("belief_chain_coef", 0.0) * belief_chain
         + loss_cfg.get("value_coef", 0.5) * value
         + loss_cfg.get("self_belief_coef", 0.0) * self_belief
     )
     with torch.no_grad():
         top1 = (out.log_probs.argmax(-1) == batch["action"]).float().mean().item()
     metrics = {
-        "loss": float(total), "action_ce": float(action_ce), "belief": float(belief),
-        "value": float(value), "action_top1": top1,
+        "loss": float(total.detach()), "action_ce": float(action_ce.detach()),
+        "belief": float(belief.detach()), "belief_chain": float(belief_chain.detach()),
+        "value": float(value.detach()), "action_top1": top1,
     }
     if "legality_mask" in batch:
         # Replay legality masks are RECONSTRUCTED from public state (~3.5 legal actions/row vs ~9
@@ -91,7 +99,35 @@ def train(cfg: dict) -> dict:
         ds = ReplayDataset(manifest, limit_rows=limit)
     print(f"BC dataset: {len(ds)} decision rows  (config_hash={config_hash(cfg)})")
     agent = FogAgent.from_tables(cfg).to(device)
-    opt = torch.optim.AdamW(agent.parameters(), lr=lr0)
+    if bc_cfg.get("init_ckpt"):
+        initial = torch.load(bc_cfg["init_ckpt"], map_location=device)
+        if bc_cfg.get("init_compatible", False):
+            import json
+
+            manifest = agent.load_compatible_state_dict(initial)
+            (ckpt_dir.parent / "init_compatibility.json").write_text(
+                json.dumps(manifest, indent=2), encoding="utf-8"
+            )
+            print(
+                f"[init] compatible warm start: {len(manifest['loaded'])} tensors loaded, "
+                f"{len(manifest['initialized'])} initialized",
+                flush=True,
+            )
+        else:
+            agent.load_state_dict(initial)
+
+    scope = str(bc_cfg.get("scope", "full"))
+    if scope == "belief":
+        for parameter in agent.parameters():
+            parameter.requires_grad_(False)
+        for parameter in agent.belief.parameters():
+            parameter.requires_grad_(True)
+    elif scope != "full":
+        raise ValueError("bc.scope must be 'full' or 'belief'")
+    trainable = [parameter for parameter in agent.parameters() if parameter.requires_grad]
+    if not trainable:
+        raise ValueError(f"bc.scope={scope!r} selected no trainable parameters")
+    opt = torch.optim.AdamW(trainable, lr=lr0)
     steps_per_epoch = max(1, math.ceil(len(ds) / batch_size))
     total_steps = steps_per_epoch * epochs
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=total_steps, eta_min=lr1)
@@ -121,7 +157,8 @@ def train(cfg: dict) -> dict:
         print(
             f"[bc] epoch {epoch+1}/{epochs}  loss={metrics['loss']:.3f}  "
             f"action_ce={metrics['action_ce']:.3f}  top1={metrics['action_top1']:.3f}  "
-            f"belief={metrics['belief']:.3f}  value={metrics['value']:.3f}",
+            f"belief={metrics['belief']:.3f}  chain={metrics['belief_chain']:.3f}  "
+            f"value={metrics['value']:.3f}",
             flush=True,
         )
         torch.save(agent.state_dict(), ckpt_dir / f"bc_epoch{epoch+1}.pt")

@@ -123,6 +123,26 @@ def test_persistent_mode_end_to_end(agent):
         assert post.sum() == pytest.approx(1.0) or post.sum() == pytest.approx(0.0)
 
 
+def test_selective_depth_two_expands_only_likely_public_leaves(agent):
+    """A real >1-ply solve retains the root grid, expands one high-reach leaf, and re-solves."""
+    from fog.search.pb_search import pb_search_action
+
+    battle = _battle(seed=17)
+    opponent = np.stack([battle.truth_tokens("p2")])
+    result = pb_search_action(
+        agent, battle, "p1", own_source=_StubOwnStates(1), opp_tokens=opponent,
+        seed=18, iters=24, search_depth=2, depth2_max_nodes=1,
+        depth2_min_reach=0.0, depth2_child_iters=24,
+    )
+    assert result.search_depth == 2
+    assert result.depth2_expanded == 1
+    assert result.depth2_child_sims > 0
+    assert result.sims_run > result.depth2_child_sims
+    assert 0.0 < result.depth2_reach_mass <= 1.0
+    assert not result.depth2_failures
+    assert battle.action_mask("p1")[result.action]
+
+
 def test_table_mode_uses_and_validates_the_table(agent):
     from fog.search.belief_table import JointBeliefTable
     from fog.search.pb_search import pb_search_action

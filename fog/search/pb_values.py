@@ -67,6 +67,7 @@ def make_grid_values(
     *,
     fallback_value: float = 0.0,
     max_batch_forward: int = 256,
+    leaf_pair_values: Array | None = None,
 ) -> tuple[Callable[[Array, Array], Array], GridValueStats]:
     """Build `values_fn(sigma1, sigma2) -> u[K, J, A, B]` over a simulated PBGrid.
 
@@ -115,6 +116,12 @@ def make_grid_values(
 
     rho = np.asarray(rho, dtype=np.float64)
     terminal_fill = np.where(np.isnan(grid.terminal_value), 0.0, grid.terminal_value)
+    pair_override = None
+    if leaf_pair_values is not None:
+        pair_override = np.asarray(leaf_pair_values, dtype=np.float64)
+        want = (len(grid.leaf_obs), *rho.shape)
+        if pair_override.shape != want:
+            raise ValueError(f"leaf_pair_values must be {want}, got {pair_override.shape}")
     static_u: Array | None = None
 
     def _leaf_values(sigma1: Array, sigma2: Array) -> Array:
@@ -145,8 +152,20 @@ def make_grid_values(
         # A grid can be all-terminal (every branch ends the game, e.g. a KO near game end) -> no
         # leaves and `v` is empty; np.where still evaluates the (unused) leaf lookup, so guard the
         # index. All-terminal means per_branch is just the terminal payoffs.
-        per_branch = (np.where(grid.leaf_index >= 0, v[np.maximum(grid.leaf_index, 0)], terminal_fill)
-                      if v.size else terminal_fill)
+        if v.size:
+            safe_leaf = np.maximum(grid.leaf_index, 0)
+            if pair_override is None:
+                branch_value = v[safe_leaf]
+            else:
+                leaf_value = np.where(
+                    np.isfinite(pair_override), pair_override, v[:, None, None]
+                )
+                k_axis = np.arange(rho.shape[0])[:, None, None, None, None]
+                j_axis = np.arange(rho.shape[1])[None, :, None, None, None]
+                branch_value = leaf_value[safe_leaf, k_axis, j_axis]
+            per_branch = np.where(grid.leaf_index >= 0, branch_value, terminal_fill)
+        else:
+            per_branch = terminal_fill
         u = (grid.branch_prob * per_branch).sum(axis=-1)
         u[grid.failed] = float(fallback_value)
         if posterior_dim == 0:

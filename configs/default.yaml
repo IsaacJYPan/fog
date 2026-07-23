@@ -44,8 +44,8 @@ model:
   entity_transformer_layers: 2
   entity_heads: 4
   history_gru_hidden: 256
-  belief_decoder_layers: 2
-  belief_dim: 128              # belief/self-belief decoder width d
+  belief_decoder_layers: 2     # legacy key; current set-AR team encoder is two layers
+  belief_dim: 128              # belief/self-belief set-encoder width d
   aux_into_trunk: true         # belief/self-belief losses backprop into backbone (shapes c_dyn; §3.6)
   oracle: none                 # {none, set, action} — §3.4 evaluation ceilings
 
@@ -54,7 +54,7 @@ loss:
   value_coef: 0.5
   belief_coef: 1.0              # marginal CE: calibrates the diagnostic/leakage marginal forward (§8.2)
   self_belief_coef: 1.0
-  belief_chain_coef: 1.0        # chain CE: THE belief aux loss; shapes c_dyn (§3.6). 0 -> pure marginal
+  belief_chain_coef: 1.0        # matched set-AR next-field CE; shapes c_dyn (§3.6)
   self_belief_chain_coef: 1.0
   preview_coef: 0.5
 

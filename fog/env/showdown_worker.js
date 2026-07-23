@@ -369,7 +369,11 @@ BattleActions.prototype.secondaries = function exactSecondaries(
 function channelLogTail(battle, rootLogLength, channelIds = [0]) {
   const tail = battle.log.slice(rootLogLength).join("\n");
   if (!tail) return Object.fromEntries(channelIds.map(channel => [channel, []]));
-  return extractChannelMessages(tail, channelIds);
+  const channels = extractChannelMessages(tail, channelIds);
+  for (const channel of channelIds) {
+    channels[channel] = normalizeTimestampLines(channels[channel]);
+  }
+  return channels;
 }
 
 function leafSeed(prefix) {
@@ -377,10 +381,22 @@ function leafSeed(prefix) {
   return `sodium,${digest}`;
 }
 
+function normalizeTimestampLines(lines) {
+  // Showdown inserts the current wall-clock second into `|t:|...` protocol lines. It has no battle
+  // semantics, must not split otherwise identical exact leaves, and makes replay fingerprints vary
+  // across calls. Retain the protocol event with a stable numeric payload for parser compatibility.
+  return lines.map(line => line.startsWith("|t:|") ? "|t:|0" : line);
+}
+
+function normalizeStateTimestamps(state) {
+  if (Array.isArray(state.log)) state.log = normalizeTimestampLines(state.log);
+  return state;
+}
+
 function serializeCompletedLeaf(battle, rootLogLength, prefix, includeState) {
   // The enumerator has a common zero seed, so it cannot prevent mechanically identical leaves
   // from merging. Install a deterministic independent future only after the merge key is made.
-  const state = battle.toJSON();
+  const state = normalizeStateTimestamps(battle.toJSON());
   const mergeKey = JSON.stringify(state);
   state.prng = leafSeed(prefix);
   const channels = channelLogTail(battle, rootLogLength, [0, 1, 2]);
@@ -404,7 +420,7 @@ function serializeCompletedLeaf(battle, rootLogLength, prefix, includeState) {
 function serializeSampledLeaf(battle, rootLogLength, includeState) {
   // A sampled validation path must retain Showdown's real post-turn PRNG state. This makes a
   // sampled multi-turn replay identical to running the same seed through Showdown normally.
-  const state = battle.toJSON();
+  const state = normalizeStateTimestamps(battle.toJSON());
   const channels = channelLogTail(battle, rootLogLength, [0, 1, 2]);
   return {
     state: includeState ? state : undefined,
@@ -697,7 +713,7 @@ function stepSession(request) {
 function normalizedPublicLog(battle) {
   const text = battle.log.join("\n");
   const lines = text ? extractChannelMessages(text, [0])[0] : [];
-  return lines.map(line => line.startsWith("|t:|") ? "|t:|" : line);
+  return normalizeTimestampLines(lines);
 }
 
 function firstDifference(left, right) {

@@ -229,6 +229,33 @@ def test_agent_forward_shapes_and_budget():
     assert out.belief.logits["species"].shape == (2, 6, 320)
 
 
+def test_set_ar_route_loss_is_one_mean_over_selected_fields():
+    """A sampled next field keeps its scheduler frequency; family count must not reweight it."""
+    from fog.models.belief import BeliefOutput
+    from fog.training.losses import belief_output_loss
+
+    output = BeliefOutput(
+        logits={
+            "item": torch.zeros(1, 1, 2),
+            "move": torch.zeros(1, 3, 2),
+        },
+        loss_valid={
+            "item": torch.ones(1, 1, dtype=torch.bool),
+            "move": torch.ones(1, 3, dtype=torch.bool),
+        },
+        loss_targets={
+            "item": torch.zeros(1, 1, dtype=torch.long),
+            "move": torch.zeros(1, 3, dtype=torch.long),
+        },
+    )
+    valid = {
+        "item": torch.ones(1, 1, dtype=torch.bool),
+        "move": torch.ones(1, 3, dtype=torch.bool),
+    }
+    loss = belief_output_loss(output, output.loss_targets, valid)
+    assert torch.allclose(loss, torch.log(torch.tensor(2.0)))
+
+
 @pytest.mark.parametrize("aux_into_trunk", [True, False])
 def test_aux_into_trunk_switch(aux_into_trunk):
     torch.manual_seed(4)

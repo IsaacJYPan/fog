@@ -128,6 +128,21 @@ def test_batchable_leaves_match_singletons():
     assert torch.allclose(batched, singles, atol=1e-5)
 
 
+def test_cached_representation_matches_reference_forward():
+    """Caching removes only belief-independent work; it cannot change the value definition."""
+    net = _net()
+    s_board, c_dyn, own, opp, rho = _inputs(L=6, K=3, J=4)
+    with torch.no_grad():
+        reference = net(s_board, c_dyn, own, opp, rho)
+        cache = net.prepare(s_board, c_dyn, own, opp)
+        cached = net.forward_cached(cache, rho)
+        rho2 = torch.flip(rho, dims=(1, 2))
+        rho2 = rho2 / rho2.sum(dim=(1, 2), keepdim=True)
+        cached2 = net.forward_cached(cache, rho2)
+    assert torch.allclose(reference, cached, atol=1e-6)
+    assert not torch.allclose(cached, cached2)
+
+
 def test_team_encoder_binds_attributes_to_their_pokemon():
     """Swapping items between two species changes the team; it must not be an exact collision."""
     gen = torch.Generator().manual_seed(123)

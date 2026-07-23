@@ -90,6 +90,7 @@ class PBGrid:
     terminal_value: np.ndarray   # [K, J, A, B, M] float, NaN where not terminal
     leaf_index: np.ndarray       # [K, J, A, B, M] int into leaf_obs, -1 where terminal/absent
     leaf_obs: list               # flat public-only Observations for batched value forwards
+    leaf_battles: list           # matching live forks; used only by selective depth > 1
     leaf_evidence: np.ndarray    # [L, K, J] bool — candidate pairs compatible with leaf reveals
     pruned_mass: np.ndarray      # [K, J, A, B] float — dropped branch probability per cell
     failed: np.ndarray           # [K, J, A, B] bool — simulation raised; value layer substitutes
@@ -229,6 +230,7 @@ def build_pb_grid(
     terminal_value = np.full((n_k, n_j, n_a, n_b, max_m), np.nan)
     leaf_index = np.full((n_k, n_j, n_a, n_b, max_m), -1, dtype=np.int64)
     leaf_obs: list = []
+    leaf_battles: list = []
     leaf_evidence: list[np.ndarray] = []
     for (k, j, a, b), outcomes in cell_outcomes.items():
         for m, o in enumerate(outcomes):
@@ -258,13 +260,14 @@ def build_pb_grid(
                         f"keep_opp={bool(keep_opp[j])})"
                     )
                 leaf_obs.append(public_obs)
+                leaf_battles.append(o.leaf)
                 leaf_evidence.append(np.outer(keep_own, keep_opp))
 
     return PBGrid(
         labels1=labels1, labels2=labels2, avail1=avail1, avail2=avail2,
         local_action1=local_action1, local_action2=local_action2,
         branch_prob=branch_prob, terminal_value=terminal_value, leaf_index=leaf_index,
-        leaf_obs=leaf_obs,
+        leaf_obs=leaf_obs, leaf_battles=leaf_battles,
         leaf_evidence=(np.stack(leaf_evidence).astype(bool, copy=False)
                        if leaf_evidence else np.ones((0, n_k, n_j), dtype=bool)),
         pruned_mass=pruned_mass, failed=failed, sims_run=sims_run,

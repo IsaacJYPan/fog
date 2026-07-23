@@ -116,7 +116,11 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
     adv = batch["advantages"]
     adv = (adv - adv.mean()) / (adv.std() + 1e-8)
 
-    from fog.training.losses import belief_loss, value_loss  # local import: avoid cycles at module load
+    from fog.training.losses import (  # local import: avoid cycles at module load
+        belief_loss,
+        belief_output_loss,
+        value_loss,
+    )
 
     metrics: dict[str, list[float]] = {}
 
@@ -172,8 +176,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
                 # query, and (with aux_into_trunk) the gradient that makes c_dyn belief-informative
                 # for the policy. Separate coefficient + metric.
                 if out.belief_chain is not None:
-                    bc_loss = belief_loss(
-                        out.belief_chain.logits, mb["belief_targets"], mb["belief_valid"]
+                    bc_loss = belief_output_loss(
+                        out.belief_chain, mb["belief_targets"], mb["belief_valid"]
                     )
                     loss = loss + belief_chain_coef * bc_loss
                     log("belief_ce_chain", bc_loss)
@@ -192,8 +196,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict) -> dict:
                 log("self_belief_dropped_rate",
                     sb_stats.get("dropped_nonfinite", 0) / max(1, sb_total))
                 if out.self_belief_chain is not None:
-                    sbc_loss = belief_loss(
-                        out.self_belief_chain.logits, mb["self_belief_targets"],
+                    sbc_loss = belief_output_loss(
+                        out.self_belief_chain, mb["self_belief_targets"],
                         mb["self_belief_valid"],
                     )
                     loss = loss + self_belief_chain_coef * sbc_loss
@@ -335,9 +339,22 @@ class _TrainSetup:
         # restored — set total_decisions to the REMAINING budget and entropy_coef to the schedule
         # value at the interruption point (the decay runs over this config's own total).
         if self.ppo_cfg.get("init_ckpt"):
-            self.agent.load_state_dict(
-                torch.load(self.ppo_cfg["init_ckpt"], map_location=self.device)
-            )
+            initial = torch.load(self.ppo_cfg["init_ckpt"], map_location=self.device)
+            if self.ppo_cfg.get("init_compatible", False):
+                manifest = self.agent.load_compatible_state_dict(initial)
+                loaded = len(manifest["loaded"])
+                initialized = len(manifest["initialized"])
+                print(
+                    f"[init] compatible warm start: {loaded} tensors loaded, "
+                    f"{initialized} initialized for the new architecture",
+                    flush=True,
+                )
+                import json
+
+                init_manifest = self.ckpt_dir.parent / "init_compatibility.json"
+                init_manifest.write_text(json.dumps(manifest, indent=2))
+            else:
+                self.agent.load_state_dict(initial)
         self.opt = torch.optim.AdamW(self.agent.parameters(), lr=self.lr)
         self.league = League(
             snapshot_every_decisions=self.snap_every,

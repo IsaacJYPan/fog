@@ -2,10 +2,10 @@
 
 This is the single nn.Module that training and inference instantiate. The backbone emits two vectors
 (s_board, c_dyn); the policy/value head consumes both (inputs (a)+(b) via s_board, (c) via c_dyn) and
-NO explicit belief summary (the old b_vec is gone, §3.6). The belief and self-belief chains cross-
-attend to the SAME c_dyn — one vector, two consumers — so their auxiliary CE (with `aux_into_trunk`
-on, the default) shapes c_dyn to be belief-informative for the policy. `aux_into_trunk` is the
-ablation switch controlling whether the belief/self-belief losses backprop into the shared backbone.
+NO explicit belief summary (the old b_vec is gone, §3.6). The belief and self-belief set encoders
+read the SAME c_dyn — one vector, two consumers — so their auxiliary CE (with `aux_into_trunk` on,
+the default) shapes c_dyn to be belief-informative for the policy. `aux_into_trunk` is the ablation
+switch controlling whether the belief/self-belief losses backprop into the shared backbone.
 """
 from __future__ import annotations
 
@@ -26,11 +26,10 @@ PARAM_BUDGET = 5_000_000  # hard cap (≤5M); spec target ≈ 3.8M
 class AgentOutput:
     log_probs: torch.Tensor
     value: torch.Tensor
-    belief: BeliefOutput | None = None       # opponent-team belief, pass A / marginals (§3.2)
-    self_belief: BeliefOutput | None = None  # leakage measurer output, pass A (§3.3; training only)
-    # Pass B (BELIEF_POLICY_PLAN §3.3): random-order, fully-teacher-forced chain logits for the chain-rule
-    # CE. Populated only during a training-mode forward that carries belief/self-belief targets; the
-    # deployed b_vec and marginals always come from pass A above.
+    belief: BeliefOutput | None = None       # opponent-team field marginals (diagnostic)
+    self_belief: BeliefOutput | None = None  # opponent-view field marginals (diagnostic)
+    # Set-AR matched next-step outputs. Populated only when a training/evaluation batch carries full
+    # truth; each row uses a random legal route and partial cut matching ancestral sampling.
     belief_chain: BeliefOutput | None = None
     self_belief_chain: BeliefOutput | None = None
 
@@ -162,9 +161,9 @@ class FogAgent(nn.Module):
 
             opp_revealed = apply_set_oracle(opp_revealed or {}, batch["opp_truth_tokens"])
 
-        # Belief cross-attends to c_dyn (§3.1). The marginal forward is a diagnostic (dashboards /
-        # pool_id fast path / leakage) — no longer a policy input; the CHAIN forward (pass B) is the
-        # auxiliary loss + search proposal. `c_dyn_aux` carries the aux_into_trunk detach.
+        # Belief reads c_dyn (§3.1). The marginal forward is a diagnostic (dashboards / pool_id fast
+        # path / leakage), not a policy input. The second forward samples a matched set-AR route/cut
+        # and supplies the auxiliary loss. `c_dyn_aux` carries the aux_into_trunk detach.
         belief_out: BeliefOutput | None = None
         belief_chain: BeliefOutput | None = None
         c_dyn_aux = c_dyn if self.aux_into_trunk else c_dyn.detach()
@@ -225,6 +224,37 @@ class FogAgent(nn.Module):
 
     def n_params(self) -> int:
         return sum(p.numel() for p in self.parameters())
+
+    def load_compatible_state_dict(self, state_dict: dict) -> dict:
+        """Warm-start every parameter whose name and shape still match.
+
+        Architectural research changes sometimes replace only the belief generator while leaving
+        the trained backbone, policy, value, preview head, and even the belief value embeddings and
+        output heads usable.  PyTorch's ``strict=False`` does not ignore shape mismatches, so a
+        deliberate compatibility loader is required.  The returned manifest makes every retained,
+        newly initialized, obsolete, and shape-mismatched tensor explicit; callers should record it
+        beside the run configuration.
+        """
+        current = self.state_dict()
+        compatible = {
+            name: value
+            for name, value in state_dict.items()
+            if name in current and tuple(value.shape) == tuple(current[name].shape)
+        }
+        mismatched = {
+            name: {"checkpoint": list(value.shape), "model": list(current[name].shape)}
+            for name, value in state_dict.items()
+            if name in current and tuple(value.shape) != tuple(current[name].shape)
+        }
+        obsolete = sorted(name for name in state_dict if name not in current)
+        initialized = sorted(name for name in current if name not in compatible)
+        self.load_state_dict(compatible, strict=False)
+        return {
+            "loaded": sorted(compatible),
+            "initialized": initialized,
+            "obsolete": obsolete,
+            "mismatched": mismatched,
+        }
 
     def assert_within_budget(self) -> None:
         n = self.n_params()

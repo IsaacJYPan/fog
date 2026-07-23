@@ -84,6 +84,11 @@ class PBSearchResult:
     # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
     own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
     opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
+    search_depth: int = 1
+    depth2_expanded: int = 0
+    depth2_reach_mass: float = 0.0
+    depth2_child_sims: int = 0
+    depth2_failures: list[str] = field(default_factory=list)
 
 
 def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: int,
@@ -247,6 +252,10 @@ def pb_search_action(
     policy_init: bool = False,
     value_net: Any | None = None,
     value_recompute_every: int = 8,
+    search_depth: int = 1,
+    depth2_max_nodes: int = 2,
+    depth2_min_reach: float = 0.01,
+    depth2_child_iters: int = 64,
 ) -> PBSearchResult:
     """One real decision under the two-sided solver. See the module docstring for the two
     candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
@@ -268,6 +277,9 @@ def pb_search_action(
     `value_recompute_every` calls — the G4-drift-chosen N). Default None keeps the §18 interim
     posterior-feature head (`make_grid_values`) as the baseline arm; the swap is claim-bearing
     only after the G4 gates pass."""
+    if int(search_depth) not in (1, 2):
+        raise ValueError("search_depth currently supports 1 or 2; deeper traversal requires the "
+                         "outcome-sampling public-belief search phase")
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
@@ -307,19 +319,47 @@ def pb_search_action(
         init1 = init2 = None
         if policy_init:
             init1, init2 = _policy_inits(agent, battle, role, grid, own_toks, opp_toks, rng)
-        if value_net is not None:
-            from fog.search.pb_value_fn import make_pb_value_grid_values
+        def make_values(leaf_pair_values=None):
+            if value_net is not None:
+                from fog.search.pb_value_fn import make_pb_value_grid_values
 
-            values_fn, vstats = make_pb_value_grid_values(
-                agent, value_net, grid, rho, own_toks, opp_toks,
-                recompute_every=value_recompute_every, fallback_value=root_value)
-        else:
-            values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
+                return make_pb_value_grid_values(
+                    agent, value_net, grid, rho, own_toks, opp_toks,
+                    recompute_every=value_recompute_every, fallback_value=root_value,
+                    leaf_pair_values=leaf_pair_values,
+                )
+            return make_grid_values(
+                agent, grid, rho, fallback_value=root_value,
+                leaf_pair_values=leaf_pair_values,
+            )
+
+        values_fn, vstats = make_values()
         sol = two_sided_regret_solve(values_fn, rho, grid.avail1, grid.avail2,
                                      init1=init1, init2=init2,
                                      iters=iters, floor=floor,
                                      sample_seed=rng.randrange(2**31))
-        return grid, vstats, sol
+        depth_stats = None
+        if int(search_depth) == 2:
+            from fog.search.selective_depth import build_depth2_overrides
+
+            overrides, depth_stats = build_depth2_overrides(
+                agent, grid, rho, sol.sigma1, sol.sigma2, role, own_toks, opp_toks,
+                rng=rng, value_net=value_net,
+                value_recompute_every=value_recompute_every,
+                child_iters=depth2_child_iters, floor=floor,
+                min_prob=min_prob, max_branches=max_branches,
+                max_nodes=depth2_max_nodes, min_reach=depth2_min_reach,
+                fallback_value=root_value,
+            )
+            if depth_stats.expanded:
+                values_fn, vstats = make_values(overrides)
+                sol = two_sided_regret_solve(
+                    values_fn, rho, grid.avail1, grid.avail2,
+                    init1=sol.sigma1, init2=sol.sigma2,
+                    iters=iters, floor=floor,
+                    sample_seed=rng.randrange(2**31),
+                )
+        return grid, vstats, sol, depth_stats
 
     sims_total = 0
     if opp_tokens is not None:                                  # ---- persistent mode ----
@@ -339,8 +379,10 @@ def pb_search_action(
         own_toks_used = own.tokens[own_kept]
         opp_toks_used = opp_tokens[opp_kept]
         kt = int(np.flatnonzero(own_kept == own.true_index)[0])
-        grid, vstats, sol = _solve(own_toks_used, opp_toks_used, rho)
-        sims_total += grid.sims_run
+        grid, vstats, sol, depth_stats = _solve(own_toks_used, opp_toks_used, rho)
+        sims_total += grid.sims_run + (
+            depth_stats.child_sims if depth_stats is not None else 0
+        )
     else:                                                       # ---- adaptive sampled mode ----
         if top_k is not None or top_j is not None:
             raise ValueError("posterior-mass truncation (top_k/top_j) is a persistent-mode "
@@ -356,8 +398,10 @@ def pb_search_action(
             toks, logw = opp_source(battle, role, j_req, seed=rng.randrange(2**31))
             rho = np.outer(own_w, np.exp(logw))
             rho = rho / rho.sum()
-            grid, vstats, sol = _solve(own.tokens, toks, rho)
-            sims_total += grid.sims_run
+            grid, vstats, sol, depth_stats = _solve(own.tokens, toks, rho)
+            sims_total += grid.sims_run + (
+                depth_stats.child_sims if depth_stats is not None else 0
+            )
             row = _real_action_dist(sol.sigma1[kt], grid.local_action1[kt], mask)
             stable = (prev_row is not None
                       and 0.5 * np.abs(row - prev_row).sum() <= j_tol)
@@ -407,4 +451,11 @@ def pb_search_action(
         opp_tokens=np.asarray(opp_toks_used, dtype=np.int64),
         own_kept=own_kept, opp_kept=opp_kept,
         dropped_own_mass=dropped_own, dropped_opp_mass=dropped_opp,
+        search_depth=int(search_depth),
+        depth2_expanded=(depth_stats.expanded if depth_stats is not None else 0),
+        depth2_reach_mass=(
+            depth_stats.expanded_reach_mass if depth_stats is not None else 0.0
+        ),
+        depth2_child_sims=(depth_stats.child_sims if depth_stats is not None else 0),
+        depth2_failures=(depth_stats.failures if depth_stats is not None else []),
     )

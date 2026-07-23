@@ -151,7 +151,7 @@ def test_cached_pair_table_stays_fixed_between_refreshes(monkeypatch):
 
 
 def test_refresh_cadence_counts(monkeypatch):
-    """One network pass per `recompute_every` calls (calls 0, N, 2N, ...)."""
+    """Representations run once; only the small belief-conditioned tail follows refresh cadence."""
     from fog.search.pb_value_fn import make_pb_value_grid_values
     grid, agent, net, own, opp, rho, *_ = _build(monkeypatch)
     values_fn, stats = make_pb_value_grid_values(
@@ -161,6 +161,7 @@ def test_refresh_cadence_counts(monkeypatch):
         values_fn(s, s)
     assert stats.reweightings == 9
     assert stats.net_refreshes == 3                                  # calls 0, 4, 8
+    assert stats.representation_forwards == 1
 
 
 def test_all_terminal_grid_has_no_leaves(monkeypatch):

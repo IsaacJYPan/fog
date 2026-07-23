@@ -1,0 +1,20 @@
+# Verification run for the permutation-equivariant set-autoregressive belief redesign.
+# It retains every shape-compatible tensor from the selected G0 checkpoint, initializes only the
+# replaced set encoders/query layers, and runs two small PPO updates. This is a plumbing and
+# finite-gradient check, not a strength result.
+extends: g0_v2_champion.yaml
+
+experiment: set_ar_smoke
+model:
+  # The retained G0 exact-search checkpoint has the 4-feature search-era policy/value input.
+  # Policy-only rollouts supply zeros, matching that checkpoint's deployment fallback.
+  use_posterior_features: true
+ppo:
+  init_ckpt: artifacts/checkpoints/g0_retained.pt
+  init_compatible: true
+  total_decisions: 2000
+  batch_decisions: 1000
+  minibatch_size: 256
+  games_per_chunk: 8
+log:
+  dir: runs/set_ar_smoke

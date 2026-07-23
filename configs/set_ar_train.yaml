@@ -1,0 +1,22 @@
+# Full continuation recipe for the permutation-equivariant set-autoregressive belief model.
+# Warm-starting preserves the retained G0 policy/backbone while relearning the new unordered belief
+# contexts. Promotion still requires the ordinary held-out belief gates and matched Showdown play.
+extends: g0_v2_champion.yaml
+
+experiment: set_ar_train
+model:
+  # Required to preserve G0's trained policy/value first layers during the compatible warm start.
+  # Ordinary PPO rollouts use the head's defined zero-feature fallback.
+  use_posterior_features: true
+ppo:
+  init_ckpt: artifacts/checkpoints/g0_retained.pt
+  init_compatible: true
+  total_decisions: 200000
+  batch_decisions: 16000
+  minibatch_size: 512
+league:
+  # Weight snapshots bound interruption loss. Resuming from one starts a fresh optimizer/schedule
+  # segment; it is a warm resume, not bit-exact restoration of optimizer/RNG state.
+  snapshot_every_decisions: 20000
+log:
+  dir: runs/set_ar_train

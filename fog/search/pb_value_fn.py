@@ -24,11 +24,10 @@ tables' belief-conditioning goes stale as the strategies move — a pair's conti
 on the belief carried into the leaf, the §5.1 thesis). Between refreshes the cached table is reused;
 there is no second belief average in the payoff bridge.
 
-    recompute_every = 1  ==  THE CORRECTNESS REFERENCE (the "single value per query" form): every
-                            iteration re-runs the net at the current evidence-conditioned belief,
-                            so there is no drift. This is the definition the N > 1
-                            approximation is measured against on the exact small-pool gate (§15.3);
-                            it is exact but pays a full network pass per iteration.
+    recompute_every = 1  ==  THE CORRECTNESS REFERENCE: every iteration reruns the
+                            belief-dependent message/head path at the current
+                            evidence-conditioned belief. Static leaf/candidate representations
+                            remain cached. The N > 1 approximation is measured against this.
     recompute_every = N  ==  the deployed approximation: one network pass per N iterations and
                             cached-table reuse in between. The drift error vs. N = 1 is measured.
 
@@ -52,6 +51,7 @@ class PBValueStats:
     leaves: int              # live leaf observations behind the u tensor
     failed_cells: int        # simulation failures — their u entries are `fallback_value`
     trunk_forwards: int      # backbone batches over the leaf set (once, at construction)
+    representation_forwards: int = 0  # leaf + candidate encoder preparation (once per decision)
     net_refreshes: int = 0   # PBValueNet passes over the leaves (one per `recompute_every` calls)
     reweightings: int = 0    # legacy name: cached table uses (one per values_fn call)
 
@@ -68,6 +68,7 @@ def make_pb_value_grid_values(
     fallback_value: float = 0.0,
     max_batch_forward: int = 256,
     trace: list | None = None,
+    leaf_pair_values: Array | None = None,
 ) -> tuple[Callable[[Array, Array], Array], PBValueStats]:
     """Build `values_fn(sigma1, sigma2) -> u[K, J, A, B]` backed by the public-belief value network.
 
@@ -113,6 +114,18 @@ def make_pb_value_grid_values(
     stats = PBValueStats(leaves=n_leaves, failed_cells=int(grid.failed.sum()),
                          trunk_forwards=trunk_forwards)
 
+    # The public leaf encoder and both candidate-team encoders are independent of rho and of the
+    # regret strategies. Cache them once. Only the belief-conditioned message rounds and pair head
+    # are allowed to run at a refresh. A custom test net without this split keeps the reference
+    # `forward` fallback.
+    prepared = None
+    if n_leaves and hasattr(net, "prepare") and hasattr(net, "forward_cached"):
+        with torch.no_grad():
+            prepared = net.prepare(
+                s_board_all, c_dyn_all, own_t, opp_t
+            )
+        stats.representation_forwards = 1
+
     # ---- leaf -> (a, b) so a leaf can read its own action-conditioned posterior slice -----------
     positions = np.argwhere(grid.leaf_index >= 0)                      # rows (k, j, a, b, m)
     leaf_ab = np.zeros((n_leaves, 2), dtype=np.int64)
@@ -132,6 +145,12 @@ def make_pb_value_grid_values(
 
     rho = np.asarray(rho, dtype=np.float64)
     terminal_fill = np.where(np.isnan(grid.terminal_value), 0.0, grid.terminal_value)
+    pair_override = None
+    if leaf_pair_values is not None:
+        pair_override = np.asarray(leaf_pair_values, dtype=np.float64)
+        want = (n_leaves, n_k, n_j)
+        if pair_override.shape != want:
+            raise ValueError(f"leaf_pair_values must be {want}, got {pair_override.shape}")
 
     v_table: Array | None = None          # cached [L, K, J], refreshed every `recompute_every` calls
     call_count = 0
@@ -158,7 +177,18 @@ def make_pb_value_grid_values(
         for lo in range(0, n_leaves, max_batch_forward):
             hi = min(lo + max_batch_forward, n_leaves)
             with torch.no_grad():
-                v = net(s_board_all[lo:hi], c_dyn_all[lo:hi], own_t, opp_t, rho_t[lo:hi])
+                if prepared is not None:
+                    from fog.models.pb_value import PBValueCache
+
+                    chunk = PBValueCache(
+                        ctx=prepared.ctx[lo:hi], own=prepared.own, opp=prepared.opp
+                    )
+                    v = net.forward_cached(chunk, rho_t[lo:hi])
+                else:
+                    v = net(
+                        s_board_all[lo:hi], c_dyn_all[lo:hi],
+                        own_t, opp_t, rho_t[lo:hi],
+                    )
             out[lo:hi] = v.detach().cpu().numpy()
         return out
 
@@ -170,6 +200,10 @@ def make_pb_value_grid_values(
             refreshed = v_table is None or (call_count % max(1, int(recompute_every)) == 0)
             if refreshed:
                 v_table = _refresh(post_leaf)
+                if pair_override is not None:
+                    v_table = np.where(
+                        np.isfinite(pair_override), pair_override, v_table
+                    )
         call_count += 1
         stats.reweightings += 1
         if trace is not None:

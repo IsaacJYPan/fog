@@ -4,15 +4,16 @@
 WHAT THIS REPLACES. The interim leaf evaluator (fog/search/pb_values.py) reused the policy's small
 value head with four scalar posterior features. Four numbers cannot say WHICH candidate teams retain
 probability, and the head must re-run every solver iteration because its scalar output moves with the
-posterior. This module is the real thing the proposal §9 asks for: it reads the full K x J belief and
-each candidate team's identity, and — crucially — emits a value for EVERY candidate pair at once so
-the solver can reuse a cached table between periodic belief-conditioned refreshes.
+posterior. This module is the architecture the proposal §9 asks for: it reads the full K x J belief
+and each candidate team's identity, and — crucially — emits a value for EVERY candidate pair at
+once.
 
 THE OUTPUT SHAPE IS THE COST DECISION (§9.2, settled). During one real decision the solver runs
 hundreds of regret iterations; each iteration moves both strategies, hence the action-conditioned
 posterior at every cached leaf (§5.1: same leaf observation, different iteration, different belief).
-A single-scalar value would demand a full encoder pass per leaf per iteration — the dominant cost of
-a decision. Instead this network runs ONCE per leaf and returns the per-pair table
+A single-scalar value would demand repeated belief-dependent evaluation for every pair. Instead the
+public-leaf and candidate encoders run once per decision, while the belief-dependent message rounds
+and pair head return the table
 
     V[leaf, k, j] = our expected continuation payoff from this leaf IF the true teams are (k, j),
                     under the belief the network was conditioned on.
@@ -21,11 +22,10 @@ The simulated cell for private pair `(k, j)` receives `V[leaf, k, j]`. The two-s
 performs the single required average over the other player's possible private types. Averaging the
 table inside the bridge as well would use the belief twice and destroy type-specific decisions.
 
-Between recomputes `V` is held fixed. Because a pair's true continuation
-value ALSO depends on the belief carried into the leaf (continuation play is belief-dependent — the
-whole §5.1 thesis), a table conditioned once slowly drifts stale as the strategies move, so the
-bridge recomputes it every N iterations. Refreshing every iteration stays the correctness reference
-on the exact small-pool gate (§15.3); the drift error is measured against it.
+The bridge may hold `V` fixed for N solver calls. Because a pair's true continuation value also
+depends on the belief carried into the leaf, that table drifts stale as strategies move. Refreshing
+every iteration is the correctness reference. Crucially, a refresh calls `forward_cached`: it reruns
+only the belief-dependent messages and pair head, not the cached public/candidate encoders.
 
 THE SEVEN REQUIRED PROPERTIES (§9.1), and where each lives here:
 
@@ -64,6 +64,8 @@ This module is engine-free and self-contained: it takes tensors and returns a te
 property above is testable on hand-built inputs without a battle (tests/test_pb_value.py).
 """
 from __future__ import annotations
+
+from dataclasses import dataclass
 
 import torch
 import torch.nn as nn
@@ -141,6 +143,15 @@ def _weighted_messages(src: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
     return num / den
 
 
+@dataclass
+class PBValueCache:
+    """Belief-independent representations reusable across every solver iteration."""
+
+    ctx: torch.Tensor          # [L, d] public leaf representation
+    own: torch.Tensor          # [K, d] candidate-team representations
+    opp: torch.Tensor          # [J, d]
+
+
 class PBValueNet(nn.Module):
     """Public-belief value network (§9). `forward` returns V[L, K, J] (see module docstring)."""
 
@@ -188,24 +199,39 @@ class PBValueNet(nn.Module):
             nn.LayerNorm(2 * d + 1), nn.Linear(2 * d + 1, d), nn.GELU(), nn.Linear(d, 1)
         )
 
-    def forward(
+    def prepare_candidates(
+        self, own_tokens: torch.Tensor, opp_tokens: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Encode both candidate sets once per decision, before regret iterations begin."""
+        return self.team(own_tokens), self.team(opp_tokens)
+
+    def prepare_leaves(
+        self, s_board: torch.Tensor, c_dyn: torch.Tensor
+    ) -> torch.Tensor:
+        """Encode public leaf state once; no belief or strategy enters this computation."""
+        return self.ctx(torch.cat([s_board, c_dyn], dim=-1))
+
+    def prepare(
         self,
         s_board: torch.Tensor,     # [L, state_dim]  per-leaf board summary (backbone)
         c_dyn: torch.Tensor,       # [L, dyn_dim]    per-leaf dynamics context (backbone)
         own_tokens: torch.Tensor,  # [K, 6, 9]       our K candidate teams (shared across leaves)
         opp_tokens: torch.Tensor,  # [J, 6, 9]       opponent's J candidate teams (shared)
-        rho: torch.Tensor,         # [L, K, J]       each leaf's conditioning belief
-    ) -> torch.Tensor:
-        """Returns V[L, K, J], tanh-bounded OUR-perspective continuation payoff per candidate pair."""
-        L = s_board.shape[0]
-        K, J = own_tokens.shape[0], opp_tokens.shape[0]
-        ctx = self.ctx(torch.cat([s_board, c_dyn], dim=-1))               # [L, d]
+    ) -> PBValueCache:
+        """All expensive belief-independent work, cached once per decision."""
+        own, opp = self.prepare_candidates(own_tokens, opp_tokens)
+        return PBValueCache(ctx=self.prepare_leaves(s_board, c_dyn), own=own, opp=opp)
 
-        own = self.team(own_tokens)                                       # [K, d], once per decision
-        opp = self.team(opp_tokens)                                       # [J, d]
+    def forward_cached(
+        self,
+        cache: PBValueCache,
+        rho: torch.Tensor,         # [L, K, J] each leaf's conditioning belief
+    ) -> torch.Tensor:
+        """Run only belief-conditioned messages and the small pair head."""
+        L, K, J = cache.ctx.shape[0], cache.own.shape[0], cache.opp.shape[0]
         # Broadcast particles across leaves and inject the leaf context (property 1).
-        own = own.unsqueeze(0).expand(L, K, self.d) + ctx.unsqueeze(1)    # [L, K, d]
-        opp = opp.unsqueeze(0).expand(L, J, self.d) + ctx.unsqueeze(1)    # [L, J, d]
+        own = cache.own.unsqueeze(0).expand(L, K, self.d) + cache.ctx.unsqueeze(1)
+        opp = cache.opp.unsqueeze(0).expand(L, J, self.d) + cache.ctx.unsqueeze(1)
 
         rho = rho.to(own.dtype)
         rho_t = rho.transpose(1, 2).contiguous()                          # [L, J, K]
@@ -221,6 +247,19 @@ class PBValueNet(nn.Module):
         opp_g = opp.unsqueeze(1).expand(L, K, J, self.d)                  # [L, K, J, d]
         pair = torch.cat([own_g, opp_g, rho.unsqueeze(-1)], dim=-1)       # [L, K, J, 2d+1]
         return torch.tanh(self.head(pair).squeeze(-1))                    # [L, K, J]
+
+    def forward(
+        self,
+        s_board: torch.Tensor,
+        c_dyn: torch.Tensor,
+        own_tokens: torch.Tensor,
+        opp_tokens: torch.Tensor,
+        rho: torch.Tensor,
+    ) -> torch.Tensor:
+        """Reference convenience path; search uses ``prepare`` + ``forward_cached``."""
+        return self.forward_cached(
+            self.prepare(s_board, c_dyn, own_tokens, opp_tokens), rho
+        )
 
     def n_params(self) -> int:
         return sum(p.numel() for p in self.parameters())

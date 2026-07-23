@@ -116,9 +116,10 @@ def test_c_dyn_is_shared_by_chain_and_policy():
 
 # -------------------------------------------------------- no belief mean-pool on the policy path
 def test_no_belief_vec_anywhere():
-    """The mean-pooled b_vec is gone (§3.6): BeliefOutput carries only logits, the head has no
-    use_belief_vec/belief_vec, and head_inputs returns (s_board, c_dyn) with no belief forward."""
-    assert {f.name for f in dataclasses.fields(BeliefOutput)} == {"logits"}
+    """BeliefOutput has no pooled belief vector; route-loss metadata never enters the policy."""
+    assert {f.name for f in dataclasses.fields(BeliefOutput)} == {
+        "logits", "loss_valid", "loss_targets", "order",
+    }
     agent = _agent()
     assert not hasattr(agent.policy_value, "use_belief_vec")
     assert not hasattr(agent, "use_belief_vec")

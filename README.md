@@ -94,6 +94,37 @@ The distribution is normalized only after multiplying all three factors. Impossi
 zero probability. Publicly known current facts override a candidate's original team-paste facts:
 for example, search may not resurrect an item that was consumed, removed, or exchanged.
 
+### Order-independent complete-team model
+
+The belief model — the network that estimates a hidden team — is set-autoregressive. Every revealed
+fact is available before the first hidden prediction, and every generated fact is added to the same
+unordered context. Facts are bound within each Pokémon before the six Pokémon are mixed. Therefore
+reordering reveal storage, team-sheet rows, or a Pokémon's move list cannot change the represented
+distribution except for the matching output-row permutation.
+
+A sequential generator still needs a generation route; “order independent” does not mean that a
+sample appears without steps. The next-field scheduler is independent of field values and chooses
+uniformly among mechanically eligible fields. Species precedes species-dependent legality, and a
+spread waits for species/item/ability; no other global semantic order is imposed. Training samples
+a route and a partial cut, then predicts the next field from exactly the kind of partially completed
+set that sampling sees. This prevents the earlier mismatch between full teacher forcing and
+progressive sampling.
+
+For route `r` and completed team `x`, the model records
+
+```text
+P(x, r | public evidence)
+  = product of scheduler probabilities
+    × product of field-value probabilities.
+```
+
+The probability of unordered team `x` is the sum over all legal routes. Exact enumeration is
+combinatorial, so production candidate scoring estimates that sum by evaluating several sampled
+routes and taking their log-mean-exp. Hidden move sequences are sampled uniformly and receive the
+factorial correction required to estimate the sum over their permutations. The route count and
+residual order sensitivity are measured; one canonical route is retained only as a diagnostic.
+Hidden move truths are randomly permuted during training and sampled as distinct set insertions.
+
 ### Search target
 
 The target expert is a two-sided public-belief search, not ordinary determinization. Ordinary
@@ -116,6 +147,17 @@ outcome targets, which are distilled into the deployment policy. After policy di
 belief models are refreshed on new play because the policy is part of the evidence likelihood
 above. The fast deployed policy remains a single network forward pass; search is an optional
 inference-time arm and a training-data producer.
+
+The value network caches public-leaf and candidate-team representations once. When solver
+probabilities change, only the belief-dependent message passing and pair-value head rerun. This is
+exact reuse for the declared architecture; it does not assume that one cached scalar can be
+combined with policy probabilities to recover every nonlinear hidden-matchup value.
+
+Selective depth two is available as a correctness scaffold. It solves depth one, ranks public
+leaves by actual reach probability, expands a bounded number of likely child public-belief
+subgames, returns their pair-specific continuation values, and solves the root again. The scalable
+target is probability-guided outcome-sampling public-belief regret search: likely public histories
+are revisited often, while sampling corrections preserve the underlying game probabilities.
 
 ### Simulator decision
 
@@ -191,6 +233,10 @@ python -m fog.scripts.pipeline refresh-beliefs   # Phase 4: belief consistency r
 Milestone training runs (M-track) and evaluation:
 
 ```bash
+python -m fog.training.bc   --config configs/set_ar_replay_smoke.yaml # optional censored-replay check
+python -m fog.training.bc   --config configs/set_ar_replay.yaml       # optional belief-only replay arm
+python -m fog.training.ppo  --config configs/set_ar_smoke.yaml    # two-update compatibility check
+python -m fog.training.ppo  --config configs/set_ar_train.yaml    # set-AR warm start from retained G0
 python -m fog.training.ppo  --config configs/m1_poc.yaml          # M1 baseline (no belief vec)
 python -m fog.training.ppo  --config configs/m2_oracle.yaml       # M2 set-oracle ceiling
 python -m fog.training.ppo  --config configs/m3_leakage_engine.yaml --set leakage.beta=0.03 ...
@@ -252,6 +298,18 @@ cd server/pokemon-showdown && npm ci && npm run build && cd ../..
 # Verify the transferred checkpoints before spending compute.
 git lfs fsck
 
+# Verify the redesigned belief path and inspect runs/set_ar_smoke/init_compatibility.json before
+# spending a long run. Matching G0 tensors are reused; new set-encoder tensors initialize fresh.
+uv run python -m fog.training.ppo --config configs/set_ar_smoke.yaml
+
+# Optional replay auxiliary. Replays label only facts eventually revealed, so this updates only the
+# opponent belief model and does not replace complete-truth self-play. Run it as a separate arm;
+# promote it only if complete-team likelihood and downstream search beat the no-replay arm.
+uv run python -m fog.training.bc --config configs/set_ar_replay.yaml
+
+# Start the longer set-autoregressive run. It saves weight snapshots every 20k decisions.
+uv run python -m fog.training.ppo --config configs/set_ar_train.yaml
+
 # Complete the binding promotion test first. The report is saved every four games; rerun the
 # identical command with --resume after an interruption.
 uv run python -m fog.eval.showdown_direct_selection \
@@ -272,3 +330,7 @@ uv run python -m fog.scripts.pb_loop \
 The exact worker count should be set from available RAM, not just GPU size. Each worker holds its
 own simulator/search state. Start with four workers, measure peak memory, then increase to eight
 only if the machine retains safe headroom. Do not run tests or another PyTorch job concurrently.
+An interrupted PPO run can warm-resume from its newest `runs/set_ar_train/checkpoints/ppo_*.pt` by
+setting that file as `ppo.init_ckpt` and setting `ppo.total_decisions` to the remaining budget.
+This restores weights, not optimizer moments or the exact random stream; preserve the previous
+checkpoint as a league opponent and record the segment boundary.

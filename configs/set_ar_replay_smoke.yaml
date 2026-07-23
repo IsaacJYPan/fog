@@ -1,0 +1,26 @@
+# Verification of the optional partial-replay set-AR auxiliary.
+#
+# Replay sheets are censored: they label facts eventually revealed, not the complete hidden team.
+# This run therefore updates only the opponent belief model and cannot replace full-truth self-play.
+extends: bc_ou.yaml
+
+experiment: set_ar_replay_smoke
+model:
+  use_posterior_features: true
+bc:
+  manifest: data/parsed/manifest.parquet
+  batch_size: 256
+  epochs: 2
+  limit_rows: 2048
+  init_ckpt: artifacts/checkpoints/g0_retained.pt
+  init_compatible: true
+  scope: belief
+loss:
+  action_coef: 0.0
+  value_coef: 0.0
+  belief_coef: 0.0
+  belief_chain_coef: 1.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+log:
+  dir: runs/set_ar_replay_smoke
