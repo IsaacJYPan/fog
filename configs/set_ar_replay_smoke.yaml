@@ -2,13 +2,14 @@
 #
 # Replay sheets are censored: they label facts eventually revealed, not the complete hidden team.
 # This run therefore updates only the opponent belief model and cannot replace full-truth self-play.
-extends: bc_ou.yaml
+extends: set_ar_replay.yaml
 
 experiment: set_ar_replay_smoke
 model:
   use_posterior_features: true
 bc:
   manifest: data/parsed/manifest.parquet
+  streaming: false
   batch_size: 256
   epochs: 2
   limit_rows: 2048
@@ -18,8 +19,8 @@ bc:
 loss:
   action_coef: 0.0
   value_coef: 0.0
-  belief_coef: 0.0
-  belief_chain_coef: 1.0
+  belief_coef: 1.0
+  belief_chain_coef: 2.0
   self_belief_coef: 0.0
   self_belief_chain_coef: 0.0
 log:

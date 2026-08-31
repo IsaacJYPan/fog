@@ -13,21 +13,21 @@ and per-species static features) are produced by `build.py`.
 from fog.constants import schema
 from fog.constants.schema import (
     ACTIONS,
-    ActionType,
     N_ACTIONS,
     STATUS,
     TERRAIN,
     WEATHER,
+    ActionType,
     MoveCategory,
 )
 
 __all__ = [
-    "schema",
     "ACTIONS",
-    "ActionType",
     "N_ACTIONS",
     "STATUS",
     "TERRAIN",
     "WEATHER",
+    "ActionType",
     "MoveCategory",
+    "schema",
 ]

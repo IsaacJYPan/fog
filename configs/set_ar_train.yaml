@@ -4,16 +4,36 @@
 extends: g0_v2_champion.yaml
 
 experiment: set_ar_train
+preflight:
+  required: true
+  report: runs/preflight_audit/latest.json
+  min_games: 5
+  schema_version: 5
+  match_source: true
+  min_replay_dryruns: 10
+  min_replay_hidden_targets: 1
+env:
+  # Do not inherit G0's approximate volume backend for the claim-bearing continuation.
+  backend: showdown_direct
+  # Conservative process-parallel baseline for the 16-logical-CPU development machine. Benchmark
+  # 4/6/8 on the target machine; keep one inference thread per actor to avoid oversubscription.
+  rollout_workers: 4
+  rollout_worker_mode: process
+  actor_threads: 1
 model:
   # Required to preserve G0's trained policy/value first layers during the compatible warm start.
   # Ordinary PPO rollouts use the head's defined zero-feature fallback.
   use_posterior_features: true
+  # Uniform random prefixes under-sample late ancestral conditionals by roughly 1 / route length.
+  # Oversample the all-other-recoverable-facts context while retaining arbitrary random queries.
+  belief_last_context_probability: 0.25
 ppo:
   init_ckpt: artifacts/checkpoints/g0_retained.pt
   init_compatible: true
   total_decisions: 200000
   batch_decisions: 16000
   minibatch_size: 512
+  games_per_chunk: 32
 league:
   # Weight snapshots bound interruption loss. Resuming from one starts a fresh optimizer/schedule
   # segment; it is a warm resume, not bit-exact restoration of optimizer/RNG state.

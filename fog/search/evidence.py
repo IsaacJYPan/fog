@@ -1,6 +1,6 @@
 """Truthful public-evidence checks shared by real-play and simulated-leaf belief updates.
 
-The input is a public [6, 9] reveal grid and a collection of complete candidate team sheets.
+The input is a public [6, 15] reveal grid and a collection of complete candidate team sheets.
 The output says which candidate sheets can still be true. Keeping this calculation in one module
 prevents the real-play table and the simulated-leaf table from applying different rules to the
 same public fact.
@@ -13,9 +13,9 @@ from __future__ import annotations
 
 import numpy as np
 
-# SLOT_ATTRS order: species, item, ability, move0..3, spread, tera.
+# Public exact fields in SET_SLOT_ATTRS order: species, item, ability, move0..3, tera.
 _MOVE_COLS = slice(3, 7)
-_EXACT_COLS = (0, 1, 2, 7, 8)
+_EXACT_COLS = (0, 1, 2, 14)
 
 
 def keep_mask_from_reveals(
@@ -81,7 +81,7 @@ def keep_mask_from_initial_drive_activation(
     without the complete item-event history. Weather/terrain already present on the public board
     is included because it independently activates the corresponding ability without consuming
     Booster Energy. The exact boosted-stat suffix is compared as well; it is a deterministic
-    consequence of the candidate's spread and is public in the engine protocol.
+    consequence of the candidate's nature/EV stats and is public in the engine protocol.
     """
     cands = np.asarray(candidates, dtype=np.int64)
     keep = np.ones(len(cands), dtype=bool)
@@ -97,7 +97,7 @@ def keep_mask_from_initial_drive_activation(
     observed = {to_id(value) for value in (side.volatile_statuses or ())}
     observed_drive = {
         value for value in observed
-        if value.startswith("protosynthesis") or value.startswith("quarkdrive")
+        if value.startswith(("protosynthesis", "quarkdrive"))
     }
     weather = to_id(battle.state.weather)
     terrain = to_id(battle.state.terrain)

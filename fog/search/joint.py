@@ -1,4 +1,4 @@
-"""Joint sampled counterfactual search (SEARCH_PLAN §4.3). Inference-time only — NEVER in PPO.
+"""Legacy joint sampled counterfactual search. Inference-time only — NEVER in PPO.
 
 Where determinized search (search/determinized.py) samples worlds for MY uncertainty about the
 OPPONENT, this module reasons over the opposite direction: K candidate private states the OPPONENT
@@ -27,15 +27,16 @@ Three design decisions that carry the correctness:
      pinned by tests/test_joint_search.py as the contrast case, not a supported configuration.
 
 Two-sided worlds: the searcher doesn't know the OPPONENT's team either, so each own-state k is
-paired with one opponent world sampled from the agent's belief net (v1 — variance note in
-SEARCH_PLAN §8). Opponent replies come from `opponent_policy` (default EngineMaxDamagePolicy —
+paired with one opponent world sampled from the agent's belief net. Opponent replies come from
+`opponent_policy` (default EngineMaxDamagePolicy —
 reads only its own side, so no engine truth leaks; it also cannot react to beliefs, which is the
-depth-1 approximation documented in SEARCH_PLAN §8).
+depth-one limitation documented by ARCHITECTURE.md invariant S6).
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Callable
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
 
 import numpy as np
 
@@ -125,6 +126,7 @@ class JointSearchResult:
     true_index: int
     action_dist: np.ndarray          # [14] executed-state policy on real-battle action indices
     failures: int                    # (state, action) simulations that errored (root-value fallback)
+    failure_reasons: dict[str, int] = field(default_factory=dict)
 
 
 def joint_search_action(
@@ -141,7 +143,7 @@ def joint_search_action(
     max_batch_forward: int = 256,
     seed: int = 0,
 ) -> JointSearchResult:
-    """One joint-search decision on a live EngineBattle. See module docstring; SEARCH_PLAN §4.3.
+    """One legacy joint-search decision on a live EngineBattle. See the module docstring.
 
     `own_source` is an own-states provider (`EnumeratedPoolStates` / `SampledOwnStates`).
     `temperature=0` plays the argmax of the true state's averaged policy; >0 samples from it.
@@ -180,10 +182,11 @@ def joint_search_action(
     gen = torch.Generator(device=device)  # must live where sample_team's multinomial runs
     gen.manual_seed(seed)
     with torch.no_grad():
-        _, c_dyn_my = agent._backbone_pass(my_batch)
+        contexts = agent.encode_contexts(my_batch)
+        belief_context = agent.belief_context(contexts)
         opp_worlds = agent.belief.sample_team(
-            c_dyn_my, my_batch["opp_revealed"], k=k_states, generator=gen
-        )[0].cpu().numpy().astype(np.int64)                                  # [K, 6, 9]
+            belief_context, my_batch["opp_revealed"], k=k_states, generator=gen
+        )[0].cpu().numpy().astype(np.int64)                                  # [K, 6, 15]
 
     # ---- root forks + the public-action label space (design decision 1) ----
     roots, per_state = [], []
@@ -224,13 +227,16 @@ def joint_search_action(
     leaf_of = np.full((k_states, n_labels), -1, dtype=np.int64)
     leaf_obs, leaf_state = [], []
     failures = 0
+    failure_reasons: dict[str, int] = {}
     for k in range(k_states):
         for j in np.flatnonzero(avail[k]):
             fork = roots[k].clone_for_step(seed=rng.randrange(2**31))
             try:
                 r = _play_one_ply(fork, role, int(local_action[k, j]), opponent_policy,
                                   max_forced_steps=max_forced_steps)
-            except Exception:
+            except Exception as exc:  # noqa: BLE001 - legacy search reports every failed cell
+                reason = f"{type(exc).__name__}: {exc}"[:240]
+                failure_reasons[reason] = failure_reasons.get(reason, 0) + 1
                 r = None
             if r is None:
                 failures += 1
@@ -316,6 +322,7 @@ def joint_search_action(
     return JointSearchResult(
         action=action, labels=labels, policies=avg_pi, posterior=posterior,
         prior=own.weights.copy(), true_index=kt, action_dist=action_dist, failures=failures,
+        failure_reasons=failure_reasons,
     )
 
 

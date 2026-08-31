@@ -50,19 +50,30 @@ class BattleTracker:
         self.my_role = my_role
         self.last_used_move: dict[str, str] = {}      # mon_key -> move id string
         self.booster_consumed: set[str] = set()
+        self.original_booster: set[str] = set()       # private sheet snapshot at team preview
+        self.original_item: dict[str, str] = {}
+        self.original_ability: dict[str, str] = {}
+        # Exact submitted own-sheet rows keyed by species-table id. Request-side calculated stats
+        # can admit multiple nature/EV reconstructions (for example Sassy vs Calm with 0 IVs);
+        # the player knows the paste it submitted, so retain that authoritative private context.
+        self.exact_private_truth: dict[int, np.ndarray] = {}
         self.fallen_at_entry: dict[str, int] = {}
         self.faints: dict[str, int] = {"p1": 0, "p2": 0}
         self.effect_start: dict[tuple[str, str], int] = {}   # (mon_key, effect) -> start turn
         self.delayed: dict[str, _SideDelayed] = {"p1": _SideDelayed(), "p2": _SideDelayed()}
         self.hp: dict[str, float] = {}                # mon_key -> current hp fraction
         self._active: dict[str, str | None] = {"p1": None, "p2": None}
-        self._fed: set[int] = set()
+        # poke-env's current observation grows as public events arrive within a turn. Keep a cursor
+        # so current-turn facts can be consumed immediately without double-counting older events.
+        self._event_counts: dict[int, int] = {}
         # decision-time recordings (filled by the player, not by events)
         self.snapshots: dict[int, np.ndarray] = {}    # turn -> [hist_snapshot] start-of-turn snapshot
+        self.snapshot_ids: dict[int, np.ndarray] = {}
+        self.snapshot_state: dict[int, np.ndarray] = {}
         self.my_actions: dict[int, int] = {}          # turn -> chosen action index 0-13
         self.hp_at_turn_start: dict[int, dict[str, float]] = {}
 
-    def clone(self) -> "BattleTracker":
+    def clone(self) -> BattleTracker:
         """A copy safe to feed one more turn without touching the original (search-fork leaves).
 
         The dicts `feed_turn` mutates are copied; the large decision-time recordings
@@ -75,23 +86,73 @@ class BattleTracker:
         new.my_role = self.my_role
         new.last_used_move = dict(self.last_used_move)
         new.booster_consumed = set(self.booster_consumed)
+        new.original_booster = set(self.original_booster)
+        new.original_item = dict(self.original_item)
+        new.original_ability = dict(self.original_ability)
+        new.exact_private_truth = {
+            species: row.copy() for species, row in self.exact_private_truth.items()
+        }
         new.fallen_at_entry = dict(self.fallen_at_entry)
         new.faints = dict(self.faints)
         new.effect_start = dict(self.effect_start)
         new.delayed = {r: copy.copy(d) for r, d in self.delayed.items()}
         new.hp = dict(self.hp)
         new._active = dict(self._active)
-        new._fed = set(self._fed)
+        new._event_counts = dict(self._event_counts)
         new.snapshots = self.snapshots        # shared: feed_turn never writes it
+        new.snapshot_ids = self.snapshot_ids
+        new.snapshot_state = self.snapshot_state
         new.my_actions = self.my_actions      # shared: feed_turn never writes it
         new.hp_at_turn_start = dict(self.hp_at_turn_start)
         return new
 
     # ---------------------------------------------------------------------------- player recordings
-    def record_decision(self, turn: int, snapshot: np.ndarray | None, action_idx: int | None) -> None:
+    def record_exact_private_truth(self, truth_tokens: np.ndarray) -> None:
+        """Remember the exact submitted own team sheet, keyed by unique species id."""
+        rows = np.asarray(truth_tokens, dtype=np.int64)
+        if rows.ndim != 2 or rows.shape[1] < 14:
+            raise ValueError("exact private truth must have shape [slots, >=14]")
+        for row in rows:
+            species = int(row[0])
+            if species >= 0:
+                self.exact_private_truth[species] = row.copy()
+
+    def record_private_team(self, battle: object) -> None:
+        """Remember irreversible private starting-sheet facts before requests mutate them."""
+        for key, mon in (getattr(battle, "team", None) or {}).items():
+            mon_key = str(key)
+            item = to_id(getattr(mon, "item", None) or "")
+            ability = to_id(getattr(mon, "ability", None) or "")
+            if item and mon_key not in self.original_item:
+                self.original_item[mon_key] = item
+            if ability and mon_key not in self.original_ability:
+                self.original_ability[mon_key] = ability
+            if item == "boosterenergy":
+                self.original_booster.add(mon_key)
+
+    def booster_was_consumed(self, mon_key: str, mon: object) -> bool:
+        """True after a known starting Booster Energy is no longer currently held."""
+        if mon_key in self.booster_consumed:
+            return True
+        current = to_id(getattr(mon, "item", None) or "")
+        return mon_key in self.original_booster and current in ("", "noitem")
+
+    def record_decision(
+        self,
+        turn: int,
+        snapshot: np.ndarray | None,
+        action_idx: int | None,
+        *,
+        snapshot_ids: np.ndarray | None = None,
+        snapshot_state: np.ndarray | None = None,
+    ) -> None:
         """Record the start-of-turn snapshot + my chosen action for turn `turn` (history §2.3)."""
         if snapshot is not None and turn not in self.snapshots:
             self.snapshots[turn] = np.asarray(snapshot, dtype=np.float32)
+        if snapshot_ids is not None and turn not in self.snapshot_ids:
+            self.snapshot_ids[turn] = np.asarray(snapshot_ids, dtype=np.int64)
+        if snapshot_state is not None and turn not in self.snapshot_state:
+            self.snapshot_state[turn] = np.asarray(snapshot_state, dtype=np.float32)
         if action_idx is not None:
             self.my_actions[turn] = int(action_idx)
         if turn not in self.hp_at_turn_start:
@@ -99,13 +160,14 @@ class BattleTracker:
 
     # ------------------------------------------------------------------------------- event feeding
     def feed_turn(self, turn: int, events: list[list[str]]) -> None:
-        """Consume one completed turn's events. Idempotent per turn number."""
-        if turn in self._fed:
+        """Consume the newly appended suffix of one turn's cumulative public event list."""
+        start = self._event_counts.get(turn, 0)
+        if len(events) <= start:
             return
-        self._fed.add(turn)
+        self._event_counts[turn] = len(events)
         self.hp_at_turn_start.setdefault(turn, dict(self.hp))
 
-        for ev in events:
+        for ev in events[start:]:
             if len(ev) < 2:
                 continue
             kind = ev[1]
@@ -150,8 +212,7 @@ class BattleTracker:
 
             elif kind == "-start" and len(args) >= 2:
                 eff = to_id(args[1])
-                if eff.startswith("move"):
-                    eff = eff[len("move"):]
+                eff = eff.removeprefix("move")
                 if eff in ("futuresight", "doomdesire"):
                     # pending doom lands on the side OPPOSITE the user
                     target = "p2" if role == "p1" else "p1"
@@ -163,15 +224,13 @@ class BattleTracker:
 
             elif kind == "-activate" and len(args) >= 2:
                 eff = to_id(args[1])
-                if eff.startswith("move"):
-                    eff = eff[len("move"):]
+                eff = eff.removeprefix("move")
                 if eff in _PARTIAL_TRAP_MOVES:
                     self.effect_start[(key, "partiallytrapped")] = turn
 
             elif kind == "-end" and len(args) >= 2:
                 eff = to_id(args[1])
-                if eff.startswith("move"):
-                    eff = eff[len("move"):]
+                eff = eff.removeprefix("move")
                 if eff in ("futuresight", "doomdesire") and role:
                     self.delayed[role].future_sight_turn = None
                 elif eff in _COUNTER_DURATION:

@@ -1,4 +1,4 @@
-"""Sources of MY possible private states, from the opponent's point of view (SEARCH_PLAN §4.1).
+"""Sources of my possible private states from the opponent's point of view.
 
 Joint search (fog/search/joint.py) reasons over K teams the opponent could believe the searcher
 has. This module supplies them behind one interface, two implementations:
@@ -7,12 +7,12 @@ has. This module supplies them behind one interface, two implementations:
     finite set of known pastes (POOL-A: 8, pool_gen: 128). Filter to the pastes consistent with
     everything I have revealed so far and weight by the pool prior. No sampling error, no missed
     states — the debugging/validation rung. (An effect that only shows on the memorizable 8-team
-    pool is an artifact; pool_gen is the claim-bearing pool — HANDOFF's standing caveat.)
+    pool is an artifact; pool_gen is the claim-bearing pool per ARCHITECTURE.md invariant S5.)
   * `SampledOwnStates` — the scalability arm: ancestral samples from the agent's own
     SelfBeliefPredictor (it inherits BeliefModel.sample_team) run on the OPPONENT's observation of
     the battle, so hidden attributes are drawn from the learned model and revealed ones are
     clamped. Weights are the empirical sample frequencies after dedup (an unbiased proxy for the
-    model's own probabilities that needs no extra scoring pass — v1, documented in SEARCH_PLAN §6).
+    model's own probabilities that needs no extra scoring pass.)
 
 Both ALWAYS include the true state (the doc rule: the system knows which state is real, but its
 weight must stay whatever the opponent would assign it):
@@ -21,7 +21,7 @@ weight must stay whatever the opponent would assign it):
   * sampling: if absent from the draw it is inserted with one pseudo-count (add-one smoothing).
 
 The `states(battle, role)` contract takes a live `EngineBattle` and the searcher's role and
-returns an `OwnStates`: tokens [K,6,9] (SLOT_ATTRS order), normalized weights [K], and the index
+returns an `OwnStates`: tokens [K,6,15] (SET_SLOT_ATTRS order), normalized weights [K], and the index
 of the true state.
 """
 from __future__ import annotations
@@ -33,13 +33,15 @@ import numpy as np
 
 @dataclass
 class OwnStates:
-    tokens: np.ndarray    # [K, 6, 9] int64
+    tokens: np.ndarray    # [K, 6, 15] int64
     weights: np.ndarray   # [K] float64, sums to 1
     true_index: int
 
     def __post_init__(self) -> None:
-        if self.tokens.ndim != 3 or self.tokens.shape[1:] != (6, 9):
-            raise ValueError(f"tokens must be [K,6,9], got {self.tokens.shape}")
+        from fog.constants.schema import SET_N_ATTRS
+
+        if self.tokens.ndim != 3 or self.tokens.shape[1:] != (6, SET_N_ATTRS):
+            raise ValueError(f"tokens must be [K,6,{SET_N_ATTRS}], got {self.tokens.shape}")
         if len(self.weights) != len(self.tokens):
             raise ValueError("weights/tokens length mismatch")
         if not 0 <= self.true_index < len(self.tokens):
@@ -101,7 +103,7 @@ class EnumeratedPoolStates:
 
 
 class StablePoolOwnStates:
-    """Full-pool own-state source with STABLE candidate identities (PROPOSAL_IMPL_PLAN Phase G2).
+    """Full-pool own-state source with stable candidate identities (ARCHITECTURE.md S1).
 
     The persistent `JointBeliefTable`'s axes are fixed for the battle's lifetime (§7.4), so the
     runner cannot use `EnumeratedPoolStates` (its reveal filtering changes K turn to turn).
@@ -166,11 +168,12 @@ class SampledOwnStates:
         gen = torch.Generator(device=_device(self.agent))  # sample_team's multinomial device
         gen.manual_seed(self.seed * 1_000_003 + self._calls)
         with torch.no_grad():
-            _, c_dyn = self.agent._backbone_pass(batch)
+            contexts = self.agent.encode_contexts(batch)
+            belief_context = self.agent.belief_context(contexts)
             draws = self.agent.self_belief.sample_team(
-                c_dyn, batch["opp_revealed"], k=self.k * self.oversample,
+                belief_context, batch["opp_revealed"], k=self.k * self.oversample,
                 temperature=self.temperature, generator=gen,
-            )[0].cpu().numpy().astype(np.int64)                       # [k*oversample, 6, 9]
+            )[0].cpu().numpy().astype(np.int64)                       # [k*oversample, 6, 15]
 
         counts: dict[bytes, int] = {}
         by_key: dict[bytes, np.ndarray] = {}

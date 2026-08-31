@@ -1,0 +1,34 @@
+extends: default.yaml
+
+experiment: gen9ou_typed_token_trunk
+seed: 20261118
+
+model:
+  shared_latent_trunk: true
+  shared_latent_learned_only: true
+  shared_latent_contextual: true
+  shared_typed_world_tokens: true
+  shared_recent_history_tokens: 8
+  shared_entity_dim: 128
+  shared_latent_dim: 3072
+  shared_contextual_layers: 4
+  shared_contextual_heads: 4
+  shared_contextual_ff_dim: 512
+  shared_contextual_dropout: 0.05
+  shared_contextual_head_readers: true
+  token_action_policy: true
+  action_query_policy: true
+  action_query_heads: 4
+  simple_rule_prior_strength: 0.0
+  history_transformer_layers: 2
+  history_heads: 4
+  history_ff_dim: 512
+
+encoding:
+  entity_hidden: 128
+  history_encoder: causal_transformer
+  history_cap: 60
+  dropout: 0.05
+
+log:
+  dir: runs/gen9ou_typed_token_trunk

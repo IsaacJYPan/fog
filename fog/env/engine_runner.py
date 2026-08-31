@@ -14,16 +14,19 @@ Frozen-checkpoint opponents run as a second batched forward. Per-decision leakag
 currently per-item like the Showdown path; batch it here first if a leakage run's probe shows it
 dominating.
 
-Throughput probe (run before committing to a grid — HANDOFF rule):
+Throughput probe for selecting a safe local worker count:
 
     python -m fog.env.engine_runner --probe --pool data/teams/pool_a --config configs/default.yaml
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
+
+from fog.encoding.batch import collate_observations
+from fog.training.progress_reward import battle_progress_score as _progress_score
 
 if TYPE_CHECKING:
     from fog.env.engine_battle import EngineBattle
@@ -37,7 +40,7 @@ OPPONENT = "p2"
 class FrozenAgentPolicy:
     """A frozen FogAgent as the engine opponent (league checkpoint). Batched, never recorded."""
 
-    def __init__(self, agent: "FogAgent", name: str = "frozen", temperature: float = 1.0):
+    def __init__(self, agent: FogAgent, name: str = "frozen", temperature: float = 1.0):
         agent.eval()
         self.agent = agent
         self.name = name
@@ -46,7 +49,7 @@ class FrozenAgentPolicy:
 
 @dataclass
 class _Slot:
-    battle: "EngineBattle"
+    battle: EngineBattle
     gid: int | None = None
     decisions: int = 0
     stalled_turns: int = field(default=0)
@@ -57,13 +60,14 @@ class EngineRunner:
 
     def __init__(
         self,
-        agent: "FogAgent",
-        buffer: "RolloutBuffer | None" = None,
+        agent: FogAgent,
+        buffer: RolloutBuffer | None = None,
         *,
         pool: list[str],
         batch_size: int = 64,
         seed: int = 0,
         temperature: float = 1.0,
+        tera_logit_bonus: float = 0.0,
         phi_hat=None,
         leak_family_weights: dict | None = None,
         oracle_truth: bool = False,
@@ -84,6 +88,7 @@ class EngineRunner:
         self.pool = list(pool)
         self.batch_size = int(batch_size)
         self.temperature = float(temperature)
+        self.tera_logit_bonus = float(tera_logit_bonus)
         self.oracle_truth = bool(oracle_truth)
         self.max_batch_forward = int(max_batch_forward)
         self.rng = random.Random(seed)
@@ -186,6 +191,7 @@ class EngineRunner:
                 outcome=outcome,
                 belief_targets=truth,
                 final_leak_ce=self._final_leak_ce(battle),
+                final_progress_score=_progress_score(battle, LEARNER),
             )
 
     def _truth(self, battle) -> np.ndarray | None:
@@ -205,7 +211,8 @@ class EngineRunner:
             obs = Observation.from_battle(view, tracker=battle.trackers[LEARNER])
             mirror = self._helper._mirror(view, obs, battle.ledgers[LEARNER])
             return self._helper._leakage_ce(mirror, obs, _device(self.agent))
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - optional metric boundary; recorded by helper
+            self._helper._record_diagnostic_error("engine_final_leakage", exc)
             return None
 
     # -------------------------------------------------------------------------------- decision waves
@@ -215,9 +222,9 @@ class EngineRunner:
         import torch
 
         from fog.constants.tables import TABLES
-        from fog.encoding.events import build_snapshot
+        from fog.encoding.events import record_history_decision
         from fog.encoding.observation import Observation
-        from fog.env.player import _sample_action
+        from fog.env.player import _behavior_log_probs, _sample_action
 
         if not items:
             return []
@@ -243,7 +250,13 @@ class EngineRunner:
             for i, (slot, _) in enumerate(items):
                 truth = self._truth(slot.battle)
                 oracle_rows[i] = truth
-                rows.append(truth if truth is not None else np.full((6, 9), -1, dtype=np.int64))
+                from fog.constants.schema import SET_N_ATTRS
+
+                rows.append(
+                    truth
+                    if truth is not None
+                    else np.full((6, SET_N_ATTRS), -1, dtype=np.int64)
+                )
             batch["opp_truth_tokens"] = torch.as_tensor(
                 np.stack(rows), dtype=torch.long, device=device
             )
@@ -253,7 +266,20 @@ class EngineRunner:
 
         actions: list[int] = []
         for i, (slot, role) in enumerate(items):
-            action_idx = _sample_action(out.log_probs[i], temperature=temperature)
+            action_idx = _sample_action(
+                out.log_probs[i],
+                temperature=temperature,
+                tera_logit_bonus=self.tera_logit_bonus if record else 0.0,
+            )
+            recorded_log_probs = (
+                _behavior_log_probs(
+                    out.log_probs[i],
+                    temperature=temperature,
+                    tera_logit_bonus=self.tera_logit_bonus,
+                )
+                if temperature > 0
+                else out.log_probs[i]
+            )
             actions.append(action_idx)
             battle = slot.battle
             obs, view = obs_list[i], views[i]
@@ -266,16 +292,20 @@ class EngineRunner:
                     "entity_ids": obs.entity_ids,
                     "field": obs.field,
                     "history": obs.history,
+                    "history_ids": obs.history_ids,
+                    "history_state": obs.history_state,
+                    "history_len": np.int64(obs.history_len),
                     "active_idx": obs.active_idx if obs.active_idx is not None
                     else np.array([0, 6], dtype=np.int64),
                     "legality_mask": obs.legality_mask,
+                    "action_features": obs.action_features,
                     "opp_revealed": obs.opp_revealed,
                     "turn": np.int64(battle.turn),
                 }
                 if self.oracle_truth:
                     frag["opp_truth_tokens"] = (
                         oracle_rows[i] if oracle_rows[i] is not None
-                        else np.full((6, 9), -1, dtype=np.int64)
+                        else np.full((6, SET_N_ATTRS), -1, dtype=np.int64)
                     )
                 mirror = self._helper._mirror(view, obs, battle.ledgers[role])
                 if mirror is not None:
@@ -285,18 +315,17 @@ class EngineRunner:
                     slot.gid,
                     frag,
                     action=action_idx,
-                    log_prob=float(out.log_probs[i, action_idx]),
+                    log_prob=float(recorded_log_probs[action_idx]),
                     value=float(out.value[i]),
                     leak_ce=self._helper._leakage_ce(mirror, obs, device),
+                    progress_score=_progress_score(battle, role),
                 )
                 slot.decisions += 1
 
-            try:  # history retro-fidelity (§2.3), both agent-driven sides
-                battle.trackers[role].record_decision(
-                    battle.turn, build_snapshot(view, TABLES), action_idx
-                )
-            except Exception:
-                pass
+            # History is part of the next observation, so a mapping failure is training-critical.
+            record_history_decision(
+                battle.trackers[role], battle.turn, view, TABLES, action_idx
+            )
         return actions
 
     # --------------------------------------------------------------------------------- main loop
@@ -374,44 +403,8 @@ def _t(a, dtype, device):
 
 
 def _stack_obs(obs_list, device) -> dict:
-    """Stack unbatched Observations into one C3 batch (history front-padded to the wave max)."""
-    import torch
-
-    from fog.encoding.history import pad_or_truncate_front
-
-    max_t = max(o.history.shape[0] for o in obs_list)
-    batch = {
-        "entities": _t(np.stack([o.entities for o in obs_list]), torch.float32, device),
-        "entity_ids": _t(np.stack([o.entity_ids for o in obs_list]), torch.long, device),
-        "field": _t(np.stack([o.field for o in obs_list]), torch.float32, device),
-        "history": _t(
-            np.stack([pad_or_truncate_front(o.history, max_t) for o in obs_list]),
-            torch.float32, device,
-        ),
-        "active_idx": _t(
-            np.stack([
-                o.active_idx if o.active_idx is not None else np.array([0, 6], dtype=np.int64)
-                for o in obs_list
-            ]),
-            torch.long, device,
-        ),
-        "legality_mask": _t(np.stack([o.legality_mask for o in obs_list]), torch.bool, device),
-    }
-    tokens = np.stack([
-        (o.opp_revealed or {}).get("tokens", np.full((6, 9), -1, dtype=np.int64))
-        for o in obs_list
-    ])
-    masks: dict[str, Any] = {}
-    mask_keys = set((obs_list[0].opp_revealed or {}).get("masks", {}) or {})
-    for o in obs_list:
-        assert set((o.opp_revealed or {}).get("masks", {}) or {}) == mask_keys, \
-            "inconsistent opp_revealed mask keys in one wave"
-    for key in mask_keys:
-        masks[key] = _t(
-            np.stack([o.opp_revealed["masks"][key] for o in obs_list]), torch.bool, device
-        )
-    batch["opp_revealed"] = {"tokens": _t(tokens, torch.long, device), "masks": masks}
-    return batch
+    """Compatibility alias; new callers should import ``collate_observations`` directly."""
+    return collate_observations(obs_list, device)
 
 
 # ---------------------------------------------------------------------------- throughput probe

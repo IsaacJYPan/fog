@@ -1,0 +1,20 @@
+# Archived M3 generative set-variant experiment (usage-sampled sets on the POOL-A
+# species core; build/regen: python -m fog.scripts.build_generative_pool --n 128 --seed 0).
+#
+# WHEN TO USE WHICH POOL (audit 2026-07-05 follow-up):
+#   * pool_a  (m3_leakage.yaml)  — 8 hand-built coherent variants, ~3 bits of team identity.
+#     Coherence-controlled; probes CAN memorize the finite pool over a long run.
+#   * pool_gen (this config)     — 128 sampled variants, ~100+ bits upper-bound hidden info
+#     (per-slot entropy report in data/teams/pool_gen.json::_meta). Entropy-scaled; sets are
+#     marginal samples (chaos usage has no joint set data), so per-set coherence is weaker.
+# Protocol: run both; if the β effect appears only where the belief net can memorize (pool_a),
+# it's an artifact — pool_gen is the pool that can support a real concealment claim.
+#
+# Same run order as m3_leakage.yaml: β=0 control FIRST, ≥3 seeds per cell.
+extends: m3_leakage.yaml
+
+experiment: m3_leakage_gen
+env:
+  team_pool: data/teams/pool_gen
+log:
+  dir: runs/m3_leakage_gen

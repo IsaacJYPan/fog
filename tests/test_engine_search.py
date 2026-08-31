@@ -74,7 +74,7 @@ def _perturbed_world(battle):
         i for i, s in enumerate(ids) if not s.startswith("<") and i != int(world[0, 1])
     )
     sp_idx = int(world[0, 0])
-    current_moves = set(int(m) for m in world[0, 3:7])
+    current_moves = {int(m) for m in world[0, 3:7]}
     learnable = np.flatnonzero(TABLES.learnset_mask(sp_idx))
     new_move = next(int(m) for m in learnable if int(m) not in current_moves)
     world[0, 1] = new_item
@@ -143,7 +143,8 @@ def test_stepper_leaf_is_censored():
         r.validate()
         tokens = r.opp_revealed["tokens"]
         assert (tokens == -1).any(), "leaf belief input must keep hidden attributes hidden"
-        assert tokens[0, 7] == -1, "spreads are never revealed by one simulated ply"
+        assert (tokens[0, 7:14] == -1).all(), \
+            "submitted nature/EVs are never revealed by one simulated ply"
 
 
 def test_engine_determinized_action_end_to_end(agent):
@@ -275,8 +276,8 @@ def test_showdown_stepper_leaf_censored_and_end_to_end(agent):
     leaf = stepper._fork(battle.truth_tokens("p2"))  # reconstructed base for one world
     leaf_clone = leaf.clone_for_step(seed=7)
     legal = np.flatnonzero(leaf_clone.action_mask(role))
-    from fog.search.engine_step import _play_one_ply
     from fog.env.engine_scripted import EngineMaxDamagePolicy
+    from fog.search.engine_step import _play_one_ply
 
     r = _play_one_ply(leaf_clone, role, int(legal[0]), EngineMaxDamagePolicy(seed=0),
                       max_forced_steps=8)

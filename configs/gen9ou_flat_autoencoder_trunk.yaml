@@ -1,0 +1,37 @@
+# Simple shared latent baseline: one global learned MLP maps the complete legitimate
+# current observation to one unpartitioned 2,048-value vector.  There is no Transformer,
+# token layout, raw bypass, or analytically invertible path.
+extends: default.yaml
+
+experiment: gen9ou_flat_autoencoder_trunk
+seed: 20261120
+device: cuda
+
+model:
+  belief_last_context_probability: 0.25
+  public_action_features_only: true
+  simple_rule_prior_strength: 0.0
+  simple_rule_prior_strength_final: 0.0
+  use_action_features: true
+  use_posterior_features: true
+  shared_latent_trunk: true
+  shared_latent_learned_only: true
+  shared_latent_contextual: false
+  shared_latent_flat_autoencoder: true
+  shared_latent_dim: 2048
+  shared_flat_hidden_dim: 2048
+  shared_flat_layers: 2
+  structured_memory: false
+  token_action_policy: false
+  exact_action_context: false
+
+loss:
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  value_coef: 0.0
+  preview_coef: 0.0
+
+log:
+  dir: runs/gen9ou_flat_autoencoder_trunk

@@ -268,8 +268,8 @@ def test_persistent_truncation_zero_mass_always_dropped(agent):
     b = _battle()
     truth = b.truth_tokens("p2")
     opp = np.stack([truth, truth, truth])
-    log_prior = np.log(np.array([[0.45, 0.3, 0.0], [0.15, 0.1, 0.0]]))
     with np.errstate(divide="ignore"):
+        log_prior = np.log(np.array([[0.45, 0.3, 0.0], [0.15, 0.1, 0.0]]))
         table = JointBeliefTable(log_prior)
     r = pb_search_action(agent, b, "p1", own_source=_StubOwnStates(2), opp_tokens=opp,
                          table=table, seed=3, iters=24)
@@ -302,7 +302,7 @@ def test_persistent_truncation_top_j_and_refuses_private_truth_dependent_top_k(a
     assert r.dropped_opp_mass == pytest.approx(0.2)
     assert r.rho.shape == (2, 2)
     np.testing.assert_allclose(r.rho.sum(), 1.0)
-    assert r.own_tokens.shape == (2, 6, 9) and r.opp_tokens.shape == (2, 6, 9)
+    assert r.own_tokens.shape == (2, 6, 15) and r.opp_tokens.shape == (2, 6, 15)
     mask = b.action_mask("p1")
     assert mask[r.action]
 

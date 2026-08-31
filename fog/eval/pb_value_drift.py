@@ -1,7 +1,7 @@
-"""Drift gate for the per-pair value table: does reusing a stale table approximate re-running
-the network? (PROJECT_DESIGN_PROPOSAL.md §9.2 + §15.3 line "the error from reusing a stored
-per-pair value table instead of re-running the network is measured against full re-evaluation on
-the exact small-pool harness"; PROPOSAL_IMPL_PLAN.md Phase G drift-vs-full-reeval measurement.)
+"""Drift gate for the per-pair value table: does a stale table approximate re-running the network?
+
+The error is measured against full re-evaluation on the exact small-pool harness, implementing
+ARCHITECTURE.md invariant S2 without depending on an untracked experiment plan.
 
 WHY THIS IS THE LOAD-BEARING MEASUREMENT. The whole Option-2 decision (per-pair table refreshed
 every N iterations, cheap table reuse in between) is only worth anything if the cached entries stay

@@ -1,0 +1,26 @@
+# Production continuation after causal diagnosis. High-rated censored replays remain the primary
+# source. The exact Simple-vs-Simple auxiliary is 69% coherent hand-built teams and 31%
+# usage-sampled set variants by row; variants provide move/EV/set-identity coverage without
+# replacing realistic team structure. Global PCGrad protects both sources in one optimizer step.
+extends: gen9ou_typed_token_joint_belief_value_pcgrad_continuation_v2.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_diversified_v1
+seed: 20261209
+
+bc:
+  auxiliary_manifest: runs/gen9ou_simple_belief_value_combined_v1/train_manifest.parquet
+  auxiliary_holdout_manifest: runs/gen9ou_simple_belief_value_combined_v1/holdout_manifest.parquet
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_pcgrad_continuation_v2/checkpoints/bc_best.pt
+  epochs: 48
+  lr: 2.0e-6
+  lr_final: 2.0e-7
+  early_stopping_patience: 12
+  early_stopping_min_delta: 0.0005
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_diversified_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_diversified_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_diversified_v1
+  tensorboard: true

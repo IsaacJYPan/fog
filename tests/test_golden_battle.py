@@ -61,9 +61,12 @@ def test_golden_spotchecks():
     assert a["field"][o_haz] == 1.0 and a["field"][o_haz + 1] == pytest.approx(2 / 3)
     # history: 5 turns, most recent last; turn-5 record has opponent tera flag set
     assert a["history"].shape[0] == 5
+    assert a["history_ids"].shape == (5, 17)
+    assert a["history_state"].shape == (5, 14)
     from fog.encoding.events import _OFF_OPP
 
     assert a["history"][4, _OFF_OPP + 4] == 1.0
+    assert a["mirror_history_ids"][4, 13] == a["history_ids"][4, 12]
     # mirror: my Glowking's revealed moves visible, Zamazenta's item hidden
     mv = a["my_view_tokens"]
     assert mv[4, 3] >= 0          # Glowking revealed at least one move

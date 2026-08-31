@@ -1,5 +1,4 @@
-"""The K x J cell grid for two-sided public-belief search (PROPOSAL_IMPL_PLAN Phase C;
-PROJECT_DESIGN_PROPOSAL.md §10 table construction, §13 budgets, settled decision 14).
+"""The K x J cell grid for two-sided public-belief search (ARCHITECTURE.md S1–S3).
 
 One real decision needs, for every pair (our candidate world k, opponent candidate world j) and
 every available public-action pair (a, b), the turn's chance branches simulated ONCE and cached —
@@ -10,8 +9,8 @@ Structure decisions carried from the proposal:
   * **Shared opponent particles** (settled 14): the J opponent worlds are sampled once by the
     caller and every one of our K candidate worlds faces the SAME J worlds. The old one-sided
     code paired each own-world with its own opponent draw, which confounds private-state effects
-    with opponent-draw luck. This module receives `own_tokens [K, 6, 9]` and
-    `opp_tokens [J, 6, 9]` and builds the full K x J fork matrix.
+    with opponent-draw luck. This module receives `own_tokens [K, 6, 15]` and
+    `opp_tokens [J, 6, 15]` and builds the full K x J fork matrix.
   * **Public-action labels for BOTH sides** (proposal §7.3): strategies and posteriors live in
     the space of what the opponent observes (move ids, switch species), not action-slot indices.
     A world that lacks a label cannot play it (`avail` masks), so observing that label eliminates
@@ -25,8 +24,7 @@ Structure decisions carried from the proposal:
     Each leaf also stores a [K, J] compatibility mask derived from the new truthful reveal facts,
     so its probability table cannot retain a team pair contradicted by the board it accompanies.
 
-The builder handles OUR decision whether or not the opponent is also pending (PROPOSAL_IMPL_PLAN
-Phase F2, proposal §10.5):
+The builder handles our decision whether or not the opponent is also pending:
 
   * both sides pending  -> a normal simultaneous turn, the full K x J x A x B grid;
   * only `role` pending -> a one-sided forced replacement / pivot (U-turn, Baton Pass, Eject, or a
@@ -41,8 +39,8 @@ A decision we do NOT own (only the opponent pending) stays an error: the caller 
 solo replacement (its behavioral likelihood is unmodeled there — the honest §7.2 floor) and never
 asks this builder to solve a move that is not ours.
 
-Simulation failures are tolerated the way the baseline tolerates them: the cell is marked in
-`failed` and gets no branches; the value layer (Phase E) substitutes the root value for failed
+Simulation failures are retained explicitly: the cell is marked in `failed` and gets no branches;
+the value layer substitutes the root value for failed
 cells and reports the count. A flood of failures signals a reconstruction bug, not noise.
 """
 from __future__ import annotations
@@ -216,7 +214,7 @@ def build_pb_grid(
                             fork, role, int(local_action1[k, a]), opp_idx,
                             min_prob=min_prob, max_branches=max_branches,
                         )
-                    except Exception as e:
+                    except Exception as e:  # noqa: BLE001 - failure is retained in PBGrid
                         failed[k, j, a, b] = True
                         reason = f"{type(e).__name__}: {e}"[:200]
                         fail_reasons[reason] = fail_reasons.get(reason, 0) + 1

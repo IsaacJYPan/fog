@@ -21,11 +21,13 @@ as reward — see ppo_update's preview term).
 """
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from collections.abc import Callable
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from fog.env.actions import active_entity_indices, map_action_to_order
+from fog.training.progress_reward import battle_progress_score as _progress_score
 
 if TYPE_CHECKING:
     from poke_env.environment import AbstractBattle
@@ -37,19 +39,53 @@ if TYPE_CHECKING:
 class FogPlayer:
     """Thin adapter from `FogAgent` decisions to poke-env battle orders."""
 
-    def __init__(self, agent: "FogAgent | None" = None, *, temperature: float = 1.0) -> None:
+    def __init__(
+        self,
+        agent: FogAgent | None = None,
+        *,
+        temperature: float = 1.0,
+        tera_logit_bonus: float = 0.0,
+    ) -> None:
         self.agent = agent
         self.temperature = temperature
+        self.tera_logit_bonus = float(tera_logit_bonus)
+        if not np.isfinite(self.tera_logit_bonus) or self.tera_logit_bonus < 0:
+            raise ValueError("tera_logit_bonus must be finite and non-negative")
         self._player_ref: Any | None = None
-        self._buffer: "RolloutBuffer | None" = None
+        self._team_builder: Any | None = None
+        self._buffer: RolloutBuffer | None = None
         self._game_ids: dict[str, int] = {}
         # per-battle state, keyed by battle_tag (safe under max_concurrent_battles > 1)
         self._ledgers: dict[str, Any] = {}
         self._trackers: dict[str, Any] = {}
         self._fed_turns: dict[str, set[int]] = {}
         self.on_battle_end: Callable[[Any], None] | None = None
-        # optional: finished battle -> [6,9] opponent truth tokens (self-play belief supervision)
+        self.on_battle_start: Callable[[Any], None] | None = None
+        self.decision_delay_seconds = 0.0
+        self._announced_battles: set[str] = set()
+        # Optional policy-distillation tap: called with the exact unbatched fragment and acting
+        # output before the decision is added to the rollout buffer. It is deliberately inert in
+        # ordinary training and evaluation.
+        self.decision_observer: Callable[[str, dict, Any], None] | None = None
+        # Optional exact action-label provider used by supervised policy collection. It receives
+        # the live battle, exact observation, and agent output, and must return a legal project
+        # action index. Ordinary PPO/inference leaves this unset.
+        self.action_override: Callable[[Any, Any, Any], int] | None = None
+        # Optional DAgger labeler. Unlike ``action_override`` this never changes the live action:
+        # it only stores a legal target alongside the exact accepted rollout fragment, so rejected
+        # Showdown choices are rolled back atomically with their supervision.
+        self.supervised_label_provider: Callable[[Any, Any, Any], int] | None = None
+        # Opt-in supervised-data metadata. When true, the finalized rollout fragment retains the
+        # donor's full masked policy distribution. It remains inside RolloutBuffer so a rejected
+        # Showdown choice is rolled back together with the action row.
+        self.record_policy_reference = False
+        # optional: finished battle -> [6,15] opponent truth tokens (self-play belief supervision)
         self.truth_provider: Callable[[Any], Any] | None = None
+        # Optional immutable submitted private-state truth for the acting player's own team.
+        # Direct-Showdown training has no poke-env team builder, so reading the live battle objects
+        # here would incorrectly turn temporary in-battle changes (Skill Swap, Transform, etc.) into
+        # self-belief labels.
+        self.private_state_truth_provider: Callable[[Any], Any] | None = None
         # optional leakage measurement (§7): a FrozenProbe (frozen backbone + self-belief). When set,
         # each decision records the probe's self-readability CE so the rollout buffer can derive the
         # per-turn ΔI penalty. `leak_family_weights` rescales per-family CE (weighted-ΔI ablation).
@@ -58,7 +94,8 @@ class FogPlayer:
         # mirror recording for self-belief TRAINING (§3.3): tri-state — None = auto (try once,
         # disable permanently on first failure), True/False = forced. Only active with a buffer.
         self.record_mirror: bool | None = None
-        # optional set-oracle truth injection (§3.4 eval): battle -> [6,9] opponent truth tokens fed
+        self.mirror_last_error: str | None = None
+        # optional set-oracle truth injection (§3.4 eval): battle -> [6,15] opponent truth tokens fed
         # to the belief net as opp_truth_tokens (perfect-information ceiling).
         self.oracle_truth_provider: Callable[[Any], Any] | None = None
         # optional determinized search at action time (§8): when set, act() selects via
@@ -66,8 +103,28 @@ class FogPlayer:
         # the live battle + belief-sampled worlds and rolls one ply each (search/engine_step). Dict:
         # {"k": int, "prior_weight": float, "seed": int}. Inference-only; never during training.
         self.search: dict | None = None
+        # Search failures used to be swallowed by the policy fallback, making a broken search row
+        # look indistinguishable from policy-only play. Evaluations read these counters through the
+        # built player's `_fog_adapter` reference.
+        self.search_stats: dict[str, Any] = {
+            "decisions": 0,
+            "simulation_attempts": 0,
+            "simulation_failures": 0,
+            "fallbacks": 0,
+            "overrides": 0,
+            "last_error": None,
+            "failure_reasons": {},
+        }
+        # Optional subsystems may degrade without aborting a battle, but never silently.  Each
+        # boundary records a stable name, count, and last concrete error for run reports/tests.
+        self.diagnostic_errors: dict[str, dict[str, Any]] = {}
 
-    def attach_buffer(self, buffer: "RolloutBuffer") -> None:
+    def _record_diagnostic_error(self, name: str, exc: BaseException) -> None:
+        entry = self.diagnostic_errors.setdefault(name, {"count": 0, "last_error": None})
+        entry["count"] += 1
+        entry["last_error"] = f"{type(exc).__name__}: {exc}"
+
+    def attach_buffer(self, buffer: RolloutBuffer) -> None:
         """Record every decision + game outcome into `buffer` (training mode)."""
         self._buffer = buffer
 
@@ -100,7 +157,9 @@ class FogPlayer:
                 finally:
                     adapter._battle_finished(battle)
 
+        self._team_builder = poke_env_kwargs.get("team")
         self._player_ref = FogBot(**poke_env_kwargs)
+        self._player_ref._fog_adapter = self
         return self._player_ref
 
     # ---------------------------------------------------------------------------- per-battle state
@@ -111,14 +170,30 @@ class FogPlayer:
             from fog.encoding.tracker import BattleTracker
 
             role = getattr(battle, "player_role", None) or "p1"
-            self._trackers[tag] = BattleTracker(my_role=role)
-            self._fed_turns[tag] = set()
-            try:
-                from fog.encoding.reveals import RevealLedger
+            tracker = BattleTracker(my_role=role)
+            private_truth = None
+            if self.private_state_truth_provider is not None:
+                private_truth = self.private_state_truth_provider(battle)
+            if private_truth is None:
+                paste = getattr(self._team_builder, "last_paste", None)
+                if paste:
+                    try:
+                        from fog.constants.tables import TABLES
+                        from fog.env.team_truth import truth_tokens_from_paste
 
-                self._ledgers[tag] = RevealLedger()
-            except Exception:  # pragma: no cover
-                self._ledgers[tag] = None
+                        private_truth = truth_tokens_from_paste(paste, TABLES)
+                    except Exception as exc:  # noqa: BLE001 - optional builder metadata boundary
+                        self._record_diagnostic_error("team_builder_private_truth", exc)
+                        # Non-pool teambuilders and malformed optional metadata keep the
+                        # request-stat fallback; ordinary policy inference remains available.
+                        private_truth = None
+            if private_truth is not None:
+                tracker.record_exact_private_truth(private_truth)
+            self._trackers[tag] = tracker
+            self._fed_turns[tag] = set()
+            from fog.encoding.reveals import RevealLedger
+
+            self._ledgers[tag] = RevealLedger()
         return tag, self._ledgers[tag], self._trackers[tag], self._fed_turns[tag]
 
     def _game_id(self, tag: str) -> int:
@@ -131,7 +206,7 @@ class FogPlayer:
         return gid
 
     # ------------------------------------------------------------------------------- decision path
-    def act(self, battle: "AbstractBattle"):
+    def act(self, battle: AbstractBattle):
         """Build an observation, sample an agent action, and return the corresponding BattleOrder."""
         player = self._player_ref
         if player is None:
@@ -141,9 +216,15 @@ class FogPlayer:
 
         import torch
 
+        from fog.encoding.batch import observation_to_batch
         from fog.encoding.observation import Observation
 
         tag, ledger, tracker, fed = self._battle_state(battle)
+        if tag not in self._announced_battles:
+            self._announced_battles.add(tag)
+            if self.on_battle_start is not None:
+                self.on_battle_start(battle)
+        tracker.record_private_team(battle)
         self._feed_events(battle, ledger, tracker, fed)
         obs = Observation.from_battle(battle, tracker=tracker)
         obs.validate()
@@ -154,23 +235,10 @@ class FogPlayer:
             if obs.active_idx is not None
             else np.asarray(active_entity_indices(battle), dtype=np.int64)
         )
-        batch = {
-            "entities": torch.as_tensor(obs.entities, dtype=torch.float32, device=device).unsqueeze(0),
-            "entity_ids": torch.as_tensor(obs.entity_ids, dtype=torch.long, device=device).unsqueeze(0),
-            "field": torch.as_tensor(obs.field, dtype=torch.float32, device=device).unsqueeze(0),
-            "history": torch.as_tensor(obs.history, dtype=torch.float32, device=device).unsqueeze(0),
-            "active_idx": torch.as_tensor(active_idx, dtype=torch.long, device=device).unsqueeze(0),
-            "legality_mask": torch.as_tensor(
-                obs.legality_mask, dtype=torch.bool, device=device
-            ).unsqueeze(0),
-            "opp_revealed": _opp_revealed_to_torch(obs.opp_revealed, device=device),
-        }
+        batch = observation_to_batch(obs, device)
         oracle_truth = None
         if self.oracle_truth_provider is not None:
-            try:
-                oracle_truth = self.oracle_truth_provider(battle)
-            except Exception:
-                oracle_truth = None
+            oracle_truth = self.oracle_truth_provider(battle)
             if oracle_truth is not None:
                 oracle_truth = np.asarray(oracle_truth, dtype=np.int64)
                 batch["opp_truth_tokens"] = torch.as_tensor(
@@ -179,56 +247,109 @@ class FogPlayer:
 
         with torch.no_grad():
             out = self.agent(batch)
-        if self.search is not None:
+        recorded_log_probs = out.log_probs[0]
+        if self.action_override is not None:
+            action_idx = int(self.action_override(battle, obs, out))
+            if not bool(obs.legality_mask[action_idx]):
+                raise ValueError(f"action_override returned illegal action {action_idx}")
+        elif self.search is not None:
             action_idx = self._search_action(battle, obs, tracker, batch, device)
         else:
-            action_idx = _sample_action(out.log_probs[0], temperature=self.temperature)
+            action_idx = _sample_action(
+                out.log_probs[0],
+                temperature=self.temperature,
+                tera_logit_bonus=self.tera_logit_bonus,
+            )
+            if self.temperature > 0:
+                # PPO must store the probability of the distribution that actually sampled the
+                # action.  Previously temperature changed the sample but the untempered policy
+                # probability was recorded, silently corrupting every importance ratio at T != 1.
+                recorded_log_probs = _behavior_log_probs(
+                    out.log_probs[0],
+                    temperature=self.temperature,
+                    tera_logit_bonus=self.tera_logit_bonus,
+                )
 
-        if self._buffer is not None:
-            gid = self._game_id(tag)
+        if self._buffer is not None or self.decision_observer is not None:
             frag = {
                 "entities": obs.entities,
                 "entity_ids": obs.entity_ids,
                 "field": obs.field,
                 "history": obs.history,
+                "history_ids": obs.history_ids,
+                "history_state": obs.history_state,
+                "history_len": np.int64(obs.history_len),
                 "active_idx": active_idx,
                 "legality_mask": obs.legality_mask,
+                "action_features": obs.action_features,
                 "opp_revealed": obs.opp_revealed,
                 "turn": np.int64(getattr(battle, "turn", 0) or 0),
             }
-            if self.oracle_truth_provider is not None:
-                # The update-time forward must see what the acting forward saw (acting with truth
-                # but updating without silently breaks the PPO ratio). Key always present so frag
-                # structure is batch-constant; -1 rows merge to "no truth" in apply_set_oracle.
-                frag["opp_truth_tokens"] = (
-                    oracle_truth if oracle_truth is not None
-                    else np.full((6, 9), -1, dtype=np.int64)
+            mirror = None
+            if self._buffer is not None:
+                gid = self._game_id(tag)
+                if self.record_policy_reference:
+                    frag["reference_log_probs"] = out.log_probs[0].detach().cpu().numpy()
+                if self.supervised_label_provider is not None:
+                    supervised_label = int(self.supervised_label_provider(battle, obs, out))
+                    if not 0 <= supervised_label < len(obs.legality_mask):
+                        raise ValueError(
+                            f"supervised_label_provider returned out-of-range action "
+                            f"{supervised_label}"
+                        )
+                    if not bool(obs.legality_mask[supervised_label]):
+                        raise ValueError(
+                            f"supervised_label_provider returned illegal action {supervised_label}"
+                        )
+                    frag["supervised_label"] = np.int64(supervised_label)
+                if self.oracle_truth_provider is not None:
+                    # The update-time forward must see what the acting forward saw (acting with
+                    # truth but updating without silently breaks the PPO ratio). Key always
+                    # present so fragment structure is batch-constant.
+                    frag["opp_truth_tokens"] = (
+                        oracle_truth if oracle_truth is not None
+                        else np.full((6, 15), -1, dtype=np.int64)
+                    )
+                mirror = self._mirror(battle, obs, ledger)
+                if mirror is not None:
+                    mirror_frag, my_view = mirror
+                    frag["opp_view"] = {**mirror_frag, "my_view": my_view}
+            if self.decision_observer is not None:
+                self.decision_observer(tag, frag, out)
+            if self._buffer is not None:
+                self._buffer.add_decision(
+                    gid,
+                    frag,
+                    action=action_idx,
+                    log_prob=float(recorded_log_probs[action_idx]),
+                    value=float(out.value[0]),
+                    leak_ce=self._leakage_ce(mirror, obs, device),
+                    progress_score=_progress_score(battle),
                 )
-            mirror = self._mirror(battle, obs, ledger)
-            if mirror is not None:
-                mirror_frag, my_view = mirror
-                frag["opp_view"] = {**mirror_frag, "my_view": my_view}
-            self._buffer.add_decision(
-                gid,
-                frag,
-                action=action_idx,
-                log_prob=float(out.log_probs[0, action_idx]),
-                value=float(out.value[0]),
-                leak_ce=self._leakage_ce(mirror, obs, device),
-            )
 
         # history retro-fidelity: snapshot + my chosen action for this turn (§2.3)
-        try:
-            from fog.constants.tables import TABLES
-            from fog.encoding.events import build_snapshot
+        from fog.constants.tables import TABLES
+        from fog.encoding.events import record_history_decision
 
-            tracker.record_decision(
-                int(getattr(battle, "turn", 0) or 0), build_snapshot(battle, TABLES), action_idx
-            )
-        except Exception:
-            pass
+        record_history_decision(
+            tracker, int(getattr(battle, "turn", 0) or 0), battle, TABLES, action_idx
+        )
 
+        if self.decision_delay_seconds > 0:
+            import time
+
+            time.sleep(self.decision_delay_seconds)
         return map_action_to_order(battle, action_idx, player)
+
+    def discard_last_uncommitted_decision(self, battle: Any) -> None:
+        """Remove the PPO row for a Showdown-rejected choice before retrying the request."""
+        if self._buffer is None:
+            return
+        tag = str(getattr(battle, "battle_tag", ""))
+        gid = self._game_ids.get(tag)
+        if gid is None:
+            raise RuntimeError(f"no rollout game exists for rejected choice in {tag!r}")
+        self._buffer.discard_last_decision(gid)
 
     # ------------------------------------------------------------------------------- team preview
     def choose_teampreview(self, battle: Any) -> str:
@@ -241,6 +362,7 @@ class FogPlayer:
             from fog.encoding.observation import Observation
 
             tag, _, tracker, _ = self._battle_state(battle)
+            tracker.record_private_team(battle)
             obs = Observation.from_battle(battle, tracker=tracker)
             device = _agent_device(self.agent)
             pre = {
@@ -252,12 +374,17 @@ class FogPlayer:
                 logits = self.agent.preview_logits(pre)[0]                      # [6]
             n_mons = len(getattr(battle, "team", None) or {}) or 6
             logits = logits[:n_mons]
+            raw_log_probs = torch.log_softmax(logits, dim=-1)
             if self.temperature <= 0:
                 lead = int(logits.argmax())
+                behavior_log_probs = raw_log_probs
             else:
-                probs = torch.softmax(logits / max(self.temperature, 1e-6), dim=-1)
+                behavior_log_probs = _temperature_log_probs(
+                    raw_log_probs, temperature=self.temperature
+                )
+                probs = behavior_log_probs.exp()
                 lead = int(torch.multinomial(probs, 1))
-            log_prob = float(torch.log_softmax(logits, dim=-1)[lead])
+            log_prob = float(behavior_log_probs[lead])
             order = [lead] + [i for i in range(n_mons) if i != lead]
 
             if self._buffer is not None:
@@ -269,7 +396,8 @@ class FogPlayer:
                     log_prob=log_prob,
                 )
             return "/team " + "".join(str(i + 1) for i in order)
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - team-preview fallback is explicit and recorded
+            self._record_diagnostic_error("team_preview", exc)
             return "/team 123456"
 
     # -------------------------------------------------------------------------------------- search
@@ -279,24 +407,78 @@ class FogPlayer:
         search run never crashes a game."""
         import torch
 
+        self.search_stats["decisions"] += 1
+        stepper = None
+        stepper_failures_accounted = False
         try:
-            from fog.search.determinized import determinized_action
-            from fog.search.engine_step import ShowdownWorldStepper
-
             cfg = self.search or {}
+            if cfg.get("mode") == "direct_two_sided":
+                from fog.search.direct_two_sided import direct_two_sided_action
+
+                role = getattr(battle, "player_role", None) or "p1"
+                result = direct_two_sided_action(
+                    self.agent,
+                    battle,
+                    role=role,
+                    device=device,
+                    iters=int(cfg.get("iters", 256)),
+                    floor=float(cfg.get("floor", 0.02)),
+                    min_probability=float(cfg.get("min_probability", 0.0)),
+                    max_branches=cfg.get("max_branches"),
+                )
+                self.search_stats["simulation_attempts"] += result.simulations
+                self.search_stats["chance_branches"] = (
+                    int(self.search_stats.get("chance_branches", 0)) + result.chance_branches
+                )
+                self.search_stats["pruned_mass_max"] = max(
+                    float(self.search_stats.get("pruned_mass_max", 0.0)),
+                    result.pruned_mass_max,
+                )
+                with torch.no_grad():
+                    policy_action = int(self.agent(batch).log_probs[0].argmax())
+                self.search_stats["overrides"] += int(result.action != policy_action)
+                return result.action
+
+            self.search_stats["simulation_attempts"] += (
+                int(batch["legality_mask"][0].sum().item()) * int(cfg.get("k", 16))
+            )
+            from fog.search.determinized import determinized_action
+            from fog.search.engine_step import EngineAgentPolicy, ShowdownWorldStepper
+
             role = getattr(battle, "player_role", None) or "p1"
+            opponent_policy = None
+            if cfg.get("opponent_model") == "policy":
+                opponent_policy = EngineAgentPolicy(self.agent, temperature=0.0)
             stepper = ShowdownWorldStepper(
-                battle, tracker, role=role, seed=int(cfg.get("seed", 0)),
+                battle, tracker, role=role, opponent_policy=opponent_policy,
+                seed=int(cfg.get("seed", 0)),
             )
             action = determinized_action(
                 self.agent, batch, step_fn=stepper,
                 k=int(cfg.get("k", 16)), prior_weight=float(cfg.get("prior_weight", 0.5)),
+                min_override_margin=float(cfg.get("min_override_margin", 0.0)),
+                uncertainty_z=float(cfg.get("uncertainty_z", 0.0)),
             )
+            with torch.no_grad():
+                policy_action = int(self.agent(batch).log_probs[0].argmax())
+            self.search_stats["overrides"] += int(action != policy_action)
+            self.search_stats["simulation_failures"] += int(stepper.failures)
+            self.search_stats["failure_reasons"] = dict(
+                getattr(stepper, "failure_reasons", {})
+            )
+            stepper_failures_accounted = True
             # if every world's reconstruction failed, search saw nothing — fall back to the policy
             if stepper.failures and not stepper._bases:
                 raise RuntimeError("all search reconstructions failed")
             return action
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - inference fallback is counted in search_stats
+            if stepper is not None and not stepper_failures_accounted:
+                self.search_stats["simulation_failures"] += int(stepper.failures)
+                self.search_stats["failure_reasons"] = dict(
+                    getattr(stepper, "failure_reasons", {})
+                )
+            self.search_stats["fallbacks"] += 1
+            self.search_stats["last_error"] = f"{type(exc).__name__}: {exc}"
             with torch.no_grad():
                 out = self.agent(batch)
             return _sample_action(out.log_probs[0], temperature=self.temperature)
@@ -322,12 +504,29 @@ class FogPlayer:
             my_view_tokens = tokens_from_views(
                 ledger.views(my_keys, my_species) if ledger else []
             )
-            my_truth_tokens = _own_truth_tokens(battle, TABLES)
+            my_truth_tokens = None
+            if self.private_state_truth_provider is not None:
+                try:
+                    my_truth_tokens = self.private_state_truth_provider(battle)
+                except Exception as exc:  # noqa: BLE001 - provider boundary; mirror records failure
+                    self._record_diagnostic_error("mirror_private_truth_provider", exc)
+                    my_truth_tokens = None
+            if my_truth_tokens is None:
+                paste = getattr(self._team_builder, "last_paste", None)
+            else:
+                paste = None
+            if paste:
+                from fog.env.team_truth import truth_tokens_from_paste
+
+                my_truth_tokens = truth_tokens_from_paste(paste, TABLES)
+            elif my_truth_tokens is None:
+                my_truth_tokens = _own_truth_tokens(battle, TABLES)
             out = build_opponent_view_np(obs, my_view_tokens, my_truth_tokens, TABLES)
             if self.record_mirror is None:
                 self.record_mirror = True
             return out
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - optional mirror boundary; error retained below
+            self.mirror_last_error = f"{type(exc).__name__}: {exc}"
             if self.record_mirror is None:
                 self.record_mirror = False   # never worked: drop the opp_view key entirely
                 return None
@@ -351,7 +550,12 @@ class FogPlayer:
                 "entities": _t1(mirror_frag["entities"], torch.float32, device),
                 "entity_ids": _t1(mirror_frag["entity_ids"], torch.long, device),
                 "field": _t1(mirror_frag["field"], torch.float32, device),
-                "history": _t1(obs.history, torch.float32, device),
+                "history": _t1(mirror_frag["history"], torch.float32, device),
+                "history_ids": _t1(mirror_frag["history_ids"], torch.long, device),
+                "history_state": _t1(mirror_frag["history_state"], torch.float32, device),
+                "history_len": torch.as_tensor(
+                    [mirror_frag["history_len"]], dtype=torch.long, device=device
+                ),
                 "active_idx": _t1(mirror_frag["active_idx"], torch.long, device),
             }
             mv = {
@@ -361,7 +565,8 @@ class FogPlayer:
             }
             ce = self.phi_hat.leakage_ce(mb, mv, family_weights=self.leak_family_weights)
             return float(ce[0])
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - optional metric boundary; error is recorded
+            self._record_diagnostic_error("leakage_measurement", exc)
             return None  # leakage measurement is never battle-critical
 
     def _final_leak_ce(self, battle: Any, ledger: Any, tracker: Any) -> float | None:
@@ -374,28 +579,36 @@ class FogPlayer:
             obs = Observation.from_battle(battle, tracker=tracker)
             mirror = self._mirror(battle, obs, ledger)
             return self._leakage_ce(mirror, obs, _agent_device(self.agent))
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - optional final metric boundary
+            self._record_diagnostic_error("final_leakage_measurement", exc)
             return None
 
     # -------------------------------------------------------------------------------- battle hooks
     def _feed_events(self, battle: Any, ledger: Any, tracker: Any, fed: set[int]) -> None:
         """Feed newly completed turns' events into the ledger + tracker (idempotent per turn)."""
-        try:
-            from fog.constants.tables import TABLES
-            from fog.encoding.events import feed_ledger_from_events
+        from fog.constants.tables import TABLES
+        from fog.encoding.events import feed_ledger_from_events
+        from fog.encoding.history import observations_by_turn
 
-            role = getattr(battle, "player_role", None) or "p1"
-            obs_map = getattr(battle, "observations", None) or {}
-            current = int(getattr(battle, "turn", 0) or 0)
-            for t in sorted(obs_map):
-                if t < current and t not in fed:
-                    events = getattr(obs_map[t], "events", None) or []
-                    if ledger is not None:
-                        feed_ledger_from_events(events, role, ledger, TABLES)
-                    tracker.feed_turn(t, events)
-                    fed.add(t)
-        except Exception:
-            pass  # event tracking is data collection, never battle-critical
+        role = getattr(battle, "player_role", None) or "p1"
+        obs_map = observations_by_turn(battle)
+        current = int(getattr(battle, "turn", 0) or 0)
+        for t in sorted(obs_map):
+            if t < current and t not in fed:
+                events = getattr(obs_map[t], "events", None) or []
+                if ledger is not None:
+                    feed_ledger_from_events(events, role, ledger, TABLES)
+                tracker.feed_turn(t, events)
+                fed.add(t)
+        # Already-observed pre-turn/mid-turn events belong in the current state and reveal
+        # ledger immediately. The tracker consumes only the newly appended suffix. This does
+        # not make the turn part of encode_history, which still requires t < current.
+        current_obs = obs_map.get(current)
+        if current_obs is not None:
+            events = getattr(current_obs, "events", None) or []
+            if ledger is not None:
+                feed_ledger_from_events(events, role, ledger, TABLES)
+            tracker.feed_turn(current, events)
 
     def _battle_finished(self, battle: Any) -> None:
         tag = str(getattr(battle, "battle_tag", "battle"))
@@ -407,25 +620,22 @@ class FogPlayer:
                 # drain any final-turn events so the last measurement sees the full game
                 fed = self._fed_turns.get(tag, set())
                 if tracker is not None:
-                    try:
-                        obs_map = getattr(battle, "observations", None) or {}
-                        for t in sorted(obs_map):
-                            if t not in fed:
-                                tracker.feed_turn(t, getattr(obs_map[t], "events", None) or [])
-                                fed.add(t)
-                    except Exception:
-                        pass
+                    from fog.encoding.history import observations_by_turn
+
+                    obs_map = observations_by_turn(battle)
+                    for t in sorted(obs_map):
+                        if t not in fed:
+                            tracker.feed_turn(t, getattr(obs_map[t], "events", None) or [])
+                            fed.add(t)
                 won = getattr(battle, "won", None)
                 outcome = 0.0 if won is None else (1.0 if won else -1.0)
                 truth = None
                 if self.truth_provider is not None:
-                    try:
-                        truth = self.truth_provider(battle)
-                    except Exception:
-                        truth = None
+                    truth = self.truth_provider(battle)
                 self._buffer.end_game(
                     gid, outcome=outcome, belief_targets=truth,
                     final_leak_ce=self._final_leak_ce(battle, ledger, tracker),
+                    final_progress_score=_progress_score(battle),
                 )
         if self.on_battle_end is not None:
             self.on_battle_end(battle)
@@ -433,6 +643,7 @@ class FogPlayer:
         self._ledgers.pop(tag, None)
         self._trackers.pop(tag, None)
         self._fed_turns.pop(tag, None)
+        self._announced_battles.discard(tag)
 
 
 def unique_account(prefix: str = "fog"):
@@ -451,41 +662,41 @@ def unique_account(prefix: str = "fog"):
 
 
 def _species_id(mon) -> str:
-    import re
+    from fog.encoding.events import submitted_species_id
 
-    return re.sub(r"[^a-z0-9]", "", str(getattr(mon, "species", "")).lower())
+    return submitted_species_id(getattr(mon, "species", ""))
 
 
 def _own_truth_tokens(battle, tables):
-    """My own full team as [6,9] truth tokens (I always know my team) for self-belief labels (§3.3)."""
+    """My own full team as [6,15] truth tokens for self-belief labels (§3.3)."""
 
     from fog.constants.schema import TYPE_INDEX
+    from fog.encoding.events import submitted_species_id, to_id
     from fog.encoding.reveals import SlotView, tokens_from_views
-
-    def _id(x):
-        import re
-
-        return re.sub(r"[^a-z0-9]", "", str(x).lower())
 
     views = []
     for mon in list((getattr(battle, "team", None) or {}).values())[:6]:
         v = SlotView()
         sp = getattr(mon, "species", None)
         if sp:
-            v.species = tables.species_index(_id(sp))
+            v.species = tables.species_index(submitted_species_id(sp))
         item = getattr(mon, "item", None)
-        if item and _id(item) != "unknownitem":
-            v.item = tables.item_index(_id(item))
+        if item and to_id(item) != "unknownitem":
+            v.item = tables.item_index(to_id(item))
         ability = getattr(mon, "ability", None)
         if ability:
-            v.ability = tables.ability_index(_id(ability), default=None)
-        for mid in list((getattr(mon, "moves", None) or {}))[:4]:
-            idx = tables.move_index(_id(mid), default=None)
+            v.ability = tables.ability_index(to_id(ability), default=None)
+        for mid in list(getattr(mon, "moves", None) or {})[:4]:
+            idx = tables.move_index(to_id(mid), default=None)
             if idx is not None and idx not in v.moves:
                 v.moves.append(idx)
+        if sp:
+            from fog.encoding.entities import _own_nature_evs
+
+            v.nature, v.evs = _own_nature_evs(mon, to_id(sp), tables)
         tt = getattr(mon, "tera_type", None)
         if tt is not None:
-            v.tera = TYPE_INDEX.get(_id(getattr(tt, "name", tt)), 18)
+            v.tera = TYPE_INDEX.get(to_id(getattr(tt, "name", tt)), 18)
         views.append(v)
     while len(views) < 6:
         views.append(SlotView())
@@ -500,7 +711,7 @@ def _zero_mirror(obs) -> tuple[dict, dict]:
     """
     import numpy as np
 
-    from fog.constants.schema import MAX_SPREADS_PER_SPECIES
+    from fog.constants.schema import SET_N_ATTRS
     from fog.constants.tables import TABLES
 
     frag = {
@@ -508,23 +719,27 @@ def _zero_mirror(obs) -> tuple[dict, dict]:
         "entity_ids": np.zeros_like(obs.entity_ids),
         "field": np.zeros_like(obs.field),
         "active_idx": np.array([0, 6], dtype=np.int64),
+        # Opponent request legality is private and unavailable in a mirror fallback.  Keep the
+        # structure identical to real mirrors with a constant, non-informative public placeholder.
+        "legality_mask": np.ones(14, dtype=bool),
     }
-    tokens = np.full((6, 9), -1, dtype=np.int64)
+    tokens = np.full((6, SET_N_ATTRS), -1, dtype=np.int64)
     masks = {
         "species": np.ones((6, TABLES.n_species), dtype=bool),
         "ability": np.ones((6, TABLES.n_abilities), dtype=bool),
         "move": np.ones((6, TABLES.n_moves), dtype=bool),
-        "spread": np.ones((6, MAX_SPREADS_PER_SPECIES + 1), dtype=bool),
     }
     labels = {
         "species": np.full(6, -1, dtype=np.int64), "item": np.full(6, -1, dtype=np.int64),
         "ability": np.full(6, -1, dtype=np.int64), "move": np.full((6, 4), -1, dtype=np.int64),
-        "spread": np.full(6, -1, dtype=np.int64), "tera": np.full(6, -1, dtype=np.int64),
+        "nature": np.full(6, -1, dtype=np.int64),
+        "ev": np.full((6, 6), -1, dtype=np.int64),
+        "tera": np.full(6, -1, dtype=np.int64),
     }
     return frag, {"tokens": tokens, "masks": masks, "labels": labels}
 
 
-def _agent_device(agent: "FogAgent"):
+def _agent_device(agent: FogAgent):
     import torch
 
     try:
@@ -540,27 +755,9 @@ def _t1(a, dtype, device):
     return (t.to(device) if device is not None else t).unsqueeze(0)
 
 
-def _opp_revealed_to_torch(opp_revealed: dict[str, Any] | None, *, device: Any) -> dict[str, Any]:
-    import torch
-
-    if opp_revealed is None:
-        return {
-            "tokens": torch.full((1, 6, 9), -1, dtype=torch.long, device=device),
-            "masks": {},
-        }
-
-    tokens = torch.as_tensor(np.asarray(opp_revealed["tokens"]), dtype=torch.long, device=device)
-    if tokens.ndim == 2:
-        tokens = tokens.unsqueeze(0)
-
-    masks: dict[str, Any] = {}
-    for name, mask in (opp_revealed.get("masks") or {}).items():
-        m = torch.as_tensor(np.asarray(mask), dtype=torch.bool, device=device)
-        masks[name] = m.unsqueeze(0) if m.ndim == 2 else m
-    return {"tokens": tokens, "masks": masks}
-
-
-def _sample_action(log_probs: Any, *, temperature: float) -> int:
+def _sample_action(
+    log_probs: Any, *, temperature: float, tera_logit_bonus: float = 0.0
+) -> int:
     import torch
 
     if temperature <= 0:
@@ -569,9 +766,50 @@ def _sample_action(log_probs: Any, *, temperature: float) -> int:
     finite = torch.isfinite(log_probs)
     if not bool(finite.any()):
         return 13
-    scaled = log_probs if temperature == 1.0 else log_probs / max(temperature, 1e-6)
-    probs = torch.softmax(scaled, dim=-1)
+    probs = _behavior_log_probs(
+        log_probs,
+        temperature=temperature,
+        tera_logit_bonus=tera_logit_bonus,
+    ).exp()
     if not bool(torch.isfinite(probs).all()) or float(probs.sum().item()) <= 0:
         legal = torch.nonzero(finite, as_tuple=True)[0]
         return int(legal[0].item())
     return int(torch.multinomial(probs, 1).item())
+
+
+def _temperature_log_probs(log_probs: Any, *, temperature: float):
+    """Return the exact normalized distribution sampled at a positive temperature.
+
+    ``log_probs`` may contain ``-inf`` for illegal actions.  Keeping the transformation in one
+    helper lets rollout collection and PPO recompute byte-for-byte equivalent likelihoods.
+    Temperature zero is deterministic evaluation and has no differentiable sampling
+    distribution, so callers must handle it separately.
+    """
+    return _behavior_log_probs(log_probs, temperature=temperature)
+
+
+def _behavior_log_probs(
+    log_probs: Any, *, temperature: float = 1.0, tera_logit_bonus: float = 0.0
+):
+    """Exact normalized training policy after optional temperature and Tera-only exploration.
+
+    A fixed Tera bonus is deliberately narrower than global temperature: it changes only the
+    relative mass of legal slots 4..7 versus all other legal actions, while preserving the policy's
+    learned preferences within each group.  The same transformation is used for acting and PPO's
+    update-time likelihood, so the importance ratio starts at one.
+    """
+    import torch
+
+    value = float(temperature)
+    bonus = float(tera_logit_bonus)
+    if not np.isfinite(value) or value <= 0:
+        raise ValueError("temperature must be finite and positive")
+    if not np.isfinite(bonus) or bonus < 0:
+        raise ValueError("tera_logit_bonus must be finite and non-negative")
+    if value == 1.0 and bonus == 0.0:
+        return log_probs
+    scaled = log_probs / value
+    if bonus:
+        scaled = scaled.clone()
+        scaled[..., 4:8] = scaled[..., 4:8] + bonus
+    return torch.log_softmax(scaled, dim=-1)

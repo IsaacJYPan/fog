@@ -144,50 +144,49 @@ def showdown_direct_trajectory(
     }
     trajectory: list[dict] = []
     order_factory = LocalOrderFactory()
-    with ShowdownDirectClient() as client:
-        with LocalShowdownBattle.create(
-            client, options, battle_tag=f"battle-direct-fuzz-{seed}"
-        ) as battle:
-            choice_rounds = 0
-            while not battle.ended and choice_rounds < 1_000:
-                choices: list[str | None] = []
-                for role, view in (("p1", battle.p1), ("p2", battle.p2)):
-                    request = battle.update.requests[role]
-                    if request is None or request.get("wait"):
-                        choices.append(None)
-                        continue
-                    if request.get("teamPreview"):
-                        choices.append("/team 123456")
-                        continue
-                    turn = int(getattr(view, "turn", 0) or 0)
-                    if turn > max_turns:
-                        choices.append(order_factory.choose_default_move().message)
-                        continue
-                    mask = np.asarray(action_legality_mask(view), dtype=bool)
-                    idx = scripted_action(seed, role, turn, mask)
-                    try:
-                        order = map_action_to_order(view, idx, order_factory)
-                        choice = getattr(order, "message", str(order))
-                        fingerprint = _showdown_fingerprint(view, role, mask)
-                        fingerprint.update(action_idx=idx, choice=choice)
-                        trajectory.append(fingerprint)
-                        choices.append(choice)
-                    except AssertionError:
-                        trajectory.append(
-                            {
-                                "turn": turn,
-                                "role": role,
-                                "mask": ("MASK_REQUEST_MISMATCH",),
-                                "side": [],
-                            }
-                        )
-                        choices.append(order_factory.choose_default_move().message)
-                if choices == [None, None]:
-                    raise RuntimeError("direct Showdown fuzz battle owes no choice while live")
-                battle.step(choices[0], choices[1], include_state=False)
-                choice_rounds += 1
-            if not battle.ended and choice_rounds >= 1_000:
-                raise RuntimeError("direct Showdown fuzz battle exceeded 1,000 choice rounds")
+    with ShowdownDirectClient() as client, LocalShowdownBattle.create(
+        client, options, battle_tag=f"battle-direct-fuzz-{seed}"
+    ) as battle:
+        choice_rounds = 0
+        while not battle.ended and choice_rounds < 1_000:
+            choices: list[str | None] = []
+            for role, view in (("p1", battle.p1), ("p2", battle.p2)):
+                request = battle.update.requests[role]
+                if request is None or request.get("wait"):
+                    choices.append(None)
+                    continue
+                if request.get("teamPreview"):
+                    choices.append("/team 123456")
+                    continue
+                turn = int(getattr(view, "turn", 0) or 0)
+                if turn > max_turns:
+                    choices.append(order_factory.choose_default_move().message)
+                    continue
+                mask = np.asarray(action_legality_mask(view), dtype=bool)
+                idx = scripted_action(seed, role, turn, mask)
+                try:
+                    order = map_action_to_order(view, idx, order_factory)
+                    choice = getattr(order, "message", str(order))
+                    fingerprint = _showdown_fingerprint(view, role, mask)
+                    fingerprint.update(action_idx=idx, choice=choice)
+                    trajectory.append(fingerprint)
+                    choices.append(choice)
+                except AssertionError:
+                    trajectory.append(
+                        {
+                            "turn": turn,
+                            "role": role,
+                            "mask": ("MASK_REQUEST_MISMATCH",),
+                            "side": [],
+                        }
+                    )
+                    choices.append(order_factory.choose_default_move().message)
+            if choices == [None, None]:
+                raise RuntimeError("direct Showdown fuzz battle owes no choice while live")
+            battle.step(choices[0], choices[1], include_state=False)
+            choice_rounds += 1
+        if not battle.ended and choice_rounds >= 1_000:
+            raise RuntimeError("direct Showdown fuzz battle exceeded 1,000 choice rounds")
     return _sorted_traj(trajectory)
 
 

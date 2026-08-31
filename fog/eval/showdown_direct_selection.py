@@ -23,11 +23,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import random
 import time
+from collections.abc import Callable
 from dataclasses import asdict, dataclass, fields
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -76,6 +78,46 @@ def match_result_from_dict(data: dict[str, Any]) -> MatchResult:
     """Restore one checkpointed row while ignoring its derived reporting fields."""
     names = {field.name for field in fields(MatchResult)}
     return MatchResult(**{key: value for key, value in data.items() if key in names})
+
+
+def greedy_action_with_tera_bonus(log_probs: Any, tera_logit_bonus: float = 0.0) -> int:
+    """Deterministic evaluation action after an explicit Tera-family logit intervention.
+
+    This is deliberately an evaluation-only causal screen.  Illegal actions remain ``-inf`` and
+    the bonus changes only slots 4..7, so it can reveal whether a policy has useful but suppressed
+    Tera preferences without adding global sampling noise or changing model parameters.
+    """
+    import torch
+
+    bonus = float(tera_logit_bonus)
+    if not math.isfinite(bonus) or bonus < 0:
+        raise ValueError("tera logit bonus must be finite and non-negative")
+    scores = log_probs
+    if bonus:
+        scores = log_probs.clone()
+        scores[..., 4:8] = scores[..., 4:8] + bonus
+    return int(torch.argmax(scores).item())
+
+
+def validate_evaluation_temperature(value: float) -> float:
+    """Validate the global policy temperature used by a read-only gameplay screen."""
+    temperature = float(value)
+    if not math.isfinite(temperature) or temperature < 0:
+        raise ValueError("evaluation temperature must be finite and non-negative")
+    return temperature
+
+
+def _label_float_arg(value: str) -> tuple[str, float]:
+    label, separator, raw = value.partition("=")
+    if not separator or not label or not raw:
+        raise argparse.ArgumentTypeError("expected LABEL=FLOAT")
+    try:
+        number = float(raw)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("expected LABEL=FLOAT") from exc
+    if not math.isfinite(number) or number < 0:
+        raise argparse.ArgumentTypeError("Tera bonus must be finite and non-negative")
+    return label, number
 
 
 def matched_schedule(pool_size: int, games: int, seed: int) -> list[ScheduledGame]:
@@ -199,11 +241,38 @@ def _checkpoint_arg(value: str) -> tuple[str, str]:
     return label, path
 
 
+def _load_native_agent(
+    cfg: dict, checkpoint: str | Path, device: Any, *, compatible: bool = False
+) -> Any:
+    """Load a checkpoint under its own architecture.
+
+    ``compatible`` is explicit because it may initialize newly added, behavior-preserving
+    tensors.  It is useful for evaluating historical anchors after a zero-compatible head was
+    added, while keeping strict loading as the default for current candidates.
+    """
+    import torch
+
+    from fog.models.agent import FogAgent
+
+    agent = FogAgent.from_tables(cfg).to(device)
+    state = torch.load(checkpoint, map_location=device, weights_only=False)
+    if compatible:
+        manifest = agent.load_compatible_state_dict(state)
+        print(
+            f"[load] compatible checkpoint {checkpoint}: "
+            f"loaded={len(manifest['loaded'])} initialized={len(manifest['initialized'])}",
+            flush=True,
+        )
+    else:
+        agent.load_state_dict(state)
+    return agent
+
+
 def main() -> None:
     import torch
 
     from fog.config import load_config_with_args
-    from fog.env.player import FogPlayer
+    from fog.env.player import FogPlayer, _sample_action
     from fog.env.showdown_direct import ShowdownDirectClient
     from fog.env.showdown_local_runner import bind_fog_player
     from fog.env.teams import load_pool, to_packed
@@ -214,6 +283,26 @@ def main() -> None:
     parser.add_argument("--config", default="configs/default.yaml")
     parser.add_argument("--checkpoint", action="append", type=_checkpoint_arg, required=True,
                         metavar="LABEL=PATH")
+    parser.add_argument(
+        "--checkpoint-config", action="append", type=_checkpoint_arg, default=[],
+        metavar="LABEL=CONFIG",
+        help="load LABEL natively with this architecture config; required for mixed architectures",
+    )
+    parser.add_argument(
+        "--compatible-checkpoint", action="append", default=[], metavar="LABEL",
+        help="explicitly use behavior-preserving compatible loading for this checkpoint label",
+    )
+    parser.add_argument(
+        "--checkpoint-tera-logit-bonus",
+        action="append",
+        type=_label_float_arg,
+        default=[],
+        metavar="LABEL=FLOAT",
+        help=(
+            "evaluation-only deterministic bonus for legal Tera slots 4..7 on one checkpoint; "
+            "default zero preserves the deployed policy exactly"
+        ),
+    )
     parser.add_argument("--opponent", action="append", default=[],
                         choices=("random", "maxdamage", "simpleheuristics"))
     parser.add_argument("--head-to-head", action="store_true")
@@ -222,13 +311,26 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--format", default="gen9ou")
     parser.add_argument("--device", default="cuda")
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=0.0,
+        help="checkpoint action temperature; zero is the deployed greedy policy",
+    )
     parser.add_argument("--progress-every", type=int, default=4)
     parser.add_argument("--max-turns", type=int, default=200,
                         help="declare longer games draws instead of allowing pathological stalls")
+    parser.add_argument("--action-stats", action="store_true",
+                        help="record passive selected/legal action-family frequencies")
     parser.add_argument("--resume", action="store_true",
                         help="resume --out from its last complete four-game block")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
+
+    try:
+        args.temperature = validate_evaluation_temperature(args.temperature)
+    except ValueError as exc:
+        parser.error(str(exc))
 
     if len(dict(args.checkpoint)) != len(args.checkpoint):
         parser.error("checkpoint labels must be unique")
@@ -236,6 +338,29 @@ def main() -> None:
         parser.error("request at least one --opponent or --head-to-head")
 
     cfg = load_config_with_args(args.config) if args.config else {}
+    checkpoint_configs = dict(args.checkpoint_config)
+    checkpoint_tera_bonuses = dict(args.checkpoint_tera_logit_bonus)
+    if len(checkpoint_tera_bonuses) != len(args.checkpoint_tera_logit_bonus):
+        parser.error("--checkpoint-tera-logit-bonus labels must be unique")
+    compatible_labels = set(args.compatible_checkpoint)
+    unknown_compatible_labels = compatible_labels - set(dict(args.checkpoint))
+    if unknown_compatible_labels:
+        parser.error(
+            "--compatible-checkpoint labels must also appear in --checkpoint: "
+            + ", ".join(sorted(unknown_compatible_labels))
+        )
+    unknown_config_labels = set(checkpoint_configs) - set(dict(args.checkpoint))
+    if unknown_config_labels:
+        parser.error(
+            "--checkpoint-config labels must also appear in --checkpoint: "
+            + ", ".join(sorted(unknown_config_labels))
+        )
+    unknown_bonus_labels = set(checkpoint_tera_bonuses) - set(dict(args.checkpoint))
+    if unknown_bonus_labels:
+        parser.error(
+            "--checkpoint-tera-logit-bonus labels must also appear in --checkpoint: "
+            + ", ".join(sorted(unknown_bonus_labels))
+        )
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     teams = load_pool(args.pool)
     packed = [to_packed(team) for team in teams]
@@ -243,12 +368,77 @@ def main() -> None:
 
     agents = {}
     for label, checkpoint in args.checkpoint:
-        agent = load_posterior_agent(cfg, checkpoint, device)
+        if label in checkpoint_configs:
+            checkpoint_cfg = load_config_with_args(checkpoint_configs[label])
+            agent = _load_native_agent(
+                checkpoint_cfg, checkpoint, device, compatible=label in compatible_labels
+            )
+        else:
+            agent = load_posterior_agent(cfg, checkpoint, device)
         agent.eval()
         agents[label] = agent
 
-    def checkpoint_factory(label: str) -> Callable[[], Any]:
-        return lambda: bind_fog_player(FogPlayer(agents[label], temperature=0.0))
+    action_stats: dict[str, dict[str, Any]] = {}
+
+    def checkpoint_factory(label: str, stats_key: str | None = None) -> Callable[[], Any]:
+        def make() -> Any:
+            tera_bonus = checkpoint_tera_bonuses.get(label, 0.0)
+            player = FogPlayer(
+                agents[label],
+                temperature=args.temperature,
+                tera_logit_bonus=tera_bonus,
+            )
+            if args.action_stats and stats_key is not None:
+                stats = action_stats.setdefault(
+                    stats_key,
+                    {
+                        "decisions": 0,
+                        "selected_by_slot": [0] * 14,
+                        "legal_opportunities_by_slot": [0] * 14,
+                        "selected_by_family": {
+                            "ordinary_move": 0,
+                            "tera_move": 0,
+                            "switch": 0,
+                            "forced": 0,
+                        },
+                        "legal_decisions_by_family": {
+                            "ordinary_move": 0,
+                            "tera_move": 0,
+                            "switch": 0,
+                            "forced": 0,
+                        },
+                    },
+                )
+
+                def select_and_count(_battle: Any, obs: Any, out: Any) -> int:
+
+                    action = _sample_action(
+                        out.log_probs[0],
+                        temperature=args.temperature,
+                        tera_logit_bonus=tera_bonus,
+                    )
+                    legal = [bool(value) for value in obs.legality_mask]
+                    stats["decisions"] += 1
+                    stats["selected_by_slot"][action] += 1
+                    for index, is_legal in enumerate(legal):
+                        stats["legal_opportunities_by_slot"][index] += int(is_legal)
+                    families = {
+                        "ordinary_move": range(4),
+                        "tera_move": range(4, 8),
+                        "switch": range(8, 13),
+                        "forced": range(13, 14),
+                    }
+                    for family, indices in families.items():
+                        stats["legal_decisions_by_family"][family] += int(
+                            any(legal[index] for index in indices)
+                        )
+                        stats["selected_by_family"][family] += int(action in indices)
+                    return action
+
+                player.action_override = select_and_count
+            return bind_fog_player(player)
+
+        return make
 
     def scripted_factory(name: str) -> Callable[[], str]:
         return lambda: name
@@ -262,9 +452,11 @@ def main() -> None:
         "block_size": 4,
         "block_design": "both team assignments crossed with both player positions",
         "seed": args.seed,
-        "temperature": 0.0,
+        "temperature": args.temperature,
         "max_turns": args.max_turns,
         "device": str(device),
+        "checkpoint_configs": checkpoint_configs,
+        "checkpoint_tera_logit_bonuses": checkpoint_tera_bonuses,
         "draws_excluded_from_win_rate": True,
     }
     checkpoint_map = dict(args.checkpoint)
@@ -288,6 +480,8 @@ def main() -> None:
             "checkpoints": checkpoint_map,
             "rows": rows,
         }
+        if args.action_stats:
+            report["action_stats"] = action_stats
         if active is not None:
             report["current_row"] = active.as_dict()
         args.out.parent.mkdir(parents=True, exist_ok=True)
@@ -349,7 +543,8 @@ def main() -> None:
             for opponent in args.opponent:
                 run_row(
                     client,
-                    checkpoint_factory(label), scripted_factory(opponent),
+                    checkpoint_factory(label, f"{label} vs {opponent}"),
+                    scripted_factory(opponent),
                     label=f"{label} vs {opponent}", a_name=label, b_name=opponent,
                 )
 
@@ -359,7 +554,8 @@ def main() -> None:
                 for b_label in labels[i + 1:]:
                     run_row(
                         client,
-                        checkpoint_factory(a_label), checkpoint_factory(b_label),
+                        checkpoint_factory(a_label, f"{a_label} vs {b_label}:a"),
+                        checkpoint_factory(b_label, f"{a_label} vs {b_label}:b"),
                         label=f"{a_label} vs {b_label}", a_name=a_label, b_name=b_label,
                     )
 

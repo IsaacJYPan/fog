@@ -15,6 +15,7 @@ from fog.eval.search_gauntlet import (
     run_search_match,
 )
 
+
 # ------------------------------------------------------------------------------------- pure logic
 def test_team_schedule_paired_swaps_teams():
     pool = ["A", "B", "C"]
@@ -91,8 +92,8 @@ def test_arm_player_validation():
 
 
 # ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE  # noqa: E402
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP  # noqa: E402  (shared pastes)
+from fog.env.engine_battle import HAVE_ENGINE
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 

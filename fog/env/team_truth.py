@@ -15,9 +15,9 @@ the eval-time set oracle:
     moves/tera per slot, injective slot assignment). Disambiguates shared-species pools once any
     set-distinguishing attribute is revealed.
 
-`truth_tokens_from_paste` parses a Showdown paste into the C1 token layout [6, 9] (SLOT_ATTRS order),
-with spread mapped to its nearest generated cluster. Unmatched battles return None -> the caller
-falls back to censored labels (no supervision for that game).
+`truth_tokens_from_paste` parses a Showdown paste into the C1 token layout [6, 15]
+(SET_SLOT_ATTRS order), preserving nature and all six EV contributions exactly. Unmatched battles
+return None -> the caller falls back to censored labels (no supervision for that game).
 """
 from __future__ import annotations
 
@@ -26,7 +26,14 @@ from collections import Counter
 
 import numpy as np
 
-from fog.constants.schema import MAX_SPREADS_PER_SPECIES, TYPE_INDEX
+from fog.constants.schema import (
+    NATURE_INDEX,
+    SET_EV_COLS,
+    SET_N_ATTRS,
+    SET_NATURE_COL,
+    SET_TERA_COL,
+    TYPE_INDEX,
+)
 
 _NON_ID = re.compile(r"[^a-z0-9]")
 
@@ -35,32 +42,13 @@ def _to_id(s: object) -> str:
     return _NON_ID.sub("", str(s).lower())
 
 
-def _nearest_spread(species_id: str, evs: list[int], nature: str, tables) -> int:
-    """Index of the closest generated spread cluster for this species (<OTHER_SPREAD> = last)."""
-    clusters = (tables.spreads.get("species", {}) or {}).get(species_id, [])
-    if not clusters:
-        return MAX_SPREADS_PER_SPECIES  # <OTHER_SPREAD>
-    from fog.constants.build_spreads import nature_modified_stats
-
-    feats = tables.species["features"].get(species_id)
-    if feats is None:
-        return MAX_SPREADS_PER_SPECIES
-    base = np.array(feats["base_stats"], dtype=np.int64)
-    try:
-        target = nature_modified_stats(base, np.asarray(evs), nature)
-    except Exception:
-        return MAX_SPREADS_PER_SPECIES
-    best, best_d = MAX_SPREADS_PER_SPECIES, float("inf")
-    for i, c in enumerate(clusters[:MAX_SPREADS_PER_SPECIES]):
-        d = float(np.abs(np.array(c["stats"]) - target).sum()) if c.get("stats") else float("inf")
-        if d < best_d:
-            best, best_d = i, d
-    return best
-
-
 def truth_tokens_from_paste(paste: str, tables) -> np.ndarray:
-    """Showdown paste -> [6, 9] int64 truth tokens (SLOT_ATTRS: species,item,ability,move0-3,spread,
-    tera). Uses poke-env's paste parser for robustness."""
+    """Showdown paste -> [6,15] exact submitted-set truth tokens.
+
+    EV labels are native stat-contribution units ``floor(EV/4)`` in [0,63]. Showdown accepts EV
+    remainders, but they do not affect stats; decoding therefore canonicalizes them to multiples of
+    four. Uses poke-env's paste parser for robustness.
+    """
     from poke_env.teambuilder import Teambuilder
 
     class _T(Teambuilder):
@@ -68,7 +56,7 @@ def truth_tokens_from_paste(paste: str, tables) -> np.ndarray:
             return ""
 
     mons = _T().parse_showdown_team(paste)
-    tokens = np.full((6, 9), -1, dtype=np.int64)
+    tokens = np.full((6, SET_N_ATTRS), -1, dtype=np.int64)
     for j, mon in enumerate(mons[:6]):
         sid = _to_id(mon.species or (mon.nickname or ""))
         tokens[j, 0] = tables.species_index(sid)
@@ -78,10 +66,12 @@ def truth_tokens_from_paste(paste: str, tables) -> np.ndarray:
             tokens[j, 2] = tables.ability_index(_to_id(mon.ability), default=-1)
         for k, mv in enumerate([m for m in (mon.moves or []) if m][:4]):
             tokens[j, 3 + k] = tables.move_index(_to_id(mv), default=-1)
+        nature = _to_id(mon.nature or "serious")
+        tokens[j, SET_NATURE_COL] = NATURE_INDEX.get(nature, NATURE_INDEX["serious"])
         evs = [int(x or 0) for x in (mon.evs or [0] * 6)]
-        tokens[j, 7] = _nearest_spread(sid, evs, mon.nature or "hardy", tables)
+        tokens[j, list(SET_EV_COLS)] = [min(63, max(0, ev // 4)) for ev in evs]
         tera = getattr(mon, "tera_type", None) or getattr(mon, "teraType", None)
-        tokens[j, 8] = TYPE_INDEX.get(_to_id(tera), 18) if tera else -1
+        tokens[j, SET_TERA_COL] = TYPE_INDEX.get(_to_id(tera), 18) if tera else -1
     return tokens
 
 
@@ -97,7 +87,7 @@ class PoolTruth:
         self._no_item = tables.item_index(NO_ITEM)
 
     def match(self, revealed_species_idx: list[int]) -> np.ndarray | None:
-        """Return [6,9] truth for the unique pool team containing all revealed species, else None.
+        """Return [6,15] truth for the unique pool team containing all revealed species, else None.
 
         WARNING: always None on shared-species pools (POOL-A) — prefer `match_views`/`match_battle`.
         """
@@ -110,7 +100,7 @@ class PoolTruth:
         return self._truth[candidates[0]].copy() if len(candidates) == 1 else None
 
     def match_views(self, views) -> np.ndarray | None:
-        """[6,9] truth for the UNIQUE pool team consistent with the revealed per-slot views, else None.
+        """[6,15] truth for the UNIQUE pool team consistent with the revealed per-slot views, else None.
 
         A team is consistent when the revealed slots admit an injective assignment onto its slots with
         species equal and every revealed attribute matching: item (skipping `<NO_ITEM>` — knock-off /
@@ -125,7 +115,7 @@ class PoolTruth:
 
     def consistent_indices(self, views) -> list[int]:
         """Pool indices of EVERY team consistent with the revealed per-slot views (the exact
-        enumeration source for joint search, SEARCH_PLAN §4.1). Unlike `match_views` this does not
+        enumeration source for legacy joint search, ARCHITECTURE.md S6). Unlike `match_views` this does not
         require uniqueness: before anything distinguishing is revealed it returns the whole pool.
         No revealed views => everything is consistent."""
         revealed = [v for v in views if v.species is not None and int(v.species) >= 0]
@@ -134,7 +124,7 @@ class PoolTruth:
         return [i for i, t in enumerate(self._truth) if self._consistent(revealed, t)]
 
     def truth_tokens(self, index: int) -> np.ndarray:
-        """[6,9] truth tokens for pool team `index` (a copy)."""
+        """[6,15] truth tokens for pool team `index` (a copy)."""
         return self._truth[index].copy()
 
     def match_battle(self, battle) -> np.ndarray | None:
@@ -168,12 +158,14 @@ class PoolTruth:
             return False
         if view.ability is not None and row[2] >= 0 and int(view.ability) != int(row[2]):
             return False
-        if view.tera is not None and row[8] >= 0 and int(view.tera) != int(row[8]):
+        if (
+            view.tera is not None
+            and row[SET_TERA_COL] >= 0
+            and int(view.tera) != int(row[SET_TERA_COL])
+        ):
             return False
         sheet_moves = {int(m) for m in row[3:7] if m >= 0}
-        if sheet_moves and any(int(m) not in sheet_moves for m in view.moves):
-            return False
-        return True
+        return not (sheet_moves and any(int(m) not in sheet_moves for m in view.moves))
 
     def _consistent(self, views, truth: np.ndarray) -> bool:
         """Injective assignment of revealed views onto team slots (backtracking; <=6x6)."""
@@ -201,7 +193,7 @@ def assert_uniform_slot_order(cand_tokens: np.ndarray) -> None:
     conditionals just bury it. TRUE for all committed pools (POOL-A verified 2026-07-11) but
     unenforced until now; a regenerated pool_gen or replay-built pool could violate it.
 
-    cand_tokens [C, 6, 9]. Raises ValueError naming the first offending pair. Species-distinct
+    cand_tokens [C, 6, 15]. Raises ValueError naming the first offending pair. Species-distinct
     candidates are exempt (no slot-by-slot ambiguity to guard)."""
     cand = np.asarray(cand_tokens, dtype=np.int64)
     groups: dict[tuple, tuple[int, tuple]] = {}

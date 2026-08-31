@@ -15,7 +15,7 @@ def _frag(x: float = 0.0, t: int = 3):
         "legality_mask": np.array([True] * 4 + [False] * 10),
         "history": np.full((t, 2), x, dtype=np.float32),
         "opp_revealed": {
-            "tokens": np.full((6, 9), -1, dtype=np.int64),
+            "tokens": np.full((6, 15), -1, dtype=np.int64),
             "masks": {"item": np.ones((6, 3), dtype=bool)},
         },
     }
@@ -31,6 +31,7 @@ def test_terminal_reward_and_gae_lambda1():
     batch = buf.to_batch()
     assert torch.allclose(batch["advantages"], torch.ones(4))
     assert torch.allclose(batch["returns"], torch.ones(4))
+    assert torch.allclose(batch["game_outcomes"], torch.ones(4))
     assert batch["actions"].tolist() == [0, 1, 2, 3]
 
 
@@ -68,8 +69,9 @@ def test_multi_game_flatten_and_no_cross_game_leak():
     assert batch["advantages"].shape == (3,)
     # g1's win must not bleed into g2's advantage
     assert torch.allclose(batch["advantages"], torch.tensor([1.0, 1.0, -1.0]))
+    assert torch.allclose(batch["game_outcomes"], torch.tensor([1.0, 1.0, -1.0]))
     assert batch["obs"].shape == (3, 4)
-    assert batch["opp_revealed"]["tokens"].shape == (3, 6, 9)
+    assert batch["opp_revealed"]["tokens"].shape == (3, 6, 15)
     assert batch["opp_revealed"]["masks"]["item"].shape == (3, 6, 3)
 
 
@@ -106,6 +108,37 @@ def test_faints_bonus_lands_on_last_step():
     buf.add_decision(g, _frag(), action=0, log_prob=-1.0, value=0.0)
     buf.end_game(g, outcome=1.0, faints_bonus=0.04)
     assert torch.allclose(buf.to_batch()["returns"], torch.tensor([1.04]))
+
+
+def test_progress_reward_telescopes_and_cannot_be_farmed_by_waiting():
+    buf = RolloutBuffer(gamma=1.0, lam=1.0, progress_coef=0.25)
+    game = buf.start_game()
+    # Repeating 0.2 for an extra decision earns nothing.  Only the net 0.0 -> 0.5 progress counts.
+    for score in (0.0, 0.2, 0.2):
+        buf.add_decision(
+            game, _frag(), action=0, log_prob=-1.0, value=0.0, progress_score=score
+        )
+    buf.end_game(game, outcome=-1.0, final_progress_score=0.5)
+    batch = buf.to_batch()
+    assert "step_rewards" in batch
+    assert torch.isfinite(batch["step_rewards"]).all()
+    assert float(batch["step_rewards"].abs().sum()) > 0.0
+    assert torch.allclose(batch["returns"], torch.tensor([-0.875, -0.925, -0.925]))
+    assert np.isclose(float(batch["returns"][0]), -1.0 + 0.25 * 0.5)
+
+
+def test_progress_reward_requires_complete_measurements_when_enabled():
+    buf = RolloutBuffer(progress_coef=0.25)
+    game = buf.start_game()
+    buf.add_decision(game, _frag(), action=0, log_prob=-1.0, value=0.0)
+    buf.end_game(game, outcome=-1.0, final_progress_score=-1.0)
+    with pytest.raises(RuntimeError, match="no progress score"):
+        buf.to_batch()
+
+
+def test_progress_reward_is_capped_below_terminal_result():
+    with pytest.raises(ValueError, match="win/loss remains dominant"):
+        RolloutBuffer(progress_coef=0.75)
 
 
 def test_batch_feeds_ppo_update_end_to_end():

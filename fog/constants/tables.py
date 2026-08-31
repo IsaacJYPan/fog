@@ -140,6 +140,17 @@ class Tables:
                 idx = self._move_idx.get(mv)
                 if idx is not None:
                     m[row, idx] = True
+        # Showdown's ordinary Smeargle learnset contains only Sketch, while a submitted Smeargle
+        # can carry every sketchable move.  Treating the raw learnset as a hard mask therefore
+        # makes legitimate replay labels (for example Jaw Lock) impossible.  The generated move
+        # flags retain Showdown's `nosketch` marker, so this is still a legality mask rather than
+        # an unrestricted usage prior.
+        smeargle = self._species_idx.get("smeargle")
+        if smeargle is not None:
+            for move_id, features in self.moves["features"].items():
+                idx = self._move_idx.get(move_id)
+                if idx is not None and "nosketch" not in features.get("flags", ()):
+                    m[smeargle, idx] = True
         m[self._species_idx[RARE_SPECIES]] = True
         return m
 
@@ -152,6 +163,22 @@ class Tables:
                 idx = self._ability_idx.get(ab)
                 if idx is not None:
                     m[row, idx] = True
+        # Ogerpon's public species changes to an `...tera` battle-only form whose live ability is
+        # Embody Aspect, while submitted-set truth correctly remains the mask form's original
+        # ability (for example Water Absorb). Belief supervision predicts submitted private state,
+        # so both abilities must remain legal under that public form. The generated Gen 9 species
+        # table contains exactly these four `...tera` forms, each paired with its non-Tera id.
+        for sid, row in self._species_idx.items():
+            if not sid.startswith("ogerpon") or not sid.endswith("tera"):
+                continue
+            submitted_id = sid[: -len("tera")]
+            # Showdown names the battle-only Teal form `Ogerpon-Teal-Tera`, but the submitted
+            # no-mask species is simply `Ogerpon` (there is no `ogerponteal` table row).
+            if submitted_id == "ogerponteal":
+                submitted_id = "ogerpon"
+            submitted_form = self._species_idx.get(submitted_id)
+            if submitted_form is not None:
+                m[row] |= m[submitted_form]
         m[self._species_idx[RARE_SPECIES]] = True
         return m
 

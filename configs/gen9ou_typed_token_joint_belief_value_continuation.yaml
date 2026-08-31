@@ -1,0 +1,26 @@
+# Long continuation of the joint representation curriculum. Policy remains frozen.
+# Every optimizer update concatenates one censored high-rated replay batch with one exact-truth
+# Simple-vs-Simple batch, preventing sequential source drift inside an epoch.
+extends: gen9ou_typed_token_joint_belief_value_overnight.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_continuation
+seed: 20261173
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_overnight_v1/checkpoints/bc_best.pt
+  auxiliary_joint_batch: true
+  epochs: 96
+  max_primary_batches_per_epoch: 160
+  lr: 5.0e-6
+  lr_final: 5.0e-7
+  shared_lr_scale: 0.15
+  early_stopping_patience: 16
+  early_stopping_min_delta: 0.0005
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_continuation_v2/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_continuation_v2/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_continuation_v1
+  tensorboard: true

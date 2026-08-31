@@ -1,0 +1,25 @@
+# Short replay-belief refresh before broad Gen 9 OU PPO.
+#
+# Public replays provide censored opponent facts, not complete hidden sets.  Keep policy/value,
+# the three-encoder backbone, self-belief, and private-to-belief conditioning frozen; update only
+# the opponent belief predictor at a low learning rate.  Exact full-team PPO supervision follows.
+extends: set_ar_replay_scale20k.yaml
+
+experiment: gen9ou_replay_belief_refresh
+
+bc:
+  manifest: data/parsed/manifest_rating1500_20k.parquet
+  init_ckpt: runs/ppo_after_distill_stage3_private_belief_resume_75180/checkpoints/ppo_final.pt
+  init_compatible: false
+  scope: belief
+  epochs: 3
+  batch_size: 512
+  lr: 2.0e-5
+  lr_final: 1.0e-5
+  holdout_fraction: 0.1
+  eval_batches: 0
+  early_stopping_patience: 2
+  early_stopping_min_delta: 0.005
+
+log:
+  dir: runs/gen9ou_replay_belief_refresh

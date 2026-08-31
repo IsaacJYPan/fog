@@ -1,4 +1,4 @@
-"""PBValueNet outcome training on v2 decision logs (PROPOSAL_IMPL_PLAN Phase G3; proposal §9.3).
+"""PBValueNet outcome training on two-sided decision logs (ARCHITECTURE.md S2).
 
 The training target: at each public leaf actually reached, the net's per-pair table should price
 the TRUE cell — V[k*, j*] ≈ outcome — one labeled cell per example; off-diagonal cells are shaped by
@@ -14,7 +14,7 @@ belief.
 Row filtering (G3 spec): rows with j* = -1 (off-pool or truncated-out opponent) and rows of
 cap-truncated games (outcome 0 is an artifact) are dropped at dataset build.
 
-The agent's trunk supplies (s_board, c_dyn) per public leaf — computed ONCE and cached (the
+The agent's trunk supplies private-state and public-context tensors per leaf — computed once and
 trunk is FROZEN here; only PBValueNet trains). Rows carry per-decision candidate sets, so the v1
 trainer runs one forward per row (L = 1); bucketing rows that share candidate sets is the known
 optimization if profiling demands it.
@@ -131,8 +131,8 @@ def train_pb_value(agent: Any, net: Any, rows: list[dict], *, epochs: int = 10,
             sb, cd = agent.head_inputs(_stack_obs([r["obs"] for r in chunk], device))
         sb_parts.append(sb)
         cd_parts.append(cd)
-    s_board = torch.cat(sb_parts)
-    c_dyn = torch.cat(cd_parts)
+    private_state = torch.cat(sb_parts)
+    public_context = torch.cat(cd_parts)
 
     games = np.asarray([r["game"] for r in rows], dtype=np.int64)
     train_idx, hold_idx = _split_by_game(games, holdout_frac, seed)
@@ -142,7 +142,7 @@ def train_pb_value(agent: Any, net: Any, rows: list[dict], *, epochs: int = 10,
         r = rows[i]
         rho = torch.as_tensor(r["belief"][None], dtype=torch.float32, device=device)
         rho = rho / rho.sum()
-        v = net(s_board[i][None], c_dyn[i][None],
+        v = net(private_state[i][None], public_context[i][None],
                 torch.as_tensor(r["own_tokens"], device=device),
                 torch.as_tensor(r["opp_tokens"], device=device), rho)
         return v[0, r["k_star"], r["j_star"]]
@@ -180,7 +180,7 @@ def train_pb_value(agent: Any, net: Any, rows: list[dict], *, epochs: int = 10,
     after = evaluate(hold_idx)
     return {
         "n_rows": len(rows), "n_train": len(train_idx), "n_holdout": len(hold_idx),
-        "n_games": int(len(np.unique(games))),
+        "n_games": len(np.unique(games)),
         "belief_variants_mean": 1.0,
         "value_target_kind": "played_leaf_outcome",
         "epochs": int(epochs), "lr": float(lr), "batch_size": int(batch_size),

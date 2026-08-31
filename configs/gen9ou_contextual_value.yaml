@@ -1,0 +1,40 @@
+# Stage 3: train final-outcome value after the belief stage, retaining trunk information.
+extends: gen9ou_contextual_heads.yaml
+
+experiment: gen9ou_contextual_value
+seed: 20261111
+device: cuda
+
+bc:
+  manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_replay_policy_rating1650_v2/holdout_manifest.parquet
+  holdout_fraction: 0.0
+  init_ckpt: runs/gen9ou_contextual_belief_v1/checkpoints/bc_best.pt
+  init_compatible: false
+  scope: value_shared
+  epochs: 6
+  batch_size: 1536
+  lr: 2.0e-5
+  lr_final: 2.0e-6
+  shared_lr_scale: 0.1
+  reconstruction_decoder: runs/gen9ou_contextual_trunk_v4_frozen_decoder_diagnostic/decoder_best.pt
+  reconstruction_slot_dim: 512
+  reconstruction_coef: 0.1
+  eval_batches: 0
+  early_stopping_patience: 3
+  early_stopping_min_delta: 0.001
+  streaming: true
+  shard_buffer: 16
+
+loss:
+  action_coef: 0.0
+  value_coef: 1.0
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+log:
+  dir: runs/gen9ou_contextual_value_v1
+  tensorboard: true

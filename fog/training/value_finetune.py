@@ -1,4 +1,4 @@
-"""Posterior-aware value fine-tune (SEARCH_PLAN §4.2).
+"""Posterior-aware value fine-tuning (ARCHITECTURE.md invariant S2).
 
 The value head is the coupling CONSUMER of joint search: it must price "what does the opponent
 now believe about me" or the joint optimization degenerates to independent per-world searches
@@ -12,7 +12,7 @@ weights on the same batches — one seeing the logged posterior features, one se
 posterior-blind control, exactly what the head computes when features are absent). The gate is
 held-out MSE: aware < blind. Split is BY GAME (decisions within a game share an outcome — a row
 split would leak labels into the holdout). Only the value MLP trains; the trunk/belief/policy are
-frozen, so (s_board, c_dyn) are precomputed once and the fine-tune never risks the acting policy.
+frozen, so private state and public context are precomputed once and fine-tuning cannot alter policy.
 
 Checkpoint compatibility: a posterior-blind checkpoint (posterior_dim=0, e.g. the M1.5 run) is
 loaded by zero-padding the first Linear of both head MLPs with the 4 posterior columns
@@ -117,7 +117,7 @@ def _split_by_game(games: np.ndarray, holdout_frac: float, seed: int
         raise ValueError("need >=2 games for a game-level holdout split")
     rng = np.random.default_rng(seed)
     rng.shuffle(uniq)
-    n_hold = max(1, int(round(len(uniq) * holdout_frac)))
+    n_hold = max(1, round(len(uniq) * holdout_frac))
     n_hold = min(n_hold, len(uniq) - 1)  # never hold out everything
     hold = set(uniq[:n_hold].tolist())
     mask = np.array([g in hold for g in games])
@@ -148,15 +148,15 @@ def finetune_value(agent: Any, data: dict[str, np.ndarray], *, holdout_frac: flo
     for lo in range(0, n, int(precompute_batch)):
         idx = np.arange(lo, min(lo + int(precompute_batch), n))
         with torch.no_grad():
-            s_board, c_dyn = agent.head_inputs(batch_from_rows(data, idx, device))
-        xs.append(torch.cat([s_board, c_dyn], dim=-1))
+            private_state, public_context = agent.head_inputs(batch_from_rows(data, idx, device))
+        xs.append(torch.cat([private_state, public_context], dim=-1))
     x_base = torch.cat(xs)
     feats = torch.as_tensor(data["posterior_features"], dtype=torch.float32, device=device)
     y = torch.as_tensor(data["outcome"], dtype=torch.float32, device=device)
     x_aware = torch.cat([x_base, feats], dim=-1)
     x_blind = torch.cat([x_base, torch.zeros_like(feats)], dim=-1)
 
-    fit = dict(epochs=epochs, lr=lr, batch_size=batch_size, seed=seed)
+    fit = {"epochs": epochs, "lr": lr, "batch_size": batch_size, "seed": seed}
     aware = copy.deepcopy(agent.policy_value.value)
     blind = copy.deepcopy(agent.policy_value.value)
     aware_losses = fit_value_mlp(aware, x_aware[train_idx], y[train_idx], **fit)
@@ -164,7 +164,7 @@ def finetune_value(agent: Any, data: dict[str, np.ndarray], *, holdout_frac: flo
 
     report = {
         "n_decisions": int(n), "n_train": len(train_idx), "n_holdout": len(hold_idx),
-        "n_games": int(len(np.unique(data["game"]))),
+        "n_games": len(np.unique(data["game"])),
         "aware_holdout_mse": _value_mse(aware, x_aware[hold_idx], y[hold_idx]),
         "blind_holdout_mse": _value_mse(blind, x_blind[hold_idx], y[hold_idx]),
         "aware_train_loss": aware_losses[-1], "blind_train_loss": blind_losses[-1],

@@ -1,0 +1,16 @@
+# Open-OU self-play over the provenance-aware public team bank.
+#
+# First build the bank:
+#   python -m fog.scripts.collect_team_bank --target 150 --min-quality 70
+# Inspect data/teams/public_gen9ou/manifest.json before a claim-bearing run. Tournament/resource
+# pastes and RMT candidates remain labeled separately there.
+extends: train_ou.yaml
+
+experiment: train_ou_public
+
+env:
+  team_pool: data/teams/public_gen9ou/pool.json
+  min_team_pool_size: 100
+
+log:
+  dir: runs/train_ou_public

@@ -2,8 +2,9 @@
 
 The opponent's visible facts are not a sequence.  They are a set: a Tera type revealed on turn 20
 must be available when predicting an item just as immediately as a species shown at team preview.
-Generated hidden facts have the same status.  Consequently this model never encodes the physical
-order in which facts were supplied.
+Generated hidden facts are a second, explicitly tagged assumption set. Consequently this model
+never encodes the physical order in which facts were supplied, while still distinguishing public
+evidence from its own hypothetical ancestral assignments.
 
 The model is nevertheless autoregressive: it completes a team one fact at a time.  At every step:
 
@@ -11,17 +12,18 @@ The model is nevertheless autoregressive: it completes a team one fact at a time
 2. a value-independent scheduler chooses uniformly among the fields that are currently eligible;
 3. the model samples that field's value and adds the resulting fact to the set.
 
-Only mechanical dependencies constrain the scheduler.  Species precedes species-dependent legality;
-spread follows species, item, and ability so a damage-consistency mask can be applied.  Everything
-else is free to occur in either direction.  The four moves of one Pokemon are one exchangeable set:
+Only mechanical dependencies constrain the scheduler. Species precedes species-dependent legality
+and the submitted nature/EV fields. A dynamic EV mask enforces a total of at most 127 stat units
+(508 effective EVs). Everything else is free to occur in either direction. The four moves of one
+Pokemon are one exchangeable set:
 they use the same query and value head, and generated values are stored in the next free move column
 only as an external tensor convention.
 
-Training matches sampling.  A dependency-valid random route and a random prefix length are drawn for
-each example.  The input is the real reveal set plus that generated prefix, and the loss predicts the
-route's next fact.  Thus every supervised conditional has exactly the same kind of partially completed
-set as ancestral sampling.  This replaces the old mismatch in which random-order teacher forcing was
-trained while the sampler walked one canonical order.
+Training draws an arbitrary random ordering of the fields recoverable from a replay and a random
+prefix length. The input is the complete public reveal set plus that generated/teacher prefix, and
+the loss predicts the addressed next fact. Missing-not-at-random replay fields remain absent rather
+than becoming negatives. ``query_field`` can target any labeled slot without pretending that a
+censored row defines a normalized full-team likelihood.
 
 There are two probability objects and they must not be confused:
 
@@ -40,22 +42,40 @@ permutes the corresponding outputs instead of changing the represented team.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 import torch
-import torch.nn as nn
+from torch import nn
 
-SLOT_ATTRS = ("species", "item", "ability", "move0", "move1", "move2", "move3", "spread", "tera")
+from fog.constants.schema import (
+    MAX_TOTAL_EV_UNITS,
+    N_EV_UNITS,
+    N_NATURES,
+    SET_EV_COLS,
+    SET_MOVE_COLS,
+    SET_NATURE_COL,
+    SET_SLOT_ATTRS,
+    SET_TERA_COL,
+)
+from fog.models.belief_types import BeliefOutput, BeliefSamples
+
+SLOT_ATTRS = SET_SLOT_ATTRS
 N_SLOTS = 6
 N_ATTRS = N_SLOTS * len(SLOT_ATTRS)
 SEQ_LEN = N_ATTRS + 1
 _START = N_ATTRS
 
-_ATTR_FAMILY = ("species", "item", "ability", "move", "move", "move", "move", "spread", "tera")
-_FIELD_KIND = (0, 1, 2, 3, 3, 3, 3, 4, 5)
-_MOVE_SUBSLOT = (None, None, None, 0, 1, 2, 3, None, None)
-_MOVE_COLS = (3, 4, 5, 6)
-_ITEM_COL, _ABILITY_COL, _SPREAD_COL = 1, 2, 7
+_ATTR_FAMILY = (
+    "species", "item", "ability", "move", "move", "move", "move",
+    "nature", "ev", "ev", "ev", "ev", "ev", "ev", "tera",
+)
+_FIELD_KIND = (0, 1, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 6)
+_MOVE_SUBSLOT = (None, None, None, 0, 1, 2, 3, None, None, None, None, None, None, None, None)
+_MOVE_COLS = SET_MOVE_COLS
+_EV_COLS = SET_EV_COLS
+_EV_SUBINDEX = tuple(
+    _EV_COLS.index(column) if column in _EV_COLS else -1
+    for column in range(len(SLOT_ATTRS))
+)
+_ITEM_COL, _ABILITY_COL, _NATURE_COL, _TERA_COL = 1, 2, SET_NATURE_COL, SET_TERA_COL
 
 _POS_SLOT = tuple(p // len(SLOT_ATTRS) for p in range(N_ATTRS))
 _POS_FAMILY = tuple(_ATTR_FAMILY[p % len(SLOT_ATTRS)] for p in range(N_ATTRS))
@@ -65,31 +85,12 @@ _SLOT_MOVE_FLATS = tuple(
 )
 _SLOT_ITEM_FLATS = tuple(j * len(SLOT_ATTRS) + _ITEM_COL for j in range(N_SLOTS))
 _SLOT_ABILITY_FLATS = tuple(j * len(SLOT_ATTRS) + _ABILITY_COL for j in range(N_SLOTS))
-_SLOT_SPREAD_FLATS = tuple(j * len(SLOT_ATTRS) + _SPREAD_COL for j in range(N_SLOTS))
+_SLOT_NATURE_FLATS = tuple(j * len(SLOT_ATTRS) + _NATURE_COL for j in range(N_SLOTS))
+_SLOT_EV_FLATS = tuple(
+    tuple(j * len(SLOT_ATTRS) + c for c in _EV_COLS) for j in range(N_SLOTS)
+)
 
 _NEG_INF = float("-inf")
-
-
-@dataclass
-class BeliefOutput:
-    logits: dict[str, torch.Tensor]
-    # The set-AR training forward predicts one route step per row.  These optional dictionaries
-    # identify that step and its possibly move-permuted target.  Marginal forwards leave them None.
-    loss_valid: dict[str, torch.Tensor] | None = None
-    loss_targets: dict[str, torch.Tensor] | None = None
-    order: torch.Tensor | None = None
-
-
-@dataclass
-class BeliefSamples:
-    teams: torch.Tensor              # [B, k, 6, 9]
-    log_value_prob: torch.Tensor     # [B, k]
-    log_route_prob: torch.Tensor     # [B, k]
-    order: torch.Tensor              # [B, k, 54], -1 after completion
-
-    @property
-    def log_joint_path_prob(self) -> torch.Tensor:
-        return self.log_value_prob + self.log_route_prob
 
 
 class BeliefModel(nn.Module):
@@ -103,8 +104,10 @@ class BeliefModel(nn.Module):
         n_items: int = 64,
         n_abilities: int = 160,
         n_moves: int = 720,
-        n_spreads: int = 17,
+        n_natures: int = N_NATURES,
+        n_ev_units: int = N_EV_UNITS,
         n_tera: int = 19,
+        last_context_probability: float = 0.0,
     ) -> None:
         super().__init__()
         self.d = d
@@ -114,21 +117,47 @@ class BeliefModel(nn.Module):
             "item": n_items,
             "ability": n_abilities,
             "move": n_moves,
-            "spread": n_spreads,
+            "nature": n_natures,
+            "ev": n_ev_units,
             "tera": n_tera,
         }
+        # Item labels describe the submitted set. <NO_ITEM> is a public CURRENT-state fact after
+        # consumption/Knock Off, not the Pokemon's original set item. Keep it in the board/entity
+        # encoding, but do not clamp the set-AR item field to that sentinel. The exact removed item
+        # remains available through categorical battle history when Showdown revealed it.
+        self.no_item_index = n_items - 2
+        self.last_context_probability = float(last_context_probability)
+        if not 0.0 <= self.last_context_probability <= 1.0:
+            raise ValueError("last_context_probability must be in [0,1]")
 
         # These names intentionally survive from the preceding architecture.  A warm-start loader
         # can retain learned value embeddings, family heads, and the dynamics projection while the
         # obsolete ordered decoder is discarded.
         self.s_proj = nn.Linear(state_dim, d)
         self.heads = nn.ModuleDict({name: nn.Linear(d, n) for name, n in self.sizes.items()})
+        # Stat-specific residuals let the six very different EV marginals specialize directly.
+        # All-zero initialization keeps compatible checkpoint outputs exactly unchanged.
+        self.ev_stat_heads = nn.ModuleList(
+            nn.Linear(d, n_ev_units) for _ in range(len(_EV_COLS))
+        )
+        for head in self.ev_stat_heads:
+            nn.init.zeros_(head.weight)
+            nn.init.zeros_(head.bias)
         self.value_embeds = nn.ModuleDict(
             {name: nn.Embedding(n + 1, d) for name, n in self.sizes.items()}
         )
 
-        # Six semantic field identities; all four move columns deliberately share identity 3.
-        self.field_id = nn.Embedding(6, d)
+        # Seven semantic field identities; move columns and EV-stat columns share identities.
+        self.field_id = nn.Embedding(7, d)
+        # EV amount is not exchangeable across stats: 252 Atk and 252 Spe mean different things.
+        # Zero initialization preserves old checkpoint outputs under compatible loading while
+        # continuation training learns the six stat roles.
+        self.ev_stat_id = nn.Embedding(len(_EV_COLS), d)
+        nn.init.zeros_(self.ev_stat_id.weight)
+        # Public observations and hypothetical chain assignments are both facts, but they are not
+        # the same evidence source.  Keeping this distinction lets the model learn how much to trust
+        # an ancestral assumption without ever hiding or weakening a real public reveal.
+        self.source_id = nn.Embedding(2, d)  # 0 = public reveal, 1 = generated/teacher assumption
         self.count_id = nn.Embedding(len(SLOT_ATTRS) + 1, d)
         self.fact_proj = nn.Sequential(
             nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d)
@@ -140,11 +169,17 @@ class BeliefModel(nn.Module):
             d_model=d, nhead=self.nhead, dim_feedforward=4 * d, batch_first=True,
             norm_first=True,
         )
-        self.team_encoder = nn.TransformerEncoder(team_layer, num_layers=2)
+        self.team_encoder = nn.TransformerEncoder(
+            team_layer,
+            num_layers=2,
+            # ``norm_first=True`` is intentional and cannot use PyTorch's
+            # nested-tensor fast path.
+            enable_nested_tensor=False,
+        )
         self.team_token = nn.Parameter(torch.empty(1, 1, d))
         nn.init.normal_(self.team_token, std=0.02)
 
-        self.query_id = nn.Embedding(6, d)
+        self.query_id = nn.Embedding(7, d)
         self.query_proj = nn.Sequential(
             nn.LayerNorm(3 * d), nn.Linear(3 * d, 2 * d), nn.GELU(), nn.Linear(2 * d, d)
         )
@@ -159,7 +194,10 @@ class BeliefModel(nn.Module):
     def _revealed_mask(self, tokens: torch.Tensor) -> torch.Tensor:
         flat = tokens.reshape(tokens.shape[0], N_ATTRS)
         n = self.pos_n.to(flat.device)
-        return (flat >= 0) & (flat < n)
+        revealed = (flat >= 0) & (flat < n)
+        for position in _SLOT_ITEM_FLATS:
+            revealed[:, position] &= flat[:, position] != self.no_item_index
+        return revealed
 
     def _fed_values(self, tokens: torch.Tensor, teacher_values: torch.Tensor | None) -> torch.Tensor:
         """Compatibility helper: reveals plus all supplied teacher values.
@@ -174,27 +212,6 @@ class BeliefModel(nn.Module):
         truth = teacher_values.reshape(tokens.shape[0], N_ATTRS)
         return torch.where(revealed, flat, truth)
 
-    @staticmethod
-    def _spread_after_item_ability(r: torch.Tensor, revealed: torch.Tensor) -> torch.Tensor:
-        """Compatibility utility used by the ordering tests.
-
-        The real scheduler enforces dependencies through `_eligible`; this stable-sort key helper
-        expresses the same spread-after-item/ability constraint for diagnostic random keys.
-        """
-        r = r.clone()
-        it = torch.where(
-            revealed[:, _SLOT_ITEM_FLATS], r.new_full((), float("-inf")),
-            r[:, _SLOT_ITEM_FLATS],
-        )
-        ab = torch.where(
-            revealed[:, _SLOT_ABILITY_FLATS], r.new_full((), float("-inf")),
-            r[:, _SLOT_ABILITY_FLATS],
-        )
-        r[:, _SLOT_SPREAD_FLATS] = torch.maximum(
-            torch.maximum(it, ab), r[:, _SLOT_SPREAD_FLATS]
-        ) + 1e-3
-        return r
-
     def _eligible(self, known: torch.Tensor) -> torch.Tensor:
         """Fields that may be generated next, given a set of known flat attributes.
 
@@ -206,15 +223,12 @@ class BeliefModel(nn.Module):
         for slot in range(N_SLOTS):
             base = slot * len(SLOT_ATTRS)
             species = known[:, base]
-            item = known[:, base + _ITEM_COL]
-            ability = known[:, base + _ABILITY_COL]
-
             out[:, base] = ~species
-            out[:, base + _ITEM_COL] = ~item
-            out[:, base + 8] = ~known[:, base + 8]  # Tera has no prerequisite.
+            out[:, base + _ITEM_COL] = ~known[:, base + _ITEM_COL]
+            out[:, base + _TERA_COL] = ~known[:, base + _TERA_COL]  # no prerequisite
 
             species_known = species
-            out[:, base + _ABILITY_COL] = species_known & ~ability
+            out[:, base + _ABILITY_COL] = species_known & ~known[:, base + _ABILITY_COL]
 
             move_known = known[:, [base + c for c in _MOVE_COLS]]
             for sub, col in enumerate(_MOVE_COLS):
@@ -224,10 +238,39 @@ class BeliefModel(nn.Module):
                 )
                 out[:, base + col] = species_known & ~move_known[:, sub] & earlier_full
 
-            out[:, base + _SPREAD_COL] = (
-                species_known & item & ability & ~known[:, base + _SPREAD_COL]
-            )
+            out[:, base + _NATURE_COL] = species_known & ~known[:, base + _NATURE_COL]
+            for col in _EV_COLS:
+                out[:, base + col] = species_known & ~known[:, base + col]
         return out
+
+    def _training_route(
+        self,
+        revealed: torch.Tensor,
+        target_valid: torch.Tensor,
+        mode: str,
+        generator: torch.Generator | None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Arbitrary replay-query route over the labeled, currently hidden fields.
+
+        This deliberately does *not* use the ancestral scheduler.  A replay may reveal any
+        slot/field next, so training samples a random permutation of every recoverable hidden fact
+        and a random prefix of that permutation.  The prefix is hypothetical chain context and the
+        next entry is the addressed query.  Missing replay labels never become values or negatives.
+        """
+        available = target_valid & ~revealed
+        length = available.sum(dim=1)
+        if mode == "canonical":
+            score = torch.arange(N_ATTRS, device=revealed.device).expand(len(revealed), -1)
+            score = score.masked_fill(~available, N_ATTRS + 1)
+        elif mode == "random":
+            score = torch.rand(
+                len(revealed), N_ATTRS, device=revealed.device, generator=generator
+            ).masked_fill(~available, 2.0)
+        else:
+            raise ValueError(f"order mode must be 'random' or 'canonical', got {mode!r}")
+        raw = score.argsort(dim=1)
+        steps = torch.arange(N_ATTRS, device=revealed.device).view(1, -1)
+        return raw.masked_fill(steps >= length.view(-1, 1), -1), length
 
     def _choose_next(
         self,
@@ -263,7 +306,7 @@ class BeliefModel(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """A complete dependency-valid route over hidden fields.
 
-        Returns order [B,54] padded with -1, route lengths [B], and the scheduler log-probability.
+        Returns order [B,N_ATTRS] padded with -1, route lengths, and scheduler log-probability.
         """
         known = revealed.clone() if skip is None else (revealed | skip)
         order = torch.full(
@@ -329,8 +372,10 @@ class BeliefModel(nn.Module):
         return out
 
     # ------------------------------------------------------------------------------- set encoding
-    def _fact_embeddings(self, fed: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-        """Return transformed facts [B,6,9,d] and a known-value mask [B,6,9]."""
+    def _fact_embeddings(
+        self, fed: torch.Tensor, source: torch.Tensor | None = None
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Return transformed facts [B,6,15,d] and a known-value mask [B,6,15]."""
         fields = []
         known_cols = []
         for col, fam in enumerate(_ATTR_FAMILY):
@@ -342,52 +387,97 @@ class BeliefModel(nn.Module):
             known_cols.append(known)
         fact = torch.stack(fields, dim=2)
         known = torch.stack(known_cols, dim=2)
-        fact = fact + self.field_id(self.field_kind).view(1, 1, 9, self.d)
+        fact = fact + self.field_id(self.field_kind).view(
+            1, 1, len(SLOT_ATTRS), self.d
+        )
+        ev_subindex = torch.tensor(_EV_SUBINDEX, device=fed.device)
+        ev_columns = ev_subindex >= 0
+        ev_identity = torch.zeros(
+            len(SLOT_ATTRS), self.d, device=fed.device, dtype=fact.dtype
+        )
+        ev_identity[ev_columns] = self.ev_stat_id(ev_subindex[ev_columns])
+        fact = fact + ev_identity.view(1, 1, len(SLOT_ATTRS), self.d)
+        if source is None:
+            source = torch.zeros_like(fed)
+        fact = fact + self.source_id(source.clamp(min=0, max=1))
         return self.fact_proj(fact), known
 
     def _set_context(
-        self, c_dyn: torch.Tensor, fed: torch.Tensor
+        self,
+        belief_context: torch.Tensor,
+        fed: torch.Tensor,
+        source: torch.Tensor | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Encode an unordered partial team -> (global [B,d], Pokemon [B,6,d])."""
         b = fed.shape[0]
         grid = fed.reshape(b, N_SLOTS, len(SLOT_ATTRS))
-        fact, known = self._fact_embeddings(grid)
+        source_grid = None if source is None else source.reshape_as(grid)
+        fact, known = self._fact_embeddings(grid, source_grid)
         count = known.sum(dim=2)
         pooled = (fact * known.unsqueeze(-1)).sum(dim=2)
         pooled = pooled / count.clamp_min(1).unsqueeze(-1)
         pokemon = self.mon_proj(pooled + self.count_id(count))
 
-        dyn = self.s_proj(c_dyn)
+        dyn = self.s_proj(belief_context)
+        if dyn.ndim == 3:
+            if tuple(dyn.shape[1:2]) != (N_SLOTS,):
+                raise ValueError("slot-aware belief context must have shape [batch,6,state_dim]")
+            global_dyn = dyn.mean(dim=1)
+            pokemon = pokemon + dyn
+        elif dyn.ndim == 2:
+            global_dyn = dyn
+        else:
+            raise ValueError("belief context must have shape [batch,state_dim] or [batch,6,state_dim]")
         team = torch.cat(
-            [self.team_token.expand(b, -1, -1) + dyn.unsqueeze(1), pokemon], dim=1
+            [self.team_token.expand(b, -1, -1) + global_dyn.unsqueeze(1), pokemon], dim=1
         )
         team = self.team_encoder(team)  # no positional encoding: Pokemon order is equivariant
         global_ctx = team[:, 0]
         pokemon_ctx = team[:, 1:]
         return global_ctx, pokemon_ctx
 
-    def _context_hidden(self, c_dyn: torch.Tensor, fed: torch.Tensor) -> torch.Tensor:
-        """Encode an unordered partial team and return one query hidden per flat field [B,54,d]."""
+    def _context_hidden(
+        self,
+        belief_context: torch.Tensor,
+        fed: torch.Tensor,
+        source: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Encode an unordered partial team and return one query hidden per flat field."""
         b = fed.shape[0]
-        global_ctx, pokemon_ctx = self._set_context(c_dyn, fed)
+        global_ctx, pokemon_ctx = self._set_context(belief_context, fed, source)
 
         kind = self.field_kind.repeat(N_SLOTS)
+        column = torch.arange(len(SLOT_ATTRS), device=fed.device).repeat(N_SLOTS)
         slot = torch.arange(N_SLOTS, device=fed.device).repeat_interleave(len(SLOT_ATTRS))
         q = self.query_id(kind).unsqueeze(0).expand(b, -1, -1)
+        ev_subindex = torch.tensor(_EV_SUBINDEX, device=fed.device)[column]
+        ev_columns = ev_subindex >= 0
+        if bool(ev_columns.any()):
+            q = q.clone()
+            q[:, ev_columns] += self.ev_stat_id(ev_subindex[ev_columns])
         mon = pokemon_ctx[:, slot]
         glob = global_ctx.unsqueeze(1).expand(-1, N_ATTRS, -1)
         return self.query_proj(torch.cat([mon, glob, q], dim=-1))
 
     def _selected_context_hidden(
-        self, c_dyn: torch.Tensor, fed: torch.Tensor, position: torch.Tensor
+        self,
+        belief_context: torch.Tensor,
+        fed: torch.Tensor,
+        position: torch.Tensor,
+        source: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """One query per row, avoiding 53 unused query tensors during sampling/scoring."""
-        global_ctx, pokemon_ctx = self._set_context(c_dyn, fed)
+        global_ctx, pokemon_ctx = self._set_context(belief_context, fed, source)
         slot = torch.div(position, len(SLOT_ATTRS), rounding_mode="floor")
         column = position % len(SLOT_ATTRS)
         kind = self.field_kind[column]
         rows = torch.arange(len(fed), device=fed.device)
         query = self.query_id(kind)
+        ev_subindex = torch.tensor(_EV_SUBINDEX, device=fed.device)[column]
+        ev_columns = ev_subindex >= 0
+        if bool(ev_columns.any()):
+            query = query.clone()
+            query[ev_columns] += self.ev_stat_id(ev_subindex[ev_columns])
         return self.query_proj(
             torch.cat([pokemon_ctx[rows, slot], global_ctx, query], dim=-1)
         )
@@ -397,6 +487,20 @@ class BeliefModel(nn.Module):
             return logits
         ok = mask.any(dim=-1, keepdim=True)
         return logits.masked_fill(~mask & ok, _NEG_INF)
+
+    def _value_logits(
+        self,
+        family: str,
+        hidden: torch.Tensor,
+        *,
+        ev_subslot: int | None = None,
+    ) -> torch.Tensor:
+        logits = self.heads[family](hidden)
+        if family == "ev":
+            if ev_subslot is None:
+                raise ValueError("EV logits require an explicit stat subslot")
+            logits = logits + self.ev_stat_heads[int(ev_subslot)](hidden)
+        return logits
 
     def _move_set_mask(
         self,
@@ -420,6 +524,30 @@ class BeliefModel(nn.Module):
                 mask[rows, val[valid]] = False
         return mask
 
+    def _ev_budget_mask(
+        self,
+        fed: torch.Tensor,
+        slot: int,
+        position: int,
+        base: torch.Tensor | None,
+    ) -> torch.Tensor:
+        """Legal EV-unit values for one stat after accounting for the other five stats."""
+        b = fed.shape[0]
+        mask = (
+            base.clone()
+            if base is not None
+            else torch.ones(b, self.sizes["ev"], dtype=torch.bool, device=fed.device)
+        )
+        other = [p for p in _SLOT_EV_FLATS[slot] if p != position]
+        values = fed[:, other]
+        valid = (values >= 0) & (values < self.sizes["ev"])
+        used = torch.where(valid, values, torch.zeros_like(values)).sum(dim=1)
+        remaining = (MAX_TOTAL_EV_UNITS - used).clamp(
+            min=0, max=self.sizes["ev"] - 1
+        )
+        candidates = torch.arange(self.sizes["ev"], device=fed.device).unsqueeze(0)
+        return mask & (candidates <= remaining.unsqueeze(1))
+
     def _delta_fill(
         self,
         logits: torch.Tensor,
@@ -442,11 +570,14 @@ class BeliefModel(nn.Module):
         per_family: dict[str, list[torch.Tensor]] = {f: [] for f in self.sizes}
         for p in range(N_ATTRS):
             slot, fam = _POS_SLOT[p], _POS_FAMILY[p]
-            logits = self.heads[fam](hidden[:, p])
+            ev_subslot = _EV_COLS.index(p % len(SLOT_ATTRS)) if fam == "ev" else None
+            logits = self._value_logits(fam, hidden[:, p], ev_subslot=ev_subslot)
             family_mask = masks.get(fam)
             legal = family_mask[:, slot] if family_mask is not None else None
             if fam == "move":
                 legal = self._move_set_mask(fed, slot, legal)
+            elif fam == "ev":
+                legal = self._ev_budget_mask(fed, slot, p, legal)
             logits = self._apply_mask(logits, legal)
             logits = self._delta_fill(logits, clamp[:, p], tokens_flat[:, p])
             per_family[fam].append(logits)
@@ -456,6 +587,8 @@ class BeliefModel(nn.Module):
             stacked = torch.stack(values, dim=1)
             if fam == "move":
                 stacked = stacked.reshape(b, N_SLOTS, 4, self.sizes["move"])
+            elif fam == "ev":
+                stacked = stacked.reshape(b, N_SLOTS, 6, self.sizes["ev"])
             out[fam] = stacked
         return out
 
@@ -467,14 +600,15 @@ class BeliefModel(nn.Module):
             "item": grid[:, :, 1],
             "ability": grid[:, :, 2],
             "move": grid[:, :, 3:7],
-            "spread": grid[:, :, 7],
-            "tera": grid[:, :, 8],
+            "nature": grid[:, :, _NATURE_COL],
+            "ev": grid[:, :, list(_EV_COLS)],
+            "tera": grid[:, :, _TERA_COL],
         }
 
     # ------------------------------------------------------------------------------------- forward
     def forward(
         self,
-        c_dyn: torch.Tensor,
+        belief_context: torch.Tensor,
         opp_revealed: dict,
         *,
         teacher_values: torch.Tensor | None = None,
@@ -484,8 +618,9 @@ class BeliefModel(nn.Module):
         """Marginals from the reveal set, or one matched set-AR training conditional per row.
 
         With ``teacher_values=None`` all hidden fields are predicted from all public reveals.
-        With teacher values, a random generation route and prefix cut are sampled and only the
-        next route field is marked in ``loss_valid``.  Callers must intersect that mask with their
+        With teacher values, an arbitrary random ordering of the replay-labeled hidden fields and
+        a prefix cut are sampled.  The prefix is tagged as generated assumptions and only the next
+        addressed field is marked in ``loss_valid``.  Callers must intersect that mask with their
         ordinary label/censoring mask; ``loss_targets`` carries the exchangeable move permutation.
         """
         tokens: torch.Tensor = opp_revealed["tokens"]
@@ -494,9 +629,10 @@ class BeliefModel(nn.Module):
         tokens_flat = tokens.reshape(b, N_ATTRS)
         revealed = self._revealed_mask(tokens)
         fed = torch.where(revealed, tokens_flat, torch.full_like(tokens_flat, -1))
+        source = torch.zeros_like(fed)
 
         if teacher_values is None:
-            hidden = self._context_hidden(c_dyn, fed)
+            hidden = self._context_hidden(belief_context, fed, source)
             logits = self._heads_from_context(
                 hidden, tokens_flat, fed, revealed, masks
             )
@@ -506,12 +642,17 @@ class BeliefModel(nn.Module):
         truth = teacher_values.reshape(b, N_ATTRS)
         truth = self._permute_hidden_moves(truth, revealed, mode, generator)
         target_valid = (truth >= 0) & (truth < self.pos_n)
-        order, length, _ = self._route(revealed, mode, generator, skip=~target_valid)
+        order, length = self._training_route(revealed, target_valid, mode, generator)
 
         # Uniform cut over the actual hidden route.  Rows without any hidden fields have no chain
         # target and remain all-reveal delta rows.
         rand = torch.rand(b, device=tokens.device, generator=generator)
         cut = torch.floor(rand * length.clamp_min(1).to(rand.dtype)).to(torch.long)
+        if self.last_context_probability > 0:
+            choose_last = torch.rand(
+                b, device=tokens.device, generator=generator
+            ) < self.last_context_probability
+            cut = torch.where(choose_last & (length > 0), length - 1, cut)
         selected = torch.full((b,), -1, dtype=torch.long, device=tokens.device)
         rows = torch.arange(b, device=tokens.device)
         has_hidden = length > 0
@@ -530,8 +671,9 @@ class BeliefModel(nn.Module):
                 vp = pos[valid_value]
                 fed[vr, vp] = truth[vr, vp]
                 known[vr, vp] = True
+                source[vr, vp] = 1
 
-        hidden = self._context_hidden(c_dyn, fed)
+        hidden = self._context_hidden(belief_context, fed, source)
         # Clamp facts already in the context.  The next selected field remains a genuine prediction.
         logits = self._heads_from_context(hidden, fed, fed, known, masks)
 
@@ -543,13 +685,122 @@ class BeliefModel(nn.Module):
             loss_valid=self._split_flat(valid_flat),
             loss_targets=self._split_flat(truth),
             order=order,
+            context_count=cut,
+            route_length=length,
         )
+
+    def query_field(
+        self,
+        belief_context: torch.Tensor,
+        opp_revealed: dict,
+        *,
+        slot: int,
+        field: str,
+        context_values: torch.Tensor | None = None,
+        subslot: int | None = None,
+    ) -> torch.Tensor:
+        """Query one named fact for one Pokemon under an arbitrary partial fact set.
+
+        This is the explicit censored-replay interface. ``context_values`` is an optional
+        ``[B,6,15]`` grid with ``-1`` for unavailable facts. Public reveals always win, and the
+        requested hidden field is removed from teacher context so its answer cannot leak into its
+        own logits. Unlike the ancestral scheduler this query is allowed for any slot/field; it is
+        a conditional auxiliary objective, not a claim that censored rows define a normalized
+        complete-team likelihood.
+
+        Moves are a set, so ``field="move"`` means "another move for this Pokemon", not one
+        semantically ordered moveset column.
+        """
+        if not 0 <= int(slot) < N_SLOTS:
+            raise ValueError(f"slot must be in [0,{N_SLOTS}), got {slot!r}")
+        if field not in self.sizes:
+            raise ValueError(f"unknown belief field {field!r}; expected one of {tuple(self.sizes)}")
+
+        tokens: torch.Tensor = opp_revealed["tokens"]
+        masks: dict = opp_revealed.get("masks") or {}
+        b = tokens.shape[0]
+        public = tokens.reshape(b, N_ATTRS)
+        revealed = self._revealed_mask(tokens)
+        fed = torch.where(revealed, public, torch.full_like(public, -1))
+        source = torch.zeros_like(fed)
+
+        if context_values is not None:
+            supplied = context_values.reshape(b, N_ATTRS).to(
+                device=tokens.device, dtype=tokens.dtype
+            )
+            valid = (supplied >= 0) & (supplied < self.pos_n)
+            fed = torch.where(~revealed & valid, supplied, fed)
+            source = torch.where(~revealed & valid, torch.ones_like(source), source)
+
+        if field == "move":
+            # External move columns have no identity. Query the first currently unresolved storage
+            # cell, while all known move values remain available as a set in the context.
+            base = int(slot) * len(SLOT_ATTRS)
+            move_known = (fed[:, [base + c for c in _MOVE_COLS]] >= 0)
+            counts = move_known.sum(dim=1).clamp(max=len(_MOVE_COLS) - 1)
+            positions = counts + base + _MOVE_COLS[0]
+        elif field == "ev":
+            if subslot is None:
+                base = int(slot) * len(SLOT_ATTRS)
+                ev_known = fed[:, [base + c for c in _EV_COLS]] >= 0
+                counts = ev_known.sum(dim=1).clamp(max=len(_EV_COLS) - 1)
+                positions = counts + base + _EV_COLS[0]
+            else:
+                if not 0 <= int(subslot) < len(_EV_COLS):
+                    raise ValueError(
+                        f"EV subslot must be in [0,{len(_EV_COLS)}), got {subslot!r}"
+                    )
+                positions = torch.full(
+                    (b,), int(slot) * len(SLOT_ATTRS) + _EV_COLS[int(subslot)],
+                    dtype=torch.long, device=tokens.device,
+                )
+        else:
+            column = _ATTR_FAMILY.index(field)
+            positions = torch.full(
+                (b,), int(slot) * len(SLOT_ATTRS) + column,
+                dtype=torch.long, device=tokens.device,
+            )
+
+        rows = torch.arange(b, device=tokens.device)
+        public_target = revealed[rows, positions]
+        # A hidden teacher value for the requested target must never enter its own context.
+        fed[rows[~public_target], positions[~public_target]] = -1
+        hidden = self._selected_context_hidden(belief_context, fed, positions, source)
+        if field == "ev":
+            ev_subslots = torch.tensor(_EV_SUBINDEX, device=tokens.device)[
+                positions % len(SLOT_ATTRS)
+            ]
+            logits = torch.empty(
+                b, self.sizes["ev"], device=hidden.device, dtype=hidden.dtype
+            )
+            for ev_subslot in torch.unique(ev_subslots).tolist():
+                use = ev_subslots == int(ev_subslot)
+                logits[use] = self._value_logits(
+                    "ev", hidden[use], ev_subslot=int(ev_subslot)
+                )
+        else:
+            logits = self._value_logits(field, hidden)
+
+        family_mask = masks.get(field)
+        legal = family_mask[:, int(slot)] if family_mask is not None else None
+        if field == "move":
+            legal = self._move_set_mask(fed, int(slot), legal)
+        elif field == "ev":
+            budget = torch.ones_like(logits, dtype=torch.bool)
+            for p in torch.unique(positions).tolist():
+                use = positions == int(p)
+                budget[use] = self._ev_budget_mask(fed[use], int(slot), int(p), None)
+            legal = budget if legal is None else (legal & budget)
+        logits = self._apply_mask(logits, legal)
+        if bool(public_target.any()):
+            logits = self._delta_fill(logits, public_target, public[rows, positions])
+        return logits
 
     # --------------------------------------------------------------------------- path probabilities
     @torch.no_grad()
     def path_logprob(
         self,
-        c_dyn: torch.Tensor,
+        belief_context: torch.Tensor,
         opp_revealed: dict,
         team_values: torch.Tensor,
         *,
@@ -593,26 +844,32 @@ class BeliefModel(nn.Module):
         initial = torch.where(
             revealed, tokens.reshape(b, N_ATTRS), torch.full_like(truth, -1)
         )
+        initial_source = torch.zeros_like(initial)
         contexts = torch.full(
             (b, N_ATTRS, N_ATTRS), -1, dtype=torch.long, device=tokens.device
         )
+        context_sources = torch.zeros_like(contexts)
         fed = initial.clone()
+        source = initial_source.clone()
         for step in range(N_ATTRS):
             active = step < length
             if not bool(active.any()):
                 break
             contexts[active, step] = fed[active]
+            context_sources[active, step] = source[active]
             pos = order[active, step]
             target = truth[active, pos]
             valid = (target >= 0) & (target < self.pos_n[pos])
             active_rows = torch.nonzero(active, as_tuple=True)[0]
             if bool(valid.any()):
                 fed[active_rows[valid], pos[valid]] = target[valid]
+                source[active_rows[valid], pos[valid]] = 1
 
         step_id = torch.arange(N_ATTRS, device=tokens.device).view(1, -1)
         active_ctx = step_id < length.view(-1, 1)
         route_row, route_step = torch.nonzero(active_ctx, as_tuple=True)
         context_flat = contexts[route_row, route_step]
+        source_flat = context_sources[route_row, route_step]
         selected = order[route_row, route_step]
         target = truth[route_row, selected]
 
@@ -630,12 +887,15 @@ class BeliefModel(nn.Module):
         self.eval()
         try:
             selected_hidden = self._selected_context_hidden(
-                c_dyn[route_row], context_flat, selected
+                belief_context[route_row], context_flat, selected, source_flat
             )
             for p in torch.unique(selected).tolist():
                 use = selected == int(p)
                 fam, slot = _POS_FAMILY[p], _POS_SLOT[p]
-                logits = self.heads[fam](selected_hidden[use])
+                ev_subslot = _EV_COLS.index(p % len(SLOT_ATTRS)) if fam == "ev" else None
+                logits = self._value_logits(
+                    fam, selected_hidden[use], ev_subslot=ev_subslot
+                )
                 family_mask = masks.get(fam)
                 legal = (
                     family_mask[route_row[use], slot]
@@ -643,6 +903,8 @@ class BeliefModel(nn.Module):
                 )
                 if fam == "move":
                     legal = self._move_set_mask(context_flat[use], slot, legal)
+                elif fam == "ev":
+                    legal = self._ev_budget_mask(context_flat[use], slot, int(p), legal)
                 logits = self._apply_mask(logits, legal)
                 target_p = target[use]
                 target_ok = (target_p >= 0) & (target_p < logits.shape[-1])
@@ -671,7 +933,7 @@ class BeliefModel(nn.Module):
     @torch.no_grad()
     def sample_team(
         self,
-        c_dyn: torch.Tensor,
+        belief_context: torch.Tensor,
         opp_revealed: dict,
         k: int = 16,
         temperature: float = 1.0,
@@ -689,7 +951,7 @@ class BeliefModel(nn.Module):
         def rep(x: torch.Tensor) -> torch.Tensor:
             return x.repeat_interleave(k, dim=0)
 
-        c_k = rep(c_dyn)
+        c_k = rep(belief_context)
         tokens_k = rep(tokens0)
         masks_k = {name: rep(mask) for name, mask in masks.items()}
         revealed = self._revealed_mask(tokens_k)
@@ -698,6 +960,7 @@ class BeliefModel(nn.Module):
                 tokens_k.reshape(b * k, N_ATTRS), -1
             )
         )
+        source = torch.zeros_like(fed)
         known = revealed.clone()
         log_value = torch.zeros(b * k, device=fed.device)
         log_route = torch.zeros(b * k, device=fed.device)
@@ -715,21 +978,27 @@ class BeliefModel(nn.Module):
                 log_route[active] -= count[active].to(torch.float32).log()
                 active_rows = rows[active]
                 selected_hidden = self._selected_context_hidden(
-                    c_k[active], fed[active], chosen[active]
+                    c_k[active], fed[active], chosen[active], source[active]
                 )
                 for p in torch.unique(chosen[active]).tolist():
                     local_use = chosen[active] == int(p)
                     ur = active_rows[local_use]
                     fam, slot = _POS_FAMILY[p], _POS_SLOT[p]
-                    logits = self.heads[fam](selected_hidden[local_use])
+                    ev_subslot = _EV_COLS.index(p % len(SLOT_ATTRS)) if fam == "ev" else None
+                    logits = self._value_logits(
+                        fam, selected_hidden[local_use], ev_subslot=ev_subslot
+                    )
                     family_mask = masks_k.get(fam)
                     legal = family_mask[ur, slot] if family_mask is not None else None
                     if fam == "move":
                         legal = self._move_set_mask(fed[ur], slot, legal)
+                    elif fam == "ev":
+                        legal = self._ev_budget_mask(fed[ur], slot, int(p), legal)
                     logits = self._apply_mask(logits, legal)
                     probs = torch.softmax(logits / max(float(temperature), 1e-6), dim=-1)
                     draw = torch.multinomial(probs, 1, generator=generator).squeeze(1)
                     fed[ur, p] = draw
+                    source[ur, p] = 1
                     log_value[ur] += torch.log(
                         probs.gather(1, draw.unsqueeze(1)).squeeze(1).clamp_min(1e-30)
                     )

@@ -1,4 +1,4 @@
-"""Multiprocess two-sided-search data generation on a team pool (PROPOSAL_IMPL_PLAN Phase G2,
+"""Multiprocess two-sided-search data generation on a team pool (ARCHITECTURE.md S1–S3,
 cost lever L2; §6.2 acceptance bar: sustained >= 1,000 POOL-A games/day on this box).
 
 Games are independent, the blind/interim value path needs no GPU, and the box has 20 cores; RAM

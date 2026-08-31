@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import random
+import threading
 from dataclasses import dataclass
 from typing import Any
 
 from fog.env.showdown_direct import ShowdownDirectClient
 from fog.env.showdown_local import LocalShowdownBattle
+
+_SCRIPTED_RNG_LOCK = threading.Lock()
 
 
 class LocalOrderFactory:
@@ -36,7 +39,7 @@ class LocalBattleResult:
 
 def bind_fog_player(adapter: Any) -> Any:
     """Bind FogPlayer's action mapper to local order formatting instead of a poke-env Player."""
-    adapter._player_ref = LocalOrderFactory()  # noqa: SLF001 - intentional local transport port
+    adapter._player_ref = LocalOrderFactory()
     return adapter
 
 
@@ -59,15 +62,18 @@ def _scripted_order(name: str, battle: Any, rng: random.Random):
     # The poke-env baselines use Python's module-global RNG in fallback cases. Isolate that call
     # behind this runner's seeded stream so direct-backend runs remain reproducible and do not
     # perturb unrelated Python randomness.
-    global_state = random.getstate()
-    random.seed(rng.getrandbits(128))
-    try:
-        if name == "maxdamage":
-            return MaxBasePowerPlayer.choose_singles_move(battle)
-        if name == "simpleheuristics":
-            return SimpleHeuristicsPlayer.choose_singles_move(battle)[0]
-    finally:
-        random.setstate(global_state)
+    # These poke-env helpers use Python's module-global RNG in fallback cases.  Direct rollout
+    # workers are threads, so save/seed/call/restore must be one atomic region.
+    with _SCRIPTED_RNG_LOCK:
+        global_state = random.getstate()
+        random.seed(rng.getrandbits(128))
+        try:
+            if name == "maxdamage":
+                return MaxBasePowerPlayer.choose_singles_move(battle)
+            if name == "simpleheuristics":
+                return SimpleHeuristicsPlayer.choose_singles_move(battle)[0]
+        finally:
+            random.setstate(global_state)
     raise ValueError(f"unknown local scripted controller: {name!r}")
 
 
@@ -84,6 +90,24 @@ def _choice(controller: Any, battle: Any, request: dict[str, Any] | None, rng: r
         order = controller(battle)
     else:
         raise TypeError("local controller must be FogPlayer-like, a scripted name, or callable")
+
+    # poke-env's scripted baselines and frozen Player-like controllers bypass FogPlayer's action
+    # mapper. Normalize their Pokemon switch orders here too: numeric-leading nicknames otherwise
+    # reach Showdown as enormous party-slot numbers (for example nickname "6666" -> slot 6666).
+    order_target = getattr(order, "order", None)
+    if order_target is not None:
+        from fog.env.actions import _request_switch_position, same_pokemon
+
+        if any(
+            same_pokemon(order_target, offered)
+            for offered in (getattr(battle, "available_switches", None) or [])
+        ):
+            request_position = _request_switch_position(battle, order_target)
+            if request_position is None:
+                raise AssertionError(
+                    "controller switch target could not be mapped to an authoritative request slot"
+                )
+            return f"/choose switch {request_position}"
     return getattr(order, "message", str(order))
 
 
@@ -109,13 +133,40 @@ def play_local_battle(
             if max_turns is not None and int(local.p1.turn) >= int(max_turns):
                 truncated = True
                 break
+            controllers = (p1_controller, p2_controller)
+            views = (local.p1, local.p2)
             choices = [
                 _choice(p1_controller, local.p1, local.update.requests["p1"], rng),
                 _choice(p2_controller, local.p2, local.update.requests["p2"], rng),
             ]
             if choices == [None, None]:
                 raise RuntimeError("direct Showdown battle is live but neither side owes a choice")
-            local.step(choices[0], choices[1], include_state=False)
+            for retry in range(4):
+                update = local.step(choices[0], choices[1], include_state=False)
+                if not update.choice_errors:
+                    break
+                for index, role in enumerate(("p1", "p2")):
+                    if role not in update.choice_errors:
+                        continue
+                    discard = getattr(
+                        controllers[index], "discard_last_uncommitted_decision", None
+                    )
+                    if discard is not None:
+                        discard(views[index])
+                    choices[index] = _choice(
+                        controllers[index],
+                        views[index],
+                        update.requests[role],
+                        rng,
+                    )
+                    if choices[index] is None:
+                        raise RuntimeError(
+                            f"{role} received an unavailable-choice retry without a new request"
+                        )
+            else:
+                raise RuntimeError(
+                    "direct Showdown battle exceeded 4 unavailable-choice retries in one round"
+                )
         else:
             raise RuntimeError(
                 f"direct Showdown battle exceeded max_choice_rounds={max_choice_rounds}"

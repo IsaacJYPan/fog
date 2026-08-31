@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from fog.models.agent import FogAgent
 
 
-def cross_sim_gauntlet(agent: "FogAgent", cfg: dict) -> dict:
+def cross_sim_gauntlet(agent: FogAgent, cfg: dict) -> dict:
     """Play `cross_sim.games` vs the same scripted opponent on BOTH backends with the live agent.
 
     Returns {"engine_wr", "showdown_wr", "gap", "games", "opponent"}; gap = engine - showdown.

@@ -9,7 +9,10 @@ import torch
 
 from fog.models.pb_value import PBValueNet, TeamEncoder
 
-SIZES = {"species": 32, "item": 12, "ability": 16, "move": 40, "spread": 8, "tera": 6}
+SIZES = {
+    "species": 32, "item": 12, "ability": 16, "move": 40,
+    "nature": 8, "ev": 8, "tera": 6,
+}
 
 
 def _net(d=32):
@@ -21,7 +24,7 @@ def _rand_teams(n, gen):
     # concrete teams: every attribute a valid in-range index for its family
     from fog.models.pb_value import _POS_FAMILY, N_ATTRS
     cols = [torch.randint(0, SIZES[_POS_FAMILY[p]], (n, 1), generator=gen) for p in range(N_ATTRS)]
-    return torch.cat(cols, dim=1).reshape(n, 6, 9)
+    return torch.cat(cols, dim=1).reshape(n, 6, 15)
 
 
 def _inputs(L=5, K=3, J=4, seed=1):

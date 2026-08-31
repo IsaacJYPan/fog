@@ -164,7 +164,7 @@ def test_species_filtering_and_sentinel(built, tables):
 
 
 def test_meta_records_commit(built):
-    out_dir, paths = built
+    _out_dir, paths = built
     data = json.loads(paths["species"].read_text())
     assert data["_meta"]["showdown_commit"] == "deadbeef"
 

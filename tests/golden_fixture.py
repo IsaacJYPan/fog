@@ -148,7 +148,7 @@ class GoldenBattle:
 def build_golden_observation():
     """Feed the fixture through tracker + ledger + encoders exactly as the live player does."""
     from fog.constants.tables import TABLES
-    from fog.encoding.events import build_snapshot, feed_ledger_from_events
+    from fog.encoding.events import feed_ledger_from_events
     from fog.encoding.mirror import build_opponent_view_np
     from fog.encoding.observation import Observation
     from fog.encoding.reveals import RevealLedger, tokens_from_views
@@ -163,7 +163,9 @@ def build_golden_observation():
         events = battle.observations[t].events
         tracker.feed_turn(t, events)
         feed_ledger_from_events(events, "p1", ledger, TABLES)
-        tracker.record_decision(t, build_snapshot(battle, TABLES), my_actions[t])
+        from fog.encoding.events import record_history_decision
+
+        record_history_decision(tracker, t, battle, TABLES, my_actions[t])
 
     obs = Observation.from_battle(battle, tracker=tracker)
     my_keys = list(battle.team)
@@ -182,12 +184,17 @@ def golden_arrays() -> dict[str, np.ndarray]:
         "entity_ids": obs.entity_ids,
         "field": obs.field,
         "history": obs.history,
+        "history_ids": obs.history_ids,
+        "history_state": obs.history_state,
         "legality_mask": obs.legality_mask.astype(np.int8),
         "active_idx": obs.active_idx,
         "opp_tokens": obs.opp_revealed["tokens"],
         "mirror_entities": mirror_frag["entities"],
         "mirror_entity_ids": mirror_frag["entity_ids"],
         "mirror_field": mirror_frag["field"],
+        "mirror_history": mirror_frag["history"],
+        "mirror_history_ids": mirror_frag["history_ids"],
+        "mirror_history_state": mirror_frag["history_state"],
         "my_view_tokens": my_view["tokens"],
         "my_truth_species": my_view["labels"]["species"],
     }

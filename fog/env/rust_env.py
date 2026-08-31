@@ -23,7 +23,7 @@ question. The proxy feeds the SAME encoders as the Showdown path, but note "same
 mean "same inputs": every proxy field below that approximates (see _ProxyMon) is a drift source the
 cross-sim fuzz must catch.
 
-Division of labor (decided 2026-07, HANDOFF):
+Division of labor (see ARCHITECTURE.md simulator authority):
   * poke-engine  -> self-play rollout volume (synchronous, no websocket, orders of magnitude faster)
   * Showdown     -> ground truth: BC replays, gauntlet/Elo eval, fuzzing, ladder, final fine-tune
 
@@ -43,10 +43,8 @@ releases before.
 """
 from __future__ import annotations
 
-
-
 try:
-    import poke_engine  # noqa: F401
+    import poke_engine
     HAVE_ENGINE = True
 except ImportError:  # pragma: no cover
     HAVE_ENGINE = False
@@ -58,7 +56,7 @@ def _require_engine() -> None:
 
 
 # ---------------------------------------------------------------------------- paste -> engine side
-def paste_to_engine_pokemon(mon) -> "poke_engine.Pokemon":
+def paste_to_engine_pokemon(mon) -> poke_engine.Pokemon:
     """poke-env TeambuilderPokemon (parsed paste mon) -> poke_engine.Pokemon.
 
     With built tables this computes REAL stats/types/weight (pe.Pokemon derives nothing from
@@ -91,7 +89,7 @@ def paste_to_engine_pokemon(mon) -> "poke_engine.Pokemon":
     )
 
 
-def paste_to_engine_side(paste: str) -> "poke_engine.Side":
+def paste_to_engine_side(paste: str) -> poke_engine.Side:
     """Showdown paste -> poke_engine.Side (6 mons, first active)."""
     _require_engine()
     from poke_env.teambuilder import Teambuilder
@@ -107,12 +105,12 @@ def paste_to_engine_side(paste: str) -> "poke_engine.Side":
 # --------------------------------------------------------------- engine state -> encoder battle proxy
 def _try_tables():
     """Generated tables when built (base stats / weight source); None keeps the fallback path."""
-    try:
-        from fog.constants.tables import TABLES
+    from fog.constants.tables import TABLES, TablesNotBuilt
 
-        TABLES.species  # force lazy load; raises when tables aren't generated
+    try:
+        _ = TABLES.species  # force lazy load; raises when tables aren't generated
         return TABLES
-    except Exception:
+    except TablesNotBuilt:
         return None
 
 
@@ -148,7 +146,7 @@ class _ProxyMon:
         if tables is not None:
             try:
                 feats = tables.species["features"].get(self.species)
-            except Exception:
+            except (AttributeError, KeyError, TypeError):
                 feats = None
         if feats is not None:
             self.base_stats = dict(zip(("hp", "atk", "def", "spa", "spd", "spe"),
@@ -186,7 +184,7 @@ class RustBattleProxy:
 
     player_role = "p1"
 
-    def __init__(self, state: "poke_engine.State", turn: int = 1, observations: dict | None = None,
+    def __init__(self, state: poke_engine.State, turn: int = 1, observations: dict | None = None,
                  reveal_opponent: bool = False):
         self._state = state
         self.battle_tag = "rust-battle"

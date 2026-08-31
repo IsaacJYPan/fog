@@ -1,0 +1,25 @@
+extends: set_ar_train.yaml
+
+experiment: gen9ou_simple_imitation_scratch
+seed: 20260839
+device: cuda
+
+env:
+  backend: showdown_direct
+  battle_format: gen9ou
+  showdown_root: server/pokemon-showdown
+  team_pool: data/teams/gen9ou_public_v1/train.json
+  min_team_pool_size: 171
+  rollout_workers: 4
+  rollout_worker_mode: process
+  actor_threads: 2
+
+model:
+  # These features include calculations derived from SimpleHeuristics, so the independent
+  # imitation model must not construct or consume them.
+  use_action_features: false
+  simple_rule_prior_strength: 0.0
+  simple_rule_prior_strength_final: 0.0
+
+log:
+  tensorboard: false

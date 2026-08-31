@@ -1,21 +1,20 @@
-"""Interim leaf values for the two-sided search (PROPOSAL_IMPL_PLAN Phase E).
+"""Interim scalar leaf values for the two-sided search.
 
 Bridges a simulated PBGrid to `two_sided_regret_solve`'s `values_fn` contract using the EXISTING
-value head. This is explicitly the interim of PROJECT_DESIGN_PROPOSAL.md §18 ("four scalar
-posterior features"), kept so the two-sided machinery runs end-to-end and surfaces
-information-flow bugs NOW; the real public-belief value network (proposal §9, particle encoder
-over candidate identities plus the full joint weights) replaces this module in Phase G.
+value head. It is retained so the two-sided machinery can run end-to-end and expose
+information-flow defects; the real public-belief value network consumes candidate identities and
+the full joint weights.
 
 What is interim here, named precisely:
 
-  * The leaf evaluator is the small policy/value head on `(s_board, c_dyn, four posterior
-    features)`. Four concentration numbers cannot say WHICH candidate teams retain probability
-    (proposal §8) — they only make leaf values react to the solver's changing posterior at all.
+  * The leaf evaluator is the small policy/value head on `(private_state, public_context, four
+    posterior features)`. Four concentration numbers cannot say which candidate teams retain
+    probability; they only make leaf values react to the solver's changing posterior at all.
   * The features summarize the OWN-side margin of the action-pair posterior (what the opponent
     would now believe about us), evaluated at the leaf's own candidate index — the same semantics
     the frozen one-sided baseline fed its head, so its §4.2 value fine-tune transfers.
   * §10.6's discrete branch-evidence conditioning is not applied — the interim head has no input
-    for it. The grid's leaf observations already carry the reveal facts for Phase G.
+    for it. The grid's leaf observations already carry the reveal facts for the replacement path.
 
 Cost model (invariant 19.13): the expensive parts — engine simulation (already inside the grid)
 and the backbone trunk over all leaves — happen ONCE here at construction. Each solver iteration
@@ -26,8 +25,9 @@ tests, useful only as a contrast arm).
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -40,7 +40,7 @@ def _posterior_features(post_own: Array, k_index: int) -> Array:
     """Four concentration features of an own-side posterior column: [normalized entropy, mass on
     this candidate, top-1 mass, effective-candidate fraction]. Deliberate duplicate of the frozen
     baseline's private helper (fog/search/joint.py `posterior_features_np`) — new code never
-    imports from the frozen module, and this §18 interim dies with Phase G."""
+    imports from the frozen module; this interim remains a controlled comparison only."""
     p = np.asarray(post_own, dtype=np.float64)
     k = len(p)
     nz = p[p > 0]
@@ -79,7 +79,7 @@ def make_grid_values(
     leaf's action pair — recomputed from the CURRENT strategies every call, which is exactly the
     coupling channel (§5.1: same cached leaf, different iteration, different belief).
 
-    `fallback_value` fills cells whose simulation failed (Phase F passes the root value, the
+    `fallback_value` fills cells whose simulation failed (the caller passes the root value, the
     baseline's convention). Unavailable cells come out 0 and are masked by the solver.
     """
     import torch
@@ -104,8 +104,8 @@ def make_grid_values(
     for lo in range(0, len(grid.leaf_obs), max_batch_forward):
         chunk = _stack_obs(grid.leaf_obs[lo: lo + max_batch_forward], device)
         with torch.no_grad():
-            s_board, c_dyn = agent.head_inputs(chunk)
-        head_cache.append((s_board, c_dyn, chunk["legality_mask"]))
+            private_state, public_context = agent.head_inputs(chunk)
+        head_cache.append((private_state, public_context, chunk["legality_mask"]))
     stats = GridValueStats(leaves=len(grid.leaf_obs), failed_cells=int(grid.failed.sum()),
                            trunk_forwards=len(head_cache))
 
@@ -133,12 +133,14 @@ def make_grid_values(
                      if len(leaf_kab) else np.zeros((0, posterior_dim), dtype=np.float32))
         values = np.zeros(len(grid.leaf_obs))
         pos = 0
-        for s_board, c_dyn, mask in head_cache:
-            n = s_board.shape[0]
+        for private_state, public_context, mask in head_cache:
+            n = private_state.shape[0]
             pf = (torch.as_tensor(feats[pos: pos + n], device=device)
                   if feats is not None else None)
             with torch.no_grad():
-                _, v = agent.policy_value(s_board, mask, c_dyn, posterior_features=pf)
+                _, v = agent.policy_value(
+                    private_state, mask, public_context, posterior_features=pf
+                )
             values[pos: pos + n] = v.cpu().numpy()
             pos += n
         stats.head_passes += 1

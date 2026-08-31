@@ -21,7 +21,10 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-_BACKBONE_KEYS = ("entities", "entity_ids", "field", "history", "active_idx")
+_BACKBONE_KEYS = (
+    "entities", "entity_ids", "field", "history", "active_idx", "history_len",
+    "history_ids", "history_state",
+)
 
 
 # ------------------------------------------------------------------------------ per-game case studies
@@ -35,7 +38,9 @@ class CaseStudies:
 
     def extend_from_battle(self, battle) -> None:
         my_role = getattr(battle, "player_role", None) or "p1"
-        obs_map = getattr(battle, "observations", None) or {}
+        from fog.encoding.history import observations_by_turn
+
+        obs_map = observations_by_turn(battle)
         events_by_turn = {t: (getattr(o, "events", None) or []) for t, o in obs_map.items()}
 
         from fog.encoding.events import event_mon_key, event_role, to_id
@@ -96,7 +101,9 @@ class CaseStudies:
 
     def report(self) -> dict:
         from fog.eval.leakage_metrics import (
-            choice_lock_reveal_delay, move_reveal_entropy, tera_timing_distribution,
+            choice_lock_reveal_delay,
+            move_reveal_entropy,
+            tera_timing_distribution,
         )
 
         return {
@@ -212,7 +219,7 @@ def readability_curves(probe, batch: dict, minibatch: int = 512) -> dict:
         for start in range(0, n, minibatch):
             idx = torch.arange(start, min(start + minibatch, n), device=turns.device)
             sub = _index_nested(opp_view, idx)
-            mirror = {k: sub[k] for k in _BACKBONE_KEYS}
+            mirror = {k: sub[k] for k in _BACKBONE_KEYS if k in sub and sub[k] is not None}
             per_fam = probe.leakage_ce(mirror, sub["my_view"], per_family=True)
             total = sum(per_fam.values())
             for i, t in enumerate(turns[idx].tolist()):

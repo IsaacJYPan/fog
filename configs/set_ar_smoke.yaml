@@ -5,6 +5,17 @@
 extends: g0_v2_champion.yaml
 
 experiment: set_ar_smoke
+preflight:
+  required: true
+  report: runs/preflight_audit/latest.json
+  min_games: 5
+  schema_version: 5
+  min_replay_dryruns: 10
+  min_replay_hidden_targets: 1
+  match_source: true
+env:
+  # Authoritative mechanics path: persistent in-process Showdown, no server/WebSocket.
+  backend: showdown_direct
 model:
   # The retained G0 exact-search checkpoint has the 4-feature search-era policy/value input.
   # Policy-only rollouts supply zeros, matching that checkpoint's deployment fallback.

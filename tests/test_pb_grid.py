@@ -161,9 +161,9 @@ def test_value_assembly_contract(grid_2x2):
 def test_grid_rejects_decisions_we_do_not_own():
     """A one-sided state the OPPONENT owns (only p2 pending) is not ours to solve — F2 accepts our
     own one-sided decisions but the symmetric opponent-only case stays an error (proposal §10.5)."""
+    from fog.env.engine_battle import EngineBattle
     from fog.search.pb_grid import build_pb_grid
     from fog.search.pb_leaves import commit_pair_branches
-    from fog.env.engine_battle import EngineBattle
 
     b = EngineBattle(ATTACKER, WEAK2, seed=0, battle_tag="pbgrid-onesided")
     draco = next(i for i, m in enumerate(b.active("p1").moves)

@@ -40,6 +40,10 @@ dev = [
 fog-build-constants = "fog.scripts.build_constants:main"
 fog-scrape          = "fog.scripts.scrape_replays:main"
 fog-parse           = "fog.scripts.parse_replays:main"
+fog-collect-teams   = "fog.scripts.collect_team_bank:main"
+fog-train-auto      = "fog.scripts.automated_training:main"
+fog-train-run       = "fog.train:main"
+fog-checkpoint-cleanup = "fog.scripts.checkpoint_cleanup:main"
 
 [tool.setuptools.packages.find]
 include = ["fog*"]
@@ -62,3 +66,5 @@ extend-exclude = ["server"]  # vendored Showdown checkout — not our code
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "--basetemp=.pytest-tmp"
+cache_dir = ".pytest-cache-local"

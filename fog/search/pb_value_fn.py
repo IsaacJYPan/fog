@@ -1,9 +1,8 @@
-"""Phase-G leaf values: the public-belief value network wired into the solver's `values_fn`
-(PROJECT_DESIGN_PROPOSAL.md §9, §10 steps 6-7; PROPOSAL_IMPL_PLAN.md Phase G — OWNER DECISION
-2026-07-16). This is the successor of the interim in fog/search/pb_values.py, which reused the
+"""Posterior-aware leaf values wired into the solver's ``values_fn`` (ARCHITECTURE.md S2).
+This is the successor of the interim in fog/search/pb_values.py, which reused the
 policy's scalar value head with four posterior features.
 
-THE COST STRUCTURE THIS EXISTS TO GET RIGHT (§9.2). Expensive work runs ONCE per decision: the
+Expensive work runs once per decision: the
 backbone trunk over every leaf (shared with the interim path), and the encoding of the K own- and J
 opponent-candidate teams. The value network then produces, per leaf, the full per-pair table
 
@@ -35,8 +34,9 @@ there is no second belief average in the payoff bridge.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -72,8 +72,8 @@ def make_pb_value_grid_values(
 ) -> tuple[Callable[[Array, Array], Array], PBValueStats]:
     """Build `values_fn(sigma1, sigma2) -> u[K, J, A, B]` backed by the public-belief value network.
 
-    `agent` supplies the shared backbone trunk (`head_inputs` -> s_board, c_dyn per leaf); `net` is a
-    `PBValueNet`. `own_tokens [K,6,9]` / `opp_tokens [J,6,9]` are the SAME candidate identities the
+    `agent` supplies the shared trunk (`head_inputs` -> private state and public context per leaf);
+    `PBValueNet`. `own_tokens [K,6,15]` / `opp_tokens [J,6,15]` are the SAME candidate identities the
     grid was built from (proposal §10 shared particles). `rho [K,J]` is the decision's root joint
     belief. `recompute_every = 1` gives the exact single-query reference; larger N trades measured
     drift for speed.
@@ -96,20 +96,20 @@ def make_pb_value_grid_values(
     n_k, n_j = own_t.shape[0], opp_t.shape[0]
 
     # ---- one-time trunk pass over every live leaf (the §19.13 expensive half) ------------------
-    s_board_parts: list = []
-    c_dyn_parts: list = []
+    private_state_parts: list = []
+    public_context_parts: list = []
     trunk_forwards = 0
     for lo in range(0, len(grid.leaf_obs), max_batch_forward):
         chunk = _stack_obs(grid.leaf_obs[lo: lo + max_batch_forward], device)
         with torch.no_grad():
-            s_board, c_dyn = agent.head_inputs(chunk)
-        s_board_parts.append(s_board)
-        c_dyn_parts.append(c_dyn)
+            private_state, public_context = agent.head_inputs(chunk)
+        private_state_parts.append(private_state)
+        public_context_parts.append(public_context)
         trunk_forwards += 1
     n_leaves = len(grid.leaf_obs)
     # widths are irrelevant when empty: every consumer below is guarded by `n_leaves`.
-    s_board_all = torch.cat(s_board_parts, dim=0) if s_board_parts else torch.zeros((0, 0), device=device)
-    c_dyn_all = torch.cat(c_dyn_parts, dim=0) if c_dyn_parts else torch.zeros((0, 0), device=device)
+    private_state_all = torch.cat(private_state_parts, dim=0) if private_state_parts else torch.zeros((0, 0), device=device)
+    public_context_all = torch.cat(public_context_parts, dim=0) if public_context_parts else torch.zeros((0, 0), device=device)
 
     stats = PBValueStats(leaves=n_leaves, failed_cells=int(grid.failed.sum()),
                          trunk_forwards=trunk_forwards)
@@ -122,7 +122,7 @@ def make_pb_value_grid_values(
     if n_leaves and hasattr(net, "prepare") and hasattr(net, "forward_cached"):
         with torch.no_grad():
             prepared = net.prepare(
-                s_board_all, c_dyn_all, own_t, opp_t
+                private_state_all, public_context_all, own_t, opp_t
             )
         stats.representation_forwards = 1
 
@@ -186,7 +186,7 @@ def make_pb_value_grid_values(
                     v = net.forward_cached(chunk, rho_t[lo:hi])
                 else:
                     v = net(
-                        s_board_all[lo:hi], c_dyn_all[lo:hi],
+                        private_state_all[lo:hi], public_context_all[lo:hi],
                         own_t, opp_t, rho_t[lo:hi],
                     )
             out[lo:hi] = v.detach().cpu().numpy()

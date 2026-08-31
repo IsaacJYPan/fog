@@ -1,0 +1,67 @@
+# Joint representation curriculum before policy training.
+#
+# Primary source: high-rated public replays.  These provide realistic state/outcome distributions,
+# but belief labels are censored to facts genuinely revealed later and private-set inputs retain
+# explicit uncertainty provenance.
+#
+# Auxiliary source: authoritative SimpleHeuristics-vs-SimpleHeuristics simulations.  Both actions
+# are scripted, the acting player's submitted set is an exact private input, and the opponent's
+# submitted set is an exact belief label.  Equal batch mixing prevents either source from defining
+# the trunk alone.  Policy supervision is disabled on both sources.
+extends: gen9ou_typed_token_enhanced.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value
+seed: 20261157
+device: cuda
+
+bc:
+  manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_replay_policy_rating1650_v2/holdout_manifest.parquet
+  auxiliary_manifest: runs/gen9ou_simple_belief_value_512_v4/train_manifest.parquet
+  auxiliary_holdout_manifest: runs/gen9ou_simple_belief_value_512_v4/holdout_manifest.parquet
+  auxiliary_every_primary_batches: 1
+  auxiliary_eval_weight: 1.0
+  auxiliary_eval_batches: 0
+  max_primary_batches_per_epoch: 24
+  init_ckpt: runs/gen9ou_typed_token_enhanced_reconstruction_v2/latent_best.pt
+  init_compatible: false
+  scope: belief_value_shared
+  epochs: 16
+  batch_size: 768
+  lr: 2.0e-5
+  lr_final: 2.0e-6
+  shared_lr_scale: 0.10
+  eval_batches: 32
+  early_stopping_patience: 4
+  early_stopping_min_delta: 0.002
+  streaming: true
+  shard_buffer: 16
+
+loss:
+  action_coef: 0.0
+  # The raw belief objectives are numerically about6-7x the outcome MSE. These coefficients make
+  # initial trunk pressure comparable instead of letting belief dominate merely by scale.
+  belief_coef: 0.15
+  belief_chain_coef: 0.15
+  value_coef: 1.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+preflight:
+  required: true
+  report: runs/preflight_audit/typed_token_joint_belief_value_v4/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_v4/summary.json
+  min_games: 5
+  min_replay_dryruns: 10
+  min_replay_hidden_targets: 1000
+  min_parsed_replay_games: 5
+  min_parsed_replay_dryruns: 10
+  min_parsed_replay_rows: 200
+  schema_version: 5
+  replay_schema_version: 4
+  match_source: true
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_v1
+  tensorboard: true

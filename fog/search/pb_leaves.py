@@ -1,5 +1,4 @@
-"""Branch leaf play for the two-sided public-belief search (PROPOSAL_IMPL_PLAN Phase B(ii);
-PROJECT_DESIGN_PROPOSAL.md §10 steps 1-5, §10.4, §10.5).
+"""Branch leaf play for the two-sided public-belief search (ARCHITECTURE.md S1–S3).
 
 One cell of the search grid is "our candidate world k, opponent candidate world j, our public
 action a, their public action b". This module commits one such simultaneous action pair on a
@@ -13,7 +12,7 @@ scripted stand-in ever chooses it inside a leaf. (The frozen baseline `fog/searc
 resolves opponent replacements with a reply policy — that is the old one-sided interim's
 semantics, deliberately NOT reproduced here. The value network owns pending-replacement leaves.)
 
-Both action indices come from the solver's enumeration of each side's public labels (the Phase C
+Both action indices come from the solver's enumeration of each side's public labels (the grid
 grid builder), never from a policy or script: the opponent's simultaneous action is a solver
 variable, not a modeled reply (§21.2).
 """

@@ -2,10 +2,16 @@
 mechanics, and the end-to-end engine run."""
 from __future__ import annotations
 
+import shutil
+from pathlib import Path
+
 import numpy as np
 import pytest
 
+from fog.env.engine_battle import HAVE_ENGINE
 from fog.eval.pool_id import GATE_TURN, aggregate_pool_id
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
+
 
 # ------------------------------------------------------------------------------- aggregation
 def test_aggregate_gate_reads_last_decision_by_turn_4():
@@ -23,6 +29,10 @@ def test_aggregate_gate_reads_last_decision_by_turn_4():
     assert r["gate_accuracy"] == pytest.approx(0.5)
     assert not r["gate_passed"]
     assert r["decisions"] == 7 and r["chance"] == pytest.approx(1 / 8)
+    assert r["identifiable_decisions"] == 0
+    assert np.isnan(r["identifiable_top1_accuracy"])
+    assert r["ambiguous_decisions"] == 0
+    assert np.isnan(r["ambiguous_top1_accuracy"])
 
     # curve buckets: turn 9 lands in t9, turns >=10 merge into 10+
     records += [(0, 15, True)]
@@ -38,11 +48,41 @@ def test_aggregate_no_gate_games_is_not_a_pass():
     assert not r["gate_passed"]
 
 
-# ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE  # noqa: E402
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP  # noqa: E402
+def test_aggregate_reports_uniquely_identifiable_subset():
+    records = [
+        (0, 2, True, 1),
+        (0, 3, False, 1),
+        (1, 2, False, 4),
+    ]
+    r = aggregate_pool_id(records, games=2, failed=0, pool_size=8)
+    assert r["identifiable_decisions"] == 2
+    assert r["identifiable_top1_accuracy"] == pytest.approx(0.5)
+    assert r["ambiguous_decisions"] == 1
+    assert r["ambiguous_top1_accuracy"] == 0.0
+    assert r["ambiguous_uniform_accuracy"] == pytest.approx(0.25)
+    assert r["ambiguous_excess_accuracy"] == pytest.approx(-0.25)
 
+
+def test_aggregate_reports_ambiguous_candidate_collapse():
+    records = [
+        (0, 1, True, 4, 2, 2),
+        (0, 2, False, 3, 2, 0),
+        (1, 1, False, 8, 5, 0),
+    ]
+    r = aggregate_pool_id(records, games=2, failed=0, pool_size=8)
+    assert r["ambiguous_prediction_counts"]["0"] == 2
+    assert r["ambiguous_prediction_counts"]["2"] == 1
+    assert r["ambiguous_true_counts"]["2"] == 2
+    assert r["ambiguous_true_counts"]["5"] == 1
+
+
+# ------------------------------------------------------------------------------- engine-backed
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
+showdown_direct = pytest.mark.skipif(
+    shutil.which("node") is None
+    or not (Path(__file__).parents[1] / "server" / "pokemon-showdown" / "dist").is_dir(),
+    reason="requires Node and the pinned built Pokemon Showdown",
+)
 
 
 @pytest.fixture(scope="module")
@@ -149,11 +189,11 @@ def test_pool_id_joint_and_order_sensitivity(agent):
 def test_slot_order_guard_fires_on_shuffled_paste():
     from fog.env.team_truth import assert_uniform_slot_order
 
-    a = np.full((6, 9), -1, dtype=np.int64)
+    a = np.full((6, 15), -1, dtype=np.int64)
     a[:, 0] = [1, 2, 3, 4, 5, 6]
     b = a.copy()
     b[:, 0] = [2, 1, 3, 4, 5, 6]  # same species multiset, different slot order
-    c = np.full((6, 9), -1, dtype=np.int64)
+    c = np.full((6, 15), -1, dtype=np.int64)
     c[:, 0] = [7, 8, 9, 10, 11, 12]  # distinct multiset: exempt
     assert_uniform_slot_order(np.stack([a, a, c]))  # must not raise
     with pytest.raises(ValueError, match="different slot orders"):
@@ -170,3 +210,23 @@ def test_run_pool_id_end_to_end(agent):
     assert report["curve_by_turn"], "at least one turn bucket must be populated"
     assert all(0.0 <= v <= 1.0 for v in report["curve_by_turn"].values())
     assert isinstance(report["gate_passed"], bool)
+
+
+@showdown_direct
+def test_run_pool_id_direct_end_to_end(agent):
+    from fog.env.teams import load_pool
+    from fog.eval.pool_id import run_pool_id_direct
+
+    report = run_pool_id_direct(
+        agent,
+        load_pool("data/teams/pool_a"),
+        games=1,
+        seed=7,
+        max_turns=2,
+        os_sample=0,
+        score_orders=1,
+        showdown_root="server/pokemon-showdown",
+    )
+    assert report["backend"] == "showdown_direct"
+    assert report["games"] == 1 and report["failed_games"] == 0
+    assert report["decisions"] > 0

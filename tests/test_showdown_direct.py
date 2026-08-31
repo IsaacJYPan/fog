@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import os
 import shutil
 from fractions import Fraction
 from pathlib import Path
@@ -17,7 +18,9 @@ from fog.env.showdown_direct import (
 from fog.env.showdown_local import LocalShowdownBattle
 from fog.env.showdown_local_runner import play_local_battle
 
-
+EXPLICIT_NODE = os.environ.get("FOG_NODE_BINARY")
+if EXPLICIT_NODE:
+    os.environ["PATH"] = str(Path(EXPLICIT_NODE).resolve().parent) + os.pathsep + os.environ["PATH"]
 SHOWDOWN_BUILT = (DEFAULT_SHOWDOWN_ROOT / "dist" / "sim" / "index.js").is_file()
 pytestmark = pytest.mark.skipif(
     shutil.which("node") is None or not SHOWDOWN_BUILT,
@@ -187,6 +190,46 @@ def test_persistent_session_runs_a_battle_without_a_server() -> None:
     assert any(line.startswith("|move|") for line in final.messages["p1"])
 
 
+def test_persistent_session_returns_updated_request_for_hidden_trap_retry() -> None:
+    bench = {
+        "species": "Celebi",
+        "ability": "Natural Cure",
+        "item": "Leftovers",
+        "moves": ["Splash"],
+        "nature": "Serious",
+        "level": 100,
+    }
+    gothitelle = {
+        "species": "Gothitelle",
+        "ability": "Shadow Tag",
+        "item": "Leftovers",
+        "moves": ["Splash"],
+        "nature": "Serious",
+        "level": 100,
+    }
+    options = {
+        "formatid": "gen9customgame@@@!teampreview",
+        "seed": f"sodium,{'8' * 64}",
+        "strictChoices": True,
+        "p1": {"name": "Alpha", "team": [_mew("Splash"), bench]},
+        "p2": {"name": "Beta", "team": [gothitelle, _mew("Splash")]},
+    }
+    with ShowdownDirectClient() as client:
+        session_id, initial = client.create_session(options)
+        assert initial.requests["p1"]["active"][0].get("maybeTrapped") is True
+
+        rejected = client.step_session(session_id, ("switch 2", "move splash"))
+        assert "trapped" in rejected.choice_errors["p1"].lower()
+        assert rejected.requests["p1"]["active"][0]["trapped"] is True
+        assert rejected.turn == initial.turn
+
+        accepted = client.step_session(session_id, ("move splash", "move splash"))
+        client.close_session(session_id)
+
+    assert accepted.choice_errors == {}
+    assert accepted.turn == initial.turn + 1
+
+
 def test_exact_leaves_expose_common_and_private_channels() -> None:
     with ShowdownDirectClient() as client:
         root = _root(client, "Tackle")
@@ -239,8 +282,10 @@ def test_local_battle_reuses_poke_env_censored_views() -> None:
         "p1": {"name": "Alpha", "team": [_mew("Final Gambit")]},
         "p2": {"name": "Beta", "team": [_mew("Final Gambit")]},
     }
-    with ShowdownDirectClient() as client:
-        with LocalShowdownBattle.create(client, options) as battle:
+    with (
+        ShowdownDirectClient() as client,
+        LocalShowdownBattle.create(client, options) as battle,
+    ):
             assert battle.p1.player_role == "p1"
             assert battle.p2.player_role == "p2"
             assert [move.id for move in battle.p1.available_moves] == ["finalgambit"]
@@ -254,6 +299,49 @@ def test_local_battle_reuses_poke_env_censored_views() -> None:
             assert battle.p1.finished is True
             assert battle.p2.finished is True
             assert battle.p1.won is not battle.p2.won or battle.p1.won is None
+
+
+def test_direct_two_sided_solver_uses_authoritative_action_and_chance_axes() -> None:
+    import types
+
+    import numpy as np
+    import torch
+    from torch import nn
+
+    from fog.search.direct_two_sided import direct_two_sided_action
+
+    class ConstantValue(nn.Module):
+        def __init__(self) -> None:
+            super().__init__()
+            self.marker = nn.Parameter(torch.zeros(()))
+
+        def forward(self, batch):
+            count = batch["entities"].shape[0]
+            return types.SimpleNamespace(value=torch.zeros(count, device=self.marker.device))
+
+    mon = {**_mew("Tackle"), "moves": ["Tackle", "Splash"]}
+    options = {
+        "formatid": "gen9customgame@@@!teampreview",
+        "seed": f"sodium,{'8' * 64}",
+        "strictChoices": True,
+        "p1": {"name": "Alpha", "team": [mon]},
+        "p2": {"name": "Beta", "team": [mon]},
+    }
+    with (
+        ShowdownDirectClient() as client,
+        LocalShowdownBattle.create(client, options) as battle,
+    ):
+        result = direct_two_sided_action(
+            ConstantValue(), battle.p1, role="p1", device=torch.device("cpu"), iters=8
+        )
+
+    assert result.payoff.shape[:2] == (1, 1)
+    assert result.payoff.shape[2] >= 2
+    assert result.payoff.shape[3] >= 2
+    assert result.simulations == result.payoff.shape[2] * result.payoff.shape[3]
+    assert result.chance_branches >= result.simulations
+    assert result.action_dist.sum() == pytest.approx(1.0)
+    assert result.action in np.flatnonzero(result.action_dist)
 
 
 def test_local_runner_completes_without_network_players() -> None:
@@ -374,5 +462,50 @@ def test_showdown_direct_training_backend_smoke(tmp_path) -> None:
     metrics = train(cfg)
 
     assert metrics["decisions"] >= 2
+    assert math.isfinite(metrics["loss"])
+    assert (tmp_path / "run" / "checkpoints" / "ppo_final.pt").is_file()
+
+
+def test_showdown_direct_training_backend_process_workers(tmp_path) -> None:
+    from fog.training.ppo import train
+
+    pool = tmp_path / "pool"
+    pool.mkdir()
+    (pool / "mew.txt").write_text(
+        "Mew @ Leftovers\n"
+        "Ability: Synchronize\n"
+        "Tera Type: Psychic\n"
+        "Timid Nature\n"
+        "- Final Gambit\n",
+        encoding="utf-8",
+    )
+    cfg = {
+        "seed": 7,
+        "device": "cpu",
+        "env": {
+            "backend": "showdown_direct",
+            "battle_format": "gen9customgame@@@!teampreview",
+            "team_pool": str(pool),
+            "rollout_workers": 2,
+            "rollout_worker_mode": "process",
+            "actor_threads": 1,
+            "rollout_worker_timeout": 60,
+        },
+        "ppo": {
+            # Two one-decision batches force persistent workers to survive an optimizer step and
+            # consume the in-place shared actor refresh before collecting again.
+            "total_decisions": 4,
+            "batch_decisions": 2,
+            "games_per_chunk": 2,
+            "epochs": 1,
+            "minibatch_size": 1,
+        },
+        "league": {"scripted": ["MaxDamage"], "snapshot_every_decisions": 100},
+        "log": {"dir": str(tmp_path / "run")},
+    }
+
+    metrics = train(cfg)
+
+    assert metrics["decisions"] >= 4
     assert math.isfinite(metrics["loss"])
     assert (tmp_path / "run" / "checkpoints" / "ppo_final.pt").is_file()

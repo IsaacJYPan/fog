@@ -69,6 +69,7 @@ def load_showdown_data(showdown_root: Path) -> dict[str, Any]:
         capture_output=True,
         text=True,
         encoding="utf-8",
+        check=False,
     )
     if proc.returncode != 0:
         raise RuntimeError(f"dump-dex.cjs failed:\n{proc.stderr}")
@@ -134,9 +135,8 @@ def build_species_table(
     for sid, entry in dex["pokedex"].items():
         if entry.get("isNonstandard") or entry.get("num", 0) <= 0:
             continue
-        if shares:
-            if shares.get(sid, 0.0) < SPECIES_USAGE_CUT and sid not in extra:
-                continue
+        if shares and shares.get(sid, 0.0) < SPECIES_USAGE_CUT and sid not in extra:
+            continue
         ids.append(sid)
     ids.sort()
 

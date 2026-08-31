@@ -19,7 +19,7 @@ def _duck_obs(n_actions: int = 14):
         history=np.zeros((2, 7), dtype=np.float32),
         active_idx=np.array([0, 6], dtype=np.int64),
         legality_mask=np.ones(n_actions, dtype=bool),
-        opp_revealed={"tokens": np.full((6, 9), -1, dtype=np.int64), "masks": {}},
+        opp_revealed={"tokens": np.full((6, 15), -1, dtype=np.int64), "masks": {}},
     )
 
 

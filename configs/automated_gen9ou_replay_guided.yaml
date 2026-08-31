@@ -1,0 +1,62 @@
+version: 1
+name: gen9ou_replay_guided_automatic
+output_dir: runs/gen9ou_replay_guided_automatic
+base_config: runs/gen9ou_replay_guided_selfplay_240k_2_prepared/config.yaml
+initial_checkpoint: runs/gen9ou_replay_guided_selfplay_240k_2/checkpoints/ppo_240044.pt
+
+training:
+  blocks: 4
+  decisions_per_block: 240000
+  batch_decisions: 24000
+  checkpoint_every_decisions: 24000
+  minibatch_size: 1536
+  epochs: 1
+  lr: 3.0e-5
+  clip: 0.05
+  seed: 20261100
+  tensorboard: true
+
+evaluation:
+  enabled: true
+  pool: data/teams/gen9ou_public_v1/validation.json
+  opponents: [simpleheuristics, maxdamage]
+  head_to_head: true
+  games: 64
+  seed: 20261200
+  format: gen9ou
+  device: cuda
+  max_turns: 120
+  progress_every: 4
+  # This only writes a recommendation into pipeline_state.json. It does not silently change the
+  # visible-battle model.
+  viewer_min_head_to_head: 0.53
+  viewer_max_benchmark_regression: 0.03
+  # A single weak result is logged but training continues. Two weak blocks in a row trigger a
+  # fallback to one of the two retained backups.
+  deterioration_head_to_head_below: 0.47
+  deterioration_benchmark_regression: 0.03
+
+retention:
+  backup_checkpoints: 2
+  keep_numbered_per_block: 2
+  prune_numbered_after_evaluation: true
+  maximum_fallback_uses: 2
+  larger_evaluation_games: 256
+
+# If source or training configuration changes between long blocks, rerun both zero-update
+# safety checks and require them to pass before the next model is loaded.
+safety:
+  auto_refresh: true
+  games: 5
+  device: cuda
+  replay_audit_config: runs/gen9ou_public_action_start_prepared/replay_audit_config.yaml
+
+# These are applied after resolving base_config, which makes the job file the single place
+# to make intentional experiment changes.
+overrides:
+  preflight.report: runs/preflight_audit/automated_replay_guided_v2/summary.json
+  preflight.replay_report: runs/replay_preflight_audit/automated_replay_guided_v2/summary.json
+  ppo.rollout_tera_logit_bonus: 0.0
+  league.latest_frac: 0.50
+  league.past_frac: 0.50
+  league.scripted_frac: 0.0

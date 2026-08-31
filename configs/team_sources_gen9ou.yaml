@@ -1,0 +1,46 @@
+# Explicit allowlist for the public Gen 9 OU team-bank collector.
+#
+# Tournament/resource threads contribute only exact Pokepaste links that their authors chose to
+# publish. Replays are evidence metadata, never a source for guessing hidden sets. Older pastes are
+# harmless to discovery: the pinned current Showdown validator rejects obsolete/illegal teams.
+#
+# RMT index pages are only a discovery queue. Titles must claim >=1850 Elo, top 200, >=80 GXE, or
+# OLT qualification; the collector then scores replay/evidence signals and still requires a complete
+# legal paste. Keep RMT-derived teams distinguishable in manifest.json for later manual review.
+sources:
+  - name: current_ou_samples
+    kind: resource
+    url: https://www.smogon.com/forums/threads/sv-ou-sample-teams-new-samples-added-post-spl-and-tera-blast-ban.3712513/
+    max_pages: 1
+    base_quality: 90
+    ruleset_epoch: "2026-06-current"
+    stop_marker: "Sample Teams Change Log"
+
+  - name: spl_xvii_ou
+    kind: tournament
+    url: https://www.smogon.com/forums/threads/spl-xvii-ou-discussion-thread.3775874/
+    max_pages: 1
+    base_quality: 80
+    ruleset_epoch: "2026-pre-tera-blast-ban"
+
+  - name: wcop_2025_sv_ou
+    kind: tournament
+    url: https://www.smogon.com/forums/threads/world-cup-of-pokemon-2025-sv-ou-discussion.3764281/
+    max_pages: 1
+    base_quality: 75
+    ruleset_epoch: "2025-pre-tera-blast-ban"
+
+  - name: olt_xii
+    kind: tournament
+    url: https://www.smogon.com/forums/threads/the-official-olt-xii-discussion-thread.3768814/
+    max_pages: 1
+    base_quality: 75
+    ruleset_epoch: "2025-pre-tera-blast-ban"
+
+  - name: sv_ou_high_ladder_rmt
+    kind: rmt_forum
+    url: https://www.smogon.com/forums/forums/sv-ou-teams.748/
+    max_pages: 44
+    base_quality: 20
+    min_claimed_elo: 1850
+    ruleset_epoch: "mixed-review-required"

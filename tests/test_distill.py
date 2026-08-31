@@ -68,7 +68,7 @@ def _fake_log(agent, n_games=6, rows_per_game=8, seed=0):
     dist[np.arange(n), target] = 0.9
     for a in (0, 1, 8):
         dist[:, a] += 0.1 / 3
-    tokens = np.full((n, 6, 9), -1, dtype=np.int64)
+    tokens = np.full((n, 6, 15), -1, dtype=np.int64)
     tokens[:, :, 0] = rng.integers(0, n_species, (n, 6))
     return {
         "entities": rng.normal(size=(n, 12, ENTITY_RAW_DIM)).astype(np.float32),

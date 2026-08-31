@@ -5,19 +5,27 @@ __pycache__/
 *.egg-info/
 .mypy_cache/
 .pytest_cache/
+.pytest-tmp*/
+.pytest-cache-local/
+.test-runs/
 .ruff_cache/
 .uv-cache/
 .test_tmp*/
+.pytest_tmp*/
+/.tools/
 
 # Data artifacts (immutable raw + regenerable derived) — regenerate from pinned sources
 data/raw_replays/*
 data/parsed/*
 data/usage/*
+data/team_bank_cache/
 !data/**/.gitkeep
 
 # Team pools: the hand-built PASTES are irreplaceable experiment definitions — TRACKED.
 # Only the derived packaged banks (regenerable via fog.scripts.build_team_pools) stay out.
 data/teams/*.json
+data/teams/public_*/
+data/teams/gen9ou_public_v*/
 # ... except the generative bank's package: its _meta IS the provenance record (seed, mass cut,
 # core, per-slot entropy report) for the committed pool_gen pastes.
 !data/teams/pool_gen.json
@@ -32,6 +40,7 @@ data/teams/*.json
 # Training artifacts
 runs/
 /checkpoints/
+/artifacts/*.zip
 *.ckpt
 *.pt
 !artifacts/checkpoints/*.pt
@@ -44,7 +53,11 @@ course/
 .idea/
 .vscode/
 
-# Root documentation is tracked explicitly.
+# Track maintained project documentation explicitly.
 /*.md
 !/README.md
+!/KAGGLE_TRAINING.md
+!/ARCHITECTURE.md
+!/TECHNICAL_DEBT.md
+!/HIGH_LEVEL_TRAINING_PLAN.md
 server/README.md

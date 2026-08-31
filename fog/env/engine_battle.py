@@ -116,7 +116,7 @@ def parse_paste(paste: str) -> list:
     return _T().parse_showdown_team(paste)[:N_SLOTS]
 
 
-def build_engine_pokemon(mon: Any, tables) -> "pe.Pokemon":
+def build_engine_pokemon(mon: Any, tables) -> pe.Pokemon:
     """TeambuilderPokemon -> pe.Pokemon with REAL computed stats/types/weight (module docstring)."""
     _require_engine()
     from fog.constants.build_spreads import nature_modified_stats
@@ -158,7 +158,7 @@ def build_engine_pokemon(mon: Any, tables) -> "pe.Pokemon":
     )
 
 
-def _rebuild_pokemon(mon: Any, **overrides: Any) -> "pe.Pokemon":
+def _rebuild_pokemon(mon: Any, **overrides: Any) -> pe.Pokemon:
     """Copy one engine Pokemon while replacing explicitly named fields.
 
     poke-engine's exposed state objects are immutable. Small adapter-level fidelity corrections
@@ -186,10 +186,13 @@ def _rebuild_pokemon(mon: Any, **overrides: Any) -> "pe.Pokemon":
         "sleep_turns": int(mon.sleep_turns),
         "weight_kg": float(mon.weight_kg),
         "moves": [pe.Move(id=str(m.id), pp=int(m.pp), disabled=bool(m.disabled)) for m in mon.moves],
-        "mega_evolved": bool(mon.mega_evolved),
         "terastallized": bool(mon.terastallized),
         "tera_type": str(mon.tera_type),
     }
+    # Older poke-engine builds exposed this Gen-6/7-only constructor field; current Gen 9 builds
+    # omit it entirely. Mirror the installed API instead of passing an unsupported keyword.
+    if hasattr(mon, "mega_evolved"):
+        values["mega_evolved"] = bool(mon.mega_evolved)
     values.update(overrides)
     return pe.Pokemon(**values)
 
@@ -207,9 +210,17 @@ def _species_id_from_token(idx: int, tables) -> str:
 
 
 def _decode_world_slot(row: np.ndarray, level: int, tables) -> SimpleNamespace:
-    """One [9] belief token row (SLOT_ATTRS order) -> a TeambuilderPokemon-shaped namespace for
-    `build_engine_pokemon`. Spread cluster supplies nature+EVs; sentinel items map to no item."""
-    from fog.constants.schema import NO_ITEM, OTHER_ITEM, TYPES, UNKNOWN_ITEM
+    """One [15] belief row -> a TeambuilderPokemon-shaped native nature/EV set."""
+    from fog.constants.schema import (
+        NATURES,
+        NO_ITEM,
+        OTHER_ITEM,
+        SET_EV_COLS,
+        SET_NATURE_COL,
+        SET_TERA_COL,
+        TYPES,
+        UNKNOWN_ITEM,
+    )
 
     sid = _species_id_from_token(row[0], tables)
 
@@ -230,14 +241,21 @@ def _decode_world_slot(row: np.ndarray, level: int, tables) -> SimpleNamespace:
             if mid not in moves:
                 moves.append(mid)
 
-    clusters = (tables.spreads.get("species", {}) or {}).get(sid, [])
-    c = clusters[int(row[7])] if 0 <= int(row[7]) < len(clusters) else (
-        clusters[0] if clusters else None
+    nature = (
+        NATURES[int(row[SET_NATURE_COL])]
+        if 0 <= int(row[SET_NATURE_COL]) < len(NATURES)
+        else "serious"
     )
-    nature = (c or {}).get("nature", "serious")
-    evs = list((c or {}).get("evs", [0] * 6))
+    evs = [
+        4 * int(row[col]) if 0 <= int(row[col]) < 64 else 0
+        for col in SET_EV_COLS
+    ]
 
-    tera = TYPES[int(row[8])] if 0 <= int(row[8]) < len(TYPES) else "normal"
+    tera = (
+        TYPES[int(row[SET_TERA_COL])]
+        if 0 <= int(row[SET_TERA_COL]) < len(TYPES)
+        else "normal"
+    )
     return SimpleNamespace(
         species=sid, nickname=None, level=level, evs=evs, ivs=None,
         nature=nature, ability=ability, item=item, moves=moves, tera_type=tera,
@@ -246,7 +264,7 @@ def _decode_world_slot(row: np.ndarray, level: int, tables) -> SimpleNamespace:
 
 def _world_engine_mon(
     row: np.ndarray, src: Any, tables, *, current_item_known: bool = False
-) -> "pe.Pokemon":
+) -> pe.Pokemon:
     """Rebuild one opponent mon from a sampled token row, overlaying `src`'s PUBLIC board state
     (HP fraction, status, sleep/rest turns, terastallized). Hidden attributes come exclusively
     from the sample — never from `src`.
@@ -268,7 +286,7 @@ def _world_engine_mon(
         for m in base.moves
     ]
     frac = (src.hp / src.maxhp) if src.maxhp else 0.0
-    hp = int(round(frac * base.maxhp))
+    hp = round(frac * base.maxhp)
     hp = max(1, hp) if src.hp > 0 else 0
     tera_now = bool(src.terastallized)
     base_types = tuple(str(t) for t in base.types)
@@ -287,27 +305,27 @@ def _world_engine_mon(
     )
 
 
-def _rebuild_side(side: Any, mons: list, **overrides: Any) -> "pe.Side":
+def _rebuild_side(side: Any, mons: list, **overrides: Any) -> pe.Side:
     """New pe.Side with `mons` and every public side attribute copied from `side`."""
-    values = dict(
-        pokemon=mons,
-        active_index=str(side.active_index),
-        attack_boost=int(side.attack_boost), defense_boost=int(side.defense_boost),
-        special_attack_boost=int(side.special_attack_boost),
-        special_defense_boost=int(side.special_defense_boost),
-        speed_boost=int(side.speed_boost),
-        accuracy_boost=int(side.accuracy_boost), evasion_boost=int(side.evasion_boost),
-        side_conditions=side.side_conditions,
-        volatile_statuses={str(v) for v in (side.volatile_statuses or ())},
-        volatile_status_durations=side.volatile_status_durations,
-        substitute_health=int(side.substitute_health or 0),
-        force_switch=bool(side.force_switch), force_trapped=bool(side.force_trapped),
-        baton_passing=bool(side.baton_passing), shed_tailing=bool(side.shed_tailing),
-        slow_uturn_move=bool(side.slow_uturn_move),
-        wish=side.wish, future_sight=side.future_sight,
-        last_used_move=str(side.last_used_move),
-        switch_out_move_second_saved_move=str(side.switch_out_move_second_saved_move),
-    )
+    values = {
+        "pokemon": mons,
+        "active_index": str(side.active_index),
+        "attack_boost": int(side.attack_boost), "defense_boost": int(side.defense_boost),
+        "special_attack_boost": int(side.special_attack_boost),
+        "special_defense_boost": int(side.special_defense_boost),
+        "speed_boost": int(side.speed_boost),
+        "accuracy_boost": int(side.accuracy_boost), "evasion_boost": int(side.evasion_boost),
+        "side_conditions": side.side_conditions,
+        "volatile_statuses": {str(v) for v in (side.volatile_statuses or ())},
+        "volatile_status_durations": side.volatile_status_durations,
+        "substitute_health": int(side.substitute_health or 0),
+        "force_switch": bool(side.force_switch), "force_trapped": bool(side.force_trapped),
+        "baton_passing": bool(side.baton_passing), "shed_tailing": bool(side.shed_tailing),
+        "slow_uturn_move": bool(side.slow_uturn_move),
+        "wish": side.wish, "future_sight": side.future_sight,
+        "last_used_move": str(side.last_used_move),
+        "switch_out_move_second_saved_move": str(side.switch_out_move_second_saved_move),
+    }
     values.update(overrides)
     return pe.Side(**values)
 
@@ -392,7 +410,7 @@ class EngineView:
     uses. The opponent's team is censored from THAT side's recorded reveals (never engine truth).
     """
 
-    def __init__(self, battle: "EngineBattle", role: str):
+    def __init__(self, battle: EngineBattle, role: str):
         self.player_role = role
         self.battle_tag = battle.battle_tag
         self.turn = battle.turn
@@ -785,19 +803,19 @@ class EngineBattle:
         return str(target.id)
 
     def truth_tokens(self, role: str) -> np.ndarray:
-        """[6,9] full-truth tokens for `role`'s team (paste order = view slot order)."""
+        """[6,15] full-truth tokens for `role`'s team (paste order = view slot order)."""
         from fog.env.team_truth import truth_tokens_from_paste
 
         return truth_tokens_from_paste(self._pastes[role], self.tables)
 
     # ------------------------------------------------------------------------- search-world fork
-    def fork_for_search(self, role: str, world_tokens: np.ndarray, *, seed: int = 0) -> "EngineBattle":
+    def fork_for_search(self, role: str, world_tokens: np.ndarray, *, seed: int = 0) -> EngineBattle:
         """A disposable copy of this battle with the opponent's HIDDEN attributes replaced by one
-        sampled belief world (search §8). `role` is the searcher; `world_tokens` is one [6,9] row-
+        sampled belief world (search §8). `role` is the searcher; `world_tokens` is one [6,15] row-
         per-slot sample from BeliefModel.sample_team (paste/preview slot order).
 
-        The sampled world supplies exactly what `role` cannot see (item, ability, moves, spread,
-        tera); everything public stays real: HP fraction, status, boosts, volatiles, hazards,
+        The sampled world supplies exactly what `role` cannot see (item, ability, moves, nature,
+        EVs, Tera); everything public stays real: HP fraction, status, boosts, volatiles, hazards,
         weather/terrain, active mons, and `role`'s own side (deep-cloned engine truth). Trackers
         and the reveal census are deep-copied so leaf observations keep real history and honest
         censoring — the searcher's leaf view NEVER sees engine truth, only root reveals plus
@@ -817,8 +835,8 @@ class EngineBattle:
         return self._fork_worlds({opp_role: world_tokens}, seed=seed)
 
     def fork_for_own_world(self, role: str, world_tokens: np.ndarray, *, seed: int = 0,
-                           opp_world_tokens: np.ndarray | None = None) -> "EngineBattle":
-        """The mirror of `fork_for_search` for joint search (SEARCH_PLAN §4.1): a disposable copy
+                           opp_world_tokens: np.ndarray | None = None) -> EngineBattle:
+        """The mirror of `fork_for_search` for legacy joint search (ARCHITECTURE.md S6): a disposable copy
         with `role`'s OWN hidden attributes replaced by one own-world sample — a team the OPPONENT
         considers possible for `role`. Public board state (HP fraction, status, boosts, tera state,
         disabled moves) stays real, exactly as in `fork_for_search`; only the sheet-hidden
@@ -826,27 +844,27 @@ class EngineBattle:
         opponent's hidden attributes (the searcher doesn't know THEIR team either — two-sided
         worlds, one fork).
 
-        Own-world fidelity notes (uniform across worlds, so cross-world value comparisons share
-        the bias): the world's spread cluster replaces `role`'s exact EVs even for the true-state
-        world (nearest-cluster stats), and a consumed item is restored to the world's sheet item
-        (same approximation `fork_for_search` makes for the opponent). `truth_tokens(role)` on the
-        fork still returns the REAL paste — never call it on a fork.
+        The world's native nature/EV values determine its exact effective submitted stats. Publicly
+        observed item changes remain current-state facts and override the sampled original item.
+        `truth_tokens(role)` on the fork still returns the REAL paste — never call it on a fork.
         """
         replace = {role: world_tokens}
         if opp_world_tokens is not None:
             replace["p2" if role == "p1" else "p1"] = opp_world_tokens
         return self._fork_worlds(replace, seed=seed)
 
-    def _fork_worlds(self, replace: dict[str, np.ndarray], *, seed: int) -> "EngineBattle":
-        """Shared fork body: rebuild the sides named in `replace` from [6,9] world tokens, keep
+    def _fork_worlds(self, replace: dict[str, np.ndarray], *, seed: int) -> EngineBattle:
+        """Shared fork body: rebuild the sides named in `replace` from [6,15] world tokens, keep
         every other side's engine truth (safe to reuse — the engine never mutates states)."""
         _require_engine()
+        from fog.constants.schema import SET_N_ATTRS
+
         if self.finished:
             raise RuntimeError("cannot fork a finished battle")
         worlds = {r: np.asarray(w, dtype=np.int64) for r, w in replace.items()}
         for r, w in worlds.items():
-            if w.shape != (N_SLOTS, 9):
-                raise ValueError(f"world_tokens for {r} must be [6,9], got {w.shape}")
+            if w.shape != (N_SLOTS, SET_N_ATTRS):
+                raise ValueError(f"world_tokens for {r} must be [6,{SET_N_ATTRS}], got {w.shape}")
 
         # NOT a to_string/from_string round-trip: serialization uppercases every id, which would
         # desync the fork from to_id()-lowercased tables/views. Attribute reads keep ids intact.
@@ -890,7 +908,7 @@ class EngineBattle:
         return new_mons
 
     def _world_species_list(self, world_tokens: np.ndarray) -> list[str]:
-        """Preview species list for a world ([6,9] tokens). Empty/sentinel slots (short teams,
+        """Preview species list for a world ([6,15] tokens). Empty/sentinel slots (short teams,
         <RARE_SPECIES>) contribute no preview name."""
         species_ids = self.tables.species["ids"]
         return [
@@ -904,7 +922,7 @@ class EngineBattle:
     def _from_reconstruction(
         cls, state, *, role: str, tables, tracker, revealed: dict, paste_species: dict,
         turn: int, tera_used: dict, field_start: dict, seed: int = 0,
-    ) -> "EngineBattle":
+    ) -> EngineBattle:
         """Wrap an externally-reconstructed engine `state` (state_recon: a Showdown position + one
         belief world) as a steppable EngineBattle from `role`'s perspective. NO pastes are attached
         — `truth_tokens` must never be called (the opponent side is a sample, not truth). `tracker`
@@ -937,7 +955,7 @@ class EngineBattle:
         self.state = state
         return self
 
-    def clone_for_step(self, *, seed: int = 0) -> "EngineBattle":
+    def clone_for_step(self, *, seed: int = 0) -> EngineBattle:
         """A disposable copy that can be stepped one ply without touching `self` — same as
         `fork_for_search` but with the opponent side UNCHANGED (used when the world is already
         baked into `self`, e.g. a Showdown-reconstructed battle). See `_clone_shell`."""
@@ -948,7 +966,7 @@ class EngineBattle:
             self._rebuild_state(self.state.side_one, self.state.side_two), seed=seed
         )
 
-    def _rebuild_state(self, side_one, side_two) -> "pe.State":
+    def _rebuild_state(self, side_one, side_two) -> pe.State:
         return pe.State(
             side_one=side_one, side_two=side_two,
             weather=str(self.state.weather),
@@ -959,7 +977,7 @@ class EngineBattle:
             trick_room_turns_remaining=int(self.state.trick_room_turns_remaining),
         )
 
-    def _clone_shell(self, state, *, seed: int) -> "EngineBattle":
+    def _clone_shell(self, state, *, seed: int) -> EngineBattle:
         """Shared clone body for _fork_worlds / clone_for_step. Trackers use the cheap
         `BattleTracker.clone` (shares read-only history); ledgers are fresh-empty — a leaf
         observation reads censoring from `self.revealed`, never the ledger, so copying the ledger
@@ -1226,7 +1244,7 @@ class EngineBattle:
         not pending passes "none" (filled in automatically when absent). Chance resolves by
         SAMPLING one outcome from the engine's enumerated branch list — the volume-play path.
         Search must use step_branches instead (single-sample cells are interim only,
-        PROJECT_DESIGN_PROPOSAL.md §10.4 / §18)."""
+        ARCHITECTURE.md simulator-authority boundary)."""
         m1, m2, pending = self._resolve_moves(moves)
         pre = self.state
         sets = pe.generate_instructions(pre, m1, m2)
@@ -1243,9 +1261,9 @@ class EngineBattle:
 
     def step_branches(
         self, moves: dict[str, str], *, min_prob: float = 0.0, max_branches: int | None = None,
-    ) -> tuple[list[tuple[float, "EngineBattle"]], float]:
+    ) -> tuple[list[tuple[float, EngineBattle]], float]:
         """Every chance outcome of one decision round, each as its own advanced fork
-        (PROJECT_DESIGN_PROPOSAL.md §10.4: enumerate and branch, never one frozen sample).
+        (enumerate and branch rather than substituting one frozen random sample).
 
         Returns `(branches, pruned_mass)`. `branches` is a list of `(probability, fork)` pairs:
         the engine's enumerated outcomes of committing `moves` (hit/miss, critical or not,
@@ -1436,7 +1454,7 @@ class EngineBattle:
                                    ability_map: dict, new_value: str) -> None:
         """Weather/terrain changed: if a mon that just switched in (this round) owns the matching
         setter ability, that ability is now public."""
-        for r, ev_idx in last_switch_in.items():
+        for r in last_switch_in:
             mon = mons[r][active[r]]
             ability = to_id(mon.ability)
             if ability_map.get(ability) and to_id(ability_map[ability]) == new_value:

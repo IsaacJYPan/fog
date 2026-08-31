@@ -1,0 +1,12 @@
+# Same corpus and capacity as scale2k, with a long enough budget to measure validation plateau.
+extends: set_ar_replay_scale2k.yaml
+
+experiment: set_ar_replay_scale2k_plateau
+bc:
+  epochs: 30
+  eval_batches: 0
+  early_stopping_patience: 5
+  early_stopping_min_delta: 0.02
+
+log:
+  dir: runs/set_ar_replay_scale2k_plateau

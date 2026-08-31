@@ -1,0 +1,26 @@
+# Joint BV curriculum with exact belief truth and an empirical ordered-matchup win probability as
+# the simulator value target. Replays retain real-battle coverage and their observed outcomes;
+# global PCGrad protects both sources. The policy remains frozen.
+extends: gen9ou_typed_token_joint_belief_value_ev_stat_continuation_v3.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_soft_value_v1
+seed: 20261229
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_ev_stat_continuation_v3/checkpoints/bc_best.pt
+  auxiliary_manifest: runs/gen9ou_simple_bv_repeat_train_soft_2048_v1/train_manifest.parquet
+  auxiliary_holdout_manifest: runs/gen9ou_simple_bv_repeat_holdout_soft_1024_v1/holdout_manifest.parquet
+  epochs: 32
+  lr: 2.0e-6
+  lr_final: 2.0e-7
+  shared_lr_scale: 0.1
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.0005
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_soft_value_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_soft_value_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_soft_value_v1
+  tensorboard: true

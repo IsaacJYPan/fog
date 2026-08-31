@@ -705,9 +705,24 @@ function stepSession(request) {
     throw new TypeError("session_step requires choices=[p1_choice, p2_choice]");
   }
   const choices = request.choices.map(normalizeChoice);
-  session.battle.makeChoices(...choices);
+  try {
+    session.battle.makeChoices(...choices);
+  } catch (error) {
+    const detail = String(error?.message || error);
+    if (!detail.startsWith("[Unavailable choice]")) throw error;
+
+    // A normal Showdown client is re-requested when hidden trapping/disabling information makes an
+    // apparently legal choice unavailable. Keep the session alive and expose the updated censored
+    // request so the local player can retry without turning hidden information into a legality leak.
+    const choiceErrors = {};
+    for (const side of session.battle.sides) {
+      if (side.choice?.error) choiceErrors[side.id] = String(side.choice.error);
+    }
+    for (const side of session.battle.sides) side.clearChoice();
+    return {...sessionUpdate(session, request.include_state === true), choice_errors: choiceErrors};
+  }
   session.choiceRounds.push(choices);
-  return sessionUpdate(session, request.include_state === true);
+  return {...sessionUpdate(session, request.include_state === true), choice_errors: {}};
 }
 
 function normalizedPublicLog(battle) {

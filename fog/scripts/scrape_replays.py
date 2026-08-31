@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -33,7 +34,7 @@ def search_page(fmt: str, before: int | None = None) -> list[dict]:
         url += f"&before={before}"
     try:
         return json.loads(_get(url))
-    except Exception as e:  # transient: caller retries next loop
+    except (json.JSONDecodeError, OSError, TimeoutError, urllib.error.URLError) as e:
         print(f"  search error: {type(e).__name__} {e}")
         return []
 
@@ -41,7 +42,7 @@ def search_page(fmt: str, before: int | None = None) -> list[dict]:
 def fetch_replay(replay_id: str) -> dict | None:
     try:
         return json.loads(_get(REPLAY_URL.format(replay_id=replay_id)))
-    except Exception as e:
+    except (json.JSONDecodeError, OSError, TimeoutError, urllib.error.URLError) as e:
         print(f"  fetch error {replay_id}: {type(e).__name__}")
         return None
 

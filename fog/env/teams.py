@@ -120,6 +120,7 @@ def validate_team(paste: str, battle_format: str = "gen9ou") -> tuple[bool, str]
         text=True,
         encoding="utf-8",
         cwd=str(SHOWDOWN_DIR),
+        check=False,
     )
     ok = proc.returncode == 0
     return ok, (proc.stdout + proc.stderr).strip()

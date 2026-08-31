@@ -16,29 +16,46 @@ from __future__ import annotations
 import copy
 
 import torch
-import torch.nn as nn
+from torch import nn
 
-_BACKBONE_KEYS = ("entities", "entity_ids", "field", "history", "active_idx")
+_BACKBONE_KEYS = (
+    "entities", "entity_ids", "field", "history", "active_idx", "history_len",
+    "history_ids", "history_state",
+)
 
 
 def _backbone_kwargs(batch: dict) -> dict:
-    return {k: batch[k] for k in _BACKBONE_KEYS}
+    return {k: batch[k] for k in _BACKBONE_KEYS if k in batch and batch[k] is not None}
 
 
 class FrozenProbe(nn.Module):
     """Φ̂: frozen (backbone + self-belief) pair. Built via `from_agent`; refrozen on the §7 schedule."""
 
-    def __init__(self, backbone: nn.Module, predictor: nn.Module) -> None:
+    def __init__(
+        self, backbone: nn.Module, private_to_belief: nn.Module, predictor: nn.Module
+    ) -> None:
         super().__init__()
         self.backbone = backbone
+        self.private_to_belief = private_to_belief
         self.predictor = predictor
         self.eval()
         for p in self.parameters():
             p.requires_grad_(False)
 
     @classmethod
-    def from_agent(cls, agent) -> "FrozenProbe":
-        return cls(copy.deepcopy(agent.backbone), copy.deepcopy(agent.self_belief))
+    def from_agent(cls, agent) -> FrozenProbe:
+        return cls(
+            copy.deepcopy(agent.backbone),
+            copy.deepcopy(agent.private_to_belief),
+            copy.deepcopy(agent.self_belief),
+        )
+
+    def _belief_context(self, batch: dict) -> torch.Tensor:
+        contexts = self.backbone(**_backbone_kwargs(batch))
+        public_context = self.backbone.fuse_public(
+            contexts.public_state, contexts.history
+        )
+        return public_context + self.private_to_belief(contexts.private_state)
 
     @torch.no_grad()
     def leakage_ce(
@@ -52,9 +69,9 @@ class FrozenProbe(nn.Module):
         """Readability CE of the mirror observation under frozen weights. See
         `SelfBeliefPredictor.leakage_ce` for mask/label/weight semantics. Returns [B] (or a
         per-family dict of [B] when `per_family`)."""
-        _, c_dyn = self.backbone(**_backbone_kwargs(mirror_batch))
+        belief_context = self._belief_context(mirror_batch)
         return self.predictor.leakage_ce(
-            c_dyn, my_view, still_hidden_mask=still_hidden_mask,
+            belief_context, my_view, still_hidden_mask=still_hidden_mask,
             family_weights=family_weights, per_family=per_family,
         )
 
@@ -77,17 +94,27 @@ class TrainableProbe(nn.Module):
         cfg = cfg or {}
         model_cfg = cfg.get("model", {})
         belief_kwargs = (
-            {k: sizes[k] for k in ("n_species", "n_items", "n_abilities", "n_moves", "n_spreads")}
+            {
+                k: sizes[k]
+                for k in (
+                    "n_species", "n_items", "n_abilities", "n_moves",
+                    "n_natures", "n_ev_units",
+                )
+            }
             if sizes
             else {}
         )
         self.backbone = Backbone(cfg.get("encoding", {}) | model_cfg, sizes=sizes)
+        self.private_to_belief = nn.Linear(
+            self.backbone.state_dim, self.backbone.dyn_dim, bias=False
+        )
+        nn.init.zeros_(self.private_to_belief.weight)
         self.predictor = SelfBeliefPredictor(
             state_dim=self.backbone.dyn_dim, d=model_cfg.get("belief_dim", 128), **belief_kwargs
         )
 
     @classmethod
-    def from_agent(cls, agent, cfg: dict | None = None) -> "TrainableProbe":
+    def from_agent(cls, agent, cfg: dict | None = None) -> TrainableProbe:
         """Same sizes as `agent` (built via FogAgent.from_tables or bare), freshly initialized."""
         probe = cls(cfg, sizes=agent.sizes)
         return probe
@@ -99,8 +126,12 @@ class TrainableProbe(nn.Module):
 
         my_view = opp_view_batch["my_view"]
         labels = labels if labels is not None else my_view["labels"]
-        _, c_dyn = self.backbone(**_backbone_kwargs(opp_view_batch))
-        out = self.predictor(c_dyn, my_view)
+        contexts = self.backbone(**_backbone_kwargs(opp_view_batch))
+        public_context = self.backbone.fuse_public(
+            contexts.public_state, contexts.history
+        )
+        belief_context = public_context + self.private_to_belief(contexts.private_state)
+        out = self.predictor(belief_context, my_view)
         valid = {k: (v >= 0) for k, v in labels.items()}
         return belief_loss(out.logits, labels, valid)
 
@@ -113,8 +144,12 @@ class TrainableProbe(nn.Module):
         family_weights: dict[str, float] | None = None,
         per_family: bool = False,
     ):
-        _, c_dyn = self.backbone(**_backbone_kwargs(mirror_batch))
+        contexts = self.backbone(**_backbone_kwargs(mirror_batch))
+        public_context = self.backbone.fuse_public(
+            contexts.public_state, contexts.history
+        )
+        belief_context = public_context + self.private_to_belief(contexts.private_state)
         return self.predictor.leakage_ce(
-            c_dyn, my_view, still_hidden_mask=still_hidden_mask,
+            belief_context, my_view, still_hidden_mask=still_hidden_mask,
             family_weights=family_weights, per_family=per_family,
         )

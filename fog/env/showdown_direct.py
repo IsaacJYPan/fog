@@ -8,12 +8,12 @@ replay, not seed discovery: every finite random request is expanded and carries 
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import threading
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
-
+from typing import Any, Self
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SHOWDOWN_ROOT = PROJECT_ROOT / "server" / "pokemon-showdown"
@@ -33,7 +33,7 @@ class ExactProbability:
     decimal: float
 
     @classmethod
-    def from_json(cls, value: dict[str, Any]) -> "ExactProbability":
+    def from_json(cls, value: dict[str, Any]) -> ExactProbability:
         return cls(
             numerator=int(value["numerator"]),
             denominator=int(value["denominator"]),
@@ -86,6 +86,7 @@ class ShowdownSessionUpdate:
     turn: int
     ended: bool
     winner: str | None
+    choice_errors: dict[str, str]
 
 
 class ShowdownDirectClient:
@@ -103,12 +104,16 @@ class ShowdownDirectClient:
         node_binary: str = "node",
     ) -> None:
         self.showdown_root = Path(showdown_root).resolve()
-        self.node_binary = node_binary
+        self.node_binary = (
+            os.environ.get("FOG_NODE_BINARY", node_binary)
+            if node_binary == "node"
+            else node_binary
+        )
         self._process: subprocess.Popen[str] | None = None
         self._lock = threading.Lock()
         self._next_id = 1
 
-    def start(self) -> "ShowdownDirectClient":
+    def start(self) -> ShowdownDirectClient:
         if self._process is not None:
             return self
         if not (self.showdown_root / "dist" / "sim" / "index.js").is_file():
@@ -157,7 +162,7 @@ class ShowdownDirectClient:
         if process.stderr is not None:
             process.stderr.close()
 
-    def __enter__(self) -> "ShowdownDirectClient":
+    def __enter__(self) -> Self:
         return self.start()
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
@@ -296,6 +301,10 @@ class ShowdownDirectClient:
             turn=int(value["turn"]),
             ended=bool(value["ended"]),
             winner=value.get("winner"),
+            choice_errors={
+                str(role): str(error)
+                for role, error in value.get("choice_errors", {}).items()
+            },
         )
 
     def create_session(

@@ -12,13 +12,13 @@ turning them on is a one-line config change (deliberate — §3.4). The heavy li
     entity's epistemic flags known. Ground truth is supplied by the caller (simulator in self-play,
     the parsed row's uncensored labels where available).
   - `ActionOracleHead`: a small embedding of the opponent's committed action concatenated to
-    `s_board` before the policy head.
+    `private_state` before the policy head.
 """
 from __future__ import annotations
 
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
 
 from fog.constants.schema import N_ACTIONS
 
@@ -26,7 +26,7 @@ from fog.constants.schema import N_ACTIONS
 def apply_set_oracle(opp_revealed: dict, opp_truth_tokens) -> dict:
     """Return an opp_revealed dict with tokens replaced by truth where known (epistemic = known).
 
-    `opp_truth_tokens`: [B,6,9] (or [6,9]) ground-truth opponent tokens, -1 where truth is
+    `opp_truth_tokens`: [B,6,15] (or [6,15]) ground-truth opponent tokens, -1 where truth is
     unavailable (e.g. a decision recorded before the attribute-matcher disambiguated, or a batch row
     without truth). Truth MERGES over the revealed tokens — a -1 truth attribute keeps whatever the
     battle revealed, so "no truth" degrades exactly to the non-oracle input instead of blanking real

@@ -73,6 +73,26 @@ def test_per_battle_state_is_isolated():
     assert "battle-a" not in p._trackers and "battle-b" in p._trackers
 
 
+def test_private_state_truth_provider_is_immutable_tracker_source():
+    from fog.constants.tables import TABLES
+
+    p = FogPlayer(agent=None)
+    battle = _Battle("immutable-private-truth")
+    submitted = np.full((6, 15), -1, dtype=np.int64)
+    species = TABLES.species_index("cinderace")
+    submitted[0, 0] = species
+    submitted[0, 2] = TABLES.ability_index("blaze")
+    p.private_state_truth_provider = lambda _battle: submitted.copy()
+
+    # A temporary in-battle ability change must not replace the submitted private state.
+    battle.team["p1: Mon0"].species = "cinderace"
+    battle.team["p1: Mon0"].ability = "shielddust"
+    _, _, tracker, _ = p._battle_state(battle)
+
+    assert tracker.exact_private_truth[species][2] == TABLES.ability_index("blaze")
+    assert tracker.exact_private_truth[species][2] != TABLES.ability_index("shielddust")
+
+
 def test_teampreview_without_agent_falls_back():
     p = FogPlayer(agent=None)
     assert p.choose_teampreview(_Battle("x")) == "/team 123456"

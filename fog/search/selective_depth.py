@@ -142,7 +142,7 @@ def build_depth2_overrides(
             pair_value = np.einsum(
                 "ka,jb,kjab->kj", solution.sigma1, solution.sigma2, payoff
             )
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - failure is retained in depth statistics
             stats.failures.append(f"leaf {leaf}: {type(exc).__name__}: {exc}"[:240])
             continue
 

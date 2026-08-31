@@ -1,8 +1,8 @@
-"""Belief retraining on the CURRENT agent's self-play — SEARCH_PLAN §7's consistency step.
+"""Belief retraining on the current agent's self-play (ARCHITECTURE.md invariant S4).
 
 Distillation shifts the policy; the belief and self-belief nets still describe the agent that
 played BEFORE distillation, which reintroduces exactly the inconsistency approach A exists to
-kill (SEARCH_PLAN §8 risk 4: "skipping it reintroduces..."). This module closes one generation of
+avoid. This module closes one generation of
 that loop: engine self-play with the agent AS IT NOW PLAYS (both sides), then supervised retrain
 of ONLY the belief + self-belief nets on the recorded truth labels — policy, value, trunk and
 preview untouched, so the agent's play is byte-identical afterward and only its beliefs moved.
@@ -91,7 +91,7 @@ def _belief_ces(agent: Any, batch: dict, *, chunk: int = 512) -> tuple[float, fl
 def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_games: int = 64,
                     epochs: int = 3, lr: float = 1e-4, minibatch_size: int = 1024,
                     engine_batch: int = 32, temperature: float = 1.0, seed: int = 0,
-                    max_grad_norm: float = 0.5) -> dict:
+                    max_grad_norm: float = 0.5, scope: str = "both") -> dict:
     """One consistency-loop generation: collect self-play, retrain belief + self-belief only.
     Mutates `agent` in place; returns the report dict."""
     import torch
@@ -102,6 +102,8 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
     device = next(agent.parameters()).device
     if agent.belief is None or agent.self_belief is None:
         raise ValueError("refresh_beliefs needs an agent with belief + self-belief nets")
+    if scope not in ("both", "belief", "self_belief"):
+        raise ValueError("scope must be 'both', 'belief', or 'self_belief'")
 
     train_batch = _collect(agent, pool, games, engine_batch=engine_batch,
                            temperature=temperature, seed=seed, device=device)
@@ -114,7 +116,11 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
 
     before_b, before_sb, before_bc, before_sbc = _belief_ces(agent, hold_batch)
 
-    params = list(agent.belief.parameters()) + list(agent.self_belief.parameters())
+    params = []
+    if scope in ("both", "belief"):
+        params.extend(agent.belief.parameters())
+    if scope in ("both", "self_belief"):
+        params.extend(agent.self_belief.parameters())
     opt = torch.optim.Adam(params, lr=lr)
     gen = torch.Generator(device="cpu")
     gen.manual_seed(seed)
@@ -132,14 +138,28 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
                 out = agent(mb)
                 if out.belief_chain is None or out.self_belief_chain is None:
                     raise RuntimeError("refresh training did not produce complete-team chain logits")
-                loss = (belief_loss(out.belief.logits, mb["belief_targets"], mb["belief_valid"])
-                        + belief_loss(out.self_belief.logits, mb["self_belief_targets"],
-                                      mb["self_belief_valid"])
-                        + belief_output_loss(out.belief_chain,
-                                             mb["belief_targets"], mb["belief_valid"])
-                        + belief_output_loss(out.self_belief_chain,
-                                             mb["self_belief_targets"],
-                                             mb["self_belief_valid"]))
+                terms = []
+                if scope in ("both", "belief"):
+                    terms.extend((
+                        belief_loss(out.belief.logits, mb["belief_targets"], mb["belief_valid"]),
+                        belief_output_loss(
+                            out.belief_chain, mb["belief_targets"], mb["belief_valid"]
+                        ),
+                    ))
+                if scope in ("both", "self_belief"):
+                    terms.extend((
+                        belief_loss(
+                            out.self_belief.logits,
+                            mb["self_belief_targets"],
+                            mb["self_belief_valid"],
+                        ),
+                        belief_output_loss(
+                            out.self_belief_chain,
+                            mb["self_belief_targets"],
+                            mb["self_belief_valid"],
+                        ),
+                    ))
+                loss = sum(terms)
                 opt.zero_grad(set_to_none=True)
                 loss.backward()
                 torch.nn.utils.clip_grad_norm_(params, max_grad_norm)
@@ -154,15 +174,17 @@ def refresh_beliefs(agent: Any, pool: list[str], *, games: int = 256, holdout_ga
         "games": int(games), "holdout_games": int(holdout_games),
         "n_train": int(n), "n_holdout": int(hold_batch["actions"].shape[0]),
         "epochs": int(epochs), "lr": float(lr), "temperature": float(temperature),
-        "seed": int(seed),
+        "seed": int(seed), "scope": scope,
         "belief_ce_before": before_b, "belief_ce_after": after_b,
         "self_belief_ce_before": before_sb, "self_belief_ce_after": after_sb,
         "belief_chain_ce_before": before_bc, "belief_chain_ce_after": after_bc,
         "self_belief_chain_ce_before": before_sbc,
         "self_belief_chain_ce_after": after_sbc,
         "train_loss_first": train_curve[0], "train_loss_last": train_curve[-1],
-        "improved": (after_b <= before_b and after_sb <= before_sb
-                     and after_bc <= before_bc and after_sbc <= before_sbc),
+        "improved": (
+            (scope == "self_belief" or (after_b <= before_b and after_bc <= before_bc))
+            and (scope == "belief" or (after_sb <= before_sb and after_sbc <= before_sbc))
+        ),
     }
     print(f"[belief_refresh] held-out CE: belief marginal {before_b:.3f} -> {after_b:.3f}, "
           f"chain {before_bc:.3f} -> {after_bc:.3f} | self marginal "
@@ -181,7 +203,7 @@ def main() -> None:
     from fog.env.teams import load_pool
     from fog.training.value_finetune import load_posterior_agent
 
-    ap = argparse.ArgumentParser(description="Belief consistency refresh (SEARCH_PLAN §7).")
+    ap = argparse.ArgumentParser(description="Belief consistency refresh for the current policy.")
     ap.add_argument("--ckpt", type=str, required=True,
                     help="the distilled checkpoint (blind ones are expanded)")
     ap.add_argument("--config", type=str, default="configs/default.yaml")
@@ -196,6 +218,7 @@ def main() -> None:
     ap.add_argument("--temperature", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--device", type=str, default="cuda")
+    ap.add_argument("--scope", choices=("both", "belief", "self_belief"), default="both")
     args = ap.parse_args()
 
     cfg = load_config_with_args(args.config)
@@ -206,6 +229,7 @@ def main() -> None:
         agent, load_pool(args.pool), games=args.games, holdout_games=args.holdout_games,
         epochs=args.epochs, lr=args.lr, minibatch_size=args.minibatch_size,
         engine_batch=args.engine_batch, temperature=args.temperature, seed=args.seed,
+        scope=args.scope,
     )
     args.out.mkdir(parents=True, exist_ok=True)
     torch.save(agent.state_dict(), args.out / "belief_refresh.pt")

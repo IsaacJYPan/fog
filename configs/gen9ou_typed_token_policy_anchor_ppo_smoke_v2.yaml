@@ -1,0 +1,38 @@
+extends: gen9ou_typed_token_policy_anchor_ppo_v1.yaml
+
+# Retry after the first smoke exposed that opponent mirrors omitted the typed shared-latent's
+# non-informative legality placeholder.  The failed v1 run and logs remain preserved.
+experiment: gen9ou_typed_token_policy_anchor_ppo_smoke_v2
+seed: 20261315
+
+ppo:
+  total_decisions: 4000
+  batch_decisions: 4000
+  minibatch_size: 512
+  games_per_chunk: 8
+  epochs: 1
+  clip: 0.05
+  lr: 2.0e-6
+  entropy_coef: 0.003
+  entropy_coef_final: 0.003
+  init_ckpt: runs/gen9ou_typed_token_policy_post_matchup_prior_v1/checkpoints/bc_best.pt
+  bc_anchor_ckpt: runs/gen9ou_typed_token_policy_post_matchup_prior_v1/checkpoints/bc_best.pt
+  kl_anchor_decisions: 4000
+  kl_anchor_coef: 0.05
+  trainable_prefixes:
+    - policy_value.action_query_
+    - policy_value.value.
+    - shared_to_value.
+
+league:
+  snapshot_every_decisions: 4000
+  latest_frac: 0.0
+  past_frac: 0.0
+  scripted_frac: 1.0
+  past_ckpts: []
+  scripted: [SimpleHeuristics]
+
+log:
+  dir: runs/gen9ou_typed_token_policy_anchor_ppo_smoke_v2
+  tensorboard: false
+  checkpoint_every_decisions: 4000

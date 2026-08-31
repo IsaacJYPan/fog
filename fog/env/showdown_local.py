@@ -9,14 +9,14 @@ observation/encoding path instead of introducing a second interpretation of batt
 from __future__ import annotations
 
 import logging
+from copy import deepcopy
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Self
 
 from fog.env.showdown_direct import (
     ShowdownDirectClient,
     ShowdownSessionUpdate,
 )
-
 
 # Transport-level messages poke-env's Player normally removes before calling Battle.parse_message.
 _TRANSPORT_MESSAGES = {"t:", "expire", "uhtmlchange"}
@@ -44,7 +44,7 @@ class LocalShowdownBattle:
         options: dict[str, Any],
         *,
         battle_tag: str = "battle-local-1",
-    ) -> "LocalShowdownBattle":
+    ) -> LocalShowdownBattle:
         """Create a battle and initialize both player-censored views from its protocol output."""
         try:
             from poke_env.battle import Battle
@@ -95,21 +95,52 @@ class LocalShowdownBattle:
 
     def _apply(self, update: ShowdownSessionUpdate) -> None:
         for role, view in self.views.items():
-            for line in update.messages[role]:
-                split = _parse_protocol_line(line)
-                event = split[1] if len(split) > 1 else ""
-                if event in _TRANSPORT_MESSAGES:
-                    continue
-                if event == "win":
-                    view.won_by(split[2])
-                elif event == "tie":
-                    view.tied()
-                else:
-                    view.parse_message(split)
-            request = update.requests.get(role)
-            if request is not None:
-                view.parse_request(request)
+            self._apply_view_update(view, update.messages[role], update.requests.get(role))
+            # Direct-search adapters need the authoritative forkable session, but ordinary
+            # Observation construction must remain censored to this role's poke-env view.  The
+            # back-reference is transport context, not a model input.
+            view._fog_local_battle = self
+            view._fog_local_role = role
         self.update = update
+
+    @staticmethod
+    def _apply_view_update(
+        view: Any,
+        lines: tuple[str, ...],
+        request: dict[str, Any] | None,
+    ) -> None:
+        """Apply one censored protocol delta to a poke-env battle view."""
+        for line in lines:
+            split = _parse_protocol_line(line)
+            event = split[1] if len(split) > 1 else ""
+            if event in _TRANSPORT_MESSAGES:
+                continue
+            if event == "win":
+                view.won_by(split[2])
+            elif event == "tie":
+                view.tied()
+            else:
+                view.parse_message(split)
+        if request is not None:
+            view.parse_request(request)
+
+    def branch_view(self, role: str, branch: Any) -> Any:
+        """Return a detached censored view advanced through one exact chance branch.
+
+        The live session and its views are never mutated.  This is the direct-Showdown analogue of
+        an engine search fork and is the only supported way for a value function to inspect an
+        enumerated branch.
+        """
+        if role not in self.views:
+            raise ValueError(f"unknown battle role: {role!r}")
+        # The view carries a transport back-reference to ``self``; pre-seed deepcopy's memo so it
+        # does not try to copy the client's thread lock or recursively copy both live views.
+        view = deepcopy(self.views[role], {id(self): None})
+        self._apply_view_update(view, branch.player_logs[role], branch.requests.get(role))
+        # A detached branch must never recursively expose the live authoritative session.
+        view._fog_local_battle = None
+        view._fog_local_role = role
+        return view
 
     def step(
         self,
@@ -130,7 +161,7 @@ class LocalShowdownBattle:
     def close(self) -> None:
         self.client.close_session(self.session_id)
 
-    def __enter__(self) -> "LocalShowdownBattle":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:

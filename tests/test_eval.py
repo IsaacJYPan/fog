@@ -5,7 +5,11 @@ import math
 
 import numpy as np
 
-from fog.eval.belief_metrics import accuracy_vs_turn, expected_calibration_error, pre_reveal_accuracy
+from fog.eval.belief_metrics import (
+    accuracy_vs_turn,
+    expected_calibration_error,
+    pre_reveal_accuracy,
+)
 from fog.eval.elo import RoundRobin, expected_score
 from fog.eval.gauntlet import GauntletResult
 from fog.eval.leakage_metrics import (

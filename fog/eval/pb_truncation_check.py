@@ -1,4 +1,4 @@
-"""G2 truncation validation (PROPOSAL_IMPL_PLAN Phase G2; amendment A3's reconsideration gate):
+"""Posterior-mass truncation validation for experimental two-sided search:
 how much does posterior-mass truncation move the EXECUTED action row?
 
 For each sampled pool position, solve the same decision at several `top_j` caps and compare each

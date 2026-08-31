@@ -64,7 +64,7 @@ def test_pool_truth_match_views_disambiguates_pool_a():
                 item=int(row[1]) if row[1] >= 0 else None,
                 ability=int(row[2]) if row[2] >= 0 else None,
                 moves=[int(m) for m in row[3:7] if m >= 0],
-                tera=int(row[8]) if row[8] >= 0 else None,
+                tera=int(row[14]) if row[14] >= 0 else None,
             )
         )
     got = pt.match_views(views)
@@ -158,7 +158,7 @@ def test_oracle_truth_reaches_frag_and_update_forward():
 
     torch.manual_seed(0)
     agent = FogAgent.from_tables({"model": {"oracle": "set"}})
-    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth = np.full((6, 15), -1, dtype=np.int64)
     truth[:, 0] = np.arange(6)
 
     p = FogPlayer(agent, temperature=0.0)
@@ -178,7 +178,7 @@ def test_oracle_truth_reaches_frag_and_update_forward():
     for gid in list(p._game_ids.values()):
         buf.end_game(gid, outcome=1.0)
     batch = buf.to_batch()
-    assert batch["opp_truth_tokens"].shape == (2, 6, 9)
+    assert batch["opp_truth_tokens"].shape == (2, 6, 15)
     out = agent(batch)  # the update-time forward consumes the truth without special-casing
     assert out.belief is not None
 
@@ -186,8 +186,8 @@ def test_oracle_truth_reaches_frag_and_update_forward():
 def test_apply_set_oracle_merges_unknown_truth_back_to_revealed():
     from fog.models.oracle import apply_set_oracle
 
-    revealed = {"tokens": torch.arange(2 * 54, dtype=torch.long).reshape(2, 6, 9) % 7, "masks": {}}
-    truth = torch.full((2, 6, 9), -1, dtype=torch.long)
+    revealed = {"tokens": torch.arange(2 * 90, dtype=torch.long).reshape(2, 6, 15) % 7, "masks": {}}
+    truth = torch.full((2, 6, 15), -1, dtype=torch.long)
     truth[0, 0, 0] = 5
     out = apply_set_oracle(revealed, truth)
     assert out["tokens"][0, 0, 0] == 5                       # truth wins where known

@@ -1,5 +1,4 @@
-"""v2 decision logger + game runner for two-sided search (PROPOSAL_IMPL_PLAN Phase F carve-out;
-PROJECT_DESIGN_PROPOSAL.md §11 steps 2-5, §14 step 11).
+"""Decision logger and game runner for experimental two-sided search (ARCHITECTURE.md S1–S3).
 
 `play_and_log_pb_games` plays whole engine games in which the learner's non-trivial decisions go
 through `pb_search_action` in persistent mode, maintains ONE `JointBeliefTable` per battle, and
@@ -40,7 +39,7 @@ Phase G2 budget features:
     stored distribution with this game's rng. Zero approximation; kills the most expensive
     decision of every game after the first per matchup.
 
-One-sided decisions (PROPOSAL_IMPL_PLAN Phase F2, proposal §10.5) flow through the same path with
+One-sided decisions flow through the same path with
 no special-casing. When only the learner is pending (a forced replacement with several live bench,
 or a pivot force-switch), pb_search solves a degenerate B = 1 grid; `opp_label` is None (the
 opponent owed nothing), so the belief step multiplies in ONLY our replacement sigma1 — the
@@ -81,7 +80,7 @@ from fog.search.pb_search import N_ACTIONS, pb_search_action
 
 
 class OpeningSolveCache:
-    """L1 (PROPOSAL_IMPL_PLAN §6.2): exact reuse of the opening solve per pool matchup.
+    """Exact reuse of the opening solve per pool matchup.
 
     Valid because the solve is a deterministic function of (public state, candidate sets, rho,
     budget params) and none of those depend on the game seed at the factory-fresh opening state:
@@ -238,7 +237,7 @@ def play_and_log_pb_games(
     seed: int = 0,
     max_decisions: int = 200,
     search_kwargs: dict | None = None,
-    solve_cache: "OpeningSolveCache | None" = None,
+    solve_cache: OpeningSolveCache | None = None,
     flush_every: int = 0,
 ) -> list[dict]:
     """Play `n_games` engine games; the learner (`role`) decides via pb_search_action in
@@ -255,7 +254,7 @@ def play_and_log_pb_games(
     Row fields: game_id, turn, role, obs (deployment input), action, action_dist (the
     distillation target), labels1/labels2, sigma1, sigma2, rho, true_index (our k* on the row's
     KEPT own axis), opp_true_index (the opponent's j* on the row's KEPT opp axis, -1 if off-pool
-    or truncated out this decision), own_tokens [K,6,9] / opp_tokens [J,6,9] (the KEPT candidate
+    or truncated out this decision), own_tokens [K,6,15] / opp_tokens [J,6,15] (the KEPT candidate
     identities rho indexes — the Phase-G value trainer embeds these and labels V[k*, j*] with
     the outcome), own_kept / opp_kept (full-pool indices behind those axes) with
     dropped_own_mass / dropped_opp_mass (G2 truncation accounting), j_used, sims_run,
@@ -308,7 +307,15 @@ def play_and_log_pb_games(
 
         no_item = int(battle.tables.item_index(NO_ITEM))
 
-        def _mechanical(msg: str) -> None:
+        def _mechanical(
+            msg: str,
+            *,
+            battle=battle,
+            own0=own0,
+            no_item=no_item,
+            opp_true_index=opp_true_index,
+            table=table,
+        ) -> None:
             """Both-side reveal filtering; the own side uses the opponent's mirror view of us."""
             own_view = Observation.from_battle(battle.view(opp_role),
                                                tracker=battle.trackers[opp_role])
@@ -461,7 +468,7 @@ def play_and_log_pb_selfplay_games(
     seed: int = 0,
     max_decisions: int = 200,
     search_kwargs: dict | None = None,
-    solve_cache: "OpeningSolveCache | None" = None,
+    solve_cache: OpeningSolveCache | None = None,
     flush_every: int = 0,
 ) -> list[dict]:
     """Shared-solve self-play (Phase I.2; module docstring).
@@ -513,7 +520,14 @@ def play_and_log_pb_selfplay_games(
                     np.log(np.asarray(own0[r].weights, dtype=np.float64)),
                     np.log(np.asarray(own0[o].weights, dtype=np.float64)))
 
-        def _mechanical(msg: str) -> None:
+        def _mechanical(
+            msg: str,
+            *,
+            battle=battle,
+            no_item=no_item,
+            own0=own0,
+            tables=tables,
+        ) -> None:
             """One reveal mask per side's public state; each table gets (own, opp) views."""
             rev = {}
             for r in roles:
@@ -626,7 +640,7 @@ def play_and_log_pb_selfplay_games(
 
             # ---- §14 step 11, both sides: each observed action's likelihood is the sigma1 of
             # the solve that CHOSE it (19.6 exact for both players — the I.2 point) ----------
-            def _acted(r: str):
+            def _acted(r: str, *, results=results, labels=labels):
                 """(sigma, avail, col, kept) of r's own executed action, or Nones."""
                 result = results.get(r)
                 if result is None or result.sims_run == 0:

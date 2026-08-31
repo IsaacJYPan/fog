@@ -1,0 +1,36 @@
+# Stage 4a: learn the policy/action heads while the accepted trunk, belief, and value stay frozen.
+extends: gen9ou_contextual_heads.yaml
+
+experiment: gen9ou_contextual_policy_head
+seed: 20261112
+device: cuda
+
+bc:
+  manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_replay_policy_rating1650_v2/holdout_manifest.parquet
+  holdout_fraction: 0.0
+  init_ckpt: runs/gen9ou_contextual_value_v1/checkpoints/bc_best.pt
+  init_compatible: false
+  scope: policy
+  epochs: 10
+  batch_size: 1536
+  lr: 3.0e-5
+  lr_final: 3.0e-6
+  eval_batches: 0
+  early_stopping_patience: 3
+  early_stopping_min_delta: 0.002
+  streaming: true
+  shard_buffer: 16
+
+loss:
+  action_coef: 1.0
+  value_coef: 0.0
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+log:
+  dir: runs/gen9ou_contextual_policy_head_v1
+  tensorboard: true

@@ -1,0 +1,50 @@
+extends: gen9ou_typed_token_trunk.yaml
+
+experiment: gen9ou_typed_token_belief
+seed: 20261119
+device: cuda
+
+bc:
+  manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_replay_policy_rating1650_v2/holdout_manifest.parquet
+  holdout_fraction: 0.0
+  init_ckpt: runs/gen9ou_continuous_latest_240k_3/checkpoints/ppo_240496.pt
+  init_compatible: true
+  scope: belief_shared
+  epochs: 8
+  batch_size: 768
+  lr: 2.0e-5
+  lr_final: 2.0e-6
+  shared_lr_scale: 0.1
+  eval_batches: 0
+  early_stopping_patience: 3
+  early_stopping_min_delta: 0.002
+  streaming: true
+  shard_buffer: 16
+
+loss:
+  action_coef: 0.0
+  value_coef: 0.0
+  belief_coef: 1.0
+  belief_chain_coef: 1.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+preflight:
+  required: true
+  report: runs/preflight_audit/typed_token_v4/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_v4/summary.json
+  min_games: 5
+  min_replay_dryruns: 10
+  min_replay_hidden_targets: 1000
+  min_parsed_replay_games: 5
+  min_parsed_replay_dryruns: 10
+  min_parsed_replay_rows: 200
+  schema_version: 5
+  replay_schema_version: 4
+  match_source: true
+
+log:
+  dir: runs/gen9ou_typed_token_belief_v1
+  tensorboard: true

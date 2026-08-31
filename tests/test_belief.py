@@ -15,7 +15,10 @@ from fog.models.self_belief import (
 )
 from fog.training.losses import belief_loss
 
-SIZES = dict(n_species=10, n_items=6, n_abilities=5, n_moves=12, n_spreads=4, n_tera=19)
+SIZES = {
+    "n_species": 10, "n_items": 6, "n_abilities": 5, "n_moves": 12,
+    "n_natures": 5, "n_ev_units": 8, "n_tera": 19,
+}
 STATE_DIM = 32
 D = 16
 B = 3
@@ -33,7 +36,9 @@ def make_inputs(reveal_all: bool = False, with_masks: bool = True):
     if reveal_all:
         highs = [SIZES["n_species"], SIZES["n_items"], SIZES["n_abilities"],
                  SIZES["n_moves"], SIZES["n_moves"], SIZES["n_moves"], SIZES["n_moves"],
-                 SIZES["n_spreads"], SIZES["n_tera"]]
+                 SIZES["n_natures"],
+                 *([SIZES["n_ev_units"]] * 6),
+                 SIZES["n_tera"]]
         for a, hi in enumerate(highs):
             tokens[:, :, a] = torch.randint(0, hi, (B, N_SLOTS))
         # make moves distinct within each slot
@@ -51,7 +56,6 @@ def make_inputs(reveal_all: bool = False, with_masks: bool = True):
             "item": torch.ones(B, N_SLOTS, SIZES["n_items"], dtype=torch.bool),
             "ability": torch.ones(B, N_SLOTS, SIZES["n_abilities"], dtype=torch.bool),
             "move": torch.ones(B, N_SLOTS, SIZES["n_moves"], dtype=torch.bool),
-            "spread": torch.ones(B, N_SLOTS, SIZES["n_spreads"], dtype=torch.bool),
         }
         masks["item"][:, :, -2:] = False       # last two items illegal everywhere
         masks["move"][:, :, 0] = False         # move 0 not in any learnset
@@ -66,9 +70,10 @@ def test_forward_shapes():
     assert out.logits["item"].shape == (B, 6, SIZES["n_items"])
     assert out.logits["ability"].shape == (B, 6, SIZES["n_abilities"])
     assert out.logits["move"].shape == (B, 6, 4, SIZES["n_moves"])
-    assert out.logits["spread"].shape == (B, 6, SIZES["n_spreads"])
+    assert out.logits["nature"].shape == (B, 6, SIZES["n_natures"])
+    assert out.logits["ev"].shape == (B, 6, 6, SIZES["n_ev_units"])
     assert out.logits["tera"].shape == (B, 6, 19)
-    for fam in ("species", "spread", "tera"):
+    for fam in ("species", "nature", "ev", "tera"):
         assert torch.isfinite(out.logits[fam]).any()
 
 
@@ -98,7 +103,7 @@ def test_sample_team_shapes_legality_and_clamping():
     k = 4
     g = torch.Generator().manual_seed(7)
     teams = model.sample_team(s, opp, k=k, generator=g)
-    assert teams.shape == (B, k, 6, 9)
+    assert teams.shape == (B, k, 6, 15)
     assert (teams >= 0).all()
     # revealed attrs are clamped
     assert (teams[:, :, :, 0] == opp["tokens"][:, None, :, 0]).all()
@@ -114,8 +119,10 @@ def test_sample_team_shapes_legality_and_clamping():
                 assert len(set(mv[bi, ki, j].tolist())) == 4
     # ranges
     assert (teams[..., 2] < SIZES["n_abilities"]).all()
-    assert (teams[..., 7] < SIZES["n_spreads"]).all()
-    assert (teams[..., 8] < 19).all()
+    assert (teams[..., 7] < SIZES["n_natures"]).all()
+    assert (teams[..., 8:14] < SIZES["n_ev_units"]).all()
+    assert (teams[..., 8:14].sum(-1) <= 127).all()
+    assert (teams[..., 14] < 19).all()
 
 
 def test_sample_team_deterministic_with_seed():
@@ -135,7 +142,8 @@ def test_belief_loss_backprops():
         "item": torch.randint(0, SIZES["n_items"] - 2, (B, 6)),
         "ability": torch.randint(0, SIZES["n_abilities"], (B, 6)),
         "move": torch.randint(1, SIZES["n_moves"], (B, 6, 4)),
-        "spread": torch.randint(0, SIZES["n_spreads"], (B, 6)),
+        "nature": torch.randint(0, SIZES["n_natures"], (B, 6)),
+        "ev": torch.randint(0, SIZES["n_ev_units"], (B, 6, 6)),
         "tera": torch.randint(0, 19, (B, 6)),
     }
     valid = {k: torch.ones_like(v, dtype=torch.bool) for k, v in targets.items()}
@@ -153,7 +161,7 @@ def test_leakage_ce_and_frozen_copy():
     s, my_view = make_inputs()
     truth_tokens = my_view["tokens"].clone()
     # fill full truth (I know my own team)
-    s_full, full_view = make_inputs(reveal_all=True, with_masks=False)
+    _s_full, full_view = make_inputs(reveal_all=True, with_masks=False)
     labels = labels_from_tokens(full_view["tokens"])
     my_view["labels"] = labels
 
@@ -175,7 +183,7 @@ def test_leakage_ce_and_frozen_copy():
 
 
 def test_still_hidden_from_tokens():
-    tokens = torch.full((2, 6, 9), -1, dtype=torch.long)
+    tokens = torch.full((2, 6, 15), -1, dtype=torch.long)
     tokens[:, :, 0] = 1  # species seen
     hidden = still_hidden_from_tokens(tokens)
     assert not hidden["species"].any()
@@ -190,19 +198,19 @@ def make_agent_batch(b: int = 2, t: int = 7):
     from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS
 
     torch.manual_seed(2)
-    tokens = torch.full((b, 6, 9), -1, dtype=torch.long)
+    tokens = torch.full((b, 6, 15), -1, dtype=torch.long)
     tokens[:, :, 0] = torch.randint(0, 320, (b, 6))
     legality = torch.zeros(b, 14, dtype=torch.bool)
     legality[:, 0] = True
     legality[:, 8] = True
-    my_tokens = torch.zeros(b, 6, 9, dtype=torch.long)
-    group = dict(
-        entities=torch.randn(b, 12, ENTITY_RAW_DIM),
-        entity_ids=torch.zeros(b, 12, N_ID_FIELDS, dtype=torch.long),
-        field=torch.randn(b, DIMS.field_dim),
-        history=torch.randn(b, t, DIMS.turn_dim),
-        active_idx=torch.tensor([[0, 6]] * b),
-    )
+    my_tokens = torch.zeros(b, 6, 15, dtype=torch.long)
+    group = {
+        "entities": torch.randn(b, 12, ENTITY_RAW_DIM),
+        "entity_ids": torch.zeros(b, 12, N_ID_FIELDS, dtype=torch.long),
+        "field": torch.randn(b, DIMS.field_dim),
+        "history": torch.randn(b, t, DIMS.turn_dim),
+        "active_idx": torch.tensor([[0, 6]] * b),
+    }
     batch = dict(
         **group,
         legality_mask=legality,
@@ -268,7 +276,8 @@ def test_aux_into_trunk_switch(aux_into_trunk):
         "item": torch.randint(0, 64, (2, 6)),
         "ability": torch.randint(0, 160, (2, 6)),
         "move": torch.randint(0, 720, (2, 6, 4)),
-        "spread": torch.randint(0, 17, (2, 6)),
+        "nature": torch.randint(0, 25, (2, 6)),
+        "ev": torch.randint(0, 8, (2, 6, 6)),
         "tera": torch.randint(0, 19, (2, 6)),
     }
     valid = {k: torch.ones_like(v, dtype=torch.bool) for k, v in targets.items()}

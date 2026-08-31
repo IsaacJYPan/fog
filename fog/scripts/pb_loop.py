@@ -1,5 +1,4 @@
-"""Generation loop driver — solver self-play -> distill -> belief refresh -> value retrain
-(PROPOSAL_IMPL_PLAN Phase I.5; proposal §11 steps 1-8, §15.4 gates).
+"""Generation loop driver: solver self-play -> distill -> belief refresh -> value retrain.
 
 One generation:
   1. **generate** — solver-vs-solver self-play v2 logs, sharded over workers via

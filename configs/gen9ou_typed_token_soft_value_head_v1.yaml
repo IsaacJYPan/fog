@@ -1,0 +1,46 @@
+# Calibrate only the value head against lower-variance empirical matchup win rates.
+# The selected shared trunk and belief model stay byte-identical, so this follow-up
+# cannot trade away the representation/belief gains protected by the joint run.
+extends: gen9ou_typed_token_joint_belief_value_ev_stat_continuation_v3.yaml
+
+experiment: gen9ou_typed_token_soft_value_head_v1
+seed: 20261230
+
+bc:
+  manifest: runs/gen9ou_simple_bv_repeat_train_soft_2048_v1/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_simple_bv_repeat_holdout_soft_1024_v1/holdout_manifest.parquet
+  holdout_fraction: 0.0
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_ev_stat_continuation_v3/checkpoints/bc_best.pt
+  init_compatible: false
+  scope: value
+  epochs: 24
+  batch_size: 512
+  lr: 1.0e-5
+  lr_final: 1.0e-6
+  eval_batches: 0
+  max_primary_batches_per_epoch: 96
+  early_stopping_patience: 8
+  early_stopping_min_delta: 0.0002
+  streaming: true
+  shard_buffer: 32
+  auxiliary_manifest: null
+  auxiliary_holdout_manifest: null
+  auxiliary_gradient_surgery: none
+  auxiliary_joint_batch: false
+
+loss:
+  action_coef: 0.0
+  value_coef: 1.0
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+preflight:
+  report: runs/preflight_audit/typed_token_soft_value_head_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_soft_value_head_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_soft_value_head_v1
+  tensorboard: true

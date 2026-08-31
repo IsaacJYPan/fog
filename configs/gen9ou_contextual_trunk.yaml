@@ -1,0 +1,41 @@
+# Shared contextual representation for the next Gen 9 OU training branch.
+#
+# Sixteen learned 128-wide tokens form one 2,048-number representation:
+# 12 creature slots, field, history, active/legal metadata, and a global token.  Every token is
+# contextualized jointly before belief, value, or policy reads it.  No exact-value bypass exists.
+extends: default.yaml
+
+experiment: gen9ou_contextual_trunk
+seed: 20261101
+
+model:
+  belief_last_context_probability: 0.25
+  public_action_features_only: true
+  simple_rule_prior_strength: 0.0
+  simple_rule_prior_strength_final: 0.0
+  use_action_features: true
+  use_posterior_features: true
+  shared_latent_trunk: true
+  shared_latent_learned_only: true
+  shared_latent_contextual: true
+  shared_latent_dim: 2048
+  shared_entity_dim: 128
+  shared_field_dim: 128
+  shared_residual_dim: 256
+  shared_contextual_layers: 3
+  shared_contextual_heads: 8
+  shared_contextual_ff_dim: 512
+  structured_memory: false
+  token_action_policy: true
+  exact_action_context: false
+
+loss:
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  value_coef: 0.0
+  preview_coef: 0.0
+
+log:
+  dir: runs/gen9ou_contextual_trunk

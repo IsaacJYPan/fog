@@ -1,0 +1,22 @@
+# The first global-total PCGrad run was still improving at its final epoch. Continue the
+# successful trajectory at a lower learning rate; worst-relative selection keeps the
+# prior best unless both replay and exact-simulator holdouts improve.
+extends: gen9ou_typed_token_joint_belief_value_pcgrad.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_pcgrad_continuation_v2
+seed: 20261191
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_pcgrad_v1/checkpoints/bc_best.pt
+  epochs: 48
+  lr: 2.0e-6
+  lr_final: 2.0e-7
+  early_stopping_patience: 12
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_pcgrad_continuation_v2/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_pcgrad_continuation_v2/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_pcgrad_continuation_v2
+  tensorboard: true

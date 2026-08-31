@@ -11,10 +11,13 @@ from dataclasses import dataclass
 import numpy as np
 import torch
 
-from fog.models.pb_value import PBValueNet, _POS_FAMILY, N_ATTRS
+from fog.models.pb_value import _POS_FAMILY, N_ATTRS, PBValueNet
 from fog.search.two_sided import pair_posteriors
 
-SIZES = {"species": 32, "item": 12, "ability": 16, "move": 40, "spread": 8, "tera": 6}
+SIZES = {
+    "species": 32, "item": 12, "ability": 16, "move": 40,
+    "nature": 8, "ev": 8, "tera": 6,
+}
 STATE, DYN, D = 24, 20, 16
 
 
@@ -43,7 +46,7 @@ class FakeAgent:
 
 def _rand_teams(n, gen):
     cols = [torch.randint(0, SIZES[_POS_FAMILY[p]], (n, 1), generator=gen) for p in range(N_ATTRS)]
-    return torch.cat(cols, dim=1).reshape(n, 6, 9)
+    return torch.cat(cols, dim=1).reshape(n, 6, 15)
 
 
 def _build(monkeypatch):

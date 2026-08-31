@@ -1,0 +1,15 @@
+# Archived M2 oracle experiment: retained for reproduction, not active training.
+#   python -m fog.training.ppo --config configs/archive/m2_oracle.yaml    # set oracle
+# The ACTION oracle is NOT trainable in the online loop (the opponent's committed action is not
+# observable at decision time — Showdown resolves choices simultaneously); the trainer raises on
+# model.oracle=action rather than silently training an N-agent and reporting a fake ~0 gap. An
+# offline/replay pathway is specced in §3.4 but unimplemented.
+extends: m1_5_belief.yaml
+
+experiment: m2_oracle
+model:
+  oracle: set                       # §3.4 — truth tokens come from the recording teambuilder
+                                    # (exact per-battle paste) and are stored in every frag, so the
+                                    # update-time forward sees what the acting forward saw
+log:
+  dir: runs/m2_oracle

@@ -12,10 +12,11 @@ predictor bad instead of the play deceptive.
 
 Tensor conventions (shared with BeliefModel):
   * view dicts ("my_view" = the opponent's view of my team) have the same {"tokens","masks"} contract
-    as `opp_revealed` in belief.py — tokens [B, 6, 9], -1 where the OPPONENT can't see the attribute.
+    as `opp_revealed` in belief.py — tokens [B, 6, 15], -1 where the OPPONENT can't see the attribute.
   * label dicts are per-family index tensors:
-      species/item/ability/spread/tera : [B, 6]
+      species/item/ability/nature/tera : [B, 6]
       move                             : [B, 6, 4]
+      ev                               : [B, 6, 6]
     with -1 for "no label" (never the case for own-team truth, but supported).
   * still-hidden dicts are bools of the same per-family shapes.
 """
@@ -28,30 +29,31 @@ import torch.nn.functional as F
 
 from fog.models.belief import SLOT_ATTRS, BeliefModel
 
-# family -> the attr columns it occupies in a [.., 6, 9] token tensor (order = SLOT_ATTRS)
+# family -> the attr columns it occupies in a [.., 6, 15] token tensor (order = SLOT_ATTRS)
 _FAMILY_COLS = {
     "species": (0,),
     "item": (1,),
     "ability": (2,),
     "move": (3, 4, 5, 6),
-    "spread": (7,),
-    "tera": (8,),
+    "nature": (7,),
+    "ev": (8, 9, 10, 11, 12, 13),
+    "tera": (14,),
 }
 
 
 def labels_from_tokens(tokens: torch.Tensor) -> dict[str, torch.Tensor]:
-    """Split a [B, 6, 9] token tensor into the per-family label dict (see module docstring)."""
+    """Split a [B, 6, 15] token tensor into the per-family label dict (see module docstring)."""
     out: dict[str, torch.Tensor] = {}
     for fam, cols in _FAMILY_COLS.items():
         sel = tokens[..., list(cols)]
-        out[fam] = sel if fam == "move" else sel.squeeze(-1)
+        out[fam] = sel if fam in ("move", "ev") else sel.squeeze(-1)
     return out
 
 
 def tokens_from_labels(labels: dict[str, torch.Tensor]) -> torch.Tensor:
-    """Inverse of `labels_from_tokens`: a per-family label dict -> [B, 6, 9] token grid, -1 preserved.
+    """Inverse of `labels_from_tokens`: a per-family label dict -> [B, 6, 15] token grid.
 
-    Used to rebuild the true-value grid teacher-forced into the belief chain (BELIEF_POLICY_PLAN §3.3 pass B).
+    Used to rebuild the true-value grid teacher-forced into the belief chain's supervised pass.
     A -1 label (censored/off-table) stays -1, so that tail token feeds <UNK> — exactly the pass-B
     contract ("<UNK> appears in the tail only where the label itself is censored/missing").
     """
@@ -60,7 +62,7 @@ def tokens_from_labels(labels: dict[str, torch.Tensor]) -> torch.Tensor:
     grid = torch.full((b, 6, len(SLOT_ATTRS)), -1, dtype=torch.long, device=any_fam.device)
     for fam, cols in _FAMILY_COLS.items():
         vals = labels[fam].to(torch.long)
-        if fam == "move":
+        if fam in ("move", "ev"):
             grid[..., list(cols)] = vals
         else:
             grid[..., cols[0]] = vals
@@ -71,7 +73,7 @@ def still_hidden_from_tokens(view_tokens: torch.Tensor) -> dict[str, torch.Tenso
     """Per-family bool masks of what the OPPONENT still can't see: view token == -1."""
     hidden = view_tokens < 0
     return {
-        fam: (m if fam == "move" else m.squeeze(-1))
+        fam: (m if fam in ("move", "ev") else m.squeeze(-1))
         for fam, m in ((f, hidden[..., list(c)]) for f, c in _FAMILY_COLS.items())
     }
 
@@ -104,7 +106,20 @@ class SelfBeliefPredictor(BeliefModel):
         if labels is None:
             labels = my_view["labels"]
         if still_hidden_mask is None:
-            still_hidden_mask = still_hidden_from_tokens(my_view["tokens"])
+            still_hidden_mask = still_hidden_from_tokens(
+                my_view.get("supervision_tokens", my_view["tokens"])
+            )
+        consistent_slots = my_view.get("supervision_consistent")
+        if consistent_slots is not None:
+            still_hidden_mask = {
+                family: mask
+                & (
+                    consistent_slots.unsqueeze(-1)
+                    if family in ("move", "ev")
+                    else consistent_slots
+                )
+                for family, mask in still_hidden_mask.items()
+            }
 
         out = self.forward(s_opp_view, my_view)
         total = s_opp_view.new_zeros(s_opp_view.shape[0])
@@ -126,7 +141,7 @@ class SelfBeliefPredictor(BeliefModel):
             total = total + w * fam_sum
         return by_family if per_family else total
 
-    def frozen_copy(self) -> "SelfBeliefPredictor":
+    def frozen_copy(self) -> SelfBeliefPredictor:
         """Detached, eval-mode deep copy of the HEAD ONLY. NOT the §7 penalty probe: a frozen head
         fed by the live trunk drifts OOD (the v1 hole) — Φ̂ is `models.probe.FrozenProbe`, which
         freezes the (backbone + self-belief) pair together."""

@@ -1,0 +1,24 @@
+# Follow-up to global PCGrad. Replay and exact-simulator gradients are separated by
+# belief marginal, belief chain, and value family. Each source is equal-norm balanced
+# within a family before conflict projection, preventing the simulator's large aligned
+# value gradient from hiding belief conflicts in the total-task cosine.
+extends: gen9ou_typed_token_joint_belief_value_continuation_v2.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_component_pcgrad
+seed: 20261187
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_pcgrad_v1/checkpoints/bc_best.pt
+  auxiliary_gradient_surgery: component_pcgrad
+  epochs: 24
+  lr: 3.0e-6
+  lr_final: 3.0e-7
+  early_stopping_patience: 8
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_component_pcgrad_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_component_pcgrad_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_component_pcgrad_v1
+  tensorboard: true

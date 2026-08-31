@@ -1,11 +1,12 @@
-"""Model heads (BELIEF_POLICY_PLAN §3). Shared backbone -> (s_board, c_dyn), then:
+"""Model heads. Three encoders -> (private context, fused public context), then:
 
-  * policy + value + team-preview heads          (§3.2)  <- (s_board ‖ c_dyn), no belief summary
-  * battle-conditioned autoregressive belief net (§3.3)  -> chain CE + sample_team(k); reads c_dyn
+  * policy + value + team-preview heads          <- (private ‖ public), no belief summary
+  * battle-conditioned autoregressive belief net -> chain CE + sample_team(k); public evidence plus
+    the same observer's private context
   * self-belief predictor (leakage measurer)     (§3.5)  -> per-attribute CE = leakage signal
   * oracle variants (evaluation ceilings)        (§3.4)
 
-Parameter budget: backbone ~1.5M + belief ~1M + self-belief ~1M + heads ~0.3M ≈ 3.8M (≤5M cap).
+The default generated-table model is approximately 4.24M parameters (≤5M cap).
 """
 
 from fog.models.agent import FogAgent
@@ -13,12 +14,17 @@ from fog.models.belief import BeliefModel
 from fog.models.encoder import Backbone
 from fog.models.heads import PolicyValueHead, TeamPreviewHead
 from fog.models.self_belief import SelfBeliefPredictor
+from fog.models.shared_latent import SharedBattleLatent
+from fog.models.structured_memory import StructuredMemoryEncoder, StructuredMemoryReader
 
 __all__ = [
-    "FogAgent",
     "Backbone",
     "BeliefModel",
+    "FogAgent",
     "PolicyValueHead",
-    "TeamPreviewHead",
     "SelfBeliefPredictor",
+    "SharedBattleLatent",
+    "StructuredMemoryEncoder",
+    "StructuredMemoryReader",
+    "TeamPreviewHead",
 ]

@@ -1,9 +1,8 @@
-"""pb_search_action — one two-sided public-belief decision (PROPOSAL_IMPL_PLAN Phase F;
-PROJECT_DESIGN_PROPOSAL.md §14 end-to-end procedure, §10.3, §13.1).
+"""One experimental two-sided public-belief decision (ARCHITECTURE.md S1–S3).
 
 Assembles the landed pieces into the claim-bearing decision path: candidate worlds for both
 sides -> joint belief rho -> simulated K x J branch grid (pb_grid) -> leaf values (pb_values,
-the §18 interim head until Phase G) -> two-sided regret solve (two_sided) -> **sample exactly
+the interim scalar head) -> two-sided regret solve (two_sided) -> **sample exactly
 from the averaged strategy row of the true private state**. The API deliberately has no
 temperature and no greedy mode (settled decisions 16.2/16.3): the sampled randomness IS the
 mixed equilibrium being executed, and any reshaping would play a strategy the solver never
@@ -27,13 +26,14 @@ The search NEVER mutates the belief table (§14 step 11 is the runner's job, aft
 actions are public, using this result's averaged strategies — invariant 19.6). The result
 carries a subsample of the action-pair posteriors the values were computed under
 (`queried_beliefs`), plus the same subsampling under one uniformly drawn solver iteration's
-CURRENT strategies (`sample_beliefs`, Phase G1) — together the §9.3 value-training query log.
+CURRENT strategies (`sample_beliefs`) — together the value-training query log.
 """
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -82,8 +82,8 @@ class PBSearchResult:
     dropped_opp_mass: float = 0.0
     # The candidate identities rho / sigma / true_index index (proposal §10 shared particles). The
     # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
-    own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
-    opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
+    own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 15), dtype=np.int64))
+    opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 15), dtype=np.int64))
     search_depth: int = 1
     depth2_expanded: int = 0
     depth2_reach_mass: float = 0.0
@@ -95,7 +95,7 @@ def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: 
                            ) -> tuple[np.ndarray, np.ndarray]:
     """Default `opp_source`: j ancestral samples from the belief chain on `role`'s censored
     observation, deduplicated, weighted by empirical frequency (the documented SampledOwnStates
-    recipe applied to the opponent direction). Returns (tokens [J', 6, 9], log_weights [J'])."""
+    recipe applied to the opponent direction). Returns (tokens [J', 6, 15], log_weights [J'])."""
     import torch
 
     from fog.encoding.observation import Observation
@@ -108,9 +108,10 @@ def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: 
     gen = torch.Generator(device=device)
     gen.manual_seed(seed)
     with torch.no_grad():
-        _, c_dyn = agent._backbone_pass(batch)
+        contexts = agent.encode_contexts(batch)
+        belief_context = agent.belief_context(contexts)
         worlds = agent.belief.sample_team(
-            c_dyn, batch["opp_revealed"], k=max(1, int(j)), generator=gen,
+            belief_context, batch["opp_revealed"], k=max(1, int(j)), generator=gen,
         )[0].cpu().numpy().astype(np.int64)
     index: dict[bytes, int] = {}
     tokens: list[np.ndarray] = []

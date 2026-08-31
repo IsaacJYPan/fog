@@ -1,0 +1,51 @@
+# First policy stage after the accepted typed matchup-prior belief/value checkpoint.
+# Exact high-rated replay actions are the only policy demonstrations.  The typed trunk,
+# belief model, ordinary value head, and initial-only matchup prior remain byte-identical.
+extends: gen9ou_typed_token_joint_belief_value_matchup_prior_v2.yaml
+
+experiment: gen9ou_typed_token_policy_post_matchup_prior_v1
+seed: 20261306
+
+bc:
+  manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_replay_policy_rating1650_v2/holdout_manifest.parquet
+  auxiliary_manifest: null
+  auxiliary_holdout_manifest: null
+  auxiliary_joint_batch: false
+  auxiliary_gradient_surgery: none
+  guard_train_manifest: null
+  guard_holdout_manifest: null
+  guard_train_value_only: false
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_matchup_prior_v2/checkpoints/bc_best.pt
+  init_compatible: false
+  scope: policy
+  epochs: 16
+  max_primary_batches_per_epoch: 96
+  batch_size: 768
+  lr: 2.0e-5
+  lr_final: 2.0e-6
+  shared_lr_scale: 1.0
+  eval_batches: 64
+  early_stopping_patience: 4
+  early_stopping_min_delta: 0.002
+  streaming: true
+  shard_buffer: 16
+
+loss:
+  action_coef: 1.0
+  require_exact_chosen_action_features: true
+  require_exact_chosen_legality: true
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  value_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+preflight:
+  report: runs/preflight_audit/typed_token_policy_post_matchup_prior_v8/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_policy_post_matchup_prior_v8/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_policy_post_matchup_prior_v1
+  tensorboard: true

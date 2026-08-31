@@ -139,7 +139,7 @@ def main() -> None:
     root_mse = float(np.mean((root - target) ** 2))
     report = {
         "n_holdout_rows": len(selected),
-        "n_holdout_games": int(len(np.unique(games[holdout]))),
+        "n_holdout_games": len(np.unique(games[holdout])),
         "leaf_holdout_mse": leaf_mse,
         "support_uniform_input_mse": float(np.mean((uniform - target) ** 2)),
         "root_board_with_leaf_belief_mse": root_mse,

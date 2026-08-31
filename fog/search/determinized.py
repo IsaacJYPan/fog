@@ -37,6 +37,24 @@ from __future__ import annotations
 import torch
 
 
+def root_belief_context(agent, batch: dict, contexts=None):
+    """Build the belief context through the same shared-trunk route as ``FogAgent.forward``.
+
+    Search predates the typed shared latent and used to call ``belief_context(contexts)``
+    directly.  That is valid for the legacy encoder, but it either fails or bypasses the learned
+    common state for current typed agents.  Keep this helper inference-only and derive everything
+    from the same censored root batch used by the acting policy.
+    """
+    if contexts is None:
+        contexts = agent.encode_contexts(batch)
+    shared_state = None
+    if getattr(agent, "shared_latent", None) is not None:
+        shared_state = agent.shared_latent(batch, contexts, agent.backbone.embeds)
+        if isinstance(shared_state, tuple):
+            shared_state = shared_state[0]
+    return agent.belief_context(contexts, shared_state=shared_state)
+
+
 @torch.no_grad()
 def determinized_action(
     agent,
@@ -47,6 +65,8 @@ def determinized_action(
     prior_weight: float = 0.5,
     max_batch_forward: int = 256,
     generator: torch.Generator | None = None,
+    min_override_margin: float = 0.0,
+    uncertainty_z: float = 0.0,
 ) -> int:
     """Return the argmax action under root-level determinized rollout for a single decision.
 
@@ -70,10 +90,11 @@ def determinized_action(
     log_probs = out.log_probs[0]
     root_value = float(out.value[0])
 
-    _, c_dyn = agent._backbone_pass(batch)                             # c_dyn conditions the belief
+    contexts = agent.encode_contexts(batch)
+    belief_context = root_belief_context(agent, batch, contexts)
     worlds = agent.belief.sample_team(
-        c_dyn, batch["opp_revealed"], k=k, generator=generator
-    )[0].cpu().numpy()                                                 # [k, 6, 9]
+        belief_context, batch["opp_revealed"], k=k, generator=generator
+    )[0].cpu().numpy()                                                 # [k, 6, 15]
 
     # simulate every (action, world) ply; terminal outcomes score directly, fog leaves batch up
     scores_by_action: dict[int, list[float]] = {a: [] for a in legal}
@@ -97,11 +118,24 @@ def determinized_action(
             scores_by_action[a].append(v)
 
     scores = torch.full((14,), float("-inf"))
+    standard_errors: dict[int, float] = {}
     for a in legal:
         vals = scores_by_action[a]
         search = sum(vals) / len(vals) if vals else root_value
         scores[a] = search + prior_weight * float(log_probs[a])
-    return int(scores.argmax())
+        if len(vals) > 1:
+            standard_errors[a] = float(torch.tensor(vals).std(unbiased=True) / len(vals) ** 0.5)
+        else:
+            standard_errors[a] = 0.0
+    candidate = int(scores.argmax())
+    policy_action = max(legal, key=lambda action: float(log_probs[action]))
+    if candidate == policy_action:
+        return candidate
+    uncertainty = float(uncertainty_z) * (
+        standard_errors[candidate] ** 2 + standard_errors[policy_action] ** 2
+    ) ** 0.5
+    required = float(min_override_margin) + uncertainty
+    return candidate if float(scores[candidate] - scores[policy_action]) >= required else policy_action
 
 
 def _stack_observations(obs_list: list, device) -> dict:

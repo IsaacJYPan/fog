@@ -9,7 +9,7 @@
 # blocks CLAIMS, not machinery training; the champion's claim-bearing evaluations (G5, L) run on
 # Showdown separately.
 #   python -m fog.training.ppo --config configs/g0_v2_champion.yaml
-extends: m1_5_belief.yaml
+extends: archive/m1_5_belief.yaml
 
 experiment: g0_v2_champion
 env:

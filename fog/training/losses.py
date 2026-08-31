@@ -24,15 +24,29 @@ def _masked_cross_entropy_sum(
         tgt_logit = logits.gather(1, safe_target.unsqueeze(1)).squeeze(1)
         finite = torch.isfinite(tgt_logit)
         if stats is not None:
+            dropped = valid & ~finite
             stats["dropped_nonfinite"] = (
-                stats.get("dropped_nonfinite", 0) + int((valid & ~finite).sum())
+                stats.get("dropped_nonfinite", 0) + int(dropped.sum())
             )
+            if bool(dropped.any()):
+                indices = torch.nonzero(dropped, as_tuple=False).flatten()[:8]
+                stats.setdefault("dropped_examples", []).extend(
+                    {
+                        "flat_index": int(index),
+                        "target": int(target[index]),
+                    }
+                    for index in indices
+                )
         valid = valid & finite
     count = int(valid.sum())
     if stats is not None:
         stats["valid"] = stats.get("valid", 0) + count
     if count == 0:
-        return logits.new_zeros(()), 0
+        # Keep an all-censored batch connected to the model graph. Replay shuffling can rarely
+        # produce a batch with no eventually revealed belief fields; a detached scalar zero makes
+        # the otherwise valid no-op update crash at backward(). Summing an empty view is finite
+        # even when masked logits contain -inf and gives every upstream parameter a zero gradient.
+        return logits.reshape(-1)[:0].sum(), 0
     return F.cross_entropy(logits[valid], target[valid], reduction="sum"), count
 
 
@@ -51,7 +65,7 @@ def masked_cross_entropy(
     BUG signal, not noise: exactly this guard silently swallowed every revealed move whose paste
     position differed from its clamp position until the 2026-07-12 alignment fix
     (reveals.align_truth_to_views). Post-alignment the only legitimate drops are a truth label
-    outside its legality mask (usage-derived spread priors, learnset table gaps) — genuinely rare.
+    outside its legality mask (learnset table gaps or an invalid EV total) — genuinely rare.
     """
     total, count = _masked_cross_entropy_sum(logits, target, valid, stats)
     return total / count if count else total
@@ -64,7 +78,17 @@ def belief_loss(
     `stats` threads through to masked_cross_entropy's dropped-entry counter."""
     total = None
     for name, logits in attr_logits.items():
-        term = masked_cross_entropy(logits, attr_targets[name], attr_valid[name], stats=stats)
+        family_stats: dict | None = {} if stats is not None else None
+        term = masked_cross_entropy(
+            logits, attr_targets[name], attr_valid[name], stats=family_stats
+        )
+        if stats is not None and family_stats is not None:
+            stats["valid"] = stats.get("valid", 0) + family_stats.get("valid", 0)
+            stats["dropped_nonfinite"] = (
+                stats.get("dropped_nonfinite", 0)
+                + family_stats.get("dropped_nonfinite", 0)
+            )
+            stats.setdefault("by_family", {})[name] = dict(family_stats)
         total = term if total is None else total + term
     return total if total is not None else torch.zeros(())
 

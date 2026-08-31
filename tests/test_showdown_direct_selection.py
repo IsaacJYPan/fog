@@ -1,10 +1,35 @@
 import pytest
+import torch
 
 from fog.eval.showdown_direct_selection import (
     MatchResult,
+    greedy_action_with_tera_bonus,
     match_result_from_dict,
     matched_schedule,
+    validate_evaluation_temperature,
 )
+
+
+def test_greedy_tera_bonus_is_local_and_preserves_illegal_actions():
+    log_probs = torch.tensor([-0.2, -0.7, -1.0, -1.5, -2.0, float("-inf"), -3.0, -4.0,
+                              -0.5, -1.1, -1.2, -1.3, -1.4, float("-inf")])
+    assert greedy_action_with_tera_bonus(log_probs) == 0
+    assert greedy_action_with_tera_bonus(log_probs, 2.0) == 4
+    # The illegal Tera slot remains impossible even after a very large family bonus.
+    only_illegal_tera_high = log_probs.clone()
+    only_illegal_tera_high[4] = float("-inf")
+    assert greedy_action_with_tera_bonus(only_illegal_tera_high, 100.0) in {6, 7}
+    with pytest.raises(ValueError, match="non-negative"):
+        greedy_action_with_tera_bonus(log_probs, -1.0)
+
+
+def test_evaluation_temperature_validation_accepts_sampling_and_rejects_bad_values():
+    assert validate_evaluation_temperature(0.0) == 0.0
+    assert validate_evaluation_temperature(1.2) == pytest.approx(1.2)
+    with pytest.raises(ValueError, match="finite and non-negative"):
+        validate_evaluation_temperature(-0.1)
+    with pytest.raises(ValueError, match="finite and non-negative"):
+        validate_evaluation_temperature(float("nan"))
 
 
 def test_matched_schedule_crosses_team_and_position_for_a():

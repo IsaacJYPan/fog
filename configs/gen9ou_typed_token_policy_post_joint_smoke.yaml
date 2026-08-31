@@ -1,0 +1,14 @@
+extends: gen9ou_typed_token_policy_post_joint.yaml
+
+experiment: gen9ou_typed_token_policy_post_joint_smoke
+
+bc:
+  epochs: 2
+  max_primary_batches_per_epoch: 8
+  eval_batches: 8
+  auxiliary_eval_batches: 4
+  early_stopping_patience: 0
+
+log:
+  dir: runs/gen9ou_typed_token_policy_post_joint_smoke_v3
+  tensorboard: false

@@ -7,10 +7,13 @@ is self-consistent — the gate-quality NUMBERS need a trained checkpoint (docum
 import numpy as np
 import torch
 
-from fog.eval.pb_value_drift import reweight_staleness_curve, solution_gap, format_report
-from fog.models.pb_value import PBValueNet, _POS_FAMILY, N_ATTRS
+from fog.eval.pb_value_drift import format_report, reweight_staleness_curve, solution_gap
+from fog.models.pb_value import _POS_FAMILY, N_ATTRS, PBValueNet
 
-SIZES = {"species": 32, "item": 12, "ability": 16, "move": 40, "spread": 8, "tera": 6}
+SIZES = {
+    "species": 32, "item": 12, "ability": 16, "move": 40,
+    "nature": 8, "ev": 8, "tera": 6,
+}
 STATE, DYN, D = 24, 20, 16
 
 
@@ -34,7 +37,7 @@ class _FakeAgent:
 
 def _rand_teams(n, gen):
     cols = [torch.randint(0, SIZES[_POS_FAMILY[p]], (n, 1), generator=gen) for p in range(N_ATTRS)]
-    return torch.cat(cols, dim=1).reshape(n, 6, 9)
+    return torch.cat(cols, dim=1).reshape(n, 6, 15)
 
 
 def _build(monkeypatch):
@@ -82,7 +85,7 @@ def test_staleness_curve_responds_to_drift(monkeypatch):
     curve = reweight_staleness_curve(agent, net, grid, rho, own, opp, avail, avail,
                                      staleness=(1, 2, 4, 8), iters=48)
     assert set(curve) == {1, 2, 4, 8}
-    for s, r in curve.items():
+    for r in curve.values():
         assert np.isfinite(r["mean"]) and np.isfinite(r["max"])
         assert r["mean"] >= 0.0 and r["max"] >= r["mean"]
     # the belief genuinely moves the table across iterations, so staleness produces real error
@@ -99,7 +102,7 @@ def test_solution_gap_reference_is_self_consistent(monkeypatch):
     # N=1 is the reference compared to itself: exactly zero, deterministically.
     assert gap[1]["sigma1_tv"] == 0.0 and gap[1]["sigma2_tv"] == 0.0
     assert gap[1]["root_value_gap"] == 0.0
-    for n, r in gap.items():
+    for r in gap.values():
         assert np.isfinite(r["sigma1_tv"]) and r["sigma1_tv"] >= 0.0
         assert r["iterations"] == 48                                  # tol=0 -> full length
     # fewer refreshes as N grows (the whole point: N=1 refreshes every iter, N=16 far fewer)

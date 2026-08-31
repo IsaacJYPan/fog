@@ -28,6 +28,24 @@ import numpy as np
 from fog.search.determinized import determinized_action
 
 
+class EngineAgentPolicy:
+    """A frozen FogAgent reply policy over an engine fork's properly censored view."""
+
+    def __init__(self, agent: Any, *, temperature: float = 0.0) -> None:
+        self.agent = agent
+        self.temperature = float(temperature)
+        self.agent.eval()
+
+    def choose(self, battle: Any, role: str) -> int:
+        import torch
+
+        from fog.env.player import _sample_action
+
+        with torch.no_grad():
+            output = self.agent(engine_root_batch(self.agent, battle, role))
+        return _sample_action(output.log_probs[0], temperature=self.temperature)
+
+
 def _play_one_ply(fork, role: str, action_idx: int, opponent_policy, *, max_forced_steps: int):
     """Step `fork` one searcher-ply and return the leaf (Observation) / terminal float. Assumes the
     searcher is pending on `fork`; mutates only `fork` (a disposable clone)."""
@@ -74,14 +92,17 @@ class _BaseStepper:
         self.rng = random.Random(seed)
         self.max_forced_steps = int(max_forced_steps)
         self.failures = 0  # a nonzero trickle is tolerable; a flood signals a reconstruction bug
+        self.failure_reasons: dict[str, int] = {}
 
     def __call__(self, action_idx: int, world_tokens: np.ndarray):
         try:
             fork = self._fork(np.asarray(world_tokens, dtype=np.int64))
             return _play_one_ply(fork, self.role, int(action_idx), self.opponent_policy,
                                  max_forced_steps=self.max_forced_steps)
-        except Exception:
+        except Exception as exc:  # noqa: BLE001 - failed worlds are explicit search observations
             self.failures += 1
+            reason = f"{type(exc).__name__}: {exc}"[:240]
+            self.failure_reasons[reason] = self.failure_reasons.get(reason, 0) + 1
             return None
 
     def _fork(self, world_tokens: np.ndarray):  # pragma: no cover - overridden

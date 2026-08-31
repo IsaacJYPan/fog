@@ -3,10 +3,17 @@ from __future__ import annotations
 
 import math
 
+import pytest
 import torch
 
+from fog.env.player import _behavior_log_probs, _temperature_log_probs
 from fog.training.leakage import DegenerateSolutionWatchdog, delta_information, shaped_reward
-from fog.training.ppo import _masked_entropy, _masked_kl, ppo_update
+from fog.training.ppo import (
+    _masked_entropy,
+    _masked_kl,
+    _restricted_optimizer_groups,
+    ppo_update,
+)
 
 
 class TinyPolicyAgent(torch.nn.Module):
@@ -36,14 +43,38 @@ def make_ppo_batch(n=64, obs_dim=8, seed=0):
     old_log_probs = torch.log(torch.full((n,), 0.25))
     advantages = torch.randn(n, generator=g)
     returns = torch.tanh(torch.randn(n, generator=g))
-    return dict(
-        obs=obs,
-        legality_mask=legality,
-        actions=actions,
-        old_log_probs=old_log_probs,
-        advantages=advantages,
-        returns=returns,
+    return {
+        "obs": obs,
+        "legality_mask": legality,
+        "actions": actions,
+        "old_log_probs": old_log_probs,
+        "advantages": advantages,
+        "returns": returns,
+    }
+
+
+def test_restricted_optimizer_groups_apply_prefix_lr_scales_and_freeze_rest():
+    agent = TinyPolicyAgent()
+    groups, trainable, names = _restricted_optimizer_groups(
+        agent,
+        ("pi.", "v."),
+        {"v.": 0.1},
+        2e-5,
     )
+    assert len(trainable) == 4
+    assert sorted(group["lr"] for group in groups) == pytest.approx([2e-6, 2e-5])
+    assert set(names) == {1.0, 0.1}
+    assert all(parameter.requires_grad for parameter in agent.parameters())
+
+
+def test_restricted_optimizer_groups_reject_unmatched_scale_prefix():
+    agent = TinyPolicyAgent()
+    try:
+        _restricted_optimizer_groups(agent, ("pi.",), {"missing.": 0.1}, 1e-4)
+    except ValueError as exc:
+        assert "matched no trainable parameters" in str(exc)
+    else:
+        raise AssertionError("expected unmatched lr scale to fail closed")
 
 
 def test_masked_entropy_and_kl_handle_neg_inf():
@@ -53,6 +84,68 @@ def test_masked_entropy_and_kl_handle_neg_inf():
     assert abs(ent.item() - math.log(2)) < 1e-6
     kl = _masked_kl(lp, lp)
     assert abs(kl.item()) < 1e-6
+
+
+def test_temperature_log_probs_preserves_mask_and_renormalizes():
+    raw = torch.log(torch.tensor([[0.9, 0.1, 0.0]]))
+    hot = _temperature_log_probs(raw, temperature=2.0)
+    expected = torch.tensor([[0.75, 0.25, 0.0]])
+    assert torch.allclose(hot.exp(), expected, atol=1e-6)
+    assert torch.isneginf(hot[0, 2])
+    assert _temperature_log_probs(raw, temperature=1.0) is raw
+
+
+def test_ppo_temperature_recomputes_the_recorded_behavior_probability():
+    torch.manual_seed(3)
+    agent = TinyPolicyAgent()
+    opt = torch.optim.Adam(agent.parameters(), lr=0.0)
+    batch = make_ppo_batch(n=64, seed=3)
+    with torch.no_grad():
+        behavior = _temperature_log_probs(agent(batch).log_probs, temperature=2.0)
+        batch["old_log_probs"] = behavior.gather(
+            1, batch["actions"].unsqueeze(1)
+        ).squeeze(1)
+    metrics = ppo_update(
+        agent,
+        opt,
+        batch,
+        {"ppo": {"minibatch_size": 64, "epochs": 1, "rollout_temperature": 2.0}},
+    )
+    assert abs(metrics["approx_kl"]) < 1e-7
+    assert metrics["clip_frac"] == 0.0
+    assert metrics["rollout_temperature"] == 2.0
+
+
+def test_tera_bonus_changes_only_cross_family_mass_and_preserves_illegal_mask():
+    raw = torch.log(torch.tensor([[0.45, 0.25, 0.0, 0.0, 0.20, 0.10] + [0.0] * 8]))
+    explored = _behavior_log_probs(raw, tera_logit_bonus=2.0)
+    probs = explored.exp()
+    assert torch.isneginf(explored[0, 2])
+    assert torch.allclose(probs[0, 0] / probs[0, 1], torch.tensor(0.45 / 0.25))
+    assert torch.allclose(probs[0, 4] / probs[0, 5], torch.tensor(2.0))
+    assert probs[0, 4:6].sum() > torch.tensor(0.30)
+
+
+def test_ppo_tera_bonus_recomputes_the_recorded_behavior_probability():
+    torch.manual_seed(4)
+    agent = TinyPolicyAgent()
+    opt = torch.optim.Adam(agent.parameters(), lr=0.0)
+    batch = make_ppo_batch(n=64, seed=4)
+    batch["legality_mask"][:, 4:8] = True
+    with torch.no_grad():
+        behavior = _behavior_log_probs(agent(batch).log_probs, tera_logit_bonus=1.5)
+        batch["old_log_probs"] = behavior.gather(
+            1, batch["actions"].unsqueeze(1)
+        ).squeeze(1)
+    metrics = ppo_update(
+        agent,
+        opt,
+        batch,
+        {"ppo": {"minibatch_size": 64, "epochs": 1, "rollout_tera_logit_bonus": 1.5}},
+    )
+    assert abs(metrics["approx_kl"]) < 1e-7
+    assert metrics["clip_frac"] == 0.0
+    assert metrics["rollout_tera_logit_bonus"] == 1.5
 
 
 def test_ppo_update_runs_and_changes_params():
@@ -67,6 +160,48 @@ def test_ppo_update_runs_and_changes_params():
     for key in ("loss", "policy_loss", "value_loss", "entropy", "approx_kl", "clip_frac"):
         assert key in metrics and math.isfinite(metrics[key])
     assert 0.0 <= metrics["clip_frac"] <= 1.0
+
+
+def test_ppo_update_mixes_replay_policy_loss_into_same_optimizer_step():
+    """The optional replay lesson is consumed and reported during an ordinary PPO update."""
+
+    class FakeReplayRegularizer:
+        def __init__(self):
+            self.remaining = 0
+            self.calls = 0
+
+        def begin_update(self):
+            self.remaining = 1
+
+        def loss(self, agent):
+            if self.remaining <= 0:
+                return None
+            self.remaining -= 1
+            self.calls += 1
+            replay = make_ppo_batch(n=16, seed=91)
+            out = agent({"obs": replay["obs"], "legality_mask": replay["legality_mask"]})
+            nll = -out.log_probs[:, 0].mean()
+            return 0.01 * nll, {
+                "replay_policy_nll": float(nll.detach()),
+                "replay_policy_rows": 16.0,
+                "replay_policy_coef": 0.01,
+            }
+
+    torch.manual_seed(91)
+    agent = TinyPolicyAgent()
+    opt = torch.optim.Adam(agent.parameters(), lr=1e-3)
+    regularizer = FakeReplayRegularizer()
+    metrics = ppo_update(
+        agent,
+        opt,
+        make_ppo_batch(n=64, seed=92),
+        {"ppo": {"minibatch_size": 32, "epochs": 1}},
+        replay_regularizer=regularizer,
+    )
+    assert regularizer.calls == 1
+    assert metrics["replay_policy_rows"] == 16.0
+    assert metrics["replay_policy_coef"] == 0.01
+    assert math.isfinite(metrics["replay_policy_nll"])
 
 
 def test_ppo_update_improves_advantaged_action():

@@ -1,0 +1,13 @@
+extends: gen9ou_typed_token_soft_value_head_hybrid_v2.yaml
+
+experiment: gen9ou_typed_token_soft_value_head_hybrid_smoke_v2
+
+bc:
+  epochs: 2
+  max_primary_batches_per_epoch: 4
+  eval_batches: 4
+  early_stopping_patience: 0
+
+log:
+  dir: runs/gen9ou_typed_token_soft_value_head_hybrid_smoke_v2
+  tensorboard: false

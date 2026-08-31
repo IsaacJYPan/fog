@@ -6,6 +6,11 @@ import numpy as np
 from fog.encoding.tracker import BattleTracker
 
 
+class _Mon:
+    def __init__(self, item):
+        self.item = item
+
+
 def test_last_used_move_and_switch_reset():
     t = BattleTracker()
     t.feed_turn(1, [
@@ -56,6 +61,32 @@ def test_booster_and_volatile_counters():
     t2.feed_turn(2, [["", "-start", "p2a: Gholdengo", "Encore"]])
     t2.feed_turn(3, [["", "switch", "p2a: Kingambit", "Kingambit", "100/100"]])
     assert t2.counter_remaining("p2: Gholdengo", "encore", now=4) == 0.0
+
+
+def test_growing_current_turn_events_are_consumed_once():
+    t = BattleTracker()
+    initial = [["", "switch", "p1a: Iron Valiant", "Iron Valiant", "100/100"]]
+    t.feed_turn(1, initial)
+    t.feed_turn(1, initial)  # repeated decision request: no duplicate processing
+    grown = initial + [
+        ["", "-enditem", "p1a: Iron Valiant", "Booster Energy"],
+        ["", "faint", "p2a: Dragapult"],
+    ]
+    t.feed_turn(1, grown)
+    t.feed_turn(1, grown)
+
+    assert "p1: Iron Valiant" in t.booster_consumed
+    assert t.faints["p2"] == 1
+
+
+def test_private_preview_snapshot_preserves_consumed_booster_without_event_history():
+    t = BattleTracker()
+    mon = _Mon("boosterenergy")
+    battle = type("Battle", (), {"team": {"p1: Iron Valiant": mon}})()
+    t.record_private_team(battle)
+    mon.item = None  # poke-env applies the on-entry consumption before the first move request
+
+    assert t.booster_was_consumed("p1: Iron Valiant", mon)
 
 
 def test_future_sight_and_wish_delayed_block():

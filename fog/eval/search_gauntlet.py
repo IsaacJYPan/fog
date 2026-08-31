@@ -1,4 +1,4 @@
-"""Phase-2 search gauntlet (SEARCH_PLAN §5): validate the joint-search expert.
+"""Legacy one-sided search gauntlet (ARCHITECTURE.md S5–S6).
 
 Plays engine games where the SAME checkpoint acts through three arms:
 
@@ -8,7 +8,7 @@ Plays engine games where the SAME checkpoint acts through three arms:
   * joint        — §4.3 joint search over the OPPONENT's belief about ME
                    (exact pool enumeration — the Phase-2 setting; no sampling noise).
 
-Two measurements, per SEARCH_PLAN §5:
+Two diagnostic measurements:
 
   * gauntlet rows: each arm vs MaxDamage AND vs the set-oracle READING opponent — the same
     checkpoint played with the learner's true team injected (`model.oracle: set`; engine truth is
@@ -33,7 +33,7 @@ fixed, so the match is verified, not assumed: every row reports measured sims/de
 Games run ONE at a time (search batches internally over worlds × actions — same reasoning as
 fog/search/posterior_log.py). Failure containment mirrors posterior_log: a game that raises is
 dropped and counted, and a >20% failure rate raises rather than reporting on a corrupted sample.
-All of this is engine-backend expert VALIDATION (SEARCH_PLAN Phase 2) — headline numbers stay on
+All of this is engine-backend diagnostic validation — headline numbers stay on
 Showdown per the binding protocol; these rows never are.
 
     python -m fog.eval.search_gauntlet --pool data/teams/pool_a \
@@ -192,19 +192,16 @@ class ArmPlayer:
 def _play_game(battle: Any, sides: dict[str, Any], *, max_turns: int = 300):
     """Step one engine game to completion; `sides` maps role -> ArmPlayer or scripted policy.
     Returns battle.winner (None on a max_turns truncation = draw)."""
-    from fog.encoding.events import build_snapshot
+    from fog.encoding.events import record_history_decision
 
     while not battle.finished and battle.turn <= max_turns:
         moves: dict[str, str] = {}
         for role in battle.pending_sides():
             idx = sides[role].choose(battle, role)
             if getattr(sides[role], "records_history", False):
-                try:  # history retro-fidelity, same as EngineRunner._agent_wave
-                    battle.trackers[role].record_decision(
-                        battle.turn, build_snapshot(battle.view(role), battle.tables), idx
-                    )
-                except Exception:
-                    pass
+                record_history_decision(
+                    battle.trackers[role], battle.turn, battle.view(role), battle.tables, idx
+                )
             moves[role] = battle.engine_action(role, idx)
         battle.step(moves)
     return battle.winner
@@ -284,7 +281,7 @@ def run_search_match(side_a: Any, side_b: Any, pool: list[str], n_games: int, *,
         try:
             winner = _play_game(battle, {LEARNER: side_a, OPPONENT: side_b},
                                 max_turns=max_turns)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - failed game is counted, printed, and bounded
             row.failed_games += 1
             print(f"[search_gauntlet] game {g} ({label}) failed and was dropped: {exc!r}",
                   flush=True)
@@ -404,7 +401,7 @@ def run_search_gauntlet(
 def gate_report(rows: list[MatchRow]) -> dict:
     """§5 gate: joint > determinized AND joint > policy — vs the reading opponent and in the
     head-to-head rows. Point ordering and CI separation reported separately; if the gate fails,
-    that is a finding, not an error (SEARCH_PLAN §5) — so this reports, it never raises."""
+    that is a finding, not an error — so this reports, it never raises."""
     from fog.eval.stats import wilson_interval
 
     def iv(row):
@@ -451,7 +448,7 @@ def main() -> None:
     from fog.config import load_config_with_args
     from fog.env.teams import load_pool
 
-    ap = argparse.ArgumentParser(description="Phase-2 search gauntlet (SEARCH_PLAN §5).")
+    ap = argparse.ArgumentParser(description="Legacy one-sided search gauntlet.")
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
     ap.add_argument("--ckpt", type=str, required=True,
                     help="checkpoint (posterior-blind ones are expanded — but run the §4.2 "

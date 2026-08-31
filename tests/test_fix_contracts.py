@@ -42,7 +42,8 @@ def _small_backbone(*, dropout: float = 0.0) -> Backbone:
             "n_items": 8,
             "n_abilities": 8,
             "n_moves": 16,
-            "n_spreads": 4,
+            "n_natures": 5,
+            "n_ev_units": 8,
         },
     )
 
@@ -58,10 +59,6 @@ def _backbone_inputs(history: torch.Tensor) -> dict:
     }
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="history lengths/padding masks are not yet carried into the GRU",
-)
 def test_history_representation_ignores_batch_padding():
     """Adding blank batch-padding before the same real turns must not change the state."""
     torch.manual_seed(10)
@@ -73,13 +70,34 @@ def test_history_representation_ignores_batch_padding():
         short_state = backbone(**_backbone_inputs(real_turns))
         padded_state = backbone(**_backbone_inputs(padded))
 
-    assert torch.allclose(short_state, padded_state, atol=1e-6)
+    assert torch.allclose(short_state.private_state, padded_state.private_state, atol=1e-6)
+    assert torch.allclose(short_state.public_state, padded_state.public_state, atol=1e-6)
+    assert torch.allclose(short_state.history, padded_state.history, atol=1e-6)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="model.dropout is not yet passed to the Transformer layers",
-)
+def test_history_sidecars_ignore_front_padding():
+    torch.manual_seed(101)
+    backbone = _small_backbone().eval()
+    real = torch.randn(1, 2, DIMS.turn_dim)
+    ids = torch.randint(0, 3, (1, 2, DIMS.hist_id_fields))
+    state = torch.randn(1, 2, DIMS.hist_state).clamp(-1, 1)
+    short = _backbone_inputs(real)
+    short.update(history_len=torch.tensor([2]), history_ids=ids, history_state=state)
+    padded = _backbone_inputs(torch.cat([torch.zeros(1, 3, DIMS.turn_dim), real], dim=1))
+    padded.update(
+        history_len=torch.tensor([2]),
+        history_ids=torch.cat([torch.zeros(1, 3, DIMS.hist_id_fields, dtype=torch.long), ids], dim=1),
+        history_state=torch.cat([torch.zeros(1, 3, DIMS.hist_state), state], dim=1),
+    )
+
+    with torch.no_grad():
+        short_state = backbone(**short)
+        padded_state = backbone(**padded)
+    assert torch.allclose(short_state.private_state, padded_state.private_state, atol=1e-6)
+    assert torch.allclose(short_state.public_state, padded_state.public_state, atol=1e-6)
+    assert torch.allclose(short_state.history, padded_state.history, atol=1e-6)
+
+
 def test_explicit_zero_dropout_is_deterministic_in_training_mode():
     """With dropout explicitly zero, identical inputs/weights must give identical outputs."""
     torch.manual_seed(11)
@@ -89,7 +107,9 @@ def test_explicit_zero_dropout_is_deterministic_in_training_mode():
     first = backbone(**inputs)
     second = backbone(**inputs)
 
-    assert torch.equal(first, second)
+    assert torch.equal(first.private_state, second.private_state)
+    assert torch.equal(first.public_state, second.public_state)
+    assert torch.equal(first.history, second.history)
 
 
 @pytest.mark.xfail(
@@ -106,10 +126,11 @@ def test_belief_teacher_forcing_lets_earlier_truth_affect_later_predictions():
         n_items=6,
         n_abilities=5,
         n_moves=12,
-        n_spreads=4,
+        n_natures=5,
+        n_ev_units=8,
     ).eval()
     state = torch.randn(1, 16)
-    revealed = torch.full((1, 6, 9), -1, dtype=torch.long)
+    revealed = torch.full((1, 6, 15), -1, dtype=torch.long)
     revealed[:, :, 0] = 1  # standard preview: species is public
     view = {"tokens": revealed, "masks": {}}
 
@@ -126,7 +147,7 @@ def test_belief_teacher_forcing_lets_earlier_truth_affect_later_predictions():
 
 
 def _agent_batch() -> dict:
-    tokens = torch.full((1, 6, 9), -1, dtype=torch.long)
+    tokens = torch.full((1, 6, 15), -1, dtype=torch.long)
     tokens[:, :, 0] = 1
     return {
         **_backbone_inputs(torch.zeros(1, 2, DIMS.turn_dim)),
@@ -141,8 +162,8 @@ def test_teacher_tokens_never_change_policy_or_visible_belief_summary():
     agent = FogAgent().eval()
     batch_a = _agent_batch()
     batch_b = copy.deepcopy(batch_a)
-    batch_a["belief_teacher_tokens"] = torch.zeros(1, 6, 9, dtype=torch.long)
-    batch_b["belief_teacher_tokens"] = torch.ones(1, 6, 9, dtype=torch.long)
+    batch_a["belief_teacher_tokens"] = torch.zeros(1, 6, 15, dtype=torch.long)
+    batch_b["belief_teacher_tokens"] = torch.ones(1, 6, 15, dtype=torch.long)
 
     with torch.no_grad():
         out_a = agent(batch_a)
@@ -167,6 +188,30 @@ class _FixedPublicStateAgent:
             belief=None,
             self_belief=None,
         )
+
+
+def test_replay_policy_loss_ignores_unaligned_action_labels():
+    agent = _FixedPublicStateAgent()
+    base = {
+        "action": torch.tensor([0, 13]),
+        "policy_valid": torch.tensor([True, False]),
+        "outcome": torch.tensor([0.0, 0.0]),
+    }
+    changed_invalid = {**base, "action": torch.tensor([0, 1])}
+    cfg = {
+        "action_coef": 1.0,
+        "belief_coef": 0.0,
+        "belief_chain_coef": 0.0,
+        "self_belief_coef": 0.0,
+        "value_coef": 0.0,
+    }
+
+    loss_a, metrics_a = bc_loss(agent, base, cfg)
+    loss_b, metrics_b = bc_loss(agent, changed_invalid, cfg)
+
+    assert torch.equal(loss_a, loss_b)
+    assert metrics_a["policy_valid_count"] == 1
+    assert metrics_b["policy_valid_count"] == 1
 
 
 @pytest.mark.xfail(

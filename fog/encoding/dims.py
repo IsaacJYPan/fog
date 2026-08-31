@@ -52,9 +52,10 @@ class Dims:
     move_pp: int = N_MOVE_SLOTS      # PP fractions where known
     tera_type: int = N_TERA_TYPES    # one-hot(19)
     tera_used_flag: int = 1
-    n_spread_slots: int = 1
-    # epistemic flags: known/unknown per hidden attribute (item, ability, 4 moves, spread, tera)
-    epistemic_flags: int = 8
+    n_nature_slots: int = 1
+    n_ev_slots: int = 6
+    # known/unknown per hidden field: item, ability, 4 moves, nature, 6 EV stats, tera
+    epistemic_flags: int = 14
     # positional
     is_mine: int = 1
     is_active: int = 1
@@ -79,6 +80,10 @@ class Dims:
     hist_my_action: int = N_ACTIONS  # 14-way one-hot
     hist_opp_action: int = 40        # observed category: move idx / switch species / tera flag / <UNSEEN>
     hist_resolution: int = 24        # dmg dealt/taken, crit, effectiveness, miss, reveals, faints, order
+    # Checkpoint-compatible sidecars.  The legacy 108-float record remains unchanged; categorical
+    # identities and the two actives' individual boost stages are embedded/projected alongside it.
+    hist_id_fields: int = 17
+    hist_state: int = 2 * N_BOOST_STATS
 
     history_cap: int = 60            # T; pad/truncate from the front
 

@@ -1,5 +1,4 @@
-"""Persistent joint public belief across turns (PROPOSAL_IMPL_PLAN Phase D;
-PROJECT_DESIGN_PROPOSAL.md §7, §14 step 11; settled decisions 16, 23, 25).
+"""Persistent joint public belief across turns (ARCHITECTURE.md invariants S1–S3).
 
 One `JointBeliefTable` lives for one battle. Its axes are STABLE candidate identities — K
 candidate versions of our team and J candidate opponent teams, fixed at construction so that
@@ -57,7 +56,7 @@ class JointBeliefTable:
         self.refused_steps = 0
 
     @classmethod
-    def from_margins(cls, log_w_own: Array, log_w_opp: Array) -> "JointBeliefTable":
+    def from_margins(cls, log_w_own: Array, log_w_opp: Array) -> JointBeliefTable:
         """Independent prior rho_0(k, j) = P_own(k) * P_opp(j) (proposal §7: valid while the two
         team selections are sampled independently; a correlated matchmaking prior would construct
         the joint table directly)."""
