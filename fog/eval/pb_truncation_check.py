@@ -1,4 +1,4 @@
-"""G2 truncation validation (PROPOSAL_IMPL_PLAN Phase G2; amendment A3's reconsideration gate):
+"""Posterior-mass truncation validation for experimental two-sided search:
 how much does posterior-mass truncation move the EXECUTED action row?
 
 For each sampled pool position, solve the same decision at several `top_j` caps and compare each
@@ -84,8 +84,8 @@ def main() -> None:
     ap.add_argument("--j-ref", type=int, default=64)
     ap.add_argument("--top-k", type=int, default=8)
     ap.add_argument("--iters", type=int, default=64)
-    ap.add_argument("--min-prob", type=float, default=0.02)
-    ap.add_argument("--max-branches", type=int, default=8)
+    ap.add_argument("--min-prob", type=float, default=0.0)
+    ap.add_argument("--max-branches", type=int, default=None)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", default=None)
     args = ap.parse_args()

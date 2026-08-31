@@ -1,4 +1,4 @@
-"""Rung-1/2 conditioning gate for the belief chain (BELIEF_POLICY_PLAN §3.7): prove the chain
+"""Rung-1/2 conditioning gate for the belief chain: prove the chain
 CONDITIONS on reveals — on controlled distributions with KNOWN joint structure — before any
 usage-data training is trusted.
 
@@ -19,7 +19,7 @@ the hidden tail). All hidden attributes are iid uniform EXCEPT one arbitrary des
 
 The source (flat 28) sits AFTER the dependent (flat 8) in canonical order, so a fixed left-to-right
 chain can never condition the dependent on a revealed source — exactly the property the reveal-set
-prefix-LM exists to provide (BELIEF_POLICY_PLAN §3.3). n_tera (8) > n_items (4), which separates three
+prefix model exists to provide. n_tera (8) > n_items (4), which separates three
 behaviors: a model beats uniform (ln 8 = 2.079) by learning the image support, reaches the true
 marginal (ln 4 = 1.386) without any conditioning, and reaches 0 only by conditioning.
 
@@ -52,9 +52,9 @@ RUNG 1 (memorization sanity, POOL-A style) — 8 fixed teams SHARING the 6 speci
 draws, the same reveal process. Gate: model chain CE within 0.10 nats of the EXACT mixture floor
 (the true 8-team posterior conditional, computed per tail order), sampled teams are members of the
 set (>= 0.95), and a uniquely-identifying reveal (all 6 items) makes samples reproduce the full
-54-attribute team exactly (>= 0.95).
+90-attribute team exactly (>= 0.95).
 
-Everything runs on the real BeliefModel (small dims) with c_dyn = 0 — the synthetic world has no
+Everything runs on the real BeliefModel (small dims) with belief_context = 0 — the synthetic world has no
 dynamics, so conditioning can only come from the prefix/tail tokens, which is precisely what is
 under test. Training mirrors ppo.py: BOTH the marginal (pass-A) and chain (pass-B) CE terms every
 step (§4.5, decision 2). This is load-bearing for the eval — the probe, the fallback read, and
@@ -91,26 +91,28 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Self
 
 import torch
 
 from fog.models.belief import N_ATTRS, N_SLOTS, SLOT_ATTRS, BeliefModel
-from fog.training.losses import belief_loss
+from fog.training.losses import belief_loss, belief_output_loss
 
 # The designed rule: source = slot-3 item (flat 28, LATE in canonical order), dependent = slot-0
 # tera (flat 8, EARLY). A fixed left-to-right chain cannot condition flat 8 on a revealed flat 28.
 SRC_SLOT, SRC_COL = 3, 1
-DEP_SLOT, DEP_COL = 0, 8
+DEP_SLOT, DEP_COL = 0, 14
 SRC_FLAT = SRC_SLOT * len(SLOT_ATTRS) + SRC_COL
 DEP_FLAT = DEP_SLOT * len(SLOT_ATTRS) + DEP_COL
 
-_SCALAR_COLS = {"species": 0, "item": 1, "ability": 2, "spread": 7, "tera": 8}
+_SCALAR_COLS = {"species": 0, "item": 1, "ability": 2, "nature": 7, "tera": 14}
 _FAM_COLS = {"species": (0,), "item": (1,), "ability": (2,), "move": (3, 4, 5, 6),
-             "spread": (7,), "tera": (8,)}
+             "nature": (7,), "ev": (8, 9, 10, 11, 12, 13), "tera": (14,)}
 _FAM_FLATS = {f: tuple(s * len(SLOT_ATTRS) + c for s in range(N_SLOTS) for c in cols)
               for f, cols in _FAM_COLS.items()}
 _FAM_SIZE_KEY = {"species": "n_species", "item": "n_items", "ability": "n_abilities",
-                 "move": "n_moves", "spread": "n_spreads", "tera": "n_tera"}
+                  "move": "n_moves", "nature": "n_natures",
+                  "ev": "n_ev_units", "tera": "n_tera"}
 
 
 # ------------------------------------------------------------------- the designed distribution
@@ -128,7 +130,10 @@ class GateSpec:
 
 def make_spec(seed: int, p_reveal_max: float = 0.6) -> GateSpec:
     g = torch.Generator().manual_seed(seed)
-    sizes = dict(n_species=8, n_items=4, n_abilities=6, n_moves=16, n_spreads=4, n_tera=8)
+    sizes = {
+        "n_species": 8, "n_items": 4, "n_abilities": 6, "n_moves": 16,
+        "n_natures": 5, "n_ev_units": 8, "n_tera": 8,
+    }
     species_team = torch.randperm(sizes["n_species"], generator=g)[:N_SLOTS]
     rule_map = torch.randperm(sizes["n_tera"], generator=g)[: sizes["n_items"]]
     return GateSpec(sizes=sizes, species_team=species_team, rule_map=rule_map,
@@ -136,7 +141,7 @@ def make_spec(seed: int, p_reveal_max: float = 0.6) -> GateSpec:
 
 
 def sample_truth(spec: GateSpec, n: int, g: torch.Generator) -> torch.Tensor:
-    """[n, 6, 9] true teams: fixed species, uniform iid attributes (moves = 4 distinct per slot),
+    """Synthetic true teams: fixed species, uniform iid fields (moves distinct),
     then the designed rule overwrites the dependent."""
     sz = spec.sizes
     t = torch.zeros(n, N_SLOTS, len(SLOT_ATTRS), dtype=torch.long)
@@ -144,8 +149,11 @@ def sample_truth(spec: GateSpec, n: int, g: torch.Generator) -> torch.Tensor:
     t[:, :, 1] = torch.randint(0, sz["n_items"], (n, N_SLOTS), generator=g)
     t[:, :, 2] = torch.randint(0, sz["n_abilities"], (n, N_SLOTS), generator=g)
     t[:, :, 3:7] = torch.rand(n, N_SLOTS, sz["n_moves"], generator=g).argsort(-1)[..., :4]
-    t[:, :, 7] = torch.randint(0, sz["n_spreads"], (n, N_SLOTS), generator=g)
-    t[:, :, 8] = torch.randint(0, sz["n_tera"], (n, N_SLOTS), generator=g)
+    t[:, :, 7] = torch.randint(0, sz["n_natures"], (n, N_SLOTS), generator=g)
+    t[:, :, 8:14] = torch.randint(
+        0, sz["n_ev_units"], (n, N_SLOTS, 6), generator=g
+    )
+    t[:, :, 14] = torch.randint(0, sz["n_tera"], (n, N_SLOTS), generator=g)
     t[:, DEP_SLOT, DEP_COL] = spec.rule_map[t[:, SRC_SLOT, SRC_COL]]
     return t
 
@@ -171,9 +179,11 @@ def targets_and_valid(truth: torch.Tensor, view: torch.Tensor) -> tuple[dict, di
     """Per-family chain-CE targets + hidden-only valid masks (the training convention)."""
     targets = {f: truth[:, :, c] for f, c in _SCALAR_COLS.items()}
     targets["move"] = truth[:, :, 3:7]
+    targets["ev"] = truth[:, :, 8:14]
     hidden = view < 0
     valid = {f: hidden[:, :, c] for f, c in _SCALAR_COLS.items()}
     valid["move"] = hidden[:, :, 3:7]
+    valid["ev"] = hidden[:, :, 8:14]
     return targets, valid
 
 
@@ -187,23 +197,57 @@ class _CaptureOrder:
         self.model = model
         self.orders: list[torch.Tensor] = []
 
-    def __enter__(self) -> "_CaptureOrder":
-        self._orig = self.model._order
+    def __enter__(self) -> Self:
+        self._orig = self.model._training_route
 
-        def wrapped(revealed, tail_order, generator):
-            order = self._orig(revealed, tail_order, generator)
-            self.orders.append(order)
-            return order
+        def wrapped(revealed, target_valid, tail_order, generator):
+            route, length = self._orig(revealed, target_valid, tail_order, generator)
+            # Preserve the old diagnostic representation: physical order contains every reveal,
+            # START, then the set-AR route.  The model itself never consumes this physical layout.
+            content = torch.full(
+                (len(revealed), N_ATTRS + 1), N_ATTRS,
+                dtype=torch.long, device=revealed.device,
+            )
+            for row in range(len(revealed)):
+                prefix = torch.nonzero(revealed[row], as_tuple=True)[0]
+                n_revealed = len(prefix)
+                content[row, :n_revealed] = prefix
+                n_hidden = int(length[row])
+                content[row, n_revealed + 1:n_revealed + 1 + n_hidden] = (
+                    route[row, :n_hidden]
+                )
+            self.orders.append(content)
+            return route, length
 
-        self.model._order = wrapped
+        self.model._training_route = wrapped
         return self
 
     def __exit__(self, *exc) -> None:
-        self.model._order = self._orig
+        self.model._training_route = self._orig
+
+
+def _seq_pos_from_route(
+    revealed: torch.Tensor, route: torch.Tensor, length: torch.Tensor
+) -> torch.Tensor:
+    """Content-id -> physical rank for reveal-set prefix plus a generated route."""
+    seq_pos = torch.full(
+        (len(revealed), N_ATTRS + 1), N_ATTRS + 1,
+        dtype=torch.long, device=revealed.device,
+    )
+    for row in range(len(revealed)):
+        prefix = torch.nonzero(revealed[row], as_tuple=True)[0]
+        seq_pos[row, prefix] = torch.arange(len(prefix), device=revealed.device)
+        seq_pos[row, N_ATTRS] = len(prefix)
+        n_hidden = int(length[row])
+        if n_hidden:
+            seq_pos[row, route[row, :n_hidden]] = (
+                torch.arange(n_hidden, device=revealed.device) + len(prefix) + 1
+            )
+    return seq_pos
 
 
 def _family_mean_sum(per_entry: torch.Tensor, valid: torch.Tensor) -> float:
-    """Aggregate a [B, 54] per-entry quantity exactly like belief_loss: mean over each family's
+    """Aggregate a [B, 90] per-entry quantity exactly like belief_loss: mean over each family's
     valid entries, summed across families (a family with no valid entry contributes 0)."""
     total = 0.0
     for flats in _FAM_FLATS.values():
@@ -214,7 +258,7 @@ def _family_mean_sum(per_entry: torch.Tensor, valid: torch.Tensor) -> float:
 
 
 def reference_ce(spec: GateSpec, seq_pos: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
-    """Exact per-entry CE [B, 54] of (marginal-product baseline, true conditional) for the rung-2
+    """Exact per-entry CE [B, 90] of (marginal-product baseline, true conditional) for the rung-2
     distribution under the order the forward used. Uniform families: marginal = conditional = ln N.
     Moves: conditional = ln(n_moves - #same-slot moves already in the conditioning set) — revealed
     moves sit in the prefix, physically before every tail token, so "earlier physical position"
@@ -225,7 +269,7 @@ def reference_ce(spec: GateSpec, seq_pos: torch.Tensor) -> tuple[torch.Tensor, t
     pos = seq_pos[:, :N_ATTRS].float()
     marg = torch.zeros(b, N_ATTRS, device=seq_pos.device)
     cond = torch.zeros(b, N_ATTRS, device=seq_pos.device)
-    for fam in ("item", "ability", "spread", "tera"):
+    for fam in ("item", "ability", "nature", "ev", "tera"):
         val = math.log(sz[_FAM_SIZE_KEY[fam]])
         marg[:, list(_FAM_FLATS[fam])] = val
         cond[:, list(_FAM_FLATS[fam])] = val
@@ -242,7 +286,7 @@ def reference_ce(spec: GateSpec, seq_pos: torch.Tensor) -> tuple[torch.Tensor, t
 
 
 # ------------------------------------------------------------------------------- rung-2 metrics
-def _zeros_cdyn(model: BeliefModel, b: int, device) -> torch.Tensor:
+def _zero_belief_context(model: BeliefModel, b: int, device) -> torch.Tensor:
     return torch.zeros(b, model.s_proj.in_features, device=device)
 
 
@@ -261,7 +305,7 @@ def _probe_metrics(model: BeliefModel, spec: GateSpec, device, *, matched: bool,
     view = sample_view(spec, truth, g, rate=None if matched else 0.0)
     view[:, SRC_SLOT, SRC_COL] = v
     view[:, DEP_SLOT, DEP_COL] = -1
-    out = model(_zeros_cdyn(model, len(v), device), {"tokens": view.to(device), "masks": None})
+    out = model(_zero_belief_context(model, len(v), device), {"tokens": view.to(device), "masks": None})
     probs = out.logits["tera"][:, DEP_SLOT].softmax(-1).cpu()
     want = spec.rule_map[v]
     acc = float((probs.argmax(-1) == want).float().mean())
@@ -276,7 +320,7 @@ def _fallback_metrics(model: BeliefModel, spec: GateSpec, device) -> tuple[float
     CE - ln(n_items) = KL(uniform-image || model)."""
     view = torch.full((1, N_SLOTS, len(SLOT_ATTRS)), -1, dtype=torch.long)
     view[:, :, 0] = spec.species_team
-    out = model(_zeros_cdyn(model, 1, device), {"tokens": view.to(device), "masks": None})
+    out = model(_zero_belief_context(model, 1, device), {"tokens": view.to(device), "masks": None})
     p = out.logits["tera"][0, DEP_SLOT].softmax(-1).cpu()
     image = p[spec.rule_map]
     return float(-image.clamp_min(1e-12).log().mean()), float(image.sum()), float(p.max())
@@ -291,7 +335,7 @@ def _sample_metrics(model: BeliefModel, spec: GateSpec, device, *, b: int, k: in
     g = torch.Generator().manual_seed(seed)
     truth = sample_truth(spec, b, g)
     rule = spec.rule_map.to(device)
-    c0 = _zeros_cdyn(model, b, device)
+    c0 = _zero_belief_context(model, b, device)
 
     def draw(view: torch.Tensor) -> torch.Tensor:
         gen = torch.Generator(device=device)
@@ -329,8 +373,7 @@ def eval_rung2(model: BeliefModel, spec: GateSpec, truth: torch.Tensor, view: to
         n_orders = 1
     truth_d, view_d = truth.to(device), view.to(device)
     b = truth.shape[0]
-    c_dyn = _zeros_cdyn(model, b, device)
-    targets, valid = targets_and_valid(truth_d, view_d)
+    belief_context = _zero_belief_context(model, b, device)
     hidden_flat = view_d.reshape(b, N_ATTRS) < 0
     dep_hidden = hidden_flat[:, DEP_FLAT]
     src_revealed = ~hidden_flat[:, SRC_FLAT]
@@ -340,16 +383,19 @@ def eval_rung2(model: BeliefModel, spec: GateSpec, truth: torch.Tensor, view: to
     for m in range(n_orders):
         gen = torch.Generator(device=device)
         gen.manual_seed(eval_seed * 1000 + m)
-        with _CaptureOrder(model) as cap:
-            out = model(c_dyn, {"tokens": view_d, "masks": None}, teacher_values=truth_d,
-                        tail_order=tail_order, generator=gen)
-        seq_pos = cap.orders[-1].argsort(dim=1)
-        tot["model"] += float(belief_loss(out.logits, targets, valid))
+        _, per_field_logp, route, length = model.path_logprob(
+            belief_context, {"tokens": view_d, "masks": None}, truth_d,
+            order_mode=tail_order, generator=gen, return_steps=True,
+        )
+        seq_pos = _seq_pos_from_route(
+            model._revealed_mask(view_d), route, length
+        )
+        per_field_ce = -per_field_logp
+        tot["model"] += _family_mean_sum(per_field_ce, hidden_flat)
         marg, cond = reference_ce(spec, seq_pos)
         tot["marg"] += _family_mean_sum(marg, hidden_flat)
         tot["cond"] += _family_mean_sum(cond, hidden_flat)
-        logp = out.logits["tera"][:, DEP_SLOT].log_softmax(-1)
-        ce = -logp.gather(1, truth_d[:, DEP_SLOT, DEP_COL].unsqueeze(1)).squeeze(1)
+        ce = per_field_ce[:, DEP_FLAT]
         before = seq_pos[:, DEP_FLAT] < seq_pos[:, SRC_FLAT]
         bins["src_revealed"].append(ce[dep_hidden & src_revealed])
         bins["src_hidden_after"].append(ce[dep_hidden & ~src_revealed & ~before])
@@ -439,7 +485,7 @@ def verdict_rung2(series: list[dict], refs: dict, tail_order: str = "random") ->
 
 # ------------------------------------------------------------------------------- rung-1 metrics
 def make_rung1_teams(spec: GateSpec, seed: int, n_teams: int = 8) -> torch.Tensor:
-    """[n_teams, 6, 9] fixed teams sharing the species line-up, item vectors pairwise distinct
+    """[n_teams, 6, 15] fixed teams sharing the species line-up, item vectors pairwise distinct
     (so revealing all 6 items identifies the team uniquely — the rung-1 identification reveal)."""
     g = torch.Generator().manual_seed(seed)
     for _ in range(64):
@@ -476,8 +522,7 @@ def eval_rung1(model: BeliefModel, spec: GateSpec, teams: torch.Tensor, truth: t
         n_orders = 1
     truth_d, view_d = truth.to(device), view.to(device)
     b = truth.shape[0]
-    c_dyn = _zeros_cdyn(model, b, device)
-    targets, valid = targets_and_valid(truth_d, view_d)
+    belief_context = _zero_belief_context(model, b, device)
     hidden_flat = view_d.reshape(b, N_ATTRS) < 0
     teams_flat = teams.reshape(len(teams), N_ATTRS).to(device)
     truth_flat = truth_d.reshape(b, N_ATTRS)
@@ -486,17 +531,20 @@ def eval_rung1(model: BeliefModel, spec: GateSpec, teams: torch.Tensor, truth: t
     for m in range(n_orders):
         gen = torch.Generator(device=device)
         gen.manual_seed(eval_seed * 1000 + m)
-        with _CaptureOrder(model) as cap:
-            out = model(c_dyn, {"tokens": view_d, "masks": None}, teacher_values=truth_d,
-                        tail_order=tail_order, generator=gen)
-        seq_pos = cap.orders[-1].argsort(dim=1)
-        tot_model += float(belief_loss(out.logits, targets, valid))
+        _, per_field_logp, route, length = model.path_logprob(
+            belief_context, {"tokens": view_d, "masks": None}, truth_d,
+            order_mode=tail_order, generator=gen, return_steps=True,
+        )
+        seq_pos = _seq_pos_from_route(
+            model._revealed_mask(view_d), route, length
+        )
+        tot_model += _family_mean_sum(-per_field_logp, hidden_flat)
         tot_floor += rung1_floor(teams_flat, truth_flat, hidden_flat, seq_pos)
 
     g = torch.Generator().manual_seed(eval_seed + 21)
     idx = torch.randint(0, len(teams), (sample_b,), generator=g)
     truth_s = teams[idx]
-    c0 = _zeros_cdyn(model, sample_b, device)
+    c0 = _zero_belief_context(model, sample_b, device)
 
     def draw(view_s: torch.Tensor) -> torch.Tensor:
         gen = torch.Generator(device=device)
@@ -505,7 +553,7 @@ def eval_rung1(model: BeliefModel, spec: GateSpec, teams: torch.Tensor, truth: t
                                  generator=gen)
 
     view0 = sample_view(spec, truth_s, g, rate=0.0)                # species only
-    samp = draw(view0).reshape(sample_b, sample_k, N_ATTRS)        # [B, k, 54]
+    samp = draw(view0).reshape(sample_b, sample_k, N_ATTRS)        # [B, k, 90]
     member = (samp.unsqueeze(2) == teams_flat.view(1, 1, -1, N_ATTRS)).all(-1).any(-1)
     view1 = view0.clone()
     view1[:, :, 1] = truth_s[:, :, 1]                              # + all 6 items (unique id)
@@ -587,18 +635,18 @@ def _train(args, spec: GateSpec, sample_batch, evaluate, header: str, row) -> li
     print(header, flush=True)
     do_eval(0)
     model.train()
-    c_dyn = torch.zeros(args.batch, args.state_dim, device=device)
+    belief_context = torch.zeros(args.batch, args.state_dim, device=device)
     t0 = time.time()
     for step in range(1, args.steps + 1):
         truth = sample_batch(args.batch, g_data)
         view = sample_view(spec, truth, g_data)
         truth, view = truth.to(device), view.to(device)
         targets, valid = targets_and_valid(truth, view)
-        out_chain = model(c_dyn, {"tokens": view, "masks": None}, teacher_values=truth,
+        out_chain = model(belief_context, {"tokens": view, "masks": None}, teacher_values=truth,
                           tail_order=args.tail_order)
-        loss = args.chain_coef * belief_loss(out_chain.logits, targets, valid)
+        loss = args.chain_coef * belief_output_loss(out_chain, targets, valid)
         if args.marginal_coef > 0:                       # pass-A term (ppo.py's belief_coef)
-            out_marg = model(c_dyn, {"tokens": view, "masks": None})
+            out_marg = model(belief_context, {"tokens": view, "masks": None})
             loss = loss + args.marginal_coef * belief_loss(out_marg.logits, targets, valid)
         opt.zero_grad(set_to_none=True)
         loss.backward()
@@ -676,7 +724,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--tail-order", choices=("random", "canonical"), default="random",
                    help="chain generation order for BOTH training and eval. 'random' = the any-order "
                         "tail (default); 'canonical' = the option-(c) ablation (fixed left-to-right "
-                        "tail matching what sample_team traverses, BELIEF_POLICY_PLAN §3.7)")
+                        "tail matching what sample_team traverses)")
     p.add_argument("--p-reveal-max", type=float, default=0.6,
                    help="per-example reveal rate ~ U(0, this)")
     p.add_argument("--seed", type=int, default=0)

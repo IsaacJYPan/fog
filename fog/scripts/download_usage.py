@@ -64,7 +64,7 @@ def build_spreads(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
         for key, weight in (row.get("Spreads") or {}).items():
             try:
                 nature, evs = parse_chaos_spread(key)
-            except Exception:
+            except (TypeError, ValueError):
                 continue
             observed.append({"nature": nature, "evs": list(evs), "usage_weight": float(weight)})
         if not observed:

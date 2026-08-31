@@ -7,9 +7,12 @@ entire reason the network takes the belief at all (a value blind to rho is the Â
 """
 import torch
 
-from fog.models.pb_value import PBValueNet
+from fog.models.pb_value import PBValueNet, TeamEncoder
 
-SIZES = {"species": 32, "item": 12, "ability": 16, "move": 40, "spread": 8, "tera": 6}
+SIZES = {
+    "species": 32, "item": 12, "ability": 16, "move": 40,
+    "nature": 8, "ev": 8, "tera": 6,
+}
 
 
 def _net(d=32):
@@ -21,7 +24,7 @@ def _rand_teams(n, gen):
     # concrete teams: every attribute a valid in-range index for its family
     from fog.models.pb_value import _POS_FAMILY, N_ATTRS
     cols = [torch.randint(0, SIZES[_POS_FAMILY[p]], (n, 1), generator=gen) for p in range(N_ATTRS)]
-    return torch.cat(cols, dim=1).reshape(n, 6, 9)
+    return torch.cat(cols, dim=1).reshape(n, 6, 15)
 
 
 def _inputs(L=5, K=3, J=4, seed=1):
@@ -126,3 +129,45 @@ def test_batchable_leaves_match_singletons():
         singles = torch.cat([net(s_board[i:i + 1], c_dyn[i:i + 1], own, opp, rho[i:i + 1])
                              for i in range(6)], dim=0)
     assert torch.allclose(batched, singles, atol=1e-5)
+
+
+def test_cached_representation_matches_reference_forward():
+    """Caching removes only belief-independent work; it cannot change the value definition."""
+    net = _net()
+    s_board, c_dyn, own, opp, rho = _inputs(L=6, K=3, J=4)
+    with torch.no_grad():
+        reference = net(s_board, c_dyn, own, opp, rho)
+        cache = net.prepare(s_board, c_dyn, own, opp)
+        cached = net.forward_cached(cache, rho)
+        rho2 = torch.flip(rho, dims=(1, 2))
+        rho2 = rho2 / rho2.sum(dim=(1, 2), keepdim=True)
+        cached2 = net.forward_cached(cache, rho2)
+    assert torch.allclose(reference, cached, atol=1e-6)
+    assert not torch.allclose(cached, cached2)
+
+
+def test_team_encoder_binds_attributes_to_their_pokemon():
+    """Swapping items between two species changes the team; it must not be an exact collision."""
+    gen = torch.Generator().manual_seed(123)
+    encoder = TeamEncoder(32, SIZES).eval()
+    team = _rand_teams(1, gen)
+    team[0, 0, 0], team[0, 1, 0] = 1, 2                       # distinct species
+    team[0, 0, 1], team[0, 1, 1] = 3, 7                       # distinct items
+    swapped = team.clone()
+    swapped[0, 0, 1], swapped[0, 1, 1] = team[0, 1, 1], team[0, 0, 1]
+    with torch.no_grad():
+        original_embedding = encoder(team)
+        swapped_embedding = encoder(swapped)
+    assert not torch.allclose(original_embedding, swapped_embedding, atol=1e-7)
+
+
+def test_team_encoder_is_invariant_to_whole_pokemon_storage_order():
+    """Reordering complete PokÃ©mon rows changes storage only, not the team they describe."""
+    gen = torch.Generator().manual_seed(124)
+    encoder = TeamEncoder(32, SIZES).eval()
+    team = _rand_teams(2, gen)
+    order = torch.tensor([5, 2, 0, 4, 1, 3])
+    with torch.no_grad():
+        original = encoder(team)
+        reordered = encoder(team[:, order])
+    assert torch.allclose(original, reordered, atol=1e-6)

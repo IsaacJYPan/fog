@@ -1,0 +1,17 @@
+extends: gen9ou_typed_token_joint_policy_bv_anchor_ppo_v1.yaml
+
+experiment: gen9ou_typed_token_joint_policy_bv_anchor_ppo_smoke_v1
+
+ppo:
+  total_decisions: 12000
+  batch_decisions: 6000
+  epochs: 1
+  kl_anchor_decisions: 12000
+
+league:
+  snapshot_every_decisions: 6000
+
+log:
+  dir: runs/gen9ou_typed_token_joint_policy_bv_anchor_ppo_smoke_v1
+  tensorboard: false
+  checkpoint_every_decisions: 6000

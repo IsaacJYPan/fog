@@ -168,6 +168,9 @@ def test_pruning_reports_dropped_mass():
     outcomes, pruned = commit_pair_branches(
         b, "p1", _move_slot(b, "p1", "darkpulse"), _move_slot(b, "p2", "thunderwave"),
         min_prob=0.10)
-    assert len(outcomes) == 2                      # 75% and 18.75% of the crit-x-flinch grid
-    assert pruned == pytest.approx(0.0625)
+    # Gen 9: the kept branches are ordinary-hit/no-flinch/Thunder-Wave-hit (69%) and
+    # ordinary-hit/flinch (23/24 * 20% = 19.166...%).  The other four exact branches are below
+    # the deliberately requested 10% threshold.
+    assert len(outcomes) == 2
+    assert pruned == pytest.approx(0.11833333333333333, abs=1e-6)
     assert sum(o.probability for o in outcomes) == pytest.approx(1.0)

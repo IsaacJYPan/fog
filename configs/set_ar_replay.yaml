@@ -1,0 +1,47 @@
+# Optional partial-replay pretraining for the set-autoregressive opponent belief model.
+#
+# Use only with a large, rating-filtered replay corpus and compare against the G0-initialized
+# no-replay arm on complete-team heldout likelihood and downstream search. Missing replay fields
+# are selective, not random, so this is an auxiliary experiment rather than the primary objective.
+extends: bc_ou.yaml
+
+experiment: set_ar_replay
+preflight:
+  required: true
+  report: runs/preflight_audit/latest.json
+  min_games: 5
+  schema_version: 5
+  min_replay_dryruns: 10
+  min_replay_hidden_targets: 1
+  replay_report: runs/replay_preflight_audit/latest.json
+  replay_schema_version: 4
+  min_parsed_replay_games: 5
+  min_parsed_replay_dryruns: 10
+  min_parsed_replay_rows: 1
+  match_source: true
+model:
+  use_posterior_features: true
+  # Retain arbitrary partial contexts while making fully constrained replay queries common enough
+  # to learn efficiently.
+  belief_last_context_probability: 0.25
+bc:
+  manifest: data/parsed/manifest.parquet
+  streaming: true
+  shard_buffer: 64
+  batch_size: 512
+  epochs: 10
+  # Split by replay/shard, never by decision row, so a battle cannot leak into evaluation.
+  holdout_fraction: 0.1
+  eval_batches: 16
+  init_ckpt: artifacts/checkpoints/g0_retained.pt
+  init_compatible: true
+  scope: belief
+loss:
+  action_coef: 0.0
+  value_coef: 0.0
+  belief_coef: 1.0
+  belief_chain_coef: 2.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+log:
+  dir: runs/set_ar_replay

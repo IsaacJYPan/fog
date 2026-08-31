@@ -31,7 +31,7 @@ ACTIONS: list[tuple[ActionType, int]] = (
 )
 assert len(ACTIONS) == N_ACTIONS
 
-MOVE_SLOTS = range(0, 4)
+MOVE_SLOTS = range(4)
 MOVE_TERA_SLOTS = range(4, 8)
 SWITCH_SLOTS = range(8, 13)
 FORCED_SLOT = 13
@@ -126,6 +126,33 @@ OTHER_ITEM = "<OTHER_ITEM>"
 NO_ITEM = "<NO_ITEM>"
 UNKNOWN_ITEM = "<UNKNOWN>"
 UNKNOWN = "<UNKNOWN>"
-OTHER_SPREAD = "<OTHER_SPREAD>"
+OTHER_SPREAD = "<OTHER_SPREAD>"  # legacy usage-table sentinel; not a belief target
 
 MAX_SPREADS_PER_SPECIES = 16  # §1.6
+
+# Submitted-set stat schema. EVs are represented in the units the battle stat formula consumes:
+# floor(EV / 4), hence one categorical value in [0, 63] per stat. Decoding multiplies by four, so
+# the largest exactly represented legal total is 508 EVs (127 units); the two discarded EV points
+# in Showdown's nominal 510 cap never affect a stat.
+EV_STATS: tuple[str, ...] = ("hp", "atk", "def", "spa", "spd", "spe")
+N_EV_UNITS = 64
+MAX_TOTAL_EV_UNITS = 127
+NATURES: tuple[str, ...] = (
+    "adamant", "bashful", "bold", "brave", "calm", "careful", "docile", "gentle", "hardy",
+    "hasty", "impish", "jolly", "lax", "lonely", "mild", "modest", "naive", "naughty",
+    "quiet", "quirky", "rash", "relaxed", "sassy", "serious", "timid",
+)
+NATURE_INDEX: dict[str, int] = {nature: i for i, nature in enumerate(NATURES)}
+N_NATURES = len(NATURES)
+
+# Full-team belief/candidate token layout. Keep this centralized: the belief model, public reveal
+# encoder, rollout labels, search worlds and public-belief value net all exchange this exact grid.
+SET_SLOT_ATTRS: tuple[str, ...] = (
+    "species", "item", "ability", "move0", "move1", "move2", "move3",
+    "nature", "ev_hp", "ev_atk", "ev_def", "ev_spa", "ev_spd", "ev_spe", "tera",
+)
+SET_N_ATTRS = len(SET_SLOT_ATTRS)
+SET_MOVE_COLS = (3, 4, 5, 6)
+SET_NATURE_COL = 7
+SET_EV_COLS = (8, 9, 10, 11, 12, 13)
+SET_TERA_COL = 14

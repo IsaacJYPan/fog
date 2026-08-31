@@ -1,0 +1,17 @@
+# Same 24-token/128-wide architecture with two learned preservation routes.
+# Both routes are zero-initialized when migrated, so the starting policy, belief,
+# value, and shared latent are exactly unchanged.  No raw value bypass exists.
+extends: gen9ou_typed_token_live.yaml
+
+experiment: gen9ou_typed_token_enhanced
+seed: 20261146
+
+model:
+  shared_contextual_dynamic_residual: true
+  shared_contextual_data_global: true
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_enhanced_seed_v1/seed.pt
+
+log:
+  dir: runs/gen9ou_typed_token_enhanced

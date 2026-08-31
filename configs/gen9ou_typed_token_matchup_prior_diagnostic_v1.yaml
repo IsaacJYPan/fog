@@ -1,0 +1,32 @@
+# Nonpromotable causal diagnostic.  A raw-visible DeepSets control beat the frozen shared-value
+# interface on disjoint heldout teams (MSE 0.2484 versus 0.271), so test the smallest production-
+# compatible correction: a permutation-symmetric matchup prior over the existing learned typed
+# creature/field tokens.  The ordinary value head remains frozen and continues to represent the
+# within-battle state delta.  Only the newly added prior is optimized here.
+extends: gen9ou_typed_token_initial_value_prior_broad_diagnostic_v2.yaml
+
+experiment: gen9ou_typed_token_matchup_prior_diagnostic_v1
+seed: 20261303
+
+model:
+  matchup_value_prior: true
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_ev_stat_continuation_v3/checkpoints/bc_best.pt
+  init_compatible: true
+  scope: value_prior
+  epochs: 60
+  batch_size: 512
+  max_primary_batches_per_epoch: 64
+  lr: 1.0e-4
+  lr_final: 1.0e-5
+  early_stopping_patience: 12
+  early_stopping_min_delta: 0.0002
+
+preflight:
+  report: runs/preflight_audit/typed_token_matchup_prior_diagnostic_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_matchup_prior_diagnostic_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_matchup_prior_diagnostic_v1
+  tensorboard: false

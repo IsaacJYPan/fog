@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from typing import ClassVar
 
 import numpy as np
 import pytest
@@ -12,6 +13,7 @@ from fog.constants.tables import Tables
 from fog.encoding.reveals import (
     RevealLedger,
     SlotView,
+    align_training_truth_to_views,
     align_truth_to_views,
     build_belief_input,
     labels_from_truth,
@@ -44,10 +46,10 @@ def tables(tmp_path_factory):
 def test_tokens_from_views_packs_moves_earliest_first():
     views = [SlotView(species=1, moves=[10, 3], tera=5)] + [SlotView()] * 5
     t = tokens_from_views(views)
-    assert t.shape == (6, 9)
+    assert t.shape == (6, 15)
     assert t[0, 0] == 1 and t[0, 3] == 10 and t[0, 4] == 3
     assert t[0, 5] == -1 and t[0, 6] == -1  # unrevealed move slots stay hidden
-    assert t[0, 8] == 5
+    assert t[0, 14] == 5
     assert (t[1:] == -1).all()
 
 
@@ -60,10 +62,8 @@ def test_masks_clamp_species_and_restrict_attributes(tables):
     assert m["species"][0].sum() == 1 and m["species"][0, tusk]
     assert (m["move"][0] == np.asarray(tables.learnset_mask(tusk))).all()
     assert m["ability"][0].sum() == 1  # protosynthesis only
-    # spread mask: 2 fixture clusters + <OTHER_SPREAD> = 3 legal
-    assert m["spread"][0].sum() == 3
     # slot 1: unknown species -> uninformative
-    assert m["species"][1].all() and m["move"][1].all() and m["spread"][1].all()
+    assert m["species"][1].all() and m["move"][1].all()
 
 
 def test_rare_species_keeps_uninformative_masks(tables):
@@ -72,6 +72,35 @@ def test_rare_species_keeps_uninformative_masks(tables):
     m = masks_for_tokens(tokens_from_views(views), tables)
     assert m["species"][0].sum() == 1  # clamped
     assert m["move"][0].all() and m["item"][0].all()  # but attributes unrestricted
+
+
+def test_off_learnset_public_move_relaxes_illusion_sensitive_masks(tables):
+    tusk = tables.species_index("greattusk")
+    legal_moves = np.asarray(tables.learnset_mask(tusk))
+    off_sheet = int(np.flatnonzero(~legal_moves)[0])
+    tokens = tokens_from_views([SlotView(species=tusk, moves=[off_sheet])] + [SlotView()] * 5)
+
+    masks = masks_for_tokens(tokens, tables)
+
+    assert masks["species"][0].sum() == 1
+    assert masks["move"][0].all()
+    assert masks["ability"][0].all()
+
+
+def test_ogerpon_tera_forms_keep_submitted_and_live_abilities_legal():
+    """Belief truth is the submitted set even after Ogerpon changes public battle form."""
+    from fog.constants.tables import TABLES
+
+    cases = (
+        ("ogerpontealtera", "defiant", "embodyaspectteal"),
+        ("ogerponwellspringtera", "waterabsorb", "embodyaspectwellspring"),
+        ("ogerponhearthflametera", "moldbreaker", "embodyaspecthearthflame"),
+        ("ogerponcornerstonetera", "sturdy", "embodyaspectcornerstone"),
+    )
+    for public_form, submitted_ability, live_ability in cases:
+        mask = TABLES.legal_abilities_mask(TABLES.species_index(public_form))
+        assert mask[TABLES.ability_index(submitted_ability)]
+        assert mask[TABLES.ability_index(live_ability)]
 
 
 def test_ledger_flow_and_my_view(tables):
@@ -99,8 +128,8 @@ def test_ledger_flow_and_my_view(tables):
     assert t1[0, 3] == eq and t1[0, 4] == sr and t1[0, 5] == -1  # reveal order, packed
     assert t1[1, 1] == tables.item_index(schema.NO_ITEM)          # known-absent, NOT -1
     assert t1[0, 2] == tables.ability_index("protosynthesis")
-    assert t1[1, 8] == 4
-    assert t1[0, 7] == -1  # spreads never directly revealed
+    assert t1[1, 14] == 4
+    assert (t1[0, 7:14] == -1).all()  # submitted nature/EVs are never directly revealed
 
     ledger.reset()
     t2 = tokens_from_views(ledger.views(keys, species))
@@ -108,10 +137,11 @@ def test_ledger_flow_and_my_view(tables):
 
 
 def test_labels_and_truth_roundtrip(tables):
-    truth = np.arange(54, dtype=np.int64).reshape(6, 9)
+    truth = np.arange(90, dtype=np.int64).reshape(6, 15)
     labels = labels_from_truth(truth)
     assert labels["species"].shape == (6,) and labels["move"].shape == (6, 4)
-    assert labels["species"][0] == 0 and labels["tera"][5] == 53
+    assert labels["species"][0] == 0 and labels["tera"][5] == 89
+    assert labels["nature"].shape == (6,) and labels["ev"].shape == (6, 6)
     assert (labels["move"][2] == truth[2, 3:7]).all()
 
     views = [SlotView(species=int(truth[j, 0]) % tables.n_species) for j in range(6)]
@@ -121,23 +151,24 @@ def test_labels_and_truth_roundtrip(tables):
 
 # -------------------------------------------------------- move-order alignment (fix 2026-07-12)
 def test_align_places_revealed_move_at_its_clamp_position():
-    truth = np.full((6, 9), -1, dtype=np.int64)
-    truth[0] = [7, 2, 1, 10, 3, 8, 5, 0, 4]  # paste-order moves 10, 3, 8, 5
-    view = np.full((6, 9), -1, dtype=np.int64)
+    truth = np.full((6, 15), -1, dtype=np.int64)
+    truth[0] = [7, 2, 1, 10, 3, 8, 5, 0, 1, 2, 3, 4, 5, 6, 4]
+    view = np.full((6, 15), -1, dtype=np.int64)
     view[0, 0] = 7
     view[0, 3] = 8  # revealed: paste position 2 -> clamped at subslot 0 by tokens_from_views
     aligned, ok = align_truth_to_views(truth, view)
     assert ok.all()
     assert aligned[0, 3:7].tolist() == [8, 10, 3, 5]  # reveal first, remainder in paste order
-    assert (aligned[0, [0, 1, 2, 7, 8]] == truth[0, [0, 1, 2, 7, 8]]).all()  # non-move cols pass
+    non_move = [0, 1, 2, *range(7, 15)]
+    assert (aligned[0, non_move] == truth[0, non_move]).all()
     assert (aligned[1:] == truth[1:]).all()
     assert truth[0, 3] == 10  # input not mutated
 
 
 def test_align_keeps_multi_reveal_order_and_is_a_permutation():
-    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth = np.full((6, 15), -1, dtype=np.int64)
     truth[2, 3:7] = [10, 3, 8, 5]
-    view = np.full((6, 9), -1, dtype=np.int64)
+    view = np.full((6, 15), -1, dtype=np.int64)
     view[2, 3], view[2, 4] = 5, 3  # revealed in THIS order (reveal order, packed earliest)
     aligned, ok = align_truth_to_views(truth, view)
     assert ok.all()
@@ -146,10 +177,10 @@ def test_align_keeps_multi_reveal_order_and_is_a_permutation():
 
 
 def test_align_flags_contradiction_only_when_provable():
-    truth = np.full((6, 9), -1, dtype=np.int64)
+    truth = np.full((6, 15), -1, dtype=np.int64)
     truth[0, 3:7] = [10, 3, 8, 5]    # fully labeled sheet
     truth[1, 3:7] = [10, 3, -1, -1]  # gap: censored labels / short set — membership unprovable
-    view = np.full((6, 9), -1, dtype=np.int64)
+    view = np.full((6, 15), -1, dtype=np.int64)
     view[0, 3] = 6  # not on slot 0's sheet -> genuine contradiction
     view[1, 3] = 6
     aligned, ok = align_truth_to_views(truth, view)
@@ -159,21 +190,35 @@ def test_align_flags_contradiction_only_when_provable():
     assert aligned[1, 3:7].tolist() == [6, 10, 3, -1]
 
 
+def test_training_alignment_preserves_truth_for_illusion_like_move():
+    truth = np.full((6, 15), -1, dtype=np.int64)
+    truth[0, 3:7] = [10, 3, 8, 5]
+    view = np.full((6, 15), -1, dtype=np.int64)
+    view[0, 3] = 6
+
+    aligned, supervision_view, ok = align_training_truth_to_views(truth, view)
+
+    assert not ok[0]
+    assert aligned[0, 3:7].tolist() == [10, 3, 8, 5]
+    assert supervision_view[0, 3:7].tolist() == [-1, -1, -1, -1]
+    assert view[0, 3] == 6
+
+
 def test_align_broadcasts_one_view_over_candidates():
-    cands = np.full((3, 6, 9), -1, dtype=np.int64)
+    cands = np.full((3, 6, 15), -1, dtype=np.int64)
     cands[:, 0, 3:7] = [[10, 3, 8, 5], [10, 3, 8, 6], [3, 8, 10, 5]]
-    view = np.full((6, 9), -1, dtype=np.int64)
+    view = np.full((6, 15), -1, dtype=np.int64)
     view[0, 3] = 5
     aligned, ok = align_truth_to_views(cands, view)
-    assert aligned.shape == (3, 6, 9) and ok.shape == (3, 6)
+    assert aligned.shape == (3, 6, 15) and ok.shape == (3, 6)
     assert aligned[0, 0, 3:7].tolist() == [5, 10, 3, 8]
     assert not ok[1, 0]  # candidate 1 lacks move 5 on a fully-labeled sheet
     assert aligned[2, 0, 3:7].tolist() == [5, 3, 8, 10]  # remainder keeps ITS paste order
 
 
 def test_align_without_reveals_is_identity():
-    truth = np.arange(54, dtype=np.int64).reshape(6, 9)
-    view = np.full((6, 9), -1, dtype=np.int64)
+    truth = np.arange(90, dtype=np.int64).reshape(6, 15)
+    view = np.full((6, 15), -1, dtype=np.int64)
     aligned, ok = align_truth_to_views(truth, view)
     assert (aligned == truth).all() and ok.all()
 
@@ -190,14 +235,16 @@ class _MockMon:
 
 def test_opponent_views_from_battle(tables):
     class _Battle:
-        opponent_team = {
+        opponent_team: ClassVar = {
             "p2: Great Tusk": _MockMon(
                 "greattusk", item=None, ability="Protosynthesis", moves=("earthquake",)
             ),
             "p2: Garchomp": _MockMon("garchomp"),
         }
-        teampreview_opponent_team = [_MockMon("greattusk"), _MockMon("garchomp"),
-                                     _MockMon("gabite"), _MockMon("rarebird")]
+        teampreview_opponent_team: ClassVar = [
+            _MockMon("greattusk"), _MockMon("garchomp"),
+            _MockMon("gabite"), _MockMon("rarebird"),
+        ]
 
     views = opponent_views_from_battle(_Battle(), tables)
     assert len(views) == 6
@@ -234,11 +281,13 @@ def test_view_slot_order_follows_preview_matching_paste_order(tables):
 
     class _Battle:
         # insertion (reveal) order REVERSED vs preview: garchomp acted first
-        opponent_team = {
+        opponent_team: ClassVar = {
             "p2: Garchomp": _MockMon("garchomp", moves=("earthquake",)),
             "p2: Great Tusk": _MockMon("greattusk"),
         }
-        teampreview_opponent_team = [_MockMon("greattusk"), _MockMon("garchomp")]
+        teampreview_opponent_team: ClassVar = [
+            _MockMon("greattusk"), _MockMon("garchomp")
+        ]
 
     tokens = tokens_from_views(opponent_views_from_battle(_Battle(), tables))
     assert tokens[0, 0] == truth[0, 0] == tables.species_index("greattusk")

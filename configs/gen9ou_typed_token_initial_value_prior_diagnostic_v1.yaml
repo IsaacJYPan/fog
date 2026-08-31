@@ -1,0 +1,25 @@
+# Nonpromotable causal diagnostic: can the existing frozen trunk support a matchup-level initial
+# value prior when the head is not simultaneously asked to model later battle-state updates?
+extends: gen9ou_typed_token_soft_value_head_hybrid_v2.yaml
+
+experiment: gen9ou_typed_token_initial_value_prior_diagnostic_v1
+seed: 20261301
+
+bc:
+  manifest: runs/gen9ou_simple_bv_repeat_train_initial_soft_2048_v1/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_simple_bv_repeat_holdout_initial_soft_1024_v1/holdout_manifest.parquet
+  epochs: 80
+  batch_size: 256
+  max_primary_batches_per_epoch: 96
+  lr: 2.0e-5
+  lr_final: 2.0e-6
+  early_stopping_patience: 16
+  early_stopping_min_delta: 0.0002
+
+preflight:
+  report: runs/preflight_audit/typed_token_initial_value_prior_diagnostic_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_initial_value_prior_diagnostic_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_initial_value_prior_diagnostic_v1
+  tensorboard: false

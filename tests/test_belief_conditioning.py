@@ -80,7 +80,7 @@ def test_targets_valid_are_hidden_only():
     assert not valid["species"].any()                                 # species never a chain target
     assert (valid["item"] == (v[:, :, 1] < 0)).all()
     assert (valid["move"] == (v[:, :, 3:7] < 0)).all()
-    assert (targets["tera"] == t[:, :, 8]).all()
+    assert (targets["tera"] == t[:, :, 14]).all()
 
 
 def test_reference_ce_exact_values():
@@ -114,15 +114,17 @@ def test_family_mean_sum_matches_belief_loss_convention():
     logits = {
         f: torch.zeros(8, N_SLOTS, spec.sizes[k])
         for f, k in (("species", "n_species"), ("item", "n_items"), ("ability", "n_abilities"),
-                     ("spread", "n_spreads"), ("tera", "n_tera"))
+                     ("nature", "n_natures"), ("tera", "n_tera"))
     }
     logits["move"] = torch.zeros(8, N_SLOTS, 4, spec.sizes["n_moves"])
+    logits["ev"] = torch.zeros(8, N_SLOTS, 6, spec.sizes["n_ev_units"])
     got = float(belief_loss(logits, targets, valid))
     per_entry = torch.zeros(8, N_ATTRS)
     for f, cols in (("item", (1,)), ("ability", (2,)), ("move", (3, 4, 5, 6)),
-                    ("spread", (7,)), ("tera", (8,))):
+                    ("nature", (7,)), ("ev", (8, 9, 10, 11, 12, 13)), ("tera", (14,))):
         n = spec.sizes[{"item": "n_items", "ability": "n_abilities", "move": "n_moves",
-                        "spread": "n_spreads", "tera": "n_tera"}[f]]
+                        "nature": "n_natures", "ev": "n_ev_units",
+                        "tera": "n_tera"}[f]]
         for s in range(N_SLOTS):
             for c in cols:
                 per_entry[:, s * len(SLOT_ATTRS) + c] = math.log(n)
@@ -198,12 +200,12 @@ def _series(dep_ce_seq, probe_seq):
     pinned to clean PASS values so only the regression logic under test decides no_drift_back."""
     out = []
     for dc, pa in zip(dep_ce_seq, probe_seq):
-        out.append(dict(
-            total_ce=8.0, total_ce_marginal_ref=9.0, dep_ce_src_revealed=dc,
-            dep_ce_src_hidden_after=dc, dep_ce_src_hidden_before=1.386,
-            probe_acc_strict=1.0, probe_acc_matched=pa, fallback_ce=1.386,
-            fallback_image_mass=1.0, fallback_max_prob=0.2, sample_fwd_consistency=0.99,
-        ))
+        out.append({
+            "total_ce": 8.0, "total_ce_marginal_ref": 9.0, "dep_ce_src_revealed": dc,
+            "dep_ce_src_hidden_after": dc, "dep_ce_src_hidden_before": 1.386,
+            "probe_acc_strict": 1.0, "probe_acc_matched": pa, "fallback_ce": 1.386,
+            "fallback_image_mass": 1.0, "fallback_max_prob": 0.2, "sample_fwd_consistency": 0.99,
+        })
     return out
 
 
@@ -241,7 +243,10 @@ def test_drift_vs_best_window_direction():
 
 def _family_nonempty(view: torch.Tensor) -> list[str]:
     hidden = view.reshape(view.shape[0], N_ATTRS) < 0
-    fams = {"item": (1,), "ability": (2,), "move": (3, 4, 5, 6), "spread": (7,), "tera": (8,)}
+    fams = {
+        "item": (1,), "ability": (2,), "move": (3, 4, 5, 6),
+        "nature": (7,), "ev": (8, 9, 10, 11, 12, 13), "tera": (14,),
+    }
     out = []
     for f, cols in fams.items():
         flats = [s * len(SLOT_ATTRS) + c for s in range(N_SLOTS) for c in cols]

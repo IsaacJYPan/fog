@@ -1,5 +1,4 @@
-"""Phase H instrumentation (PROPOSAL_IMPL_PLAN; proposal §10.4 backend note): measure, before
-engineering, the two known chance-fidelity gaps of the poke-engine branch enumeration.
+"""Measure the known chance-fidelity gaps of poke-engine branch enumeration before using it.
 
 1. **Damage-roll straddles.** The engine collapses the 16 damage rolls to the average roll
    (branch damage = floor(base * 0.925), base = the max roll from `pe.calculate_damage`), and
@@ -9,7 +8,8 @@ engineering, the two known chance-fidelity gaps of the poke-engine branch enumer
    (floor(base * r / 100), r = 85..100 — probe fact 3) and log: the straddle rate over matched
    move-damage instructions, and the probability mass the average-roll verdict gets wrong.
 
-2. **Crit rate.** The engine branches crits at 1/16 (6.25%); Gen 9's base rate is 1/24 (~4.17%).
+2. **Crit rate.** The engine must be compiled with its Gen 9 feature, which branches ordinary
+   critical hits at 1/24 (~4.17%).
    Crit branches are identified by matching branch damage against the crit base's average roll;
    the per-cell crit share is aggregated so a global constant shows up as a tight distribution
    around one value (high-crit moves and abilities would legitimately widen it — report the
@@ -54,15 +54,17 @@ def pair_damage_stats(state, m1: str, m2: str) -> dict:
     sets = pe.generate_instructions(state, m1, m2)
     if not sets:
         return {"matched": 0, "unmatched": 0, "straddles": 0, "wrong_mass": 0.0,
-                "crit_families": []}
+                "matched_mass": 0.0, "crit_families": [], "base_failures": 0}
 
     # candidate (no-crit, crit) bases per damaged side, both move orders (order can change
     # damage through e.g. weather or screens set first)
     bases: dict[str, set[tuple[int, int]]] = {"One": set(), "Two": set()}
+    base_failures = 0
     for first in (True, False):
         try:
             d1, d2 = pe.calculate_damage(state, m1, m2, first)
-        except Exception:
+        except Exception:  # noqa: BLE001 - engine instrumentation counts failed calculations
+            base_failures += 1
             continue
         if len(d1) == 2 and d1[0] > 0:
             bases["Two"].add((int(d1[0]), int(d1[1])))    # side one's move damages side two
@@ -133,7 +135,7 @@ def pair_damage_stats(state, m1: str, m2: str) -> dict:
     ]
     return {"matched": matched, "unmatched": unmatched, "straddles": straddles,
             "wrong_mass": wrong_mass, "matched_mass": matched_mass,
-            "crit_families": crit_families}
+            "crit_families": crit_families, "base_failures": base_failures}
 
 
 def measure_position(battle, role: str = "p1") -> dict:
@@ -141,7 +143,8 @@ def measure_position(battle, role: str = "p1") -> dict:
     import numpy as np
 
     totals = {"matched": 0, "unmatched": 0, "straddles": 0, "wrong_mass": 0.0,
-              "matched_mass": 0.0, "pairs": 0}
+              "matched_mass": 0.0, "pairs": 0, "pair_failures": 0,
+              "base_failures": 0}
     crit_shares: list[float] = []
     degenerate = 0
     opp = "p2" if role == "p1" else "p1"
@@ -151,13 +154,15 @@ def measure_position(battle, role: str = "p1") -> dict:
                 m1 = battle.engine_action("p1", int(a if role == "p1" else b))
                 m2 = battle.engine_action("p2", int(b if role == "p1" else a))
                 s = pair_damage_stats(battle.state, m1, m2)
-            except Exception:
+            except Exception:  # noqa: BLE001 - position report counts every failed pair
+                totals["pair_failures"] += 1
                 continue
             totals["pairs"] += 1
             for k in ("matched", "unmatched", "straddles"):
                 totals[k] += s[k]
             totals["wrong_mass"] += s["wrong_mass"]
             totals["matched_mass"] += s["matched_mass"]
+            totals["base_failures"] += s["base_failures"]
             for f in s["crit_families"]:
                 if f["both_present"]:
                     crit_shares.append(f["crit_share"])

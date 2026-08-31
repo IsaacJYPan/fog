@@ -11,7 +11,8 @@ from fog.env.engine_battle import HAVE_ENGINE
 pytestmark = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 
 # Hydreigon (faster) Dark Pulse vs Tyranitar Thunder Wave at full HP enumerates exactly the
-# crit x flinch grid: 75% / 18.75% / 5% / 1.25% (verified by probe, 2026-07-16).
+# Gen 9 also gives Thunder Wave 90% accuracy, so the crit x flinch grid splits the branches in
+# which Tyranitar acts into hit/miss outcomes.
 ATTACKER = """Hydreigon @ Choice Specs
 Ability: Levitate
 EVs: 252 SpA / 4 SpD / 252 Spe
@@ -66,12 +67,12 @@ def _step_args(b):
 def test_branches_enumerate_with_probabilities_summing_to_one():
     b = _battle()
     branches, pruned = b.step_branches(_step_args(b))
-    assert len(branches) == 4                    # crit x flinch
+    assert len(branches) == 6                    # crit x flinch x conditional Thunder Wave hit
     assert pruned == 0.0
     assert sum(p for p, _ in branches) == pytest.approx(1.0)
     probs = sorted((p for p, _ in branches), reverse=True)
-    assert probs[0] == pytest.approx(0.75)
-    assert probs[1] == pytest.approx(0.1875)
+    assert probs[0] == pytest.approx((23 / 24) * 0.8 * 0.9)
+    assert probs[1] == pytest.approx((23 / 24) * 0.2)
 
 
 def test_parent_battle_is_not_advanced():
@@ -93,14 +94,14 @@ def test_sampled_step_lands_on_an_enumerated_branch():
 def test_pruning_keeps_top_and_renormalizes():
     b = _battle()
     branches, pruned = b.step_branches(_step_args(b), min_prob=0.10)
-    assert len(branches) == 2                    # 75% and 18.75% survive
-    assert pruned == pytest.approx(0.0625)
+    assert len(branches) == 2
+    assert pruned == pytest.approx(1 - ((23 / 24) * 0.8 * 0.9 + (23 / 24) * 0.2))
     assert sum(p for p, _ in branches) == pytest.approx(1.0)
     # the most likely branch is always kept, even under an absurd threshold
     only, pruned = b.step_branches(_step_args(b), min_prob=1.0)
     assert len(only) == 1
     assert only[0][0] == pytest.approx(1.0)
-    assert pruned == pytest.approx(0.25)
+    assert pruned == pytest.approx(1 - (23 / 24) * 0.8 * 0.9)
 
 
 def test_max_branches_cap_keeps_the_most_likely():
@@ -108,8 +109,8 @@ def test_max_branches_cap_keeps_the_most_likely():
     branches, pruned = b.step_branches(_step_args(b), max_branches=2)
     assert len(branches) == 2
     raw = sorted((p * (1.0 - pruned) for p, _ in branches), reverse=True)
-    assert raw[0] == pytest.approx(0.75)
-    assert raw[1] == pytest.approx(0.1875)
+    assert raw[0] == pytest.approx((23 / 24) * 0.8 * 0.9)
+    assert raw[1] == pytest.approx((23 / 24) * 0.2)
 
 
 def test_forks_draw_fresh_independent_random_futures():

@@ -1,0 +1,17 @@
+extends: gen9ou_typed_token_policy.yaml
+
+# Live-battle settings for on-policy correction and PPO.  The replay policy config intentionally
+# has no team pool; keeping this as a separate file prevents a replay-only job from silently
+# choosing teams or a simulator backend.
+experiment: gen9ou_typed_token_live
+seed: 20261131
+
+env:
+  backend: showdown_direct
+  showdown_root: server/pokemon-showdown
+  battle_format: gen9ou
+  team_pool: data/teams/gen9ou_public_v1/train.json
+  rollout_workers: 4
+  rollout_worker_mode: process
+  actor_threads: 2
+  opponent_cache_size: 2

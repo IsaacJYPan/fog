@@ -1,0 +1,32 @@
+# Archived M1 confined-space experiment: retained for reproduction, not active training.
+# Pure self-play PPO from scratch. Debugs PPO / league / encoder / dashboard cheaply.
+#   python -m fog.training.ppo --config configs/archive/m1_poc.yaml
+extends: default.yaml
+
+experiment: m1_poc
+env:
+  battle_format: gen9ou
+  team_pool: data/teams/pool_a      # shared-species core, varied sets
+loss:
+  belief_coef: 0.0                  # M1 baseline: belief marginal CE off
+  belief_chain_coef: 0.0            # ...and the belief chain CE off (no belief net at M1)
+  value_coef: 0.5
+ppo:
+  total_decisions: 200000
+  batch_decisions: 8000
+  minibatch_size: 1024
+  games_per_chunk: 8
+  epochs: 3
+  clip: 0.2
+  lr: 1.0e-4
+  gamma: 1.0
+  lam: 0.95
+  entropy_coef: 0.02
+  entropy_coef_final: 0.005
+league:
+  snapshot_every_decisions: 50000
+log:
+  dir: runs/m1_poc
+gate:
+  vs_max_damage: 0.75
+  vs_simple_heuristics: 0.60

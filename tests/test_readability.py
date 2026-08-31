@@ -21,7 +21,9 @@ def test_readability_curves_shapes():
     out = readability_curves(probe, batch, minibatch=8)
     assert set(out) == {"curve", "per_family_ce", "mean_ce"}
     assert np.isfinite(out["mean_ce"]) and out["mean_ce"] >= 0
-    assert set(out["per_family_ce"]) == {"species", "item", "ability", "move", "spread", "tera"}
+    assert set(out["per_family_ce"]) == {
+        "species", "item", "ability", "move", "nature", "ev", "tera",
+    }
     assert all(np.isfinite(v) for v in out["curve"].values())
 
 

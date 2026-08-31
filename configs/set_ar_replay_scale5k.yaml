@@ -1,0 +1,17 @@
+# Expanded public-replay belief pretraining.  The scale and epoch budget are deliberately
+# separated from model capacity: this run determines whether data/optimization, rather than
+# parameters, is the current limiter.
+extends: set_ar_replay.yaml
+
+experiment: set_ar_replay_scale5k
+bc:
+  manifest: data/parsed/manifest_rating1500_5k.parquet
+  epochs: 30
+  # Use the whole replay-level holdout so plateau decisions are not driven by a small subset.
+  eval_batches: 0
+  # Stop only after five successive epochs lack a meaningful held-out loss reduction.
+  early_stopping_patience: 5
+  early_stopping_min_delta: 0.02
+
+log:
+  dir: runs/set_ar_replay_scale5k

@@ -1,0 +1,12 @@
+extends: gen9ou_typed_token_joint_belief_value_ev_stat_v1.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_ev_stat_v2
+seed: 20261223
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_ev_stat_v2/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_ev_stat_v2/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_ev_stat_v2
+  tensorboard: true

@@ -1,9 +1,8 @@
-"""pb_search_action — one two-sided public-belief decision (PROPOSAL_IMPL_PLAN Phase F;
-PROJECT_DESIGN_PROPOSAL.md §14 end-to-end procedure, §10.3, §13.1).
+"""One experimental two-sided public-belief decision (ARCHITECTURE.md S1–S3).
 
 Assembles the landed pieces into the claim-bearing decision path: candidate worlds for both
 sides -> joint belief rho -> simulated K x J branch grid (pb_grid) -> leaf values (pb_values,
-the §18 interim head until Phase G) -> two-sided regret solve (two_sided) -> **sample exactly
+the interim scalar head) -> two-sided regret solve (two_sided) -> **sample exactly
 from the averaged strategy row of the true private state**. The API deliberately has no
 temperature and no greedy mode (settled decisions 16.2/16.3): the sampled randomness IS the
 mixed equilibrium being executed, and any reshaping would play a strategy the solver never
@@ -27,13 +26,14 @@ The search NEVER mutates the belief table (§14 step 11 is the runner's job, aft
 actions are public, using this result's averaged strategies — invariant 19.6). The result
 carries a subsample of the action-pair posteriors the values were computed under
 (`queried_beliefs`), plus the same subsampling under one uniformly drawn solver iteration's
-CURRENT strategies (`sample_beliefs`, Phase G1) — together the §9.3 value-training query log.
+CURRENT strategies (`sample_beliefs`) — together the value-training query log.
 """
 from __future__ import annotations
 
 import random
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -82,15 +82,20 @@ class PBSearchResult:
     dropped_opp_mass: float = 0.0
     # The candidate identities rho / sigma / true_index index (proposal §10 shared particles). The
     # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
-    own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
-    opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 9), dtype=np.int64))
+    own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 15), dtype=np.int64))
+    opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 15), dtype=np.int64))
+    search_depth: int = 1
+    depth2_expanded: int = 0
+    depth2_reach_mass: float = 0.0
+    depth2_child_sims: int = 0
+    depth2_failures: list[str] = field(default_factory=list)
 
 
 def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: int,
                            ) -> tuple[np.ndarray, np.ndarray]:
     """Default `opp_source`: j ancestral samples from the belief chain on `role`'s censored
     observation, deduplicated, weighted by empirical frequency (the documented SampledOwnStates
-    recipe applied to the opponent direction). Returns (tokens [J', 6, 9], log_weights [J'])."""
+    recipe applied to the opponent direction). Returns (tokens [J', 6, 15], log_weights [J'])."""
     import torch
 
     from fog.encoding.observation import Observation
@@ -103,9 +108,10 @@ def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: 
     gen = torch.Generator(device=device)
     gen.manual_seed(seed)
     with torch.no_grad():
-        _, c_dyn = agent._backbone_pass(batch)
+        contexts = agent.encode_contexts(batch)
+        belief_context = agent.belief_context(contexts)
         worlds = agent.belief.sample_team(
-            c_dyn, batch["opp_revealed"], k=max(1, int(j)), generator=gen,
+            belief_context, batch["opp_revealed"], k=max(1, int(j)), generator=gen,
         )[0].cpu().numpy().astype(np.int64)
     index: dict[bytes, int] = {}
     tokens: list[np.ndarray] = []
@@ -128,10 +134,10 @@ def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int |
 
     Zero-mass candidates are ALWAYS dropped — exact, not an approximation (a zero-probability
     type's strategy carries no weight in any update), and load-bearing for fork validity: a
-    candidate contradicted by reveals cannot be forked coherently. `top_k`/`top_j` then cap the
-    kept sets by current margin mass; the true own candidate is always kept (we must sample its
-    row — forcing its presence does not reweight it, the §19.5 distinction). Returns ascending
-    full-axis index arrays (own_kept, opp_kept)."""
+    candidate contradicted by reveals cannot be forked coherently. Opponent candidates may then be
+    capped by public margin mass. Own-side capping is refused when it would remove any live type:
+    forcing the actual private type back into a publicly selected subset makes the opponent model
+    depend on information the opponent does not possess. Returns ascending full-axis indices."""
     row_mass = rho.sum(axis=1)
     col_mass = rho.sum(axis=0)
     if row_mass[true_k] <= 0.0:
@@ -140,10 +146,12 @@ def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int |
     own_alive = np.flatnonzero(row_mass > 0.0)
     opp_alive = np.flatnonzero(col_mass > 0.0)
     if top_k is not None and len(own_alive) > int(top_k):
-        order = own_alive[np.argsort(row_mass[own_alive])[::-1]][: int(top_k)]
-        if true_k not in order:
-            order[-1] = true_k                      # replace the lightest kept with the truth
-        own_alive = np.sort(order)
+        raise ValueError(
+            "own-side top_k truncation would remove live public types. It is disabled because "
+            "forcing the actual private team back into the solve leaks that truth into the "
+            "calculated opponent strategy. Use top_k=None until a truth-independent private-row "
+            "query is implemented."
+        )
     if top_j is not None and len(opp_alive) > int(top_j):
         opp_alive = np.sort(opp_alive[np.argsort(col_mass[opp_alive])[::-1]][: int(top_j)])
     return own_alive.astype(np.int64), opp_alive.astype(np.int64)
@@ -234,8 +242,8 @@ def pb_search_action(
     seed: int = 0,
     iters: int = 256,
     floor: float = 0.02,
-    min_prob: float = 0.005,
-    max_branches: int | None = 12,
+    min_prob: float = 0.0,
+    max_branches: int | None = None,
     j_start: int = 8,
     j_max: int = 40,
     j_tol: float = 0.05,
@@ -245,14 +253,18 @@ def pb_search_action(
     policy_init: bool = False,
     value_net: Any | None = None,
     value_recompute_every: int = 8,
+    search_depth: int = 1,
+    depth2_max_nodes: int = 2,
+    depth2_min_reach: float = 0.01,
+    depth2_child_iters: int = 64,
 ) -> PBSearchResult:
     """One real decision under the two-sided solver. See the module docstring for the two
     candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
 
-    `top_k` / `top_j` (Phase G2, persistent mode only): posterior-mass truncation — solve over
-    the top candidates by current rho margin mass (the true own candidate always kept),
-    renormalized; dropped mass is reported and truncated-out candidates keep their FULL-axis
-    table entries (the runner floors their behavior likelihood via the result's kept maps).
+    `top_j` (Phase G2, persistent mode only): opponent-axis truncation by public rho margin mass.
+    `top_k` is accepted for configuration compatibility but raises if it would remove a live own
+    type: forcing the actual private type back into support leaks truth into the opponent strategy.
+    Dropped opponent mass is reported and full-axis table entries persist.
     Zero-mass candidates are always dropped in persistent mode regardless (exact — and required
     before forking, see _truncate_axes).
 
@@ -262,10 +274,13 @@ def pb_search_action(
     (iterations-to-stability), never a correctness change.
 
     `value_net` (Phase G5 switch): a trained `PBValueNet` — leaf values come from
-    `make_pb_value_grid_values` (per-pair tables, re-weighted per iteration, refreshed every
+    `make_pb_value_grid_values` (per-pair tables, refreshed every
     `value_recompute_every` calls — the G4-drift-chosen N). Default None keeps the §18 interim
     posterior-feature head (`make_grid_values`) as the baseline arm; the swap is claim-bearing
     only after the G4 gates pass."""
+    if int(search_depth) not in (1, 2):
+        raise ValueError("search_depth currently supports 1 or 2; deeper traversal requires the "
+                         "outcome-sampling public-belief search phase")
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
@@ -305,19 +320,47 @@ def pb_search_action(
         init1 = init2 = None
         if policy_init:
             init1, init2 = _policy_inits(agent, battle, role, grid, own_toks, opp_toks, rng)
-        if value_net is not None:
-            from fog.search.pb_value_fn import make_pb_value_grid_values
+        def make_values(leaf_pair_values=None):
+            if value_net is not None:
+                from fog.search.pb_value_fn import make_pb_value_grid_values
 
-            values_fn, vstats = make_pb_value_grid_values(
-                agent, value_net, grid, rho, own_toks, opp_toks,
-                recompute_every=value_recompute_every, fallback_value=root_value)
-        else:
-            values_fn, vstats = make_grid_values(agent, grid, rho, fallback_value=root_value)
+                return make_pb_value_grid_values(
+                    agent, value_net, grid, rho, own_toks, opp_toks,
+                    recompute_every=value_recompute_every, fallback_value=root_value,
+                    leaf_pair_values=leaf_pair_values,
+                )
+            return make_grid_values(
+                agent, grid, rho, fallback_value=root_value,
+                leaf_pair_values=leaf_pair_values,
+            )
+
+        values_fn, vstats = make_values()
         sol = two_sided_regret_solve(values_fn, rho, grid.avail1, grid.avail2,
                                      init1=init1, init2=init2,
                                      iters=iters, floor=floor,
                                      sample_seed=rng.randrange(2**31))
-        return grid, vstats, sol
+        depth_stats = None
+        if int(search_depth) == 2:
+            from fog.search.selective_depth import build_depth2_overrides
+
+            overrides, depth_stats = build_depth2_overrides(
+                agent, grid, rho, sol.sigma1, sol.sigma2, role, own_toks, opp_toks,
+                rng=rng, value_net=value_net,
+                value_recompute_every=value_recompute_every,
+                child_iters=depth2_child_iters, floor=floor,
+                min_prob=min_prob, max_branches=max_branches,
+                max_nodes=depth2_max_nodes, min_reach=depth2_min_reach,
+                fallback_value=root_value,
+            )
+            if depth_stats.expanded:
+                values_fn, vstats = make_values(overrides)
+                sol = two_sided_regret_solve(
+                    values_fn, rho, grid.avail1, grid.avail2,
+                    init1=sol.sigma1, init2=sol.sigma2,
+                    iters=iters, floor=floor,
+                    sample_seed=rng.randrange(2**31),
+                )
+        return grid, vstats, sol, depth_stats
 
     sims_total = 0
     if opp_tokens is not None:                                  # ---- persistent mode ----
@@ -337,8 +380,10 @@ def pb_search_action(
         own_toks_used = own.tokens[own_kept]
         opp_toks_used = opp_tokens[opp_kept]
         kt = int(np.flatnonzero(own_kept == own.true_index)[0])
-        grid, vstats, sol = _solve(own_toks_used, opp_toks_used, rho)
-        sims_total += grid.sims_run
+        grid, vstats, sol, depth_stats = _solve(own_toks_used, opp_toks_used, rho)
+        sims_total += grid.sims_run + (
+            depth_stats.child_sims if depth_stats is not None else 0
+        )
     else:                                                       # ---- adaptive sampled mode ----
         if top_k is not None or top_j is not None:
             raise ValueError("posterior-mass truncation (top_k/top_j) is a persistent-mode "
@@ -354,8 +399,10 @@ def pb_search_action(
             toks, logw = opp_source(battle, role, j_req, seed=rng.randrange(2**31))
             rho = np.outer(own_w, np.exp(logw))
             rho = rho / rho.sum()
-            grid, vstats, sol = _solve(own.tokens, toks, rho)
-            sims_total += grid.sims_run
+            grid, vstats, sol, depth_stats = _solve(own.tokens, toks, rho)
+            sims_total += grid.sims_run + (
+                depth_stats.child_sims if depth_stats is not None else 0
+            )
             row = _real_action_dist(sol.sigma1[kt], grid.local_action1[kt], mask)
             stable = (prev_row is not None
                       and 0.5 * np.abs(row - prev_row).sum() <= j_tol)
@@ -405,4 +452,11 @@ def pb_search_action(
         opp_tokens=np.asarray(opp_toks_used, dtype=np.int64),
         own_kept=own_kept, opp_kept=opp_kept,
         dropped_own_mass=dropped_own, dropped_opp_mass=dropped_opp,
+        search_depth=int(search_depth),
+        depth2_expanded=(depth_stats.expanded if depth_stats is not None else 0),
+        depth2_reach_mass=(
+            depth_stats.expanded_reach_mass if depth_stats is not None else 0.0
+        ),
+        depth2_child_sims=(depth_stats.child_sims if depth_stats is not None else 0),
+        depth2_failures=(depth_stats.failures if depth_stats is not None else []),
     )

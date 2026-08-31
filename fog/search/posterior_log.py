@@ -1,8 +1,8 @@
-"""Log root posteriors from joint-search games (SEARCH_PLAN §4.2 — the value fine-tune's data).
+"""Legacy one-sided joint-search posterior logger (ARCHITECTURE.md S6).
 
 The posterior-features head input (`model.use_posterior_features`) is UNTRAINED until the value
 head has seen real (state, posterior) pairs; before that the joint-search coupling is weak and
-Phase-2 comparisons are premature (SEARCH_PLAN §4.2 "interim honesty"). This module generates the
+Comparisons are premature until the posterior-aware value gate passes. This module generates the
 training pairs: engine self-play where the learner acts through `joint_search_action`, logging per
 decision the root observation, the posterior features of the EXECUTED public action at the true
 state (exactly the features the head would see for the continuation actually played), the search's
@@ -13,7 +13,7 @@ What is deliberately NOT logged:
   * per-leaf (state, action) pairs — the fine-tune trains the head at the ROOT of the executed
     line; leaf-level pairs describe counterfactual worlds whose outcomes we never observe.
 
-Games run one at a time (search batches internally over K×A leaves — SEARCH_PLAN §7 notes the
+Games run one at a time (search batches internally over K×A leaves; the
 outer batch size drops; this is data generation, not the training loop). Learner plays at
 `temperature` > 0 by default: sampling from the search's average policy is what makes the logged
 posteriors cover mixed-strategy support instead of a single greedy line.
@@ -31,6 +31,8 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
+
+from fog.encoding.dims import DIMS
 
 LEARNER = "p1"
 OPPONENT = "p2"
@@ -105,7 +107,7 @@ def collect_search_decisions(
             _play_logged_game(battle, agent, own_source, opp_policy, game_rows, stats,
                               iters=iters, temperature=temperature, rng=rng,
                               max_turns=max_turns)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - failed game is counted, printed, and bounded
             # A data-generation harness must not lose a 200-game run to one pathological game
             # (e.g. the reveal-census bug ChangeItem/Trick used to trigger) — but silence would
             # hide real defects, so failures are counted, the game's rows are DROPPED (a partial
@@ -141,7 +143,6 @@ def collect_search_decisions(
 def _play_logged_game(battle, agent, own_source, opp_policy, game_rows, stats, *,
                       iters, temperature, rng, max_turns) -> None:
     """One engine game with joint-search learner decisions, appending logged rows in place."""
-    from fog.encoding.events import build_snapshot
     from fog.encoding.observation import Observation
     from fog.search.joint import joint_search_action
 
@@ -165,23 +166,28 @@ def _play_logged_game(battle, agent, own_source, opp_policy, game_rows, stats, *
                     obs = Observation.from_battle(view, tracker=battle.trackers[LEARNER])
                     game_rows.append(_row(obs, feats, res, battle.turn))
                     stats["decisions"] += 1
-                    try:  # history retro-fidelity, same as EngineRunner._agent_wave
-                        battle.trackers[LEARNER].record_decision(
-                            battle.turn, build_snapshot(view, battle.tables), res.action
-                        )
-                    except Exception:
-                        pass
+                    from fog.encoding.events import record_history_decision
+
+                    record_history_decision(
+                        battle.trackers[LEARNER],
+                        battle.turn,
+                        view,
+                        battle.tables,
+                        res.action,
+                    )
             moves[LEARNER] = battle.engine_action(LEARNER, res.action)
         if OPPONENT in pending:
             opp_action = opp_policy.choose(battle, OPPONENT)
             if getattr(opp_policy, "records_history", False):  # agent-driven opponents ('self')
-                try:
-                    battle.trackers[OPPONENT].record_decision(
-                        battle.turn,
-                        build_snapshot(battle.view(OPPONENT), battle.tables), opp_action,
-                    )
-                except Exception:
-                    pass
+                from fog.encoding.events import record_history_decision
+
+                record_history_decision(
+                    battle.trackers[OPPONENT],
+                    battle.turn,
+                    battle.view(OPPONENT),
+                    battle.tables,
+                    opp_action,
+                )
             moves[OPPONENT] = battle.engine_action(OPPONENT, opp_action)
         battle.step(moves)
 
@@ -194,11 +200,14 @@ def _row(obs, feats: np.ndarray, res, turn: int) -> dict[str, np.ndarray]:
         "entity_ids": obs.entity_ids.astype(np.int64),
         "field": obs.field.astype(np.float32),
         "history": pad_or_truncate_front(obs.history).astype(np.float32),
+        "history_ids": pad_or_truncate_front(obs.history_ids).astype(np.int64),
+        "history_state": pad_or_truncate_front(obs.history_state).astype(np.float32),
+        "history_len": np.int64(min(obs.history_len, DIMS.history_cap)),
         "active_idx": (obs.active_idx if obs.active_idx is not None
                        else np.array([0, 6], dtype=np.int64)),
         "legality_mask": obs.legality_mask.astype(bool),
         "opp_tokens": (obs.opp_revealed or {}).get(
-            "tokens", np.full((6, 9), -1, dtype=np.int64)
+            "tokens", np.full((6, 15), -1, dtype=np.int64)
         ).astype(np.int64),
         "posterior_features": feats.astype(np.float32),
         "search_dist": res.action_dist.astype(np.float32),
@@ -247,6 +256,31 @@ def batch_from_rows(data: dict[str, np.ndarray], idx: np.ndarray, device) -> dic
         "entity_ids": t(data["entity_ids"], torch.long),
         "field": t(data["field"], torch.float32),
         "history": t(data["history"], torch.float32),
+        "history_ids": (
+            t(data["history_ids"], torch.long)
+            if "history_ids" in data
+            else torch.zeros(
+                len(idx), data["history"].shape[1], DIMS.hist_id_fields,
+                dtype=torch.long, device=device,
+            )
+        ),
+        "history_state": (
+            t(data["history_state"], torch.float32)
+            if "history_state" in data
+            else torch.zeros(
+                len(idx), data["history"].shape[1], DIMS.hist_state,
+                dtype=torch.float32, device=device,
+            )
+        ),
+        "history_len": (
+            t(data["history_len"], torch.long)
+            if "history_len" in data
+            else torch.as_tensor(
+                np.any(data["history"][idx] != 0, axis=-1).sum(axis=-1),
+                dtype=torch.long,
+                device=device,
+            )
+        ),
         "active_idx": t(data["active_idx"], torch.long),
         "legality_mask": t(data["legality_mask"], torch.bool),
         "opp_revealed": {"tokens": t(data["opp_tokens"], torch.long), "masks": masks},
@@ -283,7 +317,7 @@ def main() -> None:
     from fog.env.teams import load_pool
     from fog.models.agent import FogAgent
 
-    ap = argparse.ArgumentParser(description="Log search posteriors (SEARCH_PLAN §4.2).")
+    ap = argparse.ArgumentParser(description="Log legacy one-sided search posteriors.")
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
     ap.add_argument("--out", type=Path, default=Path("runs/posterior_log"))
     ap.add_argument("--ckpt", type=str, default=None,

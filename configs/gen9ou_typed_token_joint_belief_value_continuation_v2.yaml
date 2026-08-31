@@ -1,0 +1,15 @@
+# Corrected joint-source continuation. Both source losses are normalized independently and
+# averaged into one backward/optimizer step, so dense exact simulator labels cannot drown out
+# censored replay supervision.
+extends: gen9ou_typed_token_joint_belief_value_continuation.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_continuation_v2
+seed: 20261177
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_continuation_v4/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_continuation_v4/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_continuation_v2
+  tensorboard: true

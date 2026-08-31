@@ -1,0 +1,21 @@
+# Diagnostic only. The previous belief model made all six EV-stat columns exchangeable. This fixed
+# balanced-subset run checks whether the new stat-role identity removes that specific fit barrier.
+# Its checkpoint is never promotable.
+extends: gen9ou_typed_token_joint_belief_value_overfit_v1.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_ev_stat_overfit_v1
+seed: 20261219
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_diversified_v1/checkpoints/bc_best.pt
+  init_compatible: true
+  epochs: 40
+  early_stopping_patience: 12
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_ev_stat_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_ev_stat_overfit_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_ev_stat_overfit_v1
+  tensorboard: true

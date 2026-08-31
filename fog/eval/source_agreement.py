@@ -1,4 +1,4 @@
-"""Exact-vs-sampled own-state agreement (SEARCH_PLAN §6 — Phase 3's core measurement).
+"""Exact-versus-sampled own-state agreement (ARCHITECTURE.md invariants S1 and S5).
 
 Phase 3 asks what the learned sampler costs: on pools, the opponent's belief over MY team can be
 enumerated exactly (EnumeratedPoolStates), but off-pool play (ladder, open teamsheets) must use
@@ -86,7 +86,7 @@ def run_agreement(agent: Any, pool: list[str], *, ks=(8, 16, 32), games: int = 6
         try:
             _play_measured_game(battle, agent, opp, exact_source, sampled_sources, records,
                                 iters=iters, rng=rng, max_turns=max_turns)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - failed game is counted, printed, and bounded
             failed += 1
             print(f"[agreement] game {g} failed and was dropped: {exc!r}", flush=True)
     if failed > max(1, int(games) // 5):
@@ -107,7 +107,6 @@ def run_agreement(agent: Any, pool: list[str], *, ks=(8, 16, 32), games: int = 6
 
 def _play_measured_game(battle, agent, opp_policy, exact_source, sampled_sources, records, *,
                         iters, rng, max_turns) -> None:
-    from fog.encoding.events import build_snapshot
     from fog.search.joint import joint_search_action
 
     while not battle.finished and battle.turn <= max_turns:
@@ -127,12 +126,15 @@ def _play_measured_game(battle, agent, opp_policy, exact_source, sampled_sources
                     records.append((int(battle.turn), k, res_k.action == res.action,
                                     len(res.prior), len(res_k.prior)))
                 action = res.action
-                try:  # history retro-fidelity, as everywhere the learner acts on the engine
-                    battle.trackers[LEARNER].record_decision(
-                        battle.turn, build_snapshot(battle.view(LEARNER), battle.tables), action
-                    )
-                except Exception:
-                    pass
+                from fog.encoding.events import record_history_decision
+
+                record_history_decision(
+                    battle.trackers[LEARNER],
+                    battle.turn,
+                    battle.view(LEARNER),
+                    battle.tables,
+                    action,
+                )
             moves[LEARNER] = battle.engine_action(LEARNER, action)
         if OPPONENT in pending:
             moves[OPPONENT] = battle.engine_action(
@@ -151,7 +153,7 @@ def main() -> None:
     from fog.env.teams import load_pool
     from fog.training.value_finetune import load_posterior_agent
 
-    ap = argparse.ArgumentParser(description="Exact-vs-sampled agreement (SEARCH_PLAN §6).")
+    ap = argparse.ArgumentParser(description="Measure exact-versus-sampled own-state agreement.")
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
     ap.add_argument("--ckpt", type=str, required=True)
     ap.add_argument("--config", type=str, default="configs/default.yaml")

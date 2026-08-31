@@ -2,9 +2,21 @@
 from __future__ import annotations
 
 import numpy as np
+import pytest
 
 from fog.encoding.dims import DIMS
 from fog.encoding.history import pad_or_truncate_front
+
+
+def test_legality_encoding_does_not_hide_action_mapping_failures(monkeypatch):
+    from fog.encoding import entities
+
+    def fail(_battle):
+        raise RuntimeError("broken request parser")
+
+    monkeypatch.setattr(entities, "action_legality_mask", fail)
+    with pytest.raises(RuntimeError, match="broken request parser"):
+        entities.legality_mask(object())
 
 
 def test_field_dim_matches_layout():
@@ -50,3 +62,41 @@ def test_history_truncate_keeps_recent():
     # last row is the most recent (largest index), earliest 10 dropped
     assert out[-1, 0] == DIMS.history_cap + 9
     assert out[0, 0] == 10
+
+
+def test_old_replay_entity_ids_gain_unknown_private_sheet_columns():
+    from fog.constants.schema import N_EV_UNITS, N_NATURES
+    from fog.constants.tables import TABLES
+    from fog.training.dataset import _normalize_entity_ids
+
+    old = np.zeros((2, 12, 9), dtype=np.int64)
+    upgraded = _normalize_entity_ids(old)
+    assert upgraded.shape == (2, 12, 17)
+    assert (upgraded[..., 8] == N_NATURES).all()
+    assert (upgraded[..., 9:15] == N_EV_UNITS).all()
+    assert (upgraded[..., 15] == TABLES.n_items).all()
+    assert (upgraded[..., 16] == TABLES.n_abilities).all()
+
+
+def test_public_replay_does_not_fabricate_acting_players_private_sheet():
+    from fog.constants.schema import N_EV_UNITS, N_NATURES
+    from fog.constants.tables import TABLES
+    from fog.encoding.entities import L
+    from fog.encoding.observation import Observation
+    from tests.golden_fixture import GoldenBattle
+
+    battle = GoldenBattle()
+    own_public = np.full((6, 15), -1, dtype=np.int64)
+    own_public[:, 0] = [
+        TABLES.species_index(mon.species) for mon in battle.team.values()
+    ]
+    observation = Observation.from_battle(battle, own_revealed=own_public)
+
+    assert (observation.entity_ids[:6, 1] == TABLES.n_items).all()
+    assert (observation.entity_ids[:6, 2] == TABLES.n_abilities).all()
+    assert (observation.entity_ids[:6, 3:7] == TABLES.n_moves).all()
+    assert (observation.entity_ids[:6, 8] == N_NATURES).all()
+    assert (observation.entity_ids[:6, 9:15] == N_EV_UNITS).all()
+    assert (
+        observation.entities[:6, L.epistemic : L.epistemic + DIMS.epistemic_flags] == 0
+    ).all()

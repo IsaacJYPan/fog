@@ -15,8 +15,8 @@ fields: the legality MASK (choice lock / disable / trapping / forced-switch mode
     # engine-only sanity (no server): plays seeded games, prints turn/faint stats
     python -m fog.scripts.fuzz_sim --games 50 --pool data/teams/pool_b
 
-    # full cross-sim diff (local Showdown server must be running):
-    python -m fog.scripts.fuzz_sim --games 200 --pool data/teams/pool_b --showdown
+    # full cross-sim diff (direct pinned Showdown, no server):
+    python -m fog.scripts.fuzz_sim --games 200 --pool data/teams/pool_b --showdown-direct
 
 Divergences are EXPECTED (the engine approximates; known gaps in fog/env/engine_battle.py's
 docstring and KNOWN_ISSUES); what matters is the rate and which mechanics. Per plan §5: patch
@@ -26,6 +26,7 @@ is the cross-sim gauntlet (fog/eval/cross_sim.py, halt at >3% win-rate gap).
 from __future__ import annotations
 
 import argparse
+import json
 import random
 import re
 from pathlib import Path
@@ -67,20 +68,33 @@ def engine_trajectory(paste_a: str, paste_b: str, seed: int, max_turns: int = 10
         moves = {}
         for role in battle.pending_sides():
             mask = battle.action_mask(role)
-            traj.append(_engine_fingerprint(battle, role, mask))
-            moves[role] = battle.engine_action(role, scripted_action(seed, role, battle.turn, mask))
+            action_idx = scripted_action(seed, role, battle.turn, mask)
+            engine_choice = battle.engine_action(role, action_idx)
+            fingerprint = _engine_fingerprint(battle, role, mask)
+            fingerprint.update(action_idx=action_idx, choice=engine_choice)
+            traj.append(fingerprint)
+            moves[role] = engine_choice
         battle.step(moves)
     return _sorted_traj(traj)
 
 
 def _engine_fingerprint(battle, role: str, mask: np.ndarray) -> dict:
     view = battle.view(role)
-    side = [
-        (m.species, round(float(m.current_hp_fraction), 3), str(m.status or "none"))
-        for m in view.team.values()
-    ]
-    return {"turn": int(battle.turn), "role": role,
-            "mask": tuple(int(i) for i in np.flatnonzero(mask)), "side": side}
+    side = []
+    for mon in view.team.values():
+        hp = round(float(mon.current_hp_fraction), 3)
+        # poke-env exposes faint as Status.FNT; poke-engine keeps hp=0 with status="none".
+        # Normalize that representation difference before classifying a mechanic divergence.
+        status = "fnt" if hp <= 0.0 else str(mon.status or "none")
+        side.append((mon.species, hp, status))
+    active = getattr(view, "active_pokemon", None)
+    return {
+        "turn": int(battle.turn),
+        "role": role,
+        "mask": tuple(int(i) for i in np.flatnonzero(mask)),
+        "active": _to_id(getattr(active, "species", "")),
+        "side": side,
+    }
 
 
 # ------------------------------------------------------------------------ showdown trajectory
@@ -98,6 +112,82 @@ def showdown_trajectory(paste_a: str, paste_b: str, seed: int, fmt: str = "gen9o
         return _sorted_traj(traj)
 
     return asyncio.run(_run())
+
+
+def showdown_direct_trajectory(
+    paste_a: str,
+    paste_b: str,
+    seed: int,
+    fmt: str = "gen9ou",
+    max_turns: int = 100,
+) -> list[dict]:
+    """The same deterministic-policy trajectory on in-process pinned Showdown.
+
+    This is the preferred differential reference: it exercises Showdown's real rules, censored
+    player protocol, private requests, and poke-env parser without accounts, a server, or sockets.
+    Chance streams still cannot be synchronized with poke-engine, so ``diff_trajectories`` keeps
+    the same early-turn/legality interpretation as the network-server path.
+    """
+    from fog.env.actions import action_legality_mask, map_action_to_order
+    from fog.env.showdown_direct import ShowdownDirectClient
+    from fog.env.showdown_local import LocalShowdownBattle
+    from fog.env.showdown_local_runner import LocalOrderFactory
+    from fog.env.teams import to_packed
+
+    local_seed = int(seed) % (1 << 256)
+    options = {
+        "formatid": fmt,
+        "seed": f"sodium,{local_seed:064x}",
+        "strictChoices": True,
+        "p1": {"name": "Fuzz A", "team": to_packed(paste_a)},
+        "p2": {"name": "Fuzz B", "team": to_packed(paste_b)},
+    }
+    trajectory: list[dict] = []
+    order_factory = LocalOrderFactory()
+    with ShowdownDirectClient() as client, LocalShowdownBattle.create(
+        client, options, battle_tag=f"battle-direct-fuzz-{seed}"
+    ) as battle:
+        choice_rounds = 0
+        while not battle.ended and choice_rounds < 1_000:
+            choices: list[str | None] = []
+            for role, view in (("p1", battle.p1), ("p2", battle.p2)):
+                request = battle.update.requests[role]
+                if request is None or request.get("wait"):
+                    choices.append(None)
+                    continue
+                if request.get("teamPreview"):
+                    choices.append("/team 123456")
+                    continue
+                turn = int(getattr(view, "turn", 0) or 0)
+                if turn > max_turns:
+                    choices.append(order_factory.choose_default_move().message)
+                    continue
+                mask = np.asarray(action_legality_mask(view), dtype=bool)
+                idx = scripted_action(seed, role, turn, mask)
+                try:
+                    order = map_action_to_order(view, idx, order_factory)
+                    choice = getattr(order, "message", str(order))
+                    fingerprint = _showdown_fingerprint(view, role, mask)
+                    fingerprint.update(action_idx=idx, choice=choice)
+                    trajectory.append(fingerprint)
+                    choices.append(choice)
+                except AssertionError:
+                    trajectory.append(
+                        {
+                            "turn": turn,
+                            "role": role,
+                            "mask": ("MASK_REQUEST_MISMATCH",),
+                            "side": [],
+                        }
+                    )
+                    choices.append(order_factory.choose_default_move().message)
+            if choices == [None, None]:
+                raise RuntimeError("direct Showdown fuzz battle owes no choice while live")
+            battle.step(choices[0], choices[1], include_state=False)
+            choice_rounds += 1
+        if not battle.ended and choice_rounds >= 1_000:
+            raise RuntimeError("direct Showdown fuzz battle exceeded 1,000 choice rounds")
+    return _sorted_traj(trajectory)
 
 
 def _scripted_player(paste: str, seed: int, fmt: str, traj: list[dict], max_turns: int):
@@ -143,8 +233,14 @@ def _showdown_fingerprint(battle, role: str, mask: np.ndarray) -> dict:
             round(float(getattr(mon, "current_hp_fraction", 1.0) or 0.0), 3),
             _to_id(getattr(status, "name", status)) if status else "none",
         ))
-    return {"turn": int(getattr(battle, "turn", 0) or 0), "role": role,
-            "mask": tuple(int(i) for i in np.flatnonzero(mask)), "side": side}
+    active = getattr(battle, "active_pokemon", None)
+    return {
+        "turn": int(getattr(battle, "turn", 0) or 0),
+        "role": role,
+        "mask": tuple(int(i) for i in np.flatnonzero(mask)),
+        "active": _to_id(getattr(active, "species", "")),
+        "side": side,
+    }
 
 
 def _sorted_traj(traj: list[dict]) -> list[dict]:
@@ -165,6 +261,8 @@ def diff_trajectories(a: list[dict], b: list[dict], hp_tol: float = 0.15) -> dic
         if (fa["turn"], fa["role"]) != (fb["turn"], fb["role"]):
             return {"cause": "schedule", **key, "a": (fa["turn"], fa["role"]),
                     "b": (fb["turn"], fb["role"])}
+        if fa.get("active") != fb.get("active"):
+            return {"cause": "species", **key, "a": fa.get("active"), "b": fb.get("active")}
         if fa["mask"] != fb["mask"]:
             return {"cause": "mask", **key, "a": fa["mask"], "b": fb["mask"]}
         for (ida, hpa, sta), (idb, hpb, stb) in zip(fa["side"], fb["side"]):
@@ -190,6 +288,13 @@ def main() -> None:
     ap.add_argument("--max-turns", type=int, default=100)
     ap.add_argument("--showdown", action="store_true",
                     help="replay each game on the local Showdown server and diff (server must run)")
+    ap.add_argument(
+        "--showdown-direct",
+        action="store_true",
+        help="replay on pinned in-process Showdown and diff (no server or sockets)",
+    )
+    ap.add_argument("--quiet", action="store_true", help="print only the aggregate summary")
+    ap.add_argument("--out", type=Path, default=None, help="optional JSON summary path")
     args = ap.parse_args()
 
     from collections import Counter
@@ -204,22 +309,29 @@ def main() -> None:
     total_decisions = 0
     finished = 0
     for g in range(args.games):
-        a, b = rng.choice(pool), rng.choice(pool)
+        index_a, index_b = rng.randrange(len(pool)), rng.randrange(len(pool))
+        a, b = pool[index_a], pool[index_b]
         game_seed = args.seed * 100_000 + g
         traj_e = engine_trajectory(a, b, seed=game_seed, max_turns=args.max_turns)
         total_decisions += len(traj_e)
         finished += 1
-        if not args.showdown:
+        if not args.showdown and not args.showdown_direct:
             continue
-        traj_s = showdown_trajectory(a, b, seed=game_seed, max_turns=args.max_turns)
+        traj_s = (
+            showdown_direct_trajectory(a, b, seed=game_seed, max_turns=args.max_turns)
+            if args.showdown_direct
+            else showdown_trajectory(a, b, seed=game_seed, max_turns=args.max_turns)
+        )
         d = diff_trajectories(traj_e, traj_s, hp_tol=args.hp_tol)
         if d:
+            d["teams"] = (index_a, index_b)
             diverged += 1
             causes[d["cause"]] += 1
             diverge_turns.append(int(d.get("turn", 0)))
-            print(f"game {g}: DIVERGED {d}")
+            if not args.quiet:
+                print(f"game {g}: DIVERGED {d}")
 
-    if args.showdown:
+    if args.showdown or args.showdown_direct:
         turn_note = ""
         if diverge_turns:
             turn_note = (
@@ -236,6 +348,24 @@ def main() -> None:
             "(type chart, abilities, items). Per plan §5: patch upstream, exclude from pools, or "
             "document in KNOWN_ISSUES — and keep the cross-sim gauntlet halt rule on for training."
         )
+        summary = {
+            "games": finished,
+            "diverged": diverged,
+            "divergence_rate": diverged / max(1, finished),
+            "causes": dict(causes),
+            "divergence_turn_min": min(diverge_turns) if diverge_turns else None,
+            "divergence_turn_mean": (
+                sum(diverge_turns) / len(diverge_turns) if diverge_turns else None
+            ),
+            "pool": str(args.pool),
+            "seed": args.seed,
+            "max_turns": args.max_turns,
+            "hp_tolerance": args.hp_tol,
+            "reference": "showdown_direct" if args.showdown_direct else "showdown_server",
+        }
+        if args.out is not None:
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            args.out.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     else:
         print(
             f"engine fuzz: {finished} games, avg {total_decisions / max(1, finished):.1f} "

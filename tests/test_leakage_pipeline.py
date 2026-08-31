@@ -15,11 +15,14 @@ from fog.training.ppo import ppo_update
 from fog.training.rollout import RolloutBuffer
 
 # FogAgent() placeholder cardinalities (models/belief.py defaults)
-SIZES = {"species": 320, "item": 64, "ability": 160, "move": 720, "spread": 17, "tera": 19}
+SIZES = {
+    "species": 320, "item": 64, "ability": 160, "move": 720,
+    "nature": 25, "ev": 64, "tera": 19,
+}
 
 
 def _my_view(rng) -> dict:
-    tokens = np.full((6, 9), -1, dtype=np.int64)
+    tokens = np.full((6, 15), -1, dtype=np.int64)
     tokens[:, 0] = rng.integers(0, SIZES["species"], 6)   # species public
     tokens[0, 3] = rng.integers(0, SIZES["move"])         # one revealed move
     labels = {
@@ -27,7 +30,8 @@ def _my_view(rng) -> dict:
         "item": rng.integers(0, SIZES["item"], 6),
         "ability": rng.integers(0, SIZES["ability"], 6),
         "move": rng.integers(0, SIZES["move"], (6, 4)),
-        "spread": rng.integers(0, SIZES["spread"], 6),
+        "nature": rng.integers(0, SIZES["nature"], 6),
+        "ev": rng.integers(0, 8, (6, 6)),
         "tera": rng.integers(0, SIZES["tera"], 6),
     }
     labels = {k: v.astype(np.int64) for k, v in labels.items()}
@@ -35,13 +39,12 @@ def _my_view(rng) -> dict:
         "species": np.ones((6, SIZES["species"]), dtype=bool),
         "ability": np.ones((6, SIZES["ability"]), dtype=bool),
         "move": np.ones((6, SIZES["move"]), dtype=bool),
-        "spread": np.ones((6, SIZES["spread"]), dtype=bool),
     }
     return {"tokens": tokens, "masks": masks, "labels": labels}
 
 
 def _frag(rng, t: int = 3) -> dict:
-    opp_tokens = np.full((6, 9), -1, dtype=np.int64)
+    opp_tokens = np.full((6, 15), -1, dtype=np.int64)
     opp_tokens[:, 0] = rng.integers(0, SIZES["species"], 6)
     return {
         "entities": rng.normal(size=(12, ENTITY_RAW_DIM)).astype(np.float32),
@@ -69,7 +72,7 @@ def _filled_buffer(rng, games=3, decisions=4) -> RolloutBuffer:
         for _ in range(decisions):
             buf.add_decision(g, _frag(rng), action=int(rng.integers(0, 4)),
                              log_prob=float(np.log(0.25)), value=0.0)
-        truth = np.zeros((6, 9), dtype=np.int64)
+        truth = np.zeros((6, 15), dtype=np.int64)
         buf.end_game(g, outcome=float(rng.choice([-1.0, 1.0])), belief_targets=truth)
     return buf
 
@@ -87,6 +90,23 @@ def test_to_batch_emits_self_belief_targets_and_aliases_history():
     assert batch["self_belief_valid"]["tera"].all()
     # history is aliased (same tensor object), not duplicated
     assert batch["opp_view"]["history"] is batch["history"]
+
+
+def test_self_belief_censors_inconsistent_illusion_slot():
+    rng = np.random.default_rng(9)
+    buf = RolloutBuffer()
+    frag = _frag(rng)
+    frag["opp_view"]["my_view"]["supervision_consistent"] = np.array(
+        [False, True, True, True, True, True], dtype=bool
+    )
+    game = buf.start_game()
+    buf.add_decision(game, frag, action=0, log_prob=float(np.log(0.25)), value=0.0)
+    truth = np.zeros((6, 15), dtype=np.int64)
+    buf.end_game(game, outcome=1.0, belief_targets=truth)
+
+    valid = buf.to_batch()["self_belief_valid"]
+
+    assert all(not bool(mask[0, 0].any()) for mask in valid.values())
 
 
 def test_ppo_update_trains_self_belief_and_it_decreases():
@@ -124,7 +144,7 @@ def test_frozen_probe_is_fully_frozen_and_measures():
     ce = probe.leakage_ce(mirror, opp_view["my_view"])
     assert ce.shape == (6,) and torch.isfinite(ce).all() and (ce >= 0).all()
     per_fam = probe.leakage_ce(mirror, opp_view["my_view"], per_family=True)
-    assert set(per_fam) == {"species", "item", "ability", "move", "spread", "tera"}
+    assert set(per_fam) == {"species", "item", "ability", "move", "nature", "ev", "tera"}
     # weighted ΔI knob: zero weights -> zero CE; family sums add up
     zero = probe.leakage_ce(mirror, opp_view["my_view"],
                             family_weights={k: 0.0 for k in per_fam})
@@ -299,18 +319,21 @@ def test_mirror_frame_consistency():
         entities=ent, entity_ids=eid, field=np.zeros(DIMS.field_dim, np.float32),
         history=np.zeros((2, DIMS.turn_dim), np.float32), history_len=2,
         legality_mask=np.array([True] + [False] * 13), active_idx=np.array([1, 8]),
-        opp_revealed={"tokens": np.full((6, 9), -1, np.int64), "masks": {}},
+        opp_revealed={"tokens": np.full((6, 15), -1, np.int64), "masks": {}},
     )
-    my_view = np.full((6, 9), -1, np.int64)
+    my_view = np.full((6, 15), -1, np.int64)
     my_view[:, 0] = 1
-    truth = np.zeros((6, 9), np.int64)
+    truth = np.zeros((6, 15), np.int64)
     frag, mv = build_opponent_view_np(obs, my_view, truth, TABLES)
+    assert frag["legality_mask"].shape == (14,)
+    assert frag["legality_mask"].all()
     assert frag["entities"].shape == (12, ENTITY_RAW_DIM)
     assert (frag["entities"][:6, L.is_mine] == 1.0).all()   # viewer's team reads mine
     assert (frag["entities"][6:, L.is_mine] == 0.0).all()
     assert frag["active_idx"].tolist() == [2, 7]            # sides swapped
-    assert "history" not in frag                            # aliased at batch time
-    assert set(mv["masks"]) == {"species", "ability", "move", "spread"}
+    assert "history" in frag                                # perspective-swapped public history
+    np.testing.assert_array_equal(frag["history"], obs.history)
+    assert set(mv["masks"]) == {"species", "ability", "move"}
 
     # field side-swap: mark my hazards block, expect it in the opponent block after mirroring
     field = np.zeros(DIMS.field_dim, dtype=np.float32)
@@ -334,12 +357,12 @@ def test_mirror_labels_follow_my_view_clamp():
         field=np.zeros(DIMS.field_dim, np.float32),
         history=np.zeros((2, DIMS.turn_dim), np.float32), history_len=2,
         legality_mask=np.array([True] + [False] * 13), active_idx=np.array([1, 8]),
-        opp_revealed={"tokens": np.full((6, 9), -1, np.int64), "masks": {}},
+        opp_revealed={"tokens": np.full((6, 15), -1, np.int64), "masks": {}},
     )
-    my_view = np.full((6, 9), -1, np.int64)
+    my_view = np.full((6, 15), -1, np.int64)
     my_view[:, 0] = 1
     my_view[0, 3] = 12  # opponent saw this move of mine; paste position on my sheet is 2
-    truth = np.zeros((6, 9), np.int64)
+    truth = np.zeros((6, 15), np.int64)
     truth[:, 0] = 1
     truth[0, 3:7] = [10, 11, 12, 13]
     truth[1, 3:7] = [20, 21, 22, 23]

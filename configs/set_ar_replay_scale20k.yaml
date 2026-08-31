@@ -1,0 +1,15 @@
+# Clean 20k-corpus scaling comparison against the 5k replay-belief result. Keep model capacity,
+# initialization, split semantics, and optimization settings matched so data scale is the variable.
+extends: set_ar_replay.yaml
+
+experiment: set_ar_replay_scale20k
+bc:
+  manifest: data/parsed/manifest_rating1500_20k.parquet
+  epochs: 30
+  # Evaluate the full replay-level holdout for stable plateau decisions.
+  eval_batches: 0
+  early_stopping_patience: 5
+  early_stopping_min_delta: 0.02
+
+log:
+  dir: runs/set_ar_replay_scale20k

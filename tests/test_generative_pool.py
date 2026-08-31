@@ -44,7 +44,7 @@ def test_deterministic_in_seed(tables):
 def test_truth_tokens_fully_in_vocabulary(tables, pastes):
     """No sampled attribute may fall back to a sentinel/censored token — that would silently
     weaken belief supervision on exactly the pool built to strengthen it."""
-    from fog.constants.schema import MAX_SPREADS_PER_SPECIES, OTHER_ITEM, RARE_SPECIES
+    from fog.constants.schema import N_EV_UNITS, N_NATURES, OTHER_ITEM, RARE_SPECIES
     from fog.env.team_truth import truth_tokens_from_paste
 
     rare = tables.species_index(RARE_SPECIES)
@@ -55,8 +55,10 @@ def test_truth_tokens_fully_in_vocabulary(tables, pastes):
         assert (tok[:, 1] >= 0).all() and (tok[:, 1] != other_item).all()    # item
         assert (tok[:, 2] >= 0).all()                                        # ability
         assert (tok[:, 3:7] >= 0).all()                                      # 4 moves
-        assert (tok[:, 7] >= 0).all() and (tok[:, 7] < MAX_SPREADS_PER_SPECIES).all()  # spread
-        assert (tok[:, 8] >= 0).all() and (tok[:, 8] < 18).all()             # tera (a real type)
+        assert (tok[:, 7] >= 0).all() and (tok[:, 7] < N_NATURES).all()
+        assert (tok[:, 8:14] >= 0).all() and (tok[:, 8:14] < N_EV_UNITS).all()
+        assert (tok[:, 8:14].sum(axis=1) <= 127).all()
+        assert (tok[:, 14] >= 0).all() and (tok[:, 14] < 18).all()          # real Tera type
 
 
 def test_moves_distinct_and_learnset_legal(tables, pastes):

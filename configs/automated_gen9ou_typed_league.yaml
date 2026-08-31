@@ -1,0 +1,84 @@
+version: 1
+name: gen9ou_typed_autonomous_league
+output_dir: runs/gen9ou_typed_autonomous_league
+base_config: configs/gen9ou_typed_token_selfplay.yaml
+
+# This file becomes runnable as soon as the bounded on-policy correction finishes successfully.
+# The 64-game smoke is retained as the initial historical opponent.
+initial_checkpoint: artifacts/checkpoints/typed_dagger_2048.pt
+initial_league_checkpoints:
+  - artifacts/checkpoints/typed_dagger_smoke_64.pt
+  - artifacts/checkpoints/typed_dagger_512.pt
+  - artifacts/checkpoints/typed_dagger_1024.pt
+  - artifacts/checkpoints/typed_dagger_2048.pt
+
+training:
+  blocks: 12
+  decisions_per_block: 240000
+  batch_decisions: 24000
+  checkpoint_every_decisions: 24000
+  minibatch_size: 1536
+  epochs: 1
+  lr: 1.0e-5
+  clip: 0.05
+  seed: 20261140
+  tensorboard: true
+
+evaluation:
+  enabled: true
+  pool: data/teams/gen9ou_public_v1/validation.json
+  opponents: [simpleheuristics, maxdamage]
+  head_to_head: true
+  games: 64
+  confirmation_games: 128
+  champion_games: 128
+  seed: 20261240
+  confirmation_seed_offset: 100000
+  champion_seed_offset: 200000
+  format: gen9ou
+  device: cuda
+  max_turns: 120
+  progress_every: 4
+
+  # Champion promotion is conservative; learner continuation is intentionally less so.
+  viewer_min_head_to_head: 0.53
+  viewer_max_benchmark_regression: 0.03
+  deterioration_head_to_head_below: 0.47
+  deterioration_benchmark_regression: 0.03
+  collapse_head_to_head_below: 0.42
+  collapse_benchmark_regression: 0.05
+
+retention:
+  backup_checkpoints: 2
+  league_checkpoints: 8
+  keep_numbered_per_block: 2
+  prune_numbered_after_evaluation: true
+  maximum_fallback_uses: 2
+  larger_evaluation_games: 256
+
+adaptation:
+  diversity_after_nonpromotions: 3
+  pause_after_nonpromotions: 9
+  fallback_lr_scale: 0.5
+  repeated_fallback_block_scale: 2.0
+  diversity_overrides:
+    league.latest_frac: 0.35
+    league.past_frac: 0.55
+    league.scripted_frac: 0.10
+    ppo.entropy_coef: 0.004
+    ppo.entropy_coef_final: 0.0015
+  recovery_overrides:
+    league.latest_frac: 0.35
+    league.past_frac: 0.55
+    league.scripted_frac: 0.10
+
+safety:
+  auto_refresh: true
+  games: 5
+  device: cuda
+  replay_audit_config: configs/gen9ou_typed_token_policy.yaml
+
+overrides:
+  preflight.report: runs/preflight_audit/typed_token_autonomous_v1/summary.json
+  preflight.replay_report: runs/replay_preflight_audit/typed_token_autonomous_v1/summary.json
+  ppo.rollout_tera_logit_bonus: 0.0

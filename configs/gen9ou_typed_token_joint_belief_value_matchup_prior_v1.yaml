@@ -1,0 +1,37 @@
+# Production integration of the validated typed matchup prior.  Replay remains the primary real-
+# battle source.  The exact auxiliary is broad coherent/diversified simulation with a 12.75%
+# minority of disjointly generated initial matchup-probability rows.  Later states always retain
+# hard final outcomes; the prior is explicitly gated to initial states until a static all-turn
+# representation is separately validated.
+extends: gen9ou_typed_token_joint_belief_value_ev_stat_continuation_v3.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_matchup_prior_v1
+seed: 20261304
+
+model:
+  matchup_value_prior: true
+  matchup_value_prior_initial_only: true
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_matchup_prior_diagnostic_v1/checkpoints/bc_best.pt
+  init_compatible: false
+  scope: belief_value_prior_shared
+  auxiliary_manifest: runs/gen9ou_simple_belief_value_hybrid_prior_v1/train_manifest.parquet
+  auxiliary_holdout_manifest: runs/gen9ou_simple_belief_value_combined_v1/holdout_manifest.parquet
+  guard_holdout_manifest: runs/gen9ou_simple_bv_repeat_holdout_initial_soft_1024_v1/holdout_manifest.parquet
+  guard_metric: value
+  guard_eval_batches: 0
+  epochs: 32
+  lr: 3.0e-6
+  lr_final: 3.0e-7
+  shared_lr_scale: 0.05
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.0005
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_matchup_prior_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_matchup_prior_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_matchup_prior_v1
+  tensorboard: true

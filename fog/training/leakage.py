@@ -101,7 +101,7 @@ class DegenerateSolutionWatchdog:
     decisions_seen: int = 0
 
     @classmethod
-    def from_control_run(cls, log_dir, tail_rows: int = 10) -> "DegenerateSolutionWatchdog":
+    def from_control_run(cls, log_dir, tail_rows: int = 10) -> DegenerateSolutionWatchdog:
         """Load a finished β=0 control run's full metrics.csv and start with final-tail baselines.
 
         Call `update_to(decisions)` before each check so the baselines come from the control at
@@ -133,7 +133,7 @@ class DegenerateSolutionWatchdog:
         wd.update_to(None)
         return wd
 
-    def update_to(self, decisions: int | None, window: int = 5) -> "DegenerateSolutionWatchdog":
+    def update_to(self, decisions: int | None, window: int = 5) -> DegenerateSolutionWatchdog:
         """Set baselines from the control rows at matched progress (`decisions` seen so far).
 
         None -> final tail (legacy behavior). Earlier than the control's first row -> its first

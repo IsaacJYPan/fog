@@ -24,7 +24,7 @@ AWARE_CFG = {"model": {"use_posterior_features": True}}
 
 def _batch(b=3, seed=0, n_species=300):
     torch.manual_seed(seed)
-    tokens = torch.full((b, 6, 9), -1, dtype=torch.long)
+    tokens = torch.full((b, 6, 15), -1, dtype=torch.long)
     tokens[:, :, 0] = torch.randint(0, n_species, (b, 6))
     legal = torch.zeros(b, 14, dtype=torch.bool)
     legal[:, [0, 1, 8]] = True
@@ -144,8 +144,8 @@ def test_finetune_value_requires_posterior_agent():
 
 
 # --------------------------------------------------------------------- engine-backed end-to-end
-from fog.env.engine_battle import HAVE_ENGINE  # noqa: E402
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP  # noqa: E402
+from fog.env.engine_battle import HAVE_ENGINE
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 
@@ -185,7 +185,7 @@ def test_collect_and_finetune_end_to_end(tmp_path, posterior_agent):
     # the executed action was legal in its own row
     assert all(data["legality_mask"][i, data["action"][i]] for i in range(n))
     # masks round-tripped per family
-    for fam in ("species", "item", "ability", "move", "spread"):
+    for fam in ("species", "item", "ability", "move"):
         assert f"mask_{fam}" in data
 
     if len(np.unique(data["game"])) < 2:

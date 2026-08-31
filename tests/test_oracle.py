@@ -12,7 +12,7 @@ from fog.models.oracle import ActionOracleHead, apply_set_oracle
 
 def _batch(b=2, extra=None):
     torch.manual_seed(0)
-    tokens = torch.full((b, 6, 9), -1, dtype=torch.long)
+    tokens = torch.full((b, 6, 15), -1, dtype=torch.long)
     tokens[:, :, 0] = torch.randint(0, 320, (b, 6))
     legal = torch.zeros(b, 14, dtype=torch.bool)
     legal[:, [0, 1, 8]] = True
@@ -31,16 +31,16 @@ def _batch(b=2, extra=None):
 
 
 def test_apply_set_oracle_clamps_to_truth():
-    truth = np.zeros((2, 6, 9), dtype=np.int64)
+    truth = np.zeros((2, 6, 15), dtype=np.int64)
     truth[:, :, 1] = 3  # item = 3 for all slots
-    out = apply_set_oracle({"tokens": torch.full((2, 6, 9), -1)}, truth)
+    out = apply_set_oracle({"tokens": torch.full((2, 6, 15), -1)}, truth)
     assert (out["tokens"][:, :, 1] == 3).all()
     assert out["masks"] == {}
 
 
 def test_set_oracle_uses_truth_tokens():
     agent = FogAgent({"model": {"oracle": "set"}})
-    truth = torch.zeros(2, 6, 9, dtype=torch.long)
+    truth = torch.zeros(2, 6, 15, dtype=torch.long)
     truth[:, :, 0] = 5
     batch = _batch(extra={"opp_truth_tokens": truth})
     out = agent(batch)
@@ -56,7 +56,7 @@ def test_action_oracle_changes_head_width_and_runs():
     batch = _batch(extra={"opp_committed_action": committed})
     out = agent(batch)
     assert out.log_probs.shape == (2, 14)
-    # policy head input width = (s_board + action-embed) ‖ c_dyn (no belief summary, §3.6)
+    # policy head input width = (private_state + action embedding) ‖ public_context
     assert agent.policy_value.policy[0].in_features == (
         agent.backbone.state_dim + agent.action_oracle.extra_dim + agent.backbone.dyn_dim
     )

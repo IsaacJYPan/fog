@@ -32,6 +32,29 @@ from fog.encoding.dims import DIMS
 
 _NON_ID = re.compile(r"[^a-z0-9]")
 
+# Parallel categorical history record. Table-backed fields store their ordinary table index and
+# use the table cardinality as <NONE/UNKNOWN>. This avoids the false metric geometry caused by the
+# legacy ``index / 1000`` floats while keeping the old 108-wide record checkpoint-compatible.
+H_START_MY_SPECIES = 0
+H_START_OPP_SPECIES = 1
+H_MY_MOVE = 2
+H_MY_TARGET_SPECIES = 3
+H_OPP_MOVE = 4
+H_OPP_TARGET_SPECIES = 5
+H_MY_SWITCH_SPECIES = 6
+H_OPP_SWITCH_SPECIES = 7
+H_MY_ITEM = 8
+H_OPP_ITEM = 9
+H_MY_ABILITY = 10
+H_OPP_ABILITY = 11
+H_MY_TERA = 12
+H_OPP_TERA = 13
+H_FIRST_ACTOR = 14       # 0 none, 1 me, 2 opponent
+H_MY_SWITCH_PHASE = 15   # 0 none, 1 before first move, 2 after first move
+H_OPP_SWITCH_PHASE = 16
+N_HISTORY_ID_FIELDS = 17
+assert N_HISTORY_ID_FIELDS == DIMS.hist_id_fields
+
 # --- offsets ---------------------------------------------------------------------------------------
 _OFF_SNAP = 0
 _OFF_MYACT = DIMS.hist_snapshot                                   # 30
@@ -47,6 +70,22 @@ _EFF = {"immune": 0, "resisted": 1, "neutral": 2, "super": 3, "unknown": 4}
 
 def to_id(name: object) -> str:
     return _NON_ID.sub("", str(name).lower())
+
+
+def submitted_species_id(name: object) -> str:
+    """Return the stable submitted-team identity for a live battle species.
+
+    Showdown changes Ogerpon's public species to a distinct ``...-Tera`` battle-only form.
+    Treating that form as a different team member makes old move-target history change
+    retroactively when Ogerpon terastallizes.  Tera state and the changed ability are encoded
+    separately, so identity fields should stay on the submitted mask form.
+    """
+    species = to_id(name)
+    if species.startswith("ogerpon") and species.endswith("tera"):
+        species = species[:-4]
+        if species == "ogerponteal":
+            species = "ogerpon"
+    return species
 
 
 def event_role(token: str) -> str | None:
@@ -84,7 +123,7 @@ def build_snapshot(battle: Any, tables) -> np.ndarray:
             continue
         species = getattr(mon, "species", None)
         if species:
-            snap[base] = tables.species_index(to_id(species)) / 1000.0
+            snap[base] = tables.species_index(submitted_species_id(species)) / 1000.0
         hp = getattr(mon, "current_hp_fraction", None)
         snap[2 + base] = float(hp) if hp is not None else 1.0
         status = getattr(mon, "status", None)
@@ -112,6 +151,144 @@ def build_snapshot(battle: Any, tables) -> np.ndarray:
             if member is not Terrain.NONE and f"{member.name}TERRAIN" in name:
                 snap[25 + member.value] = 1.0
     return snap
+
+
+def build_history_start(battle: Any, tables) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Return the three start-of-turn history blocks recorded at decision time.
+
+    The legacy snapshot remains byte/shape compatible. ``ids`` stores the active species as real
+    categorical ids, and ``state`` keeps all seven boost stages for both actives instead of the
+    legacy per-side sum.
+    """
+    snapshot = build_snapshot(battle, tables)
+    ids = _empty_history_ids(tables)
+    state = np.zeros(DIMS.hist_state, dtype=np.float32)
+    for side, mon in enumerate(
+        (getattr(battle, "active_pokemon", None), getattr(battle, "opponent_active_pokemon", None))
+    ):
+        if mon is None:
+            continue
+        species = getattr(mon, "species", None)
+        if species:
+            ids[H_START_MY_SPECIES + side] = tables.species_index(
+                submitted_species_id(species)
+            )
+        boosts = getattr(mon, "boosts", None) or {}
+        for i, stat in enumerate(("atk", "def", "spa", "spd", "spe", "accuracy", "evasion")):
+            state[side * 7 + i] = float(boosts.get(stat, 0)) / 6.0
+    return snapshot, ids, state
+
+
+def record_history_decision(tracker, turn: int, battle: Any, tables, action_idx: int | None) -> None:
+    """Record every start-of-turn history block through one call-site-safe helper."""
+    snapshot, ids, state = build_history_start(battle, tables)
+    tracker.record_decision(
+        turn,
+        snapshot,
+        action_idx,
+        snapshot_ids=ids,
+        snapshot_state=state,
+    )
+
+
+def _empty_history_ids(tables) -> np.ndarray:
+    """One real turn row initialized to family-specific missing-value sentinels."""
+    ids = np.zeros(N_HISTORY_ID_FIELDS, dtype=np.int64)
+    ids[[H_START_MY_SPECIES, H_START_OPP_SPECIES, H_MY_TARGET_SPECIES,
+         H_OPP_TARGET_SPECIES, H_MY_SWITCH_SPECIES, H_OPP_SWITCH_SPECIES]] = tables.n_species
+    ids[[H_MY_MOVE, H_OPP_MOVE]] = tables.n_moves
+    ids[[H_MY_ITEM, H_OPP_ITEM]] = tables.n_items
+    ids[[H_MY_ABILITY, H_OPP_ABILITY]] = tables.n_abilities
+    ids[[H_MY_TERA, H_OPP_TERA]] = len(TYPE_INDEX)
+    return ids
+
+
+def parse_turn_event_ids(
+    events: list[list[str]],
+    my_role: str,
+    tables,
+    *,
+    snapshot_ids: np.ndarray | None = None,
+    species_by_key: dict[str, int] | None = None,
+) -> np.ndarray:
+    """Encode categorical identities from one completed turn in exact protocol order.
+
+    Singles has at most one chosen move per side. The first such move/switch/reveal identity is
+    retained; ``first_actor`` and switch phase preserve the important within-turn distinction
+    between hard switches and post-move pivots/forced switches.
+    """
+    ids = _empty_history_ids(tables)
+    if snapshot_ids is not None:
+        snap = np.asarray(snapshot_ids, dtype=np.int64)
+        ids[: min(2, len(snap))] = snap[:2]
+    opp_role = "p2" if my_role == "p1" else "p1"
+    species_by_key = species_by_key or {}
+    saw_move = False
+
+    def side(role: str | None) -> bool | None:
+        if role == my_role:
+            return True
+        if role == opp_role:
+            return False
+        return None
+
+    def species_for(token: str) -> int:
+        key = event_mon_key(token)
+        if key in species_by_key:
+            return int(species_by_key[key])
+        # Switch protocol lines contain the actual species in their second argument; move targets
+        # normally contain a nickname and therefore require ``species_by_key``.
+        return tables.n_species
+
+    for ev in events:
+        if len(ev) < 2:
+            continue
+        kind, args = ev[1], ev[2:]
+        if not args:
+            continue
+        mine = side(event_role(args[0]))
+
+        if kind == "move" and mine is not None:
+            if ids[H_FIRST_ACTOR] == 0:
+                ids[H_FIRST_ACTOR] = 1 if mine else 2
+            saw_move = True
+            move_col = H_MY_MOVE if mine else H_OPP_MOVE
+            target_col = H_MY_TARGET_SPECIES if mine else H_OPP_TARGET_SPECIES
+            if ids[move_col] == tables.n_moves and len(args) >= 2:
+                idx = tables.move_index(to_id(args[1]), default=None)
+                if idx is not None:
+                    ids[move_col] = idx
+            if ids[target_col] == tables.n_species and len(args) >= 3:
+                ids[target_col] = species_for(args[2])
+
+        elif kind in ("switch", "drag", "replace") and mine is not None:
+            species_col = H_MY_SWITCH_SPECIES if mine else H_OPP_SWITCH_SPECIES
+            phase_col = H_MY_SWITCH_PHASE if mine else H_OPP_SWITCH_PHASE
+            if ids[species_col] == tables.n_species and len(args) >= 2:
+                species = submitted_species_id(args[1].split(",")[0])
+                ids[species_col] = tables.species_index(species)
+                ids[phase_col] = 2 if saw_move else 1
+
+        elif kind in ("-item", "-enditem") and mine is not None and len(args) >= 2:
+            col = H_MY_ITEM if mine else H_OPP_ITEM
+            if ids[col] == tables.n_items:
+                try:
+                    ids[col] = tables.item_index(to_id(args[1]))
+                except KeyError:
+                    ids[col] = tables.n_items
+
+        elif kind == "-ability" and mine is not None and len(args) >= 2:
+            col = H_MY_ABILITY if mine else H_OPP_ABILITY
+            if ids[col] == tables.n_abilities:
+                ids[col] = tables.ability_index(
+                    to_id(args[1]), default=tables.n_abilities
+                )
+
+        elif kind == "-terastallize" and mine is not None and len(args) >= 2:
+            col = H_MY_TERA if mine else H_OPP_TERA
+            if ids[col] == len(TYPE_INDEX):
+                ids[col] = TYPE_INDEX.get(to_id(args[1]), len(TYPE_INDEX))
+    return ids
 
 
 def parse_turn_events(
@@ -174,7 +351,7 @@ def parse_turn_events(
                 opp_acted = True
                 rec[_OFF_OPP + 2] = 1.0  # switched
                 if len(args) >= 2:
-                    species = to_id(args[1].split(",")[0])
+                    species = submitted_species_id(args[1].split(",")[0])
                     rec[_OFF_OPP + 3] = tables.species_index(species) / 1000.0
             # seed hp for whoever switched in (condition is args[2] when present)
             if len(args) >= 3:

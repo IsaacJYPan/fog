@@ -1,0 +1,14 @@
+# Exact-truth simulator collection on the audited usage-sampled set-variant pool. This pool keeps a
+# fixed species core while varying submitted sets, preventing belief training from solving the task
+# by memorizing a small finite team identity. Marginally sampled sets are used only as an auxiliary
+# coverage curriculum; ordinary coherent teams and high-rated replays remain the main distribution.
+extends: gen9ou_typed_token_enhanced.yaml
+
+experiment: gen9ou_typed_token_pool_gen_exact
+
+env:
+  team_pool: data/teams/pool_gen
+
+log:
+  dir: runs/gen9ou_typed_token_pool_gen_exact
+  tensorboard: false

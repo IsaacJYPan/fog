@@ -14,8 +14,9 @@ Everything here is pure numpy + duck typing (no poke-env import), so the revelat
 testable with mock mons; the one battle-facing function (`opponent_views_from_battle`) uses getattr
 probing in the style of env/actions.py.
 
-Token conventions (fog.models.belief.SLOT_ATTRS order — species, item, ability, move0..3, spread,
-tera): value = table index, -1 = hidden/unknown. Revealed moves are packed into the EARLIEST move
+Token conventions (schema.SET_SLOT_ATTRS order — species, item, ability, move0..3, nature,
+EV-unit hp/atk/def/spa/spd/spe, tera): value = categorical index, -1 = hidden/unknown. Revealed
+moves are packed into the EARLIEST move
 slots in reveal order (a §3.2 requirement — the belief net clamps them there), and every
 truth/candidate grid consumed against such a view must be passed through `align_truth_to_views`
 first so targets follow the same convention (the 2026-07-12 move-order fix). `<NO_ITEM>` after
@@ -29,11 +30,19 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from fog.constants.schema import MAX_SPREADS_PER_SPECIES, NO_ITEM, RARE_SPECIES
+from fog.constants.schema import (
+    NO_ITEM,
+    RARE_SPECIES,
+    SET_EV_COLS,
+    SET_MOVE_COLS,
+    SET_N_ATTRS,
+    SET_NATURE_COL,
+    SET_TERA_COL,
+)
 
 N_SLOTS = 6
-N_ATTRS = 9
-_MOVE_COLS = (3, 4, 5, 6)
+N_ATTRS = SET_N_ATTRS
+_MOVE_COLS = SET_MOVE_COLS
 _NON_ID = re.compile(r"[^a-z0-9]")
 
 # family -> token columns, mirrored from fog.models.self_belief._FAMILY_COLS (numpy side)
@@ -42,8 +51,9 @@ FAMILY_COLS: dict[str, tuple[int, ...]] = {
     "item": (1,),
     "ability": (2,),
     "move": _MOVE_COLS,
-    "spread": (7,),
-    "tera": (8,),
+    "nature": (SET_NATURE_COL,),
+    "ev": SET_EV_COLS,
+    "tera": (SET_TERA_COL,),
 }
 
 
@@ -59,17 +69,23 @@ class SlotView:
     item: int | None = None          # table index; includes <NO_ITEM> — that IS knowledge
     ability: int | None = None
     moves: list[int] = field(default_factory=list)  # revealed, in reveal order, <=4
-    spread: int | None = None
+    nature: int | None = None
+    evs: list[int] = field(default_factory=list)
     tera: int | None = None          # tera TYPE index, known once terastallized
 
 
 def tokens_from_views(views: list[SlotView]) -> np.ndarray:
-    """[6, 9] int64 token tensor (C1 contract); -1 where unknown; moves packed earliest-first."""
+    """[6,15] int64 token tensor (C1 contract); -1 where unknown; moves packed earliest-first."""
     tokens = np.full((N_SLOTS, N_ATTRS), -1, dtype=np.int64)
     for j, v in enumerate(views[:N_SLOTS]):
-        for col, val in ((0, v.species), (1, v.item), (2, v.ability), (7, v.spread), (8, v.tera)):
+        for col, val in (
+            (0, v.species), (1, v.item), (2, v.ability),
+            (SET_NATURE_COL, v.nature), (SET_TERA_COL, v.tera),
+        ):
             if val is not None:
                 tokens[j, col] = val
+        for col, value in zip(SET_EV_COLS, v.evs):
+            tokens[j, col] = value
         for k, mv in enumerate(v.moves[:4]):
             tokens[j, _MOVE_COLS[k]] = mv
     return tokens
@@ -78,24 +94,18 @@ def tokens_from_views(views: list[SlotView]) -> np.ndarray:
 def masks_for_tokens(tokens: np.ndarray, tables) -> dict[str, np.ndarray]:
     """Per-family legality masks [6, n_x] bool for the belief net, keyed off each slot's species.
 
-    Known species -> learnset / legal-abilities / usable-items rows from `tables`, spread mask
-    limited to that species' cluster count (+<OTHER_SPREAD>), species mask clamped one-hot.
+    Known species -> learnset / legal-abilities rows from `tables`, species mask clamped one-hot.
+    Nature and EV values use global fixed vocabularies and need no static mask; the belief sampler
+    applies the dynamic total-EV budget.
     Unknown species (token -1) -> all-True everywhere (uninformative prior).
     """
-    n_spread_global = MAX_SPREADS_PER_SPECIES + 1
     masks = {
         "species": np.ones((N_SLOTS, tables.n_species), dtype=bool),
         "item": np.ones((N_SLOTS, tables.n_items), dtype=bool),
         "ability": np.ones((N_SLOTS, tables.n_abilities), dtype=bool),
         "move": np.ones((N_SLOTS, tables.n_moves), dtype=bool),
-        "spread": np.ones((N_SLOTS, n_spread_global), dtype=bool),
     }
     rare_idx = tables.species_index(RARE_SPECIES)
-    try:
-        spreads_by_species = tables.spreads.get("species", {})
-        species_ids = tables.species["ids"]
-    except Exception:  # spreads table optional during PoC
-        spreads_by_species, species_ids = {}, None
 
     for j in range(N_SLOTS):
         sp = int(tokens[j, 0])
@@ -108,15 +118,24 @@ def masks_for_tokens(tokens: np.ndarray, tables) -> dict[str, np.ndarray]:
         # HARD legality (a species genuinely cannot have these): learnset + legal abilities.
         masks["move"][j] = tables.learnset_mask(sp)
         masks["ability"][j] = tables.legal_abilities_mask(sp)
+        # Illusion can make the public protocol attribute the active Zoroark's move to its
+        # disguise slot. Once an observed move contradicts that slot's apparent species, the
+        # apparent species is no longer a sound source of hard move/ability legality. Relax both
+        # masks using only public evidence (not the private truth label), so training and
+        # inference remain consistent and the relaxed mask cannot leak the target class.
+        revealed_moves = [
+            int(move) for move in tokens[j, list(_MOVE_COLS)] if int(move) >= 0
+        ]
+        if any(
+            move >= masks["move"].shape[1] or not masks["move"][j, move]
+            for move in revealed_moves
+        ):
+            masks["move"][j] = True
+            masks["ability"][j] = True
         # Items are NOT species-locked — any Pokemon can hold any item. The per-species usage list is
         # a prior, not a legality constraint, so it must not become a hard -inf (that makes the CE on
         # a legitimately-rare item's ground-truth label diverge). The belief net learns item priors
         # from data instead; item mask stays all-True.
-        if species_ids is not None:
-            n_clusters = len(spreads_by_species.get(species_ids[sp], []))
-            if 0 < n_clusters <= MAX_SPREADS_PER_SPECIES:
-                masks["spread"][j] = False
-                masks["spread"][j, : n_clusters + 1] = True  # clusters + <OTHER_SPREAD>
     return masks
 
 
@@ -133,7 +152,7 @@ def align_truth_to_views(
     distinctness -inf (silently dropped by the loss guard), and pool_id eliminates the TRUE
     candidate whenever a revealed move's paste position != its clamp position.
 
-    truth_tokens [..., 6, 9]; view_tokens [..., 6, 9] or a single [6, 9] observation shared by
+    truth_tokens [..., 6, 15]; view_tokens [..., 6, 15] or a single [6, 15] observation shared by
     every leading row (the pool_id candidates case). Returns (aligned, consistent):
       aligned    -- new array, same shape as truth_tokens;
       consistent -- bool [..., 6]; False where a slot's FULLY-labeled sheet lacks a revealed
@@ -175,13 +194,52 @@ def align_truth_to_views(
     return aligned.reshape(truth.shape), consistent.reshape(lead + (N_SLOTS,))
 
 
+def align_training_truth_to_views(
+    truth_tokens: np.ndarray, view_tokens: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Align normal reveals without corrupting truth under Illusion-like contradictions.
+
+    A move publicly attributed to an Illusion disguise can be absent from that preview slot's
+    submitted set. Keep that contradiction in the model input as useful evidence, but retain the
+    original truth row and treat its real move fields as hidden for supervision.
+    """
+    truth = np.asarray(truth_tokens, dtype=np.int64)
+    aligned, consistent = align_truth_to_views(truth, view_tokens)
+    supervision_view = np.broadcast_to(
+        np.asarray(view_tokens, dtype=np.int64), truth.shape
+    ).copy()
+    flat_truth = truth.reshape(-1, N_SLOTS, N_ATTRS)
+    flat_aligned = aligned.reshape(-1, N_SLOTS, N_ATTRS)
+    flat_supervision = supervision_view.reshape(-1, N_SLOTS, N_ATTRS)
+    flat_consistent = consistent.reshape(-1, N_SLOTS)
+    for row, slot in np.argwhere(~flat_consistent):
+        flat_aligned[row, slot] = flat_truth[row, slot]
+        flat_supervision[row, slot, list(_MOVE_COLS)] = -1
+    return aligned, supervision_view, consistent
+
+
 def labels_from_truth(truth_tokens: np.ndarray) -> dict[str, np.ndarray]:
-    """[6, 9] full-truth tokens -> per-family C2 label arrays (numpy; torchify at batch time)."""
+    """[6,15] full-truth tokens -> per-family C2 label arrays (numpy; torchify at batch time)."""
     out: dict[str, np.ndarray] = {}
     for fam, cols in FAMILY_COLS.items():
         sel = truth_tokens[..., list(cols)]
-        out[fam] = sel if fam == "move" else sel.squeeze(-1)
+        out[fam] = sel if fam in ("move", "ev") else sel.squeeze(-1)
     return out
+
+
+def original_field_hidden(tokens: np.ndarray, tables) -> np.ndarray:
+    """Whether each submitted-set field is still a prediction target.
+
+    Most public tokens use ``-1`` for hidden.  Item is the important exception: ``<NO_ITEM>`` says
+    that the Pokemon currently holds nothing, not what item appeared on its submitted set.  The
+    current-state fact stays in the board/history encodings while the original item remains hidden
+    and trainable here.
+    """
+    values = np.asarray(tokens, dtype=np.int64)
+    hidden = values < 0
+    hidden = hidden.copy()
+    hidden[..., 1] |= values[..., 1] == tables.item_index("<NO_ITEM>")
+    return hidden
 
 
 def build_belief_input(views: list[SlotView], tables, truth_tokens: np.ndarray | None = None) -> dict:
@@ -245,7 +303,7 @@ class RevealLedger:
                     item=self._items.get(key),
                     ability=self._abilities.get(key),
                     moves=list(self._moves.get(key, [])),
-                    spread=None,  # spreads are never directly revealed (damage inference only)
+                    nature=None,  # nature/EVs are never directly revealed (damage inference only)
                     tera=self._teras.get(key),
                 )
             )
@@ -325,13 +383,15 @@ def opponent_views_from_battle(battle, tables) -> list[SlotView]:
 
 
 __all__ = [
-    "SlotView",
-    "RevealLedger",
-    "tokens_from_views",
-    "masks_for_tokens",
-    "align_truth_to_views",
-    "labels_from_truth",
-    "build_belief_input",
-    "opponent_views_from_battle",
     "FAMILY_COLS",
+    "RevealLedger",
+    "SlotView",
+    "align_training_truth_to_views",
+    "align_truth_to_views",
+    "build_belief_input",
+    "labels_from_truth",
+    "masks_for_tokens",
+    "opponent_views_from_battle",
+    "original_field_hidden",
+    "tokens_from_views",
 ]

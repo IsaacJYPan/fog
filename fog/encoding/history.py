@@ -16,13 +16,14 @@ Each turn record concatenates:
                                  inference on spreads/items)
 
 Extraction runs off poke-env's `battle.observations[turn].events` via the events.py mini-parser.
-Retro fidelity note (v1): the start-of-turn snapshot block and my switch-action slots need
-incremental live tracking to fill retroactively; the action/resolution signals (which move, who
-moved first, faints, reveals, damage where derivable) are real. See KNOWN_ISSUES.
+Start-of-turn snapshots and the acting player's switch slots require the incremental
+``BattleTracker`` used by live collection. A caller that omits the tracker receives only facts that
+can be reconstructed from the censored protocol and must treat the missing fields as unavailable.
 """
 from __future__ import annotations
 
 import re
+from types import SimpleNamespace
 from typing import Any
 
 import numpy as np
@@ -30,6 +31,47 @@ import numpy as np
 from fog.encoding.dims import DIMS
 
 _NON_ID = re.compile(r"[^a-z0-9]")
+
+
+def observations_by_turn(battle: Any) -> dict[int, Any]:
+    """Return per-turn protocol events for native, engine, and ordinary poke-env battles.
+
+    Some poke-env releases retain only ``_replay_data`` and expose no ``observations`` mapping.
+    Build an incremental compatibility view from that already-censored player log. The cache is
+    attached to the battle and consumes only newly appended lines, so calling this every decision
+    is linear in new protocol traffic rather than replay length.
+    """
+    native = getattr(battle, "observations", None)
+    if native:
+        return native
+    replay = getattr(battle, "_replay_data", None)
+    if replay is None:
+        return native or {}
+
+    cache = getattr(battle, "_fog_observation_cache", None)
+    if cache is None:
+        cache = {}
+        battle._fog_observation_cache = cache
+        battle._fog_replay_cursor = 0
+        battle._fog_replay_turn = 0
+    cursor = int(getattr(battle, "_fog_replay_cursor", 0))
+    current = int(getattr(battle, "_fog_replay_turn", 0))
+    if cursor > len(replay):  # defensive reset if an upstream parser replaces its replay buffer
+        cache.clear()
+        cursor = 0
+        current = 0
+    for event in replay[cursor:]:
+        if len(event) > 2 and event[1] == "turn":
+            try:
+                current = int(event[2])
+            except (TypeError, ValueError):
+                continue
+            cache.setdefault(current, SimpleNamespace(events=[]))
+        else:
+            cache.setdefault(current, SimpleNamespace(events=[])).events.append(event)
+    battle._fog_replay_cursor = len(replay)
+    battle._fog_replay_turn = current
+    return cache
 
 
 def _my_movesets(battle: Any) -> dict[str, dict[str, int]]:
@@ -43,6 +85,18 @@ def _my_movesets(battle: Any) -> dict[str, dict[str, int]]:
     return out
 
 
+def _species_by_key(battle: Any, tables) -> dict[str, int]:
+    from fog.encoding.events import submitted_species_id
+
+    out: dict[str, int] = {}
+    for group in ("team", "opponent_team"):
+        for key, mon in (getattr(battle, group, None) or {}).items():
+            species = getattr(mon, "species", None)
+            if species:
+                out[str(key)] = tables.species_index(submitted_species_id(species))
+    return out
+
+
 def encode_history(
     battle: Any, tables=None, *, perspective: str = "p1", tracker: Any = None
 ) -> tuple[np.ndarray, int]:
@@ -52,7 +106,7 @@ def encode_history(
 
     `tracker` (BattleTracker, optional) supplies the per-turn start-of-turn snapshots, my recorded
     action indices, and hp seeds — the retro-fidelity fields that raw event parsing can't recover."""
-    obs_map = getattr(battle, "observations", None) or {}
+    obs_map = observations_by_turn(battle)
     current = int(getattr(battle, "turn", 0) or 0)
     turns = sorted(t for t in obs_map if 1 <= t < current)
     if battle is None or tables is None or not turns:
@@ -78,6 +132,56 @@ def encode_history(
         ]
     ).astype(np.float32)
     return records, len(turns)
+
+
+def encode_history_sidecars(
+    battle: Any, tables=None, *, perspective: str = "p1", tracker: Any = None
+) -> tuple[np.ndarray, np.ndarray]:
+    """Return categorical ids and per-stat start state aligned one-for-one with ``encode_history``.
+
+    The sidecars are optional model inputs so old replay shards and checkpoints remain usable.
+    Real rows follow completed-turn protocol order; the zero row is used only for a length-zero
+    history and is masked by ``history_len``.
+    """
+    from fog.encoding.events import N_HISTORY_ID_FIELDS, parse_turn_event_ids
+
+    obs_map = observations_by_turn(battle)
+    current = int(getattr(battle, "turn", 0) or 0)
+    turns = sorted(t for t in obs_map if 1 <= t < current)[-DIMS.history_cap :]
+    if battle is None or tables is None or not turns:
+        return (
+            np.zeros((1, N_HISTORY_ID_FIELDS), dtype=np.int64),
+            np.zeros((1, DIMS.hist_state), dtype=np.float32),
+        )
+
+    role = getattr(battle, "player_role", None) or perspective
+    species = _species_by_key(battle, tables)
+    ids = []
+    states = []
+    for turn in turns:
+        snapshot_ids = tracker.snapshot_ids.get(turn) if tracker is not None else None
+        if snapshot_ids is None and tracker is not None and turn in tracker.snapshots:
+            # Compatibility with trackers recorded before categorical sidecars existed.
+            legacy = np.asarray(tracker.snapshots[turn])
+            recovered = np.rint(legacy[:2] * 1000.0).astype(np.int64)
+            recovered[(recovered < 0) | (recovered >= tables.n_species)] = tables.n_species
+            snapshot_ids = recovered
+        ids.append(
+            parse_turn_event_ids(
+                getattr(obs_map[turn], "events", None) or [],
+                role,
+                tables,
+                snapshot_ids=snapshot_ids,
+                species_by_key=species,
+            )
+        )
+        state = tracker.snapshot_state.get(turn) if tracker is not None else None
+        states.append(
+            np.asarray(state, dtype=np.float32)
+            if state is not None
+            else np.zeros(DIMS.hist_state, dtype=np.float32)
+        )
+    return np.stack(ids).astype(np.int64), np.stack(states).astype(np.float32)
 
 
 def pad_or_truncate_front(records: np.ndarray, cap: int = DIMS.history_cap) -> np.ndarray:

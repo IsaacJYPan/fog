@@ -1,1 +1,4 @@
-"""Training: behavior cloning (§5), self-play PPO league (§6), leakage objective (§7)."""
+"""Behavior cloning, self-play PPO, auxiliary belief objectives, and search distillation.
+
+Use :class:`fog.train.TrainingSession` as the scriptable facade for one PPO or behavior-cloning run.
+"""

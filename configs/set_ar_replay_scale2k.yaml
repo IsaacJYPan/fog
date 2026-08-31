@@ -1,0 +1,10 @@
+# Medium-scale public-replay pretraining after the perspective/parser audit.
+# The generated manifest is rating-filtered at >=1500 and remains outside version control.
+extends: set_ar_replay.yaml
+
+experiment: set_ar_replay_scale2k
+bc:
+  manifest: data/parsed/manifest_rating1500.parquet
+
+log:
+  dir: runs/set_ar_replay_scale2k

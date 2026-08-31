@@ -1,41 +1,42 @@
-"""Phase-G leaf values: the public-belief value network wired into the solver's `values_fn`
-(PROJECT_DESIGN_PROPOSAL.md §9, §10 steps 6-7; PROPOSAL_IMPL_PLAN.md Phase G — OWNER DECISION
-2026-07-16). This is the successor of the interim in fog/search/pb_values.py, which reused the
+"""Posterior-aware leaf values wired into the solver's ``values_fn`` (ARCHITECTURE.md S2).
+This is the successor of the interim in fog/search/pb_values.py, which reused the
 policy's scalar value head with four posterior features.
 
-THE COST STRUCTURE THIS EXISTS TO GET RIGHT (§9.2). Expensive work runs ONCE per decision: the
+Expensive work runs once per decision: the
 backbone trunk over every leaf (shared with the interim path), and the encoding of the K own- and J
 opponent-candidate teams. The value network then produces, per leaf, the full per-pair table
 
     V[leaf, k, j] = our continuation payoff from this leaf if the true teams are (k, j),
                     conditioned on the belief at recompute time.
 
-Each solver iteration turns those tables into the scalar the cell payoff needs by a plain average
-over the leaf's CURRENT action-conditioned posterior (proposal §10.6) — no network pass:
+Each simulated cell keeps the value of its OWN candidate pair.  The solver performs the only
+cross-pair averaging later, when it evaluates each private type against the other side's possible
+types.  Averaging the table here as well would use the belief twice and erase the type-specific
+continuation values the table exists to preserve:
 
     post[a, b, k, j]   = pair_posteriors(rho, sigma1, sigma2)     # the coupling channel, §5.1
-    value(leaf)        = sum_{k,j} post[a_leaf, b_leaf, k, j] * V[leaf, k, j]
-    u[k, j, a, b]      = sum over branches of branch_prob * value(leaf-or-terminal)
+    post_leaf          = normalize(post[a_leaf, b_leaf] * discrete_leaf_evidence)
+    u[k, j, a, b]      = sum over branches of branch_prob * V[leaf, k, j]
 
 `recompute_every = N` controls how often the tables are refreshed by an actual network pass (the
 tables' belief-conditioning goes stale as the strategies move — a pair's continuation value depends
-on the belief carried into the leaf, the §5.1 thesis). Between refreshes only the cheap re-weighting
-runs.
+on the belief carried into the leaf, the §5.1 thesis). Between refreshes the cached table is reused;
+there is no second belief average in the payoff bridge.
 
-    recompute_every = 1  ==  THE CORRECTNESS REFERENCE (the "single value per query" form): every
-                            iteration re-runs the net at the current posterior and weights by that
-                            same posterior, so there is no drift. This is the definition the N > 1
-                            approximation is measured against on the exact small-pool gate (§15.3);
-                            it is exact but pays a full network pass per iteration.
-    recompute_every = N  ==  the deployed approximation: one network pass per N iterations, cheap
-                            re-weighting in between. The drift error vs. N = 1 is the measured knob.
+    recompute_every = 1  ==  THE CORRECTNESS REFERENCE: every iteration reruns the
+                            belief-dependent message/head path at the current
+                            evidence-conditioned belief. Static leaf/candidate representations
+                            remain cached. The N > 1 approximation is measured against this.
+    recompute_every = N  ==  the deployed approximation: one network pass per N iterations and
+                            cached-table reuse in between. The drift error vs. N = 1 is measured.
 
 `values_fn` counts its own calls to decide when a refresh is due, so the solver needs no changes.
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Callable
+from typing import Any
 
 import numpy as np
 
@@ -46,13 +47,13 @@ Array = np.ndarray
 
 @dataclass
 class PBValueStats:
-    """Budget accounting (proposal §15). A network refresh is the expensive event; re-weightings are
-    the cheap majority."""
+    """Budget accounting. A network refresh is expensive; cached-table uses are cheap."""
     leaves: int              # live leaf observations behind the u tensor
     failed_cells: int        # simulation failures — their u entries are `fallback_value`
     trunk_forwards: int      # backbone batches over the leaf set (once, at construction)
+    representation_forwards: int = 0  # leaf + candidate encoder preparation (once per decision)
     net_refreshes: int = 0   # PBValueNet passes over the leaves (one per `recompute_every` calls)
-    reweightings: int = 0    # cheap table re-averagings (one per values_fn call)
+    reweightings: int = 0    # legacy name: cached table uses (one per values_fn call)
 
 
 def make_pb_value_grid_values(
@@ -67,19 +68,20 @@ def make_pb_value_grid_values(
     fallback_value: float = 0.0,
     max_batch_forward: int = 256,
     trace: list | None = None,
+    leaf_pair_values: Array | None = None,
 ) -> tuple[Callable[[Array, Array], Array], PBValueStats]:
     """Build `values_fn(sigma1, sigma2) -> u[K, J, A, B]` backed by the public-belief value network.
 
-    `agent` supplies the shared backbone trunk (`head_inputs` -> s_board, c_dyn per leaf); `net` is a
-    `PBValueNet`. `own_tokens [K,6,9]` / `opp_tokens [J,6,9]` are the SAME candidate identities the
+    `agent` supplies the shared trunk (`head_inputs` -> private state and public context per leaf);
+    `PBValueNet`. `own_tokens [K,6,15]` / `opp_tokens [J,6,15]` are the SAME candidate identities the
     grid was built from (proposal §10 shared particles). `rho [K,J]` is the decision's root joint
     belief. `recompute_every = 1` gives the exact single-query reference; larger N trades measured
     drift for speed.
 
     If `trace` is a list, each `values_fn` call appends `{"post_leaf": [L,K,J], "v_table": [L,K,J],
-    "refreshed": bool}` — the per-leaf posterior queried and the (possibly stale) table it was
-    weighted against. The drift gate (fog/eval/pb_value_drift.py) consumes this to measure the §9.2
-    re-weighting error against full re-evaluation.
+    "refreshed": bool}` — the evidence-conditioned per-leaf belief queried and the possibly stale
+    table used. The drift gate consumes this to measure cached-table error against full
+    re-evaluation.
     """
     import torch
 
@@ -94,23 +96,35 @@ def make_pb_value_grid_values(
     n_k, n_j = own_t.shape[0], opp_t.shape[0]
 
     # ---- one-time trunk pass over every live leaf (the §19.13 expensive half) ------------------
-    s_board_parts: list = []
-    c_dyn_parts: list = []
+    private_state_parts: list = []
+    public_context_parts: list = []
     trunk_forwards = 0
     for lo in range(0, len(grid.leaf_obs), max_batch_forward):
         chunk = _stack_obs(grid.leaf_obs[lo: lo + max_batch_forward], device)
         with torch.no_grad():
-            s_board, c_dyn = agent.head_inputs(chunk)
-        s_board_parts.append(s_board)
-        c_dyn_parts.append(c_dyn)
+            private_state, public_context = agent.head_inputs(chunk)
+        private_state_parts.append(private_state)
+        public_context_parts.append(public_context)
         trunk_forwards += 1
     n_leaves = len(grid.leaf_obs)
     # widths are irrelevant when empty: every consumer below is guarded by `n_leaves`.
-    s_board_all = torch.cat(s_board_parts, dim=0) if s_board_parts else torch.zeros((0, 0), device=device)
-    c_dyn_all = torch.cat(c_dyn_parts, dim=0) if c_dyn_parts else torch.zeros((0, 0), device=device)
+    private_state_all = torch.cat(private_state_parts, dim=0) if private_state_parts else torch.zeros((0, 0), device=device)
+    public_context_all = torch.cat(public_context_parts, dim=0) if public_context_parts else torch.zeros((0, 0), device=device)
 
     stats = PBValueStats(leaves=n_leaves, failed_cells=int(grid.failed.sum()),
                          trunk_forwards=trunk_forwards)
+
+    # The public leaf encoder and both candidate-team encoders are independent of rho and of the
+    # regret strategies. Cache them once. Only the belief-conditioned message rounds and pair head
+    # are allowed to run at a refresh. A custom test net without this split keeps the reference
+    # `forward` fallback.
+    prepared = None
+    if n_leaves and hasattr(net, "prepare") and hasattr(net, "forward_cached"):
+        with torch.no_grad():
+            prepared = net.prepare(
+                private_state_all, public_context_all, own_t, opp_t
+            )
+        stats.representation_forwards = 1
 
     # ---- leaf -> (a, b) so a leaf can read its own action-conditioned posterior slice -----------
     positions = np.argwhere(grid.leaf_index >= 0)                      # rows (k, j, a, b, m)
@@ -119,19 +133,41 @@ def make_pb_value_grid_values(
         leaf_ab[grid.leaf_index[tuple(positions.T)]] = positions[:, [2, 3]]
     a_idx = leaf_ab[:, 0]
     b_idx = leaf_ab[:, 1]
+    evidence = np.asarray(
+        (getattr(grid, "leaf_evidence", np.ones((n_leaves, n_k, n_j), dtype=bool))
+         if n_leaves else np.ones((0, n_k, n_j), dtype=bool)),
+        dtype=np.float64,
+    )
+    if evidence.shape != (n_leaves, n_k, n_j):
+        raise ValueError(
+            f"leaf_evidence must be [L,K,J]={(n_leaves, n_k, n_j)}, got {evidence.shape}"
+        )
 
     rho = np.asarray(rho, dtype=np.float64)
     terminal_fill = np.where(np.isnan(grid.terminal_value), 0.0, grid.terminal_value)
+    pair_override = None
+    if leaf_pair_values is not None:
+        pair_override = np.asarray(leaf_pair_values, dtype=np.float64)
+        want = (n_leaves, n_k, n_j)
+        if pair_override.shape != want:
+            raise ValueError(f"leaf_pair_values must be {want}, got {pair_override.shape}")
 
     v_table: Array | None = None          # cached [L, K, J], refreshed every `recompute_every` calls
     call_count = 0
 
     def _post_leaf(sigma1: Array, sigma2: Array) -> Array:
-        """Each leaf's current action-conditioned posterior [L, K, J] (proposal §10.6)."""
+        """Each leaf's action- and evidence-conditioned belief [L, K, J] (§10.6)."""
         post = pair_posteriors(rho, sigma1, sigma2)                   # [A, B, K, J]
         if n_leaves == 0:
             return np.zeros((0, n_k, n_j))
-        return post[a_idx, b_idx]                                     # [L, K, J]
+        masked = post[a_idx, b_idx] * evidence                       # [L, K, J]
+        mass = masked.sum(axis=(1, 2), keepdims=True)
+        if (mass <= 0.0).any():
+            bad = np.flatnonzero(mass.reshape(-1) <= 0.0)
+            raise RuntimeError(
+                f"leaf evidence eliminated every candidate pair for leaves {bad[:8].tolist()}"
+            )
+        return masked / mass
 
     def _refresh(post_leaf: Array) -> Array:
         """One actual network pass: condition V on the current per-leaf posterior (§9.2)."""
@@ -141,7 +177,18 @@ def make_pb_value_grid_values(
         for lo in range(0, n_leaves, max_batch_forward):
             hi = min(lo + max_batch_forward, n_leaves)
             with torch.no_grad():
-                v = net(s_board_all[lo:hi], c_dyn_all[lo:hi], own_t, opp_t, rho_t[lo:hi])
+                if prepared is not None:
+                    from fog.models.pb_value import PBValueCache
+
+                    chunk = PBValueCache(
+                        ctx=prepared.ctx[lo:hi], own=prepared.own, opp=prepared.opp
+                    )
+                    v = net.forward_cached(chunk, rho_t[lo:hi])
+                else:
+                    v = net(
+                        private_state_all[lo:hi], public_context_all[lo:hi],
+                        own_t, opp_t, rho_t[lo:hi],
+                    )
             out[lo:hi] = v.detach().cpu().numpy()
         return out
 
@@ -153,6 +200,10 @@ def make_pb_value_grid_values(
             refreshed = v_table is None or (call_count % max(1, int(recompute_every)) == 0)
             if refreshed:
                 v_table = _refresh(post_leaf)
+                if pair_override is not None:
+                    v_table = np.where(
+                        np.isfinite(pair_override), pair_override, v_table
+                    )
         call_count += 1
         stats.reweightings += 1
         if trace is not None:
@@ -160,16 +211,16 @@ def make_pb_value_grid_values(
                           "v_table": v_table.copy() if v_table is not None else post_leaf.copy(),
                           "refreshed": refreshed})
 
-        # cheap re-weighting: scalar(leaf) = <post_leaf, V_leaf>  (plain arithmetic, no net pass)
+        # A branch generated from private pair (k,j) receives V[leaf,k,j]. The solver later
+        # averages these pair payoffs once. Never collapse V over post_leaf here.
         if n_leaves:
-            leaf_scalar = (post_leaf * v_table).sum(axis=(1, 2))      # [L]
+            safe_leaf = np.maximum(grid.leaf_index, 0)
+            k_axis = np.arange(n_k)[:, None, None, None, None]
+            j_axis = np.arange(n_j)[None, :, None, None, None]
+            branch_leaf_value = v_table[safe_leaf, k_axis, j_axis]
+            per_branch = np.where(grid.leaf_index >= 0, branch_leaf_value, terminal_fill)
         else:
-            leaf_scalar = np.zeros((0,))
-
-        # all-terminal grid (no leaves) -> np.where would still index empty leaf_scalar; guard it.
-        per_branch = (np.where(grid.leaf_index >= 0,
-                               leaf_scalar[np.maximum(grid.leaf_index, 0)], terminal_fill)
-                      if n_leaves else terminal_fill)
+            per_branch = terminal_fill
         u = (grid.branch_prob * per_branch).sum(axis=-1)
         u[grid.failed] = float(fallback_value)
         return u

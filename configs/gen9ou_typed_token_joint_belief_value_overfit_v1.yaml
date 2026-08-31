@@ -1,0 +1,32 @@
+# Diagnostic only: intentionally evaluates on the exact fixed rows used for training. This is not
+# a promotable model. It tests whether the current trunk/belief/value interface and optimizer can
+# fit both sources when generalization and sampling noise are removed.
+extends: gen9ou_typed_token_joint_belief_value_pcgrad_continuation_v2.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_overfit_v1
+seed: 20261203
+
+bc:
+  manifest: runs/gen9ou_joint_bv_overfit_subsets_v1/replay.parquet
+  holdout_manifest: runs/gen9ou_joint_bv_overfit_subsets_v1/replay.parquet
+  auxiliary_manifest: runs/gen9ou_joint_bv_overfit_subsets_v1/simulator.parquet
+  auxiliary_holdout_manifest: runs/gen9ou_joint_bv_overfit_subsets_v1/simulator.parquet
+  init_ckpt: runs/gen9ou_typed_token_joint_belief_value_pcgrad_continuation_v2/checkpoints/bc_best.pt
+  epochs: 80
+  batch_size: 512
+  max_primary_batches_per_epoch: 4
+  lr: 1.0e-4
+  lr_final: 1.0e-5
+  shared_lr_scale: 0.5
+  eval_batches: 0
+  auxiliary_eval_batches: 0
+  early_stopping_patience: 20
+  early_stopping_min_delta: 0.0005
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_overfit_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_overfit_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_overfit_v1
+  tensorboard: true

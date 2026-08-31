@@ -1,38 +1,35 @@
-"""Public-belief value network: the strategy-dependent leaf evaluator for two-sided search
-(PROJECT_DESIGN_PROPOSAL.md §9, PROPOSAL_IMPL_PLAN.md Phase G — OWNER DECISION 2026-07-16).
+"""Public-belief value network: strategy-dependent leaf evaluation for two-sided search.
 
 WHAT THIS REPLACES. The interim leaf evaluator (fog/search/pb_values.py) reused the policy's small
 value head with four scalar posterior features. Four numbers cannot say WHICH candidate teams retain
 probability, and the head must re-run every solver iteration because its scalar output moves with the
-posterior. This module is the real thing the proposal §9 asks for: it reads the full K x J belief and
-each candidate team's identity, and — crucially — emits a value for EVERY candidate pair at once so
-the solver can refresh a cached leaf by re-weighting, not by re-running a network.
+posterior. This module reads the full K x J belief
+and each candidate team's identity, and — crucially — emits a value for EVERY candidate pair at
+once.
 
 THE OUTPUT SHAPE IS THE COST DECISION (§9.2, settled). During one real decision the solver runs
 hundreds of regret iterations; each iteration moves both strategies, hence the action-conditioned
 posterior at every cached leaf (§5.1: same leaf observation, different iteration, different belief).
-A single-scalar value would demand a full encoder pass per leaf per iteration — the dominant cost of
-a decision. Instead this network runs ONCE per leaf and returns the per-pair table
+A single-scalar value would demand repeated belief-dependent evaluation for every pair. Instead the
+public-leaf and candidate encoders run once per decision, while the belief-dependent message rounds
+and pair head return the table
 
     V[leaf, k, j] = our expected continuation payoff from this leaf IF the true teams are (k, j),
                     under the belief the network was conditioned on.
 
-The solver then turns a table into the scalar the cell payoff needs by averaging over the leaf's
-current action-conditioned posterior (fog/search/pb_values.py Phase-G path):
+The simulated cell for private pair `(k, j)` receives `V[leaf, k, j]`. The two-sided solver later
+performs the single required average over the other player's possible private types. Averaging the
+table inside the bridge as well would use the belief twice and destroy type-specific decisions.
 
-    value(leaf) = sum_{k,j} post_leaf[k, j] * V[leaf, k, j]          (plain arithmetic, no net pass)
-
-Between recomputes only `post_leaf` moves; `V` is held fixed. Because a pair's true continuation
-value ALSO depends on the belief carried into the leaf (continuation play is belief-dependent — the
-whole §5.1 thesis), a table conditioned once slowly drifts stale as the strategies move, so the
-bridge recomputes it every N iterations. The single-value form (dot the table with the belief it was
-conditioned on) stays the CORRECTNESS REFERENCE on the exact small-pool gate (§15.3); the drift error
-is measured against it.
+The bridge may hold `V` fixed for N solver calls. Because a pair's true continuation value also
+depends on the belief carried into the leaf, that table drifts stale as strategies move. Refreshing
+every iteration is the correctness reference. Crucially, a refresh calls `forward_cached`: it reruns
+only the belief-dependent messages and pair head, not the cached public/candidate encoders.
 
 THE SEVEN REQUIRED PROPERTIES (§9.1), and where each lives here:
 
   1. Reads the shared public-state representation and explicit current state.
-        -> `s_board` and `c_dyn` per leaf, projected into the per-leaf context vector `ctx`. These
+        -> `private_state` and derived `public_context` per leaf, projected into `ctx`. These
            are exactly the backbone outputs the policy head consumes (agent.head_inputs), so the
            expensive trunk pass over the leaf set is shared, not duplicated (invariant 19.13).
   2. Reads individual embeddings for the K own-state and J opponent-state candidates.
@@ -67,25 +64,35 @@ property above is testable on hand-built inputs without a battle (tests/test_pb_
 """
 from __future__ import annotations
 
-import torch
-import torch.nn as nn
+from dataclasses import dataclass
 
-# Attribute layout of one team, shared with fog/models/belief.py (6 slots x 9 attributes = 54).
-SLOT_ATTRS = ("species", "item", "ability", "move0", "move1", "move2", "move3", "spread", "tera")
+import torch
+from torch import nn
+
+from fog.constants.schema import N_EV_UNITS, N_NATURES, SET_SLOT_ATTRS
+
+# Attribute layout of one team, shared with fog/models/belief.py.
+SLOT_ATTRS = SET_SLOT_ATTRS
 N_SLOTS = 6
-N_ATTRS = N_SLOTS * len(SLOT_ATTRS)  # 54
+N_ATTRS = N_SLOTS * len(SLOT_ATTRS)
 # attribute-within-slot -> output/embedding family (the 4 move slots share one family)
-_ATTR_FAMILY = ("species", "item", "ability", "move", "move", "move", "move", "spread", "tera")
+_ATTR_FAMILY = (
+    "species", "item", "ability", "move", "move", "move", "move",
+    "nature", "ev", "ev", "ev", "ev", "ev", "ev", "tera",
+)
 _POS_FAMILY = tuple(_ATTR_FAMILY[p % len(SLOT_ATTRS)] for p in range(N_ATTRS))
 
 
 class TeamEncoder(nn.Module):
-    """A 6x9 candidate-team token grid -> one team embedding [d]. Each attribute contributes a
-    value embedding (its family's table, with an extra <UNK> row for hidden/out-of-range indices,
-    index == family size) plus a 54-way attribute-IDENTITY embedding, so the encoding is fully
-    determined by team content and attribute identity — never by particle order. The per-attribute
-    embeddings are mean-pooled and projected. Candidate teams are normally fully concrete, but the
-    <UNK> row keeps a partially specified team (a -1 entry) well-defined."""
+    """A 6x15 candidate-team grid -> one team embedding without attribute-assignment collisions.
+
+    Each field is transformed before pooling. Fields are first combined within one Pokémon, so an
+    item, ability, move set, nature, six EV values, and Tera type remain bound to that Pokémon's
+    species. The six
+    complete Pokémon representations are then pooled as a set. A prior implementation averaged all
+    raw embeddings before its first nonlinear transform; swapping two items between species was
+    therefore an exact collision. The staged pooling below makes that regression testable.
+    """
 
     def __init__(self, d: int, sizes: dict[str, int]) -> None:
         super().__init__()
@@ -94,26 +101,40 @@ class TeamEncoder(nn.Module):
         self.value_embeds = nn.ModuleDict(
             {name: nn.Embedding(n + 1, d) for name, n in self.sizes.items()}  # +1 == <UNK>
         )
-        self.attr_id = nn.Embedding(N_ATTRS, d)
-        self.proj = nn.Sequential(nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d))
-        pos_n = torch.tensor([self.sizes[_POS_FAMILY[p]] for p in range(N_ATTRS)], dtype=torch.long)
-        self.register_buffer("pos_n", pos_n, persistent=False)
+        # species, item, ability, move, nature, EV (shared by six stats), tera
+        self.field_id = nn.Embedding(7, d)
+        self.attr_proj = nn.Sequential(
+            nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d)
+        )
+        self.mon_proj = nn.Sequential(
+            nn.LayerNorm(d), nn.Linear(d, 2 * d), nn.GELU(), nn.Linear(2 * d, d)
+        )
+        self.team_proj = nn.Sequential(
+            nn.LayerNorm(d), nn.Linear(d, d), nn.GELU(), nn.Linear(d, d)
+        )
+        self.register_buffer(
+            "field_kind",
+            torch.tensor([0, 1, 2, 3, 3, 3, 3, 4, 5, 5, 5, 5, 5, 5, 6], dtype=torch.long),
+            persistent=False,
+        )
 
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
-        """`tokens` [N, 6, 9] long value indices (-1 or >= family size -> <UNK>). Returns [N, d]."""
-        n = tokens.shape[0]
-        flat = tokens.reshape(n, N_ATTRS)
-        dev = flat.device
-        embs = []
-        for p in range(N_ATTRS):
-            fam = _POS_FAMILY[p]
+        """`tokens` [N,6,15] value indices (-1 or OOB -> <UNK>). Returns [N,d]."""
+        if tokens.ndim != 3 or tuple(tokens.shape[1:]) != (N_SLOTS, len(SLOT_ATTRS)):
+            raise ValueError(
+                f"team tokens must be [N,6,{len(SLOT_ATTRS)}], got {tuple(tokens.shape)}"
+            )
+        fields = []
+        for column, fam in enumerate(_ATTR_FAMILY):
             size = self.sizes[fam]
-            idx = flat[:, p].clone()
+            idx = tokens[:, :, column].clone()
             idx[(idx < 0) | (idx >= size)] = size                         # hidden / OOB -> <UNK>
-            embs.append(self.value_embeds[fam](idx))
-        attr_emb = torch.stack(embs, dim=1)                               # [N, 54, d]
-        attr_emb = attr_emb + self.attr_id(torch.arange(N_ATTRS, device=dev)).unsqueeze(0)
-        return self.proj(attr_emb.mean(dim=1))                            # [N, d]
+            fields.append(self.value_embeds[fam](idx))                    # [N, 6, d]
+        attr = torch.stack(fields, dim=2)                                 # [N, 6, 15, d]
+        attr = attr + self.field_id(self.field_kind).view(1, 1, len(SLOT_ATTRS), self.d)
+        attr = self.attr_proj(attr)
+        pokemon = self.mon_proj(attr.mean(dim=2))                         # [N, 6, d]
+        return self.team_proj(pokemon.mean(dim=1))                        # [N, d]
 
 
 def _weighted_messages(src: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
@@ -130,23 +151,32 @@ def _weighted_messages(src: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
     return num / den
 
 
+@dataclass
+class PBValueCache:
+    """Belief-independent representations reusable across every solver iteration."""
+
+    ctx: torch.Tensor          # [L, d] public leaf representation
+    own: torch.Tensor          # [K, d] candidate-team representations
+    opp: torch.Tensor          # [J, d]
+
+
 class PBValueNet(nn.Module):
     """Public-belief value network (§9). `forward` returns V[L, K, J] (see module docstring)."""
 
     @classmethod
     def from_tables(cls, tables=None, *, state_dim: int = 256, dyn_dim: int = 256,
-                    d: int = 128, n_rounds: int = 2) -> "PBValueNet":
+                    d: int = 128, n_rounds: int = 2) -> PBValueNet:
         """Real token-family cardinalities from the generated constants — use this (not the bare
         constructor) for anything consuming real candidate token grids: the bare defaults are
         test-scale and silently map real indices (e.g. species 912 > 320) to <UNK>. Tera is
         TYPE_INDEX plus the truth-tokenizer's out-of-table fallback row (18)."""
-        from fog.constants.schema import MAX_SPREADS_PER_SPECIES, TYPE_INDEX
+        from fog.constants.schema import TYPE_INDEX
 
         if tables is None:
             from fog.constants.tables import TABLES as tables
         sizes = {"species": tables.n_species, "item": tables.n_items,
                  "ability": tables.n_abilities, "move": tables.n_moves,
-                 "spread": MAX_SPREADS_PER_SPECIES + 1, "tera": len(TYPE_INDEX) + 1}
+                 "nature": N_NATURES, "ev": N_EV_UNITS, "tera": len(TYPE_INDEX) + 1}
         return cls(state_dim=state_dim, dyn_dim=dyn_dim, d=d, n_rounds=n_rounds, sizes=sizes)
 
     def __init__(
@@ -160,8 +190,10 @@ class PBValueNet(nn.Module):
         super().__init__()
         self.d = d
         self.n_rounds = n_rounds
-        sizes = sizes or {"species": 320, "item": 64, "ability": 160, "move": 720,
-                          "spread": 17, "tera": 19}
+        sizes = sizes or {
+            "species": 320, "item": 64, "ability": 160, "move": 720,
+            "nature": N_NATURES, "ev": N_EV_UNITS, "tera": 19,
+        }
         self.team = TeamEncoder(d, sizes)
         # Leaf public state -> per-leaf context added to every particle token.
         self.ctx = nn.Sequential(nn.Linear(state_dim + dyn_dim, d), nn.GELU(), nn.Linear(d, d))
@@ -177,24 +209,41 @@ class PBValueNet(nn.Module):
             nn.LayerNorm(2 * d + 1), nn.Linear(2 * d + 1, d), nn.GELU(), nn.Linear(d, 1)
         )
 
-    def forward(
-        self,
-        s_board: torch.Tensor,     # [L, state_dim]  per-leaf board summary (backbone)
-        c_dyn: torch.Tensor,       # [L, dyn_dim]    per-leaf dynamics context (backbone)
-        own_tokens: torch.Tensor,  # [K, 6, 9]       our K candidate teams (shared across leaves)
-        opp_tokens: torch.Tensor,  # [J, 6, 9]       opponent's J candidate teams (shared)
-        rho: torch.Tensor,         # [L, K, J]       each leaf's conditioning belief
-    ) -> torch.Tensor:
-        """Returns V[L, K, J], tanh-bounded OUR-perspective continuation payoff per candidate pair."""
-        L = s_board.shape[0]
-        K, J = own_tokens.shape[0], opp_tokens.shape[0]
-        ctx = self.ctx(torch.cat([s_board, c_dyn], dim=-1))               # [L, d]
+    def prepare_candidates(
+        self, own_tokens: torch.Tensor, opp_tokens: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Encode both candidate sets once per decision, before regret iterations begin."""
+        return self.team(own_tokens), self.team(opp_tokens)
 
-        own = self.team(own_tokens)                                       # [K, d], once per decision
-        opp = self.team(opp_tokens)                                       # [J, d]
+    def prepare_leaves(
+        self, private_state: torch.Tensor, public_context: torch.Tensor
+    ) -> torch.Tensor:
+        """Encode public leaf state once; no belief or strategy enters this computation."""
+        return self.ctx(torch.cat([private_state, public_context], dim=-1))
+
+    def prepare(
+        self,
+        private_state: torch.Tensor,  # [L, state_dim] per-leaf private-state context
+        public_context: torch.Tensor, # [L, dyn_dim] fused public-state + history context
+        own_tokens: torch.Tensor,  # [K, 6, 15]      our K candidate teams (shared across leaves)
+        opp_tokens: torch.Tensor,  # [J, 6, 15]      opponent's J candidate teams (shared)
+    ) -> PBValueCache:
+        """All expensive belief-independent work, cached once per decision."""
+        own, opp = self.prepare_candidates(own_tokens, opp_tokens)
+        return PBValueCache(
+            ctx=self.prepare_leaves(private_state, public_context), own=own, opp=opp
+        )
+
+    def forward_cached(
+        self,
+        cache: PBValueCache,
+        rho: torch.Tensor,         # [L, K, J] each leaf's conditioning belief
+    ) -> torch.Tensor:
+        """Run only belief-conditioned messages and the small pair head."""
+        L, K, J = cache.ctx.shape[0], cache.own.shape[0], cache.opp.shape[0]
         # Broadcast particles across leaves and inject the leaf context (property 1).
-        own = own.unsqueeze(0).expand(L, K, self.d) + ctx.unsqueeze(1)    # [L, K, d]
-        opp = opp.unsqueeze(0).expand(L, J, self.d) + ctx.unsqueeze(1)    # [L, J, d]
+        own = cache.own.unsqueeze(0).expand(L, K, self.d) + cache.ctx.unsqueeze(1)
+        opp = cache.opp.unsqueeze(0).expand(L, J, self.d) + cache.ctx.unsqueeze(1)
 
         rho = rho.to(own.dtype)
         rho_t = rho.transpose(1, 2).contiguous()                          # [L, J, K]
@@ -210,6 +259,19 @@ class PBValueNet(nn.Module):
         opp_g = opp.unsqueeze(1).expand(L, K, J, self.d)                  # [L, K, J, d]
         pair = torch.cat([own_g, opp_g, rho.unsqueeze(-1)], dim=-1)       # [L, K, J, 2d+1]
         return torch.tanh(self.head(pair).squeeze(-1))                    # [L, K, J]
+
+    def forward(
+        self,
+        private_state: torch.Tensor,
+        public_context: torch.Tensor,
+        own_tokens: torch.Tensor,
+        opp_tokens: torch.Tensor,
+        rho: torch.Tensor,
+    ) -> torch.Tensor:
+        """Reference convenience path; search uses ``prepare`` + ``forward_cached``."""
+        return self.forward_cached(
+            self.prepare(private_state, public_context, own_tokens, opp_tokens), rho
+        )
 
     def n_params(self) -> int:
         return sum(p.numel() for p in self.parameters())

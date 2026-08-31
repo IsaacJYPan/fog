@@ -1,85 +1,110 @@
-"""Phase-2 EV-in-chain ordering tests (BELIEF_POLICY_PLAN §4.2).
-
-Spread (the nature+EV cluster) is generated AFTER item and ability within each slot, so at the spread
-step item/ability are pinned and each observed damage event becomes a hard constraint on the spread
-alone (the precondition for the §3.4 damage-consistency mask). The constraint touches only the random
-training/probe tail order; canonical order already satisfies it. The any-order prefix property is
-untouched — this is about the tail order, not the prefix.
-"""
+"""Dependency tests for the value-independent set-AR generation scheduler."""
 from __future__ import annotations
 
 import torch
 
 from fog.models.belief import (
-    N_SLOTS,
     _SLOT_ABILITY_FLATS,
+    _SLOT_EV_FLATS,
     _SLOT_ITEM_FLATS,
-    _SLOT_SPREAD_FLATS,
+    _SLOT_MOVE_FLATS,
+    _SLOT_NATURE_FLATS,
+    N_ATTRS,
+    N_SLOTS,
+    SLOT_ATTRS,
     BeliefModel,
 )
 
-SIZES = dict(n_species=10, n_items=6, n_abilities=5, n_moves=12, n_spreads=4, n_tera=19)
-_TERA_FLATS = tuple(j * 9 + 8 for j in range(N_SLOTS))
+SIZES = {
+    "n_species": 10, "n_items": 6, "n_abilities": 5, "n_moves": 12,
+    "n_natures": 5, "n_ev_units": 8, "n_tera": 19,
+}
 
 
-def _model() -> BeliefModel:
+def model() -> BeliefModel:
     torch.manual_seed(0)
     return BeliefModel(state_dim=32, d=16, **SIZES).eval()
 
 
-def _content_to_phys(model, revealed, tail_order, seed):
-    gen = torch.Generator().manual_seed(seed)
-    order = model._order(revealed, tail_order, gen)   # [B,55] physical pos -> content id
-    return order.argsort(dim=1)                        # [B,55] content id -> physical pos
+def positions(route: torch.Tensor) -> torch.Tensor:
+    result = torch.full_like(route, -1)
+    rows = torch.arange(len(route)).unsqueeze(1).expand_as(route)
+    steps = torch.arange(route.shape[1]).unsqueeze(0).expand_as(route)
+    valid = route >= 0
+    result[rows[valid], route[valid]] = steps[valid]
+    return result
 
 
-def test_spread_after_item_ability_all_hidden_random():
-    """Nothing revealed -> all 54 attrs in the tail. Every slot's spread lands after its item and
-    ability under the random order, across a big batch."""
-    model = _model()
-    b = 128
-    revealed = torch.zeros(b, 54, dtype=torch.bool)
-    phys = _content_to_phys(model, revealed, "random", seed=1)
-    for j in range(N_SLOTS):
-        assert (phys[:, _SLOT_SPREAD_FLATS[j]] > phys[:, _SLOT_ITEM_FLATS[j]]).all()
-        assert (phys[:, _SLOT_SPREAD_FLATS[j]] > phys[:, _SLOT_ABILITY_FLATS[j]]).all()
+def test_random_route_obeys_only_mechanical_dependencies():
+    belief = model()
+    revealed = torch.zeros(128, N_ATTRS, dtype=torch.bool)
+    route, length, _ = belief._route(
+        revealed, "random", torch.Generator().manual_seed(1)
+    )
+    where = positions(route)
+    assert (length == N_ATTRS).all()
+    for slot in range(N_SLOTS):
+        species = slot * len(SLOT_ATTRS)
+        assert (where[:, _SLOT_ABILITY_FLATS[slot]] > where[:, species]).all()
+        for move in _SLOT_MOVE_FLATS[slot]:
+            assert (where[:, move] > where[:, species]).all()
+        assert (where[:, _SLOT_NATURE_FLATS[slot]] > where[:, species]).all()
+        for ev in _SLOT_EV_FLATS[slot]:
+            assert (where[:, ev] > where[:, species]).all()
 
 
-def test_spread_after_item_ability_canonical():
-    """Canonical order already satisfies the constraint (spread col 7 follows item col 1 / ability
-    col 2)."""
-    model = _model()
-    revealed = torch.zeros(4, 54, dtype=torch.bool)
-    phys = _content_to_phys(model, revealed, "canonical", seed=0)
-    for j in range(N_SLOTS):
-        assert (phys[:, _SLOT_SPREAD_FLATS[j]] > phys[:, _SLOT_ITEM_FLATS[j]]).all()
-        assert (phys[:, _SLOT_SPREAD_FLATS[j]] > phys[:, _SLOT_ABILITY_FLATS[j]]).all()
+def test_scheduler_is_not_canonical_or_globally_constrained():
+    belief = model()
+    revealed = torch.zeros(256, N_ATTRS, dtype=torch.bool)
+    route, _, _ = belief._route(
+        revealed, "random", torch.Generator().manual_seed(2)
+    )
+    where = positions(route)
+    # Item and Tera have no mutual dependency; both directions must occur in a real random route.
+    item_before_tera = []
+    for slot in range(N_SLOTS):
+        item = where[:, slot * len(SLOT_ATTRS) + 1]
+        tera = where[:, slot * len(SLOT_ATTRS) + 14]
+        item_before_tera.append(item < tera)
+    both = torch.stack(item_before_tera)
+    assert both.any() and (~both).any()
+
+    # Nature is not globally last: unrelated fields frequently follow it.
+    assert any(
+        (where[:, slot * len(SLOT_ATTRS) + 14] > where[:, _SLOT_NATURE_FLATS[slot]]).any()
+        for slot in range(N_SLOTS)
+    )
 
 
-def test_revealed_item_ability_still_before_spread():
-    """When item/ability are REVEALED they sit in the prefix (physically before START and the whole
-    tail), so the spread is still generated after them — the constraint holds trivially."""
-    model = _model()
-    b = 16
-    revealed = torch.zeros(b, 54, dtype=torch.bool)
-    for j in range(N_SLOTS):
-        revealed[:, _SLOT_ITEM_FLATS[j]] = True
-        revealed[:, _SLOT_ABILITY_FLATS[j]] = True
-    phys = _content_to_phys(model, revealed, "random", seed=2)
-    for j in range(N_SLOTS):
-        assert (phys[:, _SLOT_SPREAD_FLATS[j]] > phys[:, _SLOT_ITEM_FLATS[j]]).all()
-        assert (phys[:, _SLOT_SPREAD_FLATS[j]] > phys[:, _SLOT_ABILITY_FLATS[j]]).all()
+def test_revealed_dependencies_are_available_from_step_zero():
+    belief = model()
+    revealed = torch.zeros(32, N_ATTRS, dtype=torch.bool)
+    for slot in range(N_SLOTS):
+        revealed[:, slot * len(SLOT_ATTRS)] = True
+        revealed[:, _SLOT_ITEM_FLATS[slot]] = True
+        revealed[:, _SLOT_ABILITY_FLATS[slot]] = True
+    eligible = belief._eligible(revealed)
+    for slot in range(N_SLOTS):
+        assert eligible[:, _SLOT_MOVE_FLATS[slot][0]].all()
+        assert eligible[:, _SLOT_NATURE_FLATS[slot]].all()
+        for ev in _SLOT_EV_FLATS[slot]:
+            assert eligible[:, ev].all()
 
 
-def test_spread_not_globally_forced_last():
-    """'Everything else stays free' (§4.2): the constraint pins spread after item/ability of the SAME
-    slot only, not after every tail attr. Across a batch, tera frequently follows its slot's spread."""
-    model = _model()
-    b = 256
-    revealed = torch.zeros(b, 54, dtype=torch.bool)
-    phys = _content_to_phys(model, revealed, "random", seed=3)
-    tera_after_spread_anywhere = False
-    for j in range(N_SLOTS):
-        if (phys[:, _TERA_FLATS[j]] > phys[:, _SLOT_SPREAD_FLATS[j]]).any():
-            tera_after_spread_anywhere = True
-    assert tera_after_spread_anywhere, "spread was forced globally last — over-constrained"
+def test_canonical_diagnostic_still_respects_dependencies():
+    belief = model()
+    revealed = torch.zeros(4, N_ATTRS, dtype=torch.bool)
+    route, _, _ = belief._route(revealed, "canonical", None)
+    where = positions(route)
+    for slot in range(N_SLOTS):
+        species = slot * len(SLOT_ATTRS)
+        assert (
+            where[:, _SLOT_NATURE_FLATS[slot]]
+            > where[:, species]
+        ).all()
+        assert (
+            where[:, _SLOT_ABILITY_FLATS[slot]]
+            > where[:, species]
+        ).all()
+        for move in _SLOT_MOVE_FLATS[slot]:
+            assert (where[:, move] > where[:, species]).all()

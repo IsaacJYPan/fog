@@ -1,0 +1,26 @@
+# Nonpromotable repeat of the initial-prior diagnostic with four times more matchup groups and
+# twice as many repetitions per group. It distinguishes the prior run's data/noise failure from
+# a frozen-trunk representation limit.
+extends: gen9ou_typed_token_initial_value_prior_diagnostic_v1.yaml
+
+experiment: gen9ou_typed_token_initial_value_prior_broad_diagnostic_v2
+seed: 20261302
+
+bc:
+  manifest: runs/gen9ou_simple_bv_repeat_train_initial_soft_16384_v2/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_simple_bv_repeat_holdout_initial_soft_1024_v1/holdout_manifest.parquet
+  epochs: 60
+  batch_size: 512
+  max_primary_batches_per_epoch: 64
+  lr: 1.0e-5
+  lr_final: 1.0e-6
+  early_stopping_patience: 12
+  early_stopping_min_delta: 0.0002
+
+preflight:
+  report: runs/preflight_audit/typed_token_initial_value_prior_broad_diagnostic_v2/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_initial_value_prior_broad_diagnostic_v2/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_initial_value_prior_broad_diagnostic_v2
+  tensorboard: false

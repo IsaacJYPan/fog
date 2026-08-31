@@ -1,0 +1,24 @@
+# Preserve hard final-outcome targets after the opening while using empirical ordered-matchup
+# means only at initial states. The prior all-row soft run was rejected because it erased the
+# evolving battle-state value signal and regressed every hard-outcome holdout.
+extends: gen9ou_typed_token_soft_value_head_v1.yaml
+
+experiment: gen9ou_typed_token_soft_value_head_hybrid_v2
+seed: 20261231
+
+bc:
+  manifest: runs/gen9ou_simple_bv_repeat_train_hybrid_2048_v1/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_simple_bv_repeat_holdout_initial_soft_1024_v1/holdout_manifest.parquet
+  epochs: 24
+  lr: 5.0e-6
+  lr_final: 5.0e-7
+  early_stopping_patience: 8
+  early_stopping_min_delta: 0.0002
+
+preflight:
+  report: runs/preflight_audit/typed_token_soft_value_head_hybrid_v2/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_soft_value_head_hybrid_v2/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_soft_value_head_hybrid_v2
+  tensorboard: true

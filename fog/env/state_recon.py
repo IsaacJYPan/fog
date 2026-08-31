@@ -15,7 +15,7 @@ round-trip test possible (engine state -> view -> reconstruct -> compare).
 Exactness:
   * Searcher's own side: EXACT — real computed stats (`mon.stats`), moves, ability, item, HP,
     status, boosts come straight from poke-env's own-team knowledge.
-  * Opponent side: stats/EVs/nature/moves/item/ability/spread/tera from the SAMPLED WORLD; only
+  * Opponent side: stats/EVs/nature/moves/item/ability/tera from the SAMPLED WORLD; only
     the public board (HP fraction, status, boosts, revealed tera, active slot) is overlaid.
 
 Documented approximations (the fuzz report — scripts/fuzz_recon.py — quantifies these; none are
@@ -90,11 +90,11 @@ def _types_for(mon: Any, feats: dict, tera_now: bool) -> tuple[str, str]:
 
 
 def _hp_int(frac: float, maxhp: int, alive: bool) -> int:
-    hp = int(round(float(frac) * maxhp))
+    hp = round(float(frac) * maxhp)
     return (max(1, hp) if alive else 0)
 
 
-def _engine_mon_from_self(mon: Any, tables) -> "pe.Pokemon":
+def _engine_mon_from_self(mon: Any, tables) -> pe.Pokemon:
     """Searcher's own mon (full knowledge) -> pe.Pokemon with EXACT stats."""
     sid = to_id(getattr(mon, "species", ""))
     feats = tables.species["features"][sid]
@@ -143,7 +143,7 @@ def _engine_mon_from_self(mon: Any, tables) -> "pe.Pokemon":
     )
 
 
-def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, tables) -> "pe.Pokemon":
+def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, tables) -> pe.Pokemon:
     """Opponent mon: hidden set from the sampled `row`, public board overlaid from `view_mon`
     (None => never seen: full HP, no status, not terastallized)."""
     base = build_engine_pokemon(_decode_world_slot(row, level, tables), tables)
@@ -174,7 +174,7 @@ def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, ta
     )
 
 
-def _side_conditions(cond_dict: dict, turn: int) -> "pe.SideConditions":
+def _side_conditions(cond_dict: dict, turn: int) -> pe.SideConditions:
     """poke-env side-condition dict (hazard=count, screen=start turn) -> pe.SideConditions."""
     kw: dict[str, int] = {}
     hazards = {"stealthrock": "stealth_rock", "spikes": "spikes",
@@ -200,7 +200,7 @@ def _active_volatiles(mon: Any) -> tuple[set[str], int]:
 
 
 def _build_side(mons: list, active_idx: int, active_view: Any | None, cond_dict: dict,
-                turn: int) -> "pe.Side":
+                turn: int) -> pe.Side:
     boosts = getattr(active_view, "boosts", None) or {}
     vols, sub_hp = _active_volatiles(active_view) if active_view is not None else (set(), 0)
     if sub_hp and 0 <= active_idx < len(mons):

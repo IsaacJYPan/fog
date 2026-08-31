@@ -25,7 +25,8 @@ Build (deterministic given seed + pinned constants; the bank is COMMITTED like t
 regenerability is not a substitute for the exact experiment definition):
 
     python -m fog.scripts.build_generative_pool --n 128 --seed 0
-    # then point a run at it: configs/m3_leakage_gen.yaml (env.team_pool: data/teams/pool_gen)
+    # then point a run at it: configs/archive/m3_leakage_gen.yaml
+    # (env.team_pool: data/teams/pool_gen)
 """
 from __future__ import annotations
 

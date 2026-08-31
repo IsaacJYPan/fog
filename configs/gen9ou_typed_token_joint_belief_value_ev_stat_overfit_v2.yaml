@@ -1,0 +1,14 @@
+# Diagnostic only: independently parameterized zero-initialized EV-stat residual heads remove the
+# shared-head prior bottleneck while preserving old outputs. Never promote this checkpoint.
+extends: gen9ou_typed_token_joint_belief_value_ev_stat_overfit_v1.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_ev_stat_overfit_v2
+seed: 20261222
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_ev_stat_v2/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_ev_stat_overfit_v2/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_ev_stat_overfit_v2
+  tensorboard: true

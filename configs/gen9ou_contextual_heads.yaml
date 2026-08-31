@@ -1,0 +1,12 @@
+# Downstream belief/value/policy architecture after the 2,048-value trunk passes retention.
+# Each task gets one inexpensive learned query over all sixteen shared contextual tokens.
+# The heavy relational computation remains in the common trunk.
+extends: gen9ou_contextual_trunk_v3.yaml
+
+experiment: gen9ou_contextual_heads
+
+model:
+  shared_contextual_head_readers: true
+
+log:
+  dir: runs/gen9ou_contextual_heads

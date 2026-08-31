@@ -1,0 +1,17 @@
+extends: gen9ou_typed_token_enhanced.yaml
+
+# Evidence-backed widening after the same-width dynamic/global routes plateaued well below the
+# 95% independent frozen-decoder gate. Keep the 24-token ontology and Transformer depth; only
+# double token width while preserving the old 32-dimensional attention-head size.
+experiment: gen9ou_typed_token_wide
+
+model:
+  shared_entity_dim: 256
+  shared_latent_dim: 6144
+  shared_contextual_heads: 8
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_wide_seed_v1/seed.pt
+
+log:
+  dir: runs/gen9ou_typed_token_wide

@@ -13,6 +13,7 @@ from fog.search.joint import (
     posterior_features_np,
 )
 
+
 # ---------------------------------------------------------------------------------- pure math
 def test_action_posteriors_hand_computed():
     prior = np.array([0.25, 0.75])
@@ -129,7 +130,7 @@ def test_agent_flag_wires_posterior_dim():
 
 
 # ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE  # noqa: E402
+from fog.env.engine_battle import HAVE_ENGINE
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 
@@ -290,7 +291,7 @@ def test_sampled_own_states_includes_truth_and_is_seeded(plain_agent):
     truth = battle.truth_tokens("p1")
 
     a = SampledOwnStates(plain_agent, k=4, oversample=2, seed=7).states(battle, "p1")
-    assert a.tokens.shape[1:] == (6, 9) and 1 <= a.k <= 4
+    assert a.tokens.shape[1:] == (6, 15) and 1 <= a.k <= 4
     assert a.weights.sum() == pytest.approx(1.0)
     np.testing.assert_array_equal(a.tokens[a.true_index], truth)
 

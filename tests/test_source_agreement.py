@@ -6,6 +6,7 @@ import pytest
 
 from fog.eval.source_agreement import aggregate_agreement
 
+
 # ------------------------------------------------------------------------------- aggregation
 def test_aggregate_agreement_per_k_and_buckets():
     # (turn, k, agree, exact_states, sampled_states)
@@ -25,8 +26,8 @@ def test_aggregate_agreement_per_k_and_buckets():
 
 
 # ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE  # noqa: E402
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP  # noqa: E402
+from fog.env.engine_battle import HAVE_ENGINE
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 
@@ -35,8 +36,8 @@ engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 def test_run_agreement_end_to_end():
     """The paired protocol runs on real games: every measured decision produces one record per K,
     agreement is a valid rate, and the exact arm's state counts are bounded by the pool size."""
-    from fog.models.agent import FogAgent
     from fog.eval.source_agreement import run_agreement
+    from fog.models.agent import FogAgent
 
     agent = FogAgent.from_tables({"model": {"use_posterior_features": True}})
     agent.eval()

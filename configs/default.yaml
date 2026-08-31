@@ -14,33 +14,49 @@ pins:
 
 # --- Simulator / environment (§0, §10 M0) ----------------------------------------------------------
 env:
+  # Direct is the default research backend: each rollout process owns one persistent local
+  # Showdown worker, while observations still pass through poke-env's ordinary censored parser.
+  # The server URL remains below only for external/live-play compatibility.
+  backend: showdown_direct       # {showdown_direct, showdown, engine}
+  showdown_root: server/pokemon-showdown
+  # Authoritative rollout scaling. Spawned processes avoid the Python GIL, retain their actor and
+  # Node client across chunks, and read in-place shared CPU weights refreshed between PPO batches.
+  rollout_workers: 1
+  rollout_worker_mode: process   # {process, thread}; thread is a compatibility/debug fallback
+  actor_threads: 1               # PyTorch intra-op threads PER rollout process
+  opponent_cache_size: 2         # bounded frozen-policy cache per rollout process
+  rollout_worker_timeout: 900
   server_url: "ws://localhost:8000/showdown/websocket"
   battle_format: "gen9ou"
-  num_workers: 8               # N parallel Node Showdown processes (M0 throughput probe)
-  no_security: true            # local server flag for throughput
+  num_workers: 8               # legacy server-backed M0 throughput probe
+  no_security: true            # legacy local-server flag
   team_pool: null              # path to a parsed team bank; null = format default
-  # Concurrent battles per player during TRAINING (poke-env max_concurrent_battles). Per-battle
-  # state is keyed by battle_tag so >1 is safe; note >1 switches belief-truth from the exact
-  # recording-teambuilder source to attribute matching (labels missing until reveals disambiguate).
+  # Concurrent battles per player on env.backend=showdown (poke-env max_concurrent_battles).
+  # Per-battle state is keyed by battle_tag so >1 is safe; note >1 switches belief-truth from the
+  # exact recording-teambuilder source to attribute matching (labels missing until reveals
+  # disambiguate).
   concurrent_battles: 1
 
 # --- Encoding (§2) ---------------------------------------------------------------------------------
 encoding:
   history_cap: 60              # turns; pad/truncate from the front
-  history_encoder: gru         # {gru, transformer}
+  # Three-part backbone: public current-state MLP, public causal history, private-team MLP.
+  history_encoder: causal_transformer  # {causal_transformer, gru}; GRU retained as an ablation
   species_embed_dim: 64
   entity_hidden: 128
-  state_dim: 256               # s_board width (policy inputs (a)+(b): static entity/board summary)
-  dyn_dim: 256                 # c_dyn width (input (c): dynamics vector; also the belief memory)
+  current_dim: 256             # public current-state context before fusion
+  history_dim: 256             # public causal-history context before fusion
+  state_dim: 256               # private-state context (legacy caller name: s_board)
+  dyn_dim: 256                 # fused public context (legacy caller name: c_dyn)
 
 # --- Model (§3) ------------------------------------------------------------------------------------
 model:
-  entity_transformer_layers: 2
-  entity_heads: 4
+  history_transformer_layers: 2
+  history_heads: 4
   history_gru_hidden: 256
-  belief_decoder_layers: 2
-  belief_dim: 128              # belief/self-belief decoder width d
-  aux_into_trunk: true         # belief/self-belief losses backprop into backbone (shapes c_dyn; §3.6)
+  belief_decoder_layers: 2     # legacy key; current set-AR team encoder is two layers
+  belief_dim: 128              # belief/self-belief set-encoder width d
+  aux_into_trunk: true         # belief losses train current/history encoders + public fusion
   oracle: none                 # {none, set, action} — §3.4 evaluation ceilings
 
 # --- Losses / training shared ----------------------------------------------------------------------
@@ -48,7 +64,7 @@ loss:
   value_coef: 0.5
   belief_coef: 1.0              # marginal CE: calibrates the diagnostic/leakage marginal forward (§8.2)
   self_belief_coef: 1.0
-  belief_chain_coef: 1.0        # chain CE: THE belief aux loss; shapes c_dyn (§3.6). 0 -> pure marginal
+  belief_chain_coef: 1.0        # matched set-AR next-field CE; shapes c_dyn (§3.6)
   self_belief_chain_coef: 1.0
   preview_coef: 0.5
 

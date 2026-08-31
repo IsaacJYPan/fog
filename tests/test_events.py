@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 
+import numpy as np
 import pytest
 
 from fog.constants import schema
@@ -10,12 +12,24 @@ from fog.constants.build import build_all
 from fog.constants.tables import Tables
 from fog.encoding.dims import DIMS
 from fog.encoding.events import (
+    H_FIRST_ACTOR,
+    H_MY_MOVE,
+    H_MY_SWITCH_PHASE,
+    H_MY_TARGET_SPECIES,
+    H_OPP_ABILITY,
+    H_OPP_MOVE,
+    H_OPP_SWITCH_PHASE,
+    H_OPP_TARGET_SPECIES,
+    H_OPP_TERA,
+    build_history_start,
     event_mon_key,
     event_role,
     feed_ledger_from_events,
     hp_fraction,
+    parse_turn_event_ids,
     parse_turn_events,
 )
+from fog.encoding.history import observations_by_turn
 from fog.encoding.reveals import RevealLedger, tokens_from_views
 from tests.test_build_tables import DUMP, USAGE
 
@@ -37,6 +51,26 @@ def test_token_helpers():
     assert hp_fraction("57/100 brn") == pytest.approx(0.57)
     assert hp_fraction("0 fnt") == 0.0
     assert hp_fraction("???") is None
+
+
+def test_replay_data_fallback_builds_incremental_turn_observations():
+    battle = SimpleNamespace(_replay_data=[
+        ["", "switch", "p1a: Lead", "Lead", "100/100"],
+        ["", "turn", "1"],
+        ["", "move", "p1a: Lead", "Tackle", "p2a: Foe"],
+    ])
+    first = observations_by_turn(battle)
+    assert len(first[0].events) == 1
+    assert [event[1] for event in first[1].events] == ["move"]
+
+    battle._replay_data.extend([
+        ["", "-damage", "p2a: Foe", "50/100"],
+        ["", "turn", "2"],
+    ])
+    second = observations_by_turn(battle)
+    assert first is second
+    assert [event[1] for event in second[1].events] == ["move", "-damage"]
+    assert second[2].events == []
 
 
 # A hand-written turn: I (p1, Great Tusk) use Earthquake first, it's super effective, crits,
@@ -75,6 +109,33 @@ def test_parse_turn_record(tables):
     assert rec[84 + 16] == 0.0      # no opp item reveal
     assert rec[84 + 20] == 1.0      # I moved first
     assert rec[84 + 21] == pytest.approx(round(0.60 * 255) / 255)
+
+
+def test_categorical_turn_record_preserves_identities_and_order(tables):
+    great_tusk = tables.species_index("greattusk")
+    garchomp = tables.species_index("garchomp")
+    ids = parse_turn_event_ids(
+        TURN,
+        "p1",
+        tables,
+        snapshot_ids=np.array([great_tusk, garchomp]),
+        species_by_key={"p1: Great Tusk": great_tusk, "p2: Garchomp": garchomp},
+    )
+    assert ids[H_MY_MOVE] == tables.move_index("earthquake")
+    assert ids[H_OPP_MOVE] == tables.move_index("earthquake")
+    assert ids[H_MY_TARGET_SPECIES] == garchomp
+    assert ids[H_OPP_TARGET_SPECIES] == great_tusk
+    assert ids[H_OPP_ABILITY] == tables.ability_index("roughskin")
+    assert ids[H_OPP_TERA] == schema.TYPE_INDEX["water"]
+    assert ids[H_FIRST_ACTOR] == 1
+
+    pivot = parse_turn_event_ids([
+        ["", "switch", "p2a: Garchomp", "Garchomp, L80", "100/100"],
+        ["", "move", "p1a: Great Tusk", "U-turn", "p2a: Garchomp"],
+        ["", "switch", "p1a: Garchomp", "Garchomp, L80", "100/100"],
+    ], "p1", tables)
+    assert pivot[H_OPP_SWITCH_PHASE] == 1
+    assert pivot[H_MY_SWITCH_PHASE] == 2
 
 
 def test_preemption_flag_and_faint(tables):
@@ -123,7 +184,7 @@ def test_ledger_feeding_end_to_end(tables):
     assert t[0, 3] == tables.move_index("stealthrock")
     assert t[0, 1] == tables.item_index(schema.NO_ITEM)      # consumed Booster -> known-absent
     assert t[0, 2] == tables.ability_index("protosynthesis")
-    assert t[0, 8] == schema.TYPE_INDEX["ground"]
+    assert t[0, 14] == schema.TYPE_INDEX["ground"]
     # Garchomp's move must not appear anywhere in MY ledger
     assert len(ledger.views(["p2: Garchomp"], [0])[0].moves) == 0
 
@@ -142,13 +203,113 @@ def test_snapshot_from_mock_battle(tables):
             self.boosts = boosts or {}
 
     class Battle:
-        active_pokemon = Mon("greattusk", 0.8, Status(), {"atk": 2, "spe": 1})
-        opponent_active_pokemon = Mon("garchomp", 0.4)
-        weather = {}
-        fields = {}
+        def __init__(self):
+            self.active_pokemon = Mon("greattusk", 0.8, Status(), {"atk": 2, "spe": 1})
+            self.opponent_active_pokemon = Mon("garchomp", 0.4)
+            self.weather = {}
+            self.fields = {}
 
     snap = build_snapshot(Battle(), tables)
     assert snap.shape == (30,)
     assert snap[2] == pytest.approx(0.8) and snap[3] == pytest.approx(0.4)
     assert snap[4 + schema.Status.BRN.value] == 1.0
     assert snap[18] == pytest.approx(3 / 12)
+
+    _, ids, state = build_history_start(Battle(), tables)
+    assert ids[:2].tolist() == [
+        tables.species_index("greattusk"), tables.species_index("garchomp")
+    ]
+    assert state[0] == pytest.approx(2 / 6)
+    assert state[4] == pytest.approx(1 / 6)
+
+
+def test_ogerpon_tera_form_keeps_stable_submitted_identity(tables):
+    from fog.encoding.entities import encode_entities
+    from fog.encoding.events import H_OPP_TARGET_SPECIES, build_history_start
+    from fog.encoding.history import encode_history_sidecars
+
+    mon = SimpleNamespace(
+        species="Ogerpon-Wellspring-Tera",
+        item="wellspringmask",
+        ability="waterabsorb",
+        moves={},
+        base_stats={},
+        types=[],
+        boosts={},
+        effects={},
+        current_hp_fraction=1.0,
+        fainted=False,
+        status=None,
+        tera_type=None,
+        terastallized=True,
+    )
+    opponent = SimpleNamespace(species="Raging Bolt")
+    battle = SimpleNamespace(
+        team={"p1: Mask": mon},
+        opponent_team={"p2: Bolt": opponent},
+        active_pokemon=mon,
+        opponent_active_pokemon=opponent,
+        player_role="p1",
+        turn=2,
+        weather={},
+        fields={},
+        observations={
+            1: SimpleNamespace(
+                events=[["", "move", "p2a: Bolt", "Thunderclap", "p1a: Mask"]]
+            )
+        },
+    )
+    stable = tables.species_index("ogerponwellspring")
+    _, start_ids, _ = build_history_start(battle, tables)
+    assert start_ids[0] == stable
+    history_ids, _ = encode_history_sidecars(battle, tables)
+    assert history_ids[-1, H_OPP_TARGET_SPECIES] == stable
+    _, entity_ids, _ = encode_entities(
+        battle, tables, opp_tokens=np.full((6, 15), -1, dtype=np.int64)
+    )
+    assert entity_ids[0, 0] == stable
+
+
+def test_original_private_sheet_is_distinct_from_mutable_state(tables):
+    from fog.encoding.entities import (
+        ORIGINAL_ABILITY_ID_FIELD,
+        ORIGINAL_ITEM_ID_FIELD,
+        encode_entities,
+    )
+    from fog.encoding.tracker import BattleTracker
+
+    mon = SimpleNamespace(
+        species="garchomp",
+        item="leftovers",
+        ability="roughskin",
+        moves={},
+        base_stats={},
+        types=[],
+        boosts={},
+        effects={},
+        current_hp_fraction=1.0,
+        fainted=False,
+        status=None,
+        tera_type=None,
+        terastallized=False,
+    )
+    battle = SimpleNamespace(
+        team={"p1: Garchomp": mon},
+        opponent_team={},
+        active_pokemon=mon,
+        opponent_active_pokemon=None,
+        player_role="p1",
+        turn=1,
+    )
+    tracker = BattleTracker("p1")
+    tracker.record_private_team(battle)
+    mon.item = None
+    mon.ability = "sandveil"
+    tracker.record_private_team(battle)  # must not overwrite the submitted sheet
+    _, ids, _ = encode_entities(
+        battle, tables, opp_tokens=np.full((6, 15), -1, dtype=np.int64), tracker=tracker
+    )
+    assert ids[0, 1] == tables.item_index(schema.NO_ITEM)
+    assert ids[0, 2] == tables.ability_index("sandveil")
+    assert ids[0, ORIGINAL_ITEM_ID_FIELD] == tables.item_index("leftovers")
+    assert ids[0, ORIGINAL_ABILITY_ID_FIELD] == tables.ability_index("roughskin")

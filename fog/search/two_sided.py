@@ -1,4 +1,4 @@
-"""Two-sided public-belief regret solver (PROJECT_DESIGN_PROPOSAL.md §7, §10) — pure math core.
+"""Two-sided public-belief regret solver (ARCHITECTURE.md S1–S3) — pure math core.
 
 This module is the claim-bearing successor of the one-sided loop in fog/search/joint.py. The
 one-sided loop optimizes only OUR per-type strategies against a fixed scripted reply; this module
@@ -46,14 +46,14 @@ Solver mechanics (proposal §10.1 + settled decision 24):
   * Stopping: by measured stability of the running averages (total-variation change between
     checkpoints), with a hard iteration cap. Iterations used are reported.
 
-What this module does NOT do (later phases, PROPOSAL_IMPL_PLAN.md): build the K x J x A x B cell
+What this module does not do: build the K x J x A x B cell
 grid from engine simulations, evaluate leaves with the public-belief value network, or maintain
 the persistent cross-turn belief table (only the single-step update primitive lives here).
 """
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 import numpy as np
 
@@ -171,7 +171,7 @@ class TwoSidedSolution:
     converged: bool          # True if the stability rule fired before the cap
     root_value: float        # diagnostic: our expected payoff under the averaged strategies and
     #                          the last computed payoff tensor (exact only for fixed-u games)
-    # Random-iteration snapshot (PROPOSAL_IMPL_PLAN Phase G1; proposal §9.3 mitigation 2): the
+    # Random-iteration snapshot for value-query coverage: the
     # CURRENT floored strategy pair at one uniformly drawn iteration — exactly what `values_fn`
     # received there, so posteriors under it are beliefs the leaf values were actually queried at,
     # including the early near-uniform ones the final averages never revisit. None / -1 unless a

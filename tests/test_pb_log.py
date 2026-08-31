@@ -45,18 +45,43 @@ Adamant Nature
 def test_keep_mask_exact_and_subset_semantics():
     from fog.search.pb_log import keep_mask_from_reveals
 
-    cand = np.arange(2 * 6 * 9, dtype=np.int64).reshape(2, 6, 9)
-    revealed = np.full((6, 9), -1, dtype=np.int64)
+    cand = np.arange(2 * 6 * 15, dtype=np.int64).reshape(2, 6, 15)
+    revealed = np.full((6, 15), -1, dtype=np.int64)
     np.testing.assert_array_equal(keep_mask_from_reveals(revealed, cand), [True, True])
     # exact attribute: a revealed item must match
     revealed[0, 1] = cand[0, 0, 1]
     np.testing.assert_array_equal(keep_mask_from_reveals(revealed, cand), [True, False])
     # move subset: revealed move present ANYWHERE in the slot's move set keeps the candidate,
     # regardless of which subslot it was packed into (order-free by design)
-    revealed = np.full((6, 9), -1, dtype=np.int64)
+    revealed = np.full((6, 15), -1, dtype=np.int64)
     revealed[1, 3] = cand[1, 1, 6]              # candidate 1's LAST move, revealed FIRST
     mask = keep_mask_from_reveals(revealed, cand)
     assert mask[1] and not mask[0]
+
+
+def test_initial_booster_absence_is_mechanical_evidence():
+    """A turn-one automatic activation is observable in both directions: seeing it keeps only
+    candidates that predict it, while its absence eliminates a Booster Energy lead. A positive-
+    reveal-only token grid cannot express the second fact, so the dedicated entry check must."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.teams import load_pool
+    from fog.search.evidence import keep_mask_from_initial_drive_activation
+    from fog.search.own_states import StablePoolOwnStates
+
+    pool = load_pool("data/teams/pool_a")
+    candidates = StablePoolOwnStates(pool).tokens
+
+    without = EngineBattle(pool[1], pool[1], seed=0, battle_tag="entry-without")
+    keep_without = keep_mask_from_initial_drive_activation(without, "p1", candidates)
+    np.testing.assert_array_equal(
+        keep_without, [False, True, True, True, True, True, True, False]
+    )
+
+    with_booster = EngineBattle(pool[0], pool[1], seed=0, battle_tag="entry-with")
+    keep_with = keep_mask_from_initial_drive_activation(with_booster, "p1", candidates)
+    np.testing.assert_array_equal(
+        keep_with, [True, False, False, False, False, False, False, True]
+    )
 
 
 def test_whole_game_logged_with_outcome_backfill(tmp_path):
@@ -95,10 +120,10 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
         assert row["obs"] is not None and row["true_index"] == 0
         assert len(row["queried_beliefs"]) <= 2
         # Phase-G value-training fields: j* found (opp team is the sole pool member), and the token
-        # grids index rho's axes (own_tokens is [K,6,9], opp_tokens is [J,6,9]).
+        # grids index rho's axes (own_tokens is [K,6,15], opp_tokens is [J,6,15]).
         assert row["opp_true_index"] == 0
-        assert row["own_tokens"].shape == (row["rho"].shape[0], 6, 9)
-        assert row["opp_tokens"].shape == (row["rho"].shape[1], 6, 9)
+        assert row["own_tokens"].shape == (row["rho"].shape[0], 6, 15)
+        assert row["opp_tokens"].shape == (row["rho"].shape[1], 6, 15)
         # G1 fields: mid-solve snapshot posteriors stored for the value trainer
         assert 1 <= row["sample_iteration"] <= row["iterations"]
         assert len(row["sample_beliefs"]) <= 2
@@ -110,7 +135,7 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
 
     saved = torch.load(out, weights_only=False)
     assert saved["meta"]["version"] == 2
-    assert saved["meta"]["opp_pool_tokens"].shape == (1, 6, 9)
+    assert saved["meta"]["opp_pool_tokens"].shape == (1, 6, 15)
     assert len(saved["rows"]) == len(rows)
 
 
@@ -175,11 +200,11 @@ def test_keep_mask_unspecified_candidate_attribute_cannot_be_contradicted():
     matches ANY revealed value; a specified mismatching value still eliminates."""
     from fog.search.pb_log import keep_mask_from_reveals
 
-    cand = np.zeros((2, 6, 9), dtype=np.int64)
-    cand[0, 0, 8] = -1                      # candidate 0: no Tera Type line in the paste
-    cand[1, 0, 8] = 5                       # candidate 1: tera type 5
-    revealed = np.full((6, 9), -1, dtype=np.int64)
-    revealed[0, 8] = 3                      # we terastallized: engine default type 3 goes public
+    cand = np.zeros((2, 6, 15), dtype=np.int64)
+    cand[0, 0, 14] = -1                     # candidate 0: no Tera Type line in the paste
+    cand[1, 0, 14] = 5                      # candidate 1: tera type 5
+    revealed = np.full((6, 15), -1, dtype=np.int64)
+    revealed[0, 14] = 3                     # we terastallized: engine default type 3 goes public
     np.testing.assert_array_equal(keep_mask_from_reveals(revealed, cand), [True, False])
 
 
@@ -252,10 +277,10 @@ def test_keep_mask_consumed_item_reveals_no_item_without_eliminating():
     from fog.search.pb_log import keep_mask_from_reveals
 
     no_item = 250
-    cand = np.zeros((2, 6, 9), dtype=np.int64)
+    cand = np.zeros((2, 6, 15), dtype=np.int64)
     cand[0, 0, 1] = 6                        # sheet: Air Balloon
     cand[1, 0, 1] = 33                       # sheet: Choice Specs
-    revealed = np.full((6, 9), -1, dtype=np.int64)
+    revealed = np.full((6, 15), -1, dtype=np.int64)
     revealed[0, 1] = no_item                 # balloon popped: current item is <NO_ITEM>
     np.testing.assert_array_equal(
         keep_mask_from_reveals(revealed, cand, no_item_token=no_item), [True, True])
@@ -290,6 +315,14 @@ def test_selfplay_both_sides_solve_and_update(tmp_path):
     by_role = {"p1": [r for r in rows if r["role"] == "p1"],
                "p2": [r for r in rows if r["role"] == "p2"]}
     assert by_role["p1"] and by_role["p2"], "both sides log solved decisions (2x data)"
+    by_turn = {r: {row["turn"]: row for row in by_role[r]} for r in by_role}
+    shared_turns = sorted(set(by_turn["p1"]) & set(by_turn["p2"]))
+    assert shared_turns, "at least one simultaneous decision must exercise the shared solve"
+    for turn in shared_turns:
+        p1, p2 = by_turn["p1"][turn], by_turn["p2"][turn]
+        np.testing.assert_allclose(p1["sigma2"], p2["sigma1"])
+        np.testing.assert_allclose(p1["sigma1"], p2["sigma2"])
+        np.testing.assert_allclose(p1["rho"].T, p2["rho"])
     outcomes = {r: {row["outcome"] for row in by_role[r]} for r in by_role}
     assert outcomes["p1"] == {1.0} and outcomes["p2"] == {-1.0}, \
         "Hydreigon side wins; outcomes are mirrored per role"
@@ -302,6 +335,7 @@ def test_selfplay_both_sides_solve_and_update(tmp_path):
         assert row["true_index"] in (0, 1) and row["opp_true_index"] in (0, 1)
         assert row["truncated"] is False
         assert "action_label_col" in row
+    assert any("value_obs" in row for row in rows), "played public leaves are logged for value"
 
     saved = torch.load(out, weights_only=False)
     assert saved["meta"]["mode"] == "selfplay"
@@ -312,10 +346,10 @@ def test_selfplay_requires_shared_axes():
 
     from fog.search.pb_log import play_and_log_pb_selfplay_games
 
-    src = SimpleNamespace(tokens=np.zeros((2, 6, 9), dtype=np.int64))
+    src = SimpleNamespace(tokens=np.zeros((2, 6, 15), dtype=np.int64))
     with pytest.raises(ValueError, match="shared candidate space"):
         play_and_log_pb_selfplay_games(
-            None, None, src, np.ones((2, 6, 9), dtype=np.int64))
+            None, None, src, np.ones((2, 6, 15), dtype=np.int64))
 
 
 def test_loop_generation_smoke(tmp_path):
@@ -326,13 +360,19 @@ def test_loop_generation_smoke(tmp_path):
     from fog.scripts.pb_loop import run_generation
 
     agent = FogAgent.from_tables({"model": {"use_posterior_features": True}})
-    report = run_generation(
-        agent, [ATTACKER, WEAK2], tmp_path / "gen_00", games=3, seed=0,
+    pool = tmp_path / "pool"
+    pool.mkdir()
+    (pool / "attacker.txt").write_text(ATTACKER)
+    (pool / "weak2.txt").write_text(WEAK2)
+    report, next_net = run_generation(
+        agent, str(pool), tmp_path / "gen_00", games=3, workers=1, seed=0,
+        flush_every=0, value_net_path=None,
         search_kwargs={"iters": 12, "n_queried": 2},
         distill_kwargs={"epochs": 2, "batch_size": 8, "holdout_frac": 0.5},
         refresh_kwargs={"games": 4, "holdout_games": 2, "epochs": 1,
                         "engine_batch": 2, "minibatch_size": 64})
     assert report["rows"] > 0
+    assert next_net is None
     assert (tmp_path / "gen_00" / "agent.pt").exists()
     assert (tmp_path / "gen_00" / "report.json").exists()
     g = report["gates"]

@@ -1,0 +1,63 @@
+# Phase-B cloneability and representation test.  The primary exact simulator corpus supplies
+# SimpleHeuristics actions from the acting player's exact submitted team plus chronologically
+# censored opponent observations.  The high-rated replay corpus is a belief/value retention
+# source only: its intrinsically imputed private-team rows never supervise the policy here.
+# Both sources are evaluated independently and one optimizer update uses separately normalized
+# source losses with global PCGrad.  Policy readers learn fastest, belief/value/prior heads learn
+# modestly, and the typed trunk moves at a very small rate.
+extends: gen9ou_typed_token_policy_post_matchup_prior_v1.yaml
+
+experiment: gen9ou_typed_token_joint_policy_bv_clone_v1
+seed: 20261333
+
+bc:
+  manifest: runs/gen9ou_simple_belief_value_combined_v1/train_manifest.parquet
+  holdout_manifest: runs/gen9ou_simple_belief_value_combined_v1/holdout_manifest.parquet
+  force_primary_policy_valid: true
+  auxiliary_manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  auxiliary_holdout_manifest: runs/gen9ou_replay_policy_rating1650_v2/holdout_manifest.parquet
+  force_auxiliary_policy_valid: false
+  auxiliary_joint_batch: true
+  auxiliary_gradient_surgery: pcgrad
+  auxiliary_loss_overrides:
+    action_coef: 0.0
+  guard_train_manifest: null
+  guard_holdout_manifest: null
+  guard_train_value_only: false
+  init_ckpt: runs/gen9ou_simple_clone_control_v1/student_best.pt
+  init_compatible: false
+  scope: policy_belief_value_prior_shared
+  epochs: 24
+  max_primary_batches_per_epoch: 160
+  batch_size: 768
+  lr: 2.0e-5
+  lr_final: 2.0e-6
+  auxiliary_head_lr_scale: 0.5
+  shared_lr_scale: 0.03
+  eval_batches: 64
+  auxiliary_eval_batches: 64
+  early_stopping_patience: 10
+  early_stopping_min_delta: 0.001
+  primary_selection_metrics: [action_ce, belief, belief_chain, value]
+  auxiliary_selection_metrics: [belief, belief_chain, value]
+  streaming: true
+  shard_buffer: 16
+
+loss:
+  action_coef: 1.0
+  require_exact_chosen_action_features: true
+  require_exact_chosen_legality: true
+  belief_coef: 0.15
+  belief_chain_coef: 0.15
+  value_coef: 1.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_policy_bv_clone_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_policy_bv_clone_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_policy_bv_clone_v1
+  tensorboard: true

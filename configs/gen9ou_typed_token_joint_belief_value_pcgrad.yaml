@@ -1,0 +1,20 @@
+# Evidence-backed response to replay/simulator gradient conflict. Each source loss is normalized
+# independently, both gradients are computed on the same optimizer step, and only the conflicting
+# component is projected away before averaging.
+extends: gen9ou_typed_token_joint_belief_value_continuation_v2.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_pcgrad
+seed: 20261183
+
+bc:
+  auxiliary_gradient_surgery: pcgrad
+  epochs: 48
+  early_stopping_patience: 12
+
+preflight:
+  report: runs/preflight_audit/typed_token_joint_belief_value_pcgrad_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_belief_value_pcgrad_v1/summary.json
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_pcgrad_v1
+  tensorboard: true

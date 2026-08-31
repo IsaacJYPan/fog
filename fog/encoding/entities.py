@@ -9,8 +9,8 @@ entity record and the belief-net input can never disagree about what is known.
 Fidelity notes (v1, live extraction — see KNOWN_ISSUES):
   * booster_consumed / fallen_count / last_used_move / volatile counters are event-derived: filled
     from the per-battle BattleTracker when one is passed, 0/UNK otherwise.
-  * spread cluster id: my own slots stay UNK (spread inference from my sheet is not wired — a known
-    fidelity bound); opponent slots read the C1 reveal token (spreads are never directly revealed).
+  * native nature + six EV-unit ids: my own slots recover the effective private spread from the
+    request stats; opponent slots read C1 reveal tokens (these fields are normally never public).
   * paradox_boost is best-effort from effect names containing PROTOSYNTHESIS/QUARKDRIVE + stat.
 """
 from __future__ import annotations
@@ -21,15 +21,25 @@ from typing import Any
 import numpy as np
 
 from fog.constants.schema import (
+    EV_STATS,
     N_ACTIONS,
+    N_EV_UNITS,
+    N_NATURES,
     N_TERA_TYPES,
+    NATURE_INDEX,
+    NATURES,
     PARADOX_BOOST_STATS,
-    Status,
+    SET_EV_COLS,
+    SET_N_ATTRS,
+    SET_NATURE_COL,
+    SET_TERA_COL,
     TYPE_INDEX,
     VOLATILE_COUNTERS,
     VOLATILES,
+    Status,
 )
 from fog.encoding.dims import DIMS, N_ENTITIES
+from fog.encoding.events import submitted_species_id
 from fog.env.actions import action_legality_mask, team_order
 
 _NON_ID = re.compile(r"[^a-z0-9]")
@@ -60,11 +70,16 @@ ENTITY_RAW_DIM = (
 )
 
 # Integer id fields embedded inside the model, in this order:
-#   species, item, ability, move0..3, last_used_move, spread
+#   species, item, ability, move0..3, last_used_move, nature, ev_hp..ev_spe
 # last_used_move (encoding audit 2026-07) is public info driving Encore/choice-lock/Torment
 # inference; it reuses the move embedding table, with <UNKNOWN> (= n_moves) when nothing has been
-# used since entry. NOTE: encoder.EntityEmbeddings reads spread at index [-1] — keep spread last.
-N_ID_FIELDS = 1 + 1 + 1 + DIMS.n_move_slots + 1 + 1
+# used since entry.
+NATURE_ID_FIELD = 8
+EV_ID_FIELDS = (9, 10, 11, 12, 13, 14)
+ORIGINAL_ITEM_ID_FIELD = 15
+ORIGINAL_ABILITY_ID_FIELD = 16
+BASE_ID_FIELDS = 15
+N_ID_FIELDS = 17
 
 _BOOST_ORDER = ("atk", "def", "spa", "spd", "spe", "accuracy", "evasion")
 _VOLATILE_IDX = {name: i for i, name in enumerate(VOLATILES)}
@@ -74,6 +89,67 @@ _PARADOX_STAT = {s: i for i, s in enumerate(PARADOX_BOOST_STATS)}
 
 def _to_id(name: object) -> str:
     return _NON_ID.sub("", str(name).lower())
+
+
+def _own_nature_evs(mon: Any, species_id: str, tables) -> tuple[int, list[int]]:
+    """Recover the effective private nature and EV units from a request-side Pokemon.
+
+    Some battle objects retain ``nature``/``evs`` directly. poke-env's live Pokemon generally
+    exposes only calculated unboosted stats, so the fallback enumerates the 25 natures and inverts
+    each stat over the 64 effective EV units. Neutral natures are battle-equivalent and canonicalize
+    to Serious when the request cannot distinguish their labels.
+    """
+    raw_evs = getattr(mon, "evs", None)
+    raw_nature = _to_id(getattr(mon, "nature", None) or "")
+    if raw_evs is not None and raw_nature in NATURE_INDEX:
+        if isinstance(raw_evs, dict):
+            values = [int(raw_evs.get(stat, 0) or 0) for stat in EV_STATS]
+        else:
+            values = [int(v or 0) for v in list(raw_evs)[:6]]
+        if len(values) == 6:
+            return NATURE_INDEX[raw_nature], [min(63, max(0, v // 4)) for v in values]
+
+    stats = getattr(mon, "stats", None) or {}
+    features = (tables.species.get("features", {}) or {}).get(species_id)
+    try:
+        actual = np.asarray([int(stats[key]) for key in EV_STATS], dtype=np.int64)
+        base = np.asarray(features["base_stats"], dtype=np.int64)
+    except (KeyError, TypeError, ValueError):
+        return NATURE_INDEX["serious"], [0] * 6
+
+    from fog.constants.build_spreads import nature_multipliers
+
+    level = int(getattr(mon, "level", 100) or 100)
+    units = np.arange(N_EV_UNITS, dtype=np.int64)
+    best: tuple[int, int, list[int]] | None = None
+    for nature in NATURES:
+        mult = nature_multipliers(nature)
+        chosen: list[int] = []
+        error = 0
+        for stat in range(6):
+            core = (2 * int(base[stat]) + 31 + units) * level // 100
+            if stat == 0:
+                predicted = (
+                    np.ones_like(core)
+                    if int(base[0]) == 1
+                    else core + level + 10
+                )
+            else:
+                predicted = np.floor((core + 5) * mult[stat]).astype(np.int64)
+            distance = np.abs(predicted - actual[stat])
+            value = int(distance.argmin())
+            chosen.append(value)
+            error += int(distance[value])
+        over = max(0, sum(chosen) - 127)
+        # Exact/legal reconstructions always beat a wrong-nature approximation. Among equivalent
+        # neutral labels, prefer Serious as the canonical representation.
+        score = error + 1000 * over
+        tie = 0 if nature == "serious" else 1
+        candidate = (score, tie, chosen)
+        if best is None or candidate[:2] < best[:2]:
+            best = candidate
+            best_nature = nature
+    return NATURE_INDEX[best_nature], best[2]  # type: ignore[index,has-type]
 
 
 class _Layout:
@@ -136,12 +212,13 @@ def _fill_mon_record(row: np.ndarray, mon: Any, tables) -> None:
     for i, key in enumerate(_BOOST_ORDER):
         row[L.boosts + i] = float(boosts.get(key, 0)) / 6.0
 
-    for effect, count in (getattr(mon, "effects", None) or {}).items():
+    for effect in getattr(mon, "effects", None) or {}:
         name = _to_id(getattr(effect, "name", effect))
         if name in _VOLATILE_IDX:
             row[L.volatiles + _VOLATILE_IDX[name]] = 1.0
-        if name in _COUNTER_IDX:
-            row[L.vol_counters + _COUNTER_IDX[name]] = float(count or 0) / 8.0
+        # The simulator/poke-env effect value may be an exact internal remaining duration that the
+        # player cannot know (partial trapping is the important example).  Countdown features are
+        # populated only by BattleTracker from public start/end events below.
         for stat, pi in _PARADOX_STAT.items():
             if ("protosynthesis" in name or "quarkdrive" in name) and name.endswith(stat):
                 row[L.paradox + pi] = 1.0
@@ -158,9 +235,9 @@ def encode_entities(
     battle: Any, tables=None, *, opp_tokens: np.ndarray | None = None, perspective: str = "p1",
     tracker: Any = None,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Return (entities[12, ENTITY_RAW_DIM] f32, entity_ids[12, 9] i64, active_idx[2] i64).
+    """Return (entities[12, ENTITY_RAW_DIM] f32, entity_ids[12,17] i64, active_idx[2] i64).
 
-    `opp_tokens` = the C1 reveal tokens [6, 9] from reveals.build_belief_input — the single source
+    `opp_tokens` = the C1 reveal tokens [6,15] from reveals.build_belief_input — the single source
     of truth for the opponent's epistemic flags and revealed ids. battle=None or tables=None keeps
     the zero-fill shape-test path. `tracker` (encoding.tracker.BattleTracker, optional) fills the
     event-derived audit fields: last_used_move, booster_consumed, fallen_count, volatile counters.
@@ -192,7 +269,7 @@ def encode_entities(
             idx = tables.move_index(last, default=None)
             if idx is not None:
                 ids[7] = idx
-        if key in tracker.booster_consumed:
+        if tracker.booster_was_consumed(key, mon):
             row[L.booster] = 1.0
         row[L.fallen] = tracker.fallen_for(key, role)
         for ci, eff in enumerate(VOLATILE_COUNTERS):
@@ -200,12 +277,10 @@ def encode_entities(
             if v > 0:
                 row[L.vol_counters + ci] = v
 
-    from fog.constants.schema import MAX_SPREADS_PER_SPECIES
-
     unk = {
         "species": tables.n_species, "item": tables.n_items,
         "ability": tables.n_abilities, "move": tables.n_moves,
-        "spread": MAX_SPREADS_PER_SPECIES + 1,  # clusters + <OTHER_SPREAD>; UNK row on top
+        "nature": N_NATURES, "ev": N_EV_UNITS,
     }
 
     # ---- my six (slots 0-5): full sheet, all epistemic flags known --------------------------------
@@ -222,7 +297,8 @@ def encode_entities(
             active_idx[0] = j
 
         ids = entity_ids[j]
-        ids[0] = tables.species_index(_to_id(getattr(mon, "species", "")))
+        stable_species_id = submitted_species_id(getattr(mon, "species", ""))
+        ids[0] = tables.species_index(stable_species_id)
         item = getattr(mon, "item", None)
         ids[1] = tables.item_index(_to_id(item)) if item else tables.item_index("<NO_ITEM>")
         ability = getattr(mon, "ability", None)
@@ -241,7 +317,34 @@ def encode_entities(
             else:
                 ids[3 + k] = unk["move"]
         ids[7] = unk["move"]      # last_used_move: filled from the tracker below when available
-        ids[8] = unk["spread"]    # own spread cluster: not wired (module-docstring fidelity note)
+        exact_truth = (
+            getattr(tracker, "exact_private_truth", {}).get(int(ids[0]))
+            if tracker is not None
+            else None
+        )
+        if exact_truth is not None:
+            nature = int(exact_truth[7])
+            ev_units = [int(value) for value in exact_truth[8:14]]
+        else:
+            nature, ev_units = _own_nature_evs(
+                mon, stable_species_id, tables
+            )
+        ids[NATURE_ID_FIELD] = nature
+        ids[list(EV_ID_FIELDS)] = ev_units
+        mon_key = key_by_mon.get(id(mon), "")
+        original_item = tracker.original_item.get(mon_key) if tracker is not None else None
+        original_ability = tracker.original_ability.get(mon_key) if tracker is not None else None
+        if original_item:
+            try:
+                ids[ORIGINAL_ITEM_ID_FIELD] = tables.item_index(original_item)
+            except KeyError:
+                ids[ORIGINAL_ITEM_ID_FIELD] = unk["item"]
+        else:
+            ids[ORIGINAL_ITEM_ID_FIELD] = unk["item"]
+        ids[ORIGINAL_ABILITY_ID_FIELD] = (
+            tables.ability_index(original_ability, default=unk["ability"])
+            if original_ability else unk["ability"]
+        )
         # my tera type is MY sheet knowledge even before terastallizing
         tera = getattr(mon, "tera_type", None)
         if tera is not None and not getattr(mon, "terastallized", False):
@@ -273,16 +376,28 @@ def encode_entities(
             row[L.hp] = 1.0
 
         ids = entity_ids[slot]
-        tok = opp_tokens[j] if opp_tokens is not None else np.full(9, -1, dtype=np.int64)
+        tok = (
+            opp_tokens[j]
+            if opp_tokens is not None
+            else np.full(SET_N_ATTRS, -1, dtype=np.int64)
+        )
         ids[0] = tok[0] if tok[0] >= 0 else unk["species"]
         ids[1] = tok[1] if tok[1] >= 0 else unk["item"]
         ids[2] = tok[2] if tok[2] >= 0 else unk["ability"]
         for k in range(4):
             ids[3 + k] = tok[3 + k] if tok[3 + k] >= 0 else unk["move"]
         ids[7] = unk["move"]
-        ids[8] = tok[7] if tok[7] >= 0 else unk["spread"]
-        # epistemic flags [item, ability, move0-3, spread, tera] from the same tokens (C1 alignment)
-        for bit, col in enumerate((1, 2, 3, 4, 5, 6, 7, 8)):
+        ids[NATURE_ID_FIELD] = (
+            tok[SET_NATURE_COL] if tok[SET_NATURE_COL] >= 0 else unk["nature"]
+        )
+        for target, col in zip(EV_ID_FIELDS, SET_EV_COLS):
+            ids[target] = tok[col] if tok[col] >= 0 else unk["ev"]
+        ids[ORIGINAL_ITEM_ID_FIELD] = unk["item"]
+        ids[ORIGINAL_ABILITY_ID_FIELD] = unk["ability"]
+        # epistemic flags mirror every non-species submitted-set field in the C1 grid.
+        for bit, col in enumerate(
+            (1, 2, 3, 4, 5, 6, SET_NATURE_COL, *SET_EV_COLS, SET_TERA_COL)
+        ):
             row[L.epistemic + bit] = 1.0 if tok[col] >= 0 else 0.0
         _tracker_fill(row, ids, mon, opp_role)
 
@@ -291,9 +406,7 @@ def encode_entities(
 
 def legality_mask(battle: Any, *, perspective: str = "p1") -> np.ndarray:
     """Compute the 14-way action legality mask from a live battle/request-like object."""
-    try:
-        mask = np.asarray(action_legality_mask(battle), dtype=bool)
-    except Exception:
-        mask = np.zeros(N_ACTIONS, dtype=bool)
-        mask[13] = True
+    mask = np.asarray(action_legality_mask(battle), dtype=bool)
+    if mask.shape != (N_ACTIONS,):
+        raise ValueError(f"action legality mask must have shape ({N_ACTIONS},); got {mask.shape}")
     return mask

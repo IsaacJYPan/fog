@@ -1,0 +1,14 @@
+extends: gen9ou_typed_token_joint_belief_value_continuation_v2.yaml
+
+experiment: gen9ou_typed_token_joint_belief_value_continuation_smoke_v4
+
+bc:
+  epochs: 2
+  max_primary_batches_per_epoch: 4
+  eval_batches: 4
+  auxiliary_eval_batches: 4
+  early_stopping_patience: 0
+
+log:
+  dir: runs/gen9ou_typed_token_joint_belief_value_continuation_smoke_v4
+  tensorboard: false

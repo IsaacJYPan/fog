@@ -1,0 +1,13 @@
+# Same 2,048-wide contextual trunk with better allocation for exact dynamic facts.
+# The extra routes are nonlinear learned encoders; no raw value reaches an output unchanged.
+extends: gen9ou_contextual_trunk.yaml
+
+experiment: gen9ou_contextual_trunk_v3
+seed: 20261114
+
+model:
+  shared_contextual_dynamic_residual: true
+  shared_contextual_data_global: true
+
+log:
+  dir: runs/gen9ou_contextual_trunk_v3

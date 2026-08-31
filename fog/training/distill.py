@@ -1,5 +1,4 @@
-"""Search distillation — approach A, SEARCH_PLAN §7 (Phase 4); v2-log reader is
-PROPOSAL_IMPL_PLAN Phase I.1.
+"""Search-policy distillation from logged expert action distributions.
 
 Trains the policy toward the search's play and the value head toward outcomes under real
 posteriors, from either decision-log format:
@@ -57,6 +56,8 @@ from typing import Any
 
 import numpy as np
 
+from fog.encoding.dims import DIMS
+
 TURN_BUCKETS = ((1, 5), (6, 10), (11, 20), (21, 10**9))
 SCOPES = ("heads", "full")
 
@@ -91,16 +92,33 @@ def _v2_row_columns(row: dict) -> dict[str, np.ndarray]:
         post = post / z if z > 0 else margin
     else:  # pre-action root margin (older logs without the executed-label column)
         post = margin / margin.sum() if margin.sum() > 0 else margin
+    history_ids = getattr(obs, "history_ids", None)
+    history_state = getattr(obs, "history_state", None)
     out = {
         "entities": obs.entities.astype(np.float32),
         "entity_ids": obs.entity_ids.astype(np.int64),
         "field": obs.field.astype(np.float32),
         "history": pad_or_truncate_front(obs.history).astype(np.float32),
+        "history_ids": pad_or_truncate_front(
+            history_ids if history_ids is not None
+            else np.zeros((len(obs.history), DIMS.hist_id_fields), dtype=np.int64)
+        ).astype(np.int64),
+        "history_state": pad_or_truncate_front(
+            history_state if history_state is not None
+            else np.zeros((len(obs.history), DIMS.hist_state), dtype=np.float32)
+        ).astype(np.float32),
+        "history_len": np.int64(min(
+            getattr(
+                obs, "history_len",
+                int(np.any(np.asarray(obs.history) != 0, axis=-1).sum()),
+            ),
+            DIMS.history_cap,
+        )),
         "active_idx": (obs.active_idx if obs.active_idx is not None
                        else np.array([0, 6], dtype=np.int64)),
         "legality_mask": obs.legality_mask.astype(bool),
         "opp_tokens": (obs.opp_revealed or {}).get(
-            "tokens", np.full((6, 9), -1, dtype=np.int64)).astype(np.int64),
+            "tokens", np.full((6, 15), -1, dtype=np.int64)).astype(np.int64),
         "posterior_features": _own_posterior_features(post, int(row["true_index"])),
         "search_dist": np.asarray(row["action_dist"], dtype=np.float32),
         "action": np.int64(row["action"]),
@@ -272,7 +290,7 @@ def distill(agent: Any, data: dict[str, np.ndarray], *, scope: str = "heads",
     after = evaluate(hold_idx)
     report = {
         "n_decisions": int(n), "n_train": len(train_idx), "n_holdout": len(hold_idx),
-        "n_games": int(len(np.unique(data["game"]))), "scope": scope,
+        "n_games": len(np.unique(data["game"])), "scope": scope,
         "epochs": int(epochs), "lr": float(lr), "batch_size": int(batch_size),
         "value_coef": float(value_coef), "seed": int(seed),
         "train_loss_first": train_losses[0], "train_loss_last": train_losses[-1],
@@ -308,7 +326,7 @@ def main() -> None:
     from fog.models.agent import FogAgent
     from fog.search.posterior_log import load_decisions
 
-    ap = argparse.ArgumentParser(description="Search distillation (SEARCH_PLAN §7 / I.1).")
+    ap = argparse.ArgumentParser(description="Distill logged search action distributions.")
     ap.add_argument("--data", type=Path, required=True,
                     help="v1: posterior_log dir (or decisions.npz); v2: a pb_log/pb_datagen "
                          ".pt file or shard directory (auto-detected)")

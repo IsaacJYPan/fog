@@ -1,0 +1,14 @@
+# Recent, representative SV OU ladder teams.
+#
+# This source is intentionally separate from the claim-bearing tournament/sample bank.  The first
+# six forum pages emphasize current ladder play, while a 1600 Elo floor admits representative
+# teams rather than only leaderboard peaks.  Every exported paste must still contain six Pokemon,
+# deduplicate semantically, and pass the repository's pinned current-gen9ou Showdown validator.
+sources:
+  - name: sv_ou_recent_ladder_rmt
+    kind: rmt_forum
+    url: https://www.smogon.com/forums/forums/sv-ou-teams.748/
+    max_pages: 6
+    base_quality: 45
+    min_claimed_elo: 1600
+    ruleset_epoch: "recent-forum-current-legal"

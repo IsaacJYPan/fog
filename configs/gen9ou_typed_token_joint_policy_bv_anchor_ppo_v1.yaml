@@ -1,0 +1,112 @@
+# First meaningful outcome-learning bridge after the exact-private joint cloneability stage.
+# The actor is always censored.  Stationary Simple/MaxDamage/frozen-parent anchors provide actual
+# win/loss outcomes; exact simulator belief labels train the BV heads during PPO, and a small
+# high-rated replay BV term anchors real-distribution calibration.  Policy readers learn fastest,
+# BV/value readers modestly, and the typed trunk moves at only 3% of the base learning rate.
+extends: gen9ou_typed_token_joint_policy_bv_clone_v1.yaml
+
+experiment: gen9ou_typed_token_joint_policy_bv_anchor_ppo_v1
+seed: 20261336
+
+bc:
+  init_ckpt: runs/gen9ou_typed_token_joint_policy_bv_clone_v1/checkpoints/bc_best.pt
+  init_compatible: false
+
+env:
+  backend: showdown_direct
+  showdown_root: server/pokemon-showdown
+  battle_format: gen9ou
+  team_pool: data/teams/gen9ou_public_v1/train.json
+  belief_supervision: full_truth
+  rollout_workers: 4
+  rollout_worker_mode: process
+  actor_threads: 2
+  opponent_cache_size: 4
+
+ppo:
+  total_decisions: 240000
+  batch_decisions: 12000
+  minibatch_size: 768
+  games_per_chunk: 8
+  epochs: 2
+  clip: 0.10
+  lr: 3.0e-6
+  max_grad_norm: 0.5
+  entropy_coef: 0.010
+  entropy_coef_final: 0.004
+  rollout_temperature: 1.20
+  rollout_tera_logit_bonus: 0.0
+  init_ckpt: runs/gen9ou_typed_token_joint_policy_bv_clone_v1/checkpoints/bc_best.pt
+  init_compatible: false
+  bc_anchor_ckpt: runs/gen9ou_typed_token_joint_policy_bv_clone_v1/checkpoints/bc_best.pt
+  kl_anchor_decisions: 120000
+  kl_anchor_coef: 0.03
+  trainable_prefixes:
+    - policy_value.action_query_
+    - shared_to_policy.
+    - policy_value.value.
+    - shared_to_value.
+    - belief.
+    - shared_to_belief.
+    - matchup_value_prior.
+    - shared_latent.
+    - backbone.embeds.
+    - backbone.turn_history_encoder.
+  trainable_lr_scales:
+    shared_to_policy.: 0.50
+    policy_value.value.: 0.50
+    shared_to_value.: 0.25
+    belief.: 0.25
+    shared_to_belief.: 0.15
+    matchup_value_prior.: 0.15
+    shared_latent.: 0.03
+    backbone.embeds.: 0.03
+    backbone.turn_history_encoder.: 0.03
+
+league:
+  snapshot_every_decisions: 30000
+  warmup_decisions: 0
+  latest_frac: 0.0
+  past_frac: 0.25
+  scripted_frac: 0.75
+  past_ckpts:
+    - runs/gen9ou_typed_token_joint_policy_bv_clone_v1/checkpoints/bc_best.pt
+  scripted: [SimpleHeuristics, MaxDamage]
+
+loss:
+  action_coef: 1.0
+  value_coef: 0.5
+  belief_coef: 0.03
+  belief_chain_coef: 0.03
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+replay_policy:
+  manifest: runs/gen9ou_replay_policy_rating1650_v2/train_manifest.parquet
+  coef: 0.0005
+  belief_coef: 0.005
+  belief_chain_coef: 0.005
+  value_coef: 0.005
+  batch_size: 768
+  steps_per_update: 2
+  shard_buffer: 16
+
+preflight:
+  required: true
+  report: runs/preflight_audit/typed_token_joint_policy_bv_anchor_ppo_v1/summary.json
+  replay_report: runs/replay_preflight_audit/typed_token_joint_policy_bv_anchor_ppo_v1/summary.json
+  min_games: 5
+  min_replay_dryruns: 10
+  min_replay_hidden_targets: 1000
+  min_parsed_replay_games: 5
+  min_parsed_replay_dryruns: 10
+  min_parsed_replay_rows: 200
+  schema_version: 5
+  replay_schema_version: 4
+  match_source: true
+
+log:
+  dir: runs/gen9ou_typed_token_joint_policy_bv_anchor_ppo_v1
+  tensorboard: true
+  checkpoint_every_decisions: 30000

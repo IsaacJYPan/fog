@@ -23,15 +23,23 @@ from __future__ import annotations
 import numpy as np
 import torch
 
-from fog.encoding.entities import L
 from fog.encoding.dims import DIMS
+from fog.encoding.entities import (
+    EV_ID_FIELDS,
+    N_ID_FIELDS,
+    NATURE_ID_FIELD,
+    ORIGINAL_ABILITY_ID_FIELD,
+    ORIGINAL_ITEM_ID_FIELD,
+    L,
+)
+from fog.encoding.events import H_FIRST_ACTOR
 
 
 def _downgrade_my_entities(entities: np.ndarray, entity_ids: np.ndarray, my_view_tokens: np.ndarray,
                            unk: dict) -> tuple[np.ndarray, np.ndarray]:
     """Copy my 6 entity records but blank the ids + epistemic flags the opponent hasn't seen.
 
-    my_view_tokens [6,9]: what the opponent has seen of me (-1 = hidden). entities/entity_ids are my
+    my_view_tokens [6,15]: what the opponent has seen of me (-1 = hidden). entities/entity_ids are my
     slots 0-5 only ([6,...]).
     """
     ent = entities.copy()
@@ -44,12 +52,23 @@ def _downgrade_my_entities(entities: np.ndarray, entity_ids: np.ndarray, my_view
         for k in range(4):
             ids[j, 3 + k] = tok[3 + k] if tok[3 + k] >= 0 else unk["move"]
         ids[j, 7] = unk["move"]
-        ids[j, 8] = tok[7] if tok[7] >= 0 else unk["spread"]
-        # epistemic flags [item, ability, move0-3, spread, tera] = revealed?
-        for bit, col in enumerate((1, 2, 3, 4, 5, 6, 7, 8)):
+        from fog.constants.schema import SET_EV_COLS, SET_NATURE_COL, SET_TERA_COL
+
+        ids[j, NATURE_ID_FIELD] = (
+            tok[SET_NATURE_COL] if tok[SET_NATURE_COL] >= 0 else unk["nature"]
+        )
+        for target, col in zip(EV_ID_FIELDS, SET_EV_COLS):
+            ids[j, target] = tok[col] if tok[col] >= 0 else unk["ev"]
+        if ids.shape[-1] >= N_ID_FIELDS:
+            ids[j, ORIGINAL_ITEM_ID_FIELD] = unk["item"]
+            ids[j, ORIGINAL_ABILITY_ID_FIELD] = unk["ability"]
+        # epistemic flags cover item, ability, moves, nature, six EV stats, and tera.
+        for bit, col in enumerate(
+            (1, 2, 3, 4, 5, 6, SET_NATURE_COL, *SET_EV_COLS, SET_TERA_COL)
+        ):
             ent[j, L.epistemic + bit] = 1.0 if tok[col] >= 0 else 0.0
         # my sheet-known tera type is hidden from the opponent until terastallized
-        if tok[8] < 0:
+        if tok[SET_TERA_COL] < 0:
             ent[j, L.tera_type : L.tera_type + DIMS.tera_type] = 0.0
         # PP fractions are private (opponent sees moves used, not my PP bookkeeping)
         ent[j, L.move_pp : L.move_pp + DIMS.move_pp] = 0.0
@@ -79,21 +98,86 @@ def mirror_field(field: np.ndarray) -> np.ndarray:
     return out
 
 
+def mirror_history(history: np.ndarray) -> np.ndarray:
+    """Swap viewer-relative legacy history fields; zero blocks that cannot be inverted exactly."""
+    out = np.asarray(history, dtype=np.float32).copy()
+    if not len(out):
+        return out
+
+    def swap(a, b) -> None:
+        left = out[..., a].copy()
+        out[..., a] = out[..., b]
+        out[..., b] = left
+
+    swap(0, 1)       # active species scalars
+    swap(2, 3)       # hp
+    left = out[..., 4:11].copy()
+    out[..., 4:11] = out[..., 11:18]
+    out[..., 11:18] = left
+    swap(18, 19)     # legacy boost sums
+
+    my_action = DIMS.hist_snapshot
+    opp_action = my_action + DIMS.hist_my_action
+    # The old record has my action *slot* but opponent action *identity*, so there is no lossless
+    # side swap. The categorical sidecar below carries both identities; do not feed a false frame.
+    out[..., my_action : opp_action + DIMS.hist_opp_action] = 0.0
+
+    res = opp_action + DIMS.hist_opp_action
+    swap(res + 0, res + 1)  # damage
+    swap(res + 2, res + 3)  # crit
+    left = out[..., res + 4 : res + 9].copy()
+    out[..., res + 4 : res + 9] = out[..., res + 9 : res + 14]
+    out[..., res + 9 : res + 14] = left
+    swap(res + 14, res + 15)  # misses
+    out[..., res + 16 : res + 18] = 0.0  # only opponent reveals existed in the legacy block
+    swap(res + 18, res + 19)  # faints
+    out[..., res + 20 : res + 22] = 0.0  # first actor/exact outgoing damage are asymmetric
+    return out
+
+
+def mirror_history_ids(history_ids: np.ndarray) -> np.ndarray:
+    """Exact perspective swap for the categorical history sidecar."""
+    out = np.asarray(history_ids, dtype=np.int64).copy()
+    for left, right in ((0, 1), (2, 4), (3, 5), (6, 7), (8, 9), (10, 11),
+                        (12, 13), (15, 16)):
+        tmp = out[..., left].copy()
+        out[..., left] = out[..., right]
+        out[..., right] = tmp
+    actor = out[..., H_FIRST_ACTOR].copy()
+    out[..., H_FIRST_ACTOR] = np.where(actor == 1, 2, np.where(actor == 2, 1, 0))
+    return out
+
+
+def mirror_history_state(history_state: np.ndarray) -> np.ndarray:
+    """Swap the two seven-stat active boost blocks."""
+    out = np.asarray(history_state, dtype=np.float32).copy()
+    left = out[..., :7].copy()
+    out[..., :7] = out[..., 7:14]
+    out[..., 7:14] = left
+    return out
+
+
 def build_opponent_view_np(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.ndarray,
                            tables) -> tuple[dict, dict]:
     """Unbatched numpy (backbone_frag, my_view_dict) for the self-belief predictor.
 
-    obs: my own Observation (this decision). my_view_tokens [6,9]: opponent's reveal state of me.
-    my_truth_tokens [6,9]: my full team (self-belief labels). Slots are swapped so I sit in 6-11.
+    obs: my own Observation. my_view_tokens [6,15]: opponent's reveal state of me.
+    my_truth_tokens [6,15]: my full team. Slots are swapped so I sit in 6-11.
 
-    The returned frag deliberately OMITS "history" — the turn history is public and shared with the
-    primary observation, so RolloutBuffer.to_batch aliases it instead of storing it twice.
+    Public events still carry viewer-relative side and active-slot fields. The returned frag
+    therefore contains a perspective-swapped history rather than aliasing the primary history.
     """
-    from fog.constants.schema import MAX_SPREADS_PER_SPECIES
-    from fog.encoding.reveals import align_truth_to_views, labels_from_truth, masks_for_tokens
+    from fog.constants.schema import N_EV_UNITS, N_NATURES
+    from fog.encoding.reveals import (
+        align_training_truth_to_views,
+        labels_from_truth,
+        masks_for_tokens,
+    )
 
-    unk = {"item": tables.n_items, "ability": tables.n_abilities, "move": tables.n_moves,
-           "spread": MAX_SPREADS_PER_SPECIES + 1}
+    unk = {
+        "item": tables.n_items, "ability": tables.n_abilities, "move": tables.n_moves,
+        "nature": N_NATURES, "ev": N_EV_UNITS,
+    }
 
     my_ent, my_ids = _downgrade_my_entities(
         obs.entities[:6], obs.entity_ids[:6], my_view_tokens, unk
@@ -112,16 +196,37 @@ def build_opponent_view_np(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.
         "entities": ent.astype(np.float32),
         "entity_ids": ids.astype(np.int64),
         "field": mirror_field(np.asarray(obs.field, dtype=np.float32)),
+        "history": mirror_history(obs.history),
+        "history_ids": mirror_history_ids(
+            obs.history_ids if obs.history_ids is not None
+            else np.zeros((len(obs.history), DIMS.hist_id_fields), dtype=np.int64)
+        ),
+        "history_state": mirror_history_state(
+            obs.history_state if obs.history_state is not None
+            else np.zeros((len(obs.history), DIMS.hist_state), dtype=np.float32)
+        ),
+        "history_len": np.int64(obs.history_len),
         "active_idx": active,
+        # Action legality is private request state.  The opponent mirror cannot reconstruct it
+        # from our observation, so use the same constant public placeholder used by public-only
+        # probes instead of copying our (wrong-perspective and potentially leaking) mask.  The
+        # typed shared-latent route consumes this field even when the mirror is used only for the
+        # self-belief auxiliary, so omitting it makes otherwise valid PPO rollout batches fail at
+        # update time.
+        "legality_mask": np.ones(14, dtype=bool),
     }
     # my_view belief input: opponent's reveal tokens of me + masks + my truth labels. The view
     # packs MY revealed moves into the earliest subslots (RevealLedger order), so the truth grid
     # is aligned to that clamp before it becomes labels — an inconsistency here (revealed move
     # not on my own sheet) can only be a census bug; targets still follow the clamp.
     masks = masks_for_tokens(my_view_tokens, tables)
-    aligned_truth, _ = align_truth_to_views(my_truth_tokens, my_view_tokens)
+    aligned_truth, supervision_tokens, supervision_consistent = align_training_truth_to_views(
+        my_truth_tokens, my_view_tokens
+    )
     my_view = {
         "tokens": my_view_tokens.astype(np.int64),
+        "supervision_tokens": supervision_tokens.astype(np.int64),
+        "supervision_consistent": supervision_consistent.astype(bool),
         "masks": {k: v for k, v in masks.items() if k != "item"},
         "labels": labels_from_truth(aligned_truth),
     }
@@ -130,7 +235,7 @@ def build_opponent_view_np(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.
 
 def build_opponent_view(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.ndarray, tables,
                         device=None) -> tuple[dict, dict]:
-    """Batched-torch ([1, ...]) wrapper over `build_opponent_view_np`, plus the shared history.
+    """Batched-torch ([1, ...]) wrapper over `build_opponent_view_np`.
 
     Used for the per-decision frozen-probe measurement (§7); training goes through the numpy path.
     """
@@ -144,11 +249,17 @@ def build_opponent_view(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.nda
         "entities": _t(frag["entities"], torch.float32),
         "entity_ids": _t(frag["entity_ids"], torch.long),
         "field": _t(frag["field"], torch.float32),
-        "history": _t(obs.history, torch.float32),
+        "history": _t(frag["history"], torch.float32),
+        "history_ids": _t(frag["history_ids"], torch.long),
+        "history_state": _t(frag["history_state"], torch.float32),
+        "history_len": _t(np.asarray(frag["history_len"], dtype=np.int64), torch.long),
         "active_idx": _t(frag["active_idx"], torch.long),
+        "legality_mask": _t(frag["legality_mask"], torch.bool),
     }
     mv = {
         "tokens": _t(my_view["tokens"], torch.long),
+        "supervision_tokens": _t(my_view["supervision_tokens"], torch.long),
+        "supervision_consistent": _t(my_view["supervision_consistent"], torch.bool),
         "masks": {k: _t(v, torch.bool) for k, v in my_view["masks"].items()},
         "labels": {k: _t(v, torch.long) for k, v in my_view["labels"].items()},
     }
