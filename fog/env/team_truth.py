@@ -1,4 +1,4 @@
-"""Ground-truth team labels for self-play belief supervision (spec §3.2, §5, §6).
+"""Ground-truth team labels for self-play belief supervision.
 
 In self-play the simulator provides both full teams, so belief targets are the opponent's TRUE set
 (not just what leaked). The PREFERRED truth source is the recording `PoolTeambuilder` (env/teams.py):

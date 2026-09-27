@@ -1,4 +1,4 @@
-"""Training stage 1 — behavior cloning (spec §5).
+"""Training stage 1 — behavior cloning.
 
 Objective:
     CE(policy, human action)

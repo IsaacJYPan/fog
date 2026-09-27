@@ -5,7 +5,7 @@ analogue of selective Monte Carlo tree search is therefore to solve depth one fi
 public leaf's actual reach probability under that solution, and expand only the most likely leaves.
 
 An expanded child is still a two-sided public-belief solve.  Its root belief is the parent's Bayes
-update after the visible action pair and truthful branch evidence.  The child returns a continuation
+update after the public observation, marginalized over hidden choices. The child returns a continuation
 value for every surviving private-state pair; the parent substitutes those pair values at that leaf
 and is solved again.  Unexpanded leaves retain the learned value estimate.
 
@@ -26,7 +26,8 @@ import numpy as np
 from fog.search.pb_grid import build_pb_grid
 from fog.search.pb_value_fn import make_pb_value_grid_values
 from fog.search.pb_values import make_grid_values
-from fog.search.two_sided import pair_posteriors, two_sided_regret_solve
+from fog.search.public_observation import PublicObservationLikelihood
+from fog.search.two_sided import two_sided_regret_solve
 
 
 @dataclass
@@ -49,14 +50,6 @@ def leaf_reach_probabilities(grid: Any, rho: np.ndarray, sigma1: np.ndarray,
             * grid.branch_prob[k, j, a, b, branch]
         )
     return reach
-
-
-def _leaf_action_pair(grid: Any) -> np.ndarray:
-    positions = np.argwhere(grid.leaf_index >= 0)
-    result = np.zeros((len(grid.leaf_obs), 2), dtype=np.int64)
-    if len(positions):
-        result[grid.leaf_index[tuple(positions.T)]] = positions[:, [2, 3]]
-    return result
 
 
 def build_depth2_overrides(
@@ -91,8 +84,7 @@ def build_depth2_overrides(
         raise ValueError("depth-two expansion requires one retained battle fork per public leaf")
 
     reach = leaf_reach_probabilities(root_grid, rho, sigma1, sigma2)
-    leaf_ab = _leaf_action_pair(root_grid)
-    root_post = pair_posteriors(rho, sigma1, sigma2)
+    root_post = PublicObservationLikelihood(root_grid).posteriors(rho, sigma1, sigma2)
     ranked = np.argsort(reach)[::-1]
 
     for leaf in ranked:
@@ -105,8 +97,7 @@ def build_depth2_overrides(
             continue
         stats.considered += 1
 
-        a, b = leaf_ab[leaf]
-        child_rho_full = root_post[a, b] * root_grid.leaf_evidence[leaf]
+        child_rho_full = root_post[leaf]
         total = child_rho_full.sum()
         if total <= 0:
             stats.failures.append(f"leaf {leaf}: evidence removed all candidate pairs")

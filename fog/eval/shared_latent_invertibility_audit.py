@@ -67,13 +67,17 @@ def run(args: argparse.Namespace) -> dict:
                 expected_metadata = torch.cat([active, batch["legality_mask"].float()], dim=-1)
                 metadata_error = (metadata - expected_metadata).abs()
                 totals["rows"] += int(latent.shape[0])
-                totals["raw_n"] += raw_error.numel(); totals["raw_within"] += int((raw_error <= args.tolerance).sum())
+                totals["raw_n"] += raw_error.numel()
+                totals["raw_within"] += int((raw_error <= args.tolerance).sum())
                 totals["raw_max"] = max(totals["raw_max"], float(raw_error.max()))
-                totals["id_n"] += id_error.numel(); totals["id_exact"] += int((id_error == 0).sum())
+                totals["id_n"] += id_error.numel()
+                totals["id_exact"] += int((id_error == 0).sum())
                 totals["id_max"] = max(totals["id_max"], float(id_error.max()))
-                totals["field_n"] += field_error.numel(); totals["field_within"] += int((field_error <= args.tolerance).sum())
+                totals["field_n"] += field_error.numel()
+                totals["field_within"] += int((field_error <= args.tolerance).sum())
                 totals["field_max"] = max(totals["field_max"], float(field_error.max()))
-                totals["metadata_n"] += metadata_error.numel(); totals["metadata_exact"] += int((metadata_error == 0).sum())
+                totals["metadata_n"] += metadata_error.numel()
+                totals["metadata_exact"] += int((metadata_error == 0).sum())
         return {
             "rows": totals["rows"],
             "raw_within_tolerance": totals["raw_within"] / totals["raw_n"],
@@ -130,7 +134,8 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--tolerance", type=float, default=1e-5)
     parser.add_argument("--target", type=float, default=0.95)
-    args = parser.parse_args(); run(args)
+    args = parser.parse_args()
+    run(args)
 
 
 if __name__ == "__main__":

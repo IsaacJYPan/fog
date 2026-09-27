@@ -10,6 +10,7 @@ ppo:
   games_per_chunk: 16
   epochs: 1
   clip: 0.05
+  target_kl: 0.01  # stop remaining minibatches after excessive measured behavior-policy drift
   lr: 1.0e-5
   entropy_coef: 0.003
   entropy_coef_final: 0.001

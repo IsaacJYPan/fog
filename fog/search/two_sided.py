@@ -1,55 +1,24 @@
-"""Two-sided public-belief regret solver (ARCHITECTURE.md S1–S3) — pure math core.
+"""Two-sided public-belief regret solver.
 
-This module is the claim-bearing successor of the one-sided loop in fog/search/joint.py. The
-one-sided loop optimizes only OUR per-type strategies against a fixed scripted reply; this module
-optimizes BOTH players' private-type-conditioned strategies together, which is what the proposal's
-Bayesian-equilibrium target requires (§21.2). It is deliberately engine-free and network-free:
-everything battle-specific arrives through the `values_fn` callback, so every property here is
-testable on exact hand-built games (tests/test_two_sided.py).
+`rho[K, J]` is the joint belief over our and the opponent's candidate teams.
+`sigma1[K, A]` and `sigma2[J, B]` are their type-conditioned strategies;
+`avail1` and `avail2` mask illegal public-action labels for each type.
 
-Objects and their meanings (proposal §7, §10.1):
+`values_fn(sigma1, sigma2)` returns our continuation payoffs [K, J, A, B].
+It receives current strategies because leaf values may depend on their induced
+posterior. The opponent's payoff is the negation. Unavailable actions are ignored.
+Each strategy depends only on its own private type, averaging the other player's
+types using the conditional distribution derived from rho.
 
-  * `rho[K, J]`    — the joint public belief: probability that OUR private team is candidate `k`
-                     AND the opponent's private team is candidate `j`, given everything public.
-                     Both players can compute it; neither player's strategy may depend on the
-                     dimension it cannot observe.
-  * `sigma1[K, A]` — our strategy: probability of public action `a` when our private state is `k`.
-  * `sigma2[J, B]` — the opponent's strategy over ITS public actions `b`, per opponent type `j`.
-  * `avail1/avail2` — boolean masks: which public-action labels each candidate type can legally
-                     play. A type that lacks a label plays it with probability zero, so observing
-                     that label eliminates the type (proposal §7.3 — load-bearing, tested).
-  * `values_fn(sigma1, sigma2) -> u[K, J, A, B]` — OUR expected continuation payoff if the true
-                     types are `(k, j)` and the committed simultaneous actions are `(a, b)`.
-                     Zero-sum: the opponent's payoff is `-u`. The callback receives the CURRENT
-                     iteration's strategies because leaf continuation values may depend on the
-                     action-conditioned posterior those strategies induce (§5.1, §10). For a
-                     posterior-independent game it may ignore its arguments and return a constant
-                     tensor. Entries at unavailable `(k, a)` or `(j, b)` combinations are ignored.
+Regret matching optionally clamps accumulated regret at zero (`plus=True`).
+The returned strategy averages iterations with weight t + 1. An annealed
+exploration floor stabilizes the strategies used during solving, but is excluded
+from the accumulated average. Convergence uses total-variation changes between
+average-strategy checkpoints, subject to an iteration cap.
 
-Information restrictions enforced by construction (proposal §4.3, §19.1-3):
-  * `sigma1` varies with `k` only — a row's update uses the opponent-type distribution `P(j | k)`
-    derived from `rho`, never a specific `j`.
-  * `sigma2` varies with `j` only — symmetric.
-  * Neither strategy conditions on the other player's CURRENT action; actions meet only inside
-    the payoff expectation.
-
-Solver mechanics (proposal §10.1 + settled decision 24):
-  * Regret matching with optional nonnegative accumulated regrets (`plus=True`, the standard
-    "regret matching plus" variant: clamping accumulated regret at zero speeds convergence).
-  * The reported answer is the WEIGHTED AVERAGE strategy, weighting iteration `t` by `t + 1`
-    (later rounds count more; with equal weights and few iterations the "average" is mostly the
-    initialization).
-  * A small exploration floor keeps every legal action at nonzero probability DURING the solve
-    (posterior updates stay numerically stable) but is annealed toward zero and EXCLUDED from the
-    accumulated average: the floored strategy is what plays each iteration; the un-floored
-    regret-matched strategy is what accumulates. The floor must not survive into the answer.
-  * Stopping: by measured stability of the running averages (total-variation change between
-    checkpoints), with a hard iteration cap. Iterations used are reported.
-
-What this module does not do: build the K x J x A x B cell
-grid from engine simulations, evaluate leaves with the public-belief value network, or maintain
-the persistent cross-turn belief table (only the single-step update primitive lives here).
-"""
+This module contains no engine or network calls. Grid construction, leaf
+valuation, and persistent belief tracking live in the surrounding search modules.
+See tests/test_two_sided.py for checks on exact games."""
 from __future__ import annotations
 
 from collections.abc import Callable

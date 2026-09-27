@@ -1,8 +1,4 @@
-"""Config loading + hashing.
-
-Every run is reproducible from (resolved config + seed). Configs support single-level `extends` to a
-base yaml; the resolved dict is hashed so runs are traceable to an exact configuration.
-"""
+"""Load inherited YAML configs, validate overrides, and hash the resolved settings."""
 from __future__ import annotations
 
 import hashlib

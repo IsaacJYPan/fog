@@ -1,1 +1,1 @@
-"""Scrapers, parsers, cluster/table builders (spec §4). CLI entry points live in each module."""
+"""Scrapers, parsers, cluster/table builders. CLI entry points live in each module."""

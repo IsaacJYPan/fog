@@ -52,8 +52,10 @@ def _weighted_key(values: dict[str, float], rng: np.random.Generator) -> str | N
     return str(rng.choice(keys, p=probabilities))
 
 
-def _sample_spread(species_id: str, rng: np.random.Generator) -> tuple[int, list[int]]:
-    spreads = list(TABLES.spreads.get("species", {}).get(species_id, ()))
+def _sample_spread(species_id: str, rng: np.random.Generator,
+                   spread_priors: dict | None = None) -> tuple[int, list[int]]:
+    source = TABLES.spreads.get("species", {}) if spread_priors is None else spread_priors
+    spreads = list(source.get(species_id, ()))
     if not spreads:
         return NATURE_INDEX["serious"], [0] * 6
     weights = np.asarray(
@@ -73,21 +75,41 @@ def complete_private_team(
     revealed: np.ndarray,
     *,
     seed: int,
+    candidate_bank=None,
+    replay_id: str = "",
+    log_hash: str = "",
+    timestamp: int = 0,
+    rating: int = 0,
+    diagnostics: dict | None = None,
+    usage_priors: dict | None = None,
+    spread_priors: dict | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Return one plausible full own sheet and a matching ``[6,15]`` provenance grid."""
     exact = np.asarray(revealed, dtype=np.int64)
     if exact.shape != (6, SET_N_ATTRS):
         raise ValueError(f"revealed private set must have shape (6,{SET_N_ATTRS}); got {exact.shape}")
     rng = np.random.default_rng(seed)
-    priors = replay_set_priors()
+    priors = replay_set_priors() if usage_priors is None else usage_priors
     completed = exact.copy()
     provenance = np.where(exact >= 0, EXACT, UNKNOWN).astype(np.uint8)
+    if candidate_bank is not None:
+        completed, report = candidate_bank.propose(
+            exact, rng=rng, replay_id=replay_id, log_hash=log_hash,
+            timestamp=timestamp, rating=rating,
+        )
+        provenance[(exact < 0) & (completed >= 0)] = INFERRED
+        if diagnostics is not None:
+            for key, value in report.items():
+                diagnostics[key] = diagnostics.get(key, 0) + value
 
     for slot in range(6):
         species = int(completed[slot, 0])
         if species < 0 or species >= TABLES.n_species:
             continue
         species_id = str(TABLES.species["ids"][species])
+        # Separate field streams keep fallback draws paired across imputation methods. A donor
+        # supplying an item must not accidentally change the independently sampled EV spread.
+        rng = np.random.default_rng(np.random.SeedSequence([seed, slot, 1]))
 
         if completed[slot, 1] < 0:
             item_id = _weighted_key(priors.get("item_priors", {}).get(species_id, {}), rng)
@@ -96,6 +118,7 @@ def complete_private_team(
             completed[slot, 1] = TABLES.item_index(item_id or "<NO_ITEM>")
             provenance[slot, 1] = INFERRED
 
+        rng = np.random.default_rng(np.random.SeedSequence([seed, slot, 2]))
         if completed[slot, 2] < 0:
             ability_id = _weighted_key(
                 priors.get("ability_priors", {}).get(species_id, {}), rng
@@ -107,11 +130,13 @@ def complete_private_team(
             completed[slot, 2] = ability
             provenance[slot, 2] = INFERRED
 
+        rng = np.random.default_rng(np.random.SeedSequence([seed, slot, 3]))
         known_moves = [
             int(completed[slot, column])
             for column in SET_MOVE_COLS
             if int(completed[slot, column]) >= 0
         ]
+        original_moves = set(known_moves)
         move_prior = dict(priors.get("move_priors", {}).get(species_id, {}))
         while len(known_moves) < 4:
             candidates = {
@@ -134,12 +159,14 @@ def complete_private_team(
                 move = int(rng.choice(legal))
             known_moves.append(move)
             move_prior.pop(str(TABLES.moves["ids"][move]), None)
-        for offset, column in enumerate(SET_MOVE_COLS):
-            if completed[slot, column] < 0 and offset < len(known_moves):
-                completed[slot, column] = known_moves[offset]
-                provenance[slot, column] = INFERRED
+        new_moves = [move for move in known_moves if move not in original_moves]
+        empty_move_columns = [column for column in SET_MOVE_COLS if completed[slot, column] < 0]
+        for column, move in zip(empty_move_columns, new_moves):
+            completed[slot, column] = move
+            provenance[slot, column] = INFERRED
 
-        nature, ev_units = _sample_spread(species_id, rng)
+        rng = np.random.default_rng(np.random.SeedSequence([seed, slot, 7]))
+        nature, ev_units = _sample_spread(species_id, rng, spread_priors)
         if completed[slot, SET_NATURE_COL] < 0:
             completed[slot, SET_NATURE_COL] = nature
             provenance[slot, SET_NATURE_COL] = INFERRED
@@ -148,9 +175,11 @@ def complete_private_team(
                 completed[slot, column] = value
                 provenance[slot, column] = INFERRED
 
+        rng = np.random.default_rng(np.random.SeedSequence([seed, slot, 14]))
         if completed[slot, SET_TERA_COL] < 0:
             tera_id = _weighted_key(priors.get("tera_priors", {}).get(species_id, {}), rng)
-            completed[slot, SET_TERA_COL] = TYPE_INDEX.get(tera_id or "", int(rng.integers(18)))
+            tera_index = {**TYPE_INDEX, "stellar": 18}
+            completed[slot, SET_TERA_COL] = tera_index.get(tera_id or "", int(rng.integers(19)))
             provenance[slot, SET_TERA_COL] = INFERRED
 
     return completed, provenance
@@ -174,7 +203,7 @@ def apply_private_set(mon, tokens: np.ndarray) -> None:
         mon._nature = NATURES[int(row[SET_NATURE_COL])]
     mon._evs = [int(row[column]) * 4 for column in SET_EV_COLS]
     if row[SET_TERA_COL] >= 0:
-        type_id = list(TYPE_INDEX)[int(row[SET_TERA_COL])]
+        type_id = (*TYPE_INDEX, "stellar")[int(row[SET_TERA_COL])]
         mon._terastallized_type = PokemonType.from_name(type_id)
 
 

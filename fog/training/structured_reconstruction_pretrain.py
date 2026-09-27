@@ -120,7 +120,8 @@ def run(args: argparse.Namespace) -> dict:
         return torch.stack(losses).mean()
 
     def evaluate(dataset: TensorObservationDataset) -> dict[str, float | list[float]]:
-        agent.eval(); decoders.eval()
+        agent.eval()
+        decoders.eval()
         totals = {
             "loss": 0.0,
             "batches": 0,
@@ -143,7 +144,8 @@ def run(args: argparse.Namespace) -> dict:
         with torch.no_grad():
             for batch in dataset.batches(args.batch_size, shuffle=False, seed=args.seed, device=device):
                 predicted, targets = predictions(batch)
-                totals["loss"] += float(objective(batch)); totals["batches"] += 1
+                totals["loss"] += float(objective(batch))
+                totals["batches"] += 1
                 for name in ("public_raw", "private_raw", "field"):
                     error = predicted[name] - targets[name]
                     totals[f"{name}_squared"] += float(error.square().sum())
@@ -192,7 +194,10 @@ def run(args: argparse.Namespace) -> dict:
     best_decoders = None
     stale = 0
     for epoch in range(args.epochs):
-        agent.train(); decoders.train(); train_loss = 0.0; batches = 0
+        agent.train()
+        decoders.train()
+        train_loss = 0.0
+        batches = 0
         for batch in datasets["train"].batches(args.batch_size, shuffle=True, seed=args.seed + epoch, device=device):
             optimizer.zero_grad(set_to_none=True)
             loss = objective(batch)
@@ -200,7 +205,9 @@ def run(args: argparse.Namespace) -> dict:
             torch.nn.utils.clip_grad_norm_(
                 list(agent.structured_encoder.parameters()) + list(decoders.parameters()), 5.0
             )
-            optimizer.step(); train_loss += float(loss.detach()); batches += 1
+            optimizer.step()
+            train_loss += float(loss.detach())
+            batches += 1
         team = evaluate(datasets["team_holdout"])
         battle = evaluate(datasets["battle_holdout"])
         score = min(float(team["minimum_recovery"]), float(battle["minimum_recovery"]))
@@ -212,7 +219,8 @@ def run(args: argparse.Namespace) -> dict:
             "team_loss": team["loss"],
             "battle_loss": battle["loss"],
         }
-        rows.append(row); print(f"[structured-reconstruction] {row}", flush=True)
+        rows.append(row)
+        print(f"[structured-reconstruction] {row}", flush=True)
         if score > best_score + args.min_delta:
             best_score = score
             best_agent = copy.deepcopy(agent.state_dict())
@@ -224,8 +232,10 @@ def run(args: argparse.Namespace) -> dict:
             break
     if best_agent is None or best_decoders is None:
         raise RuntimeError("structured reconstruction produced no finite checkpoint")
-    agent.load_state_dict(best_agent); decoders.load_state_dict(best_decoders)
-    team = evaluate(datasets["team_holdout"]); battle = evaluate(datasets["battle_holdout"])
+    agent.load_state_dict(best_agent)
+    decoders.load_state_dict(best_decoders)
+    team = evaluate(datasets["team_holdout"])
+    battle = evaluate(datasets["battle_holdout"])
     changed = sorted(name for name, value in best_agent.items() if _digest(value) != _digest(initial[name]))
     illegal = [name for name in changed if not name.startswith("structured_encoder.")]
     if illegal:
@@ -252,7 +262,9 @@ def run(args: argparse.Namespace) -> dict:
     torch.save(best_decoders, args.out / "decoder_best.pt")
     (args.out / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     with (args.out / "metrics.csv").open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+        writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
     print(json.dumps(report, indent=2), flush=True)
     if not report["passed"]:
         raise SystemExit(2)
@@ -276,7 +288,8 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=12)
     parser.add_argument("--min-delta", type=float, default=0.0005)
     parser.add_argument("--seed", type=int, default=20261061)
-    args = parser.parse_args(); run(args)
+    args = parser.parse_args()
+    run(args)
 
 
 if __name__ == "__main__":

@@ -1,87 +1,28 @@
-"""Rung-1/2 conditioning gate for the belief chain: prove the chain
-CONDITIONS on reveals — on controlled distributions with KNOWN joint structure — before any
-usage-data training is trusted.
+"""Synthetic conditioning checks for the belief model.
 
-WHY THIS EXISTS. The autoregressive chain's entire advantage over independent per-attribute heads
-is modeling the JOINT structure of hidden attributes. Usage data cannot demonstrate that: Smogon
-chaos files carry marginals only and the generative pool draws attributes independently, so on that
-data the true joint IS the product of marginals — nothing to condition on (KNOWN_ISSUES). Worse,
-the marginal is the DEFAULT OPTIMIZATION BASIN: the 2026-07-13 scratch run watched a small chain
-fit a confident marginal for ~300 steps before discovering the designed dependency at all. So the
-gate trains on synthetic distributions where the joint is designed and conditioning is checkable
-exactly, and only a pass here licenses training on data whose joint structure we cannot inspect.
+Rung 2 uses identical species previews and a known cross-slot dependency:
+tera[slot 0] = rule_map[item[slot 3]]. Other hidden attributes are independent.
+This separates learning the marginal support from conditioning on the source.
+Training and evaluation use the same reveal-rate distribution, including sparse
+reveals; metrics average over fresh tail orders and track changes during training.
 
-RUNG 2 (the real gate) — a designed cross-slot rule, preview-indistinguishable. Every example
-shares the SAME 6 species (species always revealed = team preview carries zero information about
-the hidden tail). All hidden attributes are iid uniform EXCEPT one arbitrary designed rule:
+The final gate checks revealed-source and teacher-forced-source cross entropy,
+rule predictions, marginal fallback with the source hidden, sampling consistency,
+and regression from the best evaluation step. Reverse consistency is reported
+separately. Rung 1 checks memorization of an eight-team mixture with identical
+species, comparing chain loss with its exact conditional entropy and checking
+sample membership and recovery after identifying reveals.
 
-    tera[slot 0]  =  rule_map[ item[slot 3] ]        (rule_map a fixed injective random map)
+Both checks use a small BeliefModel with zero battle context and fresh synthetic
+training data. Marginal and chain losses are trained together. `--tail-order
+canonical` selects the fixed-order ablation; its forced-tail check is inapplicable
+when the source follows the dependent field.
 
-The source (flat 28) sits AFTER the dependent (flat 8) in canonical order, so a fixed left-to-right
-chain can never condition the dependent on a revealed source — exactly the property the reveal-set
-prefix model exists to provide. n_tera (8) > n_items (4), which separates three
-behaviors: a model beats uniform (ln 8 = 2.079) by learning the image support, reaches the true
-marginal (ln 4 = 1.386) without any conditioning, and reaches 0 only by conditioning.
-
-WHAT THE SCRATCH RUN GOT WRONG (both fixed here). Its eval (a) scored ONE random tail order and
-(b) revealed only the source while training revealed ~30% of everything — a train/eval mismatch —
-so its late-training "probe drifted back to a constant" could not be distinguished from an
-OOD-eval artifact. Here: (a) every chain metric averages over --orders fresh random tail orders;
-(b) the eval set's reveal distribution IS the training distribution — per-example reveal rate
-~ U(0, p_max), which also puts sparse-reveal states (the strict probe's neighborhood, and real
-turn-1 information states) in-support; (c) every metric is a TIME SERIES, so late-training
-regression (the drift-back question) is measured rather than guessed.
-
-THE GATE (checked at the FINAL eval step, i.e. conditioning must PERSIST, plus an explicit
-no-drift-back check against the best step):
-  (i)   conditions on a revealed source:      dep CE | source revealed          <= 0.20 nats;
-        and on a teacher-forced tail source:  dep CE | source earlier in tail   <= 0.20 nats
-        (the second is the input pattern ancestral sampling / joint scoring actually query);
-        and held-out total chain CE beats the marginal-product baseline;
-  (ii)  probe matches the designed rule:      argmax p(tera0 | item3=v) == rule_map[v] for all v,
-        both with nothing else revealed (strict) and under training-matched extra reveals;
-  (iii) no-reveal fallback:                   with the source hidden and not yet generated, the
-        dependent's conditional is the MARGINAL (uniform over the image), not a constant:
-        CE within 0.15 of ln 4, image mass >= 0.95, max single prob <= 0.40;
-  plus  sampling consistency: ancestral samples with the source revealed obey the rule >= 0.95.
-Reported but NOT gated: reverse consistency — with nothing revealed, canonical-order sampling draws
-tera0 BEFORE item3, so rule-consistent (item3, tera0) pairs require the learned REVERSE conditional
-p(item3 | tera0): the strongest joint-structure statistic here.
-
-RUNG 1 (memorization sanity, POOL-A style) — 8 fixed teams SHARING the 6 species, uniform team
-draws, the same reveal process. Gate: model chain CE within 0.10 nats of the EXACT mixture floor
-(the true 8-team posterior conditional, computed per tail order), sampled teams are members of the
-set (>= 0.95), and a uniquely-identifying reveal (all 6 items) makes samples reproduce the full
-90-attribute team exactly (>= 0.95).
-
-Everything runs on the real BeliefModel (small dims) with belief_context = 0 — the synthetic world has no
-dynamics, so conditioning can only come from the prefix/tail tokens, which is precisely what is
-under test. Training mirrors ppo.py: BOTH the marginal (pass-A) and chain (pass-B) CE terms every
-step (§4.5, decision 2). This is load-bearing for the eval — the probe, the fallback read, and
-sample_team all query the pass-A canonical forward, so without the marginal term pass A is OOD and
-reads a hedged conditional even when the chain has learned the rule (measured: chain-only leaves the
-probe at p(rule)≈0.28 with 100% argmax). Data is sampled fresh every step (infinite data): the fixed
-eval set is held out by construction. Per §3.7 sequencing, re-run this gate after the §3.4 EV-native
-surgery to confirm the 109-token chain still conditions.
-
-Run (defaults are the gate):
     python -m fog.eval.belief_conditioning --rung 2
     python -m fog.eval.belief_conditioning --rung 1
-Writes runs/belief_conditioning/rung<k>_seed<s>.json (config + references + series + verdict);
-exit code 0 iff the gate passed.
 
-OPTION-(c) ABLATION (§3.7 owner decision). `--tail-order canonical` trains AND evaluates the chain
-in a FIXED left-to-right tail instead of the any-order random tail, for BOTH rungs. Motivation: the
-random tail is trained by neither the marginal term (canonical zero-fill) nor a regime matching
-`sample_team`, which walks CANONICAL order with progressive fill — so ancestral sampling sits in an
-untrained regime and hedges (measured sample fidelity 0.295 = exp(-1.214)). A canonical chain trains
-exactly the conditionals `sample_team` traverses (each hidden attr conditions on the prefix reveals
-plus earlier-canonical tail tokens; later tokens are causally masked in both training and sampling),
-so this ablation tests whether sampling SHARPENS. It gives up the any-order property (a HIDDEN source
-later in canonical order can no longer inform an earlier dependent through the tail — reveal-based
-conditioning survives, it lives in the bidirectional prefix); the `conditions_on_forced_tail` check is
-therefore N/A here (its bin is empty by construction). Writes ..._canonical.json so both arms persist.
-"""
+Reports contain configuration, reference values, metric series, and gate results
+under runs/belief_conditioning/. Exit status is zero when the gate passes."""
 from __future__ import annotations
 
 import argparse

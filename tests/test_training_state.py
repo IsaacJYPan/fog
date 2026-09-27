@@ -26,7 +26,9 @@ def _setup(tmp_path: Path):
     agent = torch.nn.Linear(3, 2)
     optimizer = torch.optim.AdamW(agent.parameters(), lr=0.01)
     loss = agent(torch.ones(1, 3)).sum()
-    loss.backward(); optimizer.step(); optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
     return SimpleNamespace(
         cfg={"seed": 9, "ppo": {"total_decisions": 100}, "log": {"dir": str(tmp_path)}},
         device=torch.device("cpu"),

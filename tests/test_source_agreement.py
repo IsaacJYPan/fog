@@ -1,10 +1,11 @@
-"""Exact-vs-sampled agreement (SEARCH_PLAN §6): aggregation math and the paired-measurement
-protocol on real engine games."""
+"""Compare exact and sampled search decisions on paired engine games."""
 from __future__ import annotations
 
 import pytest
 
+from fog.env.engine_battle import HAVE_ENGINE
 from fog.eval.source_agreement import aggregate_agreement
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 
 # ------------------------------------------------------------------------------- aggregation
@@ -26,8 +27,6 @@ def test_aggregate_agreement_per_k_and_buckets():
 
 
 # ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 

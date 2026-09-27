@@ -1,4 +1,4 @@
-"""Validate + package the PoC team pools (spec §4.4).
+"""Validate + package the PoC team pools.
 
 Team pastes live as .txt files under data/teams/pool_{a,b}/ (hand-authored). This script validates
 every team against the PINNED simulator (the legality oracle — a rejected team hangs battles) and

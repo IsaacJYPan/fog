@@ -1,4 +1,4 @@
-"""poke-engine implementations of the determinized-search `step_fn` contract (spec §8).
+"""poke-engine implementations of the determinized-search `step_fn` contract.
 
 Two steppers, one contract (`(action_idx, world_tokens) -> Observation | float | None`), one shared
 leaf-play core (`_play_one_ply`):

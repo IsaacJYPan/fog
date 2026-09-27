@@ -1,0 +1,39 @@
+# First GPU continuation using the selected candidate imputer. No automatic promotion.
+version: 1
+name: gen9ou_candidates_kaggle
+output_dir: runs/gen9ou_candidates_gpu
+base_config: configs/gen9ou_typed_token_selfplay.yaml
+initial_checkpoint: artifacts/checkpoints/typed_dagger_2048.pt
+initial_league_checkpoints: []
+bundle_inputs:
+  - runs/gen9ou_candidates_kaggle_v1
+training:
+  blocks: 1
+  decisions_per_block: 24000
+  batch_decisions: 4096
+  checkpoint_every_decisions: 4096
+  minibatch_size: 512
+  epochs: 1
+  lr: 1.0e-5
+  clip: 0.05
+  seed: 20260920
+  tensorboard: true
+evaluation:
+  enabled: false
+safety:
+  auto_refresh: true
+  games: 5
+  device: cuda
+  replay_audit_config: configs/gen9ou_typed_token_kaggle_audit.yaml
+overrides:
+  device: cuda
+  env.team_pool: data/teams/public_regeneration_splits/train.json
+  env.rollout_workers: 2
+  env.actor_threads: 1
+  ppo.games_per_chunk: 4
+  replay_policy.manifest: runs/gen9ou_candidates_kaggle_v1/train_manifest.parquet
+  replay_policy.batch_size: 256
+  bc.manifest: runs/gen9ou_candidates_kaggle_v1/train_manifest.parquet
+  bc.holdout_manifest: runs/gen9ou_candidates_kaggle_v1/holdout_manifest.parquet
+  preflight.report: runs/gen9ou_candidates_gpu/audits/direct/summary.json
+  preflight.replay_report: runs/gen9ou_candidates_gpu/audits/replay/summary.json

@@ -1,4 +1,4 @@
-"""Download Smogon chaos usage files for the pinned month and build derived tables (spec §4.1).
+"""Download Smogon chaos usage files for the pinned month and build derived tables.
 
 Produces, under the constants generated dir + data/usage/:
   * data/usage/gen9ou-<rating>-<month>.json  -- raw chaos file (immutable cache)

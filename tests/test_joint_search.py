@@ -1,11 +1,10 @@
-"""Joint sampled counterfactual search (SEARCH_PLAN §4): the pure regret-matching core (the
-bluff test IS the method's defining property), posterior math, the posterior-features head input,
-own-world forks, own-state sources, and end-to-end engine decisions."""
+"""Joint-search regret matching, posterior updates, and engine-backed decisions."""
 from __future__ import annotations
 
 import numpy as np
 import pytest
 
+from fog.env.engine_battle import HAVE_ENGINE
 from fog.search.joint import (
     _floor_mix,
     action_posteriors,
@@ -130,7 +129,6 @@ def test_agent_flag_wires_posterior_dim():
 
 
 # ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 

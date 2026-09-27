@@ -1,22 +1,14 @@
-"""Training stage 2 — self-play PPO (spec §6).
+"""Self-play PPO training with auxiliary belief losses.
 
-PPO: clip 0.2, GAE λ=0.95, γ=1.0 (episodic win/loss ±1; optional +0.02 per opposing faint, off by
-default), entropy bonus 0.01 decayed, value coef 0.5, batch 16k decision points, 3 epochs/batch,
-lr 1e-4. Auxiliary belief/self-belief losses continue with FULL oracle labels (simulator provides both
-teams). KL-to-BC-anchor penalty 0.02 for the first 2M decisions, annealed to 0.
-
-Watch the §6 diagnostics dashboard from day one: win-rate vs each frozen league member; entropy per
-turn-bucket; belief accuracy vs turn number (MUST be monotone increasing within games); value
-calibration; tera-usage fraction; average game length.
-
-`train` runs the full rollout <-> update loop: league opponent sampling -> live battles into a
-RolloutBuffer -> GAE -> `ppo_update` -> league snapshots + checkpoints (+ the §7 leakage machinery
-when leakage.beta > 0).
-"""
+`train` samples league opponents, collects live battles into a RolloutBuffer,
+computes GAE, updates the model, and saves league snapshots and checkpoints.
+Belief supervision uses simulator team labels. Optional leakage shaping runs
+when leakage.beta > 0; configuration controls PPO and auxiliary-loss weights."""
 from __future__ import annotations
 
 import argparse
 import math
+from functools import wraps
 
 import numpy as np
 import torch
@@ -65,8 +57,7 @@ def _chain_probability_metrics(output, attr_valid: dict) -> dict[str, float]:
     """Calibration of the randomly addressed replay query, including the no-uncertainty cut.
 
     ``last`` means every other recoverable hidden fact on that row was supplied as a generated
-    assumption.  It is the direct overfit diagnostic requested for the arbitrary-query chain:
-    once its labeled context leaves one target, the true value should approach probability one.
+    assumption. With only one target left, its true-value probability should approach one.
     """
     if output.loss_valid is None:
         return {}
@@ -112,6 +103,21 @@ def _chain_probability_metrics(output, attr_valid: dict) -> dict[str, float]:
     return result
 
 
+def _deterministic_policy_update(fn):
+    """Disable dropout, not gradients; restore the caller's per-module modes on exit."""
+    @wraps(fn)
+    def wrapped(agent, *args, **kwargs):
+        modes = [(module, module.training) for module in agent.modules()]
+        agent.eval()
+        try:
+            return fn(agent, *args, **kwargs)
+        finally:
+            for module, training in modes:
+                module.training = training
+    return wrapped
+
+
+@_deterministic_policy_update
 def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None) -> dict:
     """One PPO update over a collected batch (spec §6): 3 epochs of minibatches, clip 0.2.
 
@@ -143,6 +149,9 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     preview_coef = loss_cfg.get("preview_coef", 0.5)
     kl_anchor_coef = ppo_cfg.get("kl_anchor_coef", 0.0)
     max_grad_norm = ppo_cfg.get("max_grad_norm", 0.5)
+    target_kl = ppo_cfg.get("target_kl")
+    if target_kl is not None and (not math.isfinite(float(target_kl)) or target_kl <= 0):
+        raise ValueError("ppo.target_kl must be finite and positive")
     rollout_temperature = float(ppo_cfg.get("rollout_temperature", 1.0))
     if not np.isfinite(rollout_temperature) or rollout_temperature <= 0:
         raise ValueError("ppo.rollout_temperature must be finite and positive")
@@ -153,12 +162,15 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     from fog.env.player import _behavior_log_probs, _temperature_log_probs
 
     # preview rows are per-GAME, not per-decision — handled outside the minibatch permutation
-    preview = batch.pop("preview", None)
+    preview = batch.get("preview")
+    batch = {key: value for key, value in batch.items() if key != "preview"}
 
     n = batch["actions"].shape[0]
     device = batch["actions"].device
     adv = batch["advantages"]
-    adv = (adv - adv.mean()) / (adv.std() + 1e-8)
+    if n == 0:
+        raise ValueError("cannot update PPO from an empty batch")
+    adv = (adv - adv.mean()) / (adv.std(unbiased=False) + 1e-8)
 
     from fog.training.losses import (  # local import: avoid cycles at module load
         belief_loss,
@@ -254,11 +266,15 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 )
             print(f"[ppo-drop-debug] {key} {decoded}", flush=True)
 
+    stopped_for_kl = False
+    optimizer_steps = 0
     for _ in range(epochs):
         perm = torch.randperm(n, device=device)
         for start in range(0, n, minibatch_size):
             idx = perm[start : start + minibatch_size]
             mb = _index_nested(batch, idx)
+            # Evaluation mode is the behavior policy. Chain supervision remains explicit.
+            mb["compute_belief_chain"] = True
             mb_adv = adv[idx]
 
             out = agent(mb)
@@ -272,6 +288,20 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             ).squeeze(1)
 
             ratio = (new_log_probs - mb["old_log_probs"]).exp()
+            log_ratio = new_log_probs - mb["old_log_probs"]
+            sampled_kl = (torch.expm1(log_ratio) - log_ratio).mean()
+            old_distribution = mb.get("behavior_log_probs")
+            policy_kl = (
+                _masked_kl(old_distribution, behavior_log_probs).mean()
+                if old_distribution is not None else sampled_kl
+            )
+            if not torch.isfinite(policy_kl):
+                raise FloatingPointError("nonfinite PPO behavior-policy KL")
+            log("policy_kl", policy_kl)
+            log("sampled_kl", sampled_kl)
+            if target_kl is not None and float(policy_kl.detach()) > float(target_kl):
+                stopped_for_kl = True
+                break
             surr1 = ratio * mb_adv
             surr2 = torch.clamp(ratio, 1.0 - clip, 1.0 + clip) * mb_adv
             policy_loss = -torch.min(surr1, surr2).mean()
@@ -368,11 +398,27 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                     loss = loss + replay_loss
                     for replay_name, replay_value in replay_metrics.items():
                         log(replay_name, replay_value)
+                    if ppo_cfg.get("gradient_diagnostics", False):
+                        from fog.training.diagnostics import gradient_comparison
+
+                        replay_nll = replay_regularizer.last_policy_loss
+                        if replay_nll is not None:
+                            for key, value in gradient_comparison(
+                                policy_loss, replay_nll, agent.parameters(), replay_regularizer.coef
+                            ).items():
+                                log(key, value)
+                    replay_regularizer.last_policy_loss = None
 
             optimizer.zero_grad(set_to_none=True)
+            if not torch.isfinite(loss):
+                raise FloatingPointError("nonfinite PPO loss; optimizer step refused")
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(agent.parameters(), max_grad_norm)
+            grad_norm = torch.nn.utils.clip_grad_norm_(
+                agent.parameters(), max_grad_norm, error_if_nonfinite=True
+            )
+            log("grad_norm", grad_norm)
             optimizer.step()
+            optimizer_steps += 1
 
             with torch.no_grad():
                 log("loss", loss)
@@ -382,6 +428,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 log("approx_kl", (mb["old_log_probs"] - new_log_probs).mean())
                 log("clip_frac", ((ratio - 1.0).abs() > clip).float().mean())
 
+        if stopped_for_kl:
+            break
         # team-preview bandit (§3.1): one clipped-surrogate step per epoch over all preview rows.
         # Reward = game outcome; baseline = batch mean outcome (variance reduction).
         if preview is not None and preview_coef > 0:
@@ -397,12 +445,18 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             pv_s1 = pv_ratio * pv_adv
             pv_s2 = torch.clamp(pv_ratio, 1.0 - clip, 1.0 + clip) * pv_adv
             pv_loss = -torch.min(pv_s1, pv_s2).mean() * preview_coef
+            if not torch.isfinite(pv_loss):
+                raise FloatingPointError("nonfinite PPO preview loss")
             optimizer.zero_grad(set_to_none=True)
             pv_loss.backward()
-            torch.nn.utils.clip_grad_norm_(agent.parameters(), max_grad_norm)
+            torch.nn.utils.clip_grad_norm_(
+                agent.parameters(), max_grad_norm, error_if_nonfinite=True
+            )
             optimizer.step()
             log("preview_loss", pv_loss)
 
+    log("stopped_for_kl", float(stopped_for_kl))
+    log("optimizer_steps", optimizer_steps)
     return {k: sum(v) / len(v) for k, v in metrics.items()}
 
 
@@ -577,7 +631,8 @@ class _TrainSetup:
                 "sampled pool teams (recording teambuilder / attribute match)."
             )
 
-        self.agent = FogAgent.from_tables(cfg).to(self.device)
+        # Single-worker collection uses this model directly. Autograd is independent of mode.
+        self.agent = FogAgent.from_tables(cfg).to(self.device).eval()
         if self.ppo_cfg.get("init_ckpt") and self.ppo_cfg.get("resume_ckpt"):
             raise ValueError("ppo.init_ckpt and ppo.resume_ckpt are mutually exclusive")
         # ppo.init_ckpt: warm-start the agent's weights from a saved state dict (resume after an
@@ -767,6 +822,9 @@ class _TrainSetup:
                 f"[resume] exact training state restored at {self.decisions_seen} decisions",
                 flush=True,
             )
+        from fog.training.diagnostics import tera_bonus_at
+
+        self.rollout_tera_logit_bonus = tera_bonus_at(self.ppo_cfg, self.decisions_seen, self.total)
 
 
 def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str | None:
@@ -785,6 +843,8 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     frac = min(1.0, s.decisions_seen / max(1, s.total))
     step_cfg = dict(s.cfg)
     step_ppo = dict(s.ppo_cfg)
+    # This exact value was held fixed for the entire collected batch.
+    step_ppo["rollout_tera_logit_bonus"] = s.rollout_tera_logit_bonus
     step_ppo["entropy_coef"] = s.entropy0 + (s.entropy_decay_to - s.entropy0) * frac
     step_ppo["kl_anchor_coef"] = (
         s.ppo_cfg.get("kl_anchor_coef", 0.02)
@@ -818,6 +878,11 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     metrics.update(_belief_accuracy_vs_turn(s.agent, batch))
     s.buf.clear()
     s.decisions_seen += n
+    from fog.training.diagnostics import tera_bonus_at
+
+    s.rollout_tera_logit_bonus = tera_bonus_at(s.ppo_cfg, s.decisions_seen, s.total)
+    if hasattr(phi_owner, "tera_logit_bonus"):
+        phi_owner.tera_logit_bonus = s.rollout_tera_logit_bonus
 
     # The rule player's choice is a safety prior, not a permanent hard override.  Annealing it
     # between batches lets the learned scorer make evidence-backed deviations while the frozen
@@ -885,8 +950,9 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         from fog.training.training_state import save_training_state
 
         path = s.ckpt_dir / f"ppo_{s.decisions_seen}.pt"
-        s.league.past_ckpts.append(path)
-        s.league.latest_ckpt = path
+        if not s.cfg.get("league", {}).get("freeze_history", False):
+            s.league.past_ckpts.append(path)
+            s.league.latest_ckpt = path
         s.next_snapshot += s.snap_every
         save_training_state(s, path)
     return "updated"
@@ -1302,7 +1368,8 @@ class _ShowdownRolloutWorker:
         from fog.env.showdown_local_runner import play_local_battle
         from fog.training.rollout import RolloutBuffer
 
-        assigned, opponent_spec = payload
+        assigned, opponent_spec, tera_bonus = payload
+        self.adapter.tera_logit_bonus = float(tera_bonus)
         gamma, lam, beta, clip_deltas, progress_coef = self.rollout_settings
         local_buf = RolloutBuffer(
             gamma=gamma,
@@ -1387,7 +1454,9 @@ def _train_showdown_direct(cfg: dict) -> dict:
 
     s = _TrainSetup(cfg, scripted=scripted, require_pool=True)
     assert s.pool_teams is not None
-    rng = s.rng
+    from fog.training.diagnostics import direct_rng_streams
+
+    rng, opponent_rng = direct_rng_streams(s)
     worker_count = int(s.env_cfg.get("rollout_workers", 1))
     if worker_count < 1:
         raise ValueError("env.rollout_workers must be >= 1")
@@ -1538,7 +1607,7 @@ def _train_showdown_direct(cfg: dict) -> dict:
             ]
         client = clients[0] if clients else None
         while s.decisions_seen < s.total:
-            opp_spec = s.league.sample_opponent(rng, decisions_seen=s.decisions_seen)
+            opp_spec = s.league.sample_opponent(opponent_rng, decisions_seen=s.decisions_seen)
             opp_name = str(opp_spec) if str(opp_spec) in supported else Path(str(opp_spec)).stem
             if worker_count == 1:
                 assert client is not None
@@ -1585,11 +1654,20 @@ def _train_showdown_direct(cfg: dict) -> dict:
                         )
                     )
                 assignments = partition_games(games, worker_count)
+                # Preserve the actual exogenous schedule and behavior intervention for attribution.
+                import json
+                from dataclasses import asdict
+
+                with (s.ckpt_dir.parent / "rollout_schedule.jsonl").open("a", encoding="utf-8") as stream:
+                    for game in games:
+                        stream.write(json.dumps({**asdict(game), "opponent": str(opp_spec),
+                            "learner_decisions": s.decisions_seen,
+                            "tera_bonus": s.rollout_tera_logit_bonus}) + "\n")
                 if worker_mode == "process":
                     assert process_pool is not None
                     worker_results = process_pool.map(
                         [
-                            (assigned, str(opp_spec))
+                            (assigned, str(opp_spec), s.rollout_tera_logit_bonus)
                             for assigned in assignments
                         ]
                     )
@@ -1771,7 +1849,8 @@ def _belief_accuracy_vs_turn(agent, batch: dict, max_rows: int = 512) -> dict:
         return {}
     n = batch["turn"].shape[0]
     idx = torch.randperm(n, device=batch["turn"].device)[: min(n, max_rows)]
-    sub = _index_nested(batch, idx)
+    # Preview tensors have one row per game, not one row per decision.
+    sub = _index_nested({key: value for key, value in batch.items() if key != "preview"}, idx)
     with torch.no_grad():
         out = agent(sub)
     if out.belief is None:

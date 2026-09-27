@@ -1,4 +1,4 @@
-"""Self-play league opponent sampling (spec §6). Standard defense against strategy cycling.
+"""Self-play league opponent sampling. Standard defense against strategy cycling.
 
 Opponent sampled: 50% latest checkpoint, 35% uniform past checkpoints (snapshot every 200k decisions),
 15% scripted (Max-Damage, SimpleHeuristics).

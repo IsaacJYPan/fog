@@ -64,7 +64,7 @@ def test_evaluation_summary_flips_parent_head_to_head():
     }
     summary = summarize_evaluation(report)
     assert summary["candidate_head_to_head_win_rate"] == 34 / 64
-    assert summary["recommend_viewer_update"] is True
+    assert summary["recommend_viewer_update"] is False  # aggregate-only screen is not promotion evidence
 
 
 def test_viewer_recommendation_rejects_benchmark_regression():

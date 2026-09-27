@@ -231,10 +231,6 @@ def test_public_state_pretraining_does_not_learn_from_human_action_slots():
     assert torch.equal(loss_a, loss_b)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="rollout batches do not yet retain a per-row game id",
-)
 def test_rollout_batch_retains_game_ids_for_held_out_evaluation():
     """Readability rows need their battle identity so whole battles can be held out."""
     buf = RolloutBuffer()
@@ -255,10 +251,6 @@ def test_rollout_batch_retains_game_ids_for_held_out_evaluation():
     assert batch["game_id"].tolist() == [0, 0, 1, 1]
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="readability split_probe_games has not been implemented",
-)
 def test_readability_split_never_places_one_game_in_multiple_splits():
     """Probe training, validation, and test rows must come from disjoint battles."""
     from fog.eval.readability import split_probe_games

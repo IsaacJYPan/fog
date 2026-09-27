@@ -1,67 +1,19 @@
-"""Public-belief value network: strategy-dependent leaf evaluation for two-sided search.
+"""Public-belief value network for two-sided search.
 
-WHAT THIS REPLACES. The interim leaf evaluator (fog/search/pb_values.py) reused the policy's small
-value head with four scalar posterior features. Four numbers cannot say WHICH candidate teams retain
-probability, and the head must re-run every solver iteration because its scalar output moves with the
-posterior. This module reads the full K x J belief
-and each candidate team's identity, and — crucially — emits a value for EVERY candidate pair at
-once.
+Returns V[leaf, k, j], the expected continuation payoff for each candidate-team
+pair under the supplied joint belief rho[leaf, k, j]. Values use our perspective
+and are tanh-bounded to (-1, 1); the opponent's payoff is their negation.
 
-THE OUTPUT SHAPE IS THE COST DECISION (§9.2, settled). During one real decision the solver runs
-hundreds of regret iterations; each iteration moves both strategies, hence the action-conditioned
-posterior at every cached leaf (§5.1: same leaf observation, different iteration, different belief).
-A single-scalar value would demand repeated belief-dependent evaluation for every pair. Instead the
-public-leaf and candidate encoders run once per decision, while the belief-dependent message rounds
-and pair head return the table
+Public-leaf and candidate encoders run once per decision. Belief-weighted
+bipartite messages couple the candidate teams before the pair head scores them.
+`forward_cached` refreshes these messages and scores when the solver's belief
+changes, reusing the encoded leaves and teams. Holding scores fixed across
+iterations is an approximation because continuation values depend on belief.
 
-    V[leaf, k, j] = our expected continuation payoff from this leaf IF the true teams are (k, j),
-                    under the belief the network was conditioned on.
-
-The simulated cell for private pair `(k, j)` receives `V[leaf, k, j]`. The two-sided solver later
-performs the single required average over the other player's possible private types. Averaging the
-table inside the bridge as well would use the belief twice and destroy type-specific decisions.
-
-The bridge may hold `V` fixed for N solver calls. Because a pair's true continuation value also
-depends on the belief carried into the leaf, that table drifts stale as strategies move. Refreshing
-every iteration is the correctness reference. Crucially, a refresh calls `forward_cached`: it reruns
-only the belief-dependent messages and pair head, not the cached public/candidate encoders.
-
-THE SEVEN REQUIRED PROPERTIES (§9.1), and where each lives here:
-
-  1. Reads the shared public-state representation and explicit current state.
-        -> `private_state` and derived `public_context` per leaf, projected into `ctx`. These
-           are exactly the backbone outputs the policy head consumes (agent.head_inputs), so the
-           expensive trunk pass over the leaf set is shared, not duplicated (invariant 19.13).
-  2. Reads individual embeddings for the K own-state and J opponent-state candidates.
-        -> `TeamEncoder` embeds each candidate team's 6x9 attribute grid into one token. Own and
-           opponent candidates are encoded ONCE per decision (shared across all leaves).
-  3. Reads the complete K x J belief weights.
-        -> `rho[L, K, J]` drives the bipartite messages (own<->opp) AND is available to the pair
-           head. This is the coupling channel: change rho, and V changes.
-  4. Represents different continuation values for different private types where required.
-        -> the head emits an independent scalar per (k, j); nothing averages types away inside.
-  5. Permutation-invariant to particle storage order.
-        -> teams carry identity through their token CONTENT, never position (mirrors belief.py's
-           "identity is explicit, not positional"); the message passing is order-equivariant; the
-           head is applied per pair. Permuting the K (or J) particles permutes V's k- (or j-) axis
-           identically. Pinned by tests/test_pb_value.py.
-  6. Does NOT independently solve each private-state pair as a perfect-information game.
-        -> a bare per-pair MLP would; the coupling comes from the message-passing rounds, where each
-           own token mixes in the opponent set weighted by rho (and vice versa) before the head sees
-           it. The pair value therefore depends on the whole candidate field and the joint belief,
-           not just its own two teams.
-  7. Batchable over the large leaf set search creates.
-        -> teams encode once [K, d] / [J, d]; leaves broadcast over the L axis; one forward scores
-           all leaves x all pairs.
-
-VALUE CONVENTION. Output is OUR-perspective continuation payoff, `tanh`-bounded to (-1, 1) to match
-the zero-sum terminal-payoff convention the grid stores in `terminal_value` (win = +1, loss = -1).
-The opponent's value is the negation; the solver's `values_fn` uses this network's output directly as
-`u`'s continuation entries.
-
-This module is engine-free and self-contained: it takes tensors and returns a tensor, so every
-property above is testable on hand-built inputs without a battle (tests/test_pb_value.py).
-"""
+The solver averages over private types. The value bridge must retain the full
+pair table to avoid applying belief weights twice. Candidate permutations
+permute the corresponding output axes; candidate positions carry no identity.
+See tests/test_pb_value.py for tensor-only checks of these contracts."""
 from __future__ import annotations
 
 from dataclasses import dataclass

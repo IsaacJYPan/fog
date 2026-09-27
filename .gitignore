@@ -14,33 +14,42 @@ __pycache__/
 .pytest_tmp*/
 /.tools/
 
-# Data artifacts (immutable raw + regenerable derived) — regenerate from pinned sources
+# Downloaded data and derived artifacts
 data/raw_replays/*
 data/parsed/*
 data/usage/*
 data/team_bank_cache/
+data/metamon_cache/
+data/metamon_gen9ou*/
 !data/**/.gitkeep
 
-# Team pools: the hand-built PASTES are irreplaceable experiment definitions — TRACKED.
-# Only the derived packaged banks (regenerable via fog.scripts.build_team_pools) stay out.
+# Keep team pastes; ignore packages that can be rebuilt from them.
 data/teams/*.json
 data/teams/public_*/
 data/teams/gen9ou_public_v*/
-# ... except the generative bank's package: its _meta IS the provenance record (seed, mass cut,
-# core, per-slot entropy report) for the committed pool_gen pastes.
+# This package contains the generation metadata for the committed pool_gen pastes.
 !data/teams/pool_gen.json
-
-# Generated constants are TRACKED (small JSON, pinned provenance: Showdown commit + usage month in
-# configs/default.yaml::pins). Committing them removes a regeneration failure mode — the
-# "_meta commit unknown" bridge bug already bit once.
-
-# Simulator checkout is a real submodule pinned to the same commit recorded in default.yaml.
-# Build products and local logs belong inside the submodule and must never change its gitlink.
 
 # Training artifacts
 runs/
 /checkpoints/
 /artifacts/*.zip
+/artifacts/fog-kaggle-*.sha256
+/artifacts/fog-kaggle-*.verification.json
+
+# Account settings, credentials, and local experiment notes.
+/configs/kaggle_results.json
+/configs/automated_gen9ou_candidates_300k.yaml
+.kaggle/
+kaggle.json
+.env
+.env.*
+!.env.example
+/docs/research-audit-*.md
+/docs/research-improvement-plan.md
+/docs/research-improvements-*.md
+/docs/candidates-300k-plan.md
+/docs/kaggle-trial.md
 *.ckpt
 *.pt
 !artifacts/checkpoints/*.pt

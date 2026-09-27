@@ -1,4 +1,4 @@
-"""Evaluation entry point (spec §9): gauntlet, oracle-gap closure, readability, L-vs-N, ablations.
+"""Evaluation entry point: gauntlet, oracle-gap closure, readability, L-vs-N, ablations.
 
     # gauntlet + closure (default)
     python -m fog.eval.run_eval --config configs/eval_ou.yaml --ckpt runs/.../ppo_final.pt

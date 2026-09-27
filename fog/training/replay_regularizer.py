@@ -115,6 +115,7 @@ class ReplayPolicyRegularizer:
         self.remaining = int(state.get("remaining", 0))
 
     def loss(self, agent) -> tuple[torch.Tensor, dict[str, float]] | None:
+        self.last_policy_loss = None
         if self.remaining <= 0:
             return None
         self.remaining -= 1
@@ -140,6 +141,7 @@ class ReplayPolicyRegularizer:
             if not bool(valid.any()):
                 raise RuntimeError("replay policy batch contains no finite valid decisions")
             nll = chosen[valid].mean()
+            self.last_policy_loss = nll
             top1 = (
                 out.log_probs.argmax(-1)[valid] == batch["action"][valid]
             ).float().mean()

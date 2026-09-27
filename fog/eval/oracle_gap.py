@@ -1,4 +1,4 @@
-"""Oracle-gap headline metric (spec §9).
+"""Oracle-gap headline metric.
 
     closure = (N_agent − blind_reactive) / (set_oracle − blind_reactive)
 

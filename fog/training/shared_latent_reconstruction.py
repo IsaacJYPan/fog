@@ -439,7 +439,8 @@ def _raw_loss(
         truth = target[..., offset : offset + width]
         if kind == "categorical" and categorical_cross_entropy:
             value = F.cross_entropy(block.flatten(0, -2), truth.argmax(-1).flatten())
-            losses.append(value); per_field.append(value)
+            losses.append(value)
+            per_field.append(value)
         elif linear_exact_values:
             element = (block - truth).square()
             value = _weighted_mean(element, truth, rare_value_weight)
@@ -450,7 +451,8 @@ def _raw_loss(
             )
         elif kind == "categorical":
             value = F.cross_entropy(block.flatten(0, -2), truth.argmax(-1).flatten())
-            losses.append(value); per_field.append(value)
+            losses.append(value)
+            per_field.append(value)
         elif kind == "binary":
             element = F.binary_cross_entropy_with_logits(block, truth, reduction="none")
             value = _weighted_mean(element, truth, rare_value_weight)
@@ -1034,7 +1036,8 @@ def run(args: argparse.Namespace) -> dict:
         ) < fraction
         present = entity_ids[..., 0] != 0
         entity_mask &= present
-        own_mask = entity_mask.clone(); own_mask[:, 6:] = False
+        own_mask = entity_mask.clone()
+        own_mask[:, 6:] = False
         if args.direct_input_control:
             identity_masks = {
                 field_index: entity_mask
@@ -1314,7 +1317,8 @@ def run(args: argparse.Namespace) -> dict:
         return augmented
 
     def evaluate(dataset: TensorObservationDataset) -> dict:
-        agent.eval(); decoder.eval()
+        agent.eval()
+        decoder.eval()
         totals = {
             "loss": 0.0, "batches": 0, "rows": 0,
             "raw_sq": 0.0, "raw_target_sum": 0.0, "raw_target_square": 0.0,
@@ -1357,7 +1361,8 @@ def run(args: argparse.Namespace) -> dict:
                     priority_raw_weight=args.priority_raw_weight,
                 ))
                 totals["batches"] += 1
-                rows = int(batch["entities"].shape[0]); totals["rows"] += rows
+                rows = int(batch["entities"].shape[0])
+                totals["rows"] += rows
                 for name, target_name in (("raw", "entities"), ("field", "field")):
                     target = batch[target_name]
                     error = predicted[name] - target
@@ -1526,19 +1531,26 @@ def run(args: argparse.Namespace) -> dict:
         return report
 
     rows: list[dict] = []
-    best_score = float("-inf"); best_recovery_score = float("-inf")
-    best_agent = None; best_decoder = None; best_local_decoder = None
-    stale = 0; selection_phase = None
+    best_score = float("-inf")
+    best_recovery_score = float("-inf")
+    best_agent = None
+    best_decoder = None
+    best_local_decoder = None
+    stale = 0
+    selection_phase = None
     if args.epochs == 0:
         if args.decoder_checkpoint is None:
             raise ValueError("--epochs 0 requires --decoder-checkpoint for evaluation-only use")
         best_agent = copy.deepcopy(agent.state_dict())
         best_decoder = copy.deepcopy(decoder.state_dict())
     for epoch in range(args.epochs):
-        agent.train(); decoder.train()
+        agent.train()
+        decoder.train()
         if local_decoder is not None:
             local_decoder.train()
-        running = 0.0; running_local = 0.0; batches = 0
+        running = 0.0
+        running_local = 0.0
+        batches = 0
         source_batches = (
             (fixed_overfit_batch for _ in range(args.max_train_batches or 100))
             if fixed_overfit_batch is not None
@@ -1650,7 +1662,8 @@ def run(args: argparse.Namespace) -> dict:
                     break
             if args.max_train_batches and batches >= args.max_train_batches:
                 break
-        team = evaluate(datasets["team_holdout"]); battle = evaluate(datasets["battle_holdout"])
+        team = evaluate(datasets["team_holdout"])
+        battle = evaluate(datasets["battle_holdout"])
         overfit = evaluate(fixed_overfit_dataset) if fixed_overfit_dataset is not None else None
         recovery_score = (
             float(overfit["minimum_recovery"])
@@ -1685,9 +1698,12 @@ def run(args: argparse.Namespace) -> dict:
         if overfit is not None:
             row["overfit_minimum_recovery"] = overfit["minimum_recovery"]
             row["overfit_loss"] = overfit["loss"]
-        rows.append(row); print(f"[shared-latent-reconstruction] {row}", flush=True)
+        rows.append(row)
+        print(f"[shared-latent-reconstruction] {row}", flush=True)
         with (args.out / "metrics.csv").open("w", newline="", encoding="utf-8") as stream:
-            writer = csv.DictWriter(stream, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+            writer = csv.DictWriter(stream, fieldnames=list(rows[0]))
+            writer.writeheader()
+            writer.writerows(rows)
         (args.out / "progress.json").write_text(
             json.dumps(
                 {
@@ -1702,7 +1718,8 @@ def run(args: argparse.Namespace) -> dict:
             encoding="utf-8",
         )
         if score > best_score + args.min_delta:
-            best_score = score; stale = 0
+            best_score = score
+            stale = 0
             best_agent = copy.deepcopy(agent.state_dict())
             best_decoder = copy.deepcopy(decoder.state_dict())
             best_local_decoder = (
@@ -1723,8 +1740,10 @@ def run(args: argparse.Namespace) -> dict:
             break
     if best_agent is None or best_decoder is None:
         raise RuntimeError("no finite shared-latent checkpoint was produced")
-    agent.load_state_dict(best_agent); decoder.load_state_dict(best_decoder)
-    team = evaluate(datasets["team_holdout"]); battle = evaluate(datasets["battle_holdout"])
+    agent.load_state_dict(best_agent)
+    decoder.load_state_dict(best_decoder)
+    team = evaluate(datasets["team_holdout"])
+    battle = evaluate(datasets["battle_holdout"])
     live_train = evaluate(live_train_dataset) if args.evaluate_live_train else None
     overfit = evaluate(fixed_overfit_dataset) if fixed_overfit_dataset is not None else None
     changed = sorted(name for name, value in best_agent.items() if _digest(value) != _digest(initial[name]))
@@ -1884,7 +1903,8 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=15)
     parser.add_argument("--min-delta", type=float, default=0.0005)
     parser.add_argument("--seed", type=int, default=20261069)
-    args = parser.parse_args(); run(args)
+    args = parser.parse_args()
+    run(args)
 
 
 if __name__ == "__main__":

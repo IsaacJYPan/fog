@@ -1,4 +1,4 @@
-"""Shared match-running harness for evaluation (spec §9).
+"""Shared match-running harness for evaluation.
 
 Runs games between FOG agents (checkpoints) and/or poke-env scripted baselines on a team pool, and
 returns win counts. Everything else in eval/ (gauntlet, elo) builds on this.

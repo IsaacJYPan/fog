@@ -1,4 +1,4 @@
-"""Runtime loader for generated constant tables (spec §1).
+"""Runtime loader for generated constant tables.
 
 Loads the versioned JSON emitted by `build.py` into frozen numpy arrays + id<->index dicts, and
 exposes the masks the belief model needs (item-usable-per-species, legal abilities, learnset).

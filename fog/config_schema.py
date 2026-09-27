@@ -25,6 +25,7 @@ _SECTION_KEYS = {
         "belief_supervision", "concurrent_battles", "engine_batch", "games_per_chunk",
         "min_team_pool_size", "no_security", "node_binary", "num_workers",
         "opponent_cache_size", "rollout_worker_mode", "rollout_worker_timeout",
+        "independent_opponent_rng",
         "rollout_workers", "server_url", "showdown_root", "team_pool",
     },
     "encoding": {
@@ -58,14 +59,18 @@ _SECTION_KEYS = {
     },
     "log": {"checkpoint_every_decisions", "dir", "halt_on_regression_sigma", "tensorboard"},
     "ppo": {
+        "target_kl",
         "batch_decisions", "bc_anchor_ckpt", "bc_anchor_rule_prior_strength", "clip",
         "entropy_coef", "entropy_coef_final", "epochs", "games_per_chunk", "gamma",
         "init_ckpt", "init_compatible", "kl_anchor_coef", "kl_anchor_decisions", "lam", "lr",
         "max_grad_norm", "minibatch_size", "resume_ckpt", "rollout_temperature",
         "rollout_tera_logit_bonus", "total_decisions", "trainable_prefixes",
+        "rollout_tera_logit_bonus_initial", "rollout_tera_logit_bonus_final",
+        "rollout_tera_logit_bonus_decay_decisions", "gradient_diagnostics",
         "trainable_lr_scales",
     },
     "league": {
+        "freeze_history",
         "latest_frac", "past_ckpts", "past_frac", "scripted", "scripted_frac",
         "snapshot_every_decisions", "warmup_decisions", "warmup_opponent",
     },
@@ -118,6 +123,7 @@ _SECTION_KEYS = {
         "decisions_per_block", "epochs", "lr", "minibatch_size", "seed", "tensorboard",
     },
     "evaluation": {
+        "promotion_family_alpha", "promotion_min_games", "champion_games", "champion_seed_offset",
         "deterioration_benchmark_regression", "deterioration_head_to_head_below", "device",
         "enabled", "format", "games", "head_to_head", "max_turns", "opponents", "pool",
         "progress_every", "seed", "viewer_max_benchmark_regression",

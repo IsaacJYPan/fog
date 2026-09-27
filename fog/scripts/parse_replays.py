@@ -1,20 +1,17 @@
-"""Replay JSON -> per-turn decision rows (spec §4.3). HIGHEST-DEFECT-RISK COMPONENT.
+"""Convert replay JSON into per-turn decision rows.
 
-Each row (from the ACTING player's perspective): the §2 observation tensors, the action label, censored
-belief labels (opponent attributes revealed by the END of the replay), the acting player's own
-eventually-revealed attributes (self-belief labels, §5), and the game outcome.
+Each row contains the acting player's observation, action, censored belief and
+self-belief labels from later public reveals, and game outcome. Two poke-env
+Battle objects track the players' perspectives through the protocol log.
 
-Built on poke-env's battle-state tracker (spec-mandated): two `Battle` objects (one per perspective)
-are driven through the public protocol log. Public replays lack the private `|request|` JSON, so
-legality masks are reconstructed from state (revealed moves + non-fainted bench) with the chosen action
-forced legal — sufficient for behavior cloning (the label is always in-support).
+Public replays lack private request messages. Legality is reconstructed from
+revealed moves and the surviving bench, with the observed action forced legal
+so the behavior-cloning target remains in support.
 
-Storage: one compressed `.npz` shard per replay under data/parsed/shards/ + a parquet manifest
-(data/parsed/manifest.parquet). BC reads the manifest and streams shards. Failures are quarantined
-(expect 2-5%; investigate if higher, §4.3).
+Output consists of compressed shards in data/parsed/shards/ and a parquet
+manifest in data/parsed/manifest.parquet. Failed replays are quarantined.
 
-    python -m fog.scripts.parse_replays --raw data/raw_replays --out data/parsed
-"""
+    python -m fog.scripts.parse_replays --raw data/raw_replays --out data/parsed"""
 from __future__ import annotations
 
 import argparse
@@ -123,7 +120,8 @@ class _PerspectiveState:
             if not bool(getattr(mon, "fainted", False))
         ]
         used_tera = any(
-            bool(getattr(mon, "terastallized", False)) for mon in team_order(self.battle)
+            bool(getattr(mon, "is_terastallized", getattr(mon, "terastallized", False)))
+            for mon in team_order(self.battle)
         )
         self.battle._can_tera = bool(
             not forced and not used_tera and getattr(active, "tera_type", None) is not None
@@ -358,7 +356,7 @@ def _own_censored_truth(battle) -> np.ndarray:
             idx = TABLES.move_index(_to_id(mid), default=None)
             if idx is not None and idx not in v.moves:
                 v.moves.append(idx)
-        if getattr(mon, "terastallized", False):
+        if getattr(mon, "is_terastallized", getattr(mon, "terastallized", False)):
             tt = getattr(mon, "tera_type", None)
             if tt is not None:
                 from fog.constants.schema import TYPE_INDEX
@@ -517,6 +515,7 @@ def parse_replay_policy_versions(
     replay_id: str,
     imputations: int = 3,
     seed: int = 0,
+    candidate_bank=None,
 ) -> dict:
     """Return filtered expert decisions under several plausible own private sheets.
 
@@ -539,9 +538,11 @@ def parse_replay_policy_versions(
     from collections import Counter
 
     from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
+    from fog.training.replay_candidates import replay_digest
 
     accepted: list[dict] = []
     filters: Counter[str] = Counter()
+    imputation_report: dict = {}
     for imputation in range(imputations):
         private_sets: dict[str, np.ndarray] = {}
         provenance: dict[str, np.ndarray] = {}
@@ -549,6 +550,12 @@ def parse_replay_policy_versions(
             private_sets[role], provenance[role] = complete_private_team(
                 revealed[role],
                 seed=stable_replay_seed(replay_id, role, imputation, seed),
+                candidate_bank=candidate_bank,
+                replay_id=replay_id,
+                log_hash=replay_digest(replay_json),
+                timestamp=int(replay_json.get("uploadtime") or 0),
+                rating=int(replay_json.get("rating") or 0),
+                diagnostics=imputation_report,
             )
         version = parse_replay(
             replay_json,
@@ -568,7 +575,8 @@ def parse_replay_policy_versions(
             row["replay_id"] = replay_id
             accepted.append(row)
             filters["accepted"] += 1
-    return {"rows": accepted, "p1_win": baseline["p1_win"], "filter_counts": dict(filters)}
+    return {"rows": accepted, "p1_win": baseline["p1_win"], "filter_counts": dict(filters),
+            "imputation_report": imputation_report}
 
 
 def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:

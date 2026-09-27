@@ -1,4 +1,4 @@
-"""Generate metagame-dependent lookup tables from the pinned Showdown data files (spec §1).
+"""Generate metagame-dependent lookup tables from the pinned Showdown data files.
 
 Pipeline: `server/dump-dex.cjs` (Node, run against the BUILT pinned pokemon-showdown checkout) dumps
 the dex to one JSON blob; the build_* functions here filter/shape it into the versioned tables under

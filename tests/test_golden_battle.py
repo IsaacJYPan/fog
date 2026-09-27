@@ -1,4 +1,4 @@
-"""The golden-battle integration test (spec §10): the full encoding stack must produce
+"""The golden-battle integration test: the full encoding stack must produce
 BYTE-IDENTICAL tensors for the committed scripted battle across refactors.
 
 Regenerate after an INTENTIONAL encoding change (and say so in the commit message):

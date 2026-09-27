@@ -1,4 +1,4 @@
-"""The assembled decision-point observation (spec §2) and the entry point that builds it.
+"""The assembled decision-point observation and the entry point that builds it.
 
 `Observation` is the contract between the parser/env (which produce it) and the model (which consumes
 it). Tensor construction from a poke-env `Battle` (or a parsed replay row) is delegated to `entities`,
@@ -174,6 +174,8 @@ class Observation:
         )
         obs.entities[:6] = own_entities
         obs.entity_ids[:6] = own_ids
+        hp = obs.entities[:, _entities.L.hp]
+        obs.entities[:, _entities.L.hp] = np.ceil(hp * 100 - 1e-5) / 100
         obs.legality_mask = np.ones(14, dtype=bool)
         return obs
 

@@ -1,53 +1,22 @@
-"""Search-policy distillation from logged expert action distributions.
+"""Distill logged search distributions into policy and value heads.
 
-Trains the policy toward the search's play and the value head toward outcomes under real
-posteriors, from either decision-log format:
+`load_decisions` reads flattened v1 logs from posterior_log; `load_v2_decisions`
+converts pb_log rows to the same column layout and drops cap-truncated games.
+For v2, posterior features summarize P(k | a) proportional to
+(sum_j rho[k, j]) * sigma1[k, a].
 
-  * **v1** (`fog.search.posterior_log`, the frozen one-sided baseline arm's log): root obs
-    flattened to columns, the search's full 14-dim distribution, the executed action's posterior
-    features, outcome, game id, turn. Loaded by `load_decisions`.
-  * **v2** (`fog.search.pb_log`, the two-sided claim-bearing arm's log): torch-saved row dicts
-    with raw Observations, `action_dist` (the solver's executed distribution — the distillation
-    target, §11 step 6), the joint rho and averaged sigmas on the solve's kept axes, outcome and
-    the `truncated` flag. Loaded by `load_v2_decisions`, which converts rows into the SAME
-    column contract v1 uses, so `distill()` itself is format-blind. v2 posterior features are
-    the four concentration features of the ACTION-CONDITIONED own posterior
-    P(k | a) ∝ (Σ_j rho[k, j]) · σ1[k, a] (the two-sided analogue of v1's executed-label
-    posterior; the opponent's simultaneous action marginalizes out because σ2 rows sum to 1);
-    rows from cap-truncated games are DROPPED (their outcome 0 is an artifact, not a draw).
+The policy minimizes KL(search || policy) with posterior features zeroed to match
+its deployment inputs. The value head fits outcomes using logged posterior
+features. `scope="heads"` freezes the trunk and belief models and caches head
+inputs. `scope="full"` also trains the backbone; belief models then need separate
+retraining because their inputs have changed.
 
-Two losses, two DIFFERENT head inputs — this asymmetry is the point:
-
-  * policy <- KL(search ‖ π) at DEPLOYMENT inputs: posterior features ZERO. The distilled policy
-    plays without search, so it must be trained at the input it will actually see — that is the
-    amortization claim (search folded into the 3.5M-param policy).
-  * value  <- outcome MSE at the LOGGED posterior features: the PBS-value trajectory (§4.2's
-    fine-tune continued on search play) — the value net keeps learning to price "what the
-    opponent now believes about me".
-
-`scope` picks the trainable parameters:
-
-  * "heads" (default) — policy+value MLPs only, trunk/belief frozen, head inputs precomputed once
-    (fast, stable, and the belief nets stay exactly consistent with the trunk they were trained
-    on). The right setting at small log sizes.
-  * "full" — backbone + heads. More capacity to express search behavior, but the belief and
-    self-belief nets are NOT retrained here, and a moving trunk shifts their inputs under them —
-    the §7 consistency loop (retrain beliefs on distilled-agent self-play, then iterate) is a
-    separate step this module deliberately does not hide. Use once logs are large enough that the
-    heads-scope KL plateaus.
-
-Holdout is split BY GAME (rows within a game share an outcome). Headline metric: held-out
-KL(search ‖ π) by turn bucket, before vs after — "KL by turn across generations" is the §7
-research result; this report is one generation's row of it. The whole module runs in eval mode
-(dropout off): distillation targets are fixed distributions, determinism beats regularization at
-these data sizes.
+Holdout splits are by game. Reports compare held-out KL by turn bucket before
+and after training. Dropout is disabled for these fixed-distribution targets.
+Posterior-blind checkpoints are zero-pad expanded by `load_posterior_agent`.
 
     python -m fog.training.distill --data runs/posterior_log_m15 \
-        --ckpt runs/value_finetune_m15/value_finetune.pt --out runs/distill_g1
-
-Blind checkpoints are zero-pad expanded on load (`value_finetune.load_posterior_agent`), but the
-natural input is the §4.2 fine-tuned checkpoint — distillation continues from it.
-"""
+        --ckpt runs/value_finetune_m15/value_finetune.pt --out runs/distill_g1"""
 from __future__ import annotations
 
 import json

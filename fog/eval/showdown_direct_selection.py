@@ -27,7 +27,7 @@ import math
 import random
 import time
 from collections.abc import Callable
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass, field, fields
 from pathlib import Path
 from typing import Any
 
@@ -57,18 +57,24 @@ class MatchResult:
     failures: int = 0
     turns: int = 0
     wall_s: float = 0.0
+    game_scores: list[float | None] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
         from fog.eval.stats import wilson_interval
 
         decisive = self.a_wins + self.b_wins
         interval = wilson_interval(self.a_wins, decisive)
+        finished = self.completed_games - self.truncated
+        true_draws = self.draws - self.truncated
         return {
             **asdict(self),
             "decisive_games": decisive,
             "a_win_rate_decisive": interval.point,
             "wilson_95_low": interval.low,
             "wilson_95_high": interval.high,
+            "finished_games": finished,
+            "true_draws": true_draws,
+            "a_score": (self.a_wins + 0.5 * true_draws) / finished if finished else None,
             "mean_turns": self.turns / self.completed_games if self.completed_games else None,
             "games_per_second": self.completed_games / self.wall_s if self.wall_s else None,
         }
@@ -87,16 +93,9 @@ def greedy_action_with_tera_bonus(log_probs: Any, tera_logit_bonus: float = 0.0)
     the bonus changes only slots 4..7, so it can reveal whether a policy has useful but suppressed
     Tera preferences without adding global sampling noise or changing model parameters.
     """
-    import torch
+    from fog.env.player import _sample_action
 
-    bonus = float(tera_logit_bonus)
-    if not math.isfinite(bonus) or bonus < 0:
-        raise ValueError("tera logit bonus must be finite and non-negative")
-    scores = log_probs
-    if bonus:
-        scores = log_probs.clone()
-        scores[..., 4:8] = scores[..., 4:8] + bonus
-    return int(torch.argmax(scores).item())
+    return _sample_action(log_probs, temperature=0, tera_logit_bonus=tera_logit_bonus)
 
 
 def validate_evaluation_temperature(value: float) -> float:
@@ -187,6 +186,8 @@ def run_match(
     start_index = result.completed_games + result.failures
     if start_index > len(schedule) or start_index % 4:
         raise ValueError("saved match row must end at a complete four-game block")
+    if len(result.game_scores) != start_index:
+        raise ValueError("legacy evaluation lacks per-game outcomes; use a new report path")
     previous_wall_s = result.wall_s
     started = time.perf_counter()
     for index in range(start_index, len(schedule)):
@@ -204,22 +205,32 @@ def run_match(
             )
         except Exception as exc:
             result.failures += 1
+            result.game_scores.append(None)
             print(f"[showdown-selection] {label} game {index} failed: {exc!r}", flush=True)
             if result.failures > max(1, len(schedule) // 5):
                 raise RuntimeError(
                     f"{result.failures}/{len(schedule)} games failed in {label!r}; "
                     "this is a defect, not evaluation noise"
                 ) from exc
+            result.wall_s = previous_wall_s + time.perf_counter() - started
+            if progress_callback is not None and (index + 1) % 4 == 0:
+                progress_callback(result)
             continue
         result.completed_games += 1
         result.turns += battle.turns
         result.truncated += int(battle.truncated)
-        if battle.p1_won is None:
+        if battle.truncated:
+            result.draws += 1  # legacy aggregate; true_draws explicitly excludes these
+            result.game_scores.append(None)
+        elif battle.p1_won is None:
             result.draws += 1
+            result.game_scores.append(0.5)
         elif battle.p1_won == game.p1_is_a:
             result.a_wins += 1
+            result.game_scores.append(1.0)
         else:
             result.b_wins += 1
+            result.game_scores.append(0.0)
         if progress_every and (index + 1) % progress_every == 0:
             print(
                 f"[showdown-selection] {label}: {index + 1}/{len(schedule)} "
@@ -322,6 +333,8 @@ def main() -> None:
                         help="declare longer games draws instead of allowing pathological stalls")
     parser.add_argument("--action-stats", action="store_true",
                         help="record passive selected/legal action-family frequencies")
+    parser.add_argument("--policy-diagnostics", action="store_true",
+                        help="save raw Tera margins and temperature-one mass with action stats")
     parser.add_argument("--resume", action="store_true",
                         help="resume --out from its last complete four-game block")
     parser.add_argument("--out", type=Path, required=True)
@@ -389,50 +402,17 @@ def main() -> None:
                 tera_logit_bonus=tera_bonus,
             )
             if args.action_stats and stats_key is not None:
-                stats = action_stats.setdefault(
-                    stats_key,
-                    {
-                        "decisions": 0,
-                        "selected_by_slot": [0] * 14,
-                        "legal_opportunities_by_slot": [0] * 14,
-                        "selected_by_family": {
-                            "ordinary_move": 0,
-                            "tera_move": 0,
-                            "switch": 0,
-                            "forced": 0,
-                        },
-                        "legal_decisions_by_family": {
-                            "ordinary_move": 0,
-                            "tera_move": 0,
-                            "switch": 0,
-                            "forced": 0,
-                        },
-                    },
-                )
+                from fog.eval.action_diagnostics import new_action_stats, record_action
 
-                def select_and_count(_battle: Any, obs: Any, out: Any) -> int:
+                stats = action_stats.setdefault(stats_key, new_action_stats())
 
+                def select_and_count(battle: Any, obs: Any, out: Any) -> int:
                     action = _sample_action(
-                        out.log_probs[0],
-                        temperature=args.temperature,
+                        out.log_probs[0], temperature=args.temperature,
                         tera_logit_bonus=tera_bonus,
                     )
-                    legal = [bool(value) for value in obs.legality_mask]
-                    stats["decisions"] += 1
-                    stats["selected_by_slot"][action] += 1
-                    for index, is_legal in enumerate(legal):
-                        stats["legal_opportunities_by_slot"][index] += int(is_legal)
-                    families = {
-                        "ordinary_move": range(4),
-                        "tera_move": range(4, 8),
-                        "switch": range(8, 13),
-                        "forced": range(13, 14),
-                    }
-                    for family, indices in families.items():
-                        stats["legal_decisions_by_family"][family] += int(
-                            any(legal[index] for index in indices)
-                        )
-                        stats["selected_by_family"][family] += int(action in indices)
+                    record_action(stats, battle, obs.legality_mask, out.log_probs[0], action,
+                                  policy_diagnostics=args.policy_diagnostics)
                     return action
 
                 player.action_override = select_and_count
@@ -457,7 +437,12 @@ def main() -> None:
         "device": str(device),
         "checkpoint_configs": checkpoint_configs,
         "checkpoint_tera_logit_bonuses": checkpoint_tera_bonuses,
-        "draws_excluded_from_win_rate": True,
+        "score_schema_version": 2,
+        "action_stats_schema_version": 2,
+        "action_stats": args.action_stats,
+        "policy_diagnostics": args.policy_diagnostics,
+        "primary_score": "win=1, genuine draw=0.5, loss=0; truncations unresolved",
+        "draws_excluded_from_win_rate": True,  # legacy decisive diagnostic only
     }
     checkpoint_map = dict(args.checkpoint)
     rows: list[dict[str, Any]] = []
@@ -470,6 +455,7 @@ def main() -> None:
                 "arguments or a new --out path"
             )
         rows = list(saved.get("rows", []))
+        action_stats.update(saved.get("action_stats", {}))
         if saved.get("current_row") is not None:
             current = match_result_from_dict(saved["current_row"])
 

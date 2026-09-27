@@ -1,4 +1,4 @@
-"""Per-turn protocol-event parsing -> history turn records + reveal-ledger feeding (spec §2.3, §4.3).
+"""Per-turn protocol-event parsing -> history turn records + reveal-ledger feeding.
 
 This is the mini-parser shared by the live player and (later) the replay parser. Input is poke-env's
 per-turn event lists (`battle.observations[turn].events`): each event is one protocol line already

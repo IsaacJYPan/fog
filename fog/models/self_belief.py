@@ -1,4 +1,4 @@
-"""Self-belief predictor — the leakage measurer (spec §3.3). Mirror of the belief model (§3.2).
+"""Self-belief predictor — the leakage measurer. Mirror of the belief model (§3.2).
 
 Identical architecture, SEPARATE weights, pointed at MY OWN team. Input: the opponent's view of me (my
 entity records with epistemic flags flipped to what THEY can see, plus the same history — history is

@@ -1,4 +1,4 @@
-"""Oracle variants — evaluation ceilings, never deployed (spec §3.4).
+"""Oracle variants — evaluation ceilings, never deployed.
 
   * Set oracle:    opponent entity records + belief tokens filled with true values, all epistemic
                    flags "known". Bounds the value of knowing the opponent's sets.

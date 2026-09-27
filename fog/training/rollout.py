@@ -1,4 +1,4 @@
-"""Rollout collection: per-game decision storage -> GAE -> one flat C4 PPO batch (spec §6, §7).
+"""Rollout collection: per-game decision storage -> GAE -> one flat C4 PPO batch.
 
 This is deliberately separated from the env loop because it is where the classic silent PPO bugs
 live (reward on the wrong step, bootstrap value at episode end, cross-game leakage, nested-dict
@@ -216,11 +216,13 @@ class RolloutBuffer:
         rets: list[np.ndarray] = []
         step_rewards: list[np.ndarray] = []
         game_outcomes: list[np.ndarray] = []
+        game_ids: list[int] = []
         belief_tok: list[np.ndarray] = []
         any_belief = False
 
-        for g in games:
+        for game_id, g in self._games.items():
             t = len(g.frags)
+            game_ids.extend([game_id] * t)
             # ΔI_t = ce[t]-ce[t+1] (readability increase) when Φ̂ CE was recorded; else stored deltas.
             # Moving-mask estimator (§7, canonical — see training.leakage.delta_information): each
             # CE sums over the attrs still hidden AT THAT measurement, so a hard reveal between t
@@ -275,6 +277,7 @@ class RolloutBuffer:
 
         batch = _stack_frags(frags, device=device)
         batch["actions"] = torch.as_tensor(actions, dtype=torch.long, device=device)
+        batch["game_id"] = torch.as_tensor(game_ids, dtype=torch.long, device=device)
         batch["old_log_probs"] = torch.as_tensor(log_probs, dtype=torch.float32, device=device)
         batch["advantages"] = torch.as_tensor(
             np.concatenate(advs), dtype=torch.float32, device=device

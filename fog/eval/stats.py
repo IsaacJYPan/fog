@@ -1,6 +1,7 @@
-"""Statistics helpers for evaluation (spec §9). Pokémon is high-variance — always report CIs.
+"""Statistics helpers for evaluation. Pokémon is high-variance — always report CIs.
 
-Wilson score interval for a binomial proportion (win-rate). Never conclude from <1000 games.
+Wilson intervals describe independent binary outcomes. Paired schedules need block-level
+uncertainty; neither a fixed game count nor a point estimate establishes improvement.
 """
 from __future__ import annotations
 
@@ -31,3 +32,37 @@ def wilson_interval(wins: int, n: int, confidence: float = 0.95) -> Interval:
     center = (p + z * z / (2 * n)) / denom
     half = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
     return Interval(p, center - half, center + half)
+
+
+def paired_block_interval(scores, *, alpha: float = 0.05, block_size: int = 4,
+                          bounds: tuple[float, float] = (0.0, 1.0),
+                          seed: int = 0, resamples: int = 20_000) -> Interval:
+    """Percentile bootstrap over independent matched blocks, not correlated games.
+
+    This is an approximate interval, not an anytime confidence sequence. Callers allocate alpha
+    over scheduled comparisons. Constant samples use a bounded unseen-mass interval instead of
+    a spuriously zero-width bootstrap interval.
+    """
+    import numpy as np
+
+    values = np.asarray(scores, dtype=np.float64)
+    if not (0 < alpha < 1) or block_size < 1 or len(values) < 2 * block_size:
+        raise ValueError("interval needs valid alpha and at least two complete blocks")
+    if (values.ndim != 1 or len(values) % block_size or not np.isfinite(values).all()
+            or np.any(values < bounds[0]) or np.any(values > bounds[1])):
+        raise ValueError("scores must be finite bounded values in complete matched blocks")
+    means = values.reshape(-1, block_size).mean(axis=1)
+    point = float(means.mean())
+    if np.ptp(means) == 0:
+        unseen = 1.0 - (alpha / 2.0) ** (1.0 / len(means))
+        return Interval(point, point - (point - bounds[0]) * unseen,
+                        point + (bounds[1] - point) * unseen)
+    if resamples < 2 / alpha:
+        raise ValueError("too few bootstrap resamples for the requested tail probability")
+    rng = np.random.default_rng(seed)
+    boot = np.concatenate([
+        means[rng.integers(0, len(means), size=(min(512, resamples - i), len(means)))].mean(1)
+        for i in range(0, resamples, 512)
+    ])
+    low, high = np.quantile(boot, [alpha / 2, 1 - alpha / 2])
+    return Interval(point, float(low), float(high))

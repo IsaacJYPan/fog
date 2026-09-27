@@ -1,4 +1,4 @@
-"""Shared loss terms for BC and self-play (spec §3.2, §5, §6).
+"""Shared loss terms for BC and self-play.
 
 The belief / self-belief losses are sums of masked per-attribute cross-entropies. In replay training
 the labels are CENSORED (only attributes eventually revealed contribute — the rest are masked out of

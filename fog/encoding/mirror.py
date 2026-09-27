@@ -1,4 +1,4 @@
-"""Opponent's-view-of-me observation for the self-belief / leakage path (spec §3.3, §7).
+"""Opponent's-view-of-me observation for the self-belief / leakage path.
 
 The self-belief predictor Φ measures how readable I am. Its input is "the opponent's view of me": the
 same public board, but with MY hidden attributes masked to what the opponent has actually seen, and

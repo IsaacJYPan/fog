@@ -1,11 +1,11 @@
-"""Readability evaluation driver (spec §7b/§7c, §9) — the L-vs-N headline measurements.
+"""Readability evaluation driver — the L-vs-N headline measurements.
 
 Pipeline (one command via `python -m fog.eval.run_eval ... --readability`):
   1. roll `games` battles of the evaluated checkpoint vs a fixed opponent, recording the mirror
      (opponent's-view) observation at every decision + per-game behavioral case studies;
-  2. train a FRESH TrainableProbe from scratch on those trajectories (an up-to-date adversary that
-     has only ever seen this agent play);
-  3. report the readability curve (probe CE over still-hidden attrs vs turn bucket — lower = more
+  2. split whole games into fitting, validation, and test sets; train a FRESH TrainableProbe on
+     fitting games and select its checkpoint using validation games;
+  3. report the readability curve on held-out test games (probe CE over still-hidden attrs — lower = more
      readable), per-attribute-family CE, and the §7c case studies (tera timing, choice-lock
      concealment delay, move-reveal-order entropy).
 
@@ -16,6 +16,7 @@ Pipeline (one command via `python -m fog.eval.run_eval ... --readability`):
 from __future__ import annotations
 
 import asyncio
+import copy
 from collections import defaultdict
 from dataclasses import dataclass, field
 
@@ -171,8 +172,47 @@ def collect_trajectories(ckpt: str, opponent: str, n_games: int, fmt: str, team_
 
 
 # ---------------------------------------------------------------------------------- probe fit + curves
+def split_probe_games(batch: dict, *, train_fraction: float = 0.6,
+                      validation_fraction: float = 0.2, seed: int = 0) -> tuple[dict, dict, dict]:
+    """Split complete games, never adjacent turns, into fit/validation/final-test sets."""
+    import torch
+
+    if not (0 < train_fraction < 1 and 0 < validation_fraction < 1
+            and train_fraction + validation_fraction < 1):
+        raise ValueError("probe fractions must leave nonempty train, validation and test sets")
+    ids = batch["game_id"]
+    groups = torch.unique(ids).cpu()
+    if len(groups) < 3:
+        raise ValueError("held-out readability requires at least three complete games")
+    groups = groups[torch.randperm(len(groups), generator=torch.Generator().manual_seed(seed))]
+    n_train = min(len(groups) - 2, max(1, int(len(groups) * train_fraction)))
+    n_validation = min(len(groups) - n_train - 1,
+                       max(1, int(len(groups) * validation_fraction)))
+
+    def subset(chosen):
+        indices = torch.where(torch.isin(ids, chosen.to(ids.device)))[0]
+
+        def select(value):
+            if isinstance(value, torch.Tensor) and value.ndim and value.shape[0] == len(ids):
+                return value[indices.to(value.device)]
+            if isinstance(value, dict):
+                return {key: select(child) for key, child in value.items()}
+            return value
+
+        part = {key: select(value) for key, value in batch.items() if key != "preview"}
+        part["_n_games"] = len(chosen)
+        part["_split_game_ids"] = sorted(chosen.tolist())
+        # Do not present full-corpus win rate as a split-specific measurement.
+        part.pop("_win_rate", None)
+        return part
+
+    return (subset(groups[:n_train]), subset(groups[n_train:n_train + n_validation]),
+            subset(groups[n_train + n_validation:]))
+
+
 def train_fresh_probe(batch: dict, cfg: dict, device=None, epochs: int = 8,
-                      minibatch: int = 512, lr: float = 3e-4, seed: int = 0):
+                      minibatch: int = 512, lr: float = 3e-4, seed: int = 0,
+                      validation: dict | None = None):
     """Fit a from-scratch TrainableProbe on the collected mirror views (§7b fresh predictor)."""
     import torch
 
@@ -190,8 +230,10 @@ def train_fresh_probe(batch: dict, cfg: dict, device=None, epochs: int = 8,
 
     from fog.training.ppo import _index_nested
 
-    probe.train()
+    best_loss = float("inf")
+    best_state = None
     for _ in range(epochs):
+        probe.train()
         perm = torch.randperm(n, device=opp_view["entities"].device)
         for start in range(0, n, minibatch):
             sub = _index_nested(opp_view, perm[start : start + minibatch])
@@ -199,6 +241,24 @@ def train_fresh_probe(batch: dict, cfg: dict, device=None, epochs: int = 8,
             loss = probe.loss(sub)
             loss.backward()
             opt.step()
+        if validation is not None:
+            probe.eval()
+            view = validation["opp_view"]
+            count = view["entities"].shape[0]
+            total = 0.0
+            with torch.no_grad():
+                for start in range(0, count, minibatch):
+                    idx = torch.arange(start, min(start + minibatch, count),
+                                       device=view["entities"].device)
+                    total += float(probe.loss(_index_nested(view, idx))) * len(idx)
+            score = total / count
+            if score < best_loss:
+                best_loss = score
+                best_state = copy.deepcopy(probe.state_dict())
+    if validation is not None and best_state is None:
+        raise RuntimeError("readability probe produced no finite validation checkpoint")
+    if best_state is not None:
+        probe.load_state_dict(best_state)
     probe.eval()
     return probe
 
@@ -249,11 +309,22 @@ def run_readability(ckpt: str, cfg: dict, opponent: str | None = None, games: in
     games = int(games or rd.get("games", 200))
 
     batch, cases = collect_trajectories(ckpt, opponent, games, fmt, team_pool, cfg, device)
-    probe = train_fresh_probe(batch, cfg, device, epochs=int(rd.get("probe_epochs", 8)))
+    train, validation, test = split_probe_games(
+        batch, train_fraction=float(rd.get("train_fraction", 0.6)),
+        validation_fraction=float(rd.get("validation_fraction", 0.2)),
+        seed=int(rd.get("split_seed", 0)),
+    )
+    probe = train_fresh_probe(train, cfg, device, epochs=int(rd.get("probe_epochs", 8)),
+                              validation=validation, seed=int(rd.get("probe_seed", 0)))
     report = {
         "ckpt": str(ckpt), "opponent": opponent, "games": int(batch["_n_games"]),
         "win_rate": float(batch["_win_rate"]),
-        **readability_curves(probe, batch),
+        **readability_curves(probe, test),
+        "evaluation_scope": "held_out_games",
+        "probe_splits": {
+            name: {"games": part["_n_games"], "game_ids": part["_split_game_ids"]}
+            for name, part in (("train", train), ("validation", validation), ("test", test))
+        },
         "case_studies": cases.report(),
     }
     _print_readability(report)

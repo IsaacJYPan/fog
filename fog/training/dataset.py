@@ -1,4 +1,4 @@
-"""Parsed-replay dataset for behavior cloning (spec §5).
+"""Parsed-replay dataset for behavior cloning.
 
 Two loaders over the npz shards listed in a parse manifest:
 

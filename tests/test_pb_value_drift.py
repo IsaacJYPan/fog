@@ -21,6 +21,9 @@ class _FakeGrid:
     def __init__(self, branch_prob, terminal_value, leaf_index, leaf_obs, failed):
         self.branch_prob, self.terminal_value = branch_prob, terminal_value
         self.leaf_index, self.leaf_obs, self.failed = leaf_index, leaf_obs, failed
+        self.leaf_public_keys = [""] * len(leaf_obs)
+        for k, j, a, b, m in np.argwhere(leaf_index >= 0):
+            self.leaf_public_keys[leaf_index[k, j, a, b, m]] = f"{a}:{b}"
 
 
 class _FakeAgent:

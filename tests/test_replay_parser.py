@@ -191,6 +191,9 @@ def test_policy_versions_reconstruct_tera_choice_and_action_inputs():
 |-terastallize|p1a: Chomp|Ground
 |move|p1a: Chomp|Earthquake|p2a: Bird
 |move|p2a: Bird|Roost|p2a: Bird
+|turn|2
+|move|p1a: Chomp|Earthquake|p2a: Bird
+|move|p2a: Bird|Roost|p2a: Bird
 |win|Alice
 |player|p2|"""
     result = parse_replay_policy_versions(
@@ -200,6 +203,10 @@ def test_policy_versions_reconstruct_tera_choice_and_action_inputs():
     arrays = rows_to_arrays(result["rows"])
 
     assert 4 <= p1["action"] < 8
+    p1_rows = [row for row in result["rows"] if row["role"] == "p1"]
+    assert len(p1_rows) == 2
+    assert not p1_rows[1]["obs"].legality_mask[4:8].any()
+    assert p1_rows[0]["obs"].legality_mask[4:8].any()
     assert arrays["legality_mask"][0].sum() >= 2
     assert np.array_equal(
         arrays["action_features"][..., 0].astype(bool), arrays["legality_mask"]

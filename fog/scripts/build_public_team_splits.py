@@ -1,6 +1,6 @@
 """Merge validated public team banks into deterministic, leakage-safe packages.
 
-Exact packed-team hashes never cross splits.  Each input manifest must come from
+Neither packed-team identities nor unordered set-composition groups cross splits. Each manifest comes from
 ``fog.scripts.collect_team_bank``, which records the pinned Showdown validation result.
 """
 from __future__ import annotations
@@ -11,6 +11,8 @@ import json
 import random
 from collections import Counter, defaultdict
 from pathlib import Path
+
+from fog.team_identity import team_group_key
 
 
 def _stratum(origins: list[dict]) -> str:
@@ -30,6 +32,7 @@ def build_splits(
     seed: int = 20260729,
     validation_fraction: float = 0.1,
     test_fraction: float = 0.1,
+    group_by: str = "composition",
 ) -> dict:
     if validation_fraction < 0 or test_fraction < 0:
         raise ValueError("split fractions must be non-negative")
@@ -58,19 +61,23 @@ def build_splits(
                 }
             )
 
-    strata: dict[str, list[str]] = defaultdict(list)
+    groups: dict[str, list[str]] = defaultdict(list)
     for packed_hash in sorted(by_hash):
-        strata[_stratum(origins[packed_hash])].append(packed_hash)
+        groups[team_group_key(by_hash[packed_hash]["paste"], mode=group_by)].append(packed_hash)
+    strata: dict[str, list[str]] = defaultdict(list)
+    for key, hashes in groups.items():
+        strata[_stratum([origin for value in hashes for origin in origins[value]])].append(key)
 
     split_hashes: dict[str, list[str]] = {"train": [], "validation": [], "test": []}
-    for stratum, hashes in sorted(strata.items()):
+    for stratum, group_keys in sorted(strata.items()):
         rng = random.Random(f"{seed}:{stratum}")
-        rng.shuffle(hashes)
-        n_test = round(len(hashes) * test_fraction)
-        n_validation = round(len(hashes) * validation_fraction)
-        split_hashes["test"].extend(hashes[:n_test])
-        split_hashes["validation"].extend(hashes[n_test : n_test + n_validation])
-        split_hashes["train"].extend(hashes[n_test + n_validation :])
+        rng.shuffle(group_keys)
+        n_test = round(len(group_keys) * test_fraction)
+        n_validation = round(len(group_keys) * validation_fraction)
+        for split, keys in (("test", group_keys[:n_test]),
+                            ("validation", group_keys[n_test:n_test + n_validation]),
+                            ("train", group_keys[n_test + n_validation:])):
+            split_hashes[split].extend(value for key in keys for value in groups[key])
 
     out_dir.mkdir(parents=True, exist_ok=True)
     split_records: dict[str, list[dict]] = {}
@@ -92,6 +99,7 @@ def build_splits(
         split_records[split] = [
             {
                 "packed_sha256": value,
+                "group_sha256": team_group_key(by_hash[value]["paste"], mode=group_by),
                 "stratum": _stratum(origins[value]),
                 "origins": origins[value],
             }
@@ -99,7 +107,9 @@ def build_splits(
         ]
 
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "group_by": group_by,
+        "group_count": len(groups),
         "format": "gen9ou",
         "seed": seed,
         "banks": [str(bank) for bank in banks],
@@ -131,6 +141,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=20260729)
     parser.add_argument("--validation-fraction", type=float, default=0.1)
     parser.add_argument("--test-fraction", type=float, default=0.1)
+    parser.add_argument("--group-by", choices=("composition", "roster"), default="composition")
     args = parser.parse_args()
     manifest = build_splits(
         args.banks,
@@ -138,6 +149,7 @@ def main() -> None:
         seed=args.seed,
         validation_fraction=args.validation_fraction,
         test_fraction=args.test_fraction,
+        group_by=args.group_by,
     )
     print(
         f"wrote {manifest['unique_team_count']} unique teams: "

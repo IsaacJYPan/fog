@@ -1,5 +1,4 @@
-"""Phase-2 search gauntlet (SEARCH_PLAN §5): arm players, budget accounting, paired schedules,
-the gate report, and engine-backed end-to-end rows for all three arms + the reading opponent."""
+"""Search-arm comparisons, simulation budgets, and paired battle schedules."""
 from __future__ import annotations
 
 import random
@@ -7,6 +6,7 @@ import types
 
 import pytest
 
+from fog.env.engine_battle import HAVE_ENGINE
 from fog.eval.search_gauntlet import (
     ArmPlayer,
     MatchRow,
@@ -14,6 +14,7 @@ from fog.eval.search_gauntlet import (
     gate_report,
     run_search_match,
 )
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 
 # ------------------------------------------------------------------------------------- pure logic
@@ -92,8 +93,6 @@ def test_arm_player_validation():
 
 
 # ------------------------------------------------------------------------------- engine-backed
-from fog.env.engine_battle import HAVE_ENGINE
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 

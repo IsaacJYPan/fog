@@ -1,4 +1,4 @@
-"""The scripted golden battle (spec §10): a fixed 5-turn gen9ou battle built from lightweight mocks.
+"""The scripted golden battle: a fixed 5-turn gen9ou battle built from lightweight mocks.
 
 Deterministic by construction — same fixture + same generated tables => byte-identical tensors.
 Used by test_golden_battle.py to pin the ENTIRE encoding stack (entities/field/history/reveals/

@@ -30,6 +30,12 @@ class FakeGrid:
     failed: np.ndarray
     leaf_evidence: np.ndarray
 
+    def __post_init__(self):
+        # This fixture exposes both actions and gives every type identical chance likelihoods.
+        self.leaf_public_keys = [""] * len(self.leaf_obs)
+        for k, j, a, b, m in np.argwhere(self.leaf_index >= 0):
+            self.leaf_public_keys[self.leaf_index[k, j, a, b, m]] = f"{a}:{b}"
+
 
 class FakeAgent:
     """`head_inputs(chunk)` returns the precomputed s_board/c_dyn rows for the chunk's leaf ids."""
@@ -178,6 +184,7 @@ def test_all_terminal_grid_has_no_leaves(monkeypatch):
     grid.leaf_index = np.full((K, J, A, B, M), -1, dtype=np.int64)
     grid.terminal_value = np.where(grid.branch_prob > 0, 0.3, np.nan)
     grid.leaf_obs = []
+    grid.leaf_public_keys = []
     values_fn, stats = make_pb_value_grid_values(
         agent, net, grid, rho, own.numpy(), opp.numpy(), recompute_every=1)
     u = values_fn(np.full((2, 2), 0.5), np.full((2, 2), 0.5))

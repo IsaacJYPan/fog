@@ -1,4 +1,4 @@
-"""History records [T, D_turn] (spec §2.3).
+"""History records [T, D_turn].
 
 One record per completed turn: (compressed public snapshot as of the *start* of the turn, both
 players' observed choices, resolution events). The start-of-turn snapshot is what preserves context at

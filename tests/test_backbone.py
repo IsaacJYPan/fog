@@ -1,13 +1,7 @@
-"""Backbone forward-pass shape test (spec §2.4, §3). Skipped if torch isn't installed.
-
-The backbone is fully implemented, so a random-tensor forward should produce the three explicit
-encoder contexts and the policy/value head should mask illegal actions to -inf log-prob.
-"""
+"""Check encoder output shapes and masking of illegal policy actions."""
 from __future__ import annotations
 
-import pytest
-
-torch = pytest.importorskip("torch")
+import torch
 
 from fog.encoding.dims import DIMS
 from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS

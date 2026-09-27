@@ -1,6 +1,4 @@
-"""§4.2 value fine-tune: blind-checkpoint expansion is behavior-preserving, the aware-vs-blind
-regression prefers posterior features exactly when they carry signal, and the posterior logger
-produces a loadable, trainable decision log end-to-end on the engine."""
+"""Value-checkpoint expansion, posterior-feature regression, and logged training data."""
 from __future__ import annotations
 
 import numpy as np
@@ -9,6 +7,7 @@ import torch
 
 from fog.encoding.dims import DIMS
 from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS
+from fog.env.engine_battle import HAVE_ENGINE
 from fog.models.agent import FogAgent
 from fog.models.heads import N_POSTERIOR_FEATURES
 from fog.training.value_finetune import (
@@ -18,6 +17,7 @@ from fog.training.value_finetune import (
     fit_value_mlp,
     load_posterior_agent,
 )
+from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 AWARE_CFG = {"model": {"use_posterior_features": True}}
 
@@ -40,6 +40,25 @@ def _batch(b=3, seed=0, n_species=300):
 
 
 # -------------------------------------------------------------------------- checkpoint expansion
+def test_expand_conditional_head_preserves_action_scores():
+    from fog.models.heads import PolicyValueHead
+    torch.manual_seed(42)
+    kwargs = dict(state_dim=8, dyn_dim=6, action_feature_dim=3, action_context_dim=5,
+                  structured_dim=2)
+    blind = PolicyValueHead(**kwargs).eval()
+    aware = PolicyValueHead(**kwargs, posterior_dim=N_POSTERIOR_FEATURES).eval()
+    torch.nn.init.normal_(blind.conditional_action_scorer[-1].weight)
+    expanded = expand_state_dict_for_posterior(
+        {"policy_value." + k: v for k, v in blind.state_dict().items()})
+    aware.load_state_dict({k.removeprefix("policy_value."): v for k, v in expanded.items()})
+    features = torch.randn(4, 24)  # 14 core + 2 structured + 5 context + 3 action
+    padded = torch.cat([features[:, :14], torch.zeros(4, N_POSTERIOR_FEATURES),
+                        features[:, 14:]], dim=1)
+    with torch.no_grad():
+        torch.testing.assert_close(blind.conditional_action_scorer(features),
+                                   aware.conditional_action_scorer(padded))
+
+
 def test_expand_blind_state_dict_preserves_behavior():
     """Zero-padded posterior columns must leave the head byte-equivalent at zero/absent features —
     the expanded checkpoint plays exactly like the blind one until the fine-tune trains it."""
@@ -144,8 +163,6 @@ def test_finetune_value_requires_posterior_agent():
 
 
 # --------------------------------------------------------------------- engine-backed end-to-end
-from fog.env.engine_battle import HAVE_ENGINE
-from tests.test_joint_search import P_ME, P_ME_VARIANT, P_OPP
 
 engine = pytest.mark.skipif(not HAVE_ENGINE, reason="poke-engine not installed")
 

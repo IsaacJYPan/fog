@@ -1,7 +1,8 @@
 # FOG architecture
 
-This document describes the intended model, search target, and training flow, and identifies
-differences between the intended design and the current implementation.
+This document is the source of truth for the intended model, search target, and training flow. It
+describes both the desired design and the current implementation boundary; where those differ, the
+difference is explicit.
 
 ## Problem boundary
 
@@ -98,6 +99,10 @@ nature, ev_hp, ev_atk, ev_def, ev_spa, ev_spd, ev_spe, tera
 
 ## Belief model
 
+Older typed checkpoints omit the EV-stat residual heads and identity embedding. Loading that
+complete older layout initializes only those additions to zero, preserving its EV predictions.
+Partially missing residual groups and unrelated missing tensors still fail strict loading.
+
 `fog.models.belief.BeliefModel` is a set-autoregressive model over the opponent's complete team.
 Known facts are clamped before sampling. Hidden fields are generated through a mechanically legal
 route, with generated facts added back to the set context. Move order and team storage order are not
@@ -111,6 +116,13 @@ arbitrary route as the probability of an unordered team.
 Public replays do not reveal exact nature, EVs, or every submitted set field. Unrevealed facts remain
 censored belief targets. Complete team pastes and simulator-owned self-play truth are the sources for
 complete-team supervision.
+
+Replay-policy conversion can instead fill the acting player's unknown private fields from a
+compatible joint replay donor (`--candidate-bank`). Donor fields retain inferred provenance and
+never become exact belief targets. Target/duplicate logs and later-dated donors are excluded;
+held-out games must be excluded when building the bank. Residual holes use the pinned usage
+fallback. Opponent observations remain chronological. See the
+[imputation design and controlled benchmark](docs/replay-candidate-imputation.md).
 
 ## Search target and current status
 
@@ -168,24 +180,25 @@ These identifiers replace references in source comments to untracked historical 
 
 ## Training strategy
 
-The environment reward is terminal and extremely sparse. The active typed-token branch is staged:
+The environment reward is terminal and sparse. The current typed-token experiments initialize
+from a retained imitation/DAgger checkpoint, then test bounded PPO interventions with auxiliary
+belief supervision and optional replay retention. The latest validation has not established a
+stronger replacement. See [the training plan](HIGH_LEVEL_TRAINING_PLAN.md) and
+[measured results](docs/research-status.md).
 
-1. Pretrain the flat shared trunk with exact current-state reconstruction and masked/denoising
-   reconstruction. A fresh held-out decoder must reach the per-field 95% gate. History remains an
-   auxiliary semantic input rather than an exact-copy target.
-2. Pretrain opponent belief on replay-observable censored facts, and on exact complete-team truth
-   from published team pastes or self-play. Belief cross-entropy supplies dense representation
-   learning without pretending that guessing information is an environment reward. Keep the
-   reconstruction objective active so information retention cannot silently regress.
-3. Train value from legitimate final outcomes with belief and reconstruction retention active.
-4. Train policy last. High-rated replay actions can initialize the new head, but their unknown
-   private sheets remain provenance-tracked imputations rather than truth.
-5. Fine-tune with self-play PPO against a mixture of scripted, current, and frozen past policies.
-   Optional progress shaping may help early optimization, but terminal win rate remains the target
-   and must be evaluated separately.
-6. Once the search expert is validated, distill its full move distribution into policy and refresh
-   belief models on play from the changed policy. Search may still run at inference time, analogous
-   to policy-guided search systems; distillation is not a reason to remove it.
+Belief cross-entropy provides dense representation training; guessing hidden information is not
+an environment reward. Exact simulator-owned labels remain separate from censored public-replay
+facts and imputed own sheets. Policy benefit from that auxiliary objective requires a retraining
+ablation, since ordinary inference does not read decoded beliefs.
+
+Representation reconstruction, staged value pretraining, and policy imitation remain available
+as diagnostic training routes. The older flat-model 95% reconstruction gate is not the active
+typed-token promotion criterion. Before expanding capacity or training time, measure value
+calibration, action-family suppression, and gradient interactions under a fixed opponent mix.
+
+Search distillation is a later experiment, conditional on information isolation, supported hidden
+states, and a held-out strength gain. Its presence in the repository does not establish a useful
+expert. Optional shaping also needs a terminal-win-rate comparison against an unshaped control.
 
 One PPO or behavior-cloning run can be controlled through `fog.train.TrainingSession`:
 

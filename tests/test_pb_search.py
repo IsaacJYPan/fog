@@ -111,14 +111,14 @@ def test_persistent_mode_end_to_end(agent):
     assert r.pruned_mass_max <= 0.2
     assert len(r.queried_beliefs) == 4
     for lab1, lab2, post in r.queried_beliefs:
-        assert lab1 in r.labels1 and lab2 in r.labels2
+        assert lab1 == "public_observation" and lab2 in r.observation_model.keys
         assert post.shape == r.rho.shape
         assert post.sum() == pytest.approx(1.0) or post.sum() == pytest.approx(0.0)
     # G1: the random-iteration snapshot posteriors ride alongside (§9.3 mitigation 2)
     assert 1 <= r.sample_iteration <= r.iterations
     assert len(r.sample_beliefs) == 4
     for lab1, lab2, post in r.sample_beliefs:
-        assert lab1 in r.labels1 and lab2 in r.labels2
+        assert lab1 == "public_observation" and lab2 in r.observation_model.keys
         assert post.shape == r.rho.shape
         assert post.sum() == pytest.approx(1.0) or post.sum() == pytest.approx(0.0)
 
@@ -194,6 +194,17 @@ def test_trivial_forced_decision_skips_the_grid(agent):
     assert r.action == int(legal[0])
     assert r.sims_run == 0 and r.iterations == 0
     assert r.sample_iteration == -1 and r.sample_beliefs == [], "no solve ran, no snapshot"
+
+    # A persistent filter must score the public consequences even without a choice.
+    from fog.search.belief_table import JointBeliefTable
+
+    persistent = pb_search_action(
+        agent, leaf, "p2", own_source=_StubOwnStates(1),
+        opp_tokens=np.stack([leaf.truth_tokens("p1")]),
+        table=JointBeliefTable(np.zeros((1, 1))), iters=4,
+    )
+    assert persistent.action == int(legal[0])
+    assert persistent.sims_run > 0 and persistent.observation_model is not None
 
 
 def test_one_sided_replacement_is_solved_and_sampled(agent):

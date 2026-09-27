@@ -288,6 +288,7 @@ class FogPlayer:
             mirror = None
             if self._buffer is not None:
                 gid = self._game_id(tag)
+                frag["behavior_log_probs"] = recorded_log_probs.detach().cpu().numpy()
                 if self.record_policy_reference:
                     frag["reference_log_probs"] = out.log_probs[0].detach().cpu().numpy()
                 if self.supervised_label_provider is not None:
@@ -413,8 +414,12 @@ class FogPlayer:
         try:
             cfg = self.search or {}
             if cfg.get("mode") == "direct_two_sided":
+                import random
+
                 from fog.search.direct_two_sided import direct_two_sided_action
 
+                if not hasattr(self, "_direct_search_rng"):
+                    self._direct_search_rng = random.Random(int(cfg.get("seed", 0)))
                 role = getattr(battle, "player_role", None) or "p1"
                 result = direct_two_sided_action(
                     self.agent,
@@ -425,6 +430,7 @@ class FogPlayer:
                     floor=float(cfg.get("floor", 0.02)),
                     min_probability=float(cfg.get("min_probability", 0.0)),
                     max_branches=cfg.get("max_branches"),
+                    rng=self._direct_search_rng,
                 )
                 self.search_stats["simulation_attempts"] += result.simulations
                 self.search_stats["chance_branches"] = (
@@ -761,7 +767,14 @@ def _sample_action(
     import torch
 
     if temperature <= 0:
-        return int(torch.argmax(log_probs).item())
+        bonus = float(tera_logit_bonus)
+        if not np.isfinite(bonus) or bonus < 0:
+            raise ValueError("tera_logit_bonus must be finite and non-negative")
+        scores = log_probs
+        if bonus:
+            scores = log_probs.clone()
+            scores[..., 4:8] += bonus  # -inf legal masks remain impossible.
+        return int(torch.argmax(scores).item())
 
     finite = torch.isfinite(log_probs)
     if not bool(finite.any()):

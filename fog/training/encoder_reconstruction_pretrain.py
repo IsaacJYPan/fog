@@ -92,25 +92,45 @@ def run(args: argparse.Namespace) -> dict:
         return torch.stack([public_loss, private_loss, history_loss, fused_history_loss, field_public, field_fused]).mean()
 
     def evaluate(dataset: TensorObservationDataset) -> float:
-        agent.eval(); probes.eval(); total = 0.0; batches = 0
+        agent.eval()
+        probes.eval()
+        total = 0.0
+        batches = 0
         with torch.no_grad():
             for batch in dataset.batches(args.batch_size, shuffle=False, seed=args.seed, device=device):
-                total += float(objective(batch)); batches += 1
+                total += float(objective(batch))
+                batches += 1
         return total / max(1, batches)
 
-    rows = []; best_score = float("inf"); best_agent = None; best_probe = None; stale = 0
+    rows = []
+    best_score = float("inf")
+    best_agent = None
+    best_probe = None
+    stale = 0
     for epoch in range(args.epochs):
-        agent.train(); probes.train(); running = 0.0; batches = 0
+        agent.train()
+        probes.train()
+        running = 0.0
+        batches = 0
         for batch in datasets["train"].batches(args.batch_size, shuffle=True, seed=args.seed + epoch, device=device):
-            optimizer.zero_grad(set_to_none=True); loss = objective(batch); loss.backward()
+            optimizer.zero_grad(set_to_none=True)
+            loss = objective(batch)
+            loss.backward()
             torch.nn.utils.clip_grad_norm_(list(agent.backbone.parameters()) + list(probes.parameters()), 5.0)
-            optimizer.step(); running += float(loss.detach()); batches += 1
-        team = evaluate(datasets["team_holdout"]); battle = evaluate(datasets["battle_holdout"])
+            optimizer.step()
+            running += float(loss.detach())
+            batches += 1
+        team = evaluate(datasets["team_holdout"])
+        battle = evaluate(datasets["battle_holdout"])
         score = (team + battle) / 2
         row = {"epoch": epoch + 1, "train_loss": running / max(1, batches), "team_holdout_loss": team, "battle_holdout_loss": battle}
-        rows.append(row); print(f"[encoder-reconstruction] {row}", flush=True)
+        rows.append(row)
+        print(f"[encoder-reconstruction] {row}", flush=True)
         if score < best_score - args.min_delta:
-            best_score = score; best_agent = copy.deepcopy(agent.state_dict()); best_probe = copy.deepcopy(probes.state_dict()); stale = 0
+            best_score = score
+            best_agent = copy.deepcopy(agent.state_dict())
+            best_probe = copy.deepcopy(probes.state_dict())
+            stale = 0
         else:
             stale += 1
             if stale >= args.patience:
@@ -135,7 +155,9 @@ def run(args: argparse.Namespace) -> dict:
     }
     (args.out / "report.json").write_text(json.dumps(report, indent=2))
     with (args.out / "metrics.csv").open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
     print(json.dumps(report, indent=2), flush=True)
     return report
 
@@ -156,7 +178,8 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=6)
     parser.add_argument("--min-delta", type=float, default=0.0005)
     parser.add_argument("--seed", type=int, default=20261053)
-    args = parser.parse_args(); run(args)
+    args = parser.parse_args()
+    run(args)
 
 
 if __name__ == "__main__":

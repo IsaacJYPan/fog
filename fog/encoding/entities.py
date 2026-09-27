@@ -1,4 +1,4 @@
-"""Entity records [12, D_ent], entity ids [12, 9], active indices, and the legality mask (spec §2.1).
+"""Entity records [12, D_ent], entity ids [12, N_ID_FIELDS], active indices, and the legality mask.
 
 Slots 0-5 = my team in team order (battle.team insertion order — stable, it comes from my own
 request); 6-11 = opponent in preview order (`reveals.opponent_slots` — stable across the battle).
@@ -6,7 +6,7 @@ For my own six all epistemic flags read "known" and true values fill the ids; fo
 publicly-derivable info fills, with the epistemic flags derived from the C1 reveal tokens so the
 entity record and the belief-net input can never disagree about what is known.
 
-Fidelity notes (v1, live extraction — see KNOWN_ISSUES):
+Live extraction:
   * booster_consumed / fallen_count / last_used_move / volatile counters are event-derived: filled
     from the per-battle BattleTracker when one is passed, 0/UNK otherwise.
   * native nature + six EV-unit ids: my own slots recover the effective private spread from the

@@ -1,4 +1,4 @@
-"""State encoding (spec §2). Decision-point observation = (entities, field, history, my_team_sheet).
+"""State encoding. Decision-point observation = (entities, field, history, my_team_sheet).
 
   * `entities`  -> [12, D_ent]  (§2.1) slots 0-5 mine, 6-11 opponent
   * `field`     -> [D_field]    (§2.2) ~40 dims

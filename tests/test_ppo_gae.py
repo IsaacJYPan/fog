@@ -1,4 +1,4 @@
-"""Tests for GAE (spec §6). The full ppo_update path is covered in test_ppo_update.py."""
+"""Tests for GAE. The full ppo_update path is covered in test_ppo_update.py."""
 from __future__ import annotations
 
 import numpy as np

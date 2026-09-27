@@ -1,4 +1,4 @@
-"""Build SPREADS[species] via k-means on nature-modified stat vectors (spec §1.6).
+"""Build SPREADS[species] via k-means on nature-modified stat vectors.
 
 For each species: cluster the (nature-modified stat vector) from the Smogon chaos *detailed* usage
 file, weighted by usage share, into <=16 clusters. Merge clusters whose representative stats differ by

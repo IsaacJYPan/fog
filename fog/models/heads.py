@@ -1,4 +1,4 @@
-"""Policy / value / team-preview heads (spec §3.1)."""
+"""Policy / value / team-preview heads."""
 from __future__ import annotations
 
 import torch

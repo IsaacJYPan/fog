@@ -284,14 +284,17 @@ def run(args: argparse.Namespace) -> dict:
         metrics: dict[str, dict[str, float]] = {}
         for name in public_sources:
             loss, item = probes["public"].loss_metrics(name, sources[name], public_raw, public_ids)
-            losses.append(loss); metrics[f"public/{name}"] = item
+            losses.append(loss)
+            metrics[f"public/{name}"] = item
         for name in private_sources:
             loss, item = probes["private"].loss_metrics(name, sources[name], private_raw, private_ids)
-            losses.append(loss); metrics[f"private/{name}"] = item
+            losses.append(loss)
+            metrics[f"private/{name}"] = item
         history_values = {"history_pooled": sources["history_pooled"], "fused_public": compact["fused"], "policy_input": compact["policy"]}
         for name, values in history_values.items():
             loss, item = probes["history"].loss_metrics(name, values, hist_raw, hist_ids, hist_state)
-            losses.append(loss); metrics[f"history/{name}"] = item
+            losses.append(loss)
+            metrics[f"history/{name}"] = item
         vector_values = {"public_pooled": sources["public_pooled"], "fused_public": compact["fused"], "policy_input": compact["policy"]}
         for name, values in vector_values.items():
             field_pred = probes["field"](name, values)
@@ -323,7 +326,8 @@ def run(args: argparse.Namespace) -> dict:
             loss.backward()
             torch.nn.utils.clip_grad_norm_(probes.parameters(), 5.0)
             optimizer.step()
-            running += float(loss.detach()); batches += 1
+            running += float(loss.detach())
+            batches += 1
             if args.max_train_batches and batches >= args.max_train_batches:
                 break
         history_rows.append({"epoch": epoch + 1, "train_loss": running / max(1, batches)})
@@ -336,7 +340,8 @@ def run(args: argparse.Namespace) -> dict:
         for batch_index, batch in enumerate(heldout.batches(args.batch_size, shuffle=False, seed=args.seed, device=device)):
             _, metrics = process(batch, False)
             for group, item in metrics.items():
-                _accumulate(totals[group], item); counts[group] += 1
+                _accumulate(totals[group], item)
+                counts[group] += 1
             if args.max_eval_batches and batch_index + 1 >= args.max_eval_batches:
                 break
     heldout_report = {group: _finalize(values, counts[group]) for group, values in totals.items()}
@@ -356,7 +361,8 @@ def run(args: argparse.Namespace) -> dict:
     (args.out / "report.json").write_text(json.dumps(report, indent=2))
     with (args.out / "metrics.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=["epoch", "train_loss"])
-        writer.writeheader(); writer.writerows(history_rows)
+        writer.writeheader()
+        writer.writerows(history_rows)
     print(json.dumps(report, indent=2), flush=True)
     return report
 

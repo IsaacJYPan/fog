@@ -1,9 +1,4 @@
-"""Unified, scriptable entry point for one FOG training run.
-
-The backend trainers remain responsible for their algorithms.  This module supplies a small object
-API around configuration loading and trainer selection so experiments can be controlled from a
-normal Python script or notebook without duplicating command-line plumbing.
-"""
+"""Run PPO or behavior cloning from the CLI or a Python training session."""
 from __future__ import annotations
 
 import argparse
@@ -21,7 +16,7 @@ class TrainerKind(StrEnum):
 
 
 class Trainer(Protocol):
-    """Minimal contract shared by concrete training adapters."""
+    """Training backend interface."""
 
     config: dict[str, Any]
 
@@ -56,12 +51,7 @@ _TRAINERS: dict[TrainerKind, type[PPOTrainer | BehaviorCloningTrainer]] = {
 
 @dataclass(slots=True)
 class TrainingSession:
-    """A mutable experiment object suitable for scripts and notebooks.
-
-    ``config`` is intentionally public: callers may load a checked-in YAML, make a deliberate
-    programmatic change, inspect it, and then call :meth:`run`.  The resolved configuration is the
-    exact dictionary passed to the selected backend trainer.
-    """
+    """A resolved experiment. Callers may edit ``config`` before calling :meth:`run`."""
 
     config: dict[str, Any]
     kind: TrainerKind | str | None = None

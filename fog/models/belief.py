@@ -1,45 +1,24 @@
 """Permutation-equivariant set-autoregressive belief model.
 
-The opponent's visible facts are not a sequence.  They are a set: a Tera type revealed on turn 20
-must be available when predicting an item just as immediately as a species shown at team preview.
-Generated hidden facts are a second, explicitly tagged assumption set. Consequently this model
-never encodes the physical order in which facts were supplied, while still distinguishing public
-evidence from its own hypothetical ancestral assignments.
+Public reveals and generated assumptions are separately tagged unordered sets.
+Facts are transformed and pooled within each Pokemon before a Transformer mixes
+the six Pokemon without positional encodings. Reordering moves or facts leaves
+the distribution unchanged; reordering Pokemon permutes its output slots.
 
-The model is nevertheless autoregressive: it completes a team one fact at a time.  At every step:
+Generation adds one fact at a time. A value-independent scheduler samples
+uniformly among eligible fields: species precedes species-dependent legality
+and nature/EV fields, and the EV mask caps the total at 127 units (508 EVs).
+The four move fields share a query and value head; storage uses the next free
+move column.
 
-1. all public reveals and all facts generated so far are encoded as an unordered set;
-2. a value-independent scheduler chooses uniformly among the fields that are currently eligible;
-3. the model samples that field's value and adds the resulting fact to the set.
+Training samples a route and prefix over recoverable replay fields, then
+predicts the next fact. Missing replay labels remain absent. `query_field`
+can address any labeled slot without treating censored data as a full team.
 
-Only mechanical dependencies constrain the scheduler. Species precedes species-dependent legality
-and the submitted nature/EV fields. A dynamic EV mask enforces a total of at most 127 stat units
-(508 effective EVs). Everything else is free to occur in either direction. The four moves of one
-Pokemon are one exchangeable set:
-they use the same query and value head, and generated values are stored in the next free move column
-only as an external tensor convention.
-
-Training draws an arbitrary random ordering of the fields recoverable from a replay and a random
-prefix length. The input is the complete public reveal set plus that generated/teacher prefix, and
-the loss predicts the addressed next fact. Missing-not-at-random replay fields remain absent rather
-than becoming negatives. ``query_field`` can target any labeled slot without pretending that a
-censored row defines a normalized full-team likelihood.
-
-There are two probability objects and they must not be confused:
-
-* a route probability, determined entirely by the uniform scheduler; and
-* a value probability, the product of the network's conditional probabilities along that route.
-
-Together they form a normalized distribution over (route, completed team).  A completed unordered
-team marginalizes over routes.  Exact marginalization is factorial, so candidate scoring averages a
-small, explicitly reported collection of random routes.  Sampling itself is exact for the normalized
-extended distribution and returns both log-probabilities when ``return_trace=True``.
-
-Set structure is hierarchical.  Facts belonging to one Pokemon are pooled only after a nonlinear
-field-aware transform; the six Pokemon are then processed by a Transformer with no positional
-encoding.  Therefore move order and input fact order are invariant, while permuting Pokemon slots
-permutes the corresponding outputs instead of changing the represented team.
-"""
+Scheduler and conditional-value probabilities define a normalized distribution
+over (route, completed team). Team probabilities marginalize over routes;
+candidate scoring approximates this with sampled routes. Sampling returns
+both log-probabilities when `return_trace=True`."""
 from __future__ import annotations
 
 import torch
@@ -188,6 +167,24 @@ class BeliefModel(nn.Module):
         self.register_buffer("pos_n", pos_n.to(torch.long), persistent=False)
         self.register_buffer(
             "field_kind", torch.tensor(_FIELD_KIND, dtype=torch.long), persistent=False
+        )
+
+    def _load_from_state_dict(
+        self, state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs,
+    ):
+        # Early typed checkpoints have the shared EV head but no stat residuals. Only migrate
+        # that complete old layout; a partially missing residual group is still an error.
+        residuals = {
+            name: value for name, value in self.state_dict().items()
+            if name.startswith(("ev_stat_heads.", "ev_stat_id."))
+        }
+        if prefix + "heads.ev.weight" in state_dict and not any(
+            prefix + name in state_dict for name in residuals
+        ):
+            for name, value in residuals.items():
+                state_dict[prefix + name] = torch.zeros_like(value)
+        super()._load_from_state_dict(
+            state_dict, prefix, local_metadata, strict, missing_keys, unexpected_keys, error_msgs,
         )
 
     # -------------------------------------------------------------------------- set/route mechanics

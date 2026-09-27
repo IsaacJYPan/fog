@@ -1,4 +1,4 @@
-"""Leakage probes (spec §3.3/§7): the measurement path = (backbone -> self-belief predictor).
+"""Leakage probes: the measurement path = (backbone -> self-belief predictor).
 
 `FrozenProbe` is Φ̂ — a frozen deep copy of BOTH the backbone and the self-belief head. Freezing only
 the head (the original v1 wiring) left the reward a function of the live, training backbone: as the

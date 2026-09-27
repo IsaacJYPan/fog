@@ -1,64 +1,26 @@
-"""Decision logger and game runner for experimental two-sided search (ARCHITECTURE.md S1–S3).
+"""Decision logging and game execution for two-sided search.
 
-`play_and_log_pb_games` plays whole engine games in which the learner's non-trivial decisions go
-through `pb_search_action` in persistent mode, maintains ONE `JointBeliefTable` per battle, and
-writes decision rows for the later trainers: the solver's executed distribution is the policy-
-distillation target, the root observation is the deployment input, and rho / sigma2 /
-queried_beliefs feed the Phase-G value work.
+`play_and_log_pb_games` maintains one JointBeliefTable per battle and logs root
+observations, executed solver distributions, outcomes, and value-training inputs.
+Own candidates must have stable identities and count throughout the battle.
 
-Belief-update discipline after each real turn (§14 step 11):
+After each modeled transition, the observed public transcript is scored by summing
+over latent action choices and chance outcomes under the acting strategies.
+Opponent likelihoods remain a model approximation outside shared-solve self-play.
+Mechanical evidence removes candidates
+on both sides that contradict public reveals, including before the first decision.
+Move evidence uses subset matching; own-side evidence comes from the mirrored view.
 
-  * OUR observed action's likelihood column comes from the solver's averaged sigma1 — the
-    distribution that actually acted (invariant 19.6). Trivial decisions (one legal action) carry
-    no behavioral content and pass None.
-  * The OPPONENT's observed public label is looked up in the solver's label space and its
-    likelihood column comes from the solver's averaged sigma2 — a MODEL of the opponent, floored
-    inside the table (§7.2), honest only insofar as the real opponent resembles the solve; with a
-    scripted or policy opponent this is the documented §17.16 approximation. Labels the solver
-    never enumerated (no solve this turn) pass None.
-  * Mechanical evidence then zeroes candidates on BOTH sides whose sheets contradict the
-    revealed tokens (`keep_mask_from_reveals` — move evidence uses SUBSET semantics, so the
-    reveal-order vs paste-order move-slot convention cannot bite). The own side uses the mirror
-    view (the OPPONENT's censored observation of us — what we have publicly revealed); wired in
-    Phase G2 because the stable-axes own source (`StablePoolOwnStates`) no longer filters
-    reveals itself. An initial mechanical step runs BEFORE the first decision: both leads are
-    public from turn 1, and pb_search must never fork a reveal-inconsistent own candidate (the
-    fork's species-matching silently degrades on them).
+Top-k/top-j truncation reduces the solve while retaining the table's full axes.
+Persistent observation updates reject omitted positive-mass candidates, failed cells,
+or pruned chance support; zero-mass axes may be omitted. Logs retain kept indices and
+dropped mass. OpeningSolveCache reuses identical opening solves and samples a new
+action from the stored distribution with the current game's RNG.
 
-Phase G2 budget features:
-
-  * **Posterior-mass truncation**: `search_kwargs={"top_k": ..., "top_j": ...}` solves over the
-    top candidates by current table mass (zero-mass candidates always dropped — exact). The
-    table keeps FULL axes; the result's kept maps route the behavior update so truncated-out
-    candidates take the floor likelihood (§7.2's unmodeled-is-not-impossible stance) and rows
-    log the kept sets + dropped mass.
-  * **Opening-solve cache (L1, exact)**: pass an `OpeningSolveCache`. On a pool, the first
-    decision of every game of the same matchup is byte-identical (same pastes, same prior, and
-    grid content is fork-seed-independent — pinned by the duplicate-world invariance test), so
-    the stored solve is reused EXACTLY and only the executed action is re-sampled from the
-    stored distribution with this game's rng. Zero approximation; kills the most expensive
-    decision of every game after the first per matchup.
-
-One-sided decisions flow through the same path with
-no special-casing. When only the learner is pending (a forced replacement with several live bench,
-or a pivot force-switch), pb_search solves a degenerate B = 1 grid; `opp_label` is None (the
-opponent owed nothing), so the belief step multiplies in ONLY our replacement sigma1 — the
-signaling content of the choice — and the row is logged like any other for distillation and value
-training. When only the OPPONENT is pending (its solo replacement while we owe nothing), no solve
-exists: we log nothing and skip its behavioral likelihood (the honest §7.2 no-model stance, the
-documented F2.4 approximation until solver-vs-solver self-play supplies its sigma), applying only
-mechanical evidence.
-
-**Shared-solve self-play (Phase I.2, corrected 2026-07-21)**: at a simultaneous decision, one
-public two-sided solve supplies both players' strategies. Its first-side rows execute for that
-side; its second-side rows execute for the opponent after transposing the shared candidate axes.
-This guarantees that the opponent strategy predicted by search is the strategy that actually
-acts, rather than running two independent solves that may disagree. One-sided replacement
-decisions still use the side that owns the decision. Both sides' rows are logged.
-
-The runner requires an own_source with a STABLE candidate count across the battle (the table's
-axes are fixed identities, §7.4): the full-pool sources qualify, reveal-filtering subsets do not.
-"""
+Our one-sided replacement decisions use a B=1 solve and are logged normally.
+Opponent-only replacements have no solve or behavioral update in the single-side
+runner; mechanical evidence still applies. In shared-solve self-play, one solve
+supplies both simultaneous strategies, and both sides' rows are logged."""
 from __future__ import annotations
 
 import os
@@ -77,6 +39,30 @@ from fog.search.evidence import (
 )
 from fog.search.pb_grid import public_label
 from fog.search.pb_search import N_ACTIONS, pb_search_action
+from fog.search.public_observation import public_observation_key
+
+
+def _observe_public_outcome(table, result, battle, *, sigma1=None, sigma2=None):
+    """Update once from the visible transcript, never from privately submitted action labels."""
+    if battle.finished or result is None or result.sims_run == 0:
+        return
+    model = result.observation_model
+    if model is None:
+        raise RuntimeError("search result lacks the public observation likelihood model")
+    kept = np.zeros(table.log_rho.shape, dtype=bool)
+    kept[np.ix_(result.own_kept, result.opp_kept)] = True
+    if (result.failed_cells or result.pruned_mass_max > 1e-6
+            or np.any(np.isfinite(table.log_rho[~kept]))):
+        raise RuntimeError("persistent observation updates require complete candidate/chance support")
+    likelihood = model.likelihood(
+        public_observation_key(battle),
+        result.sigma1 if sigma1 is None else sigma1,
+        result.sigma2 if sigma2 is None else sigma2,
+    )
+    full_likelihood = np.zeros(table.log_rho.shape, dtype=np.float64)
+    full_likelihood[np.ix_(result.own_kept, result.opp_kept)] = likelihood
+    if not table.observation_step(full_likelihood):
+        raise RuntimeError("public observation exhausted candidate support; rejuvenation required")
 
 
 class OpeningSolveCache:
@@ -197,7 +183,7 @@ def _mirror_search_result(
     action = int(rng.choices(range(N_ACTIONS), weights=action_dist)[0])
 
     def _swap_queries(entries):
-        return [(label2, label1, np.asarray(belief).T.copy())
+        return [(label1, label2, np.asarray(belief).T.copy())
                 for label1, label2, belief in entries]
 
     return _dc_replace(
@@ -215,6 +201,8 @@ def _mirror_search_result(
         j_used=int(result.avail1.shape[0]),
         queried_beliefs=_swap_queries(result.queried_beliefs),
         sample_beliefs=_swap_queries(result.sample_beliefs),
+        observation_model=(result.observation_model.transposed()
+                           if result.observation_model is not None else None),
         own_kept=np.asarray(result.opp_kept).copy(),
         opp_kept=np.asarray(result.own_kept).copy(),
         dropped_own_mass=float(result.dropped_opp_mass),
@@ -271,7 +259,8 @@ def play_and_log_pb_games(
     opp_pool_tokens = np.asarray(opp_pool_tokens, dtype=np.int64)
 
     def _meta(done: int) -> dict:
-        return {"version": 2, "n_games": int(n_games), "role": role,
+        return {"version": 2, "belief_update": "public_observation_likelihood_v1",
+                "n_games": int(n_games), "role": role,
                 "seed": seed, "j_pool": len(opp_pool_tokens),
                 "opp_pool_tokens": opp_pool_tokens,
                 "search_kwargs": _meta_kwargs(search_kwargs),
@@ -346,7 +335,7 @@ def play_and_log_pb_games(
         outcome = 0.0
         stepped = False                     # False until this game's first battle.step — the
         #                                     factory-fresh state the opening cache keys on
-        for _ in range(int(max_decisions)):
+        for decision_id in range(int(max_decisions)):
             if battle.finished:
                 break
             pending = set(battle.pending_sides())
@@ -370,9 +359,6 @@ def play_and_log_pb_games(
             if opp_role in pending:
                 opp_idx = policy.choose(battle, opp_role)
                 moves[opp_role] = battle.engine_action(opp_role, int(opp_idx))
-                opp_label = public_label(battle, opp_role, int(opp_idx))
-            else:
-                opp_label = None
 
             solver_row = result is not None and result.sims_run > 0
             value_row = None
@@ -384,7 +370,7 @@ def play_and_log_pb_games(
                     pos = np.flatnonzero(result.opp_kept == opp_true_index)
                     row_j = int(pos[0]) if len(pos) else -1
                 value_row = {
-                    "game_id": game_id, "turn": battle.turn, "role": role,
+                    "game_id": game_id, "decision_id": decision_id, "turn": battle.turn, "role": role,
                     "obs": Observation.from_battle(battle.view(role),
                                                    tracker=battle.trackers[role]),
                     "action": result.action, "action_dist": result.action_dist,
@@ -413,18 +399,9 @@ def play_and_log_pb_games(
             battle.step(moves)
             stepped = True
 
-            # ---- §14 step 11: behavior likelihoods (the distributions that acted) ----------
+            # Condition on the outcome, summing over private action choices producing it.
             if solver_row:
-                col1 = result.labels1.index(my_label) if my_label in result.labels1 else None
-                col2 = (result.labels2.index(opp_label)
-                        if opp_label is not None and opp_label in result.labels2 else None)
-                table.behavior_step(
-                    result.sigma1 if col1 is not None else None,
-                    result.avail1 if col1 is not None else None, col1,
-                    result.sigma2 if col2 is not None else None,
-                    result.avail2 if col2 is not None else None, col2,
-                    kept1=result.own_kept if col1 is not None else None,
-                    kept2=result.opp_kept if col2 is not None else None)
+                _observe_public_outcome(table, result, battle)
             # ---- then mechanical evidence from the updated reveal state -------------------
             _mechanical(f"turn {battle.turn}")
             if value_row is not None and not battle.finished:
@@ -499,7 +476,8 @@ def play_and_log_pb_selfplay_games(
             )
 
     def _meta(done: int) -> dict:
-        return {"version": 2, "n_games": int(n_games), "mode": "selfplay",
+        return {"version": 2, "belief_update": "public_observation_likelihood_v1",
+                "n_games": int(n_games), "mode": "selfplay",
                 "seed": seed, "j_pool": len(pool_tokens),
                 "opp_pool_tokens": pool_tokens,
                 "search_kwargs": _meta_kwargs(search_kwargs),
@@ -547,7 +525,7 @@ def play_and_log_pb_selfplay_games(
 
         game_rows: list[dict] = []
         stepped = False
-        for _ in range(int(max_decisions)):
+        for decision_id in range(int(max_decisions)):
             if battle.finished:
                 break
             pending = set(battle.pending_sides())
@@ -555,19 +533,12 @@ def play_and_log_pb_selfplay_games(
             labels: dict[str, str | None] = {}
             moves: dict[str, str] = {}
             legal = {r: np.flatnonzero(battle.action_mask(r)) for r in pending}
-            nontrivial = [r for r in roles if r in pending and len(legal[r]) > 1]
+            acting = [r for r in roles if r in pending and len(legal[r]) >= 1]
 
-            # Trivial choices execute directly and carry no behavioral likelihood or training row.
-            for r in pending:
-                if len(legal[r]) == 1:
-                    action = int(legal[r][0])
-                    labels[r] = public_label(battle, r, action)
-                    moves[r] = battle.engine_action(r, action)
-
-            if nontrivial:
-                # p1 is the canonical simultaneous perspective when both are nontrivial. If only
-                # one side has a real choice, that side owns the useful solve.
-                source = "p1" if "p1" in nontrivial else nontrivial[0]
+            if acting:
+                # Even a forced move has informative chance outcomes. One public solve supplies
+                # both strategies, and the same observation updates both tables.
+                source = "p1" if "p1" in acting else acting[0]
                 other = "p2" if source == "p1" else "p1"
                 if pending == {"p1", "p2"}:
                     np.testing.assert_allclose(
@@ -593,7 +564,7 @@ def play_and_log_pb_selfplay_games(
                 labels[source] = public_label(battle, source, result.action)
                 moves[source] = battle.engine_action(source, result.action)
 
-                if other in nontrivial and pending == {"p1", "p2"}:
+                if other in acting and pending == {"p1", "p2"}:
                     mirrored = _mirror_search_result(
                         result, battle, source, own0[other].true_index, rng
                     )
@@ -609,7 +580,7 @@ def play_and_log_pb_selfplay_games(
                 true_opp = own0[o].true_index          # shared axes: opp truth = its own index
                 pos = np.flatnonzero(result.opp_kept == true_opp)
                 row = {
-                    "game_id": game_id, "turn": battle.turn, "role": r,
+                    "game_id": game_id, "decision_id": decision_id, "turn": battle.turn, "role": r,
                     "obs": Observation.from_battle(battle.view(r),
                                                    tracker=battle.trackers[r]),
                     "action": result.action, "action_dist": result.action_dist,
@@ -638,24 +609,25 @@ def play_and_log_pb_selfplay_games(
             battle.step(moves)
             stepped = True
 
-            # ---- §14 step 11, both sides: each observed action's likelihood is the sigma1 of
-            # the solve that CHOSE it (19.6 exact for both players — the I.2 point) ----------
-            def _acted(r: str, *, results=results, labels=labels):
-                """(sigma, avail, col, kept) of r's own executed action, or Nones."""
-                result = results.get(r)
-                if result is None or result.sims_run == 0:
-                    return None, None, None, None       # trivial/absent: no behavioral content
-                col = (result.labels1.index(labels[r])
-                       if labels[r] in result.labels1 else None)
-                if col is None:
-                    return None, None, None, None
-                return result.sigma1, result.avail1, col, result.own_kept
-
             for r in roles:
                 o = "p2" if r == "p1" else "p1"
-                s1, a1, c1, k1 = _acted(r)
-                s2, a2, c2, k2 = _acted(o)
-                tables[r].behavior_step(s1, a1, c1, s2, a2, c2, kept1=k1, kept2=k2)
+                result, opposite = results.get(r), results.get(o)
+                if result is None and opposite is not None and opposite.sims_run:
+                    # This side only observed a replacement/pivot. Its posterior still changes.
+                    result = _dc_replace(
+                        opposite, sigma1=opposite.sigma2, sigma2=opposite.sigma1,
+                        own_kept=opposite.opp_kept, opp_kept=opposite.own_kept,
+                        observation_model=opposite.observation_model.transposed(),
+                    )
+                sigma2 = None
+                if (r in results and result.sims_run and opposite is not None
+                        and opposite.sims_run):
+                    if (not np.array_equal(result.opp_kept, opposite.own_kept)
+                            or set(result.labels2) != set(opposite.labels1)):
+                        raise RuntimeError("acting strategy axes do not match the observation model")
+                    sigma2 = opposite.sigma1[:, [opposite.labels1.index(label)
+                                                for label in result.labels2]]
+                _observe_public_outcome(tables[r], result, battle, sigma2=sigma2)
             _mechanical(f"turn {battle.turn}")
             if not battle.finished:
                 for r, row in step_value_rows.items():

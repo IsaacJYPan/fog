@@ -1,4 +1,4 @@
-"""Internal Elo among {BC, N-agents, L-agents×β, set oracle, action oracle} (spec §9).
+"""Internal Elo among {BC, N-agents, L-agents×β, set oracle, action oracle}.
 
 Round-robin on the same team pool, ≥3000 games/pair, Bradley-Terry MLE reported on the Elo scale.
 """

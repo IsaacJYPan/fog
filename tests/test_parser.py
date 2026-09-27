@@ -1,4 +1,4 @@
-"""Full-scale parser fuzz checks (spec §4.3) — placeholders for corpus-scale validation.
+"""Full-scale parser fuzz checks — placeholders for corpus-scale validation.
 
 The replay parser itself is implemented (fog/scripts/parse_replays.py; 0% quarantine on the first
 150 replays) and its components are tested in test_events.py / test_tracker.py / the golden-battle

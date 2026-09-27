@@ -1,0 +1,37 @@
+# Pipeline trial only: the recovered probe corpus is not the production dataset.
+version: 1
+name: gen9ou_kaggle_trial
+output_dir: runs/gen9ou_kaggle_trial
+base_config: configs/gen9ou_typed_token_selfplay.yaml
+initial_checkpoint: artifacts/checkpoints/typed_dagger_2048.pt
+initial_league_checkpoints: []
+training:
+  blocks: 1
+  decisions_per_block: 32
+  batch_decisions: 32
+  checkpoint_every_decisions: 32
+  minibatch_size: 8
+  epochs: 1
+  lr: 1.0e-5
+  clip: 0.05
+  seed: 20260920
+  tensorboard: false
+evaluation:
+  enabled: false
+safety:
+  auto_refresh: true
+  games: 5
+  device: cuda
+  replay_audit_config: configs/gen9ou_typed_token_kaggle_audit.yaml
+overrides:
+  device: cuda
+  env.team_pool: data/teams/public_regeneration_splits/train.json
+  env.rollout_workers: 1
+  env.actor_threads: 1
+  ppo.games_per_chunk: 1
+  replay_policy.manifest: runs/replay_regeneration_probe/train_manifest.parquet
+  replay_policy.batch_size: 8
+  bc.manifest: runs/replay_regeneration_probe/train_manifest.parquet
+  bc.holdout_manifest: runs/replay_regeneration_probe/holdout_manifest.parquet
+  preflight.report: runs/gen9ou_kaggle_trial/audits/direct/summary.json
+  preflight.replay_report: runs/gen9ou_kaggle_trial/audits/replay/summary.json

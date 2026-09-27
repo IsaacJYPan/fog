@@ -1,4 +1,4 @@
-"""Team pools for gen9ou training (spec §4.4): load Showdown pastes, sample per battle, validate.
+"""Team pools for gen9ou training: load Showdown pastes, sample per battle, validate.
 
 poke-env's `Player(team=...)` accepts a `Teambuilder`; its `yield_team()` is called once per battle,
 which is exactly the spec's "teams sampled per-game from the active pool" (§6). `PoolTeambuilder`

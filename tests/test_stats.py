@@ -1,4 +1,4 @@
-"""Tests for evaluation statistics (spec §9)."""
+"""Tests for evaluation statistics."""
 from __future__ import annotations
 
 import numpy as np

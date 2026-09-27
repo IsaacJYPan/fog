@@ -126,14 +126,20 @@ def test_tera_bonus_changes_only_cross_family_mass_and_preserves_illegal_mask():
     assert probs[0, 4:6].sum() > torch.tensor(0.30)
 
 
-def test_ppo_tera_bonus_recomputes_the_recorded_behavior_probability():
+@pytest.mark.parametrize("decisions", [0, 20000, 60000, 80000])
+def test_ppo_tera_bonus_recomputes_the_recorded_behavior_probability(decisions):
+    from fog.training.diagnostics import tera_bonus_at
+
+    bonus = tera_bonus_at({"rollout_tera_logit_bonus_initial": 1.5,
+                          "rollout_tera_logit_bonus_final": 0,
+                          "rollout_tera_logit_bonus_decay_decisions": 60000}, decisions, 80000)
     torch.manual_seed(4)
     agent = TinyPolicyAgent()
     opt = torch.optim.Adam(agent.parameters(), lr=0.0)
     batch = make_ppo_batch(n=64, seed=4)
     batch["legality_mask"][:, 4:8] = True
     with torch.no_grad():
-        behavior = _behavior_log_probs(agent(batch).log_probs, tera_logit_bonus=1.5)
+        behavior = _behavior_log_probs(agent(batch).log_probs, tera_logit_bonus=bonus)
         batch["old_log_probs"] = behavior.gather(
             1, batch["actions"].unsqueeze(1)
         ).squeeze(1)
@@ -141,11 +147,11 @@ def test_ppo_tera_bonus_recomputes_the_recorded_behavior_probability():
         agent,
         opt,
         batch,
-        {"ppo": {"minibatch_size": 64, "epochs": 1, "rollout_tera_logit_bonus": 1.5}},
+        {"ppo": {"minibatch_size": 64, "epochs": 1, "rollout_tera_logit_bonus": bonus}},
     )
     assert abs(metrics["approx_kl"]) < 1e-7
     assert metrics["clip_frac"] == 0.0
-    assert metrics["rollout_tera_logit_bonus"] == 1.5
+    assert metrics["rollout_tera_logit_bonus"] == bonus
 
 
 def test_ppo_update_runs_and_changes_params():

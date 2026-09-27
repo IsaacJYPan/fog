@@ -10,11 +10,11 @@ What is interim here, named precisely:
   * The leaf evaluator is the small policy/value head on `(private_state, public_context, four
     posterior features)`. Four concentration numbers cannot say which candidate teams retain
     probability; they only make leaf values react to the solver's changing posterior at all.
-  * The features summarize the OWN-side margin of the action-pair posterior (what the opponent
+  * The features summarize the OWN-side margin of the public-observation posterior (what the opponent
     would now believe about us), evaluated at the leaf's own candidate index — the same semantics
     the frozen one-sided baseline fed its head, so its §4.2 value fine-tune transfers.
-  * §10.6's discrete branch-evidence conditioning is not applied — the interim head has no input
-    for it. The grid's leaf observations already carry the reveal facts for the replacement path.
+  * Public chance likelihood and reveal evidence condition those four features, but candidate
+    identities and the full joint weights are still absent from this interim head.
 
 Cost model (invariant 19.13): the expensive parts — engine simulation (already inside the grid)
 and the backbone trunk over all leaves — happen ONCE here at construction. Each solver iteration
@@ -31,7 +31,7 @@ from typing import Any
 
 import numpy as np
 
-from fog.search.two_sided import pair_posteriors
+from fog.search.public_observation import PublicObservationLikelihood
 
 Array = np.ndarray
 
@@ -75,8 +75,8 @@ def make_grid_values(
                     probability x (terminal payoff, or head value at the censored leaf).
 
     `rho` is the decision's root joint belief (`JointBeliefTable.normalized()`): the per-leaf
-    posterior features are the own-side margin of `pair_posteriors(rho, sigma1, sigma2)` at the
-    leaf's action pair — recomputed from the CURRENT strategies every call, which is exactly the
+    posterior features are the own-side margin after the leaf's public observation, including
+    latent actions and chance — recomputed from the CURRENT strategies every call, which is the
     coupling channel (§5.1: same cached leaf, different iteration, different belief).
 
     `fallback_value` fills cells whose simulation failed (the caller passes the root value, the
@@ -123,13 +123,14 @@ def make_grid_values(
         if pair_override.shape != want:
             raise ValueError(f"leaf_pair_values must be {want}, got {pair_override.shape}")
     static_u: Array | None = None
+    observation_model = PublicObservationLikelihood(grid) if posterior_dim else None
 
     def _leaf_values(sigma1: Array, sigma2: Array) -> Array:
         feats = None
         if posterior_dim:
-            post_own = pair_posteriors(rho, sigma1, sigma2).sum(axis=3)     # [A, B, K]
-            feats = (np.stack([_posterior_features(post_own[a, b], int(k))
-                               for k, a, b in leaf_kab])
+            post_own = observation_model.posteriors(rho, sigma1, sigma2).sum(axis=2)
+            feats = (np.stack([_posterior_features(post_own[leaf], int(k))
+                               for leaf, (k, _, _) in enumerate(leaf_kab)])
                      if len(leaf_kab) else np.zeros((0, posterior_dim), dtype=np.float32))
         values = np.zeros(len(grid.leaf_obs))
         pos = 0

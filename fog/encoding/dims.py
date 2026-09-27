@@ -1,4 +1,4 @@
-"""Tensor dimension bookkeeping for the encoders (spec §2).
+"""Tensor dimension bookkeeping for the encoders.
 
 Kept in one place so the encoder network (§2.4) and the tests agree on every width. Widths that depend
 on generated tables (e.g. embedding input cardinalities) are looked up at model-build time; the widths

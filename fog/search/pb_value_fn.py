@@ -14,8 +14,8 @@ cross-pair averaging later, when it evaluates each private type against the othe
 types.  Averaging the table here as well would use the belief twice and erase the type-specific
 continuation values the table exists to preserve:
 
-    post[a, b, k, j]   = pair_posteriors(rho, sigma1, sigma2)     # the coupling channel, §5.1
-    post_leaf          = normalize(post[a_leaf, b_leaf] * discrete_leaf_evidence)
+    likelihood[o,k,j] = sum_{a,b} sigma1[k,a] sigma2[j,b] P(o | k,j,a,b)
+    post_leaf          = normalize(rho * likelihood[public_observation_of_leaf])
     u[k, j, a, b]      = sum over branches of branch_prob * V[leaf, k, j]
 
 `recompute_every = N` controls how often the tables are refreshed by an actual network pass (the
@@ -40,7 +40,7 @@ from typing import Any
 
 import numpy as np
 
-from fog.search.two_sided import pair_posteriors
+from fog.search.public_observation import PublicObservationLikelihood
 
 Array = np.ndarray
 
@@ -126,22 +126,7 @@ def make_pb_value_grid_values(
             )
         stats.representation_forwards = 1
 
-    # ---- leaf -> (a, b) so a leaf can read its own action-conditioned posterior slice -----------
-    positions = np.argwhere(grid.leaf_index >= 0)                      # rows (k, j, a, b, m)
-    leaf_ab = np.zeros((n_leaves, 2), dtype=np.int64)
-    if len(positions):
-        leaf_ab[grid.leaf_index[tuple(positions.T)]] = positions[:, [2, 3]]
-    a_idx = leaf_ab[:, 0]
-    b_idx = leaf_ab[:, 1]
-    evidence = np.asarray(
-        (getattr(grid, "leaf_evidence", np.ones((n_leaves, n_k, n_j), dtype=bool))
-         if n_leaves else np.ones((0, n_k, n_j), dtype=bool)),
-        dtype=np.float64,
-    )
-    if evidence.shape != (n_leaves, n_k, n_j):
-        raise ValueError(
-            f"leaf_evidence must be [L,K,J]={(n_leaves, n_k, n_j)}, got {evidence.shape}"
-        )
+    observation_model = PublicObservationLikelihood(grid)
 
     rho = np.asarray(rho, dtype=np.float64)
     terminal_fill = np.where(np.isnan(grid.terminal_value), 0.0, grid.terminal_value)
@@ -156,18 +141,7 @@ def make_pb_value_grid_values(
     call_count = 0
 
     def _post_leaf(sigma1: Array, sigma2: Array) -> Array:
-        """Each leaf's action- and evidence-conditioned belief [L, K, J] (§10.6)."""
-        post = pair_posteriors(rho, sigma1, sigma2)                   # [A, B, K, J]
-        if n_leaves == 0:
-            return np.zeros((0, n_k, n_j))
-        masked = post[a_idx, b_idx] * evidence                       # [L, K, J]
-        mass = masked.sum(axis=(1, 2), keepdims=True)
-        if (mass <= 0.0).any():
-            bad = np.flatnonzero(mass.reshape(-1) <= 0.0)
-            raise RuntimeError(
-                f"leaf evidence eliminated every candidate pair for leaves {bad[:8].tolist()}"
-            )
-        return masked / mass
+        return observation_model.posteriors(rho, sigma1, sigma2)
 
     def _refresh(post_leaf: Array) -> Array:
         """One actual network pass: condition V on the current per-leaf posterior (§9.2)."""

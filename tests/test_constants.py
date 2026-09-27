@@ -1,4 +1,4 @@
-"""Tests for the fixed constants / action space (spec §1) + a load check on the committed tables."""
+"""Tests for the fixed constants / action space + a load check on the committed tables."""
 from __future__ import annotations
 
 from fog.constants import schema

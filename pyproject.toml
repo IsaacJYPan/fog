@@ -11,8 +11,7 @@ requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "FOG" }]
 
-# Versions are intentionally left as lower bounds during scaffolding. Pin exact versions in a
-# lockfile before any experiment run (reproducibility is a hard project requirement).
+# uv.lock pins the development and experiment environment.
 dependencies = [
     "torch>=2.2",            # CUDA build installed separately per platform
     "poke-env>=0.8",

@@ -9,6 +9,8 @@ and makes the remaining public-belief candidate substitution work explicit.
 
 from __future__ import annotations
 
+import random
+
 from dataclasses import dataclass
 from typing import Any
 
@@ -70,6 +72,7 @@ def direct_two_sided_action(
     floor: float = 0.02,
     min_probability: float = 0.0,
     max_branches: int | None = None,
+    rng: random.Random | None = None,
 ) -> DirectTwoSidedResult:
     """Solve the current direct-Showdown action pair with exact chance enumeration.
 
@@ -143,7 +146,7 @@ def direct_two_sided_action(
     compact = solution.sigma1[0]
     action_dist = np.zeros(N_ACTIONS, dtype=np.float64)
     action_dist[own_actions] = compact
-    action = int(own_actions[int(np.argmax(compact))])
+    action = int((rng or random).choices(own_actions.tolist(), weights=compact)[0])
     return DirectTwoSidedResult(
         action=action,
         action_dist=action_dist,

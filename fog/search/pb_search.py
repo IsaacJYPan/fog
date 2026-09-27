@@ -5,7 +5,7 @@ sides -> joint belief rho -> simulated K x J branch grid (pb_grid) -> leaf value
 the interim scalar head) -> two-sided regret solve (two_sided) -> **sample exactly
 from the averaged strategy row of the true private state**. The API deliberately has no
 temperature and no greedy mode (settled decisions 16.2/16.3): the sampled randomness IS the
-mixed equilibrium being executed, and any reshaping would play a strategy the solver never
+mixed strategy being executed, and any reshaping would play a strategy the solver never
 evaluated. A greedy diagnostic, if ever wanted, lives outside this function.
 
 Two candidate-supply modes, because particle persistence is only half-landed (§7.4):
@@ -22,9 +22,9 @@ Two candidate-supply modes, because particle persistence is only half-landed (§
     a persistent table cannot be used in this mode (identities are not stable), so passing one
     raises.
 
-The search NEVER mutates the belief table (§14 step 11 is the runner's job, after both real
-actions are public, using this result's averaged strategies — invariant 19.6). The result
-carries a subsample of the action-pair posteriors the values were computed under
+The search NEVER mutates the belief table (the runner conditions on the subsequent public
+observation, marginalizing hidden choices under the acting strategies). The result
+carries a subsample of the public-observation posteriors the values were computed under
 (`queried_beliefs`), plus the same subsampling under one uniformly drawn solver iteration's
 CURRENT strategies (`sample_beliefs`) — together the value-training query log.
 """
@@ -39,7 +39,8 @@ import numpy as np
 
 from fog.search.pb_grid import build_pb_grid
 from fog.search.pb_values import make_grid_values
-from fog.search.two_sided import pair_posteriors, two_sided_regret_solve
+from fog.search.public_observation import PublicObservationLikelihood
+from fog.search.two_sided import two_sided_regret_solve
 
 N_ACTIONS = 14
 
@@ -62,18 +63,18 @@ class PBSearchResult:
     sims_run: int                    # committed (k, j, a, b) pairs across all solves
     failed_cells: int
     pruned_mass_max: float           # worst per-cell dropped chance mass (invariant 19.16)
-    queried_beliefs: list = field(default_factory=list)   # (label1, label2, rho_after [K, J])
-    # Phase G1 (§9.3 mitigation 2): action-pair posteriors under the CURRENT strategy pair of one
+    queried_beliefs: list = field(default_factory=list)   # ("public_observation", key, rho_after)
+    # Phase G1 (§9.3 mitigation 2): observation posteriors under the CURRENT strategy pair of one
     # uniformly drawn solver iteration — mid-solve belief queries the final averages never revisit
     # (early near-uniform beliefs especially). Same entry shape as queried_beliefs; the value
     # trainer mixes both sets (plus the root rho) as belief inputs. sample_iteration is the
     # 1-indexed iteration the snapshot came from (-1 on trivial decisions).
-    sample_beliefs: list = field(default_factory=list)    # (label1, label2, rho_after [K, J])
+    sample_beliefs: list = field(default_factory=list)    # ("public_observation", key, rho_after)
     sample_iteration: int = -1
     # Phase G2 posterior-mass truncation (persistent mode): which FULL-axis candidates the solve
     # actually ran over. sigma/rho/tokens/true_index above all live on the KEPT axes; `own_kept` /
     # `opp_kept` map them back to the passed candidate sets (and the belief table's axes — the
-    # runner passes them to behavior_step so truncated-out candidates take the floor likelihood).
+    # persistent observation updates reject truncation of positive-mass candidates).
     # Dropped mass is the root-belief probability the solve did not model, logged per side
     # (§13.1/§13.2 applied to the persistent path). Without truncation kept = arange, dropped = 0.
     own_kept: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.int64))
@@ -89,6 +90,7 @@ class PBSearchResult:
     depth2_reach_mass: float = 0.0
     depth2_child_sims: int = 0
     depth2_failures: list[str] = field(default_factory=list)
+    observation_model: Any | None = None
 
 
 def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: int,
@@ -284,13 +286,14 @@ def pb_search_action(
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
-    # Only 0/1 legal actions are trivial (no behavioral content). A one-sided forced replacement or
+    # A single action has no choice entropy, but its public consequences can still carry chance
+    # evidence. Persistent filtering must model that transition. A one-sided forced replacement or
     # pivot with 2+ live choices is NOT trivial: build_pb_grid collapses the absent opponent to a
     # single synthetic label and the B=1 solve yields a real, type-conditioned replacement sigma1
     # (F2, proposal §10.5) — it flows through the normal path below.
     if len(real_legal) == 0:
         return _trivial(13)
-    if len(real_legal) == 1:
+    if len(real_legal) == 1 and table is None:
         return _trivial(int(real_legal[0]))
     if table is not None and opp_tokens is None:
         raise ValueError("a persistent belief table indexes stable candidates: pass the "
@@ -419,21 +422,23 @@ def pb_search_action(
     action_dist = _real_action_dist(sol.sigma1[kt], grid.local_action1[kt], mask)
     action = int(rng.choices(range(N_ACTIONS), weights=action_dist)[0])
 
-    # §9.3 seed data: a subsample of the action-pair posteriors the leaf values saw
+    # §9.3 seed data: a subsample of the public-observation posteriors the leaf values saw
     queried: list[tuple[str, str, np.ndarray]] = []
     sampled: list[tuple[str, str, np.ndarray]] = []
-    pairs = [(a, b) for a in range(len(grid.labels1)) for b in range(len(grid.labels2))
-             if grid.avail1[:, a].any() and grid.avail2[:, b].any()]
-    if pairs and n_queried > 0:
-        post = pair_posteriors(rho, sol.sigma1, sol.sigma2)
-        for a, b in rng.sample(pairs, min(n_queried, len(pairs))):
-            queried.append((grid.labels1[a], grid.labels2[b], post[a, b].copy()))
+    observation_model = PublicObservationLikelihood(grid)
+    leaves = list(range(len(grid.leaf_obs)))
+    if leaves and n_queried > 0:
+        post = observation_model.posteriors(rho, sol.sigma1, sol.sigma2)
+        reachable = [leaf for leaf in leaves if post[leaf].sum() > 0]
+        for leaf in rng.sample(reachable, min(n_queried, len(reachable))):
+            queried.append(("public_observation", grid.leaf_public_keys[leaf], post[leaf].copy()))
         # G1: the same subsampling under the random-iteration snapshot pair — the mid-solve
-        # queries (§9.3 mitigation 2). An independent pair draw widens (a, b) coverage.
+        # queries (§9.3 mitigation 2). An independent leaf draw widens observation coverage.
         if sol.sample_sigma1 is not None:
-            post_s = pair_posteriors(rho, sol.sample_sigma1, sol.sample_sigma2)
-            for a, b in rng.sample(pairs, min(n_queried, len(pairs))):
-                sampled.append((grid.labels1[a], grid.labels2[b], post_s[a, b].copy()))
+            post_s = observation_model.posteriors(rho, sol.sample_sigma1, sol.sample_sigma2)
+            reachable_s = [leaf for leaf in leaves if post_s[leaf].sum() > 0]
+            for leaf in rng.sample(reachable_s, min(n_queried, len(reachable_s))):
+                sampled.append(("public_observation", grid.leaf_public_keys[leaf], post_s[leaf].copy()))
 
     return PBSearchResult(
         action=action, action_dist=action_dist,
@@ -444,6 +449,7 @@ def pb_search_action(
         j_used=grid.avail2.shape[0], sims_run=sims_total,
         failed_cells=vstats.failed_cells, pruned_mass_max=float(grid.pruned_mass.max()),
         queried_beliefs=queried,
+        observation_model=observation_model,
         sample_beliefs=sampled, sample_iteration=sol.sample_iteration,
         # candidate identities behind rho's axes: the KEPT sets the solve actually ran over
         # (own_kept/opp_kept map them back to the caller's full axes); true_index indexes the

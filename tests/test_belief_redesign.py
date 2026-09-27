@@ -1,6 +1,7 @@
 """Load-bearing tests for the unordered set-autoregressive belief model."""
 from __future__ import annotations
 
+import pytest
 import torch
 
 from fog.models.belief import N_ATTRS, N_SLOTS, SLOT_ATTRS, BeliefModel
@@ -115,6 +116,31 @@ def test_ev_stat_identity_starts_compatible_but_can_distinguish_stats():
     residual = model(context, {"tokens": tokens, "masks": None}).logits["ev"]
     assert torch.allclose(residual[:, :, 0], changed[:, :, 0], atol=1e-6)
     assert not torch.allclose(residual[:, :, 2], changed[:, :, 2], atol=1e-6)
+
+
+def test_loading_old_ev_heads_preserves_predictions_and_resets_residuals():
+    original = make_model()
+    tokens = revealed_species(full_truth_grid())
+    context = torch.randn(B, STATE_DIM)
+    expected = original(context, {"tokens": tokens, "masks": None}).logits["ev"]
+    legacy = {name: value for name, value in original.state_dict().items()
+              if not name.startswith(("ev_stat_heads.", "ev_stat_id."))}
+    restored = make_model()
+    with torch.no_grad():
+        restored.ev_stat_id.weight.fill_(1)
+        restored.ev_stat_heads[0].bias.fill_(1)
+    restored.load_state_dict(legacy, strict=True)
+    actual = restored(context, {"tokens": tokens, "masks": None}).logits["ev"]
+    torch.testing.assert_close(actual, expected, rtol=0, atol=0)
+
+
+@pytest.mark.parametrize("missing", ["ev_stat_heads.0.weight", "heads.ev.weight"])
+def test_loading_checkpoint_still_rejects_incomplete_tensors(missing):
+    model = make_model()
+    state = model.state_dict()
+    del state[missing]
+    with pytest.raises(RuntimeError, match="Missing key"):
+        model.load_state_dict(state, strict=True)
 
 
 def test_pokemon_slot_permutation_equivariance():

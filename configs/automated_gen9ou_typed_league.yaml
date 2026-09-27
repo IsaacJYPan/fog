@@ -3,8 +3,7 @@ name: gen9ou_typed_autonomous_league
 output_dir: runs/gen9ou_typed_autonomous_league
 base_config: configs/gen9ou_typed_token_selfplay.yaml
 
-# This file becomes runnable as soon as the bounded on-policy correction finishes successfully.
-# The 64-game smoke is retained as the initial historical opponent.
+# Portable learner and historical opponents from the on-policy correction runs.
 initial_checkpoint: artifacts/checkpoints/typed_dagger_2048.pt
 initial_league_checkpoints:
   - artifacts/checkpoints/typed_dagger_smoke_64.pt
@@ -31,13 +30,15 @@ evaluation:
   head_to_head: true
   games: 64
   confirmation_games: 128
-  champion_games: 128
+  champion_games: 1024
+  promotion_min_games: 128
+  promotion_family_alpha: 0.05  # allocated across planned blocks and comparisons
   seed: 20261240
   confirmation_seed_offset: 100000
   champion_seed_offset: 200000
   format: gen9ou
   device: cuda
-  max_turns: 120
+  max_turns: 300  # capped unfinished games invalidate promotion evidence
   progress_every: 4
 
   # Champion promotion is conservative; learner continuation is intentionally less so.
@@ -76,7 +77,7 @@ safety:
   auto_refresh: true
   games: 5
   device: cuda
-  replay_audit_config: configs/gen9ou_typed_token_policy.yaml
+  replay_audit_config: configs/gen9ou_typed_token_kaggle_audit.yaml
 
 overrides:
   preflight.report: runs/preflight_audit/typed_token_autonomous_v1/summary.json

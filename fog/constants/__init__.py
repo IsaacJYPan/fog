@@ -1,4 +1,4 @@
-"""Constants and lookup tables (spec §1). Build first — everything depends on them.
+"""Constants and lookup tables. Build first — everything depends on them.
 
 Two artifacts per table:
   * versioned JSON under `constants/generated/` (produced by `build.py` from the pinned Showdown

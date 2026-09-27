@@ -1,0 +1,5 @@
+# Audit the portable learner instead of an untracked intermediate checkpoint.
+extends: gen9ou_typed_token_policy.yaml
+bc:
+  init_ckpt: artifacts/checkpoints/typed_dagger_2048.pt
+  init_compatible: false

@@ -34,11 +34,13 @@ Reveal semantics are CONSERVATIVE by design (plan §3): when an instruction cann
 we reveal less, never more — under-revealing keeps labels censored (a supported path everywhere);
 over-revealing would leak private choices into the belief input. Known under-reveals: passive item
 proof (Leftovers heals are unattributed), most ability activations (only weather/terrain setters
-and Intimidate are inferred). Known over-reveal: a chosen move blocked by flinch/full-para still
-emits its move event (no instruction evidence distinguishes it from a no-op status move).
+and Intimidate are inferred). Move identities are withheld when flinch, an earlier knockout,
+or an ambiguous paralysis/sleep/freeze outcome can prevent execution. The latter deliberately
+under-reveals successful moves because this backend lacks a definitive move-executed event.
 """
 from __future__ import annotations
 
+import math
 import random
 import re
 from types import SimpleNamespace
@@ -373,6 +375,8 @@ class _ViewMon:
         self.weight = float(feats.get("weightkg") or 50.0)
         self.types = [str(t) for t in feats["types"]]
         self.current_hp_fraction = (ep.hp / ep.maxhp) if ep.maxhp else 0.0
+        if rev is not None:
+            self.current_hp_fraction = math.ceil(100 * self.current_hp_fraction) / 100
         self.fainted = ep.hp <= 0
         status = to_id(getattr(ep, "status", "none") or "none")
         self.status = _STATUS_MAP.get(status, status) if status else None
@@ -1322,7 +1326,8 @@ class EngineBattle:
 
         def cond(r):
             i = active[r]
-            return f"{max(hp[(r, i)], 0)}/{maxhp[(r, i)]}"
+            percentage = math.ceil(100 * max(hp[(r, i)], 0) / maxhp[(r, i)])
+            return f"{percentage}/100"
 
         # classify chosen actions
         acts: dict[str, tuple] = {}
@@ -1352,13 +1357,27 @@ class EngineBattle:
             movers = self._order_movers(pre, acts, reprs)
         events: list[list[str]] = []
         for r in movers:
+            mon = mons[r][active[r]]
+            if acts[r][2]:  # Terastallization is public even when the move is prevented.
+                events.append(["", "-terastallize", name(r), to_id(mon.tera_type)])
+            status = to_id(getattr(mon, "status", "none") or "none")
+            flinched = any(
+                rep == f"ApplyVolatileStatus Side{'One' if r == 'p1' else 'Two'}: FLINCH"
+                for rep in reprs
+            )
+            post_side = self.state.side_one if r == "p1" else self.state.side_two
+            knocked_out_before_move = (
+                len(movers) == 2 and r == movers[1]
+                and int(post_side.pokemon[active[r]].hp) <= 0
+            )
+            if (flinched or knocked_out_before_move or status in
+                    {"par", "paralyze", "paralyzed", "slp", "sleep", "frz", "freeze", "frozen"}):
+                continue
             move_id = to_id(acts[r][1])
             events.append(["", "move", name(r), move_id])
             if move_id in ("futuresight", "doomdesire"):
                 events.append(["", "-start", name(r), "move: futuresight"])
                 self._fs_end.append(("p2" if r == "p1" else "p1", self.turn + 2))
-            if acts[r][2]:  # tera chosen with the move
-                events.append(["", "-terastallize", name(r), str(mons[r][active[r]].tera_type)])
 
         # ---- instruction walk -----------------------------------------------------------------
         last_switch_in: dict[str, int] = {}  # role -> event index of its most recent switch-in

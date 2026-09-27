@@ -128,7 +128,7 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
         assert 1 <= row["sample_iteration"] <= row["iterations"]
         assert len(row["sample_beliefs"]) <= 2
         for lab1, lab2, post in row["sample_beliefs"]:
-            assert lab1 in row["labels1"] and lab2 in row["labels2"]
+            assert lab1 == "public_observation" and len(lab2) == 64
             assert post.shape == row["rho"].shape
 
     import torch
@@ -155,11 +155,14 @@ Serious Nature
 """
 
 
-def test_learner_faint_logs_one_sided_replacement_rows(tmp_path):
+@pytest.mark.parametrize("policy_seed", [0, 1])
+def test_learner_faint_logs_one_sided_replacement_rows(tmp_path, policy_seed):
     """F2 end-to-end: a game where the learner (p1) faints with 2+ live bench plays through the
     runner without raising, and its forced replacement is logged as a solved one-sided row (the
     synthetic observe column, a valid sampled replacement) with the belief update applied."""
     from types import SimpleNamespace
+
+    import torch
 
     from fog.env.engine_battle import EngineBattle
     from fog.models.agent import FogAgent
@@ -173,6 +176,7 @@ def test_learner_faint_logs_one_sided_replacement_rows(tmp_path):
             return SimpleNamespace(tokens=np.stack([t, t]),
                                    weights=np.array([0.5, 0.5]), true_index=0, k=2)
 
+    torch.manual_seed(policy_seed)
     agent = FogAgent.from_tables({})
     proto = EngineBattle(WEAK3, ATTACKER, seed=0, battle_tag="pblog-repl-proto")
     opp_pool = np.stack([proto.truth_tokens("p2")])
@@ -315,7 +319,7 @@ def test_selfplay_both_sides_solve_and_update(tmp_path):
     by_role = {"p1": [r for r in rows if r["role"] == "p1"],
                "p2": [r for r in rows if r["role"] == "p2"]}
     assert by_role["p1"] and by_role["p2"], "both sides log solved decisions (2x data)"
-    by_turn = {r: {row["turn"]: row for row in by_role[r]} for r in by_role}
+    by_turn = {r: {row["decision_id"]: row for row in by_role[r]} for r in by_role}
     shared_turns = sorted(set(by_turn["p1"]) & set(by_turn["p2"]))
     assert shared_turns, "at least one simultaneous decision must exercise the shared solve"
     for turn in shared_turns:

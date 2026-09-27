@@ -1,4 +1,4 @@
-"""Root-level determinized evaluation (spec §8). Inference-time only — NEVER in the training loop.
+"""Root-level determinized evaluation. Inference-time only — NEVER in the training loop.
 
 For each legal action a (≤14): simulate one ply in each of k opponent worlds sampled from the
 belief model (clamped to reveals), evaluate the resulting position, average over worlds, and blend

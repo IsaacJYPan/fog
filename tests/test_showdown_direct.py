@@ -302,6 +302,7 @@ def test_local_battle_reuses_poke_env_censored_views() -> None:
 
 
 def test_direct_two_sided_solver_uses_authoritative_action_and_chance_axes() -> None:
+    import random
     import types
 
     import numpy as np
@@ -332,7 +333,8 @@ def test_direct_two_sided_solver_uses_authoritative_action_and_chance_axes() -> 
         LocalShowdownBattle.create(client, options) as battle,
     ):
         result = direct_two_sided_action(
-            ConstantValue(), battle.p1, role="p1", device=torch.device("cpu"), iters=8
+            ConstantValue(), battle.p1, role="p1", device=torch.device("cpu"), iters=8,
+            rng=random.Random(2),
         )
 
     assert result.payoff.shape[:2] == (1, 1)
@@ -342,6 +344,9 @@ def test_direct_two_sided_solver_uses_authoritative_action_and_chance_axes() -> 
     assert result.chance_branches >= result.simulations
     assert result.action_dist.sum() == pytest.approx(1.0)
     assert result.action in np.flatnonzero(result.action_dist)
+    assert result.action == random.Random(2).choices(
+        list(range(len(result.action_dist))), weights=result.action_dist)[0]
+    assert result.action != int(np.argmax(result.action_dist)), "mixed play must not become argmax"
 
 
 def test_local_runner_completes_without_network_players() -> None:

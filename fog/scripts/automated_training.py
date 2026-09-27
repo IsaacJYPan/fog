@@ -98,6 +98,31 @@ def _latest_weight_checkpoint(run_dir: Path) -> tuple[Path | None, int]:
     return path, decisions
 
 
+def _promotion_design(job: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+    """Freeze the number of looks and selection rules before their outcomes are observed."""
+    evaluation = job.get("evaluation", {})
+    design = {
+        "looks": int(job["training"]["blocks"]),
+        "family_alpha": float(evaluation.get("promotion_family_alpha", 0.05)),
+        "games": int(evaluation.get("champion_games", 1024)),
+        "seed": int(evaluation.get("seed", 10_000)),
+        "seed_offset": int(evaluation.get("champion_seed_offset", 200_000)),
+        "opponents": list(evaluation.get("opponents", ["simpleheuristics", "maxdamage"])),
+        "minimum_score": float(evaluation.get("viewer_min_head_to_head", 0.53)),
+        "maximum_regression": float(evaluation.get("viewer_max_benchmark_regression", 0.03)),
+        "pool": str(evaluation.get("pool", "")),
+        "pool_role": str(evaluation.get("promotion_pool_role", "validation")),
+        "minimum_head_games": max(1000, int(evaluation.get("promotion_head_min_games", 1000))),
+        "format": str(evaluation.get("format", "gen9ou")),
+    }
+    if design["looks"] < 1 or not 0 < design["family_alpha"] < 1:
+        raise ValueError("promotion design needs positive looks and a family alpha in (0,1)")
+    previous = state.setdefault("promotion_design", design)
+    if previous != design:
+        raise ValueError("promotion design changed on resume; start a new independently evaluated job")
+    return design
+
+
 def _deep_set(config: dict[str, Any], dotted: str, value: Any) -> None:
     node = config
     parts = dotted.split(".")
@@ -301,36 +326,100 @@ def _evaluation_command(
 def summarize_evaluation(
     report: dict[str, Any], settings: dict[str, Any] | None = None
 ) -> dict[str, Any]:
+    from dataclasses import asdict
+
+    from fog.eval.stats import paired_block_interval
+
+    gate = settings or {}
     rows = report.get("rows", [])
     summary: dict[str, Any] = {"status": report.get("status"), "rows": {}}
     for row in rows:
+        wins, losses = int(row["a_wins"]), int(row["b_wins"])
+        draws, truncated = int(row["draws"]), int(row.get("truncated", 0))
+        finished = wins + losses + draws - truncated
+        scores = row.get("game_scores", [])
+        requested = row.get("requested_games")
+        complete = bool(
+            requested is not None and requested > 0 and requested % 4 == 0
+            and row.get("completed_games") == requested and row["failures"] == 0
+            and truncated == 0 and finished == requested and len(scores) == requested
+            and all(score in (0.0, 0.5, 1.0) for score in scores)
+            and scores.count(1.0) == wins and scores.count(0.0) == losses
+            and scores.count(0.5) == draws
+        )
         summary["rows"][row["label"]] = {
-            "wins": int(row["a_wins"]),
-            "losses": int(row["b_wins"]),
-            "draws": int(row["draws"]),
+            "wins": wins,
+            "losses": losses,
+            "draws": draws - truncated,
+            "truncated": truncated,
+            "requested_games": requested,
+            "completed_games": row.get("completed_games"),
+            "finished_games": finished,
             "failures": int(row["failures"]),
-            "win_rate": float(row["a_win_rate_decisive"]),
+            "win_rate": (wins + 0.5 * (draws - truncated)) / finished if finished > 0 else None,
+            "game_scores": scores,
+            "complete_evidence": complete,
         }
     head = summary["rows"].get("parent vs candidate")
-    summary["candidate_head_to_head_win_rate"] = None if head is None else 1.0 - head["win_rate"]
+    summary["candidate_head_to_head_win_rate"] = (
+        1.0 - head["win_rate"] if head is not None and head["win_rate"] is not None else None
+    )
     deltas = {}
     for label, parent_row in summary["rows"].items():
         if not label.startswith("parent vs ") or label == "parent vs candidate":
             continue
         opponent = label.removeprefix("parent vs ")
         candidate_row = summary["rows"].get(f"candidate vs {opponent}")
-        if candidate_row is not None:
+        if (candidate_row is not None and parent_row["win_rate"] is not None
+                and candidate_row["win_rate"] is not None):
             deltas[opponent] = candidate_row["win_rate"] - parent_row["win_rate"]
     summary["benchmark_win_rate_deltas"] = deltas
-    gate = settings or {}
     minimum_head = float(gate.get("viewer_min_head_to_head", 0.53))
     maximum_regression = float(gate.get("viewer_max_benchmark_regression", 0.03))
+    required = {"parent vs candidate"}
+    for opponent in gate.get("opponents", []):
+        required.update((f"parent vs {opponent}", f"candidate vs {opponent}"))
+    complete = bool(
+        report.get("status") == "complete" and required <= summary["rows"].keys()
+        and all(row["complete_evidence"] for row in summary["rows"].values())
+    )
+    summary["complete_evidence"] = complete
+    summary["candidate_score_interval"] = None
+    summary["benchmark_delta_intervals"] = {}
+    # One family includes head-to-head and every paired anchor comparison.
+    alpha = float(gate.get("promotion_alpha", 0.05)) / (1 + len(deltas))
+    minimum_games = max(128, int(gate.get("promotion_min_games", 128)))
+    enough = complete and all(row["finished_games"] >= minimum_games
+                              for row in summary["rows"].values())
+    if enough:
+        summary["candidate_score_interval"] = asdict(paired_block_interval(
+            [1.0 - value for value in head["game_scores"]], alpha=alpha,
+        ))
+        for opponent in deltas:
+            parent_scores = summary["rows"][f"parent vs {opponent}"]["game_scores"]
+            candidate_scores = summary["rows"][f"candidate vs {opponent}"]["game_scores"]
+            if len(parent_scores) != len(candidate_scores):
+                enough = False
+                break
+            summary["benchmark_delta_intervals"][opponent] = asdict(paired_block_interval(
+                [candidate - parent for candidate, parent in zip(candidate_scores, parent_scores)],
+                alpha=alpha, bounds=(-1.0, 1.0),
+            ))
+    summary["promotion_uncertainty_method"] = "paired four-game block percentile bootstrap"
+    summary["promotion_alpha_per_comparison"] = alpha
+    interval = summary["candidate_score_interval"]
     summary["recommend_viewer_update"] = bool(
-        summary["candidate_head_to_head_win_rate"] is not None
+        gate.get("promotion_pool_role") == "test"
+        and head is not None
+        and head["finished_games"] >= max(1000, int(gate.get("promotion_head_min_games", 1000)))
+        and enough and interval is not None and interval["low"] > 0.5
+        and summary["candidate_head_to_head_win_rate"] is not None
         and summary["candidate_head_to_head_win_rate"] >= minimum_head
         and all(delta >= -maximum_regression for delta in deltas.values())
-        and all(row["failures"] == 0 for row in summary["rows"].values())
+        and all(value["low"] >= -maximum_regression
+                for value in summary["benchmark_delta_intervals"].values())
     )
+    summary["promotion_scope"] = gate.get("promotion_pool_role", "validation")
     deterioration_head = float(gate.get("deterioration_head_to_head_below", 0.47))
     deterioration_regression = float(gate.get("deterioration_benchmark_regression", 0.03))
     summary["deteriorated"] = bool(
@@ -347,6 +436,9 @@ def summarize_evaluation(
     collapse_head = float(gate.get("collapse_head_to_head_below", 0.42))
     collapse_regression = float(gate.get("collapse_benchmark_regression", 0.05))
     head_collapse = bool(
+        head is not None and head["truncated"] == 0
+        and head["finished_games"] >= int(gate.get("games", 64))
+        and
         summary["candidate_head_to_head_win_rate"] is not None
         and summary["candidate_head_to_head_win_rate"] < collapse_head
     )
@@ -466,6 +558,8 @@ def run_job(job_path: Path, *, dry_run: bool = False, max_blocks: int | None = N
     job = _read_yaml(job_path)
     _validate_job(job, root)
     state_path, state = _load_state(job, root)
+    promotion_design = _promotion_design(job, state)
+    _atomic_json(state_path, state)
     output = state_path.parent
     training = job["training"]
     total_blocks = int(training["blocks"])
@@ -625,30 +719,26 @@ def run_job(job_path: Path, *, dry_run: bool = False, max_blocks: int | None = N
         promoted = False
         champion = _resolve(root, state["champion_checkpoint"])
         if selected == _portable_path(root, candidate) and evaluation.get("enabled", True):
-            if champion.resolve() == current.resolve():
-                champion_summary = record["evaluation"]
-            else:
-                champion_dir = block_root / "champion_evaluation"
-                champion_result = champion_dir / "results.json"
-                champion_games = int(evaluation.get("champion_games", 128))
-                champion_settings = copy.deepcopy(evaluation)
-                champion_settings["games"] = champion_games
-                champion_command = _evaluation_command(
-                    job, config_path, champion, candidate, champion_result,
-                    int(evaluation.get("seed", 10_000))
-                    + int(evaluation.get("champion_seed_offset", 200_000)) + index,
-                    settings=champion_settings,
-                )
-                _run_process(
-                    champion_command,
-                    champion_dir / "stdout.log",
-                    champion_dir / "stderr.log",
-                )
-                champion_report = json.loads(champion_result.read_text(encoding="utf-8"))
-                if champion_report.get("status") != "complete":
-                    raise RuntimeError(f"champion evaluation did not complete: {champion_result}")
-                champion_summary = summarize_evaluation(champion_report, champion_settings)
-                record["champion_evaluation"] = champion_summary
+            # Always independent of the diagnostic screen, including champion == parent.
+            champion_dir = block_root / "champion_evaluation"
+            champion_result = champion_dir / "results.json"
+            champion_settings = copy.deepcopy(evaluation)
+            champion_settings["games"] = int(evaluation.get("champion_games", 1024))
+            champion_settings["promotion_alpha"] = (
+                promotion_design["family_alpha"] / promotion_design["looks"]
+            )
+            champion_command = _evaluation_command(
+                job, config_path, champion, candidate, champion_result,
+                int(evaluation.get("seed", 10_000))
+                + int(evaluation.get("champion_seed_offset", 200_000)) + index,
+                settings=champion_settings,
+            )
+            _run_process(champion_command, champion_dir / "stdout.log", champion_dir / "stderr.log")
+            champion_report = json.loads(champion_result.read_text(encoding="utf-8"))
+            if champion_report.get("status") != "complete":
+                raise RuntimeError(f"champion evaluation did not complete: {champion_result}")
+            champion_summary = summarize_evaluation(champion_report, champion_settings)
+            record["champion_evaluation"] = champion_summary
             promoted = bool(champion_summary.get("recommend_viewer_update", False))
             if promoted:
                 state["champion_checkpoint"] = _portable_path(root, candidate)
@@ -784,6 +874,8 @@ def main() -> None:
     bundle.add_argument("--job", type=Path, required=True)
     bundle.add_argument("--out", type=Path, required=True)
     bundle.add_argument("--dry-run", action="store_true")
+    bundle.add_argument("--allow-missing-inputs", action="store_true",
+                        help="create a setup bundle with an explicit missing-input inventory")
     args = parser.parse_args()
     try:
         if args.command == "run":
@@ -795,7 +887,8 @@ def main() -> None:
         elif args.command == "export":
             export_job(args.job, args.out)
         elif args.command == "bundle-kaggle":
-            bundle_for_kaggle(args.job, args.out, dry_run=args.dry_run)
+            bundle_for_kaggle(args.job, args.out, dry_run=args.dry_run,
+                              allow_missing_inputs=args.allow_missing_inputs)
     except (KeyError, OSError, RuntimeError, TypeError, ValueError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         raise SystemExit(1) from None

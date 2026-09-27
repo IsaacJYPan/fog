@@ -32,9 +32,7 @@ from fog.models.shared_latent import (
 )
 from fog.models.structured_memory import StructuredMemoryEncoder, StructuredMemoryReader
 
-# Soft architectural ceiling. Models should stay only as large as evidence requires, but an
-# information-preserving token memory may exceed the historical 5M limit. Reaching this ceiling
-# requires an explicit design review rather than silent growth.
+# Parameter ceiling checked by assert_within_budget; token-memory models may exceed the older 5M limit.
 PARAM_BUDGET = 50_000_000
 
 
@@ -86,9 +84,11 @@ class TypedMatchupPrior(nn.Module):
 
 class FogAgent(nn.Module):
     def __init__(self, cfg: dict | None = None, sizes: dict | None = None) -> None:
-        """`sizes` = RAW generated-table cardinalities (see `from_tables`). None keeps the scaffolding
-        placeholder sizes — fine for unit tests, WRONG for real battles (real table indices exceed
-        the placeholder embedding ranges and will silently alias or crash)."""
+        """Build from table cardinalities, excluding the unknown-token row.
+
+        Use ``from_tables`` for battles. The default sizes support small unit-test fixtures
+        only; real species and move IDs can exceed those embedding ranges.
+        """
         super().__init__()
         cfg = cfg or {}
         model_cfg = cfg.get("model", {})

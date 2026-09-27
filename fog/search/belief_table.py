@@ -9,6 +9,9 @@ likelihoods, and direct products underflow.
 
 Update contract (who supplies what):
 
+  * `observation_step(...)` — the persistent search runner supplies the joint likelihood of the
+    public transcript, marginalized over hidden choices and chance outcomes. This is the primary
+    update; mechanically incompatible worlds have zero likelihood. No arbitrary floor is applied.
   * `behavior_step(...)` — after a real public action pair, multiply in each side's modeled
     probability of the action it was OBSERVED to play. The caller must pass the distribution that
     ACTUALLY acted (the solver's averaged strategy during solver play, the raw policy during
@@ -53,6 +56,7 @@ class JointBeliefTable:
         self.collapsed = False           # a refused all-zero step happened; rejuvenate
         self.behavior_steps = 0
         self.mechanical_steps = 0
+        self.observation_steps = 0
         self.refused_steps = 0
 
     @classmethod
@@ -73,6 +77,17 @@ class JointBeliefTable:
             return False
         self.log_rho = candidate
         return True
+
+    def observation_step(self, likelihood: Array) -> bool:
+        """Joint likelihood of the observed public outcome, including latent action choices."""
+        likelihood = np.asarray(likelihood, dtype=np.float64)
+        if (likelihood.shape != self.log_rho.shape or not np.isfinite(likelihood).all()
+                or np.any(likelihood < 0)):
+            raise ValueError("observation likelihood must be finite, nonnegative and match the axes")
+        with np.errstate(divide="ignore"):
+            accepted = self._apply(np.log(likelihood))
+        self.observation_steps += 1
+        return accepted
 
     def behavior_step(
         self,

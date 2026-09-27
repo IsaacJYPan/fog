@@ -44,10 +44,20 @@ def expand_state_dict_for_posterior(sd: dict, posterior_dim: int = N_POSTERIOR_F
     import torch
 
     sd = dict(sd)
+    core_width = sd[_HEAD_LAYER0[0]].shape[1]
     for key in _HEAD_LAYER0:
         w = sd[key]
         sd[key] = torch.cat(
             [w, torch.zeros(w.shape[0], posterior_dim, dtype=w.dtype, device=w.device)], dim=1
+        )
+    # Conditional scoring concatenates policy state, structured state, then action
+    # inputs. Insert posterior columns after the policy state, not after the actions.
+    conditional = "policy_value.conditional_action_scorer.0.weight"
+    if conditional in sd:
+        w = sd[conditional]
+        sd[conditional] = torch.cat(
+            [w[:, :core_width], w.new_zeros(w.shape[0], posterior_dim), w[:, core_width:]],
+            dim=1,
         )
     return sd
 

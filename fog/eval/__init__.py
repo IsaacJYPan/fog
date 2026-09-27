@@ -1,4 +1,4 @@
-"""Evaluation protocol (spec §9). Fixed before any experiments; results in every report.
+"""Evaluation protocol. Fixed before any experiments; results in every report.
 
   * gauntlet     -- vs Random / MaxDamage / SimpleHeuristics / BC-only, Wilson 95% CIs, ≥2000 games
   * elo          -- round-robin among {BC, N, L×β, set oracle, action oracle}

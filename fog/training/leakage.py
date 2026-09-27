@@ -1,4 +1,4 @@
-"""The research objective — information-leakage penalty (spec §7).
+"""The research objective — information-leakage penalty.
 
 Two-player population: L-agents (leakage-penalized) and N-agents (normal), same architecture/budget.
 

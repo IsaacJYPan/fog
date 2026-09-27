@@ -1,4 +1,4 @@
-"""Gauntlet vs fixed baselines (spec §9).
+"""Gauntlet vs fixed baselines.
 
 Random, MaxDamage, SimpleHeuristics (poke-env built-ins), BC-only checkpoint — each ≥2000 games.
 Report Wilson 95% CIs. Never conclude from <1000 games. Report search on/off as a separate column

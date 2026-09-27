@@ -143,7 +143,8 @@ def run(args: argparse.Namespace) -> dict:
     device = torch.device(args.device if args.device == "cpu" or torch.cuda.is_available() else "cpu")
     agent = FogAgent.from_tables(cfg).to(device)
     agent.load_state_dict(torch.load(args.checkpoint, map_location=device, weights_only=False))
-    agent.eval(); agent.requires_grad_(False)
+    agent.eval()
+    agent.requires_grad_(False)
     sizes = {"species": TABLES.n_species, "item": TABLES.n_items, "ability": TABLES.n_abilities, "move": TABLES.n_moves}
     policy_dim = agent.backbone.state_dim + agent.backbone.dyn_dim + (4 if agent.use_posterior_features else 0)
     public_sources = {"public_token": 128, "public_pooled": 256, "fused_public": 256, "policy_input": policy_dim}
@@ -170,24 +171,30 @@ def run(args: argparse.Namespace) -> dict:
         private_raw = PrivateStateEncoder._private_raw(batch["entities"])
         private_ids = batch["entity_ids"][:, :6]
         hist_raw, hist_ids, hist_state = _last_history(batch)
-        losses: list[torch.Tensor] = []; metrics: dict[str, dict[str, float]] = {}
+        losses: list[torch.Tensor] = []
+        metrics: dict[str, dict[str, float]] = {}
         for name in public_sources:
             loss, item = probes["public"].loss_metrics(name, sources[name], public_raw, public_ids)
-            losses.append(loss); metrics[f"public/{name}"] = item
+            losses.append(loss)
+            metrics[f"public/{name}"] = item
         for name in private_sources:
             loss, item = probes["private"].loss_metrics(name, sources[name], private_raw, private_ids)
-            losses.append(loss); metrics[f"private/{name}"] = item
+            losses.append(loss)
+            metrics[f"private/{name}"] = item
         history_values = {"history_pooled": sources["history_pooled"], "fused_public": compact["fused"], "policy_input": compact["policy"]}
         for name, values in history_values.items():
             loss, item = probes["history"].loss_metrics(name, values, hist_raw, hist_ids, hist_state)
-            losses.append(loss); metrics[f"history/{name}"] = item
+            losses.append(loss)
+            metrics[f"history/{name}"] = item
         vector_values = {"public_pooled": sources["public_pooled"], "fused_public": compact["fused"], "policy_input": compact["policy"]}
         for name, values in vector_values.items():
             field_pred = probes["field"](name, values)
-            field_loss = F.mse_loss(field_pred, batch["field"]); losses.append(field_loss)
+            field_loss = F.mse_loss(field_pred, batch["field"])
+            losses.append(field_loss)
             metrics[f"field/{name}"] = {"mse": float(field_loss.detach()), "zero_mse": float(batch["field"].square().mean())}
             legal_pred = probes["legality"](name, values)
-            legal_loss = F.binary_cross_entropy_with_logits(legal_pred, batch["legality_mask"].float()); losses.append(legal_loss)
+            legal_loss = F.binary_cross_entropy_with_logits(legal_pred, batch["legality_mask"].float())
+            losses.append(legal_loss)
             legal_bits = (legal_pred > 0) == batch["legality_mask"]
             metrics[f"legality/{name}"] = {"bce": float(legal_loss.detach()), "bit_accuracy": float(legal_bits.float().mean()), "row_accuracy": float(legal_bits.all(-1).float().mean())}
         if add_baseline:
@@ -195,29 +202,47 @@ def run(args: argparse.Namespace) -> dict:
         return torch.stack(losses).mean(), metrics
 
     def evaluate(dataset: TensorObservationDataset) -> tuple[float, dict]:
-        probes.eval(); total_loss = 0.0; n_batches = 0
-        totals: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float)); counts = defaultdict(int)
+        probes.eval()
+        total_loss = 0.0
+        n_batches = 0
+        totals: dict[str, dict[str, float]] = defaultdict(lambda: defaultdict(float))
+        counts = defaultdict(int)
         with torch.no_grad():
             for batch in dataset.batches(args.batch_size, shuffle=False, seed=args.seed, device=device):
-                loss, metrics = process(batch, True); total_loss += float(loss); n_batches += 1
+                loss, metrics = process(batch, True)
+                total_loss += float(loss)
+                n_batches += 1
                 for group, item in metrics.items():
-                    _accumulate(totals[group], item); counts[group] += 1
+                    _accumulate(totals[group], item)
+                    counts[group] += 1
         return total_loss / max(1, n_batches), {group: _finalize(values, counts[group]) for group, values in totals.items()}
 
-    rows = []; best_score = float("inf"); best_state = None; stale = 0
+    rows = []
+    best_score = float("inf")
+    best_state = None
+    stale = 0
     for epoch in range(args.epochs):
-        probes.train(); running = 0.0; batches = 0
+        probes.train()
+        running = 0.0
+        batches = 0
         for batch in datasets["train"].batches(args.batch_size, shuffle=True, seed=args.seed + epoch, device=device):
-            optimizer.zero_grad(set_to_none=True); loss, _ = process(batch, False); loss.backward()
-            torch.nn.utils.clip_grad_norm_(probes.parameters(), 5.0); optimizer.step()
-            running += float(loss.detach()); batches += 1
+            optimizer.zero_grad(set_to_none=True)
+            loss, _ = process(batch, False)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(probes.parameters(), 5.0)
+            optimizer.step()
+            running += float(loss.detach())
+            batches += 1
         team_loss, _ = evaluate(datasets["team_holdout"])
         battle_loss, _ = evaluate(datasets["battle_holdout"])
         score = (team_loss + battle_loss) / 2
         row = {"epoch": epoch + 1, "train_loss": running / max(1, batches), "team_holdout_loss": team_loss, "battle_holdout_loss": battle_loss}
-        rows.append(row); print(f"[live-encoder-probe] {row}", flush=True)
+        rows.append(row)
+        print(f"[live-encoder-probe] {row}", flush=True)
         if score < best_score - args.min_delta:
-            best_score = score; best_state = copy.deepcopy(probes.state_dict()); stale = 0
+            best_score = score
+            best_state = copy.deepcopy(probes.state_dict())
+            stale = 0
         else:
             stale += 1
             if stale >= args.patience:
@@ -239,7 +264,9 @@ def run(args: argparse.Namespace) -> dict:
     torch.save(best_state, args.out / "probe_best.pt")
     (args.out / "report.json").write_text(json.dumps(report, indent=2))
     with (args.out / "metrics.csv").open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0])); writer.writeheader(); writer.writerows(rows)
+        writer = csv.DictWriter(handle, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows(rows)
     print(json.dumps(report, indent=2), flush=True)
     return report
 
@@ -257,7 +284,8 @@ def main() -> None:
     parser.add_argument("--patience", type=int, default=5)
     parser.add_argument("--min-delta", type=float, default=0.001)
     parser.add_argument("--seed", type=int, default=20261051)
-    args = parser.parse_args(); run(args)
+    args = parser.parse_args()
+    run(args)
 
 
 if __name__ == "__main__":

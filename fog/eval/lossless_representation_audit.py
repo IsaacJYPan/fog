@@ -60,7 +60,9 @@ def run(args: argparse.Namespace) -> dict:
             }
             for name, pair in pairs.items():
                 correct, count = _equal(*pair)
-                bucket = totals.setdefault(name, [0, 0]); bucket[0] += correct; bucket[1] += count
+                bucket = totals.setdefault(name, [0, 0])
+                bucket[0] += correct
+                bucket[1] += count
             if agent.structured_encoder is not None:
                 memory = agent.structured_encoder(contexts, embeds)
                 public_id_start = ENTITY_RAW_DIM + embeds.out_dim
@@ -88,7 +90,8 @@ def run(args: argparse.Namespace) -> dict:
                 for name, pair in token_pairs.items():
                     correct, count = _equal(*pair)
                     bucket = token_totals.setdefault(name, [0, 0])
-                    bucket[0] += correct; bucket[1] += count
+                    bucket[0] += correct
+                    bucket[1] += count
     fields = {name: {"exact": correct / count, "correct": correct, "count": count} for name, (correct, count) in totals.items()}
     minimum = min(item["exact"] for item in fields.values())
     token_fields = {
@@ -121,7 +124,9 @@ def main() -> None:
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--device", default="cuda")
-    args = parser.parse_args(); report = run(args); raise SystemExit(0 if report["passed"] else 1)
+    args = parser.parse_args()
+    report = run(args)
+    raise SystemExit(0 if report["passed"] else 1)
 
 
 if __name__ == "__main__":
