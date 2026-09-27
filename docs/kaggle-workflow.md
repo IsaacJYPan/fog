@@ -54,6 +54,13 @@ Each `runs/experiments/<id>/` contains:
 Every experiment gets its own dataset and script, avoiding accidental updates to a
 running experiment. The worker verifies the complete input hash inventory. Collection
 checks the returned experiment descriptor before importing and records Kaggle's run ID.
+Recipes can also require `safety.policy_contract` with a frozen real-rollout `batch` path
+and a log-probability `tolerance` (default .001). Include that batch in `bundle_inputs`.
+Before training, the worker checks the initial learner against the CPU actor's recorded
+probabilities on the actual training device, with and without explicit chain supervision.
+Any failed comparison stops the job; `policy_contract.json` records successful or numerical
+failure results. The batch must come from the same initial policy and behavior temperature
+and bonus. This is a likelihood check, not proof of observation quality or useful learning.
 Archive validation prevents unsafe extraction; imports never replace earlier results.
 The worker writes checkpoints and logs to `/kaggle/working/training` throughout the
 run, with a link from the frozen recipe's output path. The final ZIP contains that

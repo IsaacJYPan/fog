@@ -59,6 +59,10 @@ def run() -> None:
             subprocess.run([python, "-m", "fog.scripts.validate_replay_decisions",
                             "--manifest", manifest, "--out",
                             str(output / "input_validation.json")], check=True)
+        if recipe.get("safety", {}).get("policy_contract"):
+            subprocess.run([python, "-m", "fog.scripts.check_policy_contract", "--job", str(job),
+                            "--out", str(output / "policy_contract.json")],
+                           env=environment, check=True)
         result = subprocess.run([python, "-m", "fog.scripts.automated_training", "run",
                                  "--job", str(job), "--max-blocks", "1"], env=environment)
         code = result.returncode
