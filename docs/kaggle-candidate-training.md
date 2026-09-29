@@ -18,8 +18,8 @@ CPU rollout workers feeding one centralized GPU learner. Multiple allocated GPUs
 distributed training. `notebooks/kaggle_candidates.ipynb` remains a manual bundle alternative.
 
 A completed execution baseline processed 24,079 decisions and exported its final checkpoint in
-about 23 minutes. This establishes that the pipeline runs. Subsequent pilot strength and retention
-results are recorded separately in [research status](research-status.md).
+about 23 minutes. This establishes that the pipeline runs; it does not establish a strength gain.
+The referenced checkpoints and generated datasets must be supplied separately.
 
 ## Dataset and split
 

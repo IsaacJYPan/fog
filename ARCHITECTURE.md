@@ -183,8 +183,7 @@ These identifiers replace references in source comments to untracked historical 
 The environment reward is terminal and sparse. The current typed-token experiments initialize
 from a retained imitation/DAgger checkpoint, then test bounded PPO interventions with auxiliary
 belief supervision and optional replay retention. The latest validation has not established a
-stronger replacement. See [the training plan](HIGH_LEVEL_TRAINING_PLAN.md) and
-[measured results](docs/research-status.md).
+stronger replacement. See the [research boundaries](README.md#research-boundaries).
 
 Belief cross-entropy provides dense representation training; guessing hidden information is not
 an environment reward. Exact simulator-owned labels remain separate from censored public-replay

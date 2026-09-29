@@ -6,20 +6,15 @@ observability. Battles use a pinned local Showdown simulator.
 
 The active experiments use a typed-token model. The earlier three-encoder model and experimental
 belief-space search are retained for comparison. See [ARCHITECTURE.md](ARCHITECTURE.md) for the
-model contracts and implementation limits, and [HIGH_LEVEL_TRAINING_PLAN.md](HIGH_LEVEL_TRAINING_PLAN.md)
-for the current training plan.
-
-[Earlier research notes](docs/research-notes.md) retain the belief-update equations, search
-invariants, and historical milestone gates used by the older experiments.
+model contracts and implementation limits.
 
 ## Local setup
 
-Install Python 3.11+, uv, Node.js with npm, Git LFS, and a Rust toolchain. On Windows, building the
+Install Python 3.11+, uv, Node.js with npm, and a Rust toolchain. On Windows, building the
 Rust dependency also requires the MSVC C++ build tools. Run these commands from the repository root:
 
 ```sh
 git submodule update --init --recursive
-git lfs pull
 uv sync --locked --extra dev
 npm --prefix server/pokemon-showdown ci
 npm --prefix server/pokemon-showdown run build
@@ -50,8 +45,7 @@ training on a memory-constrained machine.
 
 ## Training
 
-The [research status](docs/research-status.md) records the current results, PPO and evaluation
-repairs, and remaining limitations. See the [Metamon Gen9OU guide](docs/metamon-gen9ou.md)
+See the [Metamon Gen9OU guide](docs/metamon-gen9ou.md)
 for bounded, revision-pinned replay imports and their reconstruction limits.
 
 Use `fog.train` for one PPO or behavior-cloning experiment:
@@ -98,10 +92,10 @@ is no longer supported.
 | `tests/` | Unit tests and simulator integration tests |
 | `server/pokemon-showdown/` | Pinned upstream Git submodule |
 | `data/teams/` | Team pastes and packaged pools |
-| `artifacts/checkpoints/` | Portable checkpoints tracked with Git LFS |
 
-Generated lookup tables in `fog/constants/` are tracked. Raw replays, downloaded usage data,
-local reports, and training output under `runs/` are ignored.
+Generated lookup tables in `fog/constants/` and reusable team pools are tracked. Raw replays,
+downloaded usage data, checkpoints, experiment reports, and training outputs are local inputs
+and outputs excluded from version control.
 
 ## Data and checkpoints
 
@@ -123,11 +117,10 @@ claimed ladder ratings are not independently verified. `configs/train_ou_public.
 least 100 teams. `fog.scripts.build_public_team_splits` creates source-stratified train, validation,
 and test packages with no exact roster shared across splits.
 
-For a transferred checkout, run `git lfs fsck` before using the checkpoints. Their hashes and
-promotion status are recorded in `artifacts/checkpoints/manifest.json`. The typed league starts
-from `typed_dagger_2048.pt`; the older search experiments retain `g0_retained.pt`.
-`gen0_candidate.pt` still needs matched evaluation, and `gen1_rejected.pt` should not be used as a
-promoted model.
+Pretrained checkpoints are not distributed with the source. Recipes that reference
+`artifacts/checkpoints/` require separately supplied compatible models; a fresh clone cannot run
+those recipes until their inputs are available. Set the checkpoint and data paths in your recipe,
+retain hashes and provenance with each run, and run the preflight checks before training.
 
 ## Research boundaries
 
@@ -142,12 +135,11 @@ items; a matched policy pilot remains tied. It is available as an explicit conve
 The public-belief solver is experimental. Its direct-Showdown bridge currently uses one private
 world per side; multi-candidate hidden-team substitution is not a production inference path.
 The learned public-belief value model failed its public-only ablation, and the second search
-distillation generation regressed in direct play. These negative results remain part of the
-experiment record.
+distillation generation regressed in direct play. The typed-token PPO pilots have not established
+a reliable strength gain over their starting checkpoint.
 
 Changes to observations, belief, search, or training semantics should update the relevant contracts
-in [ARCHITECTURE.md](ARCHITECTURE.md) and their acceptance tests. Known limits and earlier validation
-results are recorded in [TECHNICAL_DEBT.md](TECHNICAL_DEBT.md).
+in [ARCHITECTURE.md](ARCHITECTURE.md) and their acceptance tests.
 
 ## Kaggle experiment workflow
 

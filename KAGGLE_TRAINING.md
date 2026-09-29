@@ -61,8 +61,8 @@ machine. No local background polling service is installed.
 
 The trial targets 64 decisions; full-game collection can overshoot it. The example full recipe
 targets 24,000 decisions and is retained as an execution baseline. Choose budgets through a new
-recipe using the [current training plan](HIGH_LEVEL_TRAINING_PLAN.md), not by repeatedly rerunning
-an old notebook. No long continuation is warranted by the current validation results.
+recipe with a fixed evaluation protocol and stopping criteria. A successful execution alone
+does not justify a longer training run.
 
 The worker verifies the frozen inventory, preserves Kaggle's CUDA PyTorch, installs other
 dependencies, validates replay shards, and refreshes both direct and replay audits before

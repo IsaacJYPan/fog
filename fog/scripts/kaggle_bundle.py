@@ -47,7 +47,7 @@ def _bundle_inputs(job_path: Path, root: Path) -> tuple[set[Path], list[str]]:
 
     for relative in (
         "pyproject.toml", "README.md", "uv.lock", "KAGGLE_TRAINING.md",
-        "ARCHITECTURE.md", "HIGH_LEVEL_TRAINING_PLAN.md", "TECHNICAL_DEBT.md",
+        "ARCHITECTURE.md",
     ):
         path = root / relative
         if path.is_file():

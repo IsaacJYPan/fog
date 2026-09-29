@@ -33,9 +33,12 @@ data/teams/gen9ou_public_v*/
 # Training artifacts
 runs/
 /checkpoints/
-/artifacts/*.zip
-/artifacts/fog-kaggle-*.sha256
-/artifacts/fog-kaggle-*.verification.json
+/artifacts/
+/docs/experiments/
+*.ckpt
+*.pt
+*.pth
+*.safetensors
 
 # Account settings, credentials, and local experiment notes.
 /configs/kaggle_results.json
@@ -48,11 +51,12 @@ kaggle.json
 /docs/research-audit-*.md
 /docs/research-improvement-plan.md
 /docs/research-improvements-*.md
+/docs/research-notes.md
+/docs/research-status.md
+/docs/model-evidence.md
+/docs/training-data-strategy.md
 /docs/candidates-300k-plan.md
 /docs/kaggle-trial.md
-*.ckpt
-*.pt
-!artifacts/checkpoints/*.pt
 
 # Course materials (personal study track, not project source)
 course/
@@ -61,12 +65,16 @@ course/
 .DS_Store
 .idea/
 .vscode/
+Thumbs.db
+*.log
+*.tmp
+*.bak
+/build/
+/dist/
 
 # Track maintained project documentation explicitly.
 /*.md
 !/README.md
 !/KAGGLE_TRAINING.md
 !/ARCHITECTURE.md
-!/TECHNICAL_DEBT.md
-!/HIGH_LEVEL_TRAINING_PLAN.md
 server/README.md
