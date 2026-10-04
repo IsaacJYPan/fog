@@ -150,6 +150,11 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     kl_anchor_coef = ppo_cfg.get("kl_anchor_coef", 0.0)
     max_grad_norm = ppo_cfg.get("max_grad_norm", 0.5)
     target_kl = ppo_cfg.get("target_kl")
+    heuristic_coef = float(ppo_cfg.get("heuristic_coef", 0.0))
+    if not math.isfinite(heuristic_coef) or heuristic_coef < 0:
+        raise ValueError("ppo.heuristic_coef must be finite and non-negative")
+    if heuristic_coef > 0 and batch.get("supervised_label") is None:
+        raise ValueError("heuristic guidance is enabled but rollout teacher labels are missing")
     if target_kl is not None and (not math.isfinite(float(target_kl)) or target_kl <= 0):
         raise ValueError("ppo.target_kl must be finite and positive")
     rollout_temperature = float(ppo_cfg.get("rollout_temperature", 1.0))
@@ -205,6 +210,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     game_outcomes = batch.get("game_outcomes")
     log("rollout_temperature", rollout_temperature)
     log("rollout_tera_logit_bonus", rollout_tera_logit_bonus)
+    if batch.get("supervised_label") is not None:
+        log("heuristic_coef", heuristic_coef)
     for family, selected in {
         "ordinary_move": (actions >= 0) & (actions < 4),
         "tera_move": (actions >= 4) & (actions < 8),
@@ -310,6 +317,17 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             entropy = _masked_entropy(behavior_log_probs).mean()
 
             loss = policy_loss + value_coef * v_loss - entropy_coef * entropy
+
+            if mb.get("supervised_label") is not None:
+                from fog.training.heuristic_guidance import guidance_loss
+
+                teacher_loss, teacher_metrics = guidance_loss(
+                    out.log_probs, mb["supervised_label"], mb["legality_mask"]
+                )
+                if heuristic_coef > 0:
+                    loss = loss + heuristic_coef * teacher_loss
+                for name, metric in teacher_metrics.items():
+                    log(name, metric)
 
             if kl_anchor_coef > 0 and mb.get("bc_log_probs") is not None:
                 kl_bc = _masked_kl(out.log_probs, mb["bc_log_probs"]).mean()
@@ -596,6 +614,9 @@ class _TrainSetup:
             )
 
         self.total = int(self.ppo_cfg.get("total_decisions", 100_000))
+        from fog.training.heuristic_guidance import validate_guidance
+
+        validate_guidance(cfg)
         self.batch_decisions = int(self.ppo_cfg.get("batch_decisions", 16_000))
         self.games_per_chunk = int(self.ppo_cfg.get("games_per_chunk", 8))
         self.lr = float(self.ppo_cfg.get("lr", 1e-4))
@@ -846,6 +867,9 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     # This exact value was held fixed for the entire collected batch.
     step_ppo["rollout_tera_logit_bonus"] = s.rollout_tera_logit_bonus
     step_ppo["entropy_coef"] = s.entropy0 + (s.entropy_decay_to - s.entropy0) * frac
+    from fog.training.heuristic_guidance import guidance_weight
+
+    step_ppo["heuristic_coef"] = guidance_weight(s.ppo_cfg, s.decisions_seen, s.total)
     step_ppo["kl_anchor_coef"] = (
         s.ppo_cfg.get("kl_anchor_coef", 0.02)
         if (s.bc_anchor is not None and s.decisions_seen < s.kl_anchor_decisions)
@@ -1311,6 +1335,9 @@ class _ShowdownRolloutWorker:
             )
         )
         self.adapter.leak_family_weights = cfg.get("leakage", {}).get("family_weights")
+        from fog.training.heuristic_guidance import attach_guidance
+
+        self.teacher = attach_guidance(self.adapter, cfg)
         self.adapter.phi_hat = shared_phi
 
         def local_truth(battle):
@@ -1386,6 +1413,8 @@ class _ShowdownRolloutWorker:
             p2_paste = self.pool_teams[game.p2_index]
             self.current_private_state = p1_paste
             self.current_opponent = p2_paste
+            if self.teacher is not None:
+                self.teacher.start_game(game.seed)
             # Policy sampling is per-game deterministic, independent of process scheduling.
             torch.manual_seed(game.seed % (2**63 - 1))
             np.random.seed(game.seed % (2**32))
@@ -1495,6 +1524,9 @@ def _train_showdown_direct(cfg: dict) -> dict:
         )
     )
     adapter.attach_buffer(s.buf)
+    from fog.training.heuristic_guidance import attach_guidance
+
+    teacher = attach_guidance(adapter, cfg)
     adapter.leak_family_weights = s.leak_cfg.get("family_weights")
     if s.beta > 0:
         adapter.phi_hat = FrozenProbe.from_agent(s.agent).to(s.device)
@@ -1622,11 +1654,14 @@ def _train_showdown_direct(cfg: dict) -> dict:
                     s.pool_sample_counts[p2_index] += 1
                     current_opponent["paste"] = p2_paste
                     battle_number += 1
+                    showdown_seed = rng.getrandbits(256)
+                    if teacher is not None:
+                        teacher.start_game(showdown_seed)
                     result = play_local_battle(
                         client,
                         {
                             "formatid": s.fmt,
-                            "seed": f"sodium,{rng.getrandbits(256):064x}",
+                            "seed": f"sodium,{showdown_seed:064x}",
                             "strictChoices": True,
                             "p1": {"name": "FOG", "team": packed[p1_paste]},
                             "p2": {"name": "Opponent", "team": packed[p2_paste]},
@@ -1705,6 +1740,7 @@ def _train_showdown_direct(cfg: dict) -> dict:
                             )
                         )
                         local_adapter.attach_buffer(local_buf)
+                        local_teacher = attach_guidance(local_adapter, cfg)
                         local_adapter.leak_family_weights = s.leak_cfg.get("family_weights")
                         if s.beta > 0:
                             local_adapter.phi_hat = FrozenProbe.from_agent(actor).cpu()
@@ -1748,6 +1784,8 @@ def _train_showdown_direct(cfg: dict) -> dict:
                             p2_paste = s.pool_teams[game.p2_index]
                             local_private_state["paste"] = p1_paste
                             local_current["paste"] = p2_paste
+                            if local_teacher is not None:
+                                local_teacher.start_game(game.seed)
                             result = play_local_battle(
                                 clients[worker_id],
                                 {

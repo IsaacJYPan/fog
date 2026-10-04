@@ -64,11 +64,37 @@ targets 24,000 decisions and is retained as an execution baseline. Choose budget
 recipe with a fixed evaluation protocol and stopping criteria. A successful execution alone
 does not justify a longer training run.
 
+For an exact-team curriculum, the direct simulator can combine outcome PPO with
+public-information heuristic labels on states visited by the learner. In the job's
+`overrides`, for example:
+
+```yaml
+env.belief_supervision: full_truth
+model.aux_into_trunk: true
+loss.value_coef: 0.25
+loss.belief_coef: 0.05
+loss.belief_chain_coef: 0.05
+ppo.heuristic_teacher: simpleheuristics
+ppo.heuristic_coef: 0.3
+ppo.heuristic_coef_final: 0.0
+ppo.heuristic_decay_decisions: 250000
+```
+
+These illustrative settings require the `showdown_direct` backend and submitted team
+sheets. Hidden sheets supply auxiliary targets only. The teacher uses the acting player's
+censored battle view and an independent random stream; its labels never override the
+policy's actions or enter policy inputs. Guidance reaches zero at the stated decision
+count, leaving subsequent updates to PPO and the remaining auxiliary objectives. Use
+an equal-budget control to measure benefit: teacher agreement, nonzero shared gradients,
+and auxiliary accuracy do not by themselves establish stronger play.
+
 The worker verifies the frozen inventory, preserves Kaggle's CUDA PyTorch, installs other
 dependencies, validates replay shards, and refreshes both direct and replay audits before
 training. It saves intermediate checkpoints, optimizer sidecars, metrics, configuration, runtime
 versions, and logs under `/kaggle/working/training`. A hard platform termination can prevent final
 archive export; inspect retained intermediate outputs if that occurs.
+The worker reserves five minutes for export before the frozen session deadline. An
+internally timed-out run retains its completed checkpoints and is marked `interrupted`.
 
 Collection verifies the returned experiment descriptor and preserves the archive and imported
 results under `runs/experiments/<id>/`. Read the result status and audits: a downloaded archive

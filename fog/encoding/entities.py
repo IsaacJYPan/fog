@@ -20,6 +20,8 @@ from typing import Any
 
 import numpy as np
 
+from fog.encoding.pokemon_state import is_terastallized
+
 from fog.constants.schema import (
     EV_STATS,
     N_ACTIONS,
@@ -223,10 +225,10 @@ def _fill_mon_record(row: np.ndarray, mon: Any, tables) -> None:
             if ("protosynthesis" in name or "quarkdrive" in name) and name.endswith(stat):
                 row[L.paradox + pi] = 1.0
 
-    if getattr(mon, "terastallized", False):
+    if is_terastallized(mon):
         row[L.tera_used] = 1.0
     tera = getattr(mon, "tera_type", None)
-    if tera is not None and (getattr(mon, "terastallized", False)):
+    if tera is not None and is_terastallized(mon):
         idx = TYPE_INDEX.get(_to_id(getattr(tera, "name", tera)), N_TERA_TYPES - 1)
         row[L.tera_type + idx] = 1.0
 
@@ -347,7 +349,7 @@ def encode_entities(
         )
         # my tera type is MY sheet knowledge even before terastallizing
         tera = getattr(mon, "tera_type", None)
-        if tera is not None and not getattr(mon, "terastallized", False):
+        if tera is not None and not is_terastallized(mon):
             idx = TYPE_INDEX.get(_to_id(getattr(tera, "name", tera)), N_TERA_TYPES - 1)
             entities[j, L.tera_type + idx] = 1.0
         _tracker_fill(row, ids, mon, my_role)

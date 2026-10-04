@@ -4,12 +4,46 @@ import hashlib
 import json
 import os
 import shutil
+import signal
 import subprocess
 import sys
+import time
 import zipfile
 
 
+def _signal_training(process, sig) -> None:
+    # Saved Kaggle scripts run on Linux. All descendants join the dedicated process group,
+    # including the training driver, learner, CPU actors and Showdown processes.
+    try:
+        if os.name == "posix":
+            os.killpg(process.pid, sig)
+        elif sig == signal.SIGTERM:
+            process.terminate()
+        else:
+            process.kill()
+    except ProcessLookupError:
+        pass
+
+
+def run_training(command: list[str], environment: dict, seconds: float) -> int:
+    """Leave time to export saved checkpoints before Kaggle's session deadline."""
+    if seconds <= 0:
+        raise RuntimeError("No training time remains before the export deadline")
+    process = subprocess.Popen(command, env=environment, start_new_session=True)
+    try:
+        return process.wait(timeout=seconds)
+    except subprocess.TimeoutExpired:
+        _signal_training(process, signal.SIGTERM)
+        try:
+            process.wait(timeout=20)
+        except subprocess.TimeoutExpired:
+            _signal_training(process, getattr(signal, "SIGKILL", signal.SIGTERM))
+            process.wait()
+        return 124
+
+
 def run() -> None:
+    started = time.monotonic()
     # Keep the environment and corpus out of notebook outputs.
     work = Path("/kaggle/temp/fog")
     # Keep checkpoints in saved outputs throughout training, even if the platform
@@ -63,9 +97,18 @@ def run() -> None:
             subprocess.run([python, "-m", "fog.scripts.check_policy_contract", "--job", str(job),
                             "--out", str(output / "policy_contract.json")],
                            env=environment, check=True)
-        result = subprocess.run([python, "-m", "fog.scripts.automated_training", "run",
-                                 "--job", str(job), "--max-blocks", "1"], env=environment)
-        code = result.returncode
+        remaining = int(experiment["timeout_seconds"]) - (time.monotonic() - started) - 300
+        code = run_training([python, "-m", "fog.scripts.automated_training", "run",
+                             "--job", str(job), "--max-blocks", "1"], environment, remaining)
+        if code == 124:
+            state_path = output / "pipeline_state.json"
+            if state_path.exists():
+                state = json.loads(state_path.read_text())
+                state.update(status="interrupted", error="Training deadline reached; saved checkpoints retained")
+                for block in state.get("blocks", []):
+                    if block.get("status") == "running":
+                        block.update(status="interrupted", error=state["error"])
+                state_path.write_text(json.dumps(state, indent=2))
     finally:
         for log in sorted(output.rglob("*.log")):
             print(log.relative_to(output), flush=True)
@@ -77,7 +120,7 @@ def run() -> None:
         runtime = work / "runs/kaggle_environment"
         if runtime.exists():
             shutil.copytree(runtime, output / "environment", dirs_exist_ok=True)
-        (output / "execution.json").write_text(json.dumps({"returncode": code}))
+        (output / "execution.json").write_text(json.dumps({"returncode": code, "timed_out": code == 124}))
         shutil.make_archive("/kaggle/working/fog-experiment-output", "zip", output)
     if code:
         raise RuntimeError(f"Training failed with exit code {code}; inspect the exported logs")

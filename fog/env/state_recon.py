@@ -31,6 +31,8 @@ from typing import Any
 
 import numpy as np
 
+from fog.encoding.pokemon_state import is_terastallized
+
 try:
     import poke_engine as pe
     HAVE_ENGINE = True
@@ -113,7 +115,7 @@ def _engine_mon_from_self(mon: Any, tables) -> pe.Pokemon:
         return int((2 * b) * level / 100 + 5)
 
     maxhp = stat("hp", 0)
-    tera_now = bool(getattr(mon, "terastallized", False))
+    tera_now = is_terastallized(mon)
     base_types = tuple(str(t) for t in feats["types"][:2])
     while len(base_types) < 2:
         base_types = (*base_types, "typeless")
@@ -152,7 +154,7 @@ def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, ta
         hp, status, tera_now = base.maxhp, "none", False
         disabled: set[str] = set()
     else:
-        tera_now = bool(getattr(view_mon, "terastallized", False))
+        tera_now = is_terastallized(view_mon)
         hp = _hp_int(getattr(view_mon, "current_hp_fraction", 1.0), base.maxhp,
                      not bool(getattr(view_mon, "fainted", False)))
         status = _engine_status(getattr(view_mon, "status", None))
@@ -304,8 +306,8 @@ def reconstruct_battle(
     state = pe.State(side_one=sides["p1"], side_two=sides["p2"], **_field_kwargs(view, turn))
 
     tera_used = {
-        role: any(bool(getattr(m, "terastallized", False)) for m in my_view_mons),
-        opp_role: any(bool(getattr(m, "terastallized", False))
+        role: any(is_terastallized(m) for m in my_view_mons),
+        opp_role: any(is_terastallized(m)
                       for m in (getattr(view, "opponent_team", None) or {}).values()),
     }
     return EngineBattle._from_reconstruction(

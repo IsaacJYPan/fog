@@ -68,6 +68,7 @@ _SECTION_KEYS = {
         "rollout_tera_logit_bonus_initial", "rollout_tera_logit_bonus_final",
         "rollout_tera_logit_bonus_decay_decisions", "gradient_diagnostics",
         "trainable_lr_scales",
+        "heuristic_teacher", "heuristic_coef", "heuristic_coef_final", "heuristic_decay_decisions",
     },
     "league": {
         "freeze_history",

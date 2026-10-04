@@ -25,6 +25,8 @@ is information.
 """
 from __future__ import annotations
 
+from fog.encoding.pokemon_state import is_terastallized
+
 import re
 from dataclasses import dataclass, field
 
@@ -370,7 +372,7 @@ def opponent_views_from_battle(battle, tables) -> list[SlotView]:
             if idx is not None and idx not in v.moves and len(v.moves) < 4:
                 v.moves.append(idx)
 
-        if getattr(mon, "terastallized", False):
+        if is_terastallized(mon):
             tera = getattr(mon, "tera_type", None)
             if tera is not None:
                 from fog.constants.schema import TYPE_INDEX

@@ -68,6 +68,12 @@ directory. If platform termination prevents ZIP export, inspect the saved traini
 directory for earlier completed checkpoints; final or partially written files may
 be incomplete. Long jobs can disable numbered-checkpoint pruning to retain learning curves.
 
+The worker reserves five minutes of the frozen runtime cap for export, including setup
+time in the budget. At the internal deadline it stops the training process group and
+exports completed checkpoints and logs. Such a return has execution code `124`,
+`timed_out: true`, and pipeline status `interrupted`; reaching a deadline does not count
+as finishing the decision budget. Abrupt platform termination can still prevent export.
+
 Once Kaggle accepts the job, the laptop can sleep or close. Training continues remotely.
 Status checks, downloads and local evaluation resume when the laptop is available;
 these commands do not install a background polling service. Hard timeouts or platform
