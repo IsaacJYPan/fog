@@ -127,6 +127,8 @@ def _bundle_inputs(job_path: Path, root: Path) -> tuple[set[Path], list[str]]:
         table = pq.read_table(manifest_path, columns=["shard"])
         for value in table.column("shard").to_pylist():
             include(value)
+    # Account-local submission settings stay on the submitting machine.
+    files.discard((root / "configs/kaggle_results.json").resolve())
     return files, sorted(missing)
 
 

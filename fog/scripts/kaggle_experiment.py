@@ -133,6 +133,8 @@ def handoff(folder: Path, message: str) -> None:
 def submit(folder: Path) -> None:
     verify(folder)
     state = read(folder / "state.json")
+    if state["phase"] == "superseded":
+        raise RuntimeError("Experiment was superseded; submit its replacement instead")
     if state["phase"] in {"submitting", "submitted", "collected"}:
         raise RuntimeError("Already submitted or submission uncertain; inspect status, do not resubmit")
     if state["phase"] == "prepared":

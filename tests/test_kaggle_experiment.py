@@ -47,6 +47,13 @@ def test_uncertain_submission_cannot_launch_duplicate(tmp_path, monkeypatch):
         workflow.submit(folder)
 
 
+def test_superseded_package_cannot_be_submitted(tmp_path, monkeypatch):
+    folder = experiment(tmp_path, "superseded")
+    monkeypatch.setattr(workflow, "cli", lambda *args: pytest.fail("must not contact Kaggle"))
+    with pytest.raises(RuntimeError, match="superseded"):
+        workflow.submit(folder)
+
+
 def test_submission_records_intent_before_network_failure(tmp_path, monkeypatch):
     folder = experiment(tmp_path, "uploaded")
     def cli(*args):

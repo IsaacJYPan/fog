@@ -45,14 +45,16 @@ Each `runs/experiments/<id>/` contains:
 
 - `job.yaml`, `experiment.json`, `seal.json`: frozen recipe, individual input hashes,
   parent checkpoint, source revision, and hashes of the exact uploaded files. The
-  snapshot includes local uncommitted code, so the Git commit alone is not its identity.
+snapshot includes local uncommitted code, so the Git commit alone is not its identity.
 - `dataset/bundle.zip` and `notebook/`: the private upload and minimal execution script.
 - `state.json`, `HANDOFF.md`: launch state and recovery instructions.
 - After collection, `output.zip` and `results/`: checkpoints, optimizer state,
   training metrics, audit reports, resolved configuration, runtime versions and logs.
 
 Every experiment gets its own dataset and script, avoiding accidental updates to a
-running experiment. The worker verifies the complete input hash inventory. Collection
+running experiment. Local account settings in `configs/kaggle_results.json` are excluded
+from training archives. Prepared packages marked `superseded` cannot be submitted.
+The worker verifies the complete input hash inventory. Collection
 checks the returned experiment descriptor before importing and records Kaggle's run ID.
 Recipes can also require `safety.policy_contract` with a frozen real-rollout `batch` path
 and a log-probability `tolerance` (default .001). Include that batch in `bundle_inputs`.

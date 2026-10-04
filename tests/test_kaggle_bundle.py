@@ -60,6 +60,20 @@ def test_bundle_includes_opponents_runtime_and_portable_shard_paths(portable_job
         assert json.loads(archive.read("fog/bundle_manifest.json"))["ready_for_training"]
 
 
+def test_account_local_settings_are_excluded_from_training_archives(portable_job):
+    root, job = portable_job
+    settings = root / "configs/kaggle_results.json"
+    settings.write_text('{"kernel": "private-account/saved-notebook"}')
+    example = root / "configs/kaggle_results.example.json"
+    example.write_text('{"kernel": "your-account/your-notebook"}')
+    destination = root / "bundle.zip"
+    bundle_for_kaggle(job, destination)
+    with zipfile.ZipFile(destination) as archive:
+        assert "fog/configs/kaggle_results.json" not in archive.namelist()
+        assert "fog/configs/kaggle_results.example.json" in archive.namelist()
+        assert "fog/configs/base.yaml" in archive.namelist()
+
+
 def test_missing_opponent_blocks_full_bundle_but_is_reported_in_setup_bundle(portable_job):
     root, job = portable_job
     (root / "opponent.pt").unlink()
