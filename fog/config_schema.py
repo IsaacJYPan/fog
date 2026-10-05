@@ -55,6 +55,7 @@ _SECTION_KEYS = {
     "loss": {
         "action_coef", "belief_chain_coef", "belief_coef", "preview_coef",
         "require_exact_chosen_action_features", "require_exact_chosen_legality",
+        "require_belief_labels",
         "self_belief_chain_coef", "self_belief_coef", "value_coef",
     },
     "log": {"checkpoint_every_decisions", "dir", "halt_on_regression_sigma", "tensorboard"},
@@ -69,6 +70,7 @@ _SECTION_KEYS = {
         "rollout_tera_logit_bonus_decay_decisions", "gradient_diagnostics",
         "trainable_lr_scales",
         "heuristic_teacher", "heuristic_coef", "heuristic_coef_final", "heuristic_decay_decisions",
+        "policy_objective", "value_target", "heuristic_voluntary_switch_weight",
     },
     "league": {
         "freeze_history",

@@ -83,6 +83,30 @@ termination can interrupt final export, so keep jobs bounded and collect complet
 
 ## Evaluate before choosing the next parent
 
+`configs/gen9ou_typed_token_heuristic_bc.yaml` selects a cloning stage in the online
+runner. The learner plays the games and receives public SimpleHeuristics labels on
+the states it visits. `ppo.policy_objective: heuristic_bc` uses teacher cross entropy
+as the policy objective, with no PPO surrogate or PPO KL stop gate. Exact submitted
+teams provide marginal and autoregressive belief targets; those labels do not enter
+the acting policy. The value head fits completed outcomes of the learner's games.
+The default opponent pool for this stage contains SimpleHeuristics and MaxDamage.
+
+Keep `ppo.heuristic_coef` and its final coefficient zero in this mode: the teacher
+loss is already the primary objective. An optional
+`ppo.heuristic_voluntary_switch_weight` emphasizes teacher switches when moves were
+also legal, without upweighting forced switches. Its default is one. Metrics retain
+unweighted teacher NLL and report move, forced-switch and voluntary-switch agreement
+separately. `loss.require_belief_labels` refuses updates missing either team's
+supervision or either belief decoder output. Configuration digests distinguish this
+recipe from PPO when resuming optimizer state.
+
+Evaluate cloning against SimpleHeuristics on held-out teams before starting a
+separate self-play experiment. Roughly equal strength is a curriculum milestone;
+it is not evidence of high-level play or automatic champion promotion. During
+self-play, keep exact-team belief supervision active and check held-out belief
+quality as well as win rates. Auxiliary losses constrain learning but do not
+guarantee that the representation will preserve every useful feature.
+
 ```powershell
 .\fog-experiment.cmd evaluate <experiment-id> --pool data/teams/public_regeneration_splits/validation.json --games 64
 ```

@@ -1,9 +1,10 @@
-"""Self-play PPO training with auxiliary belief losses.
+"""Online PPO or public-heuristic cloning with auxiliary belief losses.
 
 `train` samples league opponents, collects live battles into a RolloutBuffer,
 computes GAE, updates the model, and saves league snapshots and checkpoints.
 Belief supervision uses simulator team labels. Optional leakage shaping runs
-when leakage.beta > 0; configuration controls PPO and auxiliary-loss weights."""
+when leakage.beta > 0. An explicit cloning mode replaces the PPO policy objective
+while retaining rollout collection, exact-team auxiliary targets and checkpoints."""
 from __future__ import annotations
 
 import argparse
@@ -119,7 +120,7 @@ def _deterministic_policy_update(fn):
 
 @_deterministic_policy_update
 def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None) -> dict:
-    """One PPO update over a collected batch (spec §6): 3 epochs of minibatches, clip 0.2.
+    """Update a collected batch with PPO or explicit public-teacher cloning.
 
     Loss = -clip_surrogate + value_coef * value_MSE - entropy_coef * entropy
            + belief_coef * belief_CE + self_belief_coef * self_belief_CE   (full oracle labels)
@@ -131,11 +132,17 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
       optional bc_log_probs [N, 14] (frozen BC anchor policy, full masked log-probs),
       optional belief_targets/belief_valid + self_belief_targets/self_belief_valid label dicts.
 
-    Advantages are normalized here (over the full batch). Returns a metrics dict (means over
-    minibatches): loss terms, approx_kl, clip_frac, entropy.
+    ``policy_objective=heuristic_bc`` replaces the surrogate with teacher cross entropy;
+    learner actions and advantages remain diagnostic data only. Both modes retain the same
+    exact-sheet belief losses. ``value_target=outcome`` fits the learner's completed-game
+    outcome instead of its GAE return. The target describes the acting policy, not the teacher.
+    Returns mean minibatch metrics. PPO remains the default.
     """
     ppo_cfg = cfg.get("ppo", {})
     loss_cfg = cfg.get("loss", {})
+    from fog.training.heuristic_guidance import guidance_loss, validate_update_objective
+
+    policy_objective, value_target = validate_update_objective(ppo_cfg)
     clip = ppo_cfg.get("clip", 0.2)
     epochs = ppo_cfg.get("epochs", 3)
     minibatch_size = ppo_cfg.get("minibatch_size", 2048)
@@ -153,8 +160,21 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     heuristic_coef = float(ppo_cfg.get("heuristic_coef", 0.0))
     if not math.isfinite(heuristic_coef) or heuristic_coef < 0:
         raise ValueError("ppo.heuristic_coef must be finite and non-negative")
-    if heuristic_coef > 0 and batch.get("supervised_label") is None:
+    if (heuristic_coef > 0 or policy_objective == "heuristic_bc") and batch.get("supervised_label") is None:
         raise ValueError("heuristic guidance is enabled but rollout teacher labels are missing")
+    if value_target == "outcome":
+        outcomes = batch.get("game_outcomes")
+        if not isinstance(outcomes, torch.Tensor) or outcomes.shape != batch["actions"].shape:
+            raise ValueError("outcome value targets require one completed-game outcome per decision")
+        if not bool(torch.isfinite(outcomes).all()) or bool((outcomes.abs() > 1).any()):
+            raise ValueError("completed-game outcomes must be finite and in [-1, 1]")
+    if loss_cfg.get("require_belief_labels", False):
+        for name in ("belief_targets", "belief_valid", "self_belief_targets", "self_belief_valid"):
+            if not batch.get(name):
+                raise ValueError(f"required belief supervision is missing: {name}")
+        for name in ("belief_valid", "self_belief_valid"):
+            if not any(bool(valid.any()) for valid in batch[name].values()):
+                raise ValueError(f"required belief supervision has no eligible targets: {name}")
     if target_kl is not None and (not math.isfinite(float(target_kl)) or target_kl <= 0):
         raise ValueError("ppo.target_kl must be finite and positive")
     rollout_temperature = float(ppo_cfg.get("rollout_temperature", 1.0))
@@ -208,6 +228,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     actions = batch["actions"]
     raw_advantages = batch["advantages"]
     game_outcomes = batch.get("game_outcomes")
+    log("policy_objective_heuristic_bc", float(policy_objective == "heuristic_bc"))
+    log("value_target_outcome", float(value_target == "outcome"))
     log("rollout_temperature", rollout_temperature)
     log("rollout_tera_logit_bonus", rollout_tera_logit_bonus)
     if batch.get("supervised_label") is not None:
@@ -294,9 +316,14 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 1, mb["actions"].unsqueeze(1)
             ).squeeze(1)
 
-            ratio = (new_log_probs - mb["old_log_probs"]).exp()
             log_ratio = new_log_probs - mb["old_log_probs"]
-            sampled_kl = (torch.expm1(log_ratio) - log_ratio).mean()
+            # Cloning can move far from the collection policy. Bound only its diagnostic
+            # exponential; PPO's ratio and KL remain unchanged.
+            ratio = (log_ratio if policy_objective == "ppo" else log_ratio.clamp(max=30)).exp()
+            sampled_kl = (
+                (ratio - 1 - log_ratio).mean() if policy_objective == "heuristic_bc"
+                else (torch.expm1(log_ratio) - log_ratio).mean()
+            )
             old_distribution = mb.get("behavior_log_probs")
             policy_kl = (
                 _masked_kl(old_distribution, behavior_log_probs).mean()
@@ -309,25 +336,36 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             if target_kl is not None and float(policy_kl.detach()) > float(target_kl):
                 stopped_for_kl = True
                 break
-            surr1 = ratio * mb_adv
-            surr2 = torch.clamp(ratio, 1.0 - clip, 1.0 + clip) * mb_adv
-            policy_loss = -torch.min(surr1, surr2).mean()
+            teacher_loss = None
+            if mb.get("supervised_label") is not None:
+                teacher_loss, teacher_metrics = guidance_loss(
+                    out.log_probs, mb["supervised_label"], mb["legality_mask"],
+                    voluntary_switch_weight=float(ppo_cfg.get("heuristic_voluntary_switch_weight", 1.0)),
+                )
+                for name, metric in teacher_metrics.items():
+                    log(name, metric)
+            if policy_objective == "heuristic_bc":
+                policy_loss = teacher_loss
+            else:
+                surr1 = ratio * mb_adv
+                surr2 = torch.clamp(ratio, 1.0 - clip, 1.0 + clip) * mb_adv
+                policy_loss = -torch.min(surr1, surr2).mean()
 
-            v_loss = value_loss(out.value, mb["returns"])
+            v_loss = value_loss(
+                out.value, mb["game_outcomes"] if value_target == "outcome" else mb["returns"]
+            )
             entropy = _masked_entropy(behavior_log_probs).mean()
 
             loss = policy_loss + value_coef * v_loss - entropy_coef * entropy
 
-            if mb.get("supervised_label") is not None:
-                from fog.training.heuristic_guidance import guidance_loss
+            if teacher_loss is not None and heuristic_coef > 0:
+                loss = loss + heuristic_coef * teacher_loss
 
-                teacher_loss, teacher_metrics = guidance_loss(
-                    out.log_probs, mb["supervised_label"], mb["legality_mask"]
-                )
-                if heuristic_coef > 0:
-                    loss = loss + heuristic_coef * teacher_loss
-                for name, metric in teacher_metrics.items():
-                    log(name, metric)
+            if loss_cfg.get("require_belief_labels", False) and (
+                out.belief is None or out.belief_chain is None
+                or out.self_belief is None or out.self_belief_chain is None
+            ):
+                raise ValueError("required belief supervision needs both marginal and chain outputs")
 
             if kl_anchor_coef > 0 and mb.get("bc_log_probs") is not None:
                 kl_bc = _masked_kl(out.log_probs, mb["bc_log_probs"]).mean()
@@ -617,6 +655,11 @@ class _TrainSetup:
         from fog.training.heuristic_guidance import validate_guidance
 
         validate_guidance(cfg)
+        if cfg.get("loss", {}).get("require_belief_labels", False):
+            if self.env_cfg.get("belief_supervision", "full_truth") != "full_truth":
+                raise ValueError("required exact belief labels need env.belief_supervision=full_truth")
+            if not cfg.get("model", {}).get("aux_into_trunk", True):
+                raise ValueError("required shared belief supervision needs model.aux_into_trunk=true")
         self.batch_decisions = int(self.ppo_cfg.get("batch_decisions", 16_000))
         self.games_per_chunk = int(self.ppo_cfg.get("games_per_chunk", 8))
         self.lr = float(self.ppo_cfg.get("lr", 1e-4))
@@ -941,7 +984,7 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     s.chunk_t0, s.chunk_battles = time.monotonic(), 0
     s.dash.log(s.decisions_seen, metrics)
     print(
-        f"[ppo] decisions={s.decisions_seen}  win_rate={win_rate:.3f}  "
+        f"[{s.ppo_cfg.get('policy_objective', 'ppo')}] decisions={s.decisions_seen}  win_rate={win_rate:.3f}  "
         f"loss={metrics['loss']:.4f}  entropy={metrics['entropy']:.3f}  "
         f"kl={metrics['approx_kl']:.4f}  clip={metrics['clip_frac']:.3f}"
         + (f"  belief={metrics.get('belief_loss', 0):.3f}" if 'belief_loss' in metrics else "")

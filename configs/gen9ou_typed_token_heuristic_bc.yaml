@@ -1,0 +1,48 @@
+# Public SimpleHeuristics labels on learner-visited states, before self-play.
+extends: gen9ou_typed_token_selfplay.yaml
+
+env:
+  belief_supervision: full_truth
+  independent_opponent_rng: true
+
+model:
+  aux_into_trunk: true
+  oracle: none
+
+ppo:
+  policy_objective: heuristic_bc
+  heuristic_teacher: simpleheuristics
+  heuristic_coef: 0.0
+  heuristic_coef_final: 0.0
+  heuristic_voluntary_switch_weight: 1.0
+  value_target: outcome
+  total_decisions: 500000
+  batch_decisions: 4096
+  minibatch_size: 512
+  epochs: 4
+  lr: 0.00003
+  target_kl: null
+  entropy_coef: 0.0
+  entropy_coef_final: 0.0
+  rollout_temperature: 1.0
+  rollout_tera_logit_bonus: 0.0
+  games_per_chunk: 4
+
+loss:
+  value_coef: 0.1
+  belief_coef: 0.05
+  belief_chain_coef: 0.05
+  self_belief_coef: 0.01
+  self_belief_chain_coef: 0.01
+  preview_coef: 0.0
+  require_belief_labels: true
+
+replay_policy:
+  coef: 0.0
+
+league:
+  latest_frac: 0.0
+  past_frac: 0.0
+  scripted_frac: 1.0
+  scripted: [SimpleHeuristics, MaxDamage]
+  freeze_history: true

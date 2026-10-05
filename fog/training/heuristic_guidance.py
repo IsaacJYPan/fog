@@ -1,8 +1,9 @@
-"""Optional public-information teacher labels on learner-visited PPO states.
+"""Public-information teacher labels on learner-visited training states.
 
 The teacher never selects the acting policy's action. Its independent random stream supplies
 supervised targets only; accepted/rejected choices retain or discard those targets with the
-ordinary rollout fragment. This is an online imitation aid, without a DAgger regret guarantee.
+ordinary rollout fragment. Labels can supply a PPO auxiliary loss or the primary cloning
+objective. Neither mode has a DAgger regret guarantee.
 """
 from __future__ import annotations
 
@@ -24,8 +25,27 @@ def guidance_weight(settings: dict, decisions: int, total: int) -> float:
     return initial + (final - initial) * fraction
 
 
+def validate_update_objective(settings: dict) -> tuple[str, str]:
+    objective = settings.get("policy_objective", "ppo")
+    value_target = settings.get("value_target", "gae")
+    if objective not in ("ppo", "heuristic_bc"):
+        raise ValueError("ppo.policy_objective must be ppo or heuristic_bc")
+    if value_target not in ("gae", "outcome"):
+        raise ValueError("ppo.value_target must be gae or outcome")
+    weight = float(settings.get("heuristic_voluntary_switch_weight", 1.0))
+    if not math.isfinite(weight) or weight <= 0:
+        raise ValueError("heuristic voluntary-switch weight must be finite and positive")
+    if objective == "heuristic_bc":
+        if settings.get("target_kl") is not None:
+            raise ValueError("heuristic_bc requires target_kl: null; PPO's stop gate is inapplicable")
+        if any(float(settings.get(key, 0.0)) != 0 for key in ("heuristic_coef", "heuristic_coef_final")):
+            raise ValueError("heuristic_bc uses teacher CE directly; heuristic coefficients must be zero")
+    return objective, value_target
+
+
 def validate_guidance(config: dict) -> None:
     settings = config.get("ppo", {})
+    objective, _ = validate_update_objective(settings)
     teacher = settings.get("heuristic_teacher")
     if teacher not in (None, "simpleheuristics", "maxdamage"):
         raise ValueError("ppo.heuristic_teacher must be simpleheuristics or maxdamage")
@@ -33,6 +53,8 @@ def validate_guidance(config: dict) -> None:
     final = float(settings.get("heuristic_coef_final", 0.0))
     if teacher is None and (initial > 0 or final > 0):
         raise ValueError("positive heuristic guidance requires ppo.heuristic_teacher")
+    if teacher is None and objective == "heuristic_bc":
+        raise ValueError("heuristic_bc requires ppo.heuristic_teacher")
     if teacher is not None and config.get("env", {}).get("backend") != "showdown_direct":
         raise ValueError("heuristic guidance requires the showdown_direct backend")
 
@@ -68,7 +90,10 @@ def attach_guidance(adapter, config: dict) -> PublicHeuristicTeacher | None:
 
 
 def guidance_loss(log_probs: torch.Tensor, labels: torch.Tensor,
-                  legality: torch.Tensor) -> tuple[torch.Tensor, dict]:
+                  legality: torch.Tensor, *, voluntary_switch_weight: float = 1.0
+                  ) -> tuple[torch.Tensor, dict]:
+    if not math.isfinite(voluntary_switch_weight) or voluntary_switch_weight <= 0:
+        raise ValueError("heuristic voluntary-switch weight must be finite and positive")
     if labels.shape != log_probs.shape[:1] or legality.shape != log_probs.shape:
         raise ValueError("heuristic labels and legality must align with policy rows")
     if labels.dtype != torch.long or bool(((labels < 0) | (labels >= log_probs.shape[1])).any()):
@@ -78,16 +103,37 @@ def guidance_loss(log_probs: torch.Tensor, labels: torch.Tensor,
     # One-option requests contain no policy choice and must not dilute the imitation objective.
     choices = legality.sum(-1) > 1
     count = int(choices.sum())
+    voluntary_switch = (labels >= 8) & (labels < 13) & legality[:, :8].any(-1)
+    metrics = {}
     if count:
         chosen = log_probs.gather(1, labels[:, None]).squeeze(1)[choices]
         if not torch.isfinite(chosen).all():
             raise FloatingPointError("nonfinite teacher action probability")
-        loss = -chosen.mean()
+        weights = torch.where(voluntary_switch[choices], voluntary_switch_weight, 1.0)
+        loss = -(chosen * weights).sum() / weights.sum()
+        # Keep unweighted NLL comparable between recipes with different class weights.
+        nll = -chosen.mean()
         accuracy = (log_probs[choices].argmax(-1) == labels[choices]).float().mean()
     else:
         loss = torch.where(legality, log_probs, 0.0).sum() * 0.0
+        nll = loss.detach()
         accuracy = loss.detach()
-    return loss, {"heuristic_nll": loss.detach(), "heuristic_top1": accuracy.detach(),
-                  "heuristic_choice_rows": count,
+    for name, selected in {
+        "voluntary_switch": voluntary_switch,
+        "forced_switch": (labels >= 8) & (labels < 13) & ~legality[:, :8].any(-1),
+        "move": labels < 8,
+    }.items():
+        selected = selected & choices
+        metrics[f"heuristic_{name}_rows"] = int(selected.sum())
+        if bool(selected.any()):
+            metrics[f"heuristic_{name}_nll"] = -log_probs.gather(1, labels[:, None])[selected].mean().detach()
+            metrics[f"heuristic_{name}_top1"] = (log_probs[selected].argmax(-1) == labels[selected]).float().mean()
+    teacher_move = choices & (labels < 8) & legality[:, :8].any(-1)
+    if bool(teacher_move.any()):
+        prediction = log_probs[teacher_move].argmax(-1)
+        metrics["heuristic_false_voluntary_switch_rate"] = ((prediction >= 8) & (prediction < 13)).float().mean()
+    return loss, {**metrics, "heuristic_loss": loss.detach(), "heuristic_nll": nll.detach(),
+                  "heuristic_top1": accuracy.detach(), "heuristic_choice_rows": count,
+                  "heuristic_voluntary_switch_weight": voluntary_switch_weight,
                   "heuristic_target_tera_rate": ((labels >= 4) & (labels < 8)).float().mean(),
                   "heuristic_target_switch_rate": ((labels >= 8) & (labels < 13)).float().mean()}

@@ -136,3 +136,84 @@ def test_teacher_metadata_is_not_an_input_to_the_typed_acting_policy():
         second = agent({**batch, 'supervised_label': torch.tensor([2, 3])})
     assert torch.equal(first.log_probs, second.log_probs)
     assert torch.equal(first.value, second.value)
+
+
+def test_cloning_updates_ignore_executed_actions_advantages_and_gae_returns():
+    torch.manual_seed(31)
+    first = TinyPolicyAgent()
+    second = TinyPolicyAgent()
+    second.load_state_dict(first.state_dict())
+    batch = make_ppo_batch(n=32, seed=15)
+    batch['supervised_label'] = torch.zeros(32, dtype=torch.long)
+    batch['game_outcomes'] = torch.ones(32)
+    alternate = {**batch, 'actions': (batch['actions'] + 1) % 4,
+                 'advantages': -100 * batch['advantages'], 'returns': -batch['returns'],
+                 'old_log_probs': batch['old_log_probs'] - 2}
+    cfg = {'ppo': {'policy_objective': 'heuristic_bc', 'value_target': 'outcome',
+                   'epochs': 3, 'minibatch_size': 16, 'entropy_coef': 0, 'target_kl': None},
+           'loss': {'value_coef': .25}}
+    with torch.no_grad():
+        before = first(batch).log_probs[:, 0].mean().item()
+    for agent, rows in ((first, batch), (second, alternate)):
+        torch.manual_seed(51)
+        metrics = ppo_update(agent, torch.optim.Adam(agent.parameters(), lr=.01), rows, cfg)
+        assert metrics['optimizer_steps'] == 6
+        assert metrics['policy_objective_heuristic_bc'] == 1
+        assert metrics['value_target_outcome'] == 1
+        assert metrics['stopped_for_kl'] == 0
+    assert all(torch.equal(value, second.state_dict()[key]) for key, value in first.state_dict().items())
+    with torch.no_grad():
+        assert first(batch).log_probs[:, 0].mean().item() > before
+
+
+@pytest.mark.parametrize('settings', [
+    {'policy_objective': 'unknown'}, {'value_target': 'unknown'},
+    {'policy_objective': 'heuristic_bc', 'target_kl': .01},
+    {'policy_objective': 'heuristic_bc', 'heuristic_coef': .3},
+    {'policy_objective': 'heuristic_bc', 'heuristic_coef_final': .3},
+    {'heuristic_voluntary_switch_weight': 0},
+    {'heuristic_voluntary_switch_weight': float('nan')},
+])
+def test_invalid_cloning_recipe_fails_before_training(settings):
+    with pytest.raises(ValueError):
+        validate_guidance({'env': {'backend': 'showdown_direct'},
+                           'ppo': {'heuristic_teacher': 'simpleheuristics', **settings}})
+
+
+def test_cloning_requires_teacher_labels_and_outcome_value_requires_completed_games():
+    agent = TinyPolicyAgent()
+    batch = make_ppo_batch()
+    optimizer = torch.optim.Adam(agent.parameters())
+    with pytest.raises(ValueError, match='requires ppo.heuristic_teacher'):
+        validate_guidance({'ppo': {'policy_objective': 'heuristic_bc'}})
+    with pytest.raises(ValueError, match='labels are missing'):
+        ppo_update(agent, optimizer, batch, {'ppo': {'policy_objective': 'heuristic_bc'}})
+    with pytest.raises(ValueError, match='completed-game outcome'):
+        ppo_update(agent, optimizer, batch, {'ppo': {'value_target': 'outcome'}})
+    with pytest.raises(ValueError, match='finite and in'):
+        ppo_update(agent, optimizer, {**batch, 'game_outcomes': torch.full((64,), float('nan'))},
+                   {'ppo': {'value_target': 'outcome'}})
+    with pytest.raises(ValueError, match='required belief supervision'):
+        ppo_update(agent, optimizer, batch, {'loss': {'require_belief_labels': True}})
+    empty_labels = {key: {'item': torch.zeros(64, 6, dtype=torch.long if key.endswith('targets') else torch.bool)}
+                    for key in ('belief_targets', 'belief_valid', 'self_belief_targets', 'self_belief_valid')}
+    with pytest.raises(ValueError, match='no eligible targets'):
+        ppo_update(agent, optimizer, {**batch, **empty_labels}, {'loss': {'require_belief_labels': True}})
+
+
+def test_switch_weight_does_not_upweight_forced_switches_and_nll_stays_comparable():
+    logits = torch.zeros(3, 14, requires_grad=True)
+    legal = torch.zeros(3, 14, dtype=torch.bool)
+    legal[0, [0, 8]] = True
+    legal[1, [8, 9]] = True
+    legal[2, :4] = True
+    log_probs = logits.masked_fill(~legal, float('-inf')).log_softmax(-1)
+    labels = torch.tensor([8, 8, 0])
+    loss, metrics = guidance_loss(log_probs, labels, legal, voluntary_switch_weight=8.)
+    expected = (9 * torch.log(torch.tensor(2.)) + torch.log(torch.tensor(4.))) / 10
+    assert loss.detach() == pytest.approx(expected.item())
+    assert metrics['heuristic_nll'] == pytest.approx((torch.log(torch.tensor(2.)) * 2 + torch.log(torch.tensor(4.))).item() / 3)
+    assert metrics['heuristic_voluntary_switch_rows'] == 1
+    assert metrics['heuristic_forced_switch_rows'] == 1
+    loss.backward()
+    assert logits.grad[0, 8].abs() == pytest.approx(logits.grad[1, 8].abs().item() * 8)
