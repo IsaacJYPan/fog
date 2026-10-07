@@ -1,7 +1,6 @@
 """Belief-quality metrics (spec §9, §6 dashboard).
 
-  * per-attribute top-1 / top-3 vs turn number (MUST be monotone increasing within games — flat means
-    the history encoder is broken)
+  * per-attribute top-1 / top-3 vs turn number (diagnostic; empirical accuracy need not be monotone)
   * calibration (ECE)
   * on replays: accuracy at least 3 turns BEFORE the actual reveal (predicts early, not just reads log)
 """
@@ -30,11 +29,11 @@ def expected_calibration_error(confidences: np.ndarray, correct: np.ndarray, n_b
 
 
 def accuracy_vs_turn(predictions, labels, turns, bucket: int = 5) -> dict[int, float]:
-    """Top-1 accuracy bucketed by turn number (§6 dashboard: MUST be monotone increasing within
-    games — a flat curve means the history encoder is broken).
+    """Top-1 accuracy bucketed by turn number, as a descriptive history diagnostic.
 
     predictions/labels: [N] top-1 predicted class and true class; turns: [N] turn index. Returns
-    {bucket_start_turn: accuracy}. Buckets of `bucket` turns.
+    {bucket_start_turn: accuracy}. Buckets of `bucket` turns. Changing hidden-field difficulty,
+    censoring, and sampling can change this curve even with a useful history encoder.
     """
     predictions = np.asarray(predictions)
     labels = np.asarray(labels)
