@@ -8,12 +8,6 @@ The active experiments use a typed-token model. The earlier three-encoder model 
 belief-space search are retained for comparison. See [ARCHITECTURE.md](ARCHITECTURE.md) for the
 model contracts and implementation limits.
 
-The optional [native Kakuna experiment](docs/native-kakuna.md) preserves Metamon's pretrained
-policy while testing Gen9OU fine-tuning with shared belief and outcome supervision. It includes
-composition-disjoint team pools, private frozen Kaggle packages, and matched strength gates.
-No improvement over unchanged Kakuna has been established yet. See its
-[upstream attribution](integrations/THIRD_PARTY.md) for component and checkpoint licenses.
-
 ## Local setup
 
 Install Python 3.11+, uv, Node.js with npm, and a Rust toolchain. On Windows, building the
@@ -90,7 +84,6 @@ is no longer supported.
 | `fog/env/` | Direct Showdown worker, battle views, Rust backend, team loading |
 | `fog/encoding/` | Observations, reveal tracking, public history, mirrored views |
 | `fog/models/` | Policy, value, belief models, and encoders |
-| `fog/pretrained/` | Native Kakuna adapters, shared supervision, and experiment contracts |
 | `fog/training/` | PPO, supervised training, distillation, and checkpoint state |
 | `fog/search/` | Determinized and experimental public-belief search |
 | `fog/eval/` | Battle evaluation and model diagnostics |
