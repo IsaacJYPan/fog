@@ -281,7 +281,7 @@ def freeze(
         frozen["updates"] = recipe["updates"]
     write_json(folder / "experiment.json", frozen)
     with zipfile.ZipFile(
-        upload / "bundle.zip", "w", compression=zipfile.ZIP_DEFLATED, compresslevel=3
+        upload / "bundle.bin", "w", compression=zipfile.ZIP_DEFLATED, compresslevel=3
     ) as archive:
         for target, path in sorted(additions.items()):
             digest = hashlib.sha256()
@@ -319,7 +319,7 @@ def freeze(
         },
     )
     sealed = [
-        upload / "bundle.zip",
+        upload / "bundle.bin",
         upload / "dataset-metadata.json",
         notebook / "run.py",
         notebook / "kernel-metadata.json",

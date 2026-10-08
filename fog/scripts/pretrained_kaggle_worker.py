@@ -59,7 +59,11 @@ def run():
     started = time.monotonic()
     work = Path("/kaggle/temp/fog")
     output = Path("/kaggle/working/results")
-    archives = list(Path("/kaggle/input").rglob("bundle.zip"))
+    # Kaggle recursively expands ZIP and gzip dataset uploads. An opaque filename
+    # preserves the exact compressed records and their frozen SHA-256 hashes.
+    archives = list(Path("/kaggle/input").rglob("bundle.bin"))
+    if not archives:
+        archives = list(Path("/kaggle/input").rglob("bundle.zip"))
     if archives:
         if len(archives) != 1:
             raise ValueError("Expected one immutable private experiment bundle")
