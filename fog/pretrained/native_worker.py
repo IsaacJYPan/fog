@@ -40,6 +40,10 @@ class NativePlayer:
             self.battles.pop(tag, None)
             return {"closed": True}
         if tag not in self.battles:
+            if not self.battles and not getattr(self, "illusion_compatibility", None):
+                from fog.pretrained.illusion import install_illusion_family
+
+                self.illusion_compatibility = install_illusion_family()
             battle = MetamonBackendBattle(
                 tag, message["username"], logging.getLogger(__name__), False, 9
             )
