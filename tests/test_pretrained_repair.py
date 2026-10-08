@@ -1,6 +1,10 @@
 from copy import deepcopy
 import pytest
-from fog.scripts.pretrained_repair import validate_replacement, compatible_collection
+from fog.scripts.pretrained_repair import (
+    validate_replacement,
+    compatible_collection,
+    validate_recovery_inputs,
+)
 
 
 def test_recovery_allows_new_battle_seed_but_keeps_assignment():
@@ -38,3 +42,22 @@ def test_recovery_cannot_change_search_budget_or_learner_order():
     changed = dict(collection, learners={"second": "bbb", "first": "aaa"})
     with pytest.raises(ValueError, match="ordering"):
         compatible_collection(collection, changed)
+
+
+def test_recovery_can_fix_adapter_but_cannot_change_teacher_configuration():
+    first = {
+        "upstream_revisions": {"metamon": "pinned"},
+        "files": {
+            "fog/pretrained/native_worker.py": "old adapter",
+            "inputs/learners/0.yaml": "frozen configuration",
+            "upstream/foul-play/fp/data/pkmn_sets_cache/prior.json": "frozen prior",
+        },
+    }
+    repaired = deepcopy(first)
+    repaired["files"]["fog/pretrained/native_worker.py"] = "corrected adapter"
+    validate_recovery_inputs(first, repaired)
+    for name in ("inputs/learners/0.yaml", "upstream/foul-play/fp/data/pkmn_sets_cache/prior.json"):
+        changed = deepcopy(repaired)
+        changed["files"][name] = "changed recipe"
+        with pytest.raises(ValueError, match="immutable"):
+            validate_recovery_inputs(first, changed)

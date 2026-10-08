@@ -50,6 +50,22 @@ def compatible_collection(first, other):
         raise ValueError("Recovery changed frozen learners or their ordering")
 
 
+def validate_recovery_inputs(first, other):
+    protected = {
+        name: digest
+        for name, digest in first["files"].items()
+        if name.startswith("inputs/")
+        or "/pkmn_sets_cache/" in name
+        or "/smogon_stats_cache/" in name
+    }
+    if first["upstream_revisions"] != other["upstream_revisions"] or any(
+        other["files"].get(name) != digest for name, digest in protected.items()
+    ):
+        raise ValueError(
+            "Recovery changed immutable inputs, opponent priors, or upstream revisions"
+        )
+
+
 def validate_replacement(original, repaired):
     keys = ("p1_is_a", "p1_team", "p2_team", "controller_seed")
     if (
@@ -90,6 +106,7 @@ def repair(parents, recoveries, out, checkpoint):
         raise ValueError("Require the full schedule and original checkpoint")
     for root in recoveries:
         experiment, collection, paths = verify_result(root)
+        validate_recovery_inputs(first_experiment, experiment)
         compatible_collection(first_collection, collection)
         pending = {
             slot for slot, path in chosen.items() if not read_record(path)["training_eligible"]
