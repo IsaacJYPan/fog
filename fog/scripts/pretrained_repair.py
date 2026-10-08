@@ -113,7 +113,10 @@ def repair(parents, recoveries, out, checkpoint):
         }
         if set(experiment["collection"].get("slots", [])) != pending or set(paths) != pending:
             raise ValueError("Recovery must cover exactly the remaining failed slots")
-        with zipfile.ZipFile(root.parent.parent / "dataset/bundle.zip") as frozen:
+        bundle = root.parent.parent / "dataset/bundle.bin"
+        if not bundle.exists():
+            bundle = root.parent.parent / "dataset/bundle.zip"
+        with zipfile.ZipFile(bundle) as frozen:
             provenance_bytes = frozen.read("fog/inputs/recovery_provenance.json")
         if (
             hashlib.sha256(provenance_bytes).hexdigest()
