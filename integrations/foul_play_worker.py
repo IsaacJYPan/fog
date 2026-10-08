@@ -129,6 +129,12 @@ def main():
     from integrations.foul_play_sampling import install_bounded_sampling
 
     sampling = install_bounded_sampling()
+    from integrations.foul_play_processes import install_spawn_search
+
+    search_pool = install_spawn_search()
+    import atexit
+
+    atexit.register(search_pool.close)
     random.seed(args.seed)
     logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
     if args.prewarm:
@@ -145,6 +151,7 @@ def main():
                 "opponent": "Foul Play",
                 "search_ms": args.search_ms,
                 "sampling": sampling,
+                "search_processes": "persistent-spawn-v1",
             }
         ),
         flush=True,

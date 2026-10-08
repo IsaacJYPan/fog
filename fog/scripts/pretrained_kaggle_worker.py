@@ -147,6 +147,9 @@ def run():
             ]
             for learner in recipe["learners"]:
                 command += ["--learner", learner]
+            command += ["--attempt-offset", str(recipe.get("attempt_offset", 0))]
+            if "slots" in recipe:
+                command += ["--slots", "inputs/slots.json"]
         else:
             from fog.pretrained.runtime import native_environment
 
@@ -212,14 +215,16 @@ def run():
                 execute(contract_command, environment, output / "runner.log", remaining())
             status = "complete" if report["complete"] else "interrupted"
         else:
-            expected = len(
-                range(
-                    experiment["collection"]["shard"],
-                    experiment["collection"]["games"],
-                    experiment["collection"]["shards"],
-                )
-            )
+            recipe = experiment["collection"]
+            selected = recipe.get("slots", range(recipe["games"]))
+            expected = sum(index % recipe["shards"] == recipe["shard"] for index in selected)
             saved = list((output / "fresh").glob("*.json.gz"))
+            expected_indices = {
+                index for index in selected if index % recipe["shards"] == recipe["shard"]
+            }
+            actual_indices = {int(path.name.split(".")[0]) for path in saved}
+            if not actual_indices <= expected_indices:
+                raise ValueError("Returned collection contains an unplanned schedule slot")
             rows = [json.loads(gzip.decompress(path.read_bytes())) for path in saved]
             eligible = sum(bool(row.get("training_eligible")) for row in rows)
             audit = {

@@ -57,7 +57,7 @@ def collect_game(client, native, foul_play, learner, teams, game, *, tag, oppone
     records = {
         role: {"states": [], "actions": [], "observations": [], "labels": []} for role in names
     }
-    failures, public_log, timings = [], [], []
+    failures, public_log, timings, rejections = [], [], [], []
     result, stage = None, "initialization"
     rng = random.Random(game.controller_seed)
     try:
@@ -127,6 +127,37 @@ def collect_game(client, native, foul_play, learner, teams, game, *, tag, oppone
                 choices.append(chosen)
             stage = "Showdown choice"
             update = client.step_session(session, choices, include_state=False)
+            for retry in range(2):
+                if not update.choice_errors:
+                    break
+                for role, error in update.choice_errors.items():
+                    if not (role == native_role or opponent == "kakuna"):
+                        raise ValueError("External teacher choice rejected: " + error)
+                    if "trapped" not in error.lower():
+                        raise ValueError("Unexpected native choice rejection: " + error)
+                    rejections.append({"role": role, "turn": update.turn, "error": error})
+                    native.request({"op": "rollback", "battle_tag": tag + "-" + role})
+                    request = update.requests[role]
+                    response = native.request(
+                        {
+                            "op": "act",
+                            "battle_tag": tag + "-" + role,
+                            "username": names[role],
+                            "messages": update.messages[role],
+                            "request": request,
+                            "choose": True,
+                        }
+                    )
+                    choices[0 if role == "p1" else 1] = response["choice"]
+                    # The rejected switch was never executed. Replace its pending
+                    # training row after restoring the temporal policy state.
+                    record = records[role]
+                    record["states"][-1] = response["state"]
+                    record["actions"][-1] = response["native_action"]
+                    record["observations"][-1] = response["observation"]
+                    timings.append(response["elapsed_seconds"])
+                public_log.extend(update.public_messages)
+                update = client.step_session(session, choices, include_state=False)
             if update.choice_errors:
                 raise ValueError(
                     "Authoritative Showdown rejected choice: " + str(update.choice_errors)
@@ -168,6 +199,7 @@ def collect_game(client, native, foul_play, learner, teams, game, *, tag, oppone
             "training_eligible": valid,
             "failures": failures,
             "fallbacks": [],
+            "choice_rejections": rejections,
             "decision_seconds": timings,
         }
         return result
@@ -192,6 +224,7 @@ def collect_game(client, native, foul_play, learner, teams, game, *, tag, oppone
             "training_eligible": False,
             "failures": failures,
             "fallbacks": [],
+            "choice_rejections": rejections,
             "decision_seconds": timings,
         }
         return result
@@ -235,6 +268,10 @@ def main():
     parser.add_argument("--shards", type=int, default=1)
     parser.add_argument("--smoke-opponent", choices=["foulplay", "kakuna", "learner"])
     parser.add_argument("--max-attempts", type=int, default=3)
+    parser.add_argument(
+        "--slots", type=Path, help="Frozen selected slots for a diagnostic/recovery run"
+    )
+    parser.add_argument("--attempt-offset", type=int, default=0)
     args = parser.parse_args()
     import torch
     import yaml
@@ -247,6 +284,13 @@ def main():
     if args.games % 20 and not args.smoke_opponent:
         raise ValueError("Collection counts must be divisible by 20 for seat-balanced 40/30/30")
     teams = json.loads((args.pools / (args.split + ".json")).read_text())["teams"]
+    slots = json.loads(args.slots.read_text()) if args.slots else None
+    if slots is not None and (
+        not slots
+        or len(slots) != len(set(slots))
+        or any(type(slot) is not int or not 0 <= slot < args.games for slot in slots)
+    ):
+        raise ValueError("Selected collection slots must be unique indices in the frozen schedule")
     args.out.mkdir(parents=True, exist_ok=True)
     learners = []
     for specification in args.learner:
@@ -260,7 +304,7 @@ def main():
     if not learners and args.smoke_opponent != "kakuna" and args.smoke_opponent != "foulplay":
         raise ValueError("Fresh collection requires a frozen historical learner")
     descriptor = {
-        "version": 5,
+        "version": 6,
         "seed": args.seed,
         "games": args.games,
         "split": args.split,
@@ -270,6 +314,9 @@ def main():
         "opponent_mix": [0.4, 0.3, 0.3],
         "foul_play_search_ms": 500,
         "foul_play_sampling": "bounded-bernoulli-move-proposals-v1",
+        "foul_play_processes": "persistent-spawn-v1",
+        "slots": slots,
+        "attempt_offset": args.attempt_offset,
         "learners": {s: sha256(Path(s.split("=", 1)[1])) for s in args.learner},
         "smoke_opponent": args.smoke_opponent,
         "max_attempts": args.max_attempts,
@@ -323,6 +370,8 @@ def main():
             for index, game in enumerate(schedule[: args.games]):
                 if index % args.shards != args.shard:
                     continue
+                if slots is not None and index not in slots:
+                    continue
                 path = args.out / f"{index:06d}.json.gz"
                 if path.exists():
                     import gzip as gzip_reader
@@ -343,7 +392,7 @@ def main():
                 learner = (
                     learners[(index // 20) % len(learners)] if learners else "simpleheuristics"
                 )
-                for attempt in range(args.max_attempts):
+                for attempt in range(args.attempt_offset, args.attempt_offset + args.max_attempts):
                     tag = f"battle-gen9ou-exact-{args.seed}-{index}-{attempt}"
                     retry_seed = game.showdown_seed ^ int.from_bytes(
                         hashlib.sha256(tag.encode()).digest(), "big"

@@ -59,7 +59,11 @@ def freeze(
     isolation=None,
     timeout=43200,
     phase="pilot",
+    slots=None,
+    attempt_offset=0,
 ):
+    if attempt_offset < 0 or (stage != "collect" and (slots is not None or attempt_offset)):
+        raise ValueError("Selected slots and retry offsets apply only to collection")
     if sha256(checkpoint) != KAKUNA_34_SHA256:
         raise ValueError("Freeze requires original Kakuna checkpoint 34")
     if not 600 <= timeout <= 43200:
@@ -162,7 +166,7 @@ def freeze(
         "timeout_seconds": timeout,
         "git_revision": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "upstream_revisions": revisions,
-        "trial": stage == "collect" and games < 1000,
+        "trial": stage == "collect" and (games < 1000 or slots is not None),
         "automatic_promotion": False,
         "torch": "Kaggle 2.11.0; actual native probability gate required",
     }
@@ -173,6 +177,7 @@ def freeze(
         add(pools / "manifest.json", "inputs/pools/manifest.json")
         add(ROOT / "integrations/foul_play_worker.py", "integrations/foul_play_worker.py")
         add(ROOT / "integrations/foul_play_sampling.py", "integrations/foul_play_sampling.py")
+        add(ROOT / "integrations/foul_play_processes.py", "integrations/foul_play_processes.py")
         add(ROOT / "integrations/LICENSE.foul-play", "integrations/LICENSE.foul-play")
         source = ROOT / ".tools/upstream/foul-play"
         for cache in ("pkmn_sets_cache", "smogon_stats_cache"):
@@ -210,7 +215,25 @@ def freeze(
             "shards": shards,
             "learners": source_learners,
             "mix": [0.4, 0.3, 0.3],
+            "attempt_offset": attempt_offset,
         }
+        if slots is not None:
+            selected = json.loads(slots.read_text())
+            if (
+                not selected
+                or len(selected) != len(set(selected))
+                or any(type(index) is not int or not 0 <= index < games for index in selected)
+            ):
+                raise ValueError("Recovery slots must identify unique existing schedule positions")
+            add(slots, "inputs/slots.json")
+            frozen["collection"]["slots"] = selected
+            if attempt_offset:
+                provenance = slots.with_suffix(".provenance.json")
+                if not provenance.is_file():
+                    raise ValueError(
+                        "Recovery requires parent result provenance beside selected slots"
+                    )
+                add(provenance, "inputs/recovery_provenance.json")
     else:
         recipe = json.loads(config.read_text())
         recipe.update(
@@ -489,6 +512,8 @@ def main():
     prepare.add_argument("--isolation", type=Path)
     prepare.add_argument("--timeout", type=int, default=43200)
     prepare.add_argument("--phase", choices=["pilot", "main", "refinement"], default="pilot")
+    prepare.add_argument("--slots", type=Path)
+    prepare.add_argument("--attempt-offset", type=int, default=0)
     for name in ("submit", "collect", "status"):
         command = commands.add_parser(name)
         command.add_argument("experiment")

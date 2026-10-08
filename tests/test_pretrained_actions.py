@@ -79,3 +79,17 @@ def test_external_move_name_canonicalization_keeps_request_order_and_tera():
     assert request_choice("move 2", request()) == "move 2"
     with pytest.raises(ValueError, match="exactly one"):
         request_choice("/choose move missing", request())
+
+
+def test_default_selector_is_explicit_and_struggle_is_recordable():
+    data = request()
+    data["active"][0] = {"moves": [{"id": "struggle", "pp": 1}]}
+    explicit = request_choice("/choose default", data)
+    assert explicit == "move 1" and native_choices(state(), data)[0] == explicit
+    data = request()
+    data["active"][0]["moves"][0]["disabled"] = True
+    data["active"][0]["moves"][2]["pp"] = 1
+    assert request_choice("default", data) == "move 3"
+    data["forceSwitch"] = [True]
+    data["side"]["pokemon"][0]["condition"] = "0 fnt"
+    assert request_choice("default", data) == "switch 3"

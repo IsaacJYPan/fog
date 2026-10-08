@@ -64,6 +64,12 @@ class NativePlayer:
                 ),
             }
         record = self.battles[tag]
+        if message["op"] == "rollback":
+            snapshot = record.pop("decision_snapshot", None)
+            if snapshot is None:
+                raise ValueError("No pending native decision to roll back")
+            record.update(snapshot)
+            return {"rolled_back": True}
         if message["op"] == "commit":
             choice = message["choice"].removeprefix("/choose ").removeprefix("/").strip()
             matches = [index for index, value in record["choices"].items() if value == choice]
@@ -92,7 +98,20 @@ class NativePlayer:
             # Keep one fixed preview rule across all neural arms. The upstream temporal
             # policy starts at the first actual move; this preserves that convention.
             return {"choice": "team 123456", "preview": True}
+        record["decision_snapshot"] = {
+            key: copy.deepcopy(record[key])
+            for key in ("hidden", "space", "rl2", "previous_state", "time")
+        }
         state = UniversalState.from_Battle(battle)
+        from poke_env.environment.pokemon import Pokemon
+        from metamon.interface import UniversalPokemon
+        from fog.pretrained.requests import reconcile_own_roster
+
+        state = reconcile_own_roster(
+            state,
+            request,
+            lambda member: UniversalPokemon.from_Pokemon(Pokemon(gen=9, request_pokemon=member)),
+        )
         choices = native_choices(state, request)
         obs = record["space"].state_to_obs(state)
         obs["illegal_actions"] = np.array([a not in choices for a in range(13)], dtype=bool)

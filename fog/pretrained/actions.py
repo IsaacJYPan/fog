@@ -12,6 +12,21 @@ def identifier(value: str) -> str:
 def request_choice(choice: str, request: dict) -> str:
     """Canonicalize external player move names to the request's numeric slots."""
     choice = choice.removeprefix("/choose ").removeprefix("/").strip()
+    if choice == "default":
+        if request.get("teamPreview"):
+            return "team 123456"
+        if any(request.get("forceSwitch", [False])):
+            party = request.get("side", {}).get("pokemon", [])
+            reviving = any(member.get("reviving") for member in party)
+            for slot, member in enumerate(party):
+                fainted = member.get("condition", "").endswith("fnt")
+                if not member.get("active") and fainted == reviving:
+                    return f"switch {slot + 1}"
+        else:
+            for slot, move in enumerate((request.get("active") or [{}])[0].get("moves", [])):
+                if not move.get("disabled") and move.get("pp", 1) > 0:
+                    return f"move {slot + 1}"
+        raise ValueError("Default choice has no authoritative action")
     parts = choice.split()
     if parts and parts[0] == "move" and len(parts) >= 2 and not parts[1].isdigit():
         offered = request.get("active", [{}])[0].get("moves", [])
