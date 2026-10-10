@@ -61,7 +61,10 @@ def freeze(
     phase="pilot",
     slots=None,
     attempt_offset=0,
+    cpu_preflight=False,
 ):
+    if cpu_preflight and stage != "train":
+        raise ValueError("CPU pipeline preflight uses the training path")
     if attempt_offset < 0 or (stage != "collect" and (slots is not None or attempt_offset)):
         raise ValueError("Selected slots and retry offsets apply only to collection")
     if sha256(checkpoint) != KAKUNA_34_SHA256:
@@ -160,13 +163,19 @@ def freeze(
     frozen = {
         "id": name,
         "stage": stage,
-        "phase": phase if stage == "train" else "CPU data collection",
+        "phase": "CPU pipeline preflight"
+        if cpu_preflight
+        else phase
+        if stage == "train"
+        else "CPU data collection",
         "created_at": datetime.now(UTC).isoformat(),
         "timeout_seconds": timeout,
         "git_revision": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "upstream_revisions": revisions,
-        "trial": stage == "collect" and (games < 1000 or slots is not None),
+        "trial": cpu_preflight or (stage == "collect" and (games < 1000 or slots is not None)),
         "automatic_promotion": False,
+        "device": "cpu" if cpu_preflight else "cuda",
+        "cpu_preflight": cpu_preflight,
         "torch": "Kaggle 2.11.0; actual native probability gate required",
     }
     if stage == "collect":
@@ -235,6 +244,8 @@ def freeze(
                 add(provenance, "inputs/recovery_provenance.json")
     else:
         recipe = json.loads(config.read_text())
+        if cpu_preflight and (recipe["condition"] != "joint" or not 1 <= recipe["updates"] <= 2):
+            raise ValueError("CPU preflight requires one or two full joint optimizer updates")
         recipe.update(
             checkpoint="inputs/kakuna34.pt", published="inputs/published", fresh="inputs/fresh"
         )
@@ -309,7 +320,7 @@ def freeze(
             "language": "python",
             "kernel_type": "script",
             "is_private": True,
-            "enable_gpu": stage == "train",
+            "enable_gpu": stage == "train" and not cpu_preflight,
             "enable_internet": True,
             "dataset_sources": [identifier],
             "competition_sources": [],
@@ -335,6 +346,7 @@ def freeze(
             "dataset": identifier,
             "trial": frozen["trial"],
             "stage": stage,
+            "gpu_requested": stage == "train" and not cpu_preflight,
         },
     )
     handoff(
@@ -361,7 +373,8 @@ def submit(folder):
     if state["phase"] in ("submitting", "submitted", "collected"):
         raise ValueError("Already submitted or uncertain; inspect status before any retry")
     experiment = json.loads((folder / "experiment.json").read_text())
-    if state["stage"] == "train":
+    gpu_requested = state["stage"] == "train" and not experiment.get("cpu_preflight", False)
+    if gpu_requested:
         # Both sealed arms must exist before either is launched. Compare the actual
         # source/data inventories as well as recipes; paths alone do not establish parity.
         partners = []
@@ -415,7 +428,7 @@ def submit(folder):
         )
         print(json.dumps(status), flush=True)
         return
-    if state["stage"] == "train":
+    if gpu_requested:
         family = experiment["matched_recipe_sha256"] + ":" + experiment["matched_inputs_sha256"]
         reserve_gpu(
             ROOT / "runs/pretrained/gpu_budget.json",
@@ -435,7 +448,7 @@ def submit(folder):
         "--timeout",
         str(json.loads((folder / "experiment.json").read_text())["timeout_seconds"]),
     ]
-    if state["stage"] == "train":
+    if gpu_requested:
         arguments += ["--accelerator", "NvidiaTeslaT4"]
     result = cli(*arguments)
     if re.search(r"^Kernel push error:", result, re.MULTILINE | re.IGNORECASE):
@@ -523,6 +536,7 @@ def main():
     prepare.add_argument("--phase", choices=list(PHASE_SECONDS), default="pilot")
     prepare.add_argument("--slots", type=Path)
     prepare.add_argument("--attempt-offset", type=int, default=0)
+    prepare.add_argument("--cpu-preflight", action="store_true")
     for name in ("submit", "collect", "status"):
         command = commands.add_parser(name)
         command.add_argument("experiment")

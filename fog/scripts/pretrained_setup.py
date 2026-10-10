@@ -22,7 +22,7 @@ def environment(root: Path, name: str):
     return destination / "bin/python"
 
 
-def setup(root: Path, output: Path, *, stage):
+def setup(root: Path, output: Path, *, stage, device="cuda"):
     if sys.platform != "linux":
         raise RuntimeError(
             "Use the tested local environments on Windows; this installer targets Kaggle Linux"
@@ -33,7 +33,7 @@ def setup(root: Path, output: Path, *, stage):
     probe_code = "import json,torch,platform; print(json.dumps({'python':platform.python_version(),'torch':torch.__version__,'cuda':torch.version.cuda,'gpu':torch.cuda.is_available()}))"
     probe = subprocess.check_output([sys.executable, "-c", probe_code], text=True)
     platform = json.loads(probe)
-    if stage == "collect" and platform["torch"].split("+")[0] != "2.11.0":
+    if (stage == "collect" or device == "cpu") and platform["torch"].split("+")[0] != "2.11.0":
         command(
             [
                 sys.executable,
@@ -52,7 +52,7 @@ def setup(root: Path, output: Path, *, stage):
         raise RuntimeError(
             "Expected the tested Kaggle PyTorch 2.11.0; freeze and validate a new environment recipe"
         )
-    if stage == "train" and not platform["gpu"]:
+    if stage == "train" and device == "cuda" and not platform["gpu"]:
         raise RuntimeError("GPU training package requires a real CUDA device")
     (output / "platform.json").write_text(json.dumps(platform, indent=2) + "\n")
     native = environment(root, "native")
@@ -79,7 +79,7 @@ print(json.dumps({'prefix':sys.prefix,'amago':amago.__file__,'metamon':metamon._
     loaded = json.loads(result)
     if loaded["torch"] != platform["torch"] or loaded["prefix"] != str(root / ".runtime/native"):
         raise RuntimeError("Native model must use the frozen virtual environment and base Torch")
-    if stage == "train" and not loaded["gpu"]:
+    if stage == "train" and device == "cuda" and not loaded["gpu"]:
         raise RuntimeError("Native model lost access to the allocated CUDA device")
     (output / "native-imports.json").write_text(result)
     # Native code resolves FOG by cwd. Editable upstream installs preserve its
@@ -144,8 +144,9 @@ def main():
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--stage", choices=["collect", "train"], required=True)
+    parser.add_argument("--device", choices=["cpu", "cuda"], default="cuda")
     args = parser.parse_args()
-    setup(args.root, args.out, stage=args.stage)
+    setup(args.root, args.out, stage=args.stage, device=args.device)
 
 
 if __name__ == "__main__":

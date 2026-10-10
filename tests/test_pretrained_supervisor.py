@@ -129,3 +129,80 @@ def test_successful_process_without_result_is_not_a_successful_experiment(tmp_pa
             worker_command=[sys.executable, "-c", "pass"],
         )
     assert assert_archive(output)["status"] == "failed"
+
+
+def test_packaged_script_imports_verified_code_from_an_unrelated_directory(tmp_path):
+    # This is launched as a file, outside the checkout, like /kaggle/src/script.py.
+    # Changing cwd alone does not update that interpreter's sys.path[0].
+    inputs, manifest, _ = bundle(tmp_path, timeout=30)
+    manifest.update(device="cpu", cpu_preflight=True)
+    sources = {
+        "fog/__init__.py": "",
+        "fog/pretrained/__init__.py": "",
+        "fog/scripts/__init__.py": "",
+        "fog/pretrained/runtime.py": (
+            "import os\nfrom pathlib import Path\n"
+            "def native_environment(root):\n"
+            "    assert Path(__file__).resolve().is_relative_to(root)\n"
+            "    return dict(os.environ,PYTHONPATH=str(root))\n"
+        ),
+        "fog/scripts/pretrained_setup.py": (
+            "import argparse,json,sys\nfrom pathlib import Path\n"
+            "p=argparse.ArgumentParser();p.add_argument('--stage');p.add_argument('--device');"
+            "p.add_argument('--out',type=Path);a=p.parse_args()\n"
+            "assert a.device=='cpu';a.out.mkdir(parents=True)\n"
+            "(a.out/'runtimes.json').write_text(json.dumps({'native':sys.executable}))\n"
+        ),
+        "fog/scripts/pretrained_contract.py": (
+            "import argparse,json\nfrom pathlib import Path\n"
+            "p=argparse.ArgumentParser();p.add_argument('--out',type=Path);"
+            "p.add_argument('--device');a,_=p.parse_known_args()\n"
+            "assert a.device=='cpu';a.out.mkdir(parents=True)\n"
+            "(a.out/'contract.json').write_text(json.dumps({'passed':True,'device':a.device}))\n"
+        ),
+        "fog/scripts/pretrained_train.py": (
+            "import argparse,json\nfrom pathlib import Path\n"
+            "p=argparse.ArgumentParser();p.add_argument('--out',type=Path);"
+            "p.add_argument('--device');a,_=p.parse_known_args()\n"
+            "assert a.device=='cpu';a.out.mkdir(parents=True)\n"
+            "(a.out/'RESULTS.json').write_text(json.dumps({'complete':True}))\n"
+            "(a.out/'native_final.pt').write_bytes(b'fixture checkpoint')\n"
+        ),
+    }
+    manifest["files"] = {
+        name: hashlib.sha256(code.encode()).hexdigest() for name, code in sources.items()
+    }
+    with zipfile.ZipFile(inputs / "bundle.bin", "w") as archive:
+        for name, code in sources.items():
+            archive.writestr("fog/" + name, code)
+        archive.writestr("fog/experiment.json", json.dumps(manifest))
+    script = tmp_path / "notebook/script.py"
+    script.parent.mkdir()
+    script.write_text(
+        Path(worker.__file__)
+        .read_text()
+        .replace("EXPORT_RESERVE_SECONDS = 60", "EXPORT_RESERVE_SECONDS = 4")
+    )
+    output = tmp_path / "job/results"
+    env = dict(os.environ)
+    env.pop("PYTHONPATH", None)
+    worker.execute(
+        [
+            sys.executable,
+            "-I",
+            str(script),
+            "--input-root",
+            str(inputs),
+            "--work",
+            str(tmp_path / "work/fog"),
+            "--output",
+            str(output),
+            "--timeout",
+            "30",
+        ],
+        env,
+        tmp_path / "launch.log",
+        30,
+    )
+    assert assert_archive(output)["status"] == "complete"
+    assert json.loads((output / "contract-trained/cpu/contract.json").read_text())["passed"]

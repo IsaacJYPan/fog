@@ -157,12 +157,23 @@ def write_progress(output, stage):
     print("Pipeline:", stage, flush=True)
 
 
+def activate_frozen_code(work, environment):
+    """A script retains its original sys.path[0] after chdir; activate verified code."""
+    sys.path.insert(0, str(work))
+    existing = environment.get("PYTHONPATH")
+    environment["PYTHONPATH"] = str(work) + (os.pathsep + existing if existing else "")
+    return environment
+
+
 def run_pipeline(input_root, work, output, timeout):
     started = time.monotonic()
     output.mkdir(parents=True, exist_ok=True)
     experiment = prepare_inputs(input_root, work, output)
     if experiment["timeout_seconds"] != timeout:
         raise ValueError("Notebook deadline must match the frozen experiment")
+    device = experiment.get("device", "cuda")
+    if device not in ("cpu", "cuda") or (device == "cpu" and not experiment.get("cpu_preflight")):
+        raise ValueError("CPU execution requires a separately frozen preflight recipe")
     os.chdir(work)
     environment = dict(
         os.environ,
@@ -173,6 +184,7 @@ def run_pipeline(input_root, work, output, timeout):
         WANDB_MODE="disabled",
         HF_HUB_DISABLE_TELEMETRY="1",
     )
+    activate_frozen_code(work, environment)
     status, error, code = "failed", None, 1
     try:
 
@@ -192,6 +204,8 @@ def run_pipeline(input_root, work, output, timeout):
                 experiment["stage"],
                 "--out",
                 str(output / "environment"),
+                "--device",
+                device,
             ],
         )
         runtimes = json.loads((output / "environment/runtimes.json").read_text())
@@ -233,7 +247,7 @@ def run_pipeline(input_root, work, output, timeout):
             from fog.pretrained.runtime import native_environment
 
             environment["PYTHONPATH"] = native_environment(work)["PYTHONPATH"]
-            write_progress(output, "original CPU/CUDA probability gate")
+            write_progress(output, "original " + device + " probability gate")
             child(
                 [
                     runtimes["native"],
@@ -246,7 +260,7 @@ def run_pipeline(input_root, work, output, timeout):
                     "--reference",
                     "inputs/contract/cpu/probabilities.pt",
                     "--device",
-                    "cuda",
+                    device,
                     "--out",
                     str(output / "contract"),
                 ],
@@ -260,7 +274,7 @@ def run_pipeline(input_root, work, output, timeout):
                 "--out",
                 str(output / "training"),
                 "--device",
-                "cuda",
+                device,
             ]
             command += ["--max-seconds", str(max(1.0, remaining() - 180))]
         if remaining() < 1:
@@ -268,10 +282,10 @@ def run_pipeline(input_root, work, output, timeout):
         write_progress(output, "training" if experiment["stage"] == "train" else "collection")
         code = child(command)
         if experiment["stage"] == "train":
-            write_progress(output, "trained CPU/CUDA probability gate")
+            write_progress(output, "trained " + device + " probability gate")
             report = json.loads((output / "training/RESULTS.json").read_text())
             checkpoint = str(output / "training/native_final.pt")
-            for device in ("cpu", "cuda"):
+            for contract_device in ("cpu", "cuda") if device == "cuda" else ("cpu",):
                 contract_command = [
                     runtimes["native"],
                     "-m",
@@ -282,11 +296,11 @@ def run_pipeline(input_root, work, output, timeout):
                     "--samples",
                     "inputs/contract/inputs.pt",
                     "--device",
-                    device,
+                    contract_device,
                     "--out",
-                    str(output / "contract-trained" / device),
+                    str(output / "contract-trained" / contract_device),
                 ]
-                if device == "cuda":
+                if contract_device == "cuda":
                     contract_command += [
                         "--reference",
                         str(output / "contract-trained/cpu/probabilities.pt"),
@@ -328,6 +342,9 @@ def run_pipeline(input_root, work, output, timeout):
                 {
                     "status": status,
                     "stage": experiment["stage"],
+                    "operation": json.loads((output / "pipeline_progress.json").read_text())[
+                        "stage"
+                    ],
                     "error": error,
                     "elapsed_seconds": time.monotonic() - started,
                     "returncode": code,
