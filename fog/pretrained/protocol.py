@@ -8,7 +8,33 @@ import json
 import hashlib
 from pathlib import Path
 
-PHASE_SECONDS = {"pilot": 7200, "main": 28800, "refinement": 28800}
+PHASE_SECONDS = {"pilot": 7200, "recovery": 3600, "main": 28800, "refinement": 28800}
+ATTEMPT_SECONDS = 18 * 3600
+
+
+def charged_gpu_seconds(ledger):
+    return sum(row["seconds"] for row in ledger.get("reservations", {}).values()) + sum(
+        row["extra_seconds"] for row in ledger.get("observed_overruns", {}).values()
+    )
+
+
+def record_gpu_overrun(path: Path, *, run_id: str, extra_seconds: int, evidence: dict):
+    """Retain conservative measured overruns without rewriting requested allocations."""
+    if type(extra_seconds) is not int or extra_seconds <= 0 or not evidence:
+        raise ValueError("An overrun requires positive extra seconds and recorded evidence")
+    row = {"extra_seconds": extra_seconds, "evidence": evidence}
+    with registry(path) as ledger:
+        if run_id not in ledger.get("reservations", {}):
+            raise ValueError("An overrun must reference an existing reservation")
+        overruns = ledger.setdefault("observed_overruns", {})
+        if run_id in overruns and overruns[run_id] != row:
+            raise ValueError("Recorded GPU overrun cannot change")
+        overruns[run_id] = row
+        ledger["limit_seconds"] = ATTEMPT_SECONDS
+        ledger["accounting"] = (
+            "Full requested wall time plus recorded extra usage is charged, including failures. "
+            "Weekly quota resets do not reset this attempt."
+        )
 
 
 def source_fingerprint(root: Path):
@@ -88,13 +114,14 @@ def reserve_gpu(path: Path, *, run_id: str, phase: str, condition: str, seconds:
             > PHASE_SECONDS[phase]
         ):
             raise ValueError("Aggregate GPU phase budget exceeded")
-        if sum(old["seconds"] for old in runs.values()) + seconds > 18 * 3600:
+        if charged_gpu_seconds(ledger) + seconds > ATTEMPT_SECONDS:
             raise ValueError("Aggregate pretrained attempt exceeds 18 GPU hours")
         runs[run_id] = row
         ledger["accounting"] = (
-            "Full requested wall time is charged, including failed or interrupted runs."
+            "Full requested wall time plus recorded extra usage is charged, including failures. "
+            "Weekly quota resets do not reset this attempt."
         )
-        ledger["limit_seconds"] = 18 * 3600
+        ledger["limit_seconds"] = ATTEMPT_SECONDS
 
 
 def claim_confirmation(

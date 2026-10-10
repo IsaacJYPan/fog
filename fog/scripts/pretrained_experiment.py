@@ -16,7 +16,7 @@ import uuid
 import zipfile
 
 from fog.pretrained.kakuna import KAKUNA_34_SHA256, sha256
-from fog.pretrained.protocol import reserve_gpu
+from fog.pretrained.protocol import PHASE_SECONDS, reserve_gpu
 from fog.scripts.kaggle_experiment import cli, verify, directory, handoff
 from fog.scripts.kaggle_results import ROOT, client, validate_members, write_json
 
@@ -69,8 +69,7 @@ def freeze(
     if not 600 <= timeout <= 43200:
         raise ValueError("Kaggle background budget must be 10 minutes to 12 hours")
     if stage == "train":
-        limits = {"pilot": 3600, "main": 14400, "refinement": 14400}
-        if timeout > limits[phase]:
+        if timeout > PHASE_SECONDS[phase] // 2:
             raise ValueError("Per-arm pretrained GPU phase budget exceeded")
         from fog.pretrained.loading import fresh_files
 
@@ -300,7 +299,7 @@ def freeze(
     )
     notebook = folder / "notebook"
     notebook.mkdir()
-    shutil.copy2(ROOT / "fog/scripts/pretrained_kaggle_worker.py", notebook / "run.py")
+    write_notebook_runner(notebook / "run.py", timeout)
     write_json(
         notebook / "kernel-metadata.json",
         {
@@ -344,6 +343,16 @@ def freeze(
     )
     print(name, flush=True)
     return folder
+
+
+def write_notebook_runner(destination, timeout):
+    source = (ROOT / "fog/scripts/pretrained_kaggle_worker.py").read_text(encoding="utf-8")
+    marker = "FROZEN_TIMEOUT_SECONDS = 43200"
+    if source.count(marker) != 1:
+        raise ValueError("Expected exactly one frozen notebook deadline")
+    destination.write_text(
+        source.replace(marker, "FROZEN_TIMEOUT_SECONDS = " + str(timeout)), encoding="utf-8"
+    )
 
 
 def submit(folder):
@@ -511,7 +520,7 @@ def main():
     prepare.add_argument("--contract", type=Path)
     prepare.add_argument("--isolation", type=Path)
     prepare.add_argument("--timeout", type=int, default=43200)
-    prepare.add_argument("--phase", choices=["pilot", "main", "refinement"], default="pilot")
+    prepare.add_argument("--phase", choices=list(PHASE_SECONDS), default="pilot")
     prepare.add_argument("--slots", type=Path)
     prepare.add_argument("--attempt-offset", type=int, default=0)
     for name in ("submit", "collect", "status"):

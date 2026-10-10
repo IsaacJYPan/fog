@@ -4,8 +4,11 @@ from fog.pretrained.protocol import (
     claim_confirmation,
     claim_strong_evaluation,
     foulplay_fingerprint,
+    charged_gpu_seconds,
+    record_gpu_overrun,
     reserve_gpu,
 )
+import json
 
 
 def test_failed_runs_still_consume_phase_budget(tmp_path):
@@ -20,6 +23,60 @@ def test_failed_runs_still_consume_phase_budget(tmp_path):
     with pytest.raises(ValueError, match="duplicate"):
         reserve_gpu(
             path, run_id="duplicate", phase="pilot", condition="ordinary", seconds=3600, family="f"
+        )
+
+
+def test_overruns_and_recovery_keep_original_attempt_budget(tmp_path):
+    path = tmp_path / "budget.json"
+    reserve_gpu(
+        path,
+        run_id="ordinary",
+        phase="pilot",
+        condition="ordinary",
+        seconds=3600,
+        family="original",
+    )
+    reserve_gpu(
+        path, run_id="joint", phase="pilot", condition="joint", seconds=3600, family="original"
+    )
+    original = json.loads(path.read_text())["reservations"]
+    options = dict(
+        run_id="ordinary",
+        extra_seconds=23004,
+        evidence={"source": "account quota delta; conservative upper bound"},
+    )
+    record_gpu_overrun(path, **options)
+    record_gpu_overrun(path, **options)
+    assert json.loads(path.read_text())["reservations"] == original
+    with pytest.raises(ValueError, match="cannot change"):
+        record_gpu_overrun(path, **dict(options, extra_seconds=1))
+    reserve_gpu(
+        path,
+        run_id="recovery-a",
+        phase="recovery",
+        condition="ordinary",
+        seconds=1800,
+        family="fixed",
+    )
+    reserve_gpu(
+        path, run_id="recovery-b", phase="recovery", condition="joint", seconds=1800, family="fixed"
+    )
+    assert charged_gpu_seconds(json.loads(path.read_text())) == 33804
+    # Even with a fresh weekly quota, this attempt cannot use its old full main/refinement plan.
+    reserve_gpu(
+        path, run_id="main-a", phase="main", condition="ordinary", seconds=14400, family="main"
+    )
+    reserve_gpu(
+        path, run_id="main-b", phase="main", condition="joint", seconds=14400, family="main"
+    )
+    with pytest.raises(ValueError, match="exceeds 18 GPU hours"):
+        reserve_gpu(
+            path,
+            run_id="refinement-a",
+            phase="refinement",
+            condition="ordinary",
+            seconds=3600,
+            family="refined",
         )
 
 
