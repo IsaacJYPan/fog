@@ -13,6 +13,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import time
 import zipfile
 from urllib.parse import urlsplit
 
@@ -27,9 +28,36 @@ def digest(path: Path) -> str:
 
 def write_json(path: Path, value: dict) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(".tmp")
-    temporary.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
-    temporary.replace(path)
+    # Several independent packages update the same latest pointer. Their staging
+    # files must be distinct even though the last completed write wins.
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        dir=path.parent,
+        prefix="." + path.name + "-",
+        suffix=".tmp",
+        delete=False,
+    ) as stream:
+        temporary = Path(stream.name)
+        try:
+            stream.write(json.dumps(value, indent=2) + "\n")
+        except BaseException:
+            stream.close()
+            temporary.unlink(missing_ok=True)
+            raise
+    try:
+        for attempt in range(50):
+            try:
+                temporary.replace(path)
+                break
+            except PermissionError as error:
+                # Windows can briefly deny replacement while another rename or
+                # reader holds the target. Keep the complete prior JSON visible.
+                if os.name != "nt" or error.winerror not in (5, 32, 33) or attempt == 49:
+                    raise
+                time.sleep(0.01)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def validate_members(archive: zipfile.ZipFile) -> None:
