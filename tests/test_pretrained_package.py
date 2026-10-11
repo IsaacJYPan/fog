@@ -32,6 +32,7 @@ def test_cpu_jobs_never_reserve_or_request_gpu(tmp_path, monkeypatch, stage):
     (folder / "experiment.json").write_text(
         json.dumps(
             {
+                "id": folder.name,
                 "cpu_preflight": stage == "train",
                 "stage": stage,
                 "timeout_seconds": 1800,
@@ -43,10 +44,16 @@ def test_cpu_jobs_never_reserve_or_request_gpu(tmp_path, monkeypatch, stage):
             {
                 "stage": stage,
                 "phase": "uploaded",
-                "kernel": "owner/cpu-smoke",
+                "kernel": "owner/cpu-smoke-run",
                 "dataset": "owner/cpu-smoke",
             }
         )
+    )
+    (folder / "dataset").mkdir()
+    (folder / "notebook").mkdir()
+    (folder / "dataset/dataset-metadata.json").write_text(json.dumps({"id": "owner/cpu-smoke"}))
+    (folder / "notebook/kernel-metadata.json").write_text(
+        json.dumps({"id": "owner/cpu-smoke-run", "is_private": True, "enable_gpu": False})
     )
     monkeypatch.setattr(workflow, "verify", lambda _: None)
     monkeypatch.setattr(workflow, "handoff", lambda *_: None)
@@ -69,3 +76,40 @@ def test_cpu_jobs_never_reserve_or_request_gpu(tmp_path, monkeypatch, stage):
     workflow.submit(folder)
     assert len(commands) == 2
     assert json.loads((folder / "state.json").read_text())["phase"] == "submitted"
+
+
+@pytest.mark.parametrize(
+    "override",
+    [
+        {"id": "owner/another-run"},
+        {"is_private": False},
+        {"enable_gpu": True},
+    ],
+)
+def test_invalid_notebook_identity_or_resources_fail_before_network(
+    tmp_path, monkeypatch, override
+):
+    folder = tmp_path / "safe-run"
+    (folder / "dataset").mkdir(parents=True)
+    (folder / "notebook").mkdir()
+    (folder / "experiment.json").write_text(json.dumps({"id": "safe-run", "stage": "evaluate"}))
+    (folder / "state.json").write_text(
+        json.dumps(
+            {
+                "stage": "evaluate",
+                "phase": "prepared",
+                "dataset": "owner/safe-run",
+                "kernel": "owner/safe-run-run",
+            }
+        )
+    )
+    (folder / "dataset/dataset-metadata.json").write_text(json.dumps({"id": "owner/safe-run"}))
+    notebook = {"id": "owner/safe-run-run", "is_private": True, "enable_gpu": False}
+    notebook.update(override)
+    (folder / "notebook/kernel-metadata.json").write_text(json.dumps(notebook))
+    monkeypatch.setattr(workflow, "verify", lambda _: None)
+    monkeypatch.setattr(
+        workflow, "cli", lambda *_: pytest.fail("Invalid package reached network submission")
+    )
+    with pytest.raises(ValueError, match="identities must match"):
+        workflow.submit(folder)

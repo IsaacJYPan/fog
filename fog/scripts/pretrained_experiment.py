@@ -212,13 +212,13 @@ def freeze(
             native = Path(row["native"])
             if sha256(native) != row["native_sha256"]:
                 raise ValueError("Evaluation candidate changed: " + condition)
-            for field, name in (
+            for field, filename in (
                 ("native", "native.pt"),
                 ("reference", "probabilities.pt"),
                 ("auxiliary", "auxiliary.pt"),
             ):
                 if field in row:
-                    target = f"inputs/candidates/{condition}/{name}"
+                    target = f"inputs/candidates/{condition}/{filename}"
                     add(row[field], target)
                     row[field] = target
         if recipe.get("belief"):
@@ -445,6 +445,7 @@ def submit(folder):
         raise ValueError("Already submitted or uncertain; inspect status before any retry")
     experiment = json.loads((folder / "experiment.json").read_text())
     gpu_requested = state["stage"] == "train" and not experiment.get("cpu_preflight", False)
+    validate_submission_identity(folder, experiment, state, gpu_requested=gpu_requested)
     if gpu_requested:
         # Both sealed arms must exist before either is launched. Compare the actual
         # source/data inventories as well as recipes; paths alone do not establish parity.
@@ -533,6 +534,26 @@ def submit(folder):
         "Submitted privately. Collect, verify output hashes, and evaluate locally before continuing.",
     )
     print(result, flush=True)
+
+
+def validate_submission_identity(folder, experiment, state, *, gpu_requested):
+    dataset = json.loads((folder / "dataset/dataset-metadata.json").read_text())
+    notebook = json.loads((folder / "notebook/kernel-metadata.json").read_text())
+    if (
+        experiment["id"] != folder.name
+        or dataset["id"] != state["dataset"]
+        or dataset["id"].split("/")[-1] != folder.name
+        or notebook["id"] != state["kernel"]
+        or notebook["id"] != dataset["id"] + "-run"
+        or state["stage"] != experiment["stage"]
+        or notebook.get("is_private") is not True
+        or notebook.get("enable_gpu") is not gpu_requested
+    ):
+        raise ValueError(
+            "Frozen experiment, dataset, private notebook and resource identities must match"
+        )
+    if state["phase"] not in ("prepared", "uploading", "uploaded"):
+        raise ValueError("This experiment is not in a valid submission phase")
 
 
 def collect(folder):
