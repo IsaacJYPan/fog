@@ -1,10 +1,54 @@
-"""Fixed-look playing-strength gates; integration success never promotes a model."""
+"""Separate exploratory training retention from final playing-strength confirmation."""
 
 from __future__ import annotations
 
 from dataclasses import asdict
 
 from fog.eval.stats import paired_block_interval
+
+
+def continuation_review(scores, *, failures=0, unresolved=0, seed=0, alpha=0.05):
+    """Retain uncertain candidates; recommend rollback only for observed regression.
+
+    Scores must come from complete crossed games against the declared reference.
+    This exploratory review is neither a non-inferiority guarantee nor permission
+    to claim improved playing strength. Repeated development looks are not an
+    anytime-valid test.
+    """
+    if failures < 0 or unresolved < 0:
+        raise ValueError("Failure and unresolved counts cannot be negative")
+    incomplete = (
+        failures
+        or unresolved
+        or len(scores) < 256
+        or len(scores) % 4
+        or any(score is None for score in scores)
+    )
+    interval = None
+    if not incomplete:
+        interval = paired_block_interval(scores, alpha=alpha, seed=seed)
+    regression = interval is not None and interval.high < 0.5
+    improvement = interval is not None and interval.low > 0.5
+    decision = "diagnose" if incomplete else "rollback" if regression else "retain"
+    return {
+        "decision": decision,
+        "vs_reference": asdict(interval) if interval else None,
+        "significant_regression_on_development": regression,
+        "improvement_supported_on_development": improvement,
+        "failures": failures,
+        "unresolved": unresolved,
+        "games": len(scores),
+        "alpha": alpha,
+        "strength_claim_confirmed": False,
+        "automatic_weight_change": False,
+        "interpretation": (
+            "Diagnose incomplete or failed evaluation before changing checkpoints."
+            if incomplete
+            else "The exploratory upper confidence bound is below 50%; recommend rollback."
+            if regression
+            else "Retain for development; absence of significant regression does not prove non-inferiority or final improvement."
+        ),
+    }
 
 
 def confirmation_gate(scores, *, attempt, failures=0, unresolved=0, strong_differences=None):

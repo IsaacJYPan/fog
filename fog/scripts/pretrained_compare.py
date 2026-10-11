@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 from fog.eval.stats import paired_block_interval
-from fog.pretrained.evaluation import matched_update_budget
+from fog.pretrained.evaluation import continuation_review, matched_update_budget
 from fog.pretrained.kakuna import KAKUNA_34_SHA256, sha256
 
 
@@ -97,6 +97,16 @@ def compare_evaluations(pair, ordinary_path, joint_path):
     ordinary, joint = [row["rows"] for row in reports]
     if len(ordinary) < 256 or len(ordinary) % 4 or len(ordinary) != len(joint):
         raise ValueError("Require at least 256 matched crossed development games per arm")
+    for report in reports:
+        if report["protocol"]["games"] != len(report["rows"]) or any(
+            row["index"] != index
+            or row["status"] != "complete"
+            or row["failures"]
+            or row["fallbacks"]
+            or row["score"] not in (0.0, 0.5, 1.0)
+            for index, row in enumerate(report["rows"])
+        ):
+            raise ValueError("Every declared development game must be complete and failure-free")
     if any(
         a["index"] != b["index"] or a["schedule"] != b["schedule"] for a, b in zip(ordinary, joint)
     ):
@@ -109,6 +119,17 @@ def compare_evaluations(pair, ordinary_path, joint_path):
     return {
         "joint_minus_ordinary": asdict(delta),
         "auxiliary_combination_supported_on_development": delta.low > 0,
+        "continuation_reviews": {
+            condition: {
+                "candidate_sha256": report["protocol"]["candidate_sha256"],
+                "reference_sha256": report["protocol"]["original_sha256"],
+                **continuation_review(
+                    [row["score"] for row in report["rows"]],
+                    seed=report["protocol"]["seed"],
+                ),
+            }
+            for condition, report in zip(("ordinary", "joint"), reports)
+        },
         "attribution": "The matched contrast tests belief plus outcome additions together. Belief-specific attribution requires an outcome-only ablation. Development intervals are exploratory and do not establish final playing strength.",
         "automatic_promotion": False,
     }
