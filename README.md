@@ -4,15 +4,16 @@ FOG is a research agent for Pokémon Showdown Gen 9 OU singles. It learns a batt
 estimates hidden team information, and studies whether search can improve play under partial
 observability. Battles use a pinned local Showdown simulator.
 
-The active experiments use a typed-token model. The earlier three-encoder model and experimental
-belief-space search are retained for comparison. See [ARCHITECTURE.md](ARCHITECTURE.md) for the
-model contracts and implementation limits.
+The repository supports typed-token models and an optional
+[native Kakuna experiment](docs/native-kakuna.md) that preserves Metamon's pretrained policy while
+testing Gen9OU fine-tuning with shared belief and outcome supervision. The earlier three-encoder
+model and experimental belief-space search are retained for comparison. See
+[ARCHITECTURE.md](ARCHITECTURE.md) for FOG's model contracts and implementation limits, and the
+[native guide](docs/native-kakuna.md) for Kakuna's observation and training contracts.
 
-The optional [native Kakuna experiment](docs/native-kakuna.md) preserves Metamon's pretrained
-policy while testing Gen9OU fine-tuning with shared belief and outcome supervision. It includes
-composition-disjoint team pools, private frozen Kaggle packages, and matched strength gates.
-No improvement over unchanged Kakuna has been established yet. See its
-[upstream attribution](integrations/THIRD_PARTY.md) for component and checkpoint licenses.
+Neither the typed-token PPO pilots nor native Kakuna fine-tuning have established a reliable
+playing-strength gain over their respective starting checkpoints. The latest native runs and
+next diagnostic questions are summarized in the [training review](docs/training-review.md).
 
 ## Local setup
 
@@ -80,6 +81,10 @@ The doctor checks GPU availability, referenced files, the simulator build, and s
 A CPU-only development installation can run tests and display help while failing this GPU-job check.
 The `.ps1` launcher is also available where PowerShell scripts are permitted.
 
+Native Kakuna uses separately pinned Metamon and opponent runtimes in isolated environments.
+The base installation above does not install those runtimes or download pretrained weights;
+follow the [native experiment guide](docs/native-kakuna.md) before preparing a native run.
+
 Historical milestone recipes are in `configs/archive/`. The old `fog.scripts.pipeline` entry point
 is no longer supported.
 
@@ -90,15 +95,19 @@ is no longer supported.
 | `fog/env/` | Direct Showdown worker, battle views, Rust backend, team loading |
 | `fog/encoding/` | Observations, reveal tracking, public history, mirrored views |
 | `fog/models/` | Policy, value, belief models, and encoders |
-| `fog/pretrained/` | Native Kakuna adapters, shared supervision, and experiment contracts |
+| `fog/pretrained/` | Native Kakuna adapters, shared supervision, evaluation, and experiment contracts |
 | `fog/training/` | PPO, supervised training, distillation, and checkpoint state |
 | `fog/search/` | Determinized and experimental public-belief search |
 | `fog/eval/` | Battle evaluation and model diagnostics |
 | `fog/scripts/` | Data preparation, audits, and training automation |
 | `configs/` | Experiment recipes and pinned simulator/data versions |
+| `docs/` | Data, native integration, Kaggle workflow, and training-review guides |
+| `integrations/` | Foul Play process adapters and upstream attribution/licenses |
+| `notebooks/` | Manual Kaggle training and trial notebooks |
 | `tests/` | Unit tests and simulator integration tests |
 | `server/pokemon-showdown/` | Pinned upstream Git submodule |
 | `data/teams/` | Team pastes and packaged pools |
+| `runs/experiments/` | Local frozen packages, handoffs, and collected results (ignored by Git) |
 
 Generated lookup tables in `fog/constants/` and reusable team pools are tracked. Raw replays,
 downloaded usage data, checkpoints, experiment reports, and training outputs are local inputs
@@ -142,13 +151,84 @@ items; a matched policy pilot remains tied. It is available as an explicit conve
 The public-belief solver is experimental. Its direct-Showdown bridge currently uses one private
 world per side; multi-candidate hidden-team substitution is not a production inference path.
 The learned public-belief value model failed its public-only ablation, and the second search
-distillation generation regressed in direct play. The typed-token PPO pilots have not established
-a reliable strength gain over their starting checkpoint.
+distillation generation regressed in direct play.
+
+The matched native Kakuna runs completed 1,250 optimizer updates per condition. On 256 crossed
+development games per condition against unchanged Kakuna, ordinary fine-tuning scored 48.44%
+(exploratory 95% interval 43.75–53.13%) and joint training scored 50.39% (44.92–55.47%). These
+results establish neither improvement nor regression. The repeated cloud evaluation used the
+same games and does not add an independent cohort. See the
+[post-training review](docs/training-review.md) for training exposure and belief-learning evidence.
 
 Changes to observations, belief, search, or training semantics should update the relevant contracts
 in [ARCHITECTURE.md](ARCHITECTURE.md) and their acceptance tests.
 
-## Kaggle experiment workflow
+## Private Kaggle workflows
 
-See [docs/kaggle-workflow.md](docs/kaggle-workflow.md) for private API-launched GPU training,
-result collection, and local evaluation through `fog-experiment.cmd`.
+Both paths freeze code, data, configuration, and checkpoint hashes into private experiment
+packages. Changed recipes get new experiment identities. Collected results remain available for
+review; successful execution does not promote a model.
+
+### FOG model experiments
+
+Follow [KAGGLE_TRAINING.md](KAGGLE_TRAINING.md) for account setup and data preparation, then use
+[the experiment workflow](docs/kaggle-workflow.md) for training, collection, and local evaluation:
+
+```powershell
+.\fog-experiment.cmd prepare --label candidate-trial --job configs/automated_gen9ou_candidates_kaggle.yaml --trial
+.\fog-experiment.cmd submit RUN_ID
+.\fog-experiment.cmd status RUN_ID
+.\fog-experiment.cmd collect RUN_ID
+```
+
+Replace `RUN_ID` with the ID printed by `prepare`. The trial checks execution with a small decision
+budget and still requires the recipe's data and starting checkpoint. The launcher uses `.venv`
+and the `fog.scripts.kaggle_experiment` module. Evaluate the returned candidate on a deliberately
+selected held-out pool before choosing the next parent checkpoint.
+
+### Native Kakuna experiments
+
+Use `fog.scripts.pretrained_experiment` for native collection, training, and evaluation packages:
+
+```sh
+uv run --no-sync python -m fog.scripts.pretrained_experiment prepare --help
+uv run --no-sync python -m fog.scripts.pretrained_experiment status RUN_ID
+uv run --no-sync python -m fog.scripts.pretrained_experiment collect RUN_ID
+```
+
+Preparation requires a stage (`collect`, `train`, or `evaluate`), the checkpoint, an isolated native
+Python executable, and the stage's inputs. The [native guide](docs/native-kakuna.md) describes
+composition-disjoint team pools, screened published games, exact-team collection, and probability
+and data-isolation checks. A separate `prepare --cpu-preflight` recipe exercises the training and
+export pipeline before allocating GPU time. Upstream component and checkpoint licenses are listed
+in [integrations/THIRD_PARTY.md](integrations/THIRD_PARTY.md).
+
+New GPU training packages require an armed, matched private CPU evaluation queue. Register both
+training outputs, prepare and submit the initial CPU evaluation, then enable its data-update
+schedule in Kaggle before submitting training. Follow the
+[GPU-to-CPU handoff guide](docs/kaggle-evaluation-queue.md) to verify and record the schedule.
+Once armed and submitted, the chain can run while the local machine is offline; scheduled updates
+can take until the next daily trigger.
+
+Native comparisons preserve teams, seats, seeds, inference settings, and data schedules across
+unchanged Kakuna and both trained conditions. Development checkpoint retention recommends keeping
+a valid candidate unless its exploratory 95% interval against unchanged Kakuna has an upper bound
+below 50%; failed or incomplete evaluations require diagnosis. This is separate from the final
+strength gate, which requires at least 1,024 crossed confirmation games, a matched strong-opponent
+regression comparison, and the finalist's probability checks. Preserve prior checkpoints and
+explicitly select the checkpoint or complete training state for a continuation.
+
+## Evaluation and learning diagnostics
+
+Review every completed training result before choosing another large run. The
+[training-review guide](docs/training-review.md) covers data exposure, held-out progress,
+uncertainty, optimization, and testable explanations for the next experiment.
+
+For native models, `fog.scripts.pretrained_compare` checks matched runs and recommends development
+retention. Frozen CPU evaluation recipes can also benchmark unchanged Kakuna and both trained
+conditions against `simpleheuristics` and `maxdamage`. These basic-opponent diagnostics do not
+replace final confirmation. `fog.scripts.pretrained_belief_benchmark` measures sampled hidden sets;
+`fog.scripts.pretrained_belief_diagnose` compares public marginals and conditional predictions given
+verified correct prefixes across saved checkpoints on fixed training and development cohorts.
+Conditional accuracy, ancestral sampling quality, and battle strength are separate measurements.
+Learned native belief sampling is not connected to search pending supporting benchmarks.
