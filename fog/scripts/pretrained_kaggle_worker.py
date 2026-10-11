@@ -196,6 +196,19 @@ def run_pipeline(input_root, work, output, timeout):
     status, error, code = "failed", None, 1
     try:
 
+        evaluation_config = "evaluation.json"
+        if experiment["stage"] == "evaluate" and experiment.get("training_sources"):
+            from fog.scripts.pretrained_evaluation_queue import resolve_queue
+
+            write_progress(output, "resolve GPU training dependencies")
+            resolved = resolve_queue(
+                json.loads((work / "evaluation.json").read_text()), input_root, work, output
+            )
+            if resolved is None:
+                status, code = "waiting", 0
+                return
+            evaluation_config = "evaluation.resolved.json"
+
         def remaining():
             return timeout - (time.monotonic() - started) - EXPORT_RESERVE_SECONDS - 10
 
@@ -257,7 +270,7 @@ def run_pipeline(input_root, work, output, timeout):
                 "-m",
                 "fog.scripts.pretrained_evaluation_job",
                 "--config",
-                "evaluation.json",
+                evaluation_config,
                 "--native-python",
                 runtimes["native"],
                 "--out",

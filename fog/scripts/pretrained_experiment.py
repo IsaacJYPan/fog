@@ -180,6 +180,7 @@ def freeze(
         "automatic_promotion": False,
         "device": "cpu" if cpu_preflight or stage == "evaluate" else "cuda",
         "cpu_preflight": cpu_preflight,
+        "requires_cpu_evaluation_queue": stage == "train" and not cpu_preflight,
         "torch": "Kaggle 2.11.0; actual native probability gate required",
     }
     if stage in ("collect", "evaluate"):
@@ -189,10 +190,15 @@ def freeze(
             add(ROOT / "server/pokemon-showdown" / filename, "server/pokemon-showdown/" + filename)
     if stage == "evaluate":
         from fog.scripts.pretrained_evaluation_job import validate_recipe
+        from fog.scripts.pretrained_evaluation_queue import validate_queue
         from fog.pretrained.data import assert_disjoint
 
         recipe = json.loads(config.read_text())
-        validate_recipe(recipe)
+        queued = "training_sources" in recipe
+        if queued:
+            validate_queue(recipe, ROOT)
+        else:
+            validate_recipe(recipe)
         pool_data = {
             split: json.loads((pools / (split + ".json")).read_text())
             for split in ("train", "development", "final")
@@ -208,7 +214,16 @@ def freeze(
                 and "__pycache__" not in path.parts
             ):
                 add(path, path.relative_to(ROOT).as_posix())
-        for condition, row in recipe["conditions"].items():
+        for condition, row in recipe.get("training_sources", {}).items():
+            descriptor = Path(row["experiment"])
+            verify(descriptor.parent)
+            source_state = json.loads((descriptor.parent / "state.json").read_text())
+            if source_state["kernel"] != row["kernel"]:
+                raise ValueError("Training notebook differs from its frozen identity")
+            target = f"inputs/training/{condition}/experiment.json"
+            add(descriptor, target)
+            row["experiment"] = target
+        for condition, row in recipe.get("conditions", {}).items():
             native = Path(row["native"])
             if sha256(native) != row["native_sha256"]:
                 raise ValueError("Evaluation candidate changed: " + condition)
@@ -250,9 +265,13 @@ def freeze(
         write_json(recipe_path, recipe)
         add(recipe_path, "evaluation.json")
         frozen["evaluation"] = {key: value for key, value in recipe.items() if key != "conditions"}
-        frozen["conditions"] = {
-            name: row["native_sha256"] for name, row in recipe["conditions"].items()
-        }
+        if queued:
+            frozen["training_sources"] = recipe["training_sources"]
+            frozen["trigger_sources"] = recipe.get("trigger_sources", [])
+        else:
+            frozen["conditions"] = {
+                name: row["native_sha256"] for name, row in recipe["conditions"].items()
+            }
     elif stage == "collect":
         if games < 20 or games % 20 or not 0 <= shard < shards:
             raise ValueError("Collection uses complete 20-game opponent/seat-balanced schedules")
@@ -381,28 +400,30 @@ def freeze(
     )
     notebook = folder / "notebook"
     notebook.mkdir()
-    write_notebook_runner(notebook / "run.py", timeout)
+    entrypoint = "run.ipynb" if frozen.get("training_sources") else "run.py"
+    write_notebook_runner(notebook / entrypoint, timeout)
     write_json(
         notebook / "kernel-metadata.json",
         {
             "id": kernel,
             "title": name + "-run",
-            "code_file": "run.py",
+            "code_file": entrypoint,
             "language": "python",
-            "kernel_type": "script",
+            "kernel_type": "notebook" if entrypoint.endswith(".ipynb") else "script",
             "is_private": True,
             "enable_gpu": stage == "train" and not cpu_preflight,
             "enable_internet": True,
             "dataset_sources": [identifier],
             "competition_sources": [],
-            "kernel_sources": [],
+            "kernel_sources": [row["kernel"] for row in frozen.get("training_sources", {}).values()]
+            + frozen.get("trigger_sources", []),
             "model_sources": [],
         },
     )
     sealed = [
         upload / "bundle.bin",
         upload / "dataset-metadata.json",
-        notebook / "run.py",
+        notebook / entrypoint,
         notebook / "kernel-metadata.json",
         folder / "experiment.json",
     ]
@@ -433,20 +454,61 @@ def write_notebook_runner(destination, timeout):
     marker = "FROZEN_TIMEOUT_SECONDS = 43200"
     if source.count(marker) != 1:
         raise ValueError("Expected exactly one frozen notebook deadline")
-    destination.write_text(
-        source.replace(marker, "FROZEN_TIMEOUT_SECONDS = " + str(timeout)), encoding="utf-8"
-    )
+    source = source.replace(marker, "FROZEN_TIMEOUT_SECONDS = " + str(timeout))
+    if destination.suffix == ".ipynb":
+        # Scheduled script versions can be treated as notebook JSON by Kaggle.
+        # A real notebook runs the same sealed watchdog with a clean argv.
+        cell = (
+            "from pathlib import Path\nimport subprocess\nimport sys\n"
+            "runner = Path('/kaggle/temp/fog-evaluation-entry.py')\n"
+            f"runner.write_text({source!r}, encoding='utf-8')\n"
+            "subprocess.run([sys.executable, str(runner)], check=True)\n"
+        )
+        write_json(
+            destination,
+            {
+                "nbformat": 4,
+                "nbformat_minor": 5,
+                "metadata": {
+                    "kernelspec": {
+                        "display_name": "Python 3",
+                        "language": "python",
+                        "name": "python3",
+                    }
+                },
+                "cells": [
+                    {
+                        "cell_type": "code",
+                        "id": "evaluation",
+                        "metadata": {},
+                        "execution_count": None,
+                        "outputs": [],
+                        "source": cell.splitlines(keepends=True),
+                    }
+                ],
+            },
+        )
+    else:
+        destination.write_text(source, encoding="utf-8")
 
 
-def submit(folder):
+def submit(folder, *, save_only=False, bootstrap=False):
     verify(folder)
     state = json.loads((folder / "state.json").read_text())
-    if state["phase"] in ("submitting", "submitted", "collected"):
+    if state["phase"] in ("saving", "submitting", "submitted", "collected") or (
+        save_only and state["phase"] in ("saved", "registered")
+    ):
         raise ValueError("Already submitted or uncertain; inspect status before any retry")
     experiment = json.loads((folder / "experiment.json").read_text())
     gpu_requested = state["stage"] == "train" and not experiment.get("cpu_preflight", False)
+    if save_only and experiment.get("training_sources"):
+        raise ValueError(
+            "Queued evaluation requires an initial CPU submission; Quick Save can skip scheduled execution"
+        )
+    if bootstrap and (not save_only or not gpu_requested):
+        raise ValueError("Registration is a CPU placeholder for a frozen GPU training notebook")
     validate_submission_identity(folder, experiment, state, gpu_requested=gpu_requested)
-    if gpu_requested:
+    if gpu_requested and not save_only:
         # Both sealed arms must exist before either is launched. Compare the actual
         # source/data inventories as well as recipes; paths alone do not establish parity.
         partners = []
@@ -468,6 +530,8 @@ def submit(folder):
             raise ValueError(
                 "Prepare exactly one sealed opposite-condition partner with identical inputs and budget"
             )
+        if experiment.get("requires_cpu_evaluation_queue"):
+            require_cpu_queue(folder, experiment, partners[0])
         quota = json.loads(cli("quota", "--format", "json"))
         gpu = next((row for row in quota if row.get("resource") == "GPU"), None)
         partner_state = json.loads((directory(partners[0]["id"]) / "state.json").read_text())
@@ -500,7 +564,7 @@ def submit(folder):
         )
         print(json.dumps(status), flush=True)
         return
-    if gpu_requested:
+    if gpu_requested and not save_only:
         family = experiment["matched_recipe_sha256"] + ":" + experiment["matched_inputs_sha256"]
         reserve_gpu(
             ROOT / "runs/pretrained/gpu_budget.json",
@@ -510,8 +574,41 @@ def submit(folder):
             seconds=experiment["timeout_seconds"],
             family=family,
         )
-    state["phase"] = "submitting"
+    state["phase"] = "saving" if save_only else "submitting"
     write_json(folder / "state.json", state)
+    if save_only:
+        python = client().with_name("python.exe" if sys.platform == "win32" else "python")
+        command = [
+            str(python),
+            "-m",
+            "fog.scripts.kaggle_quick_save",
+            "--folder",
+            str(folder / "notebook"),
+            "--timeout",
+            str(experiment["timeout_seconds"]),
+        ]
+        if bootstrap:
+            command += ["--bootstrap", "--experiment-sha256", sha256(folder / "experiment.json")]
+        result = subprocess.check_output(command, cwd=ROOT, text=True)
+        registration = json.loads(result)
+        if registration["executed"] is not bootstrap or registration["kernel"] != state["kernel"]:
+            raise ValueError("Non-executing registration returned an unexpected identity")
+        state.update(
+            phase="registered" if bootstrap else "saved",
+            registration=registration,
+            url="https://www.kaggle.com/code/" + state["kernel"],
+        )
+        write_json(folder / "state.json", state)
+        handoff(
+            folder,
+            "Registered a CPU placeholder; training has not started. Wait for its output, "
+            "save and arm the queued CPU evaluation, then submit the real GPU package."
+            if bootstrap
+            else "Saved privately without execution. Configure the data-update schedule "
+            "for queued CPU evaluation, or submit this registered training package to launch.",
+        )
+        print(result, flush=True)
+        return
     arguments = [
         "kernels",
         "push",
@@ -548,18 +645,64 @@ def validate_submission_identity(folder, experiment, state, *, gpu_requested):
         or state["stage"] != experiment["stage"]
         or notebook.get("is_private") is not True
         or notebook.get("enable_gpu") is not gpu_requested
+        or notebook.get("kernel_sources", [])
+        != (
+            [row["kernel"] for row in experiment.get("training_sources", {}).values()]
+            + experiment.get("trigger_sources", [])
+        )
     ):
         raise ValueError(
             "Frozen experiment, dataset, private notebook and resource identities must match"
         )
-    if state["phase"] not in ("prepared", "uploading", "uploaded"):
+    if state["phase"] not in ("prepared", "uploading", "uploaded", "saved", "registered"):
         raise ValueError("This experiment is not in a valid submission phase")
+
+
+def require_cpu_queue(folder, experiment, partner):
+    """Do not allocate new GPU time until its private CPU handoff has been armed."""
+    expected = {
+        row["condition"]: sha256(directory(row["id"]) / "experiment.json")
+        for row in (experiment, partner)
+    }
+    ready = []
+    for path in folder.parent.glob("fog-native-evaluate-*/experiment.json"):
+        candidate = json.loads(path.read_text())
+        sources = candidate.get("training_sources", {})
+        if {arm: row["experiment_sha256"] for arm, row in sources.items()} != expected:
+            continue
+        verify(path.parent)
+        state = json.loads((path.parent / "state.json").read_text())
+        receipt_path = path.parent / "SCHEDULE.json"
+        if not receipt_path.is_file():
+            continue
+        receipt = json.loads(receipt_path.read_text())
+        metadata = json.loads((path.parent / "notebook/kernel-metadata.json").read_text())
+        if (
+            candidate["stage"] == "evaluate"
+            and candidate["device"] == "cpu"
+            and not candidate["evaluation"].get("pilot_only")
+            and metadata["is_private"] is True
+            and metadata["enable_gpu"] is False
+            and metadata["kernel_type"] == "notebook"
+            and receipt.get("enabled") is True
+            and receipt.get("trigger") == "data_updates"
+            and receipt.get("kernel") == state["kernel"]
+            and receipt.get("sources") == metadata["kernel_sources"]
+            and state["phase"] in ("submitted", "collected")
+        ):
+            ready.append(candidate["id"])
+    if len(ready) != 1:
+        raise ValueError(
+            "Arm exactly one hash-matched private CPU evaluation schedule before GPU launch"
+        )
 
 
 def collect(folder):
     verify(folder)
     state = json.loads((folder / "state.json").read_text())
-    if state.get("result"):
+    experiment = json.loads((folder / "experiment.json").read_text())
+    scheduled = bool(experiment.get("training_sources"))
+    if state.get("result") and not scheduled:
         print(state["result"])
         return
     status = cli("kernels", "status", state["kernel"])
@@ -584,6 +727,7 @@ def collect(folder):
         archive = Path(temporary) / "fog-experiment-output.zip"
         digest = sha256(archive)
         result = folder / "results" / digest[:16]
+        run = json.loads((Path(temporary) / "download.json").read_text())
         with zipfile.ZipFile(archive) as zipped:
             validate_members(zipped)
             if json.loads(zipped.read("experiment.json")) != json.loads(
@@ -594,11 +738,32 @@ def collect(folder):
             for name, expected in hashes.items():
                 if hashlib.sha256(zipped.read(name)).hexdigest() != expected:
                     raise ValueError("Returned output hash mismatch: " + name)
-            result.mkdir(parents=True)
-            zipped.extractall(result)
-        shutil.copy2(archive, folder / "output.zip")
-        run = json.loads((Path(temporary) / "download.json").read_text())
-    state.update(phase="collected", result=str(result), run_id=run["run_id"])
+            if not result.exists():
+                result.mkdir(parents=True)
+                zipped.extractall(result)
+        saved_archive = (
+            folder / "outputs" / f"{run['run_id']}-{digest[:16]}.zip"
+            if scheduled
+            else folder / "output.zip"
+        )
+        if not saved_archive.exists():
+            saved_archive.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(archive, saved_archive)
+    state.update(
+        phase="collected",
+        result=str(result),
+        run_id=run["run_id"],
+        output_archive=str(saved_archive),
+    )
+    if scheduled:
+        entry = {
+            "run_id": run["run_id"],
+            "result": str(result),
+            "archive": str(saved_archive),
+            "pipeline_status": json.loads((result / "pipeline_state.json").read_text())["status"],
+        }
+        if entry not in state.setdefault("collected_runs", []):
+            state["collected_runs"].append(entry)
     write_json(folder / "state.json", state)
     handoff(
         folder,
@@ -629,7 +794,7 @@ def main():
     prepare.add_argument("--slots", type=Path)
     prepare.add_argument("--attempt-offset", type=int, default=0)
     prepare.add_argument("--cpu-preflight", action="store_true")
-    for name in ("submit", "collect", "status"):
+    for name in ("submit", "save", "register", "collect", "status"):
         command = commands.add_parser(name)
         command.add_argument("experiment")
     args = parser.parse_args()
@@ -644,8 +809,8 @@ def main():
         freeze(stage, **kwargs)
     else:
         folder = directory(args.experiment)
-        if args.command == "submit":
-            submit(folder)
+        if args.command in ("submit", "save", "register"):
+            submit(folder, save_only=args.command != "submit", bootstrap=args.command == "register")
         elif args.command == "collect":
             collect(folder)
         else:

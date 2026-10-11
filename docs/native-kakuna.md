@@ -53,6 +53,8 @@ The persistent GPU ledger charges full requested time, including failed runs, pl
 
 ## Evaluation and deployment
 
+Long development evaluations can run in a separate private CPU notebook after GPU training, without a local supervisor. See [automatic GPU-to-CPU handoff](kaggle-evaluation-queue.md) for registration, scheduling, output verification, and recovery.
+
 Use `pretrained_evaluate` on development teams to select candidates. Final confirmation requires at least 1,024 crossed seat/team games against unchanged Kakuna and a matched strong-opponent regression comparison. `pretrained_gate` also requires the selected finalist's own hash-matched CPU/CUDA probability report. It combines the play reports using four-game block intervals, alpha 0.025 per planned confirmation attempt, and a predeclared five-percentage-point strong-opponent regression margin. The persistent registry prevents spending either final cohort on a different model or changing its protocol during resume. Integration success never promotes a model.
 
 `pretrained_showdown` provides a challenge/ladder entrypoint through modern poke-env and the native decision process. Credentials use `FOG_SHOWDOWN_USERNAME` and `FOG_SHOWDOWN_PASSWORD`, outside Git. It enforces a five-second inference deadline and records failures and legal fallbacks. A rejected or lost temporal decision switches that game to fallbacks until reset. Public rated confirmation requires a passed, hash-matched strength gate and at least 200 games; the report retains recent Elo, service GXE/Glicko snapshots, win-rate uncertainty, and failures. Its profile API follows [Showdown's published web API](https://github.com/smogon/pokemon-showdown-client/blob/master/WEB-API.md).
