@@ -18,6 +18,67 @@ def test_changed_replay_invalidates_previously_audited_manifest(tmp_path):
         verify_published_records(tmp_path, manifest)
 
 
+def test_freezing_warm_start_preserves_unique_dataset_and_notebook_identity(tmp_path, monkeypatch):
+    from fog.pretrained import initialization, loading
+
+    root = tmp_path / "workspace"
+    def write(name, value):
+        path = root / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(value) if isinstance(value, dict) else value)
+        return path
+
+    original = write("original.pt", "original weights")
+    original_sha = sha256(original)
+    write("fog/example.py", "pass\n")
+    for name in ("LICENSE", "integrations/THIRD_PARTY.md", "integrations/LICENSE.kakuna"):
+        write(name, "license")
+    write("configs/kaggle_results.json", {"kernel": "owner/existing"})
+    write("published/manifest.json", {
+        "matches": 1, "bytes": 10, "records": [], "pool_manifest_sha256": "pool",
+        "current_rules_screen": {"native_sample": {"passed": True}},
+    })
+    collection = write("fresh/collection.json", {"pool_sha256": "train", "split": "train"})
+    write("fresh/manifest.json", {"passed": True, "native_load_perspectives": 2000,
+                                 "collection_sha256": sha256(collection), "files": {}})
+    isolation = write("isolation.json", {
+        "passed": True, "pool_base_rosters_disjoint": True,
+        "published_manifest_sha256": sha256(root / "published/manifest.json"),
+        "pool_manifest_sha256": "pool", "training_pool_sha256": "train",
+    })
+    write("contract/cpu/contract.json", {"passed": True, "checkpoint_sha256": original_sha})
+    write("contract/inputs.pt", "samples")
+    write("contract/cpu/probabilities.pt", "probabilities")
+    sources = {}
+    for condition in ("ordinary", "joint"):
+        sources[condition] = {field: str(write(f"parents/{condition}/{field}.pt", field))
+                              for field in ("native", "auxiliary", "reference")}
+    config = write("config.json", {"condition": "joint", "updates": 1,
+                                   "warm_start": {"sources": sources}})
+    monkeypatch.setattr(workflow, "ROOT", root)
+    monkeypatch.setattr(workflow, "UPSTREAM", {})
+    monkeypatch.setattr(workflow, "KAKUNA_34_SHA256", original_sha)
+    monkeypatch.setattr(workflow, "directory", lambda name: root / "runs" / name)
+    monkeypatch.setattr(loading, "fresh_files", lambda *a, **k: ([], {"eligible": 1000}))
+    monkeypatch.setattr(initialization, "validate_warm_start", lambda *a, **k: {})
+    monkeypatch.setattr(workflow.subprocess, "check_output",
+                        lambda args, **kwargs: "revision\n" if kwargs.get("text") else b"numpy==2.5.3\n")
+    monkeypatch.setattr(workflow, "write_notebook_runner", lambda path, timeout: path.write_text("pass\n"))
+    monkeypatch.setattr(workflow, "handoff", lambda *args: None)
+    folder = workflow.freeze(
+        "train", checkpoint=original, native_python=root / "python.exe", config=config,
+        published=root / "published", fresh=root / "fresh", contract=root / "contract",
+        isolation=isolation, cpu_preflight=True, timeout=1800,
+    )
+    experiment = json.loads((folder / "experiment.json").read_text())
+    state = json.loads((folder / "state.json").read_text())
+    workflow.validate_submission_identity(folder, experiment, state, gpu_requested=False)
+    assert state["dataset"] == "owner/" + folder.name
+    assert state["kernel"] == "owner/" + folder.name + "-run"
+    assert folder.name.startswith("fog-native-train-") and folder.name != "reference"
+    assert len([name for name in experiment["files"] if name.startswith("inputs/warm-start/")]) == 6
+
+
 def test_notebook_watchdog_is_bound_before_reading_inputs(tmp_path):
     script = tmp_path / "run.py"
     write_notebook_runner(script, 1800)

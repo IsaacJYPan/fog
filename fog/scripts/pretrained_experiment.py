@@ -383,10 +383,10 @@ def freeze(
             # Include both parent arms in both packages so matched input hashes
             # remain identical, including the exact continuation lineage.
             for condition, row in recipe["warm_start"]["sources"].items():
-                for name in ("native", "auxiliary", "reference"):
-                    target = f"inputs/warm-start/{condition}/{name}.pt"
-                    add(row[name], target)
-                    row[name] = target
+                for field in ("native", "auxiliary", "reference"):
+                    target = f"inputs/warm-start/{condition}/{field}.pt"
+                    add(row[field], target)
+                    row[field] = target
         recipe_path = folder / "recipe.json"
         recipe_path.write_text(json.dumps(recipe, indent=2) + "\n")
         add(recipe_path, "recipe.json")
@@ -443,10 +443,10 @@ def freeze(
                 raise ValueError("Bundle input changed during preparation: " + target)
         archive.writestr("fog/experiment.json", json.dumps(frozen, indent=2))
     owner = json.loads((ROOT / "configs/kaggle_results.json").read_text())["kernel"].split("/")[0]
-    identifier, kernel = f"{owner}/{name}", f"{owner}/{name}-run"
+    identifier, kernel = f"{owner}/{frozen['id']}", f"{owner}/{frozen['id']}-run"
     write_json(
         upload / "dataset-metadata.json",
-        {"id": identifier, "title": name, "licenses": [{"name": "other"}]},
+        {"id": identifier, "title": frozen["id"], "licenses": [{"name": "other"}]},
     )
     notebook = folder / "notebook"
     notebook.mkdir()
@@ -456,7 +456,7 @@ def freeze(
         notebook / "kernel-metadata.json",
         {
             "id": kernel,
-            "title": name + "-run",
+            "title": frozen["id"] + "-run",
             "code_file": entrypoint,
             "language": "python",
             "kernel_type": "notebook" if entrypoint.endswith(".ipynb") else "script",
@@ -491,11 +491,15 @@ def freeze(
             "gpu_requested": stage == "train" and not cpu_preflight,
         },
     )
+    validate_submission_identity(
+        folder, frozen, json.loads((folder / "state.json").read_text()),
+        gpu_requested=stage == "train" and not cpu_preflight,
+    )
     handoff(
         folder,
         f"Prepared immutable {stage} package. Next: submit; then collect and locally audit results.",
     )
-    print(name, flush=True)
+    print(frozen["id"], flush=True)
     return folder
 
 
