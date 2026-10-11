@@ -38,6 +38,33 @@ def test_scheduled_runner_is_real_notebook_json_with_clean_child_argv(tmp_path):
     assert "subprocess.run([sys.executable, str(runner)], check=True)" in cell
 
 
+def test_notebook_executes_with_missing_temp_directory_and_kernel_arguments(tmp_path, monkeypatch):
+    import sys
+
+    source_root = tmp_path / "source"
+    source = source_root / "fog/scripts/pretrained_kaggle_worker.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "from pathlib import Path\nimport json\nimport sys\n"
+        "FROZEN_TIMEOUT_SECONDS = 43200\n"
+        "assert len(sys.argv) == 1\n"
+        "Path(__file__).with_suffix('.json').write_text(json.dumps("
+        "{'timeout': FROZEN_TIMEOUT_SECONDS, 'executed': True}))\n"
+    )
+    monkeypatch.setattr(workflow, "ROOT", source_root)
+    monkeypatch.setattr(sys, "argv", ["ipykernel_launcher.py", "-f", "connection.json"])
+    notebook_path = tmp_path / "run.ipynb"
+    write_notebook_runner(notebook_path, 1800)
+    cell = "".join(json.loads(notebook_path.read_text())["cells"][0]["source"])
+    entry = tmp_path / "absent/kaggle/temp/fog-evaluation-entry.py"
+    assert not entry.parent.exists()
+    cell = cell.replace("'/kaggle/temp/fog-evaluation-entry.py'", repr(str(entry)))
+    exec(compile(cell, "<notebook>", "exec"), {})
+    assert json.loads(entry.with_suffix(".json").read_text()) == {
+        "timeout": 1800, "executed": True,
+    }
+
+
 @pytest.mark.parametrize("stage", ["train", "evaluate"])
 def test_cpu_jobs_never_reserve_or_request_gpu(tmp_path, monkeypatch, stage):
     folder = tmp_path / "cpu-smoke"

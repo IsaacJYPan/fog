@@ -461,6 +461,7 @@ def write_notebook_runner(destination, timeout):
         cell = (
             "from pathlib import Path\nimport subprocess\nimport sys\n"
             "runner = Path('/kaggle/temp/fog-evaluation-entry.py')\n"
+            "runner.parent.mkdir(parents=True, exist_ok=True)\n"
             f"runner.write_text({source!r}, encoding='utf-8')\n"
             "subprocess.run([sys.executable, str(runner)], check=True)\n"
         )
