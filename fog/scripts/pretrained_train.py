@@ -19,6 +19,10 @@ import torch
 from fog.pretrained.data import MatchedMixture
 from fog.pretrained.checkpoints import anchor_updates, export_candidates
 from fog.pretrained.joint import JointKakuna
+from fog.pretrained.initialization import (
+    initialize_auxiliary, set_learning_rates, starting_checkpoint,
+    training_optimizer, validate_warm_start,
+)
 from fog.pretrained.kakuna import load_kakuna
 from fog.pretrained.loading import SequenceLoader, fresh_files
 from fog.pretrained.optimization import AuxiliaryGradientCap
@@ -93,19 +97,30 @@ def train(config, *, out: Path, device="cuda", resume=None, max_seconds=None):
     )
     (out / "data_audit.json").write_text(json.dumps(audit, indent=2) + "\n")
     sampler = MatchedMixture(published, fresh, seed)
-    runtime = load_kakuna(config["checkpoint"], device=device, training=True)
+    initialization = validate_warm_start(config)
+    runtime = load_kakuna(
+        starting_checkpoint(config), device=device, training=True,
+        verify_original=not bool(initialization),
+    )
     # Both arms construct the same heads before restoring the primary RNG stream,
     # keeping subsequent native stochastic operations identically seeded.
     primary_rng = torch.get_rng_state()
     model = JointKakuna(runtime.model).to(device)
+    initialize_auxiliary(model, config)
     torch.set_rng_state(primary_rng)
     runtime.model.train()
     model.train()
     joint = config["condition"] == "joint"
     if config["condition"] not in ("ordinary", "joint"):
         raise ValueError("Unsupported matched condition")
-    parameters = model.trainable_parameters() if joint else list(runtime.model.trainable_params)
-    optimizer = torch.optim.AdamW(parameters, lr=config["learning_rate"], weight_decay=0.0)
+    optimizer, parameters = training_optimizer(model, config)
+    (out / "initialization.json").write_text(json.dumps({
+        "mode": "weight_warm_start" if initialization else "original_kakuna34",
+        "sources": initialization, "selected_condition": config["condition"],
+        "optimizer": "same_recipe_resume" if resume else "reset",
+        "sampler": "same_recipe_resume" if resume else "reset",
+        "seed": seed,
+    }, indent=2) + "\n")
     cap = AuxiliaryGradientCap(model.shared_parameters(), config["auxiliary_gradient_fraction"])
     route_generator = torch.Generator(device=device).manual_seed(seed + 8675309)
     loader = SequenceLoader(runtime, sequence_length=config["sequence_length"])
@@ -183,9 +198,7 @@ def train(config, *, out: Path, device="cuda", resume=None, max_seconds=None):
                 parameters, config["gradient_clip"], error_if_nonfinite=True
             )
         )
-        lr = config["learning_rate"] * min(1.0, (update + 1) / config["warmup_updates"])
-        for group in optimizer.param_groups:
-            group["lr"] = lr
+        learning_rates = set_learning_rates(optimizer, config, update)
         optimizer.step()
         runtime.model.soft_sync_targets()
         update += 1
@@ -194,7 +207,8 @@ def train(config, *, out: Path, device="cuda", resume=None, max_seconds=None):
             "update": update,
             "losses": totals,
             "counts": counts,
-            "learning_rate": lr,
+            "learning_rate": learning_rates["native"],
+            "learning_rates": learning_rates,
             "unclipped_gradient_norm": gradient_norm,
             "seconds": time.monotonic() - begin,
             "elapsed_seconds": elapsed,

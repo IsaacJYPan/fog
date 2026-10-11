@@ -70,3 +70,52 @@ competitive ladder strength.
 The next decision should use those diagnostics. More training remains a plausible
 hypothesis, especially for the new heads, but has not yet been demonstrated to be
 the missing ingredient.
+
+## Completed CPU diagnostics, October 11
+
+The fixed CPU diagnostic completed 1,536 main games and 64 separate smoke games.
+All games resolved without failures or fallbacks. Three CPU probability contracts
+passed, and the slowest recorded decision took 1.18 seconds. This job performed no
+training and did not use final confirmation cohorts.
+
+Each table entry is wins out of 256 matched development games:
+
+| Model | SimpleHeuristics | MaxDamage |
+| --- | --- | --- |
+| Unchanged Kakuna | 230 (89.84%) | 254 (99.22%) |
+| Ordinary fine-tuning | 229 (89.45%) | 251 (98.05%) |
+| Joint fine-tuning | 230 (89.84%) | 252 (98.44%) |
+
+The joint model comfortably clears the heuristic competence target on this pool.
+Its paired differences from unchanged Kakuna were 0.00 percentage points
+(exploratory 95% block interval −4.69 to +5.08) against SimpleHeuristics and
+−0.78 points (−2.34 to +0.78) against MaxDamage. These results support retaining
+the working checkpoint; they establish neither a playing-strength improvement
+nor non-inferiority against strong opponents. The independent FOG baseline was
+not retrained or evaluated by this job.
+
+Belief diagnostics used the same 32 training and 32 development games at updates
+313, 625, 938 and 1,250, with matched hidden-field queries across checkpoints.
+Held-out public-marginal item NLL fell from 5.27 to 3.28, while ability top-1
+accuracy rose from 44.58% to 81.29%. Between the last two checkpoints,
+correct-prefix held-out NLL improved for items, abilities, moves and EV amounts.
+Tera NLL worsened, and nature NLL changed little. Per-game paired resampling
+supports examining this continued progress, but these exploratory intervals have
+no correction for multiple comparisons and games may share teams.
+
+Item accuracy is still only 11.04% from public marginals and 10.85% on sampled
+correct-prefix queries. On those identical queries, the marginal score is 10.49%.
+Thus inaccurate sampled prefixes alone cannot explain weak item reconstruction.
+The earlier 10.63% ancestral item accuracy is a reference on these same games,
+not a new independent benchmark. Move-query accuracy is not exact moveset
+accuracy, and outcome MSE remains an observed-behavior target rather than a
+comparison against Kakuna's native critic.
+
+These curves make further auxiliary optimization a concrete hypothesis. A
+controlled continuation should test a separate head learning rate while keeping
+the native learning rate small. It must explicitly load the retained native and
+auxiliary weights under a new immutable recipe, record whether optimizer state
+is retained or reset, and preserve strict full-state resume within that recipe.
+Continue to evaluate ordinary and joint training under matched data and update
+budgets. Keep learned sampling out of search until its held-out reconstruction
+and fixed-search play comparisons support using it.

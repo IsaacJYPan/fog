@@ -300,6 +300,16 @@ def run_pipeline(input_root, work, output, timeout):
                     str(output / "contract"),
                 ],
             )
+            if experiment.get("warm_start"):
+                source = experiment["warm_start"]["sources"][experiment["condition"]]
+                write_progress(output, "continued " + device + " probability gate")
+                child([
+                    runtimes["native"], "-m", "fog.scripts.pretrained_contract",
+                    "--checkpoint", source["native"], "--trained",
+                    "--samples", "inputs/contract/inputs.pt",
+                    "--reference", source["reference"], "--device", device,
+                    "--out", str(output / "contract-initial"),
+                ])
             command = [
                 runtimes["native"],
                 "-m",

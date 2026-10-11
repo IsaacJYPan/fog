@@ -11,7 +11,7 @@ from fog.scripts.pretrained_kaggle_worker import export_outputs
 from fog.scripts import pretrained_kaggle_worker as worker
 
 
-def make_sources(root, *, outputs=True, change=None):
+def make_sources(root, *, outputs=True, change=None, warm=False):
     fixture = root / "inputs/contract/inputs.pt"
     fixture.parent.mkdir(parents=True)
     fixture.write_bytes(b"fixture")
@@ -25,6 +25,13 @@ def make_sources(root, *, outputs=True, change=None):
     }
     for arm in queue.ARMS:
         config = {"condition": arm, "updates": 2}
+        if warm:
+            config.update(seed=17, warm_start={
+                "version": 1, "optimizer": "reset", "sampler": "reset",
+                "sources": {name: {"native_sha256": hashlib.sha256(name.encode()).hexdigest(),
+                                   "auxiliary_sha256": hashlib.sha256((name + "-heads").encode()).hexdigest(),
+                                   "update": 4} for name in queue.ARMS},
+            })
         paired = {key: value for key, value in config.items() if key != "condition"}
         experiment = {
             "id": "train-" + arm,
@@ -41,6 +48,8 @@ def make_sources(root, *, outputs=True, change=None):
             "files": {"inputs/contract/inputs.pt": sha256(fixture)},
         }
         descriptor = root / (arm + "-experiment.json")
+        if warm:
+            experiment["warm_start"] = config["warm_start"]
         descriptor.write_text(json.dumps(experiment))
         recipe["training_sources"][arm] = {
             "experiment": descriptor.name,
@@ -84,6 +93,18 @@ def make_sources(root, *, outputs=True, change=None):
                     {"cache_max_absolute_error": 1e-5, "cpu_cuda_max_absolute_error": 1e-5}
                 ],
             }
+        if warm:
+            source = config["warm_start"]["sources"][arm]
+            values["contract-initial/contract.json"] = {
+                **values["contract-trained/cuda/contract.json"],
+                "checkpoint_sha256": source["native_sha256"],
+            }
+            values["training/initialization.json"] = {
+                "mode": "weight_warm_start", "optimizer": "reset", "sampler": "reset",
+                "selected_condition": arm, "seed": config["seed"],
+                "sources": {name: {**row, "source_update": row["update"]}
+                            for name, row in config["warm_start"]["sources"].items()},
+            }
         if change:
             change(values, arm)
         for name, value in values.items():
@@ -118,6 +139,28 @@ def test_missing_training_output_waits_without_resolving_candidates(tmp_path):
     assert state["status"] == "waiting"
     assert state["missing_experiments"] == ["train-joint", "train-ordinary"]
     assert not (tmp_path / "evaluation.resolved.json").exists()
+
+
+def test_warm_start_queue_verifies_initialization_and_initial_cuda_contract(tmp_path):
+    recipe = make_sources(tmp_path, warm=True)
+    result = queue.resolve_queue(recipe, tmp_path / "mounted", tmp_path, tmp_path / "output")
+    assert result["matched"]["updates"] == 2
+
+
+@pytest.mark.parametrize("field", ["reset", "source_update", "cuda", "native"])
+def test_warm_start_queue_rejects_wrong_initialization_or_gate(tmp_path, field):
+    def change(values, arm):
+        if field == "reset":
+            values["training/initialization.json"]["optimizer"] = "unknown"
+        elif field == "source_update":
+            values["training/initialization.json"]["sources"][arm]["source_update"] += 1
+        elif field == "cuda":
+            values["contract-initial/contract.json"]["cpu_cuda_verified"] = False
+        else:
+            values["contract-initial/contract.json"]["checkpoint_sha256"] = "different"
+    recipe = make_sources(tmp_path, warm=True, change=change)
+    with pytest.raises(ValueError, match="initialization differs|CPU/CUDA|probability contract"):
+        queue.resolve_queue(recipe, tmp_path / "mounted", tmp_path, tmp_path / "output")
 
 
 def test_valid_pair_resolves_hashes_and_equal_schedules_without_optimizer_copies(tmp_path):

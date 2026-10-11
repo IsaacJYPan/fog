@@ -109,6 +109,8 @@ def verify_source(archive_path, expected, destination, *, archive_sha256=None):
         "contract-trained/cpu/probabilities.pt",
         "contract-trained/cuda/contract.json",
     }
+    if expected.get("warm_start"):
+        retained.update({"contract-initial/contract.json", "training/initialization.json"})
     with zipfile.ZipFile(archive_path) as archive:
         validate_members(archive)
         if json.loads(archive.read("experiment.json")) != expected:
@@ -163,11 +165,28 @@ def verify_source(archive_path, expected, destination, *, archive_sha256=None):
     if hashes[f"training/native_{update:06d}.pt"] != native_sha:
         raise ValueError("Final and selected common-update exports differ")
     samples = expected["files"]["inputs/contract/inputs.pt"]
-    for name, checkpoint_sha in (
+    contracts = [
         ("contract/contract.json", KAKUNA_34_SHA256),
         ("contract-trained/cpu/contract.json", native_sha),
         ("contract-trained/cuda/contract.json", native_sha),
-    ):
+    ]
+    if expected.get("warm_start"):
+        warm = expected["warm_start"]
+        source = warm["sources"][expected["condition"]]
+        initial = json.loads((destination / "training/initialization.json").read_text())
+        if (
+            config.get("warm_start") != warm
+            or initial["mode"] != "weight_warm_start"
+            or initial["optimizer"] != "reset" or initial["sampler"] != "reset"
+            or initial["selected_condition"] != expected["condition"]
+            or initial["seed"] != config["seed"]
+            or initial["sources"][expected["condition"]]["source_update"] != source["update"]
+            or any(initial["sources"][expected["condition"]][key] != source[key]
+                   for key in ("native_sha256", "auxiliary_sha256"))
+        ):
+            raise ValueError("Warm-start initialization differs from the frozen lineage")
+        contracts.append(("contract-initial/contract.json", source["native_sha256"]))
+    for name, checkpoint_sha in contracts:
         contract = json.loads((destination / name).read_text())
         if (
             not contract.get("passed")
@@ -178,11 +197,11 @@ def verify_source(archive_path, expected, destination, *, archive_sha256=None):
             or not contract.get("records")
         ):
             raise ValueError("GPU source probability contract failed")
-        if name == "contract-trained/cuda/contract.json" and not contract.get("cpu_cuda_verified"):
+        if name in ("contract-trained/cuda/contract.json", "contract-initial/contract.json") and not contract.get("cpu_cuda_verified"):
             raise ValueError("Trained CPU/CUDA probability agreement is required")
         for row in contract["records"]:
             errors = [row["cache_max_absolute_error"]]
-            if name == "contract-trained/cuda/contract.json":
+            if name in ("contract-trained/cuda/contract.json", "contract-initial/contract.json"):
                 errors.append(row["cpu_cuda_max_absolute_error"])
             if any(not math.isfinite(value) or not 0 <= value <= 1e-3 for value in errors):
                 raise ValueError("GPU source numerical error exceeds the contract")

@@ -28,6 +28,22 @@ The ordinary and joint configurations share a 60/40 published/fresh trajectory m
 
 Observed outcomes supervise the value of the recorded behavior and team distribution; they are not proofs of optimal play. Gradient norm ratios and alignment are recorded to diagnose whether the auxiliary objectives influence or conflict with primary training.
 
+Weight continuation uses an explicit `warm_start` inventory containing both parent
+arms' native weights, matching auxiliary exports, CPU probability references and
+hashes. Both packages carry the same inventory. Parent recipes and completed
+updates must match, and each auxiliary export must identify its native checkpoint.
+This mode starts a new recipe with explicitly reset optimizer, sampler and RNG
+state; previous full states remain intact. Interrupted runs still require the
+exact same recipe for full-state resume. The unchanged Kakuna34 checkpoint remains
+the protected reference and is bundled separately.
+
+An optional `head_learning_rate` gives joint training a separate AdamW parameter
+group for auxiliary heads while preserving the native rate and shared-gradient
+cap. Existing recipes retain their original single-group optimizer layout.
+Warm-start candidates must pass their own CPU/CUDA probability contract before
+optimization, in addition to the original and final checkpoint gates. Queued CPU
+evaluation verifies this initial contract and the recorded initialization lineage.
+
 ## Frozen private workflow
 
 Run each command from the repository root using the appropriate isolated Python environment:

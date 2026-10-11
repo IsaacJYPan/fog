@@ -376,6 +376,17 @@ def freeze(
         recipe.update(
             checkpoint="inputs/kakuna34.pt", published="inputs/published", fresh="inputs/fresh"
         )
+        if recipe.get("warm_start"):
+            from fog.pretrained.initialization import validate_warm_start
+
+            validate_warm_start(recipe, samples=contract / "inputs.pt")
+            # Include both parent arms in both packages so matched input hashes
+            # remain identical, including the exact continuation lineage.
+            for condition, row in recipe["warm_start"]["sources"].items():
+                for name in ("native", "auxiliary", "reference"):
+                    target = f"inputs/warm-start/{condition}/{name}.pt"
+                    add(row[name], target)
+                    row[name] = target
         recipe_path = folder / "recipe.json"
         recipe_path.write_text(json.dumps(recipe, indent=2) + "\n")
         add(recipe_path, "recipe.json")
@@ -391,6 +402,8 @@ def freeze(
             if path.is_file() and path.suffix in (".json", ".pt"):
                 add(path, "inputs/contract/" + path.relative_to(contract).as_posix())
         frozen["fresh_audit"] = fresh_audit
+        if recipe.get("warm_start"):
+            frozen["warm_start"] = recipe["warm_start"]
         paired = {key: value for key, value in recipe.items() if key != "condition"}
         frozen["matched_recipe_sha256"] = hashlib.sha256(
             json.dumps(paired, sort_keys=True).encode()
