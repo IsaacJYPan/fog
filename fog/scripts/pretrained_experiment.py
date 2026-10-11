@@ -63,6 +63,8 @@ def freeze(
     attempt_offset=0,
     cpu_preflight=False,
 ):
+    if stage not in ("collect", "train", "evaluate"):
+        raise ValueError("Unknown native experiment stage")
     if cpu_preflight and stage != "train":
         raise ValueError("CPU pipeline preflight uses the training path")
     if attempt_offset < 0 or (stage != "collect" and (slots is not None or attempt_offset)):
@@ -163,7 +165,9 @@ def freeze(
     frozen = {
         "id": name,
         "stage": stage,
-        "phase": "CPU pipeline preflight"
+        "phase": "CPU development evaluation"
+        if stage == "evaluate"
+        else "CPU pipeline preflight"
         if cpu_preflight
         else phase
         if stage == "train"
@@ -174,11 +178,82 @@ def freeze(
         "upstream_revisions": revisions,
         "trial": cpu_preflight or (stage == "collect" and (games < 1000 or slots is not None)),
         "automatic_promotion": False,
-        "device": "cpu" if cpu_preflight else "cuda",
+        "device": "cpu" if cpu_preflight or stage == "evaluate" else "cuda",
         "cpu_preflight": cpu_preflight,
         "torch": "Kaggle 2.11.0; actual native probability gate required",
     }
-    if stage == "collect":
+    if stage in ("collect", "evaluate"):
+        for path in (ROOT / "server/pokemon-showdown/dist").rglob("*.js"):
+            add(path, path.relative_to(ROOT).as_posix())
+        for filename in ("package.json", "package-lock.json", "LICENSE"):
+            add(ROOT / "server/pokemon-showdown" / filename, "server/pokemon-showdown/" + filename)
+    if stage == "evaluate":
+        from fog.scripts.pretrained_evaluation_job import validate_recipe
+        from fog.pretrained.data import assert_disjoint
+
+        recipe = json.loads(config.read_text())
+        validate_recipe(recipe)
+        pool_data = {
+            split: json.loads((pools / (split + ".json")).read_text())
+            for split in ("train", "development", "final")
+        }
+        assert_disjoint(pool_data)
+        for filename in ("train.json", "development.json", "final.json", "manifest.json"):
+            add(pools / filename, "inputs/pools/" + filename)
+        # Include the same integration sources in the evaluation fingerprint.
+        for path in (ROOT / "integrations").rglob("*"):
+            if (
+                path.is_file()
+                and path.suffix in (".py", ".js", ".json")
+                and "__pycache__" not in path.parts
+            ):
+                add(path, path.relative_to(ROOT).as_posix())
+        for condition, row in recipe["conditions"].items():
+            native = Path(row["native"])
+            if sha256(native) != row["native_sha256"]:
+                raise ValueError("Evaluation candidate changed: " + condition)
+            for field, name in (
+                ("native", "native.pt"),
+                ("reference", "probabilities.pt"),
+                ("auxiliary", "auxiliary.pt"),
+            ):
+                if field in row:
+                    target = f"inputs/candidates/{condition}/{name}"
+                    add(row[field], target)
+                    row[field] = target
+        if recipe.get("belief"):
+            cohort = Path(recipe["belief"]["fresh"])
+            collection = json.loads((cohort / "collection.json").read_text())
+            if collection["split"] != "development" or collection["pool_sha256"] != sha256(
+                pools / "development.json"
+            ):
+                raise ValueError("Belief evaluation requires the held-out development pool")
+            add(cohort / "collection.json", "inputs/belief/collection.json")
+            records = sorted(cohort.glob("*.json.gz"))
+            if len(records) != recipe["belief"]["games"]:
+                raise ValueError("Belief evaluation cohort must be complete")
+            from fog.pretrained.loading import read_record
+
+            for path in records:
+                record = read_record(path)
+                if (
+                    not record["training_eligible"]
+                    or record.get("failures")
+                    or record.get("fallbacks")
+                ):
+                    raise ValueError("Failed belief evaluation game requires diagnosis")
+                add(path, "inputs/belief/" + path.name)
+            recipe["belief"]["fresh"] = "inputs/belief"
+        add(contract / "inputs.pt", "inputs/contract/inputs.pt")
+        add(contract / "cpu/probabilities.pt", "inputs/contract/cpu/probabilities.pt")
+        recipe_path = folder / "evaluation.json"
+        write_json(recipe_path, recipe)
+        add(recipe_path, "evaluation.json")
+        frozen["evaluation"] = {key: value for key, value in recipe.items() if key != "conditions"}
+        frozen["conditions"] = {
+            name: row["native_sha256"] for name, row in recipe["conditions"].items()
+        }
+    elif stage == "collect":
         if games < 20 or games % 20 or not 0 <= shard < shards:
             raise ValueError("Collection uses complete 20-game opponent/seat-balanced schedules")
         add(pools / "train.json", "inputs/pools/train.json")
@@ -191,10 +266,6 @@ def freeze(
         for cache in ("pkmn_sets_cache", "smogon_stats_cache"):
             for path in (source / "fp/data" / cache).rglob("*.json"):
                 add(path, "upstream/foul-play/" + path.relative_to(source).as_posix())
-        for path in (ROOT / "server/pokemon-showdown/dist").rglob("*.js"):
-            add(path, path.relative_to(ROOT).as_posix())
-        for filename in ("package.json", "package-lock.json", "LICENSE"):
-            add(ROOT / "server/pokemon-showdown" / filename, "server/pokemon-showdown/" + filename)
         source_learners = []
         import yaml
 
@@ -242,7 +313,7 @@ def freeze(
                         "Recovery requires parent result provenance beside selected slots"
                     )
                 add(provenance, "inputs/recovery_provenance.json")
-    else:
+    elif stage == "train":
         recipe = json.loads(config.read_text())
         if cpu_preflight and (recipe["condition"] != "joint" or not 1 <= recipe["updates"] <= 2):
             raise ValueError("CPU preflight requires one or two full joint optimizer updates")
@@ -519,7 +590,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
     prepare = commands.add_parser("prepare")
-    prepare.add_argument("--stage", choices=["collect", "train"], required=True)
+    prepare.add_argument("--stage", choices=["collect", "train", "evaluate"], required=True)
     prepare.add_argument("--checkpoint", type=Path, required=True)
     prepare.add_argument("--native-python", type=Path, required=True)
     prepare.add_argument("--pools", type=Path)

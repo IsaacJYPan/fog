@@ -25,14 +25,15 @@ def test_notebook_watchdog_is_bound_before_reading_inputs(tmp_path):
     assert "timeout=FROZEN_TIMEOUT_SECONDS" in code
 
 
-def test_explicit_cpu_preflight_never_reserves_or_requests_gpu(tmp_path, monkeypatch):
+@pytest.mark.parametrize("stage", ["train", "evaluate"])
+def test_cpu_jobs_never_reserve_or_request_gpu(tmp_path, monkeypatch, stage):
     folder = tmp_path / "cpu-smoke"
     folder.mkdir()
     (folder / "experiment.json").write_text(
         json.dumps(
             {
-                "cpu_preflight": True,
-                "stage": "train",
+                "cpu_preflight": stage == "train",
+                "stage": stage,
                 "timeout_seconds": 1800,
             }
         )
@@ -40,7 +41,7 @@ def test_explicit_cpu_preflight_never_reserves_or_requests_gpu(tmp_path, monkeyp
     (folder / "state.json").write_text(
         json.dumps(
             {
-                "stage": "train",
+                "stage": stage,
                 "phase": "uploaded",
                 "kernel": "owner/cpu-smoke",
                 "dataset": "owner/cpu-smoke",

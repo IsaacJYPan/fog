@@ -131,11 +131,12 @@ def test_successful_process_without_result_is_not_a_successful_experiment(tmp_pa
     assert assert_archive(output)["status"] == "failed"
 
 
-def test_packaged_script_imports_verified_code_from_an_unrelated_directory(tmp_path):
+@pytest.mark.parametrize("stage", ["train", "evaluate"])
+def test_packaged_script_imports_verified_code_from_an_unrelated_directory(tmp_path, stage):
     # This is launched as a file, outside the checkout, like /kaggle/src/script.py.
     # Changing cwd alone does not update that interpreter's sys.path[0].
     inputs, manifest, _ = bundle(tmp_path, timeout=30)
-    manifest.update(device="cpu", cpu_preflight=True)
+    manifest.update(stage=stage, device="cpu", cpu_preflight=stage == "train")
     sources = {
         "fog/__init__.py": "",
         "fog/pretrained/__init__.py": "",
@@ -151,7 +152,7 @@ def test_packaged_script_imports_verified_code_from_an_unrelated_directory(tmp_p
             "p=argparse.ArgumentParser();p.add_argument('--stage');p.add_argument('--device');"
             "p.add_argument('--out',type=Path);a=p.parse_args()\n"
             "assert a.device=='cpu';a.out.mkdir(parents=True)\n"
-            "(a.out/'runtimes.json').write_text(json.dumps({'native':sys.executable}))\n"
+            "(a.out/'runtimes.json').write_text(json.dumps({'native':sys.executable,'evaluator':sys.executable}))\n"
         ),
         "fog/scripts/pretrained_contract.py": (
             "import argparse,json\nfrom pathlib import Path\n"
@@ -167,6 +168,13 @@ def test_packaged_script_imports_verified_code_from_an_unrelated_directory(tmp_p
             "assert a.device=='cpu';a.out.mkdir(parents=True)\n"
             "(a.out/'RESULTS.json').write_text(json.dumps({'complete':True}))\n"
             "(a.out/'native_final.pt').write_bytes(b'fixture checkpoint')\n"
+        ),
+        "fog/scripts/pretrained_evaluation_job.py": (
+            "import argparse,json\nfrom pathlib import Path\n"
+            "p=argparse.ArgumentParser();p.add_argument('--out',type=Path);"
+            "p.add_argument('--native-python');p.add_argument('--max-seconds',type=float);a,_=p.parse_known_args()\n"
+            "assert a.native_python and a.max_seconds>0;a.out.mkdir(parents=True)\n"
+            "(a.out/'RESULTS.json').write_text(json.dumps({'complete':True,'gpu_requested':False}))\n"
         ),
     }
     manifest["files"] = {
@@ -205,4 +213,8 @@ def test_packaged_script_imports_verified_code_from_an_unrelated_directory(tmp_p
         30,
     )
     assert assert_archive(output)["status"] == "complete"
-    assert json.loads((output / "contract-trained/cpu/contract.json").read_text())["passed"]
+    if stage == "train":
+        assert json.loads((output / "contract-trained/cpu/contract.json").read_text())["passed"]
+    else:
+        assert json.loads((output / "evaluation/RESULTS.json").read_text())["complete"]
+        assert not (output / "training").exists()

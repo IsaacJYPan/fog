@@ -172,8 +172,16 @@ def run_pipeline(input_root, work, output, timeout):
     if experiment["timeout_seconds"] != timeout:
         raise ValueError("Notebook deadline must match the frozen experiment")
     device = experiment.get("device", "cuda")
-    if device not in ("cpu", "cuda") or (device == "cpu" and not experiment.get("cpu_preflight")):
-        raise ValueError("CPU execution requires a separately frozen preflight recipe")
+    if device not in ("cpu", "cuda") or (
+        device == "cpu"
+        and not experiment.get("cpu_preflight")
+        and experiment["stage"] != "evaluate"
+    ):
+        raise ValueError(
+            "CPU execution requires a separately frozen preflight or evaluation recipe"
+        )
+    if experiment["stage"] == "evaluate" and device != "cpu":
+        raise ValueError("This evaluation recipe must not request a GPU")
     os.chdir(work)
     environment = dict(
         os.environ,
@@ -243,6 +251,20 @@ def run_pipeline(input_root, work, output, timeout):
             command += ["--attempt-offset", str(recipe.get("attempt_offset", 0))]
             if "slots" in recipe:
                 command += ["--slots", "inputs/slots.json"]
+        elif experiment["stage"] == "evaluate":
+            command = [
+                runtimes["evaluator"],
+                "-m",
+                "fog.scripts.pretrained_evaluation_job",
+                "--config",
+                "evaluation.json",
+                "--native-python",
+                runtimes["native"],
+                "--out",
+                str(output / "evaluation"),
+                "--max-seconds",
+                str(max(1.0, remaining())),
+            ]
         else:
             from fog.pretrained.runtime import native_environment
 
@@ -279,7 +301,12 @@ def run_pipeline(input_root, work, output, timeout):
             command += ["--max-seconds", str(max(1.0, remaining() - 180))]
         if remaining() < 1:
             raise RuntimeError("Setup exhausted the frozen job budget")
-        write_progress(output, "training" if experiment["stage"] == "train" else "collection")
+        write_progress(
+            output,
+            {"train": "training", "collect": "collection", "evaluate": "evaluation"}[
+                experiment["stage"]
+            ],
+        )
         code = child(command)
         if experiment["stage"] == "train":
             write_progress(output, "trained " + device + " probability gate")
@@ -306,6 +333,9 @@ def run_pipeline(input_root, work, output, timeout):
                         str(output / "contract-trained/cpu/probabilities.pt"),
                     ]
                 child(contract_command)
+            status = "complete" if report["complete"] else "interrupted"
+        elif experiment["stage"] == "evaluate":
+            report = json.loads((output / "evaluation/RESULTS.json").read_text())
             status = "complete" if report["complete"] else "interrupted"
         else:
             recipe = experiment["collection"]

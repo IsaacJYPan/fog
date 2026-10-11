@@ -84,11 +84,12 @@ print(json.dumps({'prefix':sys.prefix,'amago':amago.__file__,'metamon':metamon._
     (output / "native-imports.json").write_text(result)
     # Native code resolves FOG by cwd. Editable upstream installs preserve its
     # tokenizer, gin, and Dex resources that current wheels omit.
-    if stage == "collect":
-        parent = environment(root, "collector")
+    if stage in ("collect", "evaluate"):
+        parent = environment(root, "collector" if stage == "collect" else "evaluator")
         command(
             [parent, "-m", "pip", "install", "poke-env==0.15.0", "pyyaml==6.0.3", "numpy==2.5.3"]
         )
+    if stage == "collect":
         foul = environment(root, "foulplay")
         if not shutil.which("cargo"):
             installer = root / ".runtime/rustup-init.sh"
@@ -113,6 +114,7 @@ print(json.dumps({'prefix':sys.prefix,'amago':amago.__file__,'metamon':metamon._
                 "--config-settings=build-args=--features poke-engine/terastallization --no-default-features",
             ]
         )
+    if stage in ("collect", "evaluate"):
         if not shutil.which("node"):
             command(["apt-get", "update"])
             command(["apt-get", "install", "-y", "nodejs", "npm"])
@@ -129,7 +131,10 @@ print(json.dumps({'prefix':sys.prefix,'amago':amago.__file__,'metamon':metamon._
                 "--no-fund",
             ]
         )
+    if stage == "collect":
         runtimes = {"native": str(native), "collector": str(parent), "foulplay": str(foul)}
+    elif stage == "evaluate":
+        runtimes = {"native": str(native), "evaluator": str(parent)}
     else:
         runtimes = {"native": str(native)}
     for name, python in runtimes.items():
@@ -143,7 +148,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--stage", choices=["collect", "train"], required=True)
+    parser.add_argument("--stage", choices=["collect", "train", "evaluate"], required=True)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cuda")
     args = parser.parse_args()
     setup(args.root, args.out, stage=args.stage, device=args.device)
