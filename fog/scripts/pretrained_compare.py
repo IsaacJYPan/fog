@@ -76,6 +76,7 @@ def compare_evaluations(pair, ordinary_path, joint_path):
         if (
             protocol["stage"] != "development"
             or protocol["foulplay"]
+            or protocol.get("scripted_opponent")
             or protocol["original_sha256"] != KAKUNA_34_SHA256
             or protocol["candidate_sha256"] != digest
         ):
@@ -132,6 +133,61 @@ def compare_evaluations(pair, ordinary_path, joint_path):
         },
         "attribution": "The matched contrast tests belief plus outcome additions together. Belief-specific attribution requires an outcome-only ablation. Development intervals are exploratory and do not establish final playing strength.",
         "automatic_promotion": False,
+    }
+
+
+def compare_scripted_evaluations(pair, paths, opponent):
+    """Gauge basic competence and matched changes against a fixed scripted opponent."""
+    from fog.pretrained.evaluation import SCRIPTED_OPPONENTS
+
+    if opponent not in SCRIPTED_OPPONENTS or set(paths) != {"original", "ordinary", "joint"}:
+        raise ValueError("Require unchanged Kakuna and both candidates against one scripted opponent")
+    expected = dict(zip(("ordinary", "joint"), pair["models"]), original=KAKUNA_34_SHA256)
+    reports = {name: json.loads(path.read_text()) for name, path in paths.items()}
+    original = reports["original"]
+    for name, report in reports.items():
+        protocol, rows = report["protocol"], report["rows"]
+        if (
+            protocol["candidate_sha256"] != expected[name]
+            or protocol["original_sha256"] != KAKUNA_34_SHA256
+            or protocol["stage"] != "development"
+            or protocol["foulplay"]
+            or protocol.get("scripted_opponent") != opponent
+            or report["failures"]
+            or report["unresolved"]
+            or len(rows) < 256
+            or len(rows) % 4
+            or protocol["games"] != len(rows)
+            or any(
+                row["index"] != index or row["status"] != "complete"
+                or row["failures"] or row["fallbacks"] or row["score"] not in (0, 0.5, 1)
+                for index, row in enumerate(rows)
+            )
+        ):
+            raise ValueError("Scripted comparison must contain complete hash-matched development games")
+        for key in ("pool_sha256", "interface", "sources_sha256", "seed", "games", "temperature", "deadline_seconds"):
+            if protocol[key] != original["protocol"][key]:
+                raise ValueError("Unmatched scripted inference protocol: " + key)
+        if [row["schedule"] for row in rows] != [row["schedule"] for row in original["rows"]]:
+            raise ValueError("Scripted game schedules differ")
+    summaries = {}
+    for name, report in reports.items():
+        scores = [row["score"] for row in report["rows"]]
+        summaries[name] = {
+            "candidate_sha256": expected[name],
+            "games": len(scores),
+            "wins": scores.count(1), "draws": scores.count(0.5), "losses": scores.count(0),
+            "score_interval": asdict(paired_block_interval(scores, seed=report["protocol"]["seed"])),
+            "report_sha256": sha256(paths[name]),
+        }
+        if name != "original":
+            summaries[name]["minus_original"] = asdict(paired_block_interval(
+                [row["score"] - baseline["score"] for row, baseline in zip(report["rows"], original["rows"])],
+                bounds=(-1.0, 1.0), seed=report["protocol"]["seed"],
+            ))
+    return {
+        "opponent": opponent, "models": summaries, "automatic_promotion": False,
+        "interpretation": "Exploratory basic-opponent benchmark. A high win rate here does not establish competitive strength, ladder rating, or improvement against unchanged Kakuna."
     }
 
 

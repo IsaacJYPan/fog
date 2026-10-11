@@ -6,6 +6,8 @@ from dataclasses import asdict
 
 from fog.eval.stats import paired_block_interval
 
+SCRIPTED_OPPONENTS = ("simpleheuristics", "maxdamage")
+
 
 def continuation_review(scores, *, failures=0, unresolved=0, seed=0, alpha=0.05):
     """Retain uncertain candidates; recommend rollback only for observed regression.

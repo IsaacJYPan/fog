@@ -26,7 +26,7 @@ def gate(primary: Path, strong_candidate: Path, strong_original: Path, probabili
         raise ValueError("The selected finalist needs its own passed CPU/CUDA probability contract")
     protocols = [report["protocol"] for report in reports]
     for protocol in protocols:
-        if protocol["stage"] != "confirmation" or protocol["original_sha256"] != KAKUNA_34_SHA256:
+        if protocol["stage"] != "confirmation" or protocol["original_sha256"] != KAKUNA_34_SHA256 or protocol.get("scripted_opponent"):
             raise ValueError(
                 "Only final, unchanged-baseline comparisons can establish a strength gain"
             )

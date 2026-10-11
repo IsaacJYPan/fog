@@ -12,6 +12,22 @@ import threading
 import time
 
 
+def validate_player_payload(message):
+    forbidden = {"opponent_team", "truth", "labels", "simulator_state", "submitted_teams"}
+
+    def has_private_label(value):
+        if isinstance(value, dict):
+            return bool(forbidden.intersection(value)) or any(
+                has_private_label(item) for item in value.values()
+            )
+        if isinstance(value, (list, tuple)):
+            return any(has_private_label(item) for item in value)
+        return False
+
+    if has_private_label(message):
+        raise ValueError("Complete-team labels cannot enter a player decision payload")
+
+
 class DecisionProcess:
     def __init__(self, command: list[str], *, cwd: Path, log: Path, env=None, deadline=5.0):
         self.command, self.cwd, self.log, self.env = command, cwd, log, env
@@ -62,19 +78,7 @@ class DecisionProcess:
         return ready
 
     def request(self, message: dict, *, timeout=None) -> dict:
-        forbidden = {"opponent_team", "truth", "labels", "simulator_state", "submitted_teams"}
-
-        def has_private_label(value):
-            if isinstance(value, dict):
-                return bool(forbidden.intersection(value)) or any(
-                    has_private_label(item) for item in value.values()
-                )
-            if isinstance(value, (list, tuple)):
-                return any(has_private_label(item) for item in value)
-            return False
-
-        if has_private_label(message):
-            raise ValueError("Complete-team labels cannot enter a player decision payload")
+        validate_player_payload(message)
         if self.process is None:
             self.start()
         self.sequence += 1

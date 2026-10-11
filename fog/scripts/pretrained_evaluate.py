@@ -8,6 +8,7 @@ import gzip
 import json
 import os
 from pathlib import Path
+import sys
 
 from fog.env.showdown_direct import ShowdownDirectClient
 from fog.env.teams import to_packed
@@ -16,6 +17,7 @@ from fog.eval.stats import paired_block_interval
 from fog.pretrained.actions import request_choice
 from fog.pretrained.kakuna import KAKUNA_34_SHA256, INTERFACE_VERSION, sha256
 from fog.pretrained.process import DecisionProcess
+from fog.pretrained.evaluation import SCRIPTED_OPPONENTS
 from fog.pretrained.runtime import interpreter_path, native_environment
 from fog.pretrained.protocol import (
     claim_confirmation,
@@ -158,7 +160,12 @@ def main():
     )
     parser.add_argument("--foul-play-python", type=Path)
     parser.add_argument("--foul-play-source", type=Path)
+    parser.add_argument("--scripted-opponent", choices=SCRIPTED_OPPONENTS)
     args = parser.parse_args()
+    if args.games < 8 or args.games % 4:
+        raise ValueError("Evaluation requires at least eight games in complete crossed blocks")
+    if args.scripted_opponent and (args.foul_play_python or args.stage != "development"):
+        raise ValueError("Scripted opponents are development diagnostics only")
     if sha256(args.original) != KAKUNA_34_SHA256:
         raise ValueError("Comparison baseline must be unchanged checkpoint 34")
     if args.stage == "confirmation" and args.games < (256 if args.foul_play_python else 1024):
@@ -182,6 +189,7 @@ def main():
         "temperature": 1.0,
         "deadline_seconds": 5.0,
         "foulplay": bool(args.foul_play_python),
+        "scripted_opponent": args.scripted_opponent,
         "automatic_promotion": False,
     }
     if args.foul_play_python:
@@ -250,6 +258,13 @@ def main():
             ],
             cwd=root,
             log=args.out / "foulplay.log",
+            env=os.environ.copy(),
+        )
+    elif args.scripted_opponent:
+        b = DecisionProcess(
+            [sys.executable, "-m", "fog.pretrained.scripted_worker", "--kind", args.scripted_opponent],
+            cwd=root,
+            log=args.out / (args.scripted_opponent + ".log"),
             env=os.environ.copy(),
         )
     else:

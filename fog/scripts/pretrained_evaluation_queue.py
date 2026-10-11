@@ -26,6 +26,8 @@ MATCHED_KEYS = (
 
 def validate_queue(recipe, root):
     """Bind the evaluation to two immutable recipes before their weights exist."""
+    if recipe.get("diagnostic_only") or recipe.get("belief_diagnostic"):
+        raise ValueError("Training queues require the full candidate comparison; checkpoint diagnostics use a separate fixed CPU package")
     sources = recipe.get("training_sources", {})
     if set(sources) != set(ARMS) or "conditions" in recipe or "matched" in recipe:
         raise ValueError("Queued evaluation requires two training sources, without candidates")

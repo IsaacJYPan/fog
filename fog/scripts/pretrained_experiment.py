@@ -223,6 +223,7 @@ def freeze(
             target = f"inputs/training/{condition}/experiment.json"
             add(descriptor, target)
             row["experiment"] = target
+        candidate_inputs = {}
         for condition, row in recipe.get("conditions", {}).items():
             native = Path(row["native"])
             if sha256(native) != row["native_sha256"]:
@@ -234,8 +235,44 @@ def freeze(
             ):
                 if field in row:
                     target = f"inputs/candidates/{condition}/{filename}"
+                    candidate_inputs[str(Path(row[field]).resolve())] = target
                     add(row[field], target)
                     row[field] = target
+        diagnostic = recipe.get("belief_diagnostic")
+        if diagnostic:
+            from fog.pretrained.loading import read_record
+
+            for row in diagnostic["checkpoints"]:
+                if sha256(Path(row["native"])) != row["native_sha256"]:
+                    raise ValueError("Diagnostic checkpoint changed: " + row["label"])
+                for field in ("native", "auxiliary"):
+                    source = Path(row[field])
+                    target = candidate_inputs.get(str(source.resolve()))
+                    if target is None:
+                        target = f"inputs/belief-diagnostic/models/{row['label']}/{field}.pt"
+                        add(source, target)
+                    row[field] = target
+            for split, row in diagnostic["cohorts"].items():
+                cohort = Path(row["folder"])
+                collection = json.loads((cohort / "collection.json").read_text())
+                if collection["split"] != split or collection["pool_sha256"] != sha256(pools / (split + ".json")):
+                    raise ValueError("Diagnostic cohort uses the wrong split/pool")
+                target = "inputs/belief-diagnostic/" + split
+                add(cohort / "collection.json", target + "/collection.json")
+                if (cohort / "cohort.json").exists():
+                    add(cohort / "cohort.json", target + "/cohort.json")
+                records = sorted(cohort.glob("*.json.gz"))
+                if len(records) != row["games"]:
+                    raise ValueError("Diagnostic cohort must be complete")
+                for path in records:
+                    record = read_record(path)
+                    if not record["training_eligible"] or record.get("failures") or record.get("fallbacks"):
+                        raise ValueError("Failed diagnostic game requires investigation")
+                    add(path, target + "/" + path.name)
+                row["folder"] = target
+            if diagnostic.get("ancestral_report"):
+                add(diagnostic["ancestral_report"], "inputs/belief-diagnostic/ancestral.json")
+                diagnostic["ancestral_report"] = "inputs/belief-diagnostic/ancestral.json"
         if recipe.get("belief"):
             cohort = Path(recipe["belief"]["fresh"])
             collection = json.loads((cohort / "collection.json").read_text())

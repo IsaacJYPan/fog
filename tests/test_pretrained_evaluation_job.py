@@ -35,6 +35,12 @@ def recipe():
         {"matched": {"models": ["wrong", "joint-sha"]}},
         {"belief": {"games": 32, "draws": 32, "fresh": "heldout"}},
         {"pilot_only": "yes"},
+        {"diagnostic_only": "yes"},
+        {"diagnostic_only": True},
+        {"diagnostic_only": True, "pilot_only": True, "heuristics": {"opponents": ["maxdamage"], "games": 256, "smoke_games": 8}},
+        {"heuristics": {"opponents": ["unknown"], "games": 256, "smoke_games": 8}},
+        {"heuristics": {"opponents": [{}], "games": 256, "smoke_games": 8}},
+        {"heuristics": {"opponents": ["simpleheuristics"], "games": 256, "smoke_games": 4}},
     ],
 )
 def test_recipe_rejects_cohort_budget_and_candidate_mismatches(change):
@@ -107,4 +113,39 @@ def test_smoke_failure_prevents_full_comparison(tmp_path, monkeypatch):
         job.run_job(deepcopy(recipe()), "native-python", tmp_path / "results", 60)
     assert len(calls) == 5
     assert not (tmp_path / "results/RESULTS.json").exists()
+    assert not (tmp_path / "results/full").exists()
+
+
+def test_diagnostic_only_job_evaluates_all_models_and_binds_scripted_reports(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(job, "sha256", lambda path: job.KAKUNA_34_SHA256 if path.name == "kakuna34.pt" else path.stem + "-sha")
+    value = recipe()
+    value["diagnostic_only"] = True
+    value["heuristics"] = {"opponents": ["simpleheuristics"], "games": 256, "smoke_games": 8}
+    calls = []
+
+    def execute(command, *_args, **_kwargs):
+        calls.append(command)
+        destination = tmp_path / command[command.index("--out") + 1]
+        destination.mkdir(parents=True)
+        if command[2] == "fog.scripts.pretrained_contract":
+            candidate = tmp_path / command[command.index("--checkpoint") + 1]
+            (destination / "contract.json").write_text(json.dumps({"passed": True, "weights_unchanged": True, "checkpoint_sha256": job.sha256(candidate)}))
+            return
+        games = int(command[command.index("--games") + 1])
+        scripted = command[command.index("--scripted-opponent") + 1] if "--scripted-opponent" in command else None
+        candidate = tmp_path / command[command.index("--candidate") + 1]
+        (destination / "RESULTS.json").write_text(json.dumps({
+            "protocol": {"stage": "development", "foulplay": False, "scripted_opponent": scripted, "original_sha256": job.KAKUNA_34_SHA256, "candidate_sha256": job.sha256(candidate), "pool_sha256": "pool", "interface": "same", "sources_sha256": "same", "seed": 12, "games": games, "temperature": 1, "deadline_seconds": 5},
+            "failures": 0, "unresolved": 0,
+            "rows": [{"index": index, "schedule": {"block": index // 4}, "status": "complete", "score": index % 2, "failures": [], "fallbacks": []} for index in range(games)],
+        }))
+
+    monkeypatch.setattr(job, "execute", execute)
+    result = job.run_job(value, "native-python", tmp_path / "results", 60)
+    assert result["complete"] and result["development"] is None
+    assert set(result["heuristics"]["simpleheuristics"]["models"]) == {"original", "ordinary", "joint"}
+    assert result["heuristics"]["simpleheuristics"]["models"]["joint"]["minus_original"]["point"] == 0
+    assert not result["automatic_promotion"]
+    assert len(calls) == 11
     assert not (tmp_path / "results/full").exists()

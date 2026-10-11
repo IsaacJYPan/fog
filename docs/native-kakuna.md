@@ -51,9 +51,15 @@ The persistent GPU ledger charges full requested time, including failed runs, pl
 
 `pretrained_belief_benchmark` compares learned samples with the existing FOG donor/prior inference code using submitted training-pool sets as donors and exact-team development games as targets. It reports unordered joint-set accuracy, recall, and empirical marginal calibration at a fixed sample count. Unverified labels are excluded. These Monte Carlo metrics do not turn route probability traces into exact unordered-set likelihoods. A subsequent downstream comparison must keep search settings fixed before learned sampling is connected to play.
 
+`pretrained_belief_diagnose` compares saved checkpoints on fixed exact-team training and development cohorts. It scores public marginals and autoregressive next-field distributions given verified correct prefixes. The conditional and marginal comparison uses identical sampled query targets and schedules. Per-game scores support resampling without treating correlated within-game predictions as independent. Correct-prefix scores diagnose conditional learning; they do not measure ancestral sampling quality or grant the playing policy access to hidden teams.
+
 ## Evaluation and deployment
 
 Long development evaluations can run in a separate private CPU notebook after GPU training, without a local supervisor. See [automatic GPU-to-CPU handoff](kaggle-evaluation-queue.md) for registration, scheduling, output verification, and recovery.
+
+A separately frozen diagnostic CPU recipe can benchmark unchanged Kakuna and both trained conditions against `simpleheuristics` and `maxdamage`. The scripted processes use modern poke-env, per-game RNG state, public messages, their own requests, and the same fixed team-preview order. Crossed teams, seats, simulator seeds, inference settings, deadlines, and input hashes must match across models. These exploratory basic-opponent scores cannot substitute for the unchanged-Kakuna comparison or final strength gate. A diagnostic-only job cannot replace the full CPU comparison in an automatic training queue.
+
+Every training result receives a [post-training review](training-review.md), including completed runs that fail to establish improvement. Choose the next compute allocation from held-out progress and a testable explanation, and distinguish successful training time from hours spent recovering failed jobs.
 
 Use `pretrained_evaluate` on development teams to select candidates. Final confirmation requires at least 1,024 crossed seat/team games against unchanged Kakuna and a matched strong-opponent regression comparison. `pretrained_gate` also requires the selected finalist's own hash-matched CPU/CUDA probability report. It combines the play reports using four-game block intervals, alpha 0.025 per planned confirmation attempt, and a predeclared five-percentage-point strong-opponent regression margin. The persistent registry prevents spending either final cohort on a different model or changing its protocol during resume. Integration success never promotes a model.
 

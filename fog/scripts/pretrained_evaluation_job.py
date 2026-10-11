@@ -14,8 +14,9 @@ import time
 
 from fog.pretrained.kakuna import KAKUNA_34_SHA256, sha256
 from fog.pretrained.runtime import native_environment
+from fog.pretrained.evaluation import SCRIPTED_OPPONENTS
 from fog.scripts.kaggle_results import write_json
-from fog.scripts.pretrained_compare import compare_evaluations
+from fog.scripts.pretrained_compare import compare_evaluations, compare_scripted_evaluations
 from fog.scripts.pretrained_kaggle_worker import execute
 
 
@@ -31,6 +32,25 @@ def validate_recipe(recipe):
         raise ValueError("Freeze the evaluation seed")
     if "pilot_only" in recipe and type(recipe["pilot_only"]) is not bool:
         raise ValueError("Declare pilot-only execution as a boolean")
+    if "diagnostic_only" in recipe and type(recipe["diagnostic_only"]) is not bool:
+        raise ValueError("Declare diagnostic-only execution as a boolean")
+    if recipe.get("diagnostic_only") and not (recipe.get("heuristics") or recipe.get("belief_diagnostic")):
+        raise ValueError("Diagnostic-only execution requires a declared diagnostic")
+    if recipe.get("diagnostic_only") and recipe.get("pilot_only"):
+        raise ValueError("A full diagnostic job cannot also be a smoke-only queue pilot")
+    heuristics = recipe.get("heuristics")
+    if heuristics:
+        opponents = heuristics.get("opponents", [])
+        if not isinstance(opponents, list) or not opponents or any(type(value) is not str for value in opponents) or len(set(opponents)) != len(opponents) or not set(opponents).issubset(SCRIPTED_OPPONENTS):
+            raise ValueError("Declare unique supported scripted opponents")
+        for key, minimum in (("games", 256), ("smoke_games", 8)):
+            if type(heuristics.get(key)) is not int or heuristics[key] < minimum or heuristics[key] % 4:
+                raise ValueError("Scripted evaluation requires complete crossed game budgets")
+    diagnostic = recipe.get("belief_diagnostic")
+    if diagnostic:
+        from fog.scripts.pretrained_belief_diagnose import validate_diagnostic
+
+        validate_diagnostic(diagnostic)
     models = recipe.get("matched", {}).get("models")
     if models != [recipe["conditions"][arm].get("native_sha256") for arm in ("ordinary", "joint")]:
         raise ValueError("Candidates must match the audited training pair")
@@ -135,32 +155,21 @@ def run_job(recipe, native_python, out, max_seconds):
         ):
             raise ValueError("Remote CPU probability contract failed: " + name)
 
-    def evaluate(condition, phase, games):
+    def evaluate(condition, phase, games, *, scripted=None):
         destination = out / phase / condition
-        row = recipe["conditions"][condition]
+        candidate = str(original) if condition == "original" else recipe["conditions"][condition]["native"]
+        command = [
+            sys.executable, "-m", "fog.scripts.pretrained_evaluate",
+            "--candidate", candidate, "--original", str(original),
+            "--native-python", str(native_python), "--pools", "inputs/pools",
+            "--out", str(destination), "--games", str(games),
+            "--seed", str(recipe["seed"]), "--stage", "development",
+        ]
+        if scripted:
+            command += ["--scripted-opponent", scripted]
         child(
             phase + "/" + condition,
-            [
-                sys.executable,
-                "-m",
-                "fog.scripts.pretrained_evaluate",
-                "--candidate",
-                row["native"],
-                "--original",
-                str(original),
-                "--native-python",
-                str(native_python),
-                "--pools",
-                "inputs/pools",
-                "--out",
-                str(destination),
-                "--games",
-                str(games),
-                "--seed",
-                str(recipe["seed"]),
-                "--stage",
-                "development",
-            ],
+            command,
             games_dir=destination,
         )
         report_path = destination / "RESULTS.json"
@@ -203,7 +212,8 @@ def run_job(recipe, native_python, out, max_seconds):
         for condition, row in recipe["conditions"].items():
             contract(condition, root / row["native"], root / row["reference"], trained=True)
         phases = (("smoke", recipe["smoke_games"]),)
-        if not recipe.get("pilot_only", False):
+        short_comparison = recipe.get("pilot_only", False) or recipe.get("diagnostic_only", False)
+        if not short_comparison:
             phases += (("full", recipe["games"]),)
         for phase, games in phases:
             update(phase=phase)
@@ -213,7 +223,7 @@ def run_job(recipe, native_python, out, max_seconds):
                 )
         comparison = (
             None
-            if recipe.get("pilot_only", False)
+            if short_comparison
             else compare_evaluations(recipe["matched"], paths[0], paths[1])
         )
         result = {
@@ -223,7 +233,33 @@ def run_job(recipe, native_python, out, max_seconds):
             "gpu_requested": False,
             "automatic_promotion": False,
             "pilot_only": recipe.get("pilot_only", False),
+            "diagnostic_only": recipe.get("diagnostic_only", False),
+            "heuristics": None,
+            "belief_diagnostic": None,
         }
+        if recipe.get("belief_diagnostic"):
+            update(phase="belief_diagnostic")
+            diagnostic_path = out / "belief-diagnostic-inputs.json"
+            write_json(diagnostic_path, recipe["belief_diagnostic"])
+            child("belief_diagnostic", [
+                str(native_python), "-m", "fog.scripts.pretrained_belief_diagnose",
+                "--config", str(diagnostic_path), "--pools", "inputs/pools",
+                "--out", str(out / "belief-diagnostic"),
+            ], native=True)
+            result["belief_diagnostic"] = json.loads((out / "belief-diagnostic/RESULTS.json").read_text())
+        if recipe.get("heuristics"):
+            result["heuristics"] = {}
+            for opponent in recipe["heuristics"]["opponents"]:
+                for phase, games in (("smoke", recipe["heuristics"]["smoke_games"]), ("full", recipe["heuristics"]["games"])):
+                    label = "heuristics/" + opponent + "/" + phase
+                    update(phase=label)
+                    with ThreadPoolExecutor(max_workers=2) as executor:
+                        arms = ("original", "ordinary", "joint")
+                        paths = list(executor.map(lambda arm: evaluate(arm, label, games, scripted=opponent), arms))
+                result["heuristics"][opponent] = compare_scripted_evaluations(
+                    recipe["matched"], dict(zip(arms, paths)), opponent
+                )
+                write_json(out / "HEURISTICS.json", result["heuristics"])
         if recipe.get("belief"):
             update(phase="belief")
             with ThreadPoolExecutor(max_workers=2) as executor:

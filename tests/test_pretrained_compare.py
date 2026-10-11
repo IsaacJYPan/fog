@@ -3,7 +3,7 @@ import json
 import pytest
 
 from fog.pretrained.kakuna import KAKUNA_34_SHA256
-from fog.scripts.pretrained_compare import compare_evaluations, matched_reports
+from fog.scripts.pretrained_compare import compare_evaluations, compare_scripted_evaluations, matched_reports
 
 
 def test_same_update_count_with_different_data_schedule_is_rejected(tmp_path):
@@ -132,3 +132,49 @@ def test_hidden_incomplete_games_cannot_recommend_retention(
     path.write_text(json.dumps(report))
     with pytest.raises(ValueError, match="Every declared development game"):
         compare_evaluations({"models": ["ordinary", "joint"]}, *completed_development_reports)
+
+
+@pytest.fixture
+def completed_scripted_reports(completed_development_reports, tmp_path):
+    paths = dict(zip(("ordinary", "joint"), completed_development_reports))
+    for path in paths.values():
+        report = json.loads(path.read_text())
+        report["protocol"]["scripted_opponent"] = "simpleheuristics"
+        path.write_text(json.dumps(report))
+    original = json.loads(paths["ordinary"].read_text())
+    original["protocol"]["candidate_sha256"] = KAKUNA_34_SHA256
+    paths["original"] = tmp_path / "original.json"
+    paths["original"].write_text(json.dumps(original))
+    return paths
+
+
+def test_scripted_contrasts_bind_reference_and_remain_exploratory(completed_scripted_reports):
+    result = compare_scripted_evaluations(
+        {"models": ["ordinary", "joint"]}, completed_scripted_reports, "simpleheuristics"
+    )
+    assert result["models"]["original"]["candidate_sha256"] == KAKUNA_34_SHA256
+    assert result["models"]["joint"]["minus_original"]["point"] == 0
+    assert not result["automatic_promotion"]
+
+
+@pytest.mark.parametrize("corruption", ("checkpoint", "opponent", "fallback", "count", "schedule", "temperature"))
+def test_scripted_contrasts_reject_changed_or_failed_comparisons(completed_scripted_reports, corruption):
+    path = completed_scripted_reports["joint"]
+    report = json.loads(path.read_text())
+    if corruption == "checkpoint":
+        report["protocol"]["candidate_sha256"] = "other"
+    elif corruption == "opponent":
+        report["protocol"]["scripted_opponent"] = "maxdamage"
+    elif corruption == "fallback":
+        report["rows"][0]["fallbacks"] = [{"choice": "default"}]
+    elif corruption == "count":
+        report["protocol"]["games"] = 260
+    elif corruption == "schedule":
+        report["rows"][0]["schedule"] = {"controller_seed": 999}
+    else:
+        report["protocol"]["temperature"] = 0
+    path.write_text(json.dumps(report))
+    with pytest.raises(ValueError):
+        compare_scripted_evaluations(
+            {"models": ["ordinary", "joint"]}, completed_scripted_reports, "simpleheuristics"
+        )
