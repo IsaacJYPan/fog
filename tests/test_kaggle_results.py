@@ -97,7 +97,8 @@ def test_remote_checks_run_id_and_downloads_only_export(tmp_path, monkeypatch):
     calls = []
     def get(url, **kwargs):
         calls.append(url)
-        return nullcontext(SimpleNamespace(status_code=200, iter_content=lambda size: [b"archive"]))
+        return nullcontext(SimpleNamespace(status_code=200, headers={},
+                                            iter_content=lambda size: [b"archive"]))
     requests_module.get = get
     monkeypatch.setitem(sys.modules, api_module.__name__, api_module)
     monkeypatch.setitem(sys.modules, types_module.__name__, types_module)

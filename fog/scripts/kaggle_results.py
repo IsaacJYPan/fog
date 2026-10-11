@@ -158,6 +158,87 @@ def write_handoff(directory: Path, report: dict, kernel: str, version: int) -> N
     (directory / "HANDOFF.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def download_output(url: str, path: Path, *, attempts: int = 3) -> None:
+    """Resume interrupted transfers and publish only a complete response body.
+
+    Output hashes and archive contents are verified by the collector afterward.
+    Never include signed URLs in transfer errors or progress messages.
+    """
+    import requests
+
+    if attempts < 1:
+        raise ValueError("Download attempts must be positive")
+    partial = path.with_name(path.name + ".part")
+    offset, expected_size, etag = 0, None, None
+    last_progress = time.monotonic()
+    for attempt in range(attempts):
+        headers = {"Accept-Encoding": "identity"}
+        if offset:
+            headers["Range"] = f"bytes={offset}-"
+            if etag:
+                headers["If-Range"] = etag
+        try:
+            with requests.get(url, stream=True, timeout=(30, 120), headers=headers) as response:
+                if response.status_code not in (200, 206):
+                    raise RuntimeError(
+                        f"Kaggle file download returned HTTP {response.status_code}"
+                    )
+                if response.headers.get("Content-Encoding", "identity").lower() != "identity":
+                    raise RuntimeError("Kaggle output cannot resume a compressed HTTP body")
+                if response.status_code == 200:
+                    # A server may ignore Range or reject If-Range. Start a full
+                    # replacement rather than appending duplicate/mixed bytes.
+                    offset = 0
+                    length = response.headers.get("Content-Length")
+                    expected_size = int(length) if length is not None else None
+                    etag = response.headers.get("ETag")
+                    mode = "wb"
+                else:
+                    match = re.fullmatch(
+                        r"bytes (\d+)-(\d+)/(\d+)",
+                        response.headers.get("Content-Range", ""),
+                    )
+                    if not match:
+                        raise RuntimeError("Kaggle output resume lacks a valid byte range")
+                    start, end, total = map(int, match.groups())
+                    if (start != offset or not start <= end < total
+                            or (expected_size is not None and total != expected_size)):
+                        raise RuntimeError("Kaggle output resume returned a different byte range")
+                    length = response.headers.get("Content-Length")
+                    if length is not None and int(length) != end - start + 1:
+                        raise RuntimeError("Kaggle output resume length disagrees with its range")
+                    current_etag = response.headers.get("ETag")
+                    if etag and current_etag and etag != current_etag:
+                        raise RuntimeError("Kaggle output changed during a resumed transfer")
+                    expected_size, etag = total, current_etag or etag
+                    mode = "ab" if offset else "wb"
+                with partial.open(mode) as stream:
+                    for chunk in response.iter_content(1024 * 1024):
+                        stream.write(chunk)
+                        offset += len(chunk)
+                        if expected_size is not None and offset > expected_size:
+                            raise RuntimeError("Kaggle output exceeded its declared size")
+                        if time.monotonic() - last_progress >= 30:
+                            print(f"Output download: {offset:,} bytes received", flush=True)
+                            last_progress = time.monotonic()
+            if expected_size is None or offset == expected_size:
+                partial.replace(path)
+                return
+        except requests.RequestException:
+            # IncompleteRead can occur after several GB have already arrived.
+            # Keep the bytes from this call and request only the missing suffix.
+            offset = partial.stat().st_size if partial.exists() else 0
+            if expected_size is not None and offset == expected_size:
+                partial.replace(path)
+                return
+        if attempt + 1 < attempts:
+            print(f"Output transfer retry {attempt + 2}/{attempts}: {offset:,} bytes retained",
+                  flush=True)
+    raise RuntimeError(
+        f"Kaggle output transfer incomplete after {attempts} attempts; {offset:,} bytes retained"
+    ) from None
+
+
 def remote(kernel: str, version: int, destination: Path | None, filename: str,
            run_id: int | None) -> None:
     # Kaggle serves latest outputs; version_label returns 404 for these private
@@ -166,7 +247,6 @@ def remote(kernel: str, version: int, destination: Path | None, filename: str,
     from kagglesdk.kernels.types.kernels_api_service import (
         ApiGetKernelSessionStatusRequest, ApiListKernelSessionOutputRequest,
     )
-    import requests
     api = KaggleApi()
     api.authenticate()
     owner, slug = kernel.split("/")
@@ -194,13 +274,7 @@ def remote(kernel: str, version: int, destination: Path | None, filename: str,
                     raise RuntimeError("Kaggle returned a different or unrecognized run. "
                                        "No file downloaded; use the saved version's Output tab.")
                 destination.mkdir(parents=True, exist_ok=True)
-                # Never print signed download URLs or exception URLs.
-                with requests.get(item.url, stream=True, timeout=(30, 120)) as download:
-                    if download.status_code != 200:
-                        raise RuntimeError(f"Kaggle file download returned HTTP {download.status_code}")
-                    with (destination / filename).open("wb") as stream:
-                        for chunk in download.iter_content(1024 * 1024):
-                            stream.write(chunk)
+                download_output(item.url, destination / filename)
                 print(f"Downloaded {filename} from {kernel}, version {version}")
                 write_json(destination / "download.json", {"run_id": int(match[1]), "kernel": kernel})
                 return
