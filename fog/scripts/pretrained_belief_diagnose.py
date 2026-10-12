@@ -19,7 +19,7 @@ import torch
 from fog.constants.tables import TABLES
 from fog.encoding.reveals import masks_for_tokens
 from fog.models.belief import BeliefModel
-from fog.pretrained.belief_diagnostics import DistributionMetrics
+from fog.pretrained.belief_diagnostics import DistributionMetrics, ablated_latent
 from fog.pretrained.checkpoints import load_auxiliary
 from fog.pretrained.joint import JointKakuna
 from fog.pretrained.kakuna import load_kakuna, sha256
@@ -45,6 +45,49 @@ def validate_diagnostic(config):
         raise ValueError("Require hash-bound diagnostic checkpoint anchors")
     if len({row["label"] for row in checkpoints}) != len(checkpoints) or [row["update"] for row in checkpoints] != sorted({row["update"] for row in checkpoints}):
         raise ValueError("Checkpoint labels and increasing update anchors must be unique")
+    modes = config.get("latent_ablations", [])
+    if not isinstance(modes, list) or any(mode not in ("zero", "permuted") for mode in modes) or len(modes) != len(set(modes)):
+        raise ValueError("Declare unique supported offline latent ablations")
+    if "permuted" in modes and any(row["games"] < 2 for row in config["cohorts"].values()):
+        raise ValueError("Latent permutation requires at least two games per cohort")
+
+
+def conditioning_latents(runtime, loader, paths):
+    """Cache player-visible native state embeddings without consuming complete-team targets."""
+    result = {}
+    with torch.inference_mode():
+        for path in paths:
+            game = result.setdefault(path.name, {})
+            for pov in (0, 1):
+                example, _targets = loader.load(("fresh", str(path), pov))
+                points = sorted({0, len(example.actions) // 2, len(example.actions) - 1})
+                hidden = runtime.model.traj_encoder.init_hidden_state(1, torch.device("cpu"))
+                for index in range(len(example.actions)):
+                    latent, hidden = runtime.model.get_state_embedding(
+                        obs={key: value[None, index:index + 1] for key, value in example.obs.items()},
+                        rl2s=example.rl2s[None, index:index + 1],
+                        time_idxs=example.time_idxs[None, index:index + 1], hidden_state=hidden,
+                    )
+                    if index in points:
+                        game[(pov, points.index(index))] = latent[:, 0].clone()
+    return result
+
+
+def score_queries(model, latent, payload, safe_truth, hidden_fields, q, generator, metrics):
+    context = model.context_projection(latent)
+    marginal = model.belief(context, payload)
+    metrics["public_marginal"].update(marginal.logits, BeliefModel._split_flat(safe_truth), BeliefModel._split_flat(hidden_fields))
+    chain = model.belief(
+        context.expand(q, -1),
+        {"tokens": payload["tokens"].expand(q, -1, -1), "masks": {key: value.expand(q, *value.shape[1:]) for key, value in payload["masks"].items()}},
+        teacher_values=safe_truth.expand(q, -1, -1), generator=generator,
+    )
+    selected = {key: value & (chain.loss_targets[key] >= 0) for key, value in chain.loss_valid.items()}
+    metrics["true_prefix_chain"].update(chain.logits, chain.loss_targets, selected)
+    metrics["marginal_on_chain_queries"].update(
+        {key: value.expand(q, *value.shape[1:]) for key, value in marginal.logits.items()}, chain.loss_targets, selected
+    )
+    return chain.order.tolist(), chain.context_count.tolist()
 
 
 def score_checkpoint(config, checkpoint, pools, out):
@@ -68,6 +111,11 @@ def score_checkpoint(config, checkpoint, pools, out):
         if len(paths) != cohort["games"]:
             raise ValueError("Diagnostic cohort is incomplete")
         metrics = {name: DistributionMetrics() for name in ("public_marginal", "marginal_on_chain_queries", "true_prefix_chain")}
+        modes = config.get("latent_ablations", [])
+        cached = conditioning_latents(runtime, loader, paths) if "permuted" in modes else None
+        ablations = {mode: {"metrics": {name: DistributionMetrics() for name in metrics},
+                            "errors": [], "by_game": {}, "schedule": hashlib.sha256()}
+                     for mode in modes}
         generator = torch.Generator().manual_seed(config["seed"])
         contexts, outcome_errors, by_game = 0, [], {}
         query_schedule = hashlib.sha256()
@@ -79,10 +127,13 @@ def score_checkpoint(config, checkpoint, pools, out):
                 if any(len(pov["actions"]) - 1 > loader.sequence_length for pov in record["perspectives"].values()):
                     raise ValueError("A diagnostic cannot silently crop battle history")
                 game_metrics = {name: DistributionMetrics() for name in metrics}
+                ablated_metrics = {mode: {name: DistributionMetrics() for name in metrics} for mode in modes}
+                ablated_errors = {mode: [] for mode in modes}
+                donors = set()
                 game_errors, game_contexts = [], 0
                 for pov_seed in (0, 1):
                     example, targets = loader.load(("fresh", str(path), pov_seed))
-                    points = {0, len(example.actions) // 2, len(example.actions) - 1}
+                    points = sorted({0, len(example.actions) // 2, len(example.actions) - 1})
                     hidden = runtime.model.traj_encoder.init_hidden_state(1, torch.device("cpu"))
                     for index in range(len(example.actions)):
                         latent, hidden = runtime.model.get_state_embedding(
@@ -97,22 +148,26 @@ def score_checkpoint(config, checkpoint, pools, out):
                         safe_truth = torch.where(verified, targets["truth"][index:index + 1], -1)
                         masks = {key: torch.from_numpy(value[None]) for key, value in masks_for_tokens(public[0].numpy(), TABLES).items()}
                         payload = {"tokens": public, "masks": masks}
-                        context = model.context_projection(latent[:, 0])
-                        marginal = model.belief(context, payload)
                         hidden_fields = verified & ~model.belief._revealed_mask(public).reshape_as(verified)
-                        game_metrics["public_marginal"].update(marginal.logits, BeliefModel._split_flat(safe_truth), BeliefModel._split_flat(hidden_fields))
                         q = config["queries_per_context"]
-                        chain = model.belief(
-                            context.expand(q, -1),
-                            {"tokens": public.expand(q, -1, -1), "masks": {key: value.expand(q, *value.shape[1:]) for key, value in masks.items()}},
-                            teacher_values=safe_truth.expand(q, -1, -1), generator=generator,
-                        )
-                        selected = {key: value & (chain.loss_targets[key] >= 0) for key, value in chain.loss_valid.items()}
-                        game_metrics["true_prefix_chain"].update(chain.logits, chain.loss_targets, selected)
-                        game_metrics["marginal_on_chain_queries"].update(
-                            {key: value.expand(q, *value.shape[1:]) for key, value in marginal.logits.items()}, chain.loss_targets, selected
-                        )
-                        query_schedule.update(json.dumps([path.name, pov_seed, index, chain.order.tolist(), chain.context_count.tolist()], separators=(",", ":")).encode())
+                        query_rng = generator.get_state()
+                        order, count = score_queries(model, latent[:, 0], payload, safe_truth, hidden_fields, q, generator, game_metrics)
+                        native_rng = generator.get_state()
+                        query_schedule.update(json.dumps([path.name, pov_seed, index, order, count], separators=(",", ":")).encode())
+                        for mode in modes:
+                            altered, donor = ablated_latent(mode, latent[:, 0], latents=cached, game=path.name, point=(pov_seed, points.index(index)))
+                            if donor is not None:
+                                donors.add(donor)
+                            generator.set_state(query_rng)
+                            altered_order, altered_count = score_queries(model, altered, payload, safe_truth, hidden_fields, q, generator, ablated_metrics[mode])
+                            if altered_order != order or altered_count != count:
+                                raise ValueError("Latent ablation changed the hidden-field query schedule")
+                            ablations[mode]["schedule"].update(json.dumps([path.name, pov_seed, index, altered_order, altered_count], separators=(",", ":")).encode())
+                            altered_prediction = float(model.outcome(altered).tanh().item())
+                            if not math.isfinite(altered_prediction):
+                                raise FloatingPointError("Nonfinite ablated outcome prediction")
+                            ablated_errors[mode].append((altered_prediction - float(targets["outcomes"][index])) ** 2)
+                        generator.set_state(native_rng)
                         prediction = float(model.outcome(latent[:, 0]).tanh().item())
                         if not math.isfinite(prediction):
                             raise FloatingPointError("Nonfinite outcome diagnostic prediction")
@@ -127,6 +182,17 @@ def score_checkpoint(config, checkpoint, pools, out):
                     "metrics": {name: metric.report() for name, metric in game_metrics.items()},
                     "outcome_mse": sum(game_errors) / len(game_errors),
                 }
+                for mode in modes:
+                    ablation = ablations[mode]
+                    for name, metric in ablated_metrics[mode].items():
+                        ablation["metrics"][name].merge(metric)
+                    ablation["errors"].extend(ablated_errors[mode])
+                    ablation["by_game"][path.name] = {
+                        "contexts": game_contexts,
+                        "metrics": {name: metric.report() for name, metric in ablated_metrics[mode].items()},
+                        "outcome_mse": sum(ablated_errors[mode]) / len(ablated_errors[mode]),
+                        "latent_donor_games": sorted(donors) if mode == "permuted" else [],
+                    }
                 print(json.dumps({"checkpoint": checkpoint["label"], "split": split, "game": path.name, "contexts": contexts}), flush=True)
         split_reports[split] = {
             "games": len(paths), "contexts": contexts,
@@ -137,6 +203,18 @@ def score_checkpoint(config, checkpoint, pools, out):
             "query_schedule_sha256": query_schedule.hexdigest(),
             "outcome_mse": sum(outcome_errors) / len(outcome_errors),
         }
+        if modes:
+            split_reports[split]["latent_ablations"] = {}
+            for mode, ablation in ablations.items():
+                digest = ablation["schedule"].hexdigest()
+                if digest != query_schedule.hexdigest():
+                    raise ValueError("Ablated and intact query schedules differ")
+                split_reports[split]["latent_ablations"][mode] = {
+                    "metrics": {name: metric.report() for name, metric in ablation["metrics"].items()},
+                    "outcome_mse": sum(ablation["errors"]) / len(ablation["errors"]),
+                    "by_game": ablation["by_game"], "query_schedule_sha256": digest,
+                    "interpretation": "Offline conditioning perturbation only. Zero context can be out of distribution; cross-game permutation preserves POV/phase and may reuse teams. This is not a causal policy-strength test or a native-critic comparison.",
+                }
     if sha256(native) != checkpoint["native_sha256"] or sha256(auxiliary) != auxiliary_sha:
         raise ValueError("Diagnostic modified checkpoint weights")
     report = {

@@ -3,7 +3,7 @@ import math
 import pytest
 import torch
 
-from fog.pretrained.belief_diagnostics import DistributionMetrics
+from fog.pretrained.belief_diagnostics import DistributionMetrics, ablated_latent, permuted_context
 from fog.scripts.pretrained_belief_diagnose import validate_diagnostic
 
 
@@ -57,3 +57,40 @@ def test_diagnostic_requires_bound_complete_cohorts_and_checkpoint_identities(ch
     config.update(change)
     with pytest.raises(ValueError):
         validate_diagnostic(config)
+
+
+def test_permutation_preserves_pov_and_phase_without_using_other_seat_in_same_game():
+    latents = {
+        "a": {(0, 0): torch.tensor([[1.0, 2.0]]), (1, 0): torch.tensor([[3.0, 4.0]])},
+        "b": {(0, 0): torch.tensor([[5.0, 6.0]]), (1, 0): torch.tensor([[7.0, 8.0]])},
+    }
+    value, donor = permuted_context(latents, "a", (1, 0))
+    assert donor == "b" and torch.equal(value, latents["b"][(1, 0)])
+    assert not torch.equal(value, latents["a"][(0, 0)])
+    zero, donor = ablated_latent("zero", latents["a"][(0, 0)])
+    assert donor is None and not zero.any()
+    assert torch.equal(latents["a"][(0, 0)], torch.tensor([[1.0, 2.0]]))
+
+
+def test_permutation_rejects_incomplete_contexts_instead_of_borrowing_private_opponent_view():
+    with pytest.raises(ValueError, match="two complete"):
+        permuted_context({"a": {(0, 0): torch.ones(1, 2)}}, "a", (0, 0))
+    with pytest.raises(ValueError, match="matching POV/phase"):
+        permuted_context({"a": {(0, 0): torch.ones(1, 2)}, "b": {(1, 0): torch.ones(1, 2)}}, "a", (0, 0))
+    with pytest.raises(ValueError, match="shape differs"):
+        ablated_latent("permuted", torch.ones(1, 2), latents={"a": {(0, 0): torch.ones(1, 2)}, "b": {(0, 0): torch.ones(1, 3)}}, game="a", point=(0, 0))
+
+
+@pytest.mark.parametrize("modes", [["unknown"], ["zero", "zero"], "zero", ["permuted"]])
+def test_invalid_or_unpairable_ablations_fail_closed(modes):
+    config = diagnostic()
+    config["latent_ablations"] = modes
+    with pytest.raises(ValueError):
+        validate_diagnostic(config)
+
+
+def test_diagnostic_allows_complete_offline_ablations():
+    config = diagnostic()
+    config["cohorts"] = {split: {"folder": split, "games": 2} for split in ("train", "development")}
+    config["latent_ablations"] = ["zero", "permuted"]
+    validate_diagnostic(config)

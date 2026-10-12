@@ -7,6 +7,28 @@ import math
 import torch
 
 
+def permuted_context(latents, game, point):
+    """Use the same POV/phase in a different game; never the other seat's private view."""
+    games = sorted(latents)
+    if len(games) < 2 or game not in latents:
+        raise ValueError("Latent permutation requires at least two complete distinct games")
+    donor = games[(games.index(game) + 1) % len(games)]
+    if point not in latents[donor]:
+        raise ValueError("Donor game lacks the matching POV/phase context")
+    return latents[donor][point], donor
+
+
+def ablated_latent(mode, latent, *, latents=None, game=None, point=None):
+    if mode == "zero":
+        return torch.zeros_like(latent), None
+    if mode == "permuted":
+        donor, name = permuted_context(latents, game, point)
+        if donor.shape != latent.shape:
+            raise ValueError("Ablated latent shape differs from the intact context")
+        return donor, name
+    raise ValueError("Unknown offline latent ablation")
+
+
 class DistributionMetrics:
     def __init__(self):
         self.families = {}

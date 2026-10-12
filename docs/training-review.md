@@ -119,3 +119,59 @@ is retained or reset, and preserve strict full-state resume within that recipe.
 Continue to evaluate ordinary and joint training under matched data and update
 budgets. Keep learned sampling out of search until its held-out reconstruction
 and fixed-search play comparisons support using it.
+
+## Completed continuation evaluation, October 12
+
+The next matched recipe loaded each arm's native and auxiliary update-1,250
+weights, explicitly reset optimizer and sampling state, and added 1,800 updates.
+Native learning rate stayed at 2e-5; auxiliary heads used 2e-4 with 100 warmup
+updates. Each arm sampled 707,233 decision positions, including repeated draws.
+The complete model, optimizer, RNG and sampler exports passed finite-state and
+counter checks. All 1,800 data schedules and supervised counts matched.
+
+The CPU evaluation completed 2,048 main games and 64 smoke games without failures
+or fallbacks. Each trained arm played 256 games against unchanged Kakuna:
+
+| Condition | Wins | Score | Exploratory 95% block interval |
+| --- | --- | --- | --- |
+| Ordinary continuation | 122 | 47.66% | 41.80–53.52% |
+| Joint continuation | 127 | 49.61% | 44.14–55.08% |
+
+The joint-minus-ordinary difference was +1.95 percentage points
+(−2.73 to +6.25). Neither improvement nor significant regression was established.
+The joint checkpoint is retained for development, with previous models preserved.
+It is not a confirmed champion. Parent play used a different seed, so comparing
+their old scores with these scores is not an exact paired parent comparison.
+
+On matched basic-opponent games, unchanged / ordinary / joint scored
+94.14 / 91.41 / 92.58% against SimpleHeuristics and 99.61 / 99.22 / 99.61% against
+MaxDamage. These point estimates use a new play seed. They support basic
+competence, not ladder strength or non-regression against Foul Play.
+
+On the reused 32-game belief cohort, learned modal item accuracy rose from
+10.63% to 14.21%, while existing training-pool inference remains at 50.10%.
+Observed-outcome MSE fell from 0.5396 to 0.4763. Learned exact-set recall@32 remains
+zero, compared with 2.97% for existing inference. These aggregate sampling reports
+do not save per-game scores, so correlated fields cannot supply an independent
+confidence interval. Lower Monte Carlo ECE alone is not evidence of better
+inference. Outcome MSE still does not compare the native critic. Learned sampling
+remains disconnected from search.
+
+More optimization produced some auxiliary progress without a demonstrated play
+gain. Native aggregate training loss stayed nearly flat, and the mean weighted
+auxiliary shared gradient was 0.548% of primary. The tenfold head learning rate
+does not ensure that the shared representation learned useful hidden-state
+information. An offline CPU diagnostic now supports zeroing or permuting the
+latent across different games while preserving POV and decision phase. Intact and
+perturbed contexts use identical verified queries, with per-game scores. The
+perturbations can be out of distribution and are not causal tests of playing
+strength; they help distinguish latent information from revealed-fact priors.
+
+The bounded pretrained attempt has not demonstrated improvement under this
+recipe and budget. Much of its charged compute was reserved or failed time;
+successful joint training totaled about 82 plus 111 minutes. This result is not
+evidence of architectural saturation or proof that longer training cannot help.
+The next neural experiment follows the independent-weight FOG fallback, with
+mechanics-derived public action features, strong public-information teachers and
+exact-team belief/outcome supervision. Its data path and short local trial must
+pass before a new private GPU pilot. Both final confirmation cohorts remain unused.
