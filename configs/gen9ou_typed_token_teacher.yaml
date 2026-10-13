@@ -1,0 +1,30 @@
+extends: gen9ou_typed_token_trunk.yaml
+
+experiment: gen9ou_typed_token_teacher
+seed: 20261013
+device: cuda
+
+model:
+  use_action_features: true
+  public_action_features_only: true
+  simple_rule_prior_strength: 0.0
+  aux_into_trunk: true
+  oracle: none
+
+loss:
+  action_coef: 1.0
+  value_coef: 0.25
+  belief_coef: 0.1
+  belief_chain_coef: 0.1
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+  require_exact_chosen_action_features: true
+  require_exact_chosen_legality: true
+
+bc:
+  init_ckpt: null
+
+log:
+  dir: runs/teacher_pilot
+  tensorboard: false

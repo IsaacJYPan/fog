@@ -27,9 +27,11 @@ def runtime_requirements(root: Path) -> list[str]:
     return requirements
 
 
-def setup(root: Path) -> Path:
+def setup(root: Path, *, device: str = "cuda") -> Path:
     if sys.platform != "linux":
         raise RuntimeError("Run this installer inside a Kaggle Linux notebook; use uv sync locally.")
+    if device not in ("cpu", "cuda"):
+        raise ValueError("Choose a CPU evaluation or CUDA training runtime")
     python = root / ".venv" / "bin" / "python"
     # Kaggle supplies pip globally; its ensurepip bootstrap can fail even though
     # that pip is usable. Inherit it alongside the preinstalled CUDA PyTorch.
@@ -51,15 +53,17 @@ def setup(root: Path) -> Path:
 import json, platform, subprocess, torch
 from fog.env.showdown_direct import ShowdownDirectClient
 from torch.utils.tensorboard import SummaryWriter
-assert torch.cuda.is_available(), "Enable the notebook GPU accelerator before training."
+if EXPECTED_DEVICE == "cuda":
+    assert torch.cuda.is_available(), "Enable the notebook GPU accelerator before training."
 with SummaryWriter("runs/kaggle_environment/tensorboard_smoke") as writer:
     writer.add_scalar("setup/ok", 1, 0)
 with ShowdownDirectClient() as client:
     assert client.ping()["pong"]
 print(json.dumps({"python": platform.python_version(), "torch": torch.__version__,
-                  "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0),
+                  "cuda": torch.version.cuda, "gpu": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
                   "node": subprocess.check_output(["node", "--version"], text=True).strip()}))
 '''
+    probe = "EXPECTED_DEVICE = " + repr(device) + "\n" + probe
     result = subprocess.run([str(python), "-c", probe], cwd=root, capture_output=True, text=True)
     print(result.stdout, end="")
     if result.returncode:
@@ -77,12 +81,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--print-requirements", action="store_true")
+    parser.add_argument("--device", choices=("cpu", "cuda"), default="cuda")
     args = parser.parse_args()
     root = args.root.resolve()
     if args.print_requirements:
         print("\n".join(runtime_requirements(root)))
     else:
-        print(f"Training interpreter: {setup(root)}")
+        print(f"Training interpreter: {setup(root, device=args.device)}")
 
 
 if __name__ == "__main__":

@@ -7,6 +7,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import threading
 import time
 import zipfile
 
@@ -25,11 +26,25 @@ def _signal_training(process, sig) -> None:
         pass
 
 
-def run_training(command: list[str], environment: dict, seconds: float) -> int:
+def run_training(command: list[str], environment: dict, seconds: float, *, log_path: Path | None = None) -> int:
     """Leave time to export saved checkpoints before Kaggle's session deadline."""
     if seconds <= 0:
         raise RuntimeError("No training time remains before the export deadline")
-    process = subprocess.Popen(command, env=environment, start_new_session=True)
+    log = log_path.open("w", encoding="utf-8") if log_path is not None else None
+    options = {"env": environment, "start_new_session": True}
+    if log is not None:
+        options.update(stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8")
+    process = subprocess.Popen(command, **options)
+    reader = None
+    if log is not None:
+        def record_output():
+            for line in process.stdout:
+                log.write(line)
+                log.flush()
+                print(line, end="", flush=True)
+
+        reader = threading.Thread(target=record_output, daemon=True)
+        reader.start()
     try:
         return process.wait(timeout=seconds)
     except subprocess.TimeoutExpired:
@@ -40,6 +55,11 @@ def run_training(command: list[str], environment: dict, seconds: float) -> int:
             _signal_training(process, getattr(signal, "SIGKILL", signal.SIGTERM))
             process.wait()
         return 124
+    finally:
+        if reader is not None:
+            reader.join(timeout=10)
+        if log is not None:
+            log.close()
 
 
 def run() -> None:

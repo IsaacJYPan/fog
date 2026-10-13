@@ -206,17 +206,8 @@ class FogPlayer:
         return gid
 
     # ------------------------------------------------------------------------------- decision path
-    def act(self, battle: AbstractBattle):
-        """Build an observation, sample an agent action, and return the corresponding BattleOrder."""
-        player = self._player_ref
-        if player is None:
-            raise RuntimeError("FogPlayer.act requires a built poke-env Player instance.")
-        if self.agent is None:
-            return player.choose_default_move()
-
-        import torch
-
-        from fog.encoding.batch import observation_to_batch
+    def observe(self, battle: AbstractBattle):
+        """Encode the current player-visible state without running a neural policy."""
         from fog.encoding.observation import Observation
 
         tag, ledger, tracker, fed = self._battle_state(battle)
@@ -228,6 +219,22 @@ class FogPlayer:
         self._feed_events(battle, ledger, tracker, fed)
         obs = Observation.from_battle(battle, tracker=tracker)
         obs.validate()
+        return obs
+
+    def act(self, battle: AbstractBattle):
+        """Build an observation, sample an agent action, and return the corresponding BattleOrder."""
+        player = self._player_ref
+        if player is None:
+            raise RuntimeError("FogPlayer.act requires a built poke-env Player instance.")
+        if self.agent is None:
+            return player.choose_default_move()
+
+        import torch
+
+        from fog.encoding.batch import observation_to_batch
+
+        obs = self.observe(battle)
+        tag, ledger, tracker, _ = self._battle_state(battle)
 
         device = _agent_device(self.agent)
         active_idx = (

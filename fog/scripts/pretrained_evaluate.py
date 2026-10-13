@@ -46,7 +46,7 @@ def fallback_choice(request):
     return "default"
 
 
-def play(client, a, b, teams, game, *, tag, foulplay=False):
+def play(client, a, b, teams, game, *, tag, foulplay=False, own_team_players=()):
     roles = {"p1": a if game.p1_is_a else b, "p2": b if game.p1_is_a else a}
     names = {
         "p1": "Candidate" if game.p1_is_a else "Opponent",
@@ -82,7 +82,7 @@ def play(client, a, b, teams, game, *, tag, foulplay=False):
                     "choose": True,
                     "seed": game.controller_seed,
                 }
-                if foulplay and worker is b:
+                if (foulplay and worker is b) or worker in own_team_players:
                     message["own_team"] = pastes[role]
                 try:
                     response = worker.request(message)
