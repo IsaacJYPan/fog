@@ -1,5 +1,6 @@
 import hashlib
 import json
+import shutil
 import zipfile
 
 import pytest
@@ -64,3 +65,96 @@ def test_old_or_non_cuda_source_is_rejected(tmp_path):
     settings["experiment"]["device"] = "cpu"
     with pytest.raises(ValueError, match="fixed CUDA"):
         resolve_training(settings, tmp_path, tmp_path / "result")
+
+
+def dispatch_fixture(tmp_path, monkeypatch, *, cpu_pipeline="waiting"):
+    from fog.scripts import teacher_pilot_experiment as workflow
+
+    settings = archive(tmp_path / "input")
+    settings["kernel"] = "owner/train"
+    training, cpu = tmp_path / "training", tmp_path / "cpu"
+    training.mkdir()
+    cpu.mkdir()
+    (training / "outputs").mkdir()
+    exported = training / "outputs/source.zip"
+    shutil.copy2(tmp_path / "input/fog-experiment-output.zip", exported)
+    workflow.write_json(training / "experiment.json", settings["experiment"])
+    workflow.write_json(training / "state.json", {"kernel": "owner/train", "output_archive": str(exported)})
+    workflow.write_json(training / "seal.json", {})
+    workflow.write_json(cpu / "seal.json", {})
+    workflow.write_json(cpu / "experiment.json", {"stage": "evaluate", "device": "cpu", "timeout_seconds": 21600,
+                                                 "training_source": settings})
+    workflow.write_json(cpu / "notebook/kernel-metadata.json", {"is_private": True, "enable_gpu": False,
+                                                               "kernel_sources": ["owner/train"]})
+    waiting = cpu / "results/initial"
+    workflow.write_json(waiting / "pipeline_state.json", {"status": cpu_pipeline, "returncode": 0, "error": None})
+    workflow.write_json(cpu / "state.json", {"phase": "collected", "gpu_requested": False,
+                                           "kernel": "owner/cpu", "run_id": 123, "result": str(waiting)})
+    monkeypatch.setattr(workflow, "directory", lambda name: training)
+    monkeypatch.setattr(workflow, "collect", lambda folder: None)
+    return workflow, cpu
+
+
+def test_dispatch_waits_for_gpu_without_submitting(tmp_path, monkeypatch):
+    workflow, cpu = dispatch_fixture(tmp_path, monkeypatch)
+    calls = []
+    monkeypatch.setattr(workflow, "cli", lambda *args: calls.append(args) or "KernelWorkerStatus.RUNNING")
+    workflow.dispatch_evaluation(cpu)
+    assert calls == [("kernels", "status", "owner/train")]
+    assert not (cpu / "cpu-dispatches").exists()
+
+
+def test_dispatch_checks_source_and_preserves_waiting_result(tmp_path, monkeypatch):
+    workflow, cpu = dispatch_fixture(tmp_path, monkeypatch)
+    before = (cpu / "results/initial/pipeline_state.json").read_bytes()
+    pushes = []
+
+    def cli(*args):
+        if args[1] == "status":
+            return "KernelWorkerStatus.COMPLETE"
+        assert args == ("kernels", "push", "-p", str(cpu / "notebook"), "--timeout", "21600")
+        assert json.loads((cpu / "state.json").read_text())["phase"] == "submitting"
+        pushes.append(args)
+        return "Kernel version 2 successfully pushed."
+
+    monkeypatch.setattr(workflow, "cli", cli)
+    workflow.dispatch_evaluation(cpu)
+    state = json.loads((cpu / "state.json").read_text())
+    assert len(pushes) == 1 and state["phase"] == "submitted"
+    assert state["source_attachment_pending"] is False
+    assert (cpu / "results/initial/pipeline_state.json").read_bytes() == before
+    receipt = json.loads(next((cpu / "cpu-dispatches").glob("*.json")).read_text())
+    assert receipt["verified_source"]["updates"] == 500
+    assert receipt["verified_source"]["gpu_contracts_passed"] is True
+    assert receipt["gpu_requested"] is False and receipt["previous_waiting_run_id"] == 123
+
+
+@pytest.mark.parametrize("response", [
+    "Kernel push error: ambiguous server response",
+    "The following are not valid kernel sources: ['owner/train']\nKernel version 2 successfully pushed.",
+])
+def test_uncertain_cpu_dispatch_cannot_be_retried(tmp_path, monkeypatch, response):
+    workflow, cpu = dispatch_fixture(tmp_path, monkeypatch)
+    pushes = []
+
+    def cli(*args):
+        if args[1] == "status":
+            return "KernelWorkerStatus.COMPLETE"
+        pushes.append(args)
+        return response
+
+    monkeypatch.setattr(workflow, "cli", cli)
+    with pytest.raises(RuntimeError, match="uncertain"):
+        workflow.dispatch_evaluation(cpu)
+    assert json.loads((cpu / "state.json").read_text())["phase"] == "submitting"
+    with pytest.raises(ValueError, match="uncertain"):
+        workflow.dispatch_evaluation(cpu)
+    assert len(pushes) == 1
+
+
+def test_completed_cpu_screen_cannot_be_repeated_automatically(tmp_path, monkeypatch):
+    workflow, cpu = dispatch_fixture(tmp_path, monkeypatch, cpu_pipeline="complete")
+    monkeypatch.setattr(workflow, "cli", lambda *args: "KernelWorkerStatus.COMPLETE" if args[1] == "status" else pytest.fail("duplicate push"))
+    with pytest.raises(ValueError, match="already ran"):
+        workflow.dispatch_evaluation(cpu)
+    assert not (cpu / "cpu-dispatches").exists()

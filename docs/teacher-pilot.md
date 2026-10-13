@@ -65,3 +65,19 @@ Track direct marginals, correct-prefix predictions and ancestral sampling
 separately, and diagnose state-distribution shift if teacher fitting does not
 translate into play. Further training is justified by that evidence, rather
 than assuming every flat win rate is a compute shortage.
+
+## Resuming a CPU screen
+
+Kaggle may reject an output attachment while its source notebook has no saved
+export. An initial CPU execution then returns `waiting`, which does not establish
+that an automatic schedule is active. The saved submission records an attachment
+warning when Kaggle omits a requested source. Configure and verify the website
+schedule separately; a source reference alone does not queue future execution.
+
+When cloud scheduling is unavailable, use
+`python -m fog.scripts.teacher_pilot_experiment dispatch-evaluation <cpu-experiment>`
+after training finishes. This command verifies the unchanged private CPU package,
+preserves its initial waiting export, downloads and verifies the completed GPU
+source, and submits one CPU execution with the same recipe and source attachment.
+It rejects failed sources, a screen that already ran, and uncertain submissions.
+This manual dispatch requires a local check; it is not a cloud scheduler.
