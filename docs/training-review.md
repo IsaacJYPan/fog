@@ -175,3 +175,60 @@ The next neural experiment follows the independent-weight FOG fallback, with
 mechanics-derived public action features, strong public-information teachers and
 exact-team belief/outcome supervision. Its data path and short local trial must
 pass before a new private GPU pilot. Both final confirmation cohorts remain unused.
+
+## Shared-latent diagnostic, October 12
+
+The CPU diagnostic completed in 74.82 minutes. All 54 exported file hashes,
+three probability contracts and 16 smoke games passed, with no failures or
+fallbacks. Both checkpoints stayed unchanged. No new GPU training or playing
+strength benchmark ran.
+
+The parent and continued joint checkpoints used identical inputs, revealed
+facts and verified targets across 32 training and 32 development games. Each
+split contributed 192 contexts and 64 correct-prefix queries per context.
+The decoder was evaluated with intact latent conditioning, zero conditioning,
+and the same perspective and game phase from a different game's latent.
+
+On development inputs, continued outcome-head MSE was 0.4763, versus 0.5396
+for the parent, 1.0037 with zero conditioning, and 2.0724 with permuted
+conditioning. The outcome head uses useful state information in this diagnostic.
+This remains an observed-outcome prediction test, separate from comparing the
+native critic or proving that outcome supervision improves policy play.
+
+The continued dedicated marginal item head scored 21.37% top1 accuracy, versus
+11.04% for its parent; item NLL fell from 3.2825 to 3.0451. These direct
+distribution scores differ from the earlier ancestral sample modes of 14.21%
+and 10.63%. They must not be presented as another training gain. Permuting the
+continued latent changes marginal item top1 to 20.35% and NLL to 3.0766; move
+NLL changes from 3.0813 to 3.0833. Latent sensitivity is modest compared with
+the gains across checkpoints. Species and revealed-fact priors may explain
+much of the predictive structure, but this single perturbation does not prove
+that explanation or establish a failed shared representation.
+
+On identical queried fields, exact teacher prefixes improve move and EV
+prediction but worsen item prediction relative to the dedicated marginal head:
+item NLL rises from 3.0888 to 3.1598 and top1 falls from 18.90% to 14.63%.
+An approximate conditional can perform worse despite having more information.
+This indicates an unresolved training or conditioning issue; it does not
+invalidate autoregressive factorization. Retain the AR design and track direct
+marginal, correct-prefix and ancestral scores separately by field.
+
+The development cohort contains eight four-game composition groups with 16
+distinct teams. Paired uncertainty estimates resample entire groups and retain
+field counts as weights, using 20,000 resamples. The continued-minus-parent
+outcome MSE difference is -0.0633 (exploratory 95% interval -0.1052 to -0.0226),
+and marginal item NLL difference is -0.2374 (-0.3471 to -0.1359). These intervals
+are unadjusted, conditional on reused pools, and based on few groups. Permuted
+donor contexts introduce further dependence across groups that those intervals
+do not model. Perturbation estimates remain descriptive; zero context may also
+be out of distribution. No final-cohort or playing-strength claim follows.
+
+The continued joint checkpoint remains retained. The next neural recipe remains
+the approved independently initialized FOG fallback. Its immediate prerequisite
+is authoritative strong-teacher data: native fresh records preserve teams and
+native action indices but do not contain FOG fragments or per-decision requests.
+Validate deterministic engine replay or collect fresh live requests before
+training; do not guess PP, trapping or disabled-move legality. Keep complete-team
+labels and teacher-answer features outside player-visible policy inputs. Preserve
+the native and original FOG baselines and validate a short local training trial
+before freezing the bounded fallback GPU pilot.
