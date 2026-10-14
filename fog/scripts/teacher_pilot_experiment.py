@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import argparse
 from datetime import datetime, timezone
-import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -19,7 +19,7 @@ from fog.scripts.kaggle_results import ROOT, client, validate_members, write_jso
 from fog.training.teacher_replay import digest
 
 
-def prepare(stage, *, config, recipe, data, initial, validation, initialization, pool, source=None):
+def prepare(stage, *, config, recipe, data, initial, validation, initialization, pool, source=None, candidate_checkpoint="latest.pt"):
     import yaml
     from fog.config import load_config
     from fog.training.expert_pilot import validate_recipe
@@ -38,6 +38,8 @@ def prepare(stage, *, config, recipe, data, initial, validation, initialization,
         raise ValueError("Require hash-bound independent initialization")
     if stage not in ("train", "evaluate") or (stage == "evaluate") != (source is not None):
         raise ValueError("CPU evaluation needs its fixed GPU source")
+    if re.fullmatch(r"(?:latest|anchor-[0-9]{6})\.pt", candidate_checkpoint) is None or (stage == "train" and candidate_checkpoint != "latest.pt"):
+        raise ValueError("Select latest.pt or an immutable six-digit training anchor for CPU evaluation")
     name = f"fog-teacher-{stage}-{datetime.now(timezone.utc):%y%m%d-%H%M%S}-{uuid.uuid4().hex[:6]}"
     folder = directory(name)
     folder.mkdir(parents=True)
@@ -93,6 +95,7 @@ def prepare(stage, *, config, recipe, data, initial, validation, initialization,
             raise ValueError("CPU source does not match the frozen pilot")
         kernel = json.loads((source / "state.json").read_text())["kernel"]
         descriptor["training_source"] = {"experiment": expected, "kernel": kernel, "minimum_updates": 500}
+        descriptor["candidate_checkpoint"] = candidate_checkpoint
         from fog.pretrained.kakuna import KAKUNA_34_SHA256
 
         reference = ROOT / "runs/pretrained/assets/kakuna--ckpts--policy_weights--policy_epoch_34.pt"
@@ -137,8 +140,8 @@ def prepare(stage, *, config, recipe, data, initial, validation, initialization,
 def submit(folder):
     verify(folder)
     state = json.loads((folder / "state.json").read_text())
-    if state["phase"] in ("submitting", "submitted", "collected"):
-        raise ValueError("Submission is complete or uncertain; inspect remote state before retrying")
+    if state["phase"] not in ("prepared", "uploaded"):
+        raise ValueError("Submission is complete, superseded or uncertain; inspect remote state before retrying")
     quota = json.loads(cli("quota", "--format", "json"))
     if state["gpu_requested"]:
         gpu = next(row for row in quota if row["resource"] == "GPU")
@@ -187,12 +190,9 @@ def collect(folder):
             validate_members(archive)
             if json.loads(archive.read("experiment.json")) != json.loads((folder / "experiment.json").read_text()):
                 raise ValueError("Returned pilot belongs to different frozen inputs")
-            hashes = json.loads(archive.read("output_hashes.json"))
-            if set(archive.namelist()) != set(hashes) | {"output_hashes.json"}:
-                raise ValueError("Pilot output contains unverified members")
-            for name, expected in hashes.items():
-                if hashlib.sha256(archive.read(name)).hexdigest() != expected:
-                    raise ValueError("Pilot output hash mismatch: " + name)
+            from fog.scripts.teacher_pilot_queue import verified_inventory
+
+            verified_inventory(archive)
             if not result.exists():
                 result.mkdir(parents=True)
                 archive.extractall(result)
@@ -294,6 +294,7 @@ def main():
     for name in ("config", "recipe", "data", "initial", "validation", "initialization", "pool"):
         freeze.add_argument("--" + name, type=Path, required=True)
     freeze.add_argument("--source", type=Path)
+    freeze.add_argument("--candidate-checkpoint", default="latest.pt")
     for name in ("submit", "collect", "status", "dispatch-evaluation"):
         commands.add_parser(name).add_argument("experiment")
     args = vars(parser.parse_args())

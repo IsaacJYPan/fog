@@ -11,6 +11,17 @@ import time
 import zipfile
 
 
+def export_output(output, destination):
+    """Include nested source inventories while excluding only this root inventory."""
+    inventory = {}
+    for path in output.rglob("*"):
+        if path.is_file() and path != output / "output_hashes.json":
+            with path.open("rb") as stream:
+                inventory[path.relative_to(output).as_posix()] = hashlib.file_digest(stream, "sha256").hexdigest()
+    (output / "output_hashes.json").write_text(json.dumps(inventory, indent=2) + "\n")
+    shutil.make_archive(str(destination), "zip", output)
+
+
 def run():
     begun = time.monotonic()
     work = Path("/kaggle/temp/fog")
@@ -48,6 +59,12 @@ def run():
                 status, returncode = "waiting", 0
                 print("Waiting for the fixed GPU pilot export; CPU screen has not run.", flush=True)
                 return
+            candidate = output / "source-training/training" / experiment.get("candidate_checkpoint", "latest.pt")
+            if not candidate.is_file():
+                raise ValueError("The selected immutable training checkpoint is missing")
+            with candidate.open("rb") as stream:
+                source["candidate_checkpoint_sha256"] = hashlib.file_digest(stream, "sha256").hexdigest()
+            source["candidate_checkpoint"] = candidate.name
             (output / "SOURCE.json").write_text(json.dumps(source, indent=2) + "\n")
         if not shutil.which("node") or not shutil.which("npm"):
             subprocess.run(["apt-get", "update"], check=True)
@@ -63,7 +80,7 @@ def run():
                        "--out", str(output / "training"), "--device", "cuda"]
         else:
             command = [python, "-m", "fog.scripts.expert_evaluate", "--config", "config.yaml",
-                       "--checkpoint", str(output / "source-training/training/latest.pt"), "--pool", "inputs/development.json",
+                       "--checkpoint", str(candidate), "--pool", "inputs/development.json",
                        "--out", str(output / "evaluation"), "--games", str(experiment["games"]),
                        "--native-python", str(work / ".runtime/native/bin/python"), "--native-checkpoint", "inputs/kakuna34.pt",
                        "--native-games", str(experiment["native_games"])]
@@ -93,13 +110,7 @@ def run():
                 destination = output / "environment" / path.name
                 destination.parent.mkdir(exist_ok=True)
                 shutil.copy2(path, destination)
-        inventory = {}
-        for path in output.rglob("*"):
-            if path.is_file() and path.name != "output_hashes.json":
-                with path.open("rb") as stream:
-                    inventory[path.relative_to(output).as_posix()] = hashlib.file_digest(stream, "sha256").hexdigest()
-        (output / "output_hashes.json").write_text(json.dumps(inventory, indent=2) + "\n")
-        shutil.make_archive("/kaggle/working/fog-experiment-output", "zip", output)
+        export_output(output, "/kaggle/working/fog-experiment-output")
         print(json.dumps(state), flush=True)
 
 

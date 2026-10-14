@@ -81,3 +81,15 @@ preserves its initial waiting export, downloads and verifies the completed GPU
 source, and submits one CPU execution with the same recipe and source attachment.
 It rejects failed sources, a screen that already ran, and uncertain submissions.
 This manual dispatch requires a local check; it is not a cloud scheduler.
+
+Output verification hashes every regular file and permits safe, empty ZIP
+directory entries. Nested GPU hash inventories are included in the CPU export's
+own inventory. A repaired evaluation runner receives a new package identity;
+it does not require rerunning an already verified GPU experiment.
+
+An evaluation package can select an immutable training anchor with
+`--candidate-checkpoint anchor-001000.pt`. Record development-based selection
+before play and use the same team/seat schedule and opponents for an anchor and
+the final checkpoint. Teacher agreement is an action metric; it does not measure
+battle wins. Falling training loss with worsening development scores supports
+examining overfitting and data coverage before extending the same training run.

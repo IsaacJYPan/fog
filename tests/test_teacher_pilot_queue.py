@@ -5,7 +5,7 @@ import zipfile
 
 import pytest
 
-from fog.scripts.teacher_pilot_queue import resolve_training
+from fog.scripts.teacher_pilot_queue import resolve_training, verified_inventory
 
 
 def source():
@@ -158,3 +158,61 @@ def test_completed_cpu_screen_cannot_be_repeated_automatically(tmp_path, monkeyp
     with pytest.raises(ValueError, match="already ran"):
         workflow.dispatch_evaluation(cpu)
     assert not (cpu / "cpu-dispatches").exists()
+
+
+def test_safe_directory_entries_do_not_reject_valid_gpu_bytes(tmp_path):
+    settings = archive(tmp_path / "input")
+    with zipfile.ZipFile(tmp_path / "input/fog-experiment-output.zip", "a") as zipped:
+        zipped.writestr("training/", b"")
+    result = resolve_training(settings, tmp_path / "input", tmp_path / "result")
+    assert result["updates"] == 500 and result["verified_exported_files"] == 5
+
+
+@pytest.mark.parametrize("name,payload", [("unexpected.bin", b"extra bytes"), ("empty/", b"hidden bytes")])
+def test_directory_support_does_not_allow_unverified_bytes(tmp_path, name, payload):
+    settings = archive(tmp_path / "input")
+    with zipfile.ZipFile(tmp_path / "input/fog-experiment-output.zip", "a") as zipped:
+        zipped.writestr(name, payload)
+    with pytest.raises(ValueError, match="unverified"):
+        resolve_training(settings, tmp_path / "input", tmp_path / "result")
+    assert not (tmp_path / "result").exists()
+
+
+def test_real_cpu_export_hashes_nested_source_inventory(tmp_path):
+    from fog.scripts.teacher_pilot_kaggle_worker import export_output
+
+    output = tmp_path / "output"
+    output.mkdir()
+    (output / "pipeline_state.json").write_text('{"status":"complete"}')
+    (output / "source-training").mkdir()
+    nested = output / "source-training/output_hashes.json"
+    nested.write_text('{"training/latest.pt":"hash from the original GPU"}')
+    export_output(output, tmp_path / "export")
+    with zipfile.ZipFile(tmp_path / "export.zip") as zipped:
+        inventory = verified_inventory(zipped)
+        assert inventory["source-training/output_hashes.json"] == hashlib.sha256(nested.read_bytes()).hexdigest()
+        assert set(inventory) == {"source-training/output_hashes.json", "pipeline_state.json"}
+
+
+def test_make_archive_output_can_be_resolved_by_the_cpu_queue(tmp_path):
+    from fog.scripts.teacher_pilot_kaggle_worker import export_output
+
+    settings = archive(tmp_path / "original")
+    output = tmp_path / "gpu-output"
+    with zipfile.ZipFile(tmp_path / "original/fog-experiment-output.zip") as zipped:
+        zipped.extractall(output)
+    mounted = tmp_path / "mounted"
+    mounted.mkdir()
+    export_output(output, mounted / "fog-experiment-output")
+    result = resolve_training(settings, mounted, tmp_path / "verified")
+    assert result["updates"] == 500
+
+
+def test_superseded_teacher_package_cannot_be_submitted(tmp_path, monkeypatch):
+    workflow, cpu = dispatch_fixture(tmp_path, monkeypatch)
+    state = json.loads((cpu / "state.json").read_text())
+    state["phase"] = "superseded"
+    workflow.write_json(cpu / "state.json", state)
+    monkeypatch.setattr(workflow, "cli", lambda *args: pytest.fail("superseded package must not contact Kaggle"))
+    with pytest.raises(ValueError, match="superseded"):
+        workflow.submit(cpu)

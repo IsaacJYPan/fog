@@ -10,6 +10,21 @@ import zipfile
 from fog.scripts.kaggle_results import validate_members
 
 
+def verified_inventory(archive: zipfile.ZipFile):
+    """Hash every file; accept safe, empty directory entries from make_archive."""
+    validate_members(archive)
+    inventory = json.loads(archive.read("output_hashes.json"))
+    files = {entry.filename for entry in archive.infolist() if not entry.is_dir()}
+    if not isinstance(inventory, dict) or files != set(inventory) | {"output_hashes.json"}:
+        raise ValueError("Pilot export has unverified or missing members")
+    if any(entry.is_dir() and entry.file_size for entry in archive.infolist()):
+        raise ValueError("Pilot export directory contains unverified data")
+    for name, expected in inventory.items():
+        if hashlib.sha256(archive.read(name)).hexdigest() != expected:
+            raise ValueError("Pilot exported hash mismatch: " + name)
+    return inventory
+
+
 def resolve_training(source, input_root: Path, destination: Path):
     """Return None while absent; reject failed, mismatched or unverified outputs."""
     expected = source["experiment"]
@@ -31,12 +46,7 @@ def resolve_training(source, input_root: Path, destination: Path):
         validate_members(archive)
         if json.loads(archive.read("experiment.json")) != expected:
             raise ValueError("GPU pilot descriptor differs from the frozen CPU source")
-        inventory = json.loads(archive.read("output_hashes.json"))
-        if set(archive.namelist()) != set(inventory) | {"output_hashes.json"}:
-            raise ValueError("GPU export has unverified or missing members")
-        for name, digest in inventory.items():
-            if hashlib.sha256(archive.read(name)).hexdigest() != digest:
-                raise ValueError("GPU pilot exported hash mismatch: " + name)
+        inventory = verified_inventory(archive)
         pipeline = json.loads(archive.read("pipeline_state.json"))
         if pipeline["status"] != "complete" or pipeline["error"] is not None or pipeline["returncode"] != 0:
             raise ValueError("GPU pilot did not complete successfully")
