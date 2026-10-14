@@ -29,6 +29,45 @@ class NativePlayer:
         ).manual_seed(seed)
 
     def update(self, message):
+        from fog.pretrained.process import validate_player_payload
+
+        validate_player_payload(message)
+        operation = message["op"]
+        if operation not in {"act", "encode", "terminal", "close", "rollback", "commit", "propose", "value", "fork"}:
+            raise ValueError("Unknown native operation")
+        tag = message["battle_tag"]
+        if operation == "close":
+            self.battles.pop(tag, None)
+            return {"closed": True}
+        if operation == "fork":
+            if tag in self.battles:
+                raise ValueError("Counterfactual identity already exists")
+            source = self.battles.get(message["source_tag"])
+            if source is None:
+                raise ValueError("Counterfactual source does not exist")
+            choice = message.get("choice")
+            if choice is None and source.get("pending_stage"):
+                raise ValueError("An idle fork cannot omit a pending decision")
+            if choice is not None and source.get("pending_stage") != "proposed":
+                raise ValueError("Counterfactual source needs an uncommitted native proposal")
+            branch = copy.deepcopy(source)
+            response = self._commit(branch, choice) if choice is not None else {"native_action": None}
+            self.battles[tag] = branch
+            return dict(response, forked=True)
+        if operation in {"commit", "rollback"}:
+            if tag not in self.battles:
+                raise ValueError("Native decision identity does not exist")
+            record = self.battles[tag]
+            if operation == "commit":
+                return self._commit(record, message["choice"])
+            snapshot = record.pop("decision_snapshot", None)
+            if snapshot is None:
+                raise ValueError("No pending native decision to roll back")
+            record.update(snapshot)
+            record.pop("pending_stage", None)
+            record.pop("pending_hidden", None)
+            return {"rolled_back": True}
+
         import numpy as np
         import torch
         from metamon.env.metamon_battle import MetamonBackendBattle
@@ -36,10 +75,6 @@ class NativePlayer:
         from fog.pretrained.actions import native_choices
         from fog.pretrained.requests import gen9ou_battle_tag
 
-        tag = message["battle_tag"]
-        if message["op"] == "close":
-            self.battles.pop(tag, None)
-            return {"closed": True}
         if tag not in self.battles:
             if not self.battles and not getattr(self, "illusion_compatibility", None):
                 from fog.pretrained.illusion import install_illusion_family
@@ -69,23 +104,8 @@ class NativePlayer:
                 ),
             }
         record = self.battles[tag]
-        if message["op"] == "rollback":
-            snapshot = record.pop("decision_snapshot", None)
-            if snapshot is None:
-                raise ValueError("No pending native decision to roll back")
-            record.update(snapshot)
-            return {"rolled_back": True}
-        if message["op"] == "commit":
-            choice = message["choice"].removeprefix("/choose ").removeprefix("/").strip()
-            matches = [index for index, value in record["choices"].items() if value == choice]
-            if len(matches) != 1:
-                raise ValueError("Executed choice does not match one native action")
-            action = matches[0]
-            record["rl2"].zero_()
-            record["rl2"][0, 0, action + 1] = 1
-            record["previous_state"] = record["pending_state"]
-            record["time"] += 1
-            return {"native_action": action}
+        if record.get("pending_stage"):
+            raise ValueError("Commit or roll back the pending native decision before updating it")
         battle = record["battle"]
         for line in message["messages"]:
             event = line.split("|")[1] if line.startswith("|") else ""
@@ -94,9 +114,11 @@ class NativePlayer:
         request = message.get("request")
         if request:
             battle.parse_request(request)
-        if message["op"] == "terminal":
+        if operation == "terminal":
             state = UniversalState.from_Battle(battle)
-            return {"state": state.to_dict()}
+            previous = record["previous_state"]
+            reward = self.runtime.reward_function(previous, state) if previous is not None else 0.0
+            return {"state": state.to_dict(), "reward": reward}
         if not message.get("choose") or not request or request.get("wait"):
             return {"updated": True}
         if request.get("teamPreview"):
@@ -105,7 +127,7 @@ class NativePlayer:
             return {"choice": "team 123456", "preview": True}
         record["decision_snapshot"] = {
             key: copy.deepcopy(record[key])
-            for key in ("hidden", "space", "rl2", "previous_state", "time")
+            for key in ("hidden", "space", "rl2", "previous_state", "time", "generator")
         }
         state = UniversalState.from_Battle(battle)
         from poke_env.environment.pokemon import Pokemon
@@ -127,24 +149,41 @@ class NativePlayer:
         record["rl2"][0, 0, 0] = reward
         record["choices"] = choices
         record["pending_state"] = state
+        record["pending_stage"] = "encoded"
         encoded = {
             "state": state.to_dict(),
             "choices": choices,
             "observation": {k: v.tolist() for k, v in obs.items()},
             "reward": reward,
         }
-        if message["op"] == "encode":
+        if operation == "encode":
             return encoded
+        # AMAGO writes its cache in-place. A proposal must retain the live pre-root
+        # cache until execution, not merely postpone assigning the returned object.
+        inference_hidden = copy.deepcopy(record["hidden"]) if operation in {"propose", "value"} else record["hidden"]
         with torch.inference_mode():
-            probabilities, _, hidden = self.runtime.distribution(
+            probabilities, latent, hidden = self.runtime.distribution(
                 tensors,
                 record["rl2"].to(device),
                 torch.tensor([[[record["time"]]]], device=device),
-                record["hidden"],
+                inference_hidden,
             )
+            if operation == "value" or message.get("include_value", False):
+                from fog.pretrained.values import policy_value
+
+                readout = policy_value(self.runtime.model, latent, probabilities)
+                encoded.update(value=float(readout.value[0, 0]), gamma=readout.gamma,
+                               reward_multiplier=readout.reward_multiplier,
+                               value_units="unscaled_environment_shaped_return",
+                               action_values=readout.action_values[0, 0].cpu().tolist(),
+                               critic_dispersion=readout.critic_dispersion[0, 0].cpu().tolist())
         probabilities = probabilities[0, 0].float()
         if not torch.isfinite(probabilities).all() or abs(float(probabilities.sum()) - 1.0) > 1e-5:
             raise ValueError("Native policy returned invalid probabilities")
+        record["pending_hidden"] = hidden
+        record["pending_stage"] = "proposed"
+        if operation == "value":
+            return dict(encoded, probabilities=probabilities.cpu().tolist())
         if self.temperature == 0:
             action = int(probabilities.argmax())
         else:
@@ -152,14 +191,32 @@ class NativePlayer:
             action = int(torch.multinomial(scaled / scaled.sum(), 1, generator=record["generator"]))
         if action not in choices:
             raise ValueError("Native policy selected an illegal semantic action")
-        record["hidden"] = hidden
-        self.update({"op": "commit", "battle_tag": tag, "choice": choices[action]})
+        if operation == "act":
+            self._commit(record, choices[action])
         return dict(
             encoded,
             choice=choices[action],
             native_action=action,
             probabilities=probabilities.cpu().tolist(),
         )
+
+    @staticmethod
+    def _commit(record, choice):
+        if record.get("pending_stage") not in {"encoded", "proposed"}:
+            raise ValueError("No native decision is pending execution")
+        choice = choice.removeprefix("/choose ").removeprefix("/").strip()
+        matches = [index for index, value in record["choices"].items() if value == choice]
+        if len(matches) != 1:
+            raise ValueError("Executed choice does not match one native action")
+        action = matches[0]
+        if "pending_hidden" in record:
+            record["hidden"] = record.pop("pending_hidden")
+        record["rl2"].zero_()
+        record["rl2"][0, 0, action + 1] = 1
+        record["previous_state"] = record["pending_state"]
+        record["time"] += 1
+        record.pop("pending_stage")
+        return {"native_action": action}
 
 
 def main():

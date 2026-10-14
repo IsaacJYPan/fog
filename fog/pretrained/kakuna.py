@@ -17,7 +17,7 @@ import torch
 from fog.pretrained.attention import WindowAttention
 
 KAKUNA_34_SHA256 = "7e7474d5b2ec6624afdeb29a7cf1dc5c84817d5aee8ec39c1d35a153b18df26c"
-INTERFACE_VERSION = "kakuna34-metamon-default13-window96-fp32-legal-gen9ou-v4"
+INTERFACE_VERSION = "kakuna34-metamon-default13-window96-fp32-legal-gen9ou-v5"
 
 
 def sha256(path: Path) -> str:
