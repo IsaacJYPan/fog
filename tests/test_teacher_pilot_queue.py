@@ -216,3 +216,19 @@ def test_superseded_teacher_package_cannot_be_submitted(tmp_path, monkeypatch):
     monkeypatch.setattr(workflow, "cli", lambda *args: pytest.fail("superseded package must not contact Kaggle"))
     with pytest.raises(ValueError, match="superseded"):
         workflow.submit(cpu)
+
+
+def test_native_setup_environment_supplies_missing_cache(tmp_path, monkeypatch):
+    from fog.pretrained.runtime import native_environment
+
+    monkeypatch.delenv("METAMON_CACHE_DIR", raising=False)
+    environment = native_environment(tmp_path)
+    assert environment["METAMON_CACHE_DIR"] == str((tmp_path / "runs/pretrained/cache").resolve())
+    assert not (tmp_path / "runs/pretrained/cache").exists()
+
+
+def test_native_setup_environment_preserves_explicit_cache(tmp_path, monkeypatch):
+    from fog.pretrained.runtime import native_environment
+
+    monkeypatch.setenv("METAMON_CACHE_DIR", "explicit-cache")
+    assert native_environment(tmp_path)["METAMON_CACHE_DIR"] == "explicit-cache"

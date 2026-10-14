@@ -13,6 +13,8 @@ def interpreter_path(path: Path) -> str:
 
 def native_environment(root: Path):
     environment = os.environ.copy()
+    # Setup probes import Metamon directly, before native_worker's own defaults.
+    environment.setdefault("METAMON_CACHE_DIR", str((root / "runs/pretrained/cache").resolve()))
     source = root / "upstream"
     if source.exists():
         paths = [source / "amago", source / "metamon", source / "poke-env/src"]
