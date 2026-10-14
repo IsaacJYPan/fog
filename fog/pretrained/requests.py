@@ -1,8 +1,22 @@
-"""Reconcile native own reserves with the player's authoritative private request."""
+"""Adapt native battle identity and own reserves to authoritative Gen9OU requests."""
 
 from copy import deepcopy
+import hashlib
 
 from fog.pretrained.actions import identifier
+
+
+def gen9ou_battle_tag(identity: str) -> str:
+    """Keep transport identities out of Metamon's format token.
+
+    UniversalState.from_Battle reads battle_tag.split('-')[1]. Local collection
+    and evaluation identities need not follow Showdown's battle-gen9ou-id form.
+    Keep the caller's identity for cache keys and randomness, and supply a
+    canonical internal tag to the Gen9OU parser.
+    """
+    if not isinstance(identity, str) or not identity:
+        raise ValueError("Require a nonempty battle identity")
+    return "battle-gen9ou-" + hashlib.sha256(identity.encode("utf-8")).hexdigest()
 
 
 def reconcile_own_roster(state, request, convert):

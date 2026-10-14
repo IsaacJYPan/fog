@@ -93,3 +93,18 @@ before play and use the same team/seat schedule and opponents for an anchor and
 the final checkpoint. Teacher agreement is an action metric; it does not measure
 battle wins. Falling training loss with worsening development scores supports
 examining overfitting and data coverage before extending the same training run.
+
+## Native format handling
+
+Metamon derives its format token from the second component of a Showdown battle
+tag. Local evaluation and collection identities are transport keys and may use
+other naming conventions. The Gen9OU adapter supplies an internal
+`battle-gen9ou-<digest>` tag, retaining the original identity for its cache and
+random stream. This keeps experiment labels out of native model inputs.
+
+The native interface version includes this correction. Preserve older exports
+with their original source hashes: an evaluation with a malformed format token
+measures that frozen adapter, rather than correctly configured Kakuna. A new CPU
+package can repeat the matched screen with the repaired adapter while keeping
+all training checkpoints, data and schedules fixed. Verify stored trajectory
+formats separately before deciding whether any training data require repair.

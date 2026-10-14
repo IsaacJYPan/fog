@@ -34,6 +34,7 @@ class NativePlayer:
         from metamon.env.metamon_battle import MetamonBackendBattle
         from metamon.interface import UniversalState
         from fog.pretrained.actions import native_choices
+        from fog.pretrained.requests import gen9ou_battle_tag
 
         tag = message["battle_tag"]
         if message["op"] == "close":
@@ -45,7 +46,7 @@ class NativePlayer:
 
                 self.illusion_compatibility = install_illusion_family()
             battle = MetamonBackendBattle(
-                tag, message["username"], logging.getLogger(__name__), False, 9
+                gen9ou_battle_tag(tag), message["username"], logging.getLogger(__name__), False, 9
             )
             hidden = self.runtime.model.traj_encoder.init_hidden_state(
                 1, next(self.runtime.model.parameters()).device

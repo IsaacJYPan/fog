@@ -1,7 +1,27 @@
 from copy import deepcopy
 from types import SimpleNamespace as NS
 
-from fog.pretrained.requests import reconcile_own_roster
+import pytest
+
+from fog.pretrained.requests import gen9ou_battle_tag, reconcile_own_roster
+
+
+@pytest.mark.parametrize("identity", [
+    "expert-kakuna34-0-p1", "collect-training-12-p2", "live", "battle-gen9ou-123",
+    "arbitrary-gen8ou-diagnostic", "a Unicode identity \u2603",
+])
+def test_transport_identity_always_encodes_gen9ou_for_the_native_parser(identity):
+    # This is the exact upstream UniversalState.from_Battle extraction rule.
+    tag = gen9ou_battle_tag(identity)
+    assert tag.split("-")[1] == "gen9ou"
+    assert gen9ou_battle_tag(identity) == tag
+    assert gen9ou_battle_tag(identity + "-other") != tag
+
+
+@pytest.mark.parametrize("identity", ["", None, 123])
+def test_invalid_native_battle_identity_is_rejected(identity):
+    with pytest.raises(ValueError, match="battle identity"):
+        gen9ou_battle_tag(identity)
 
 
 def test_illusion_ghost_is_removed_and_actual_active_identity_is_restored():
