@@ -126,8 +126,11 @@ did not meet the gate for 32 during the pilot.
 A longer ordinary continuation retains the previous model, Adam state, RNG and
 sampler progression, and explicitly keeps the original BC policy as its KL anchor.
 Parent hashes, exposure and starting weights are checked before loading state.
-Its new recipe records inherited and new optimization separately. CUDA acting
-must pass numerical, speed, real-rollout and full-state resume preflights before
-the longer budget begins; the speed microbenchmark excludes input transfer and
-simulator work, so end-to-end rollout timing must still be measured. This is a
-test of additional fresh experience, not a selection of a proven superior arm.
+Its new recipe records inherited and new optimization separately. A first cloud
+preflight found batch-one CUDA inference 1.62 times slower than CPU (59.6 versus
+36.9 ms), while probability differences passed. That attempt stopped before
+training. The revised recipe explicitly retains CPU acting and GPU updates.
+The selected actor must pass numerical/speed and real-rollout checks, and CUDA
+training must pass full-state resume verification. The speed microbenchmark
+excludes transfers and simulator work; end-to-end rollout timing remains relevant.
+This is a test of fresh experience, not selection of a proven superior arm.

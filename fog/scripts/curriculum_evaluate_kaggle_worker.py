@@ -32,7 +32,7 @@ def run():
                 raise ValueError("Frozen evaluation input changed: " + name)
     os.chdir(work)
     sys.path.insert(0, str(work))
-    from fog.scripts.curriculum_evaluation import resolve
+    from fog.scripts.curriculum_evaluation import fixed_checkpoints, resolve
     from fog.scripts.pretrained_kaggle_worker import execute
     from fog.scripts.teacher_pilot_kaggle_worker import export_output
     from fog.pretrained.runtime import native_environment
@@ -48,21 +48,25 @@ def run():
         return descriptor["timeout_seconds"]-(time.monotonic()-begun)-120
 
     try:
-        checkpoints = {"starting": work / "inputs/bc1000.pt"}
-        if len(descriptor["training_sources"]) != 2:
-            raise ValueError("Require both fixed training conditions")
+        checkpoints = fixed_checkpoints(descriptor, work)
+        if len(descriptor["training_sources"]) not in (1, 2):
+            raise ValueError("Require one continuation or two matched training conditions")
+        conditions = set(checkpoints)
         for source in descriptor["training_sources"]:
             condition = source["experiment"]["condition"]
+            if condition in conditions:
+                raise ValueError("A training condition overwrites a fixed control")
+            conditions.add(condition)
             candidate = resolve(source, Path("/kaggle/input"), output / ("source-" + condition))
             if candidate is None:
                 status, returncode = "waiting", 0
-                print("Waiting for both completed fixed GPU exports; no evaluation was run.", flush=True)
+                print("Waiting for the completed fixed GPU exports; no evaluation was run.", flush=True)
                 return
             if source["experiment"]["initial_sha256"] != descriptor["initial_sha256"]:
                 raise ValueError("Evaluation start differs from GPU starting weights")
             checkpoints[condition] = candidate
-        if set(checkpoints) != {"starting", "ordinary", "backward"}:
-            raise ValueError("CPU sources do not contain both training conditions")
+        if set(checkpoints) != conditions:
+            raise ValueError("CPU sources do not contain all fixed training conditions")
         phase = "setup"
         execute([sys.executable, "-m", "fog.scripts.pretrained_setup", "--stage", "evaluate", "--device", "cpu",
                  "--root", str(work), "--out", str(output / "native-environment")],

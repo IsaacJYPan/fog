@@ -57,7 +57,7 @@ def run():
         if descriptor.get("parent_state_sha256") and descriptor["parent_state_sha256"] != descriptor["files"].get("inputs/parent.state.pt"):
             raise ValueError("The parent checkpoint is outside its fixed continuation identity")
         if descriptor.get("actor_preflight"):
-            phase = "CUDA actor preflight"
+            phase = "actor and CUDA training-state preflight"
             preflight = [python, "-m", "fog.training.curriculum_actor_preflight", "--config", "config.yaml",
                      "--recipe", "recipe.json", "--bank", "inputs/bank/manifest.json", "--pool", "inputs/train.json",
                      "--checkpoint", initial, "--out", str(output / "ACTOR_PREFLIGHT.json")]

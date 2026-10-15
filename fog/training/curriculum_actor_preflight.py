@@ -1,4 +1,4 @@
-"""Check fixed CUDA rollout numerics, speed and exact-team collection before training."""
+"""Check the frozen rollout device, numerics and GPU-state resume before training."""
 
 from __future__ import annotations
 
@@ -19,8 +19,9 @@ from fog.training.ppo import _index_nested
 
 
 def check(config, recipe, bank, checkpoint, out, *, parent=None, anchor_checkpoint=None):
-    if out.exists() or recipe.get("actor_device") != "cuda" or not torch.cuda.is_available():
-        raise ValueError("Require a new report and an available, declared CUDA actor")
+    selected = recipe.get("actor_device")
+    if out.exists() or selected not in ("cpu", "cuda") or not torch.cuda.is_available():
+        raise ValueError("Require a new report, a declared actor device and available CUDA training")
     torch.set_num_threads(1)
     batch = bank.contract_batch()
     visible_keys = {"entities", "entity_ids", "field", "history", "history_ids", "history_state", "history_len",
@@ -55,15 +56,18 @@ def check(config, recipe, bank, checkpoint, out, *, parent=None, anchor_checkpoi
                                  "forwards": len(measured)}
     error = float((probabilities["cpu"]-probabilities["cuda"]).abs().max())
     speed_ratio = durations["cuda"]["mean_seconds"]/durations["cpu"]["mean_seconds"]
-    numeric_speed_passed = error <= 1e-3 and speed_ratio <= 1.5
+    selected_ratio = durations[selected]["mean_seconds"]/min(value["mean_seconds"] for value in durations.values())
+    numeric_speed_passed = error <= 1e-3 and selected_ratio <= 1.5
     result = {"passed": False, "numeric_speed_passed": numeric_speed_passed, "cpu_cuda_max_error": error,
               "tolerance": 1e-3, "cuda_cpu_mean_time_ratio": speed_ratio, "maximum_allowed_ratio": 1.5,
+              "actor_device": selected, "selected_best_mean_time_ratio": selected_ratio,
               "durations": durations, "timing_scope": "Forward calls only; excludes transfers and simulator work",
               "development_contexts_used_only_for_numeric_and_speed_checks": True}
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(result, indent=2)+"\n")
     if not numeric_speed_passed:
-        raise ValueError("CUDA actor failed fixed probability or throughput preflight")
+        raise ValueError("Selected actor failed fixed probability or throughput preflight")
+    actor.to(selected)
     anchor = deepcopy(actor).cpu()
     from fog.env.showdown_direct import ShowdownDirectClient
 
@@ -73,10 +77,10 @@ def check(config, recipe, bank, checkpoint, out, *, parent=None, anchor_checkpoi
         sample, episodes, collected = collect(client, actor, anchor, bank, np.random.default_rng(20261016),
                                               ReverseSchedule(), probe)
     if not episodes or any(row["prefix"] for row in episodes) or not sample.get("belief_targets"):
-        raise ValueError("CUDA collection lost full games or exact-team supervision")
+        raise ValueError("Actor collection lost full games or exact-team supervision")
     if not torch.isfinite(sample["old_log_probs"]).all():
-        raise ValueError("CUDA collection lost finite behavior probabilities")
-    result.update(cuda_real_collection_passed=True, full_games=len(episodes), collected_positions=collected,
+        raise ValueError("Actor collection lost finite behavior probabilities")
+    result.update(actor_real_collection_passed=True, full_games=len(episodes), collected_positions=collected,
                   real_collection_seconds=time.monotonic()-start,
                   optimized_positions=0, training_data_only=True)
     out.write_text(json.dumps(result, indent=2)+"\n")
