@@ -156,6 +156,9 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     preview_coef = loss_cfg.get("preview_coef", 0.5)
     kl_anchor_coef = ppo_cfg.get("kl_anchor_coef", 0.0)
     max_grad_norm = ppo_cfg.get("max_grad_norm", 0.5)
+    auxiliary_cap = ppo_cfg.get("auxiliary_gradient_cap")
+    if auxiliary_cap is not None and (not math.isfinite(auxiliary_cap) or not 0 <= auxiliary_cap <= 0.25):
+        raise ValueError("PPO auxiliary gradient cap must be finite and in [0, 0.25]")
     target_kl = ppo_cfg.get("target_kl")
     heuristic_coef = float(ppo_cfg.get("heuristic_coef", 0.0))
     if not math.isfinite(heuristic_coef) or heuristic_coef < 0:
@@ -357,9 +360,11 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             entropy = _masked_entropy(behavior_log_probs).mean()
 
             loss = policy_loss + value_coef * v_loss - entropy_coef * entropy
+            primary_loss = policy_loss - entropy_coef * entropy
 
             if teacher_loss is not None and heuristic_coef > 0:
                 loss = loss + heuristic_coef * teacher_loss
+                primary_loss = primary_loss + heuristic_coef * teacher_loss
 
             if loss_cfg.get("require_belief_labels", False) and (
                 out.belief is None or out.belief_chain is None
@@ -370,6 +375,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             if kl_anchor_coef > 0 and mb.get("bc_log_probs") is not None:
                 kl_bc = _masked_kl(out.log_probs, mb["bc_log_probs"]).mean()
                 loss = loss + kl_anchor_coef * kl_bc
+                primary_loss = primary_loss + kl_anchor_coef * kl_bc
                 log("kl_bc", kl_bc)
 
             if out.belief is not None and mb.get("belief_targets") is not None:
@@ -468,7 +474,28 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             optimizer.zero_grad(set_to_none=True)
             if not torch.isfinite(loss):
                 raise FloatingPointError("nonfinite PPO loss; optimizer step refused")
+            shared, auxiliary_gradients, scale = [], [], 1.0
+            if auxiliary_cap is not None:
+                from fog.training.expert_pilot import gradient_norm, shared_parameters
+
+                shared = shared_parameters(agent)
+                if not shared:
+                    raise ValueError("Auxiliary gradient capping requires a recognized shared backbone")
+                primary_gradients = torch.autograd.grad(primary_loss, shared, retain_graph=True, allow_unused=True)
+                auxiliary_gradients = torch.autograd.grad(loss - primary_loss, shared, retain_graph=True, allow_unused=True)
+                primary_norm = gradient_norm(primary_gradients)
+                auxiliary_norm = gradient_norm(auxiliary_gradients)
+                if not math.isfinite(primary_norm + auxiliary_norm):
+                    raise FloatingPointError("Nonfinite PPO shared gradient")
+                scale = min(1.0, auxiliary_cap * primary_norm / max(auxiliary_norm, 1e-20))
+                log("shared_primary_norm", primary_norm)
+                log("shared_auxiliary_norm", auxiliary_norm)
+                log("shared_auxiliary_scale", scale)
+                log("capped_auxiliary_primary_ratio", scale * auxiliary_norm / max(primary_norm, 1e-20))
             loss.backward()
+            for parameter, auxiliary in zip(shared, auxiliary_gradients):
+                if auxiliary is not None:
+                    parameter.grad.add_(auxiliary, alpha=scale - 1.0)
             grad_norm = torch.nn.utils.clip_grad_norm_(
                 agent.parameters(), max_grad_norm, error_if_nonfinite=True
             )

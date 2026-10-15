@@ -24,6 +24,8 @@ class NativeReferenceResult:
     elapsed_seconds: float = 0.0
     scores: dict = field(default_factory=dict)
     failures: list = field(default_factory=list)
+    timing_seconds: dict = field(default_factory=dict)
+    last_stage: str = "root"
     privileged_known_teams: bool = True
 
 
@@ -65,6 +67,18 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
         if time.monotonic() - begin >= seconds:
             raise TimeoutError("Native reference soft decision budget exhausted")
 
+    def measured(stage, call, *args, **kwargs):
+        if stage != "close":
+            result.last_stage = stage
+        tick = time.monotonic()
+        try:
+            return call(*args, **kwargs)
+        finally:
+            result.timing_seconds[stage] = result.timing_seconds.get(stage, 0.0) + time.monotonic() - tick
+
+    def update(message):
+        return measured(message["op"], player.update, message)
+
     def leaf_value(branch, own_branch, opponent_branch):
         for step in range(max_forced_steps + 1):
             budget()
@@ -72,15 +86,15 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
             message = {"battle_tag": own_branch, "messages": branch["player_logs"][role],
                        "request": own_request, "choose": True}
             if branch["ended"]:
-                terminal = player.update(dict(message, op="terminal", choose=False))
+                terminal = update(dict(message, op="terminal", choose=False))
                 return float(terminal["reward"])
             if own_request and not own_request.get("wait"):
-                leaf = player.update(dict(message, op="value"))
+                leaf = update(dict(message, op="value"))
                 return float(leaf["reward"]) + float(leaf["gamma"]) * float(leaf["value"])
             if step == max_forced_steps:
                 raise ValueError("Native reference forced replacements did not resolve")
-            player.update(dict(message, op="act", choose=False))
-            reply = player.update({"op": "act", "battle_tag": opponent_branch,
+            update(dict(message, op="act", choose=False))
+            reply = update({"op": "act", "battle_tag": opponent_branch,
                                    "messages": branch["player_logs"][other],
                                    "request": branch["requests"][other], "choose": True})
             if not reply.get("choice"):
@@ -88,7 +102,7 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
             choices = [None, None]
             choices[0 if other == "p1" else 1] = reply["choice"]
             budget()
-            branch = client.sample(branch["state"], choices, seed=f"sodium,{rng.getrandbits(256):064x}")
+            branch = measured("sample", client.sample, branch["state"], choices, seed=f"sodium,{rng.getrandbits(256):064x}")
             result.forced_steps += 1
         raise AssertionError("Unreachable replacement loop")
 
@@ -112,12 +126,12 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
                 own_branch = f"{own_tag}-reference-{draw}-{action}"
                 opponent_branch = f"{opponent_tag}-reference-{draw}-{action}"
                 try:
-                    player.update({"op": "fork", "battle_tag": own_branch,
+                    update({"op": "fork", "battle_tag": own_branch,
                                    "source_tag": own_tag, "choice": own_choices[action]})
-                    player.update({"op": "fork", "battle_tag": opponent_branch,
+                    update({"op": "fork", "battle_tag": opponent_branch,
                                    "source_tag": opponent_tag, "choice": reply_choice})
                     choices = [own_choices[action], reply_choice] if role == "p1" else [reply_choice, own_choices[action]]
-                    branch = client.sample(state, choices, seed=chance_seed)
+                    branch = measured("sample", client.sample, state, choices, seed=chance_seed)
                     result.simulations += 1
                     value = leaf_value(branch, own_branch, opponent_branch)
                     budget()
@@ -125,8 +139,8 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
                         raise ValueError("Native reference produced a nonfinite shaped return")
                     values[action].append(value)
                 finally:
-                    player.update({"op": "close", "battle_tag": own_branch})
-                    player.update({"op": "close", "battle_tag": opponent_branch})
+                    update({"op": "close", "battle_tag": own_branch})
+                    update({"op": "close", "battle_tag": opponent_branch})
         scores = {action: sum(values[action]) / samples
                   + prior_weight * math.log(max(own_probabilities[action], 1e-30)) for action in actions}
         candidate = max(actions, key=lambda action: (scores[action], -action))

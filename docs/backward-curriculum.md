@@ -64,8 +64,34 @@ the window using development competence rather than its historical distance
 alone. The same teams and historical endings cannot be the whole training set.
 Additional independently generated guide trajectories are needed for scale.
 
-The proposed matched pilot starts both conditions from the same independently
-trained FOG lineage. One uses ordinary starts; the other adds backward starts.
+The matched online pilot starts both conditions from the same independently
+trained FOG 1,000-update cloning checkpoint. One uses ordinary starts; the other
+adds backward starts from 999 verified training games, mixed with at least one
+ordinary episode in four. Reset pairs use both seats of the same source game.
+The pilot advances through 4/8/16/32/64 historical decisions from the end, after
+at least ten batches at a level and sixteen historically winning training roots.
+Advancement requires 70% new wins on those winning roots with a Wilson lower
+bound of at least 50%. This is a train-only pilot gate; held-out full-game play
+must validate the progression before it becomes a longer training recipe.
+
+Both arms face the same fixed SimpleHeuristics opponent to isolate the starting
+distribution while measuring the heuristic warm-start objective. This is not a
+strong-opponent league or a competitive-strength confirmation. Sixty batches
+use 512 newly collected positions each, two epochs and minibatches of 128: 480
+optimizer steps per arm. Completed episodes supply GAE and fresh outcome labels
+before a uniform subset is selected for each fixed-size update. Extra collected
+positions are reported separately; the optimized-position and update budgets
+match exactly. A small KL penalty anchors the initial policy. Belief, AR and
+outcome gradients into shared parameters are jointly capped at 25% of the policy
+gradient norm; auxiliary heads retain their full gradients.
+
+The pilot uses a measured-throughput learning-rate schedule and periodic full
+state saves, including sampler, pending reset pair, curriculum stage, optimizer
+and CPU/CUDA RNG. A local real-data trial reproduced model, optimizer, sampler,
+Torch RNG and curriculum state exactly across interruption. The cloud worker
+must check CPU/CUDA probabilities before and after GPU training. GPU and CPU
+evaluation remain separate saved jobs.
+
 Use equal new on-policy decision and optimizer-update budgets, optimizer settings,
 opponent mixture, auxiliary objectives and evaluation schedules. Report extra
 prefix replay work separately. The existing early BC checkpoint is a practical
@@ -74,6 +100,13 @@ comparison. Keep PPO behavior probabilities consistent with the executed policy,
 save sampler/curriculum/optimizer/RNG state, and bound auxiliary shared gradients
 before a longer GPU launch. Full-game development evaluation determines whether
 the curriculum transfers. Final confirmation cohorts stay unused during pilots.
+
+The old team pools contain published Metamon reconstructions. Once submitted
+they give exact simulator labels, but some legal sets have poor strategic
+coherence. Keep that distinction in interpreting results. The controlled pilot
+does not solve this data-quality problem; a subsequent recipe should add
+provenance-preserving sample/tournament teams, validate them in the pinned
+simulator and keep their composition splits out of evaluation candidate banks.
 
 This does not fix the separate native Kakuna search bridge. That path still needs
 validated public-information world construction and a matched strength test.

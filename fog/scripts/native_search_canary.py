@@ -50,7 +50,9 @@ def model_digest(model):
 
 
 def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, seed=20261014,
-        max_actions=2, samples=1, seconds=3.5):
+        max_actions=2, samples=1, seconds=3.5, max_fallback_rate=0.05):
+    if not 0 <= max_fallback_rate <= 0.05:
+        raise ValueError("Engineering fallback tolerance must lie in [0, 0.05]")
     import numpy as np
     import torch
 
@@ -84,6 +86,7 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
         "seed": seed, "temperature": 0.0, "reply_temperature": 0.0,
         "fixed_preview": "team 123456", "max_actions": max_actions, "chance_samples": samples,
         "decision_seconds": seconds, "measured_deadline_seconds": 5.0,
+        "max_budget_fallback_rate": max_fallback_rate,
         "privileged_known_teams": True, "public_team_inference_tested": False,
         "playing_strength_confirmation": False, "automatic_promotion": False,
         "training_data_exported": False, "gpu_requested": False,
@@ -149,7 +152,9 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
                                 selected[role] = search.choice
                                 decisions.append(dict(arm=arm, game=index, round=rounds, role=role, **asdict(search)))
                                 maximum_seconds = max(maximum_seconds, time.monotonic() - begin)
-                                if search.failures or not search.complete_grid:
+                                expected_timeout = (not search.complete_grid and search.choice == search.policy_choice
+                                                    and search.failures and all(x["type"] == "TimeoutError" for x in search.failures))
+                                if (search.failures or not search.complete_grid) and not expected_timeout:
                                     raise ValueError("Known-team engineering grid failed: " + json.dumps(search.failures))
                             for side, response in responses.items():
                                 if "probabilities" in response:
@@ -186,6 +191,9 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
                             cleanup_passed = False
                     if player.battles or control.battles:
                         raise ValueError("Counterfactual records leaked past a completed game")
+            fallback_rate = sum(not decision["complete_grid"] for decision in decisions) / max(1, len(decisions))
+            if fallback_rate > max_fallback_rate:
+                raise ValueError(f"Budget fallback rate {fallback_rate:.3f} exceeds the declared {max_fallback_rate:.3f}")
     except Exception as error:
         failures.append({"type": type(error).__name__, "message": str(error)})
         raise
@@ -199,6 +207,7 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
             "weights_unchanged": unchanged, "failures": failures,
             "in_memory_model_sha256": initial_model_digest,
             "fallbacks": sum(not decision["complete_grid"] for decision in decisions),
+            "budget_fallback_rate": sum(not decision["complete_grid"] for decision in decisions) / max(1, len(decisions)),
             "elapsed_seconds": time.monotonic() - started,
             "privileged_known_teams": True, "playing_strength_confirmation": False,
             "public_team_inference_tested": False, "gpu_requested": False,
@@ -222,11 +231,13 @@ def main():
     parser.add_argument("--max-actions", type=int, default=2)
     parser.add_argument("--samples", type=int, default=1)
     parser.add_argument("--seconds", type=float, default=3.5)
+    parser.add_argument("--max-fallback-rate", type=float, default=0.05)
     parser.add_argument("--known-teams-diagnostic", action="store_true", required=True)
     args = parser.parse_args()
     run(args.checkpoint, args.pool, args.reference_source, args.out,
         games=args.games, max_rounds=args.max_rounds, seed=args.seed,
-        max_actions=args.max_actions, samples=args.samples, seconds=args.seconds)
+        max_actions=args.max_actions, samples=args.samples, seconds=args.seconds,
+        max_fallback_rate=args.max_fallback_rate)
 
 
 if __name__ == "__main__":

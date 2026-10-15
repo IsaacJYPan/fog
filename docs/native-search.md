@@ -61,6 +61,14 @@ one draw with a 3.5-second soft budget. These are mechanics-screen settings, not
 an assertion that a single draw adequately estimates tactical uncertainty.
 Parent-history and cleanup checks are reported independently of other failures.
 
+The reduced retry also stopped on a soft timeout, on decision 115, while history,
+cleanup, unchanged weights and probability checks passed. The subsequent diagnostic
+instruments fork, value and simulation cost and continues the original policy on
+explicit soft-budget timeouts. It allows at most 5% such fallbacks across complete
+games. Other search failures remain fatal and every complete measured decision
+must still fit five seconds. This is a changed operational gate, not evidence that
+latency improved. The timings must guide optimization if fallbacks grow with history.
+
 The next bridge must construct worlds from own private information and public
 evidence, using training-only set donors or a compatible learned decoder. Never
 use the hidden chance transcript from `reconstruct_session_strict` as belief

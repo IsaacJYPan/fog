@@ -59,6 +59,7 @@ def run():
                  "--games", str(descriptor["games"]), "--max-rounds", "2000", "--seed", str(descriptor["seed"]),
                  "--max-actions", str(descriptor["max_actions"]), "--samples", str(descriptor["chance_samples"]),
                  "--seconds", str(descriptor["decision_seconds"]),
+                 "--max-fallback-rate", str(descriptor["max_budget_fallback_rate"]),
                  "--known-teams-diagnostic"], environment, output / "worker.log", remaining())
         status, returncode = "complete", 0
     except Exception as failure:
