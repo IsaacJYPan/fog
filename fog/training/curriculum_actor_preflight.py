@@ -59,7 +59,7 @@ def check(config, recipe, bank, checkpoint, out, *, parent=None, anchor_checkpoi
     selected_ratio = durations[selected]["mean_seconds"]/min(value["mean_seconds"] for value in durations.values())
     numeric_speed_passed = error <= 1e-3 and selected_ratio <= 1.5
     result = {"passed": False, "numeric_speed_passed": numeric_speed_passed, "cpu_cuda_max_error": error,
-              "tolerance": 1e-3, "cuda_cpu_mean_time_ratio": speed_ratio, "maximum_allowed_ratio": 1.5,
+              "tolerance": 1e-3, "cuda_cpu_mean_time_ratio": speed_ratio, "maximum_allowed_selected_ratio": 1.5,
               "actor_device": selected, "selected_best_mean_time_ratio": selected_ratio,
               "durations": durations, "timing_scope": "Forward calls only; excludes transfers and simulator work",
               "development_contexts_used_only_for_numeric_and_speed_checks": True}
@@ -82,7 +82,7 @@ def check(config, recipe, bank, checkpoint, out, *, parent=None, anchor_checkpoi
         raise ValueError("Actor collection lost finite behavior probabilities")
     result.update(actor_real_collection_passed=True, full_games=len(episodes), collected_positions=collected,
                   real_collection_seconds=time.monotonic()-start,
-                  optimized_positions=0, training_data_only=True)
+                  main_optimized_positions=0, training_data_only=True)
     out.write_text(json.dumps(result, indent=2)+"\n")
     if parent is not None:
         trial = dict(recipe, max_batches=2, positions_per_batch=32, minibatch_size=16,
@@ -103,13 +103,15 @@ def check(config, recipe, bank, checkpoint, out, *, parent=None, anchor_checkpoi
         with tempfile.TemporaryDirectory(prefix="fog-cuda-resume-") as temporary:
             direct, resumed = Path(temporary)/"direct", Path(temporary)/"resumed"
             options = {"device": "cuda", "parent": parent, "anchor_checkpoint": anchor_checkpoint}
-            train(config, trial, bank, checkpoint, direct, **options)
+            direct_report = train(config, trial, bank, checkpoint, direct, **options)
             train(config, trial, bank, checkpoint, resumed, stop_after_batches=1, **options)
-            train(config, trial, bank, checkpoint, resumed, resume=resumed/"latest.state.pt", **options)
+            resumed_report = train(config, trial, bank, checkpoint, resumed, resume=resumed/"latest.state.pt", **options)
             a = torch.load(direct/"latest.state.pt", weights_only=False, map_location="cpu")
             b = torch.load(resumed/"latest.state.pt", weights_only=False, map_location="cpu")
             checks = {key: equal(a[key], b[key]) for key in ("agent", "optimizer", "random", "schedule", "lineage")}
-            result.update(cuda_resume_checks=checks, discarded_trial_optimizer_steps=12)
+            result.update(cuda_resume_checks=checks,
+                          discarded_trial_optimizer_steps=direct_report["optimizer_steps"]+resumed_report["optimizer_steps"],
+                          discarded_trial_optimized_positions=direct_report["optimized_positions"]+resumed_report["optimized_positions"])
             if not all(checks.values()):
                 out.write_text(json.dumps(result, indent=2)+"\n")
                 raise ValueError("Actual CUDA full-state continuation/resume differs")
