@@ -25,6 +25,7 @@ class NativeReferenceResult:
     scores: dict = field(default_factory=dict)
     failures: list = field(default_factory=list)
     timing_seconds: dict = field(default_factory=dict)
+    operation_counts: dict = field(default_factory=dict)
     last_stage: str = "root"
     privileged_known_teams: bool = True
 
@@ -70,6 +71,7 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
     def measured(stage, call, *args, **kwargs):
         if stage != "close":
             result.last_stage = stage
+        result.operation_counts[stage] = result.operation_counts.get(stage, 0) + 1
         tick = time.monotonic()
         try:
             return call(*args, **kwargs)
@@ -79,7 +81,8 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
     def update(message):
         return measured(message["op"], player.update, message)
 
-    def leaf_value(branch, own_branch, opponent_branch):
+    def leaf_value(branch, own_branch, opponent_branch, reply_choice):
+        opponent_forked = False
         for step in range(max_forced_steps + 1):
             budget()
             own_request = branch["requests"][role]
@@ -93,6 +96,12 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
                 return float(leaf["reward"]) + float(leaf["gamma"]) * float(leaf["value"])
             if step == max_forced_steps:
                 raise ValueError("Native reference forced replacements did not resolve")
+            # A normal leaf reads only our critic. Copy the opponent's complete
+            # history only when an opponent-only replacement needs its policy.
+            if not opponent_forked:
+                update({"op": "fork", "battle_tag": opponent_branch,
+                        "source_tag": opponent_tag, "choice": reply_choice})
+                opponent_forked = True
             update(dict(message, op="act", choose=False))
             reply = update({"op": "act", "battle_tag": opponent_branch,
                                    "messages": branch["player_logs"][other],
@@ -128,12 +137,10 @@ def known_team_action(client, player, *, state, own_tag, opponent_tag, role,
                 try:
                     update({"op": "fork", "battle_tag": own_branch,
                                    "source_tag": own_tag, "choice": own_choices[action]})
-                    update({"op": "fork", "battle_tag": opponent_branch,
-                                   "source_tag": opponent_tag, "choice": reply_choice})
                     choices = [own_choices[action], reply_choice] if role == "p1" else [reply_choice, own_choices[action]]
                     branch = measured("sample", client.sample, state, choices, seed=chance_seed)
                     result.simulations += 1
-                    value = leaf_value(branch, own_branch, opponent_branch)
+                    value = leaf_value(branch, own_branch, opponent_branch, reply_choice)
                     budget()
                     if not math.isfinite(value):
                         raise ValueError("Native reference produced a nonfinite shaped return")

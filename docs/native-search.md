@@ -69,6 +69,21 @@ games. Other search failures remain fatal and every complete measured decision
 must still fit five seconds. This is a changed operational gate, not evidence that
 latency improved. The timings must guide optimization if fallbacks grow with history.
 
+That profiling run completed all 16 games, but failed the declared fallback gate:
+47 of 572 search decisions (8.22%) exceeded the soft budget. Its maximum measured
+decision was 4.971 seconds; probability, weight, parent-history and cleanup checks
+passed. Forking consumed 430.9 seconds, compared with 265.1 for leaf values and
+12.8 for simulator steps. The two crossed matchup blocks do not establish strength.
+
+The next implementation defers the opponent's fork until an opponent-only forced
+replacement actually needs another policy prediction. Ordinary and terminal leaves
+only read the acting player's history, so eager opponent copies performed no useful
+work there. Required forks still copy the complete parser, cache and RNG state;
+multiple replacements reuse that branch. Operation counts accompany stage timings.
+Serialization alternatives were slower in local synthetic-history tests and were
+not adopted. The five-second deadline, 3.5-second soft budget and 5% fallback gate
+remain unchanged; a fresh full-game canary must validate the optimization.
+
 The next bridge must construct worlds from own private information and public
 evidence, using training-only set donors or a compatible learned decoder. Never
 use the hidden chance transcript from `reconstruct_session_strict` as belief
