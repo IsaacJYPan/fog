@@ -57,7 +57,9 @@ def species_core_from_pool(path: str | Path) -> list[str]:
         def yield_team(self) -> str:  # pragma: no cover - never battled
             return ""
 
-    mons = _T().parse_showdown_team(paste)
+    from fog.env.teams import normalize_paste_newlines
+
+    mons = _T().parse_showdown_team(normalize_paste_newlines(paste))
     core = [_to_id(m.species or m.nickname or "") for m in mons[:6]]
     if len(core) != 6 or any(not s for s in core):
         raise ValueError(f"could not read a 6-species core from {path}")

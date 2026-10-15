@@ -98,7 +98,9 @@ def paste_to_engine_side(paste: str) -> poke_engine.Side:
         def yield_team(self):  # pragma: no cover
             return ""
 
-    mons = _T().parse_showdown_team(paste)[:6]
+    from fog.env.teams import normalize_paste_newlines
+
+    mons = _T().parse_showdown_team(normalize_paste_newlines(paste))[:6]
     return poke_engine.Side(pokemon=[paste_to_engine_pokemon(m) for m in mons])
 
 

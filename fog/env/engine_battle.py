@@ -115,7 +115,9 @@ def parse_paste(paste: str) -> list:
         def yield_team(self):  # pragma: no cover
             return ""
 
-    return _T().parse_showdown_team(paste)[:N_SLOTS]
+    from fog.env.teams import normalize_paste_newlines
+
+    return _T().parse_showdown_team(normalize_paste_newlines(paste))[:N_SLOTS]
 
 
 def build_engine_pokemon(mon: Any, tables) -> pe.Pokemon:

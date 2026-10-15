@@ -17,6 +17,11 @@ from pathlib import Path
 SHOWDOWN_DIR = Path(__file__).resolve().parents[2] / "server" / "pokemon-showdown"
 
 
+def normalize_paste_newlines(paste: str) -> str:
+    """Keep Windows/network line endings from breaking poke-env's blank-line parser."""
+    return paste.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def load_pool(path: str | Path) -> list[str]:
     """Load a team pool: a directory of .txt Showdown pastes (one team per file, sorted order),
     a packaged .json ({"teams": [pastes]}), or a single paste file."""
@@ -51,7 +56,7 @@ def make_pool_teambuilder(teams: list[str], seed: int | None = None):
         def __init__(self) -> None:
             self._rng = random.Random(seed)
             self._pastes = list(teams)
-            self._packed = [self.join_team(self.parse_showdown_team(t)) for t in teams]
+            self._packed = [self.join_team(self.parse_showdown_team(normalize_paste_newlines(t))) for t in teams]
             self.last_index: int | None = None  # pool-id label for M1.5 belief metrics
             self.last_paste: str | None = None  # exact-truth source (see docstring)
             self.history: list[int] = []        # yield order == battle-start order (sequential play)
@@ -83,7 +88,7 @@ def make_paired_teambuilders(teams: list[str], n_games: int, seed: int | None = 
     def _scheduled(schedule: list[int]):
         class ScheduledTeambuilder(Teambuilder):
             def __init__(self) -> None:
-                self._packed = [self.join_team(self.parse_showdown_team(t)) for t in teams]
+                self._packed = [self.join_team(self.parse_showdown_team(normalize_paste_newlines(t))) for t in teams]
                 self._schedule = schedule
                 self._n = 0
                 self.last_index: int | None = None
@@ -107,7 +112,7 @@ def to_packed(paste: str) -> str:
             return ""
 
     t = _T()
-    return t.join_team(t.parse_showdown_team(paste))
+    return t.join_team(t.parse_showdown_team(normalize_paste_newlines(paste)))
 
 
 def validate_team(paste: str, battle_format: str = "gen9ou") -> tuple[bool, str]:

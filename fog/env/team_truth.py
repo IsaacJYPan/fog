@@ -55,7 +55,9 @@ def truth_tokens_from_paste(paste: str, tables) -> np.ndarray:
         def yield_team(self):  # pragma: no cover
             return ""
 
-    mons = _T().parse_showdown_team(paste)
+    from fog.env.teams import normalize_paste_newlines
+
+    mons = _T().parse_showdown_team(normalize_paste_newlines(paste))
     tokens = np.full((6, SET_N_ATTRS), -1, dtype=np.int64)
     for j, mon in enumerate(mons[:6]):
         sid = _to_id(mon.species or (mon.nickname or ""))
