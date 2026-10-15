@@ -53,6 +53,14 @@ and complete decision latency. Eight crossed games per arm are engineering
 coverage, not a strength confirmation. Smaller capped traces are local prefix
 checks and must not be reported as completed battle evaluations.
 
+The first cloud canary used three alternatives and two chance draws. It stopped
+on a soft-budget timeout after 96 search decisions; ordinary probabilities still
+matched the control exactly and the weights were unchanged. Its completed games
+are incomplete engineering evidence. The retry defaults to two alternatives and
+one draw with a 3.5-second soft budget. These are mechanics-screen settings, not
+an assertion that a single draw adequately estimates tactical uncertainty.
+Parent-history and cleanup checks are reported independently of other failures.
+
 The next bridge must construct worlds from own private information and public
 evidence, using training-only set donors or a compatible learned decoder. Never
 use the hidden chance transcript from `reconstruct_session_strict` as belief

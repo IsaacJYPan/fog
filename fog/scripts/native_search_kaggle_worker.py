@@ -57,6 +57,8 @@ def run():
                  "--checkpoint", "inputs/kakuna34.pt", "--pool", "inputs/development.json",
                  "--reference-source", "inputs/native_control_v4.py", "--out", str(output / "checks"),
                  "--games", str(descriptor["games"]), "--max-rounds", "2000", "--seed", str(descriptor["seed"]),
+                 "--max-actions", str(descriptor["max_actions"]), "--samples", str(descriptor["chance_samples"]),
+                 "--seconds", str(descriptor["decision_seconds"]),
                  "--known-teams-diagnostic"], environment, output / "worker.log", remaining())
         status, returncode = "complete", 0
     except Exception as failure:

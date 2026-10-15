@@ -49,7 +49,8 @@ def model_digest(model):
     return digest.hexdigest()
 
 
-def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, seed=20261014):
+def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, seed=20261014,
+        max_actions=2, samples=1, seconds=3.5):
     import numpy as np
     import torch
 
@@ -81,8 +82,8 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
         "value_units": "unscaled_environment_shaped_return",
         "deployed_gamma": float(runtime.model.gammas[-1]),
         "seed": seed, "temperature": 0.0, "reply_temperature": 0.0,
-        "fixed_preview": "team 123456", "max_actions": 3, "chance_samples": 2,
-        "decision_seconds": 4.0, "measured_deadline_seconds": 5.0,
+        "fixed_preview": "team 123456", "max_actions": max_actions, "chance_samples": samples,
+        "decision_seconds": seconds, "measured_deadline_seconds": 5.0,
         "privileged_known_teams": True, "public_team_inference_tested": False,
         "playing_strength_confirmation": False, "automatic_promotion": False,
         "training_data_exported": False, "gpu_requested": False,
@@ -93,6 +94,7 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
     maximum_error = 0.0
     maximum_seconds = 0.0
     failures = []
+    parents_unchanged, cleanup_passed = True, True
     try:
         with ShowdownDirectClient() as client:
             schedule = matched_schedule(len(teams), max(8, games), seed)[:games]
@@ -139,9 +141,14 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
                                     max_actions=settings["max_actions"], samples=settings["chance_samples"],
                                 )
                                 if any(record_digest(player.battles[tags[side]]) != digests[side] for side in names):
+                                    parents_unchanged = False
                                     raise ValueError("Counterfactual inference mutated a live parent history")
+                                if set(player.battles) != set(tags.values()):
+                                    cleanup_passed = False
+                                    raise ValueError("Counterfactual records leaked past a search decision")
                                 selected[role] = search.choice
                                 decisions.append(dict(arm=arm, game=index, round=rounds, role=role, **asdict(search)))
+                                maximum_seconds = max(maximum_seconds, time.monotonic() - begin)
                                 if search.failures or not search.complete_grid:
                                     raise ValueError("Known-team engineering grid failed: " + json.dumps(search.failures))
                             for side, response in responses.items():
@@ -175,6 +182,8 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
                         for side in names:
                             player.update({"op": "close", "battle_tag": tags[side]})
                             control.update({"op": "close", "battle_tag": tags[side]})
+                        if player.battles or control.battles:
+                            cleanup_passed = False
                     if player.battles or control.battles:
                         raise ValueError("Counterfactual records leaked past a completed game")
     except Exception as error:
@@ -186,7 +195,7 @@ def run(checkpoint, pool, reference_source, out, *, games=8, max_rounds=2000, se
             "passed": not failures and len(rows) == 2 * games and unchanged,
             "protocol": settings, "rows": rows, "search_decisions": decisions,
             "ordinary_probability_max_error": maximum_error, "maximum_complete_decision_seconds": maximum_seconds,
-            "parent_histories_unchanged": not failures, "record_cleanup_passed": not failures,
+            "parent_histories_unchanged": parents_unchanged, "record_cleanup_passed": cleanup_passed,
             "weights_unchanged": unchanged, "failures": failures,
             "in_memory_model_sha256": initial_model_digest,
             "fallbacks": sum(not decision["complete_grid"] for decision in decisions),
@@ -210,10 +219,14 @@ def main():
     parser.add_argument("--games", type=int, default=8)
     parser.add_argument("--max-rounds", type=int, default=2000)
     parser.add_argument("--seed", type=int, default=20261014)
+    parser.add_argument("--max-actions", type=int, default=2)
+    parser.add_argument("--samples", type=int, default=1)
+    parser.add_argument("--seconds", type=float, default=3.5)
     parser.add_argument("--known-teams-diagnostic", action="store_true", required=True)
     args = parser.parse_args()
     run(args.checkpoint, args.pool, args.reference_source, args.out,
-        games=args.games, max_rounds=args.max_rounds, seed=args.seed)
+        games=args.games, max_rounds=args.max_rounds, seed=args.seed,
+        max_actions=args.max_actions, samples=args.samples, seconds=args.seconds)
 
 
 if __name__ == "__main__":
