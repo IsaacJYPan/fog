@@ -113,3 +113,21 @@ validated public-information world construction and a matched strength test.
 The learned belief decoder has not yet justified replacing the stronger existing
 set prior. A shared native backbone plus useful learned inference/search remains
 a possible contribution; unchanged pretrained play is only its control.
+
+The matched 30,720-position PPO pilots completed their 1,920-game development
+screen without failures or fallbacks. Against SimpleHeuristics, the start,
+ordinary PPO and backward PPO scored 44.9%, 44.9% and 46.5%; against MaxBasePower,
+82.0%, 84.0% and 80.9%; against unchanged Kakuna, 7.0%, 5.5% and 5.5%. Every
+paired block confidence interval included zero, including nominal intervals.
+This demonstrates neither a gain nor equivalence; the intervals permit meaningful
+changes. Existing models remain available. The reset horizon advanced to 16 and
+did not meet the gate for 32 during the pilot.
+
+A longer ordinary continuation retains the previous model, Adam state, RNG and
+sampler progression, and explicitly keeps the original BC policy as its KL anchor.
+Parent hashes, exposure and starting weights are checked before loading state.
+Its new recipe records inherited and new optimization separately. CUDA acting
+must pass numerical, speed, real-rollout and full-state resume preflights before
+the longer budget begins; the speed microbenchmark excludes input transfer and
+simulator work, so end-to-end rollout timing must still be measured. This is a
+test of additional fresh experience, not a selection of a proven superior arm.

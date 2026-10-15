@@ -84,6 +84,16 @@ Serialization alternatives were slower in local synthetic-history tests and were
 not adopted. The five-second deadline, 3.5-second soft budget and 5% fallback gate
 remain unchanged; a fresh full-game canary must validate the optimization.
 
+The deferred-fork retry still failed the measured deadline: 17 of 635 search
+decisions used soft-budget fallback (2.68%), but a late-battle decision took
+5.257 seconds, leaving the final game incomplete. Ordinary probabilities,
+weights, parent histories and cleanup remained correct. Removed fork work is
+useful engineering progress, but copying still grows with parser history and
+soft admission checks cannot impose a hard process deadline. Further canaries
+need an audited compact history representation or cancellable execution with
+a cached legal policy fallback. Do not weaken the five-second gate or claim
+playing strength from these incomplete, privileged games.
+
 The next bridge must construct worlds from own private information and public
 evidence, using training-only set donors or a compatible learned decoder. Never
 use the hidden chance transcript from `reconstruct_session_strict` as belief

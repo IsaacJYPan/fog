@@ -50,11 +50,27 @@ def run():
             execute(["apt-get", "install", "-y", "nodejs", "npm"], environment, output / "apt-install.log", remaining())
         execute([sys.executable, "-m", "fog.scripts.kaggle_setup", "--device", "cuda"],
                 environment, output / "setup.log", remaining())
+        python = str(work / ".venv/bin/python")
+        initial = descriptor.get("initial_file", "inputs/bc1000.pt")
+        if initial not in descriptor["files"]:
+            raise ValueError("The initial checkpoint is outside the verified inventory")
+        if descriptor.get("parent_state_sha256") and descriptor["parent_state_sha256"] != descriptor["files"].get("inputs/parent.state.pt"):
+            raise ValueError("The parent checkpoint is outside its fixed continuation identity")
+        if descriptor.get("actor_preflight"):
+            phase = "CUDA actor preflight"
+            preflight = [python, "-m", "fog.training.curriculum_actor_preflight", "--config", "config.yaml",
+                     "--recipe", "recipe.json", "--bank", "inputs/bank/manifest.json", "--pool", "inputs/train.json",
+                     "--checkpoint", initial, "--out", str(output / "ACTOR_PREFLIGHT.json")]
+            if descriptor.get("parent_state_sha256"):
+                preflight.extend(["--parent", "inputs/parent.state.pt", "--anchor-checkpoint", "inputs/original_anchor.pt"])
+            execute(preflight, environment, output / "actor-preflight.log", remaining())
         phase = "online PPO and exact-team auxiliary training"
-        execute([str(work / ".venv/bin/python"), "-m", "fog.training.curriculum_pilot", "--config", "config.yaml",
+        command = [python, "-m", "fog.training.curriculum_pilot", "--config", "config.yaml",
                  "--recipe", "recipe.json", "--bank", "inputs/bank/manifest.json", "--pool", "inputs/train.json",
-                 "--initial", "inputs/bc1000.pt", "--out", str(output / "training"), "--device", "cuda"],
-                environment, output / "worker.log", remaining())
+                 "--initial", initial, "--out", str(output / "training"), "--device", "cuda"]
+        if descriptor.get("parent_state_sha256"):
+            command.extend(["--parent", "inputs/parent.state.pt", "--anchor-checkpoint", "inputs/original_anchor.pt"])
+        execute(command, environment, output / "worker.log", remaining())
         report = json.loads((output / "training/RESULTS.json").read_text())
         if not report["complete"] or report["batches"] != descriptor["max_batches"]:
             raise ValueError("Online pilot did not reach its frozen optimizer-update budget")

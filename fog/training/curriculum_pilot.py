@@ -213,7 +213,8 @@ def collect(client, actor, anchor, bank, sampler, schedule, recipe):
     return batch, episodes, buffer.n_decisions
 
 
-def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop_after_batches=None):
+def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop_after_batches=None,
+          parent=None, anchor_checkpoint=None):
     from fog.env.showdown_direct import ShowdownDirectClient
     from fog.models.agent import FogAgent
     from fog.training.ppo import ppo_update
@@ -227,6 +228,12 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
         raise ValueError("Require public-information acting and shared auxiliary training")
     if not 0 < recipe["auxiliary_gradient_cap"] <= 0.25 or not 0 < recipe["learning_rate"] <= 1e-4:
         raise ValueError("Freeze bounded learning rate and shared auxiliary gradients")
+    if recipe.get("actor_device", "cpu") not in ("cpu", "cuda"):
+        raise ValueError("Freeze a supported actor device")
+    if bool(recipe.get("parent_state_sha256")) != (parent is not None):
+        raise ValueError("The fixed parent full-state input is missing or undeclared")
+    if parent is not None and anchor_checkpoint is None:
+        raise ValueError("Parent continuation requires an explicit frozen policy anchor")
     torch.set_num_threads(1)
     torch.manual_seed(recipe["seed"])
     random.seed(recipe["seed"])
@@ -235,14 +242,42 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
     device = torch.device(device)
     if device.type == "cuda" and not torch.cuda.is_available():
         raise RuntimeError("Frozen GPU pilot has no CUDA accelerator")
+    if recipe.get("actor_device") == "cuda" and device.type != "cuda":
+        raise ValueError("A CUDA actor requires a CUDA training device")
     agent = FogAgent.from_tables(config).to(device).eval()
     agent.load_state_dict(torch.load(initial, weights_only=True, map_location=device))
-    actor, anchor = FogAgent.from_tables(config).cpu().eval(), FogAgent.from_tables(config).cpu().eval()
-    anchor.load_state_dict(torch.load(initial, weights_only=True, map_location="cpu"))
+    actor_device = device if recipe.get("actor_device") == "cuda" else torch.device("cpu")
+    actor, anchor = FogAgent.from_tables(config).to(actor_device).eval(), FogAgent.from_tables(config).cpu().eval()
+    anchor.load_state_dict(torch.load(anchor_checkpoint or initial, weights_only=True, map_location="cpu"))
     optimizer = torch.optim.AdamW(agent.parameters(), lr=recipe["learning_rate"], weight_decay=1e-4)
-    identity = hashlib.sha256(json.dumps({"config": config, "recipe": recipe, "bank": bank.sha256, "pool": bank.pool_sha256,
-                                        "initial": digest(initial)}, sort_keys=True).encode()).hexdigest()
+    identity_fields = {"config": config, "recipe": recipe, "bank": bank.sha256, "pool": bank.pool_sha256,
+                       "initial": digest(initial)}
+    if anchor_checkpoint is not None:
+        identity_fields["anchor"] = digest(anchor_checkpoint)
+    identity = hashlib.sha256(json.dumps(identity_fields, sort_keys=True).encode()).hexdigest()
     schedule, batch_number, history, trained_seconds = ReverseSchedule(), 0, [], 0.0
+    lineage = {"inherited_batches": 0, "inherited_optimizer_steps": 0, "inherited_optimized_positions": 0}
+    if parent is not None:
+        if digest(parent) != recipe["parent_state_sha256"]:
+            raise ValueError("Parent full-state hash differs from the fixed continuation")
+        previous = torch.load(parent, weights_only=False, map_location="cpu")
+        if (previous.get("format") != "fog.curriculum-pilot-state" or previous.get("version") != 1
+                or previous["identity"] != recipe.get("parent_identity")
+                or previous["batch"] != recipe.get("parent_batches")
+                or sum(row["optimizer_steps"] for row in previous["history"]) != recipe.get("parent_optimizer_steps")):
+            raise ValueError("Parent training identity or exposure differs")
+        weights = torch.load(initial, weights_only=True, map_location="cpu")
+        if (weights.keys() != previous["agent"].keys()
+                or not all(torch.equal(value, previous["agent"][key]) for key, value in weights.items())):
+            raise ValueError("Starting weights differ from the parent full state")
+        optimizer.load_state_dict(previous["optimizer"])
+        schedule = ReverseSchedule(previous["schedule"])
+        older = previous.get("lineage", {})
+        lineage = {"inherited_batches": older.get("inherited_batches", 0) + previous["batch"],
+                   "inherited_optimizer_steps": older.get("inherited_optimizer_steps", 0) + recipe["parent_optimizer_steps"],
+                   "inherited_optimized_positions": older.get("inherited_optimized_positions", 0) + previous["history"][-1]["optimized_positions"],
+                   "parent_identity": previous["identity"], "parent_state_sha256": digest(parent)}
+        restore_rng(previous["random"], sampler)
     if resume is not None:
         saved = torch.load(resume, weights_only=False, map_location=device)
         if saved.get("format") != "fog.curriculum-pilot-state" or saved.get("version") != 1 or saved["identity"] != identity:
@@ -250,6 +285,8 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
         agent.load_state_dict(saved["agent"])
         optimizer.load_state_dict(saved["optimizer"])
         schedule, batch_number, history = ReverseSchedule(saved["schedule"]), saved["batch"], saved["history"]
+        if saved.get("lineage", lineage) != lineage:
+            raise ValueError("Resume continuation lineage differs")
         trained_seconds = saved["training_seconds"]
         restore_rng(saved["random"], sampler)
     out.mkdir(parents=True, exist_ok=resume is not None)
@@ -266,6 +303,7 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
                  "agent": agent.state_dict(), "optimizer": optimizer.state_dict(),
                  "random": rng_state(sampler), "schedule": deepcopy(schedule.state), "batch": batch_number,
                  "history": history, "training_seconds": trained_seconds + time.monotonic() - begun}
+        value["lineage"] = lineage
         if (out / "latest.state.pt").exists():
             (out / "latest.state.pt").replace(out / "previous.state.pt")
         atomic_save(value, out / "latest.state.pt")
@@ -281,7 +319,7 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
             if trained_seconds + time.monotonic() - begun >= recipe["training_seconds"]:
                 reason = "training_time_budget"
                 break
-            actor.load_state_dict({key: value.detach().cpu() for key, value in agent.state_dict().items()})
+            actor.load_state_dict(agent.state_dict())
             tick = time.monotonic()
             cpu_batch, episodes, collected = collect(client, actor, anchor, bank, sampler, schedule, recipe)
             rollout_seconds = time.monotonic() - tick
@@ -301,7 +339,7 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
             if metrics["optimizer_steps"] != expected_steps or metrics["belief_dropped_rate"] or metrics["capped_auxiliary_primary_ratio"] > 0.25001:
                 raise ValueError("Online update lost matched optimization or auxiliary constraints")
             batch_number += 1
-            advanced = schedule.advance(batch_number) if recipe["condition"] == "backward" else False
+            advanced = schedule.advance(batch_number + lineage["inherited_batches"]) if recipe["condition"] == "backward" else False
             row = {"batch": batch_number, "optimized_positions": batch_number * recipe["positions_per_batch"],
                    "collected_positions": collected, "learning_rate": optimizer.param_groups[0]["lr"],
                    "rollout_seconds": rollout_seconds, "update_seconds": time.monotonic()-tick,
@@ -323,6 +361,9 @@ def train(config, recipe, bank, initial, out, *, device="cpu", resume=None, stop
               "checkpoint_sha256": digest(out / "latest.pt"), "full_state_sha256": digest(out / "latest.state.pt"),
               "training_seconds": trained_seconds + time.monotonic() - begun,
               "schedule": schedule.state, "automatic_promotion": False, "device": str(device)}
+    result.update(lineage=lineage, actor_device=str(actor_device), anchor_sha256=digest(anchor_checkpoint or initial))
+    result.update(total_optimizer_steps=result["optimizer_steps"] + lineage["inherited_optimizer_steps"],
+                  total_optimized_positions=result["optimized_positions"] + lineage["inherited_optimized_positions"])
     (out / "RESULTS.json").write_text(json.dumps(result, indent=2) + "\n")
     return result
 
@@ -332,11 +373,14 @@ def main():
     for name in ("config", "recipe", "bank", "pool", "initial", "out"):
         parser.add_argument("--" + name, type=Path, required=True)
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--parent", type=Path)
+    parser.add_argument("--anchor-checkpoint", type=Path)
     parser.add_argument("--stop-after-batches", type=int)
     parser.add_argument("--device", choices=("cpu", "cuda"), default="cpu")
     args = parser.parse_args()
     result = train(load_config(args.config), json.loads(args.recipe.read_text()), VerifiedBank(args.bank, args.pool),
-                   args.initial, args.out, device=args.device, resume=args.resume, stop_after_batches=args.stop_after_batches)
+                   args.initial, args.out, device=args.device, resume=args.resume, stop_after_batches=args.stop_after_batches,
+                   parent=args.parent, anchor_checkpoint=args.anchor_checkpoint)
     print(json.dumps(result), flush=True)
 
 
