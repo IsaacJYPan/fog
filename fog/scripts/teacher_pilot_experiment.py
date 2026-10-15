@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 import uuid
 import zipfile
 
@@ -153,7 +154,20 @@ def submit(folder):
         print(cli("datasets", "create", "-p", str(folder / "dataset")), flush=True)
         state["phase"] = "uploaded"
         write_json(folder / "state.json", state)
-    readiness = json.loads(cli("datasets", "status", state["dataset"], "--format", "json"))
+    # A newly uploaded private dataset can briefly return 403 while Kaggle
+    # finishes processing it. Keep its uploaded identity; never upload twice.
+    readiness = None
+    for attempt in range(4):
+        try:
+            readiness = json.loads(cli("datasets", "status", state["dataset"], "--format", "json"))
+            break
+        except RuntimeError as error:
+            if "403" not in str(error):
+                raise
+            if attempt == 3:
+                print("Private dataset is not yet readable; submission remains uploaded and can be resumed.", flush=True)
+                return
+            time.sleep(3 * (attempt + 1))
     if "ready" not in readiness.get("status", "").lower():
         print("Private dataset is processing; no notebook was submitted.", flush=True)
         return
