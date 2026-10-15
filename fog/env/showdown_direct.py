@@ -351,6 +351,16 @@ class ShowdownDirectClient:
     def close_session(self, session_id: str) -> bool:
         return bool(self._request("session_close", session_id=session_id)["closed"])
 
+    def reseed_session(self, session_id: str, *, seed: str) -> None:
+        """Preserve a training prefix and requests, drawing fresh chance thereafter.
+
+        This coordinator operation supplies no observations and consumes no log messages.
+        It must never use the historical future seed as a model feature or training target.
+        """
+        result = self._request("session_reseed", session_id=session_id, seed=seed)
+        if result != {"reseeded": True}:
+            raise ShowdownWorkerError("Showdown did not confirm the training reseed")
+
     def reconstruct_session_strict(
         self,
         session_id: str,

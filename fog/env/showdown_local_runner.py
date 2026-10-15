@@ -121,10 +121,17 @@ def play_local_battle(
     battle_tag: str = "battle-local-1",
     max_choice_rounds: int = 1_000,
     max_turns: int | None = None,
+    initial_battle: LocalShowdownBattle | None = None,
 ) -> LocalBattleResult:
-    """Play one complete battle using direct Showdown and two local decision controllers."""
+    """Play to completion, optionally continuing a caller-prepared training prefix.
+
+    A supplied battle must already have both censored views and controller
+    histories initialized. The runner owns closing it, including on failure.
+    """
     rng = random.Random(seed)
-    local = LocalShowdownBattle.create(client, options, battle_tag=battle_tag)
+    if initial_battle is not None and initial_battle.client is not client:
+        raise ValueError("A resumed battle must belong to the supplied Showdown client")
+    local = initial_battle or LocalShowdownBattle.create(client, options, battle_tag=battle_tag)
     try:
         truncated = False
         for _ in range(max_choice_rounds):

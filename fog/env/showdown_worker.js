@@ -793,6 +793,21 @@ function getSession(request) {
   return sessionUpdate(session, request.include_state === true);
 }
 
+function reseedSession(request) {
+  const session = sessions.get(String(request.session_id));
+  if (!session) throw new Error(`unknown session: ${request.session_id}`);
+  if (session.battle.ended || !session.battle.requestState) {
+    throw new Error("reseed requires a live choice boundary");
+  }
+  if (typeof request.seed !== "string" || !/^sodium,[0-9a-f]{64}$/.test(request.seed)) {
+    throw new TypeError("reseed requires an explicit sodium seed");
+  }
+  // Training resets preserve the realized prefix while drawing fresh future chance.
+  // Keep the semantic transcript intact for diagnostic replay; it is never a policy input.
+  session.battle.prng = new RecordingPRNG(new PRNG(request.seed), session.transcript);
+  return {reseeded: true};
+}
+
 function closeSession(request) {
   const sessionId = String(request.session_id);
   const session = sessions.get(sessionId);
@@ -818,6 +833,8 @@ function handleRequest(request) {
     return stepSession(request);
   case "session_get":
     return getSession(request);
+  case "session_reseed":
+    return reseedSession(request);
   case "session_reconstruct_strict":
     return reconstructSessionStrict(request);
   case "session_close":
