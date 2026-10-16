@@ -90,9 +90,13 @@ def benchmark(native, auxiliary, fresh, pools_path, out, *, games=32, draws=32, 
     if len(files) != games:
         raise ValueError("The fixed benchmark cohort is incomplete")
     contexts, trace_finite, outcome_errors = 0, True, []
+    by_game = {}
     with torch.inference_mode():
         for game, path in enumerate(files):
             record = read_record(path)
+            game_metrics = {name: SampleMetrics() for name in metrics}
+            game_errors = []
+            game_contexts = 0
             if not record["training_eligible"] or record.get("failures") or record.get("fallbacks"):
                 raise ValueError("Failed development games must be diagnosed before benchmarking")
             for pov_seed in (0, 1):
@@ -148,9 +152,24 @@ def benchmark(native, auxiliary, fresh, pools_path, out, *, games=32, draws=32, 
                             targets["verified"][index].numpy(),
                             known,
                         )
+                        game_metrics[name].update(samples, targets["truth"][index].numpy(),
+                                                  targets["verified"][index].numpy(), known)
                     prediction = float(model.outcome(latent[:, 0]).tanh().item())
                     outcome_errors.append((prediction - float(targets["outcomes"][index])) ** 2)
+                    game_errors.append(outcome_errors[-1])
                     contexts += 1
+                    game_contexts += 1
+            from fog.team_identity import team_group_key
+
+            by_game[path.name] = {
+                "source_sha256": sha256(path), "contexts": game_contexts,
+                "team_rosters": sorted({team_group_key(team, mode="roster") for team in record["submitted_teams"].values()}),
+                "methods": {name: value.report() for name, value in game_metrics.items()},
+                "resampling_data": {name: {"fields": value.fields, "joint_count": value.joint_count,
+                                             "joint_correct": value.joint_correct, "recall_count": value.recall_count,
+                                             "recall_correct": value.recall_correct} for name, value in game_metrics.items()},
+                "outcome_squared_errors": game_errors,
+            }
             print(json.dumps({"games": game + 1, "contexts": contexts}), flush=True)
     report = {
         "native_sha256": sha256(native),
@@ -165,10 +184,11 @@ def benchmark(native, auxiliary, fresh, pools_path, out, *, games=32, draws=32, 
         "seed": seed,
         "sampling_trace_finite": trace_finite,
         "methods": {name: value.report() for name, value in metrics.items()},
+        "by_game": by_game,
         "outcome_mse": float(np.mean(outcome_errors)),
         "search_connected": False,
         "automatic_promotion": False,
-        "limitations": "Monte Carlo calibration depends on sample count. Set metrics cover encoded categories, excluding IVs and distinguishing only modeled item buckets. This does not measure downstream search play; that requires fixed-search matched games before connecting the learned sampler.",
+        "limitations": "Monte Carlo calibration depends on sample count. Resample whole connected groups of games sharing team rosters; individual fields and repeated contexts are not independent. Set metrics cover encoded categories, excluding IVs and distinguishing only modeled item buckets. This does not measure downstream search play; that requires fixed-search matched games before connecting the learned sampler.",
     }
     (out / "RESULTS.json").write_text(json.dumps(report, indent=2) + "\n")
     return report

@@ -83,6 +83,13 @@ Development checkpoint retention is separate from that strength claim. `pretrain
 
 `pretrained_showdown` provides a challenge/ladder entrypoint through modern poke-env and the native decision process. Credentials use `FOG_SHOWDOWN_USERNAME` and `FOG_SHOWDOWN_PASSWORD`, outside Git. It enforces a five-second inference deadline and records failures and legal fallbacks. A rejected or lost temporal decision switches that game to fallbacks until reset. Public rated confirmation requires a passed, hash-matched strength gate and at least 200 games; the report retains recent Elo, service GXE/Glicko snapshots, win-rate uncertainty, and failures. Its profile API follows [Showdown's published web API](https://github.com/smogon/pokemon-showdown-client/blob/master/WEB-API.md).
 
-There is no demonstrated native fine-tuning gain yet. A failed 18-hour attempt means this recipe and budget did not establish improvement. The next experiment would initialize FOG's typed-token/action-query model independently, use mechanics-derived public action features without teacher-answer features, and train on strong public-information teachers with submitted-team supervision. Recovery or that first pilot uses the remaining weekly compute only after a fresh quota check.
+There is no demonstrated native fine-tuning gain yet. The closed 18-hour attempt
+did not establish improvement under that recipe and budget. The independent FOG
+fallback subsequently reached approximately 50% against SimpleHeuristics, while
+remaining weak against Kakuna. The current development direction returns to
+pretrained Kakuna with [bounded shared-representation adaptation](kakuna-belief-adaptation.md).
+That is a new hypothesis and allocation, not a reset of the old attempt ledger.
+Original native and independent models remain protected baselines. Every launch
+still requires a fresh quota check and its own frozen recipe.
 
 See [upstream attribution and licenses](../integrations/THIRD_PARTY.md).

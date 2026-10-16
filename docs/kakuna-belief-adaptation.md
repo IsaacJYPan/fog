@@ -59,7 +59,7 @@ During adaptation, keep native modules in evaluation mode while enabling gradien
 only in the final block and final normalization. This prevents frozen dropout,
 running statistics or power-iteration buffers from drifting. Train the new heads
 normally. Keep the original frozen native actor and critic as behavior references.
-Use legal-action KL and native shaped-action-value consistency penalties; the
+Use legal-action KL and native shaped-action-value mean consistency penalties; the
 native critic is not a win-probability target. Do not suppress belief gradients
 merely because an initially exact policy-retention gradient is zero.
 
