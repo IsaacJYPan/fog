@@ -15,6 +15,7 @@ from torch.nn.utils.rnn import pad_sequence
 from fog.pretrained.joint import normalized_belief_loss
 from fog.pretrained.kakuna import INTERFACE_VERSION, KAKUNA_34_SHA256, sha256
 from fog.pretrained.latent_cache import CACHE_FORMAT, CACHE_VERSION, windows
+from fog.pretrained.gradient_balance import OutcomeGradientCap
 from fog.pretrained.retention import NativeStep, RetentionLimits, action_values, legal_policy, retention_terms, upper_forward
 
 HEAD_SCHEMA_FILES = ("fog/models/belief.py", "fog/constants/tables.py", "fog/constants/schema.py") + tuple(
@@ -168,7 +169,7 @@ def belief_losses(model, latent, labels, generator):
 
 def train_update(model, batch, *, head_optimizer, native_optimizer, route_generator,
                  weights, policy_penalty=20.0, value_penalty=1.0, limits=None,
-                 sentinel=None, microbatch=8):
+                 sentinel=None, microbatch=8, outcome_backbone_ratio=None):
     adapt = native_optimizer is not None
     model.native.eval()
     for module in (model.context_projection, model.belief, model.outcome):
@@ -176,6 +177,8 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
     head_optimizer.zero_grad(set_to_none=True)
     if adapt:
         native_optimizer.zero_grad(set_to_none=True)
+    native_parameters = [] if not adapt else [p for group in native_optimizer.param_groups for p in group["params"]]
+    balance = OutcomeGradientCap(native_parameters, outcome_backbone_ratio) if adapt and outcome_backbone_ratio is not None else None
     size = len(batch["lengths"])
     totals = {key: 0.0 for key in ("marginal", "autoregressive", "outcome", "policy_kl", "value_retention")}
     for start in range(0, size, microbatch):
@@ -194,12 +197,15 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
         if not torch.isfinite(loss):
             raise FloatingPointError("Nonfinite belief/retention objective")
         scale = len(row["lengths"]) / size
+        if balance is not None:
+            belief = weights["marginal"] * losses["marginal"] + weights["autoregressive"] * losses["autoregressive"]
+            balance.accumulate(belief * scale, weights["outcome"] * losses["outcome"] * scale)
         (loss * scale).backward()
         for key, term in {**losses, "policy_kl": kl, "value_retention": value}.items():
             totals[key] += float(term.detach()) * scale
     heads = head_parameters(model)
+    balance_metrics = balance.apply() if balance is not None else {}
     head_norm = float(torch.nn.utils.clip_grad_norm_(heads, 1.5, error_if_nonfinite=True))
-    native_parameters = [] if not adapt else [p for group in native_optimizer.param_groups for p in group["params"]]
     native_norm = float(torch.nn.utils.clip_grad_norm_(native_parameters, 1.0, error_if_nonfinite=True)) if adapt else 0.0
     step = NativeStep(native_parameters, native_optimizer) if adapt else None
     head_optimizer.step()
@@ -228,6 +234,7 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
     else:
         retained = current
     return {"losses": totals, "head_gradient_norm": head_norm, "native_gradient_norm": native_norm,
+            **balance_metrics,
             "native_update_attempted": adapt, "native_update_accepted": bool(adapt and accepted),
             "attempted_batch_retention": current, "attempted_sentinel_retention": fixed,
             "retained_batch_retention": retained,

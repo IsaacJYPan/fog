@@ -57,6 +57,10 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
             raise ValueError("Require a positive frozen integer: " + key)
     if config["effective_batch"] % config["microbatch"]:
         raise ValueError("Microbatches must divide the effective context batch")
+    if config.get("outcome_backbone_ratio") is not None and (
+        not math.isfinite(config["outcome_backbone_ratio"]) or not 0 <= config["outcome_backbone_ratio"] <= 1
+    ):
+        raise ValueError("Outcome/shared-belief gradient ratio must be in [0,1]")
     if device.startswith("cuda") and (not torch.cuda.is_available() or config.get("allow_local_cache")):
         raise ValueError("CUDA training requires real CUDA and the complete production cache")
     torch.set_num_threads(config.get("cpu_threads", 1))
@@ -189,7 +193,8 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
                                        native_optimizer=native_optimizer if adapt else None,
                                        route_generator=route, weights=config["weights"],
                                        policy_penalty=config["policy_penalty"], value_penalty=config["value_penalty"],
-                                       limits=limits, sentinel=sentinel, microbatch=config["microbatch"])
+                                       limits=limits, sentinel=sentinel, microbatch=config["microbatch"],
+                                       outcome_backbone_ratio=config.get("outcome_backbone_ratio"))
             update += 1
             steps += 1
             native_accepted += metrics["native_optimizer_steps"]
