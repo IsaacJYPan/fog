@@ -43,19 +43,18 @@ def normalized_belief_loss(output, truth, verified) -> torch.Tensor:
     return total / max(count, 1)
 
 
-class JointKakuna(nn.Module):
-    """Native actor/critic plus auxiliary heads; predictions never feed ordinary policy."""
+class BeliefHeads(nn.Module):
+    """The same auxiliary heads, independently trainable on verified frozen latents."""
 
-    def __init__(self, native: nn.Module, *, belief_dim=128, tables=None):
+    def __init__(self, *, native_dim=900, belief_dim=128, tables=None):
         super().__init__()
         if tables is None:
             from fog.constants.tables import TABLES
 
             tables = TABLES
-        self.native = native
         self.context_projection = nn.Sequential(
-            nn.LayerNorm(native.traj_encoder.emb_dim),
-            nn.Linear(native.traj_encoder.emb_dim, 256),
+            nn.LayerNorm(native_dim),
+            nn.Linear(native_dim, 256),
             nn.GELU(),
         )
         self.belief = BeliefModel(
@@ -67,11 +66,76 @@ class JointKakuna(nn.Module):
             n_moves=tables.n_moves,
         )
         self.outcome = nn.Sequential(
-            nn.LayerNorm(native.traj_encoder.emb_dim),
-            nn.Linear(native.traj_encoder.emb_dim, 128),
+            nn.LayerNorm(native_dim),
+            nn.Linear(native_dim, 128),
             nn.GELU(),
             nn.Linear(128, 1),
         )
+
+    def auxiliary_losses(
+        self,
+        latent,
+        reveal_tokens,
+        truth,
+        verified,
+        outcomes,
+        outcome_valid,
+        *,
+        masks=None,
+        generator=None,
+        prior=None,
+        chain_queries=1,
+        selected_chain=False,
+    ):
+        context = self.context_projection(latent)
+        # Unverified fields cannot become teacher prefix facts either.
+        safe_truth = torch.where(verified, truth, -1)
+        reveals = {"tokens": reveal_tokens, "masks": masks or {}}
+        if prior is not None:
+            reveals["prior"] = prior
+        marginal = self.belief(context, reveals)
+        hidden = verified & ~self.belief._revealed_mask(reveal_tokens).reshape_as(verified)
+        marginal_loss = normalized_belief_loss(marginal, safe_truth, hidden)
+        if not isinstance(chain_queries, int) or chain_queries < 1:
+            raise ValueError("Positive integer AR query count required")
+        chain_context, chain_reveals, chain_truth = context, reveals, safe_truth
+        if chain_queries > 1:
+            chain_context = context.repeat_interleave(chain_queries, dim=0)
+            chain_truth = safe_truth.repeat_interleave(chain_queries, dim=0)
+            chain_reveals = {
+                "tokens": reveal_tokens.repeat_interleave(chain_queries, dim=0),
+                "masks": {key: value.repeat_interleave(chain_queries, dim=0) for key, value in reveals["masks"].items()},
+            }
+            if prior is not None:
+                chain_reveals["prior"] = prior.repeat_interleave(chain_queries)
+        chain = self.belief(chain_context, chain_reveals, teacher_values=chain_truth,
+                            generator=generator, selected_only=selected_chain)
+        # Exchangeable move fields have their validity permuted with the truth. A partially
+        # verified moveset uses -1 entries, so loss_targets itself supplies the safe validity.
+        chain_valid = verified.repeat_interleave(chain_queries, dim=0)
+        if chain.loss_targets is not None:
+            permuted = chain.loss_targets["move"]
+            chain_valid[:, :, 3:7] = permuted >= 0
+        chain_loss = normalized_belief_loss(chain, chain_truth, chain_valid)
+        predictions = self.outcome(latent).squeeze(-1)
+        valid = outcome_valid.bool() & torch.isfinite(outcomes)
+        outcome_loss = (
+            F.mse_loss(predictions[valid].tanh(), outcomes[valid])
+            if bool(valid.any())
+            else predictions[:0].sum()
+        )
+        return {"marginal": marginal_loss, "autoregressive": chain_loss, "outcome": outcome_loss}
+
+    def sample_team(self, latent, reveals, **kwargs):
+        return self.belief.sample_team(self.context_projection(latent), reveals, **kwargs)
+
+
+class JointKakuna(BeliefHeads):
+    """Native actor/critic plus auxiliary heads; predictions never feed ordinary policy."""
+
+    def __init__(self, native: nn.Module, *, belief_dim=128, tables=None):
+        super().__init__(native_dim=native.traj_encoder.emb_dim, belief_dim=belief_dim, tables=tables)
+        self.native = native
 
     def shared_parameters(self):
         return list(self.native.tstep_encoder.parameters()) + list(
@@ -98,42 +162,3 @@ class JointKakuna(nn.Module):
         if len(latent) != 1:
             raise RuntimeError("Expected one native shared-latent forward")
         return loss, latent[0]
-
-    def auxiliary_losses(
-        self,
-        latent,
-        reveal_tokens,
-        truth,
-        verified,
-        outcomes,
-        outcome_valid,
-        *,
-        masks=None,
-        generator=None,
-    ):
-        context = self.context_projection(latent)
-        # Unverified fields cannot become teacher prefix facts either.
-        safe_truth = torch.where(verified, truth, -1)
-        reveals = {"tokens": reveal_tokens, "masks": masks or {}}
-        marginal = self.belief(context, reveals)
-        hidden = verified & ~self.belief._revealed_mask(reveal_tokens).reshape_as(verified)
-        marginal_loss = normalized_belief_loss(marginal, safe_truth, hidden)
-        chain = self.belief(context, reveals, teacher_values=safe_truth, generator=generator)
-        # Exchangeable move fields have their validity permuted with the truth. A partially
-        # verified moveset uses -1 entries, so loss_targets itself supplies the safe validity.
-        chain_valid = verified.clone()
-        if chain.loss_targets is not None:
-            permuted = chain.loss_targets["move"]
-            chain_valid[:, :, 3:7] = permuted >= 0
-        chain_loss = normalized_belief_loss(chain, safe_truth, chain_valid)
-        predictions = self.outcome(latent).squeeze(-1)
-        valid = outcome_valid.bool() & torch.isfinite(outcomes)
-        outcome_loss = (
-            F.mse_loss(predictions[valid].tanh(), outcomes[valid])
-            if bool(valid.any())
-            else predictions[:0].sum()
-        )
-        return {"marginal": marginal_loss, "autoregressive": chain_loss, "outcome": outcome_loss}
-
-    def sample_team(self, latent, reveals, **kwargs):
-        return self.belief.sample_team(self.context_projection(latent), reveals, **kwargs)

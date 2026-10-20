@@ -562,6 +562,7 @@ class BeliefModel(nn.Module):
         fed: torch.Tensor,
         clamp: torch.Tensor,
         masks: dict,
+        prior=None,
     ) -> dict[str, torch.Tensor]:
         b = hidden.shape[0]
         per_family: dict[str, list[torch.Tensor]] = {f: [] for f in self.sizes}
@@ -576,6 +577,8 @@ class BeliefModel(nn.Module):
             elif fam == "ev":
                 legal = self._ev_budget_mask(fed, slot, p, legal)
             logits = self._apply_mask(logits, legal)
+            if prior is not None:
+                logits = prior.condition(logits, fed, p)
             logits = self._delta_fill(logits, clamp[:, p], tokens_flat[:, p])
             per_family[fam].append(logits)
 
@@ -587,6 +590,34 @@ class BeliefModel(nn.Module):
             elif fam == "ev":
                 stacked = stacked.reshape(b, N_SLOTS, 6, self.sizes["ev"])
             out[fam] = stacked
+        return out
+
+    def _selected_heads(self, hidden, fed, positions, active, masks, prior):
+        """Only addressed queries; other entries are zero and explicitly invalid."""
+        b = len(fed)
+        counts = {family: _POS_FAMILY.count(family) for family in self.sizes}
+        out = {family: hidden.new_zeros(b, count, self.sizes[family]) for family, count in counts.items()}
+        for position in torch.unique(positions[active]).tolist():
+            p = int(position)
+            use = active & (positions == p)
+            family, slot = _POS_FAMILY[p], _POS_SLOT[p]
+            column = p % len(SLOT_ATTRS)
+            ev_subslot = _EV_COLS.index(column) if family == "ev" else None
+            logits = self._value_logits(family, hidden[use], ev_subslot=ev_subslot)
+            base = masks.get(family)
+            legal = base[use, slot] if base is not None else None
+            if family == "move":
+                legal = self._move_set_mask(fed[use], slot, legal)
+            elif family == "ev":
+                legal = self._ev_budget_mask(fed[use], slot, p, legal)
+            logits = self._apply_mask(logits, legal)
+            if prior is not None:
+                logits = prior.index_select(use).condition(logits, fed[use], p)
+            sub = column - 3 if family == "move" else ev_subslot
+            index = slot if sub is None else slot * (4 if family == "move" else 6) + sub
+            out[family][use, index] = logits
+        out["move"] = out["move"].reshape(b, 6, 4, self.sizes["move"])
+        out["ev"] = out["ev"].reshape(b, 6, 6, self.sizes["ev"])
         return out
 
     @staticmethod
@@ -611,6 +642,7 @@ class BeliefModel(nn.Module):
         teacher_values: torch.Tensor | None = None,
         tail_order: str | None = None,
         generator: torch.Generator | None = None,
+        selected_only: bool = False,
     ) -> BeliefOutput:
         """Marginals from the reveal set, or one matched set-AR training conditional per row.
 
@@ -622,6 +654,7 @@ class BeliefModel(nn.Module):
         """
         tokens: torch.Tensor = opp_revealed["tokens"]
         masks: dict = opp_revealed.get("masks") or {}
+        prior = opp_revealed.get("prior")
         b = tokens.shape[0]
         tokens_flat = tokens.reshape(b, N_ATTRS)
         revealed = self._revealed_mask(tokens)
@@ -631,7 +664,7 @@ class BeliefModel(nn.Module):
         if teacher_values is None:
             hidden = self._context_hidden(belief_context, fed, source)
             logits = self._heads_from_context(
-                hidden, tokens_flat, fed, revealed, masks
+                hidden, tokens_flat, fed, revealed, masks, prior
             )
             return BeliefOutput(logits=logits)
 
@@ -670,9 +703,13 @@ class BeliefModel(nn.Module):
                 known[vr, vp] = True
                 source[vr, vp] = 1
 
-        hidden = self._context_hidden(belief_context, fed, source)
-        # Clamp facts already in the context.  The next selected field remains a genuine prediction.
-        logits = self._heads_from_context(hidden, fed, fed, known, masks)
+        if selected_only:
+            hidden = self._selected_context_hidden(belief_context, fed, selected.clamp_min(0), source)
+            logits = self._selected_heads(hidden, fed, selected, has_hidden, masks, prior)
+        else:
+            hidden = self._context_hidden(belief_context, fed, source)
+            # Clamp facts already in the context. The selected field remains a genuine prediction.
+            logits = self._heads_from_context(hidden, fed, fed, known, masks, prior)
 
         valid_flat = torch.zeros_like(known)
         sel_rows = rows[has_hidden]
@@ -789,6 +826,12 @@ class BeliefModel(nn.Module):
                 budget[use] = self._ev_budget_mask(fed[use], int(slot), int(p), None)
             legal = budget if legal is None else (legal & budget)
         logits = self._apply_mask(logits, legal)
+        prior = opp_revealed.get("prior")
+        if prior is not None:
+            logits = logits.clone()
+            for position in torch.unique(positions).tolist():
+                use = positions == int(position)
+                logits[use] = prior.index_select(use).condition(logits[use], fed[use], int(position))
         if bool(public_target.any()):
             logits = self._delta_fill(logits, public_target, public[rows, positions])
         return logits
@@ -903,6 +946,9 @@ class BeliefModel(nn.Module):
                 elif fam == "ev":
                     legal = self._ev_budget_mask(context_flat[use], slot, int(p), legal)
                 logits = self._apply_mask(logits, legal)
+                prior = opp_revealed.get("prior")
+                if prior is not None:
+                    logits = prior.index_select(route_row[use]).condition(logits, context_flat[use], int(p))
                 target_p = target[use]
                 target_ok = (target_p >= 0) & (target_p < logits.shape[-1])
                 lp = torch.log_softmax(logits, dim=-1)
@@ -951,6 +997,8 @@ class BeliefModel(nn.Module):
         c_k = rep(belief_context)
         tokens_k = rep(tokens0)
         masks_k = {name: rep(mask) for name, mask in masks.items()}
+        prior = opp_revealed.get("prior")
+        prior_k = prior.repeat_interleave(k) if prior is not None else None
         revealed = self._revealed_mask(tokens_k)
         fed = torch.where(
             revealed, tokens_k.reshape(b * k, N_ATTRS), torch.full_like(
@@ -992,6 +1040,8 @@ class BeliefModel(nn.Module):
                     elif fam == "ev":
                         legal = self._ev_budget_mask(fed[ur], slot, int(p), legal)
                     logits = self._apply_mask(logits, legal)
+                    if prior_k is not None:
+                        logits = prior_k.index_select(ur).condition(logits, fed[ur], int(p))
                     probs = torch.softmax(logits / max(float(temperature), 1e-6), dim=-1)
                     draw = torch.multinomial(probs, 1, generator=generator).squeeze(1)
                     fed[ur, p] = draw

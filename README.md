@@ -15,6 +15,11 @@ Neither the typed-token PPO pilots nor native Kakuna fine-tuning have establishe
 playing-strength gain over their respective starting checkpoints. The latest native runs and
 next diagnostic questions are summarized in the [training review](docs/training-review.md).
 
+The current [prior-conditioned AR pilot](docs/kakuna-prior-chain.md) targets useful hidden-team
+sampling before further policy adaptation. It keeps Kakuna's ordinary policy frozen, compares
+matched fact-only and native-context belief heads, and reserves fresh development rosters for
+reconstruction evaluation. A better belief model alone is not a demonstrated playing-strength gain.
+
 ## Local setup
 
 Install Python 3.11+, uv, Node.js with npm, and a Rust toolchain. On Windows, building the
