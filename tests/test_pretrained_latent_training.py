@@ -130,3 +130,40 @@ def test_nonfinite_native_proposal_restores_adam_and_weights_but_keeps_head_step
     assert all(torch.equal(v, before[k]) for k, v in m.native.state_dict().items())
     assert not native_optimizer.state and head_optimizer.state
     assert result["head_optimizer_steps"] == 1 and result["native_optimizer_steps"] == 0
+
+
+def test_public_retention_replay_adds_native_gradient_without_labels_or_changing_head_updates(monkeypatch):
+    import copy
+    from fog.pretrained import latent_training as module
+
+    torch.manual_seed(13)
+    initial = small_model()
+    monkeypatch.setattr(module, "latent_for", lambda model, batch, adapt: model.native(batch["reference_latent"]))
+    def losses(model, latent, labels, generator):
+        context = model.context_projection(latent)
+        return {"marginal": model.belief(context).square().mean(),
+                "autoregressive": (model.belief(context) - 1).square().mean(),
+                "outcome": model.outcome(context).square().mean()}
+    monkeypatch.setattr(module, "belief_losses", losses)
+    monkeypatch.setattr(module, "legal_policy", lambda model, latent, obs: latent.sum(-1, keepdim=True).expand(*latent.shape[:2], 13).softmax(-1))
+    monkeypatch.setattr(module, "action_values", lambda model, latent: latent.sum(-1, keepdim=True).expand(*latent.shape[:2], 13))
+    h = torch.ones(2, 2)
+    batch = {"reference_latent": h, "reference_probabilities": torch.ones(2, 13) / 13,
+             "reference_values": initial.native(h).sum(-1, keepdim=True).expand(2, 13).detach(),
+             "lengths": torch.ones(2, dtype=torch.long),
+             "actor_observations": {"illegal_actions": torch.zeros(2, 13, dtype=torch.bool)},
+             "labels": {"ignored": torch.ones(2)}}
+    anchor = {k: copy.deepcopy(v) for k, v in batch.items() if k != 'labels'}
+    anchor['reference_values'] = anchor['reference_values'] + .01
+    outputs, metrics = [], []
+    for replay in [(), (anchor,)]:
+        model = copy.deepcopy(initial)
+        result = train_update(model, batch, head_optimizer=torch.optim.Adam(head_parameters(model), lr=.001),
+                              native_optimizer=torch.optim.Adam(model.native.parameters(), lr=1e-5),
+                              route_generator=None, weights=dict(marginal=1., autoregressive=1., outcome=.1),
+                              retention_margin=.25, retention_batches=replay, microbatch=1)
+        outputs.append(head_state(model))
+        metrics.append(result)
+    assert all(torch.equal(value, outputs[1][key]) for key, value in outputs[0].items())
+    assert metrics[0]['native_gradient_norm'] != metrics[1]['native_gradient_norm']
+    assert len(metrics[1]['attempted_replay_retention']) == 1 and metrics[1]['retained_replay_within_limits']

@@ -34,6 +34,9 @@ def check(config, out, device="cuda"):
     out.mkdir(parents=True, exist_ok=True)
     trial = dict(config, warm_updates=2, condition_updates=2, effective_batch=4, microbatch=2,
                  save_every=1, evaluation_contexts=2, training_seconds=600, export_native=False)
+    if config.get("retention_replay"):
+        trial["retention_replay"] = dict(config["retention_replay"], contexts=16, batch=4, audit_every=1,
+                                         extra=config["retention_replay"].get("extra", [])[:4])
     with tempfile.TemporaryDirectory(dir=out, prefix="discarded-") as temporary:
         root = Path(temporary)
         if not root.resolve().is_relative_to(out.resolve()):
@@ -51,7 +54,8 @@ def check(config, out, device="cuda"):
         a = torch.load(root / "direct/latest.state.pt", weights_only=False, map_location="cpu")
         b = torch.load(root / "split/latest.state.pt", weights_only=False, map_location="cpu")
         keys = ("upper", "heads", "head_optimizer", "native_optimizer", "sampler", "route_rng", "rng",
-                "warm_heads", "control_heads", "rejected", "native_accepted", "steps", "phase", "phase_update")
+                "warm_heads", "control_heads", "rejected", "native_accepted", "steps", "phase", "phase_update",
+                "retention_guard", "retention_bank_sha256")
         checks = {key: identical(a[key], b[key]) for key in keys}
         rng_checks = {key: identical(value, b["rng"][key]) for key, value in a["rng"].items()}
         checks["query_schedules"] = [r["query_schedule_sha256"] for r in a["history"]] == [r["query_schedule_sha256"] for r in b["history"]]

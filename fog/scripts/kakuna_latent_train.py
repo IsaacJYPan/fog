@@ -23,9 +23,10 @@ from fog.pretrained.kakuna import INTERFACE_VERSION, KAKUNA_34_SHA256, load_kaku
 from fog.pretrained.latent_cache import tensor_digest
 from fog.pretrained.latent_training import (
     FeatureData, fixed_queries, head_parameters, head_state, initialize_heads, load_heads,
-    query_schedule, score_beliefs, train_update,
+    query_schedule, score_beliefs, select_batch, assess_behavior, train_update,
 )
 from fog.pretrained.retention import RetentionLimits, configure_upper_training, upper_modules
+from fog.pretrained.retention_replay import OriginalReferenceRepair, replay_specifications
 from fog.pretrained.state import atomic_save, restore_rng, rng_state
 
 
@@ -61,6 +62,15 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
         not math.isfinite(config["outcome_backbone_ratio"]) or not 0 <= config["outcome_backbone_ratio"] <= 1
     ):
         raise ValueError("Outcome/shared-belief gradient ratio must be in [0,1]")
+    replay_config = config.get("retention_replay")
+    if replay_config is not None:
+        for key in ("contexts", "batch", "audit_every", "max_repairs", "seed"):
+            if type(replay_config.get(key)) is not int or replay_config[key] < 1:
+                raise ValueError("Invalid retention-replay setting: " + key)
+        if (replay_config["contexts"] % replay_config["batch"]
+                or not math.isfinite(replay_config.get("margin_fraction", float('nan')))
+                or not 0 < replay_config["margin_fraction"] < 1):
+            raise ValueError("Require divisible retention groups and a margin fraction in (0,1)")
     if device.startswith("cuda") and (not torch.cuda.is_available() or config.get("allow_local_cache")):
         raise ValueError("CUDA training requires real CUDA and the complete production cache")
     torch.set_num_threads(config.get("cpu_threads", 1))
@@ -100,6 +110,12 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
     fixed = frozen_fingerprint(model.native)
     upper_parameters = configure_upper_training(model.native, adapt=True)
     limits = RetentionLimits(**config["limits"])
+    repair = OriginalReferenceRepair(upper_parameters, limits=limits) if replay_config else None
+    bank, bank_signature = None, None
+    if replay_config:
+        bank_specs, bank_signature = replay_specifications(data, count=replay_config["contexts"],
+                                                         seed=replay_config["seed"], extra=replay_config.get("extra", ()))
+        bank = data.batch(bank_specs, device)
     phases = [("warm", config["warm_updates"]), ("control", config["condition_updates"]), ("adapted", config["condition_updates"])]
     phase, update, steps, rejected, native_accepted = 0, 0, 0, 0, 0
     warm_heads, control_heads, histories, evaluations = None, None, [], {}
@@ -140,6 +156,10 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
         warm_source = saved.get("warm_source")
         if len(histories) != steps or fixed != saved["frozen_fingerprint"]:
             raise ValueError("Saved exposure or frozen-native fingerprint differs")
+        if repair:
+            if saved.get("retention_bank_sha256") != bank_signature:
+                raise ValueError("Retention replay bank changed across resume")
+            repair.load_state_dict(saved["retention_guard"])
     sentinel_specs = fixed_queries(data, seed=seed + 709, count=config["effective_batch"])
     sentinel = data.batch(sentinel_specs, device)
     development = fixed_queries(data, seed=seed + 991, count=config["evaluation_contexts"], split="development")
@@ -157,6 +177,7 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
                      "native_accepted": native_accepted, "history": histories, "evaluations": evaluations,
                      "frozen_fingerprint": fixed, "elapsed_seconds": elapsed_prior + time.monotonic() - started,
                      "initialization": initialization, "warm_source": warm_source,
+                     "retention_guard": repair.state_dict() if repair else None, "retention_bank_sha256": bank_signature,
                      "boundary": "completed head update and accepted/restored native update"}, out / "latest.state.pt")
         (out / "metrics.jsonl").write_text("".join(json.dumps(row) + "\n" for row in histories))
 
@@ -177,6 +198,23 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
             begin = time.monotonic()
             specs = data.draw(sampler, config["effective_batch"])
             batch = data.batch(specs, device)
+            anchor, preflight = None, None
+            def guard_groups(full=False):
+                groups = {"batch": batch, "sentinel": sentinel}
+                if full:
+                    for offset in range(0, len(bank["lengths"]), replay_config["batch"]):
+                        groups[f"bank-{offset}"] = select_batch(bank, slice(offset, offset + replay_config["batch"]))
+                else:
+                    groups["rotating_replay"] = anchor
+                return {name: assess_behavior(model, value, adapt=True, microbatch=config["microbatch"])
+                        for name, value in groups.items()}
+            if adapt and repair:
+                offset = (update * replay_config["batch"]) % len(bank["lengths"])
+                anchor = select_batch(bank, slice(offset, offset + replay_config["batch"]))
+                measurements = guard_groups(full=update == 0)
+                preflight = {"repaired": False, "measurements": measurements}
+                if not repair.accepts(measurements):
+                    preflight = repair.ensure(lambda: guard_groups(full=True), native_optimizer)
             fraction = update / max(1, planned - 1)
             schedule = 0.1 + 0.9 * 0.5 * (1 + math.cos(math.pi * fraction))
             if label == "warm":
@@ -184,7 +222,7 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
             for group in head_optimizer.param_groups:
                 group["lr"] = config["head_learning_rate"] * schedule
             for group in native_optimizer.param_groups:
-                group["lr"] = config["native_learning_rate"] * schedule * 0.5 ** min(rejected, 10)
+                group["lr"] = config["native_learning_rate"] * schedule * 0.5 ** min(rejected + (repair.repairs if repair else 0), 10)
             devices = [torch.device(device).index or 0] if device.startswith("cuda") else []
             route_before = hashlib.sha256(route.get_state().cpu().numpy().tobytes()).hexdigest()
             with torch.random.fork_rng(devices=devices):
@@ -194,21 +232,32 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
                                        route_generator=route, weights=config["weights"],
                                        policy_penalty=config["policy_penalty"], value_penalty=config["value_penalty"],
                                        limits=limits, sentinel=sentinel, microbatch=config["microbatch"],
-                                       outcome_backbone_ratio=config.get("outcome_backbone_ratio"))
+                                       outcome_backbone_ratio=config.get("outcome_backbone_ratio"),
+                                       retention_margin=replay_config["margin_fraction"] if replay_config else None,
+                                       retention_batches=(anchor,) if anchor is not None else ())
             update += 1
             steps += 1
             native_accepted += metrics["native_optimizer_steps"]
             rejected += int(adapt and not metrics["native_update_accepted"])
+            bank_audit = None
+            if adapt and repair and (update % replay_config["audit_every"] == 0 or update == planned):
+                bank_audit = repair.ensure(lambda: guard_groups(full=True), native_optimizer)
             row = {"stage": label, "update": update, "steps": steps, "contexts": len(specs),
                    "query_schedule_sha256": query_schedule(specs), "head_lr": head_optimizer.param_groups[0]["lr"],
                    "route_rng_before_sha256": route_before,
                    "route_rng_after_sha256": hashlib.sha256(route.get_state().cpu().numpy().tobytes()).hexdigest(),
                    "native_lr": native_optimizer.param_groups[0]["lr"], "native_accepted_total": native_accepted,
                    "native_rejected_total": rejected, "seconds": time.monotonic() - begin, **metrics}
+            if adapt and repair:
+                row.update(retention_preflight=preflight, retention_bank_audit=bank_audit,
+                           retention_bank_sha256=bank_signature, native_reference_repairs_total=repair.repairs,
+                           native_Adam_current_step=max((int(s['step']) for s in native_optimizer.state.values()), default=0))
             histories.append(row)
             print(json.dumps(row), flush=True)
-            if not metrics["retained_batch_within_limits"]:
+            if not metrics["retained_batch_within_limits"] or not metrics["retained_replay_within_limits"]:
                 stopped, reason = True, "uncovered_behavior_drift"
+            if adapt and repair and repair.repairs >= replay_config["max_repairs"]:
+                stopped, reason = True, "excessive_reference_repairs"
             if adapt and update >= 100 and rejected / update > 0.3:
                 stopped, reason = True, "excessive_native_rejections"
             if update % config["save_every"] == 0 or time.monotonic() - last_save >= 300 or stopped:
@@ -256,6 +305,7 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
               "evaluations": evaluations, "frozen_native_unchanged": frozen_fingerprint(model.native) == fixed,
               "elapsed_seconds": elapsed_prior + time.monotonic() - started,
               "initialization": initialization, "warm_head_fingerprint": warm_source,
+              "retention_guard": repair.state_dict() if repair else None, "retention_bank_sha256": bank_signature,
               "automatic_promotion": False, "cache_sha256": data.signature}
     (out / "RESULTS.json").write_text(json.dumps(report, indent=2) + "\n")
     if sha256(Path(config["checkpoint"])) != KAKUNA_34_SHA256:

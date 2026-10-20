@@ -84,6 +84,11 @@ def run():
         child([native, "-m", "fog.scripts.pretrained_contract", "--checkpoint", "inputs/kakuna34.pt",
                "--samples", "inputs/contract-inputs.pt", "--reference", "inputs/cpu-probabilities.pt",
                "--device", "cuda", "--out", str(output / "contract-initial")], "initial-contract.log")
+        if descriptor['training'].get('retention_replay'):
+            phase = "discarded CUDA regression of original-reference repair"
+            child([native, "-m", "fog.scripts.kakuna_retention_repair_check", "--config", "inputs/training.json",
+                   "--fixture", "inputs/retention-regression.pt", "--device", "cuda",
+                   "--out", str(output / "repair-check")], "repair-check.log")
         phase = "discarded CUDA full-state resume check"
         child([native, "-m", "fog.scripts.kakuna_latent_resume_check", "--config", "inputs/training.json",
                "--device", "cuda", "--out", str(output / "resume-check")], "resume-check.log")

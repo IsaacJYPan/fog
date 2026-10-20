@@ -16,6 +16,7 @@ from fog.pretrained.joint import normalized_belief_loss
 from fog.pretrained.kakuna import INTERFACE_VERSION, KAKUNA_34_SHA256, sha256
 from fog.pretrained.latent_cache import CACHE_FORMAT, CACHE_VERSION, windows
 from fog.pretrained.gradient_balance import OutcomeGradientCap
+from fog.pretrained.retention_replay import budget_retention_terms
 from fog.pretrained.retention import NativeStep, RetentionLimits, action_values, legal_policy, retention_terms, upper_forward
 
 HEAD_SCHEMA_FILES = ("fog/models/belief.py", "fog/constants/tables.py", "fog/constants/schema.py") + tuple(
@@ -169,7 +170,8 @@ def belief_losses(model, latent, labels, generator):
 
 def train_update(model, batch, *, head_optimizer, native_optimizer, route_generator,
                  weights, policy_penalty=20.0, value_penalty=1.0, limits=None,
-                 sentinel=None, microbatch=8, outcome_backbone_ratio=None):
+                 sentinel=None, microbatch=8, outcome_backbone_ratio=None,
+                 retention_margin=None, retention_batches=()):
     adapt = native_optimizer is not None
     model.native.eval()
     for module in (model.context_projection, model.belief, model.outcome):
@@ -180,6 +182,8 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
     native_parameters = [] if not adapt else [p for group in native_optimizer.param_groups for p in group["params"]]
     balance = OutcomeGradientCap(native_parameters, outcome_backbone_ratio) if adapt and outcome_backbone_ratio is not None else None
     size = len(batch["lengths"])
+    retention_groups = 1 + len(retention_batches) if adapt else 1
+    objective_totals = {"policy": 0., "value": 0.}
     totals = {key: 0.0 for key in ("marginal", "autoregressive", "outcome", "policy_kl", "value_retention")}
     for start in range(0, size, microbatch):
         row = select_batch(batch, slice(start, start + microbatch))
@@ -193,7 +197,12 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
             kl, value, _ = retention_terms(p, row["reference_probabilities"], q, row["reference_values"], ~obs["illegal_actions"][:, 0].bool())
         else:
             kl = value = latent.sum() * 0
-        loss = sum(weights[key] * term for key, term in losses.items()) + policy_penalty * kl + value_penalty * value
+        objective_kl, objective_value = kl, value
+        if adapt and retention_margin is not None:
+            objective_kl, objective_value = budget_retention_terms(
+                p, row["reference_probabilities"], q, row["reference_values"], ~obs["illegal_actions"][:, 0].bool(),
+                limits=limits or RetentionLimits(), fraction=retention_margin)
+        loss = sum(weights[key] * term for key, term in losses.items()) + (policy_penalty * objective_kl + value_penalty * objective_value) / retention_groups
         if not torch.isfinite(loss):
             raise FloatingPointError("Nonfinite belief/retention objective")
         scale = len(row["lengths"]) / size
@@ -203,6 +212,28 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
         (loss * scale).backward()
         for key, term in {**losses, "policy_kl": kl, "value_retention": value}.items():
             totals[key] += float(term.detach()) * scale
+        objective_totals["policy"] += float(objective_kl.detach()) * scale / retention_groups
+        objective_totals["value"] += float(objective_value.detach()) * scale / retention_groups
+    if adapt:
+        for anchor in retention_batches:
+            for start in range(0, len(anchor["lengths"]), microbatch):
+                row = select_batch(anchor, slice(start, start + microbatch))
+                latent = latent_for(model, row, adapt=True)
+                obs = {key: value[:, None] for key, value in row["actor_observations"].items()}
+                p = legal_policy(model.native, latent[:, None], obs)[:, 0]
+                q = action_values(model.native, latent[:, None])[:, 0]
+                legal = ~obs["illegal_actions"][:, 0].bool()
+                kl, value, _ = retention_terms(p, row["reference_probabilities"], q, row["reference_values"], legal)
+                if retention_margin is not None:
+                    kl, value = budget_retention_terms(p, row["reference_probabilities"], q, row["reference_values"], legal,
+                                                      limits=limits or RetentionLimits(), fraction=retention_margin)
+                scale = len(row["lengths"]) / len(anchor["lengths"]) / retention_groups
+                penalty = policy_penalty * kl + value_penalty * value
+                if not torch.isfinite(penalty):
+                    raise FloatingPointError("Nonfinite replay retention objective")
+                (penalty * scale).backward()
+                objective_totals["policy"] += float(kl.detach()) * scale
+                objective_totals["value"] += float(value.detach()) * scale
     heads = head_parameters(model)
     balance_metrics = balance.apply() if balance is not None else {}
     head_norm = float(torch.nn.utils.clip_grad_norm_(heads, 1.5, error_if_nonfinite=True))
@@ -215,14 +246,16 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
             native_optimizer.step()
         current = assess_behavior(model, batch, adapt=adapt, microbatch=microbatch)
         fixed = assess_behavior(model, sentinel, adapt=adapt, microbatch=microbatch) if sentinel is not None else None
-        accepted = not adapt or ((limits or RetentionLimits()).accepts(current) and (fixed is None or (limits or RetentionLimits()).accepts(fixed)))
+        replay = [assess_behavior(model, row, adapt=adapt, microbatch=microbatch) for row in retention_batches] if adapt else []
+        accepted = not adapt or ((limits or RetentionLimits()).accepts(current) and (fixed is None or (limits or RetentionLimits()).accepts(fixed))
+                                and all((limits or RetentionLimits()).accepts(row) for row in replay))
     except FloatingPointError as failure:
         if not adapt:
             raise
         step.restore()
         restored = True
         error = str(failure)
-        current, fixed, accepted = {}, None, False
+        current, fixed, replay, accepted = {}, None, [], False
     except BaseException:
         if adapt:
             step.restore()
@@ -231,14 +264,18 @@ def train_update(model, batch, *, head_optimizer, native_optimizer, route_genera
         if not restored:
             step.restore()
         retained = assess_behavior(model, batch, adapt=adapt, microbatch=microbatch)
+        retained_replay = [assess_behavior(model, row, adapt=adapt, microbatch=microbatch) for row in retention_batches]
     else:
         retained = current
+        retained_replay = replay
     return {"losses": totals, "head_gradient_norm": head_norm, "native_gradient_norm": native_norm,
             **balance_metrics,
             "native_update_attempted": adapt, "native_update_accepted": bool(adapt and accepted),
             "attempted_batch_retention": current, "attempted_sentinel_retention": fixed,
+            "attempted_replay_retention": replay, "retention_objective": objective_totals,
             "retained_batch_retention": retained,
             "retained_batch_within_limits": (limits or RetentionLimits()).accepts(retained),
+            "retained_replay_within_limits": all((limits or RetentionLimits()).accepts(row) for row in retained_replay),
             "native_rejection_error": error,
             "head_optimizer_steps": 1, "native_optimizer_steps": int(adapt and accepted)}
 

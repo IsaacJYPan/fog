@@ -86,3 +86,52 @@ The eventual contribution still requires better decisions against unchanged
 Kakuna, through measured policy learning, search or endgame teaching. The separate
 search bridge's hard deadline must be repaired before online search is enabled.
 Do not interpret a representational or imputation improvement alone as a stronger bot.
+
+## Observed failure and retention replay
+
+The stronger-step pilot stopped after 101 accepted native updates. A newly drawn
+training context already exceeded the original-policy KL limits before the next
+step. Rejecting that proposal correctly restored the pre-step weights, but could
+not repair drift left by earlier updates on other contexts. The fixed sentinel
+remained within its limits. This was a limitation of sampled coverage, not a
+failed checkpoint resume or measured playing-strength regression.
+
+Local reproduction recovered the same mean KL of 0.002886 and maximum 0.09105.
+Contracting total upper-weight displacement halfway toward protected Kakuna34
+passed the unchanged limits on the failing batch, sentinel and 64 additional
+training contexts. Retention gradients were a median 43 times the belief-gradient
+norm during the stopped pilot. More updates with that objective do not by
+themselves resolve either problem.
+
+The next bounded pilot uses a deterministic 512-context training-only retention
+bank, including the offending public context. Each update checks its current
+batch, fixed sentinel and 32 rotating bank contexts; all bank groups are checked
+every 50 updates and before export. Rotating public contexts also contribute a
+retention objective. Private labels never enter the actor/critic readouts, and
+development contexts do not decide acceptance.
+
+A dead zone leaves per-context/action changes below one quarter of the original
+mean KL/value budgets unpenalized. Hard acceptance bounds remain unchanged. If
+earlier updates left a newly detected violation, backtrack the total displacement
+toward immutable original weights and check every retention group. Copy and test
+the original exactly as the last bounded fallback. Reset native Adam moments
+after a successful repair, reduce the native learning rate, and record the repair;
+head weights, head Adam, query exposure and random streams remain intact. Failure
+to validate the original, excessive repairs, or incomplete matched exposure stops
+the run. This is an explicit changed optimization algorithm, not a global
+preservation theorem. A finite training bank can miss unseen-history drift.
+
+Use native LR 2e-5 and keep the 25% outcome-to-belief native-gradient cap. Reuse
+the completed warm heads already paired with original Kakuna, disclose their
+historical 1,000 updates, and perform 32 common warm updates plus 1,000 matched
+updates per condition. Require an actual CUDA regression of the stopped case,
+complete-state resume including repair progress, and the probability contracts.
+Keep the two-hour GPU limit and separate CPU playing-strength evaluation.
+
+The independent expanded-prior audit admitted 20,000 legal, supported training
+teams and improved development item modal accuracy from 48.26% to 52.25%, and
+encoded-set recall@8 from 1.22% to 3.85%. Calibration did not improve uniformly.
+These are eight reused development roster groups, with reconstructed archive
+evidence and no downstream-play measurement. Keep this bank separate from the
+matched shared-learning pilot. A prior-informed AR proposal and fixed-search
+comparison are subsequent hypotheses, not demonstrated strength improvements.
