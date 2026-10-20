@@ -53,7 +53,7 @@ def probabilities(heads, config, specifications, *, device="cuda", tolerance=1e-
     }
 
 
-def check(config, out, *, device="cpu"):
+def check(config, out, *, device="cpu", condition=None):
     out = Path(out)
     out.mkdir(parents=True, exist_ok=False)
     trial = dict(
@@ -67,11 +67,14 @@ def check(config, out, *, device="cpu"):
         evaluation_games=1,
         training_seconds=600,
     )
-    direct = run(trial, out / "direct", device=device)
-    partial = run(trial, out / "split", device=device, stop_after_steps=3)
-    if partial["complete"] or partial["steps"] != 3:
+    direct = run(trial, out / "direct", device=device, condition=condition)
+    interrupted_step = 1 if condition else 3
+    partial = run(trial, out / "split", device=device, stop_after_steps=interrupted_step,
+                  condition=condition)
+    if partial["complete"] or partial["steps"] != interrupted_step:
         raise ValueError("Resume proof did not interrupt after a complete update")
-    resumed = run(trial, out / "split", device=device, resume=out / "split/latest.state.pt")
+    resumed = run(trial, out / "split", device=device, resume=out / "split/latest.state.pt",
+                  condition=condition)
     a = torch.load(out / "direct/latest.state.pt", weights_only=False, map_location="cpu")
     b = torch.load(out / "split/latest.state.pt", weights_only=False, map_location="cpu")
     keys = [
@@ -90,12 +93,15 @@ def check(config, out, *, device="cpu"):
     checks = {key: identical(a[key], b[key]) for key in keys}
     checks["complete"] = direct["complete"] and resumed["complete"]
     checks["no_native_parameters"] = not any(key.startswith("native.") for key in a["model"])
-    checks["matched_exposure"] = direct["matched_query_routes"] and resumed["matched_query_routes"]
+    checks["matched_exposure"] = (
+        direct["steps"] == resumed["steps"] == trial["updates"] * (1 if condition else 2)
+    )
     checks["outcome_head_control"] = (
-        direct["outcome_heads_identical"] and resumed["outcome_heads_identical"]
+        all(torch.equal(v, b["model"][k]) for k, v in a["model"].items()
+            if k.startswith("outcome."))
     )
     checks["CUDA_rng_present"] = not device.startswith("cuda") or bool(a["rng"]["cuda"])
-    for phase, mode in enumerate(["facts", "native"]):
+    for phase, mode in enumerate([condition] if condition else ["facts", "native"]):
         left = torch.load(out / f"direct/{mode}_full.state.pt", weights_only=False, map_location="cpu")
         right = torch.load(out / f"split/{mode}_full.state.pt", weights_only=False, map_location="cpu")
         checks[f"{mode}_full_state"] = (
@@ -114,8 +120,9 @@ def check(config, out, *, device="cpu"):
         "passed": all(checks.values()) and agreement["passed"],
         "checks": checks,
         "device": device,
+        "condition": condition,
         "probability_agreement": agreement,
-        "discarded_optimizer_updates": 8,
+        "discarded_optimizer_updates": 4 if condition else 8,
         "main_initialization_unchanged": True,
         "native_updates": 0,
         "CUDA_rng_saved": bool(a["rng"]["cuda"]),
@@ -127,7 +134,7 @@ def check(config, out, *, device="cpu"):
     return result
 
 
-def benchmark(config, out, *, device="cuda"):
+def benchmark(config, out, *, device="cuda", condition="native"):
     """Discarded production-shape updates; reject an infeasible fixed budget."""
     import random
     import time
@@ -155,6 +162,7 @@ def benchmark(config, out, *, device="cuda"):
     sampler = random.Random(config["seed"] + 41)
     generator = torch.Generator(device=device).manual_seed(config["seed"] + 42)
     seconds = []
+    started_unix = time.time()
     for _ in range(8):
         started = time.monotonic()
         batch = data.batch(data.draw(sampler, config["effective_batch"]), device=device)
@@ -165,18 +173,25 @@ def benchmark(config, out, *, device="cuda"):
             batch,
             payload,
             generator,
-            mode="native",
+            mode=condition,
             chain_queries=config["chain_queries"],
             microbatch=config["microbatch"],
         )
         if device.startswith("cuda"):
             torch.cuda.synchronize()
         seconds.append(time.monotonic() - started)
-    estimate = float(np.quantile(seconds[2:], 0.9)) * config["updates"] * 2 * 1.2
+    parallel = config.get("execution") == "parallel_conditions"
+    updates_on_device = config["updates"] * (1 if parallel else 2)
+    estimate = float(np.quantile(seconds[2:], 0.9)) * updates_on_device * 1.2
     result = {
         "passed": estimate < config["training_seconds"],
         "actual_cuda": device.startswith("cuda"),
+        "condition": condition,
+        "measurement_started_unix": started_unix + sum(seconds[:2]),
+        "measurement_finished_unix": time.time(),
         "production_batch": config["effective_batch"],
+        "execution": config.get("execution", "sequential_conditions"),
+        "main_updates_on_device": updates_on_device,
         "microbatch": config["microbatch"],
         "AR_queries_per_context": config["chain_queries"],
         "update_seconds": seconds,
@@ -201,13 +216,20 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     parser.add_argument("--benchmark", action="store_true")
+    parser.add_argument("--benchmark-only", action="store_true")
+    parser.add_argument("--condition", choices=["facts", "native"])
     args = parser.parse_args()
-    check(json.loads(args.config.read_text()), args.out, device=args.device)
-    if args.benchmark:
+    if args.benchmark and args.benchmark_only:
+        parser.error("Select a proof plus benchmark, or only a benchmark")
+    if not args.benchmark_only:
+        check(json.loads(args.config.read_text()), args.out, device=args.device,
+              condition=args.condition)
+    if args.benchmark or args.benchmark_only:
         benchmark(
             json.loads(args.config.read_text()),
-            args.out.with_name(args.out.name + "-throughput"),
+            args.out if args.benchmark_only else args.out.with_name(args.out.name + "-throughput"),
             device=args.device,
+            condition=args.condition or "native",
         )
 
 

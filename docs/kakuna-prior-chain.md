@@ -64,17 +64,26 @@ The bounded pilot uses 2,000 updates per arm, effective batch 32, microbatch 8,
 eight AR queries per context, head LR 2e-4, 100 warmup updates, cosine decay,
 gradient clipping 1.5 per independent head group and outcome weight 0.1. Marginal
 and AR losses each use weight 1 after their vocabulary/field normalization.
-Budget at most two GPU hours including actual CUDA full-state resume and
-CPU/CUDA probability gates. Incomplete arms fail the matched-exposure gate.
+The first two-hour notebook budget failed its throughput gate before main
+training: actual CUDA updates took about 3.7 seconds, implying five hours for the
+sequential pair with a 20% margin. CUDA resume and probability agreement passed.
+Kaggle provided two T4s, so the recovery runs one independent arm per device,
+without changing the model, data, losses or per-arm update counts. Its notebook
+wall-time cap is four hours, with three hours allowed per arm and at most eight
+physical GPU-hours reserved. Incomplete arms fail the matched-exposure gate.
 Periodic saves include heads, Adam, initial state, data/query/global RNG,
 phase/update counts and immutable input identities. Main training starts from
 the sealed initialization, never from discarded proof updates.
 Keep a separate final full-state checkpoint for each arm so its Adam and random
 streams remain available after the other arm finishes.
-Eight discarded production-shape CUDA updates also measure throughput. Stop
-before main training if the 90th-percentile update time, with a 20% margin, cannot
-fit both fixed arms. The eight resume-proof updates and eight throughput updates
-are disclosed separately from the 4,000 main updates. Public-only donor retrieval
+Each device runs four discarded resume-proof updates and eight discarded
+production-shape updates. Measure throughput concurrently and stop before main
+training if either device's 90th-percentile update time, with a 20% margin, cannot
+fit its 2,000 updates. The 24 discarded updates are separate from 4,000 main updates.
+Cancel the sibling process if either condition fails. Audit real per-arm Adam/RNG
+states and matched query histories before joining results; there is no invented
+combined optimizer state. The independent-process implementation must reproduce
+the sequential reference, including identical outcome heads. Public-only donor retrieval
 uses a bounded deterministic cache; cold and warm retrieval produce identical
 probabilities and no cache state changes the optimizer or random streams.
 

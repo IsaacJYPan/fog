@@ -275,3 +275,77 @@ def test_loading_auxiliary_heads_cannot_change_the_native_policy(tmp_path):
     load_heads(joined, path, native_sha256=cfg["native_sha256"], prior_sha256=cfg["prior_sha256"])
     assert torch.equal(native.actor(latent), before)
     assert all(torch.equal(v, native.state_dict()[k]) for k, v in frozen.items())
+
+
+def test_independent_process_conditions_match_the_sequential_reference(tmp_path):
+    import os
+    from pathlib import Path
+    import sys
+    from fog.pretrained.paired_belief import merge_conditions
+    from fog.scripts.prior_heads_kaggle_worker import execute_pair
+
+    torch.set_num_threads(1)
+    cfg = dict(inputs(tmp_path), execution="parallel_conditions")
+    reference = tmp_path / "reference"
+    run(cfg, reference)
+    config = tmp_path / "recipe.json"
+    config.write_text(json.dumps(cfg))
+    out = tmp_path / "parallel"
+    commands = [
+        (mode, [sys.executable, "-m", "fog.scripts.train_prior_heads",
+                "--config", str(config), "--out", str(out / mode),
+                "--device", "cpu", "--condition", mode], device)
+        for device, mode in enumerate(["facts", "native"])
+    ]
+    environment = dict(os.environ, PYTHONPATH=str(Path(__file__).resolve().parents[1]),
+                       OMP_NUM_THREADS="1", MKL_NUM_THREADS="1")
+    execute_pair(commands, environment, tmp_path / "logs", 120)
+    merged = merge_conditions(cfg, out)
+    assert merged["steps"] == 4 and merged["arm_updates"] == {"facts": 2, "native": 2}
+    assert merged["matched_query_routes"] and merged["outcome_heads_identical"]
+    for mode in ("facts", "native"):
+        before = torch.load(reference / f"{mode}_heads_final.pt", weights_only=True)
+        after = torch.load(out / f"{mode}_heads_final.pt", weights_only=True)
+        assert equal(before, after)
+    # Cross-arm audits reject a changed fitted head, even if its own metadata pass.
+    state_path = out / "native/native_full.state.pt"
+    state = torch.load(state_path, weights_only=False)
+    first = next(key for key in state["model"] if key.startswith("outcome."))
+    state["model"][first] += 0.01
+    torch.save(state, state_path)
+    with pytest.raises(ValueError, match="full-state/exposure"):
+        merge_conditions(cfg, out)
+    head_path = out / "native/native_heads_final.pt"
+    head = torch.load(head_path, weights_only=True)
+    head["heads"][first] = state["model"][first]
+    torch.save(head, head_path)
+    with pytest.raises(ValueError, match="Outcome heads differ"):
+        merge_conditions(cfg, out)
+
+
+def test_condition_specific_resume_cannot_switch_arms(tmp_path):
+    cfg = inputs(tmp_path)
+    run(cfg, tmp_path / "native", condition="native", stop_after_steps=1)
+    state = tmp_path / "native/latest.state.pt"
+    with pytest.raises(ValueError, match="identity/schema/recipe"):
+        run(cfg, tmp_path / "wrong", condition="facts", resume=state)
+    assert run(cfg, tmp_path / "native", condition="native", resume=state)["complete"]
+
+
+def test_a_failed_condition_promptly_cancels_its_sibling(tmp_path):
+    import os
+    import sys
+    import time
+    from fog.scripts.prior_heads_kaggle_worker import execute_pair
+
+    marker = tmp_path / "should-not-finish"
+    commands = [
+        ("facts", [sys.executable, "-c", "raise RuntimeError('test failure')"], 0),
+        ("native", [sys.executable, "-c",
+                    "import time; from pathlib import Path; time.sleep(30); "
+                    f"Path({str(marker)!r}).write_text('finished')"], 1),
+    ]
+    started = time.monotonic()
+    with pytest.raises(RuntimeError, match="exit code|sibling failure"):
+        execute_pair(commands, dict(os.environ), tmp_path / "logs", 90)
+    assert time.monotonic() - started < 15 and not marker.exists()

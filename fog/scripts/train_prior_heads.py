@@ -30,7 +30,9 @@ from fog.pretrained.prior_head_metrics import evaluation_queries, score_distribu
 from fog.pretrained.state import atomic_save, restore_rng, rng_state
 
 
-def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
+def run(config, out, *, device="cpu", resume=None, stop_after_steps=None, condition=None):
+    if condition not in (None, "facts", "native"):
+        raise ValueError("Unknown independent belief condition")
     for key in [
         "updates",
         "effective_batch",
@@ -80,7 +82,7 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
     seed = config["seed"]
     phase, completed, steps, elapsed_prior = 0, 0, 0, 0.0
     histories, evaluations = [], {}
-    modes = ["facts", "native"]
+    modes = [condition] if condition else ["facts", "native"]
 
     def streams():
         random.seed(seed)
@@ -99,7 +101,8 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
         saved = torch.load(resume, map_location="cpu", weights_only=False)
         if (
             saved["format"] != "fog.prior-head-training"
-            or saved["version"] != 1
+            or saved["version"] != 2
+            or saved["condition"] != condition
             or saved["identity"] != identity
             or saved["config"] != config
         ):
@@ -138,7 +141,8 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
         atomic_save(
             {
                 "format": "fog.prior-head-training",
-                "version": 1,
+                "version": 2,
+                "condition": condition,
                 "identity": identity,
                 "config": config,
                 "phase": phase,
@@ -166,7 +170,7 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
             model, out / "prior_only.pt", config=config, mode="native", update=0, identity=identity
         )
     stop_reason = "planned_updates"
-    while phase < 2:
+    while phase < len(modes):
         mode = modes[phase]
         if completed == 0:
             model.load_state_dict(initial, strict=True)
@@ -255,12 +259,13 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
         )
         save()
         save(f"{mode}_full.state.pt")
-        if phase == 1:
+        if phase == len(modes) - 1:
             break
         phase, completed = phase + 1, 0
         save()
-    complete = phase == 1 and completed == config["updates"]
-    if complete:
+    complete = phase == len(modes) - 1 and completed == config["updates"]
+    matched = complete and condition is None
+    if matched:
         left = [v for v in histories if v["mode"] == "facts"]
         right = [v for v in histories if v["mode"] == "native"]
         if any(
@@ -277,13 +282,14 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None):
             raise ValueError("Outcome heads unexpectedly differ across belief-context ablations")
     result = {
         "complete": complete,
+        "condition": condition,
         "stop_reason": stop_reason,
         "identity": identity,
         "steps": steps,
         "updates_per_condition": config["updates"],
         "AR_queries_per_context": config["chain_queries"],
-        "matched_query_routes": complete,
-        "outcome_heads_identical": complete,
+        "matched_query_routes": matched,
+        "outcome_heads_identical": matched,
         "native_policy_changed": False,
         "native_optimizer_present": False,
         "native_sha256": config["native_sha256"],
@@ -303,9 +309,11 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--device", choices=["cpu", "cuda"], default="cpu")
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--condition", choices=["facts", "native"])
     args = parser.parse_args()
     result = run(
-        json.loads(args.config.read_text()), args.out, device=args.device, resume=args.resume
+        json.loads(args.config.read_text()), args.out, device=args.device, resume=args.resume,
+        condition=args.condition,
     )
     print(json.dumps({k: v for k, v in result.items() if k != "evaluations"}))
     if not result["complete"]:

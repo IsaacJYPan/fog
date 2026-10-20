@@ -47,7 +47,7 @@ def stop_process_tree(process, *, isolated):
         process.wait(timeout=5)
 
 
-def execute(command, environment, log, timeout, *, isolated=True, progress=None):
+def execute(command, environment, log, timeout, *, isolated=True, progress=None, cancel_event=None):
     """Keep console and downloadable logs while bounding the whole process tree."""
     if timeout <= 0:
         raise DeadlineExceeded("Frozen job deadline reached before starting subprocess")
@@ -82,27 +82,36 @@ def execute(command, environment, log, timeout, *, isolated=True, progress=None)
     reader.start()
     deadline = time.monotonic() + timeout
     timed_out = False
+    cancelled = False
+    last_progress = time.monotonic()
     try:
         while True:
+            if cancel_event is not None and cancel_event.is_set():
+                cancelled = True
+                break
             remaining = deadline - time.monotonic()
             if remaining <= 0:
                 timed_out = True
                 break
             try:
-                code = process.wait(timeout=min(30, remaining))
+                code = process.wait(timeout=min(1 if cancel_event is not None else 30, remaining))
                 break
             except subprocess.TimeoutExpired:
-                if progress and time.monotonic() < deadline:
+                now = time.monotonic()
+                if progress and now < deadline and now - last_progress >= 30:
                     print(json.dumps(progress()), flush=True)
+                    last_progress = now
     finally:
         # Nested commands remain in the worker's group so the supervisor also
         # stops installers, battle engines, and any abandoned grandchildren.
-        if isolated or timed_out:
+        if isolated or timed_out or cancelled:
             stop_process_tree(process, isolated=isolated)
         reader.join(timeout=1)
     process.stdout.close()
     if timed_out:
         raise DeadlineExceeded("Frozen subprocess deadline exceeded")
+    if cancelled:
+        raise RuntimeError("Paired subprocess cancelled after sibling failure")
     if code:
         raise RuntimeError("Experiment subprocess exit code " + str(code))
     return code

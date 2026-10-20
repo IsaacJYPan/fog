@@ -10,6 +10,31 @@ import time
 import zipfile
 
 
+def execute_pair(commands, environment, output, timeout):
+    """One independent condition per device; stop its sibling on failure."""
+    from concurrent.futures import ThreadPoolExecutor
+    import threading
+    from fog.scripts.pretrained_kaggle_worker import execute
+
+    cancelled = threading.Event()
+
+    def one(label, command, device):
+        try:
+            return execute(
+                command, dict(environment, CUDA_VISIBLE_DEVICES=str(device)),
+                Path(output) / f"{label}.log", timeout, isolated=False,
+                cancel_event=cancelled,
+                progress=lambda: {"condition": label, "status": "running"},
+            )
+        except BaseException:
+            cancelled.set()
+            raise
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        futures = [pool.submit(one, label, command, device) for label, command, device in commands]
+        return [future.result() for future in futures]
+
+
 def run():
     started = time.monotonic()
     work = Path("/kaggle/temp/fog")
@@ -95,56 +120,74 @@ def run():
             if (
                 descriptor["device"] != "cuda"
                 or not torch.cuda.is_available()
+                or torch.cuda.device_count() != 2
                 or torch.__version__.split("+")[0] != "2.11.0"
             ):
                 raise ValueError(
-                    "This GPU recipe requires the tested actual CUDA/PyTorch 2.11 runtime"
+                    "This GPU recipe requires two CUDA devices and tested PyTorch 2.11"
                 )
-            phase = "actual CUDA full-state resume and initial probability proof"
-            child(
-                [
-                    sys.executable,
-                    "-m",
-                    "fog.scripts.prior_heads_check",
-                    "--config",
-                    "inputs/recipe.json",
-                    "--out",
-                    str(output / "startup-proof"),
-                    "--device",
-                    "cuda",
-                    "--benchmark",
-                ]
-            )
-            proof = json.loads((output / "startup-proof/RESULTS.json").read_text())
-            throughput = json.loads((output / "startup-proof-throughput/RESULTS.json").read_text())
-            if (
-                not proof["passed"]
-                or not proof["CUDA_rng_saved"]
-                or not proof["probability_agreement"]["actual_cuda"]
-            ):
-                raise ValueError("The actual CUDA startup proof failed")
-            if (
-                not throughput["passed"]
-                or not throughput["actual_cuda"]
-                or not throughput["main_initialization_unchanged"]
-            ):
-                raise ValueError("The actual production-shape throughput gate failed")
-            phase = "matched frozen-policy residual head training"
-            child(
-                [
-                    sys.executable,
-                    "-m",
-                    "fog.scripts.train_prior_heads",
-                    "--config",
-                    "inputs/recipe.json",
-                    "--out",
-                    str(output / "training"),
-                    "--device",
-                    "cuda",
-                ]
-            )
-            result = json.loads((output / "training/RESULTS.json").read_text())
             config = json.loads((work / "inputs/recipe.json").read_text())
+            if config.get("execution") != "parallel_conditions":
+                raise ValueError("An explicit independent two-device recipe is required")
+            phase = "actual CUDA full-state resume and initial probability proof"
+            execute_pair(
+                [
+                    (mode, [sys.executable, "-m", "fog.scripts.prior_heads_check",
+                            "--config", "inputs/recipe.json", "--out",
+                            str(output / f"startup-proof-{mode}"), "--device", "cuda",
+                            "--condition", mode], device)
+                    for device, mode in enumerate(("facts", "native"))
+                ],
+                environment, output / "startup-logs",
+                descriptor["timeout_seconds"] - (time.monotonic() - started) - 120,
+            )
+            phase = "concurrent production-shape CUDA throughput"
+            execute_pair(
+                [
+                    (mode, [sys.executable, "-m", "fog.scripts.prior_heads_check",
+                            "--config", "inputs/recipe.json", "--out",
+                            str(output / f"startup-proof-{mode}-throughput"), "--device", "cuda",
+                            "--condition", mode, "--benchmark-only"], device)
+                    for device, mode in enumerate(("facts", "native"))
+                ],
+                environment, output / "throughput-logs",
+                descriptor["timeout_seconds"] - (time.monotonic() - started) - 120,
+            )
+            measurements = []
+            for mode in ("facts", "native"):
+                proof = json.loads((output / f"startup-proof-{mode}/RESULTS.json").read_text())
+                throughput = json.loads(
+                    (output / f"startup-proof-{mode}-throughput/RESULTS.json").read_text()
+                )
+                measurements.append((throughput["measurement_started_unix"],
+                                     throughput["measurement_finished_unix"]))
+                if (
+                    not proof["passed"] or not proof["CUDA_rng_saved"]
+                    or proof["condition"] != mode or throughput["condition"] != mode
+                    or not proof["probability_agreement"]["actual_cuda"]
+                    or not throughput["passed"] or not throughput["actual_cuda"]
+                    or throughput["main_updates_on_device"] != config["updates"]
+                    or not throughput["main_initialization_unchanged"]
+                ):
+                    raise ValueError("Actual per-device startup/throughput proof failed: " + mode)
+            overlap = min(end for _, end in measurements) - max(start for start, _ in measurements)
+            if overlap < 0.5 * min(end - start for start, end in measurements):
+                raise ValueError("Throughput measurements did not sufficiently overlap")
+            phase = "matched frozen-policy residual head training"
+            execute_pair(
+                [
+                    (mode, [sys.executable, "-m", "fog.scripts.train_prior_heads",
+                            "--config", "inputs/recipe.json", "--out",
+                            str(output / "training" / mode), "--device", "cuda",
+                            "--condition", mode], device)
+                    for device, mode in enumerate(("facts", "native"))
+                ],
+                environment, output / "training-logs",
+                descriptor["timeout_seconds"] - (time.monotonic() - started) - 120,
+            )
+            from fog.pretrained.paired_belief import merge_conditions
+
+            result = merge_conditions(config, output / "training")
             if (
                 not result["complete"]
                 or result["steps"] != 2 * config["updates"]
@@ -166,7 +209,8 @@ def run():
                 state = torch.load(
                     output / f"training/{label}.pt", map_location="cpu", weights_only=True
                 )
-                contracts[label] = probabilities(state["heads"], config, specs, device="cuda")
+                selected = "cuda:1" if label == "native_heads_final" else "cuda:0"
+                contracts[label] = probabilities(state["heads"], config, specs, device=selected)
             (output / "FINAL_PROBABILITIES.json").write_text(json.dumps(contracts, indent=2) + "\n")
         elif descriptor["stage"] == "evaluate":
             if descriptor["device"] != "cpu":
