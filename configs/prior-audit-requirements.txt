@@ -1,0 +1,13 @@
+certifi==2026.7.22
+charset-normalizer==3.5.2
+cloudpickle==3.1.2
+farama-notifications==0.0.6
+gymnasium==0.29.1
+idna==3.20
+numpy==2.5.3
+orjson==3.12.0
+requests==2.34.2
+tabulate==0.10.0
+typing-extensions==4.16.0
+urllib3==2.8.0
+websockets==12.0

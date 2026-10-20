@@ -42,7 +42,7 @@ def run():
     (output / "experiment.json").write_text(json.dumps(descriptor, indent=2) + "\n")
     environment = dict(
         os.environ,
-        PYTHONPATH=str(work),
+        PYTHONPATH=os.pathsep.join((str(work), str(work / "upstream/poke-env/src"))),
         OMP_NUM_THREADS="1",
         MKL_NUM_THREADS="1",
         PYTHONUTF8="1",
@@ -81,7 +81,18 @@ def run():
             "venv.log",
         )
         python = str(venv / "bin/python")
-        child([python, "-m", "pip", "install", "--no-deps", "numpy==2.5.3"], "numpy.log")
+        child(
+            [
+                python,
+                "-m",
+                "pip",
+                "install",
+                "--no-deps",
+                "-r",
+                "configs/prior-audit-requirements.txt",
+            ],
+            "dependencies.log",
+        )
         child(
             [
                 python,
@@ -91,6 +102,18 @@ def run():
             "platform.log",
         )
         child(["node", "--version"], "node-version.log")
+        child(
+            [
+                python,
+                "-c",
+                "import json;from pathlib import Path;from fog.pretrained.data import composition;"
+                "from fog.pretrained.prior_data import validate_export;"
+                "team=json.loads(Path('inputs/pools/train.json').read_text())['teams'][0];"
+                "assert validate_export([team],Path('server/pokemon-showdown'))[0]['valid'];"
+                "print(json.dumps({'roster_parser':composition(team),'validator':True}))",
+            ],
+            "parser-preflight.log",
+        )
         phase = "bounded prior construction and matched reconstruction benchmark"
         child(
             [
