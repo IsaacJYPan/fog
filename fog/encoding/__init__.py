@@ -1,12 +1,8 @@
-"""State encoding. Decision-point observation = (entities, field, history, my_team_sheet).
+"""Encode a player's battle view as entity, field, and history tensors.
 
-  * `entities`  -> [12, D_ent]  (§2.1) slots 0-5 mine, 6-11 opponent
-  * `field`     -> [D_field]    (§2.2) ~40 dims
-  * `history`   -> [T, D_turn]  (§2.3) T<=60, padded/truncated from the front
-
-`my_team_sheet` is not a separate input: it lives inside entity slots 0-5 with all epistemic flags
-set "known". Unknown vs. known-absent is distinguished by the epistemic flags. Submitted nature
-and EVs are represented natively; each EV is stored as its exact stat-contribution unit EV//4.
+Entity slots 0–5 hold the player's team; 6–11 hold the opponent's visible state.
+Known/unknown flags distinguish unrevealed attributes from known absences. Nature and
+EVs come from the submitted team, with EVs stored as stat-contribution units (EV // 4).
 """
 
 from fog.encoding.dims import DIMS, Dims

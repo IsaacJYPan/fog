@@ -1,38 +1,20 @@
-"""Persistent joint public belief across turns (ARCHITECTURE.md invariants S1–S3).
+"""Battle-long joint belief over K own-team and J opponent-team candidates.
 
-One `JointBeliefTable` lives for one battle. Its axes are STABLE candidate identities — K
-candidate versions of our team and J candidate opponent teams, fixed at construction so that
-sequential Bayes updates are well defined (persistent particles, §7.4). The cell (k, j) holds the
-public probability that our private team is candidate k AND the opponent's is candidate j, given
-every public observation so far. Weights are kept in log space: a battle multiplies in dozens of
-likelihoods, and direct products underflow.
+Candidate identities stay fixed; weights are stored in log space to avoid
+underflow. The runner can update them in three ways:
 
-Update contract (who supplies what):
+* ``observation_step`` uses the public transcript's likelihood, marginalizing
+  hidden actions and chance outcomes. Impossible observations get zero weight.
+* ``behavior_step`` uses the strategies that actually acted. Legal actions get
+  a probability floor; unavailable actions remain impossible. Pass None for a
+  side with only one legal choice, since that action carries no behavioral evidence.
+* ``mechanical_step`` removes candidates contradicted by hard evidence. Callers
+  must account for Illusion, Transform, and item movement before eliminating a team.
 
-  * `observation_step(...)` — the persistent search runner supplies the joint likelihood of the
-    public transcript, marginalized over hidden choices and chance outcomes. This is the primary
-    update; mechanically incompatible worlds have zero likelihood. No arbitrary floor is applied.
-  * `behavior_step(...)` — after a real public action pair, multiply in each side's modeled
-    probability of the action it was OBSERVED to play. The caller must pass the distribution that
-    ACTUALLY acted (the solver's averaged strategy during solver play, the raw policy during
-    policy-only play — invariant 19.6), and the likelihoods are floored here via
-    `two_sided.floored_strategy`, so a modeled "never" shrinks a candidate without destroying it
-    (§7.2 safety rule 1). A candidate whose label space LACKS the observed action still gets an
-    exact zero — that elimination is mechanical (the world cannot produce the observation), not
-    behavioral. A forced action with a single legal choice carries no behavioral likelihood:
-    pass that side's column as None (§14).
-  * `mechanical_step(keep_own, keep_opp)` — hard evidence: boolean masks of candidates that
-    remain possible. The CALLER owns the truthful-evidence carve-outs of §7.2 (Illusion,
-    Transform, item movement): only pass keep=False for facts the rules guarantee are truthful
-    about that candidate's own team. The current controlled pools contain none of the deception
-    mechanics, so reveal-census contradictions are safe hard zeros there; open-format callers
-    must filter first.
-
-Never-empty guard (invariant 19.18): any step that would zero the whole table is REFUSED — the
-table keeps its previous state, records `collapsed = True`, and `needs_rejuvenation()` turns
-true. Rejuvenation itself (proposing fresh evidence-consistent particles and re-scoring them) is
-a later phase; exact-pool play cannot collapse unless something upstream is wrong, which is
-exactly why the refusal is loud in the stats rather than silent.
+An update that would empty the table keeps the previous weights and sets
+``collapsed``. The caller must handle recovery; this module does not propose
+replacement candidates. In an exact pool, collapse usually indicates bad evidence
+or a bug in the likelihood calculation.
 """
 from __future__ import annotations
 
@@ -61,9 +43,10 @@ class JointBeliefTable:
 
     @classmethod
     def from_margins(cls, log_w_own: Array, log_w_opp: Array) -> JointBeliefTable:
-        """Independent prior rho_0(k, j) = P_own(k) * P_opp(j) (proposal §7: valid while the two
-        team selections are sampled independently; a correlated matchmaking prior would construct
-        the joint table directly)."""
+        """Product prior for independently selected teams.
+
+        For correlated team selection, construct the joint log-prior directly.
+        """
         lo = np.asarray(log_w_own, dtype=np.float64)
         lp = np.asarray(log_w_opp, dtype=np.float64)
         return cls(lo[:, None] + lp[None, :])
@@ -103,13 +86,10 @@ class JointBeliefTable:
         None for a side with no behavioral content this step (forced single-choice actions).
         Returns False (and leaves the table unchanged) if the step would kill every cell.
 
-        `kept1` / `kept2` (Phase G2 posterior-mass truncation): when a side's solve ran over a
-        SUBSET of this table's candidates, pass the kept candidates' full-axis indices; that
-        side's sigma/avail rows then correspond to the kept subset in order. Candidates OUTSIDE
-        the subset were not modeled this turn, and unmodeled is not impossible (§7.2): they take
-        the plain `floor` likelihood — shrunk relative to modeled candidates that liked the
-        action, never zeroed, and label-based elimination applies only to modeled candidates
-        (we never enumerated a truncated-out candidate's labels)."""
+        When solving over a subset, `kept1` / `kept2` map strategy rows back to
+        this table's axes. Omitted candidates receive the plain `floor` likelihood;
+        their legal labels were not enumerated, so they cannot be eliminated here.
+        """
         with np.errstate(divide="ignore"):        # log(0) -> -inf is the intended elimination
             delta = np.zeros_like(self.log_rho)
             if observed_col1 is not None:
@@ -132,10 +112,10 @@ class JointBeliefTable:
 
     def mechanical_step(self, keep_own: Array | None = None,
                         keep_opp: Array | None = None) -> bool:
-        """Zero candidates contradicted by hard, truthful evidence (see module docstring for the
-        caller's carve-out duty). Returns False and refuses the step if it would empty the
-        table — which on an exact pool means an upstream bug, and in an open space means
-        rejuvenation is due."""
+        """Remove candidates contradicted by reliable evidence.
+
+        Returns False and keeps the previous weights if no candidate survives.
+        """
         delta = np.zeros_like(self.log_rho)
         if keep_own is not None:
             delta = delta + np.where(np.asarray(keep_own, dtype=bool), 0.0, -np.inf)[:, None]
@@ -157,17 +137,16 @@ class JointBeliefTable:
         return rho.sum(axis=1), rho.sum(axis=0)
 
     def effective_sample_sizes(self) -> tuple[float, float]:
-        """Per margin: 1 / sum(p^2) — the standard 'how many candidates still really count'
-        number (equals the count when uniform, 1.0 when a point mass)."""
+        """Return 1 / sum(p²) for each side's marginal distribution."""
         p_own, p_opp = self.margins()
         return float(1.0 / (p_own ** 2).sum()), float(1.0 / (p_opp ** 2).sum())
 
     def needs_rejuvenation(self, min_ess: float = 0.0) -> bool:
-        """True when the filter is dead (a refused all-zero step), or — if the caller opts into a
-        positive `min_ess` — when the opponent-side effective sample size fell below it. The
-        threshold is an OPEN-SPACE policy (§7.4 step 4: sampled particles losing diversity around
-        a truth that may not be in the set); on an exact pool a concentrated posterior is the
-        correct end state, not a failure, so the default checks collapse only."""
+        """Check collapse and, optionally, low opponent-side effective sample size.
+
+        The default checks only collapse: concentration is expected in exact pools.
+        Sampled pools can set `min_ess` to detect lost candidate diversity as well.
+        """
         if self.collapsed:
             return True
         if min_ess <= 0.0:

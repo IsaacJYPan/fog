@@ -1,9 +1,10 @@
 # Replay-candidate imputation
 
-Implemented 20 September 2026. This is an explicit alternative to the species-marginal usage
-baseline, not a claim that reconstructed sheets are true or that policy strength has improved.
+An alternative to species-marginal usage sampling, implemented in September 2026.
+It recovers more hidden moves in the benchmark below, but loses item accuracy. The
+small policy pilot found no downstream gain.
 
-## Design and review decisions
+## How it works
 
 `fog.training.replay_candidates` extracts original submitted-set facts from public logs using the
 same transfer, Transform and Illusion handling as replay supervision. It does not parse Metamon's
@@ -25,18 +26,11 @@ Separate random streams per Pokemon and attribute keep unrelated fallback EV/nat
 between the baseline and candidate method. The implementation also fixes nonpacked move-hole
 filling and supports Stellar when installing a completed sheet in poke-env.
 
-The design review deliberately rejected three shortcuts:
-
-- Using a target's complete hidden sheet to build its own candidate support, or allowing later
-  replay evidence in a historical donor query.
-- Counting each imputation as an independent battle in evaluation.
-- Treating the more sophisticated Gen1–4 Metamon predictor as its Gen9 production method.
-  [Pinned upstream predictor](https://github.com/UT-Austin-RPL/metamon/blob/0a00a759c9a4382a2877088d828302ec294a05a5/metamon/backend/team_prediction/predictor.py)
-  falls back to the usage predictor outside Gen1–4 OU.
-
-This implementation is related to Metamon's replay-candidate idea, but does not reproduce its
-maximal-set graph or full-roster generation. Gen9 preview already supplies the roster. Partial
-donors may still need marginal fallback, so it is not a completely joint team posterior.
+This follows Metamon's replay-candidate idea without its maximal-set graph or full-roster
+generation; Gen9 preview already supplies the roster. Partial donors still need marginal
+fallback, so this is not a joint team posterior. Metamon's
+[pinned predictor](https://github.com/UT-Austin-RPL/metamon/blob/0a00a759c9a4382a2877088d828302ec294a05a5/metamon/backend/team_prediction/predictor.py)
+also uses a usage fallback for Gen9; its learned joint predictor covers Gen1–4 OU.
 
 ## Data and conversion
 
@@ -67,9 +61,9 @@ Leave-one-replay-out filtering alone does not prevent *other* held-out games con
 Do not build from all raw games and subsequently claim an independent random replay holdout.
 The generated known-sheet benchmark below uses an entirely separate simulator corpus.
 
-The converter defaults to the usage baseline unless `--candidate-bank` is supplied. This keeps a
-reproducible control and avoids silently changing existing research runs before a strength benefit
-has been established. Candidate conversion does not change the policy/AR-decoder interface.
+The converter defaults to the usage baseline unless `--candidate-bank` is supplied. This
+preserves existing runs and provides a control. Candidate conversion uses the same
+policy/AR-decoder interface.
 
 ## Known-sheet reconstruction and downstream pilot
 
@@ -128,9 +122,8 @@ End-to-end validation converted 25 real high-rated Metamon games into 4,083 deci
 with zero quarantines. Donors contributed to 888 of 900 sampled Pokemon slots; the other 12 used
 the fallback. Shard validation found zero chosen-illegal actions, nonfinite action features,
 action-feature/mask mismatches, invalid retained policy rows, or inferred opponent fields.
-The focused regression suite passed 60 tests, with two existing tests skipped.
 
-## Remaining limits and promotion criteria
+## Limits
 
 The subsequent [native Metamon comparison](metamon-native-comparison.md) runs the
 full upstream reconstruction pipeline with its own historical statistics, alongside
@@ -144,8 +137,6 @@ priors remain the pinned June 2026 snapshot; historical donor exclusion does **n
 whole reconstruction strictly historically isolated. Historical usage snapshots are a separate
 needed improvement for temporal experiments. IVs are not represented in FOG's set token schema.
 
-The first controlled results show a move-reconstruction benefit but an item-accuracy regression;
-the policy pilot does not establish a practical strength gain. Do not silently promote this to the
-only training path. A follow-up should use a separate development corpus to correct reveal bias,
-then evaluate on untouched diverse known-sheet games and a matched authoritative win-rate test.
+Further work needs a separate development corpus for reveal bias, followed by untouched
+known-sheet games and a matched win-rate test.
 Results and reproduction hashes are in `runs/replay_imputation/final_report.json`.

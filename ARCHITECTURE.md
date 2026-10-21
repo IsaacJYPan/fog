@@ -1,205 +1,131 @@
 # FOG architecture
 
-This document is the source of truth for the intended model, search target, and training flow. It
-describes both the desired design and the current implementation boundary; where those differ, the
-difference is explicit.
+The current experiments use a shared typed-token model. The earlier three-encoder model and
+several search variants remain in the code for checkpoint compatibility and comparison.
 
-## Problem boundary
+## What the agent sees
 
-At a decision on turn `t`, the agent has three information sources:
+An observation has the acting player's private team, the public board, and public turn history.
+Private state includes the submitted sets and private mechanics such as PP. The board contains
+revealed team information, HP, status, boosts, and field conditions. History records completed
+turns in order, including actions, damage, reveals, switches, and speed order.
 
-1. `private_state`: the acting player's submitted six sets and still-private mechanics such as PP.
-2. `public_state`: the current public board, including both parties, field state, revealed facts,
-   HP, status, boosts, and legal public identities.
-3. `history`: the ordered sequence of completed public turns, including actions, reveals, damage,
-   speed order, switches, and start-of-turn state.
+The board has a short, fixed-width encoding; history is capped and sequence-dependent. Keeping
+them separate avoids making the current board depend on how much history fits in the cap.
+Opponent truth can be a supervised target, a simulator search world, or an oracle evaluation input.
+It must not enter the ordinary policy observation.
 
-The current board and history are both public, but they are not interchangeable. The board is an
-exact fixed-width snapshot at one turn. History is a capped sequence whose value comes from order
-and cross-turn evidence. Keeping them separate gives the board a short, non-sequential path and
-lets the history computation stay bounded by the configured turn cap.
+## Models
 
-Opponent truth is never an ordinary model input. It is allowed only as a supervised target, as a
-simulator-owned search world, or in an explicitly labeled oracle evaluation.
+### Typed-token model
 
-## Encoders and heads
+[`configs/gen9ou_typed_token_trunk.yaml`](configs/gen9ou_typed_token_trunk.yaml) configures
+`SharedBattleLatent` in `fog/models/shared_latent.py`. Its 24 tokens, each 128 wide, represent:
 
-`fog.models.three_encoder.Backbone` owns three distinct encoders:
+- six own-private and six opponent-public Pokémon;
+- the field and decision request;
+- eight recent history records and one long-history summary;
+- one learned global token.
 
-- `CurrentStateEncoder` removes the acting player's private set fields, embeds categorical public
-  identities, encodes each entity independently, and pools the public board and field.
-- `TurnHistoryEncoder` combines numerical turn records with categorical sidecars and start-of-turn
-  state. The default is a causal transformer with learned positions; a GRU remains an ablation.
-- `PrivateStateEncoder` reads only the acting player's six complete private records. Current public
-  HP/status information stays in the current-state encoder rather than being duplicated here.
+Four attention layers mix the tokens. Each fact passes through a learned encoder. Own and opponent
+Pokémon share an encoder with different type and side embeddings; unknown opponent fields keep
+their sentinel values and visibility flags. History stops at the decision request.
 
-The checkpoint-compatible path fuses current-state and history into `public_context`. Its consumers
-are:
+Belief, value, and policy read the contextual sequence. The policy scores each candidate action
+with a shared query using its move or switch destination. It has no absolute candidate-index
+embedding, so permuting candidates permutes their logits. Masked visible-state prediction is an
+auxiliary loss.
 
-- Policy and value: `private_state + public_context`.
-- Opponent belief: `public_context + private_to_belief(private_state)`. Our set is relevant evidence
-  when interpreting damage, speed order, and action constraints.
-- Self-belief: the same construction from the opponent's censored perspective, using the
-  opponent-view private state. It estimates what the opponent can infer about us without receiving
-  our inaccessible private tensor through that perspective.
+### Earlier models
 
-All policy, value, and belief consumers therefore use the three conceptual information sources.
-The belief heads do not feed a pooled belief vector back into the ordinary policy. Search supplies
-belief-dependent strategy information outside the base forward pass.
+`fog.models.three_encoder.Backbone` encodes the public board, ordered history, and own private team
+separately. Policy and value use the private vector plus fused public context. Opponent belief
+also uses a projection of our private vector to interpret damage and speed evidence. Self-belief
+runs from the opponent's censored perspective, without access to our hidden tensor.
 
-### Revised typed-token branch (active experiment)
+The flat 2,048-wide autoencoder and sixteen-token contextual model are older reconstruction
+experiments. The sixteen-token runs plateaued around 34–36% reconstruction. The flat experiment
+uses a 95% per-field reconstruction criterion on a fixed batch, then untouched team and battle
+splits. That criterion belongs to those experiments; it is not the typed-token training criterion.
 
-The active experimental replacement is configured by
-`configs/gen9ou_typed_token_trunk.yaml`. It contains 24 learned 128-wide tokens: six complete
-own-private Pokemon, six opponent-public Pokemon, field, request/control, eight recent
-information-set history records, one long-history summary, and one learned global workspace.
-Every fact crosses a learned encoder; there is no raw-value or exact-state bypass. Four layers of
-self-attention contextualize all tokens without averaging Pokemon together.
+### Team belief
 
-History is cut at the decision request. Recent history remains available as eight separate
-chronological tokens while the causal history encoder supplies the long summary. Own and opponent
-Pokemon share a sub-encoder but receive different type and side embeddings. Opponent inputs contain
-only public reveals; missing values retain unknown sentinels and visibility flags.
+`fog.models.belief.BeliefModel` generates complete opponent teams autoregressively. It clamps known
+facts and adds generated fields back into the context while enforcing mechanical legality.
+Moves and team slots are unordered for this purpose. Search needs complete, correlated team
+candidates, so candidate scores must account for the generation routes that can produce a team.
 
-Belief, value, and policy can query the complete contextual sequence. Candidate actions carry
-their own move or destination-Pokemon reference and use one shared action-query scorer. No learned
-absolute candidate-index embedding is used, so a consistent candidate permutation produces the
-same permutation of logits. Masked visible-state prediction is a modest regularizer rather than a
-95-percent promotion gate.
-
-The following flat and sixteen-token branches are preserved only as historical diagnostics, not as
-the basis of new training:
-
-The active replacement branch was deliberately simpler:
-`SharedBattleLatent(flat_autoencoder=true)`. It concatenates every legitimate current input and its
-learned semantic embeddings, then sends that complete input through a global MLP into one
-unpartitioned 2,048-number vector. There is no transformer, token partition, raw-input bypass, or
-analytically reversible section. The representation is therefore a genuine learned compression,
-not a structured copy of the input. A training-only global decoder must reconstruct the complete
-current state from only that one vector and is discarded after pretraining.
-
-The earlier sixteen-token contextual branch is retained only as an experiment. Its strict
-reconstruction runs plateaued around 34–36%, so it is not the basis for belief, value, or policy
-training. The flat branch first has to memorize one fixed legitimate batch at the 95% per-field
-gate. This isolates architecture and objective bugs before any broad-data generalization claim.
-
-The required current-state content is 1,961 normalized scalar/code values, excluding history as
-agreed. This count makes 2,048 a reasonable starting width, but it is not proof of learned
-retention. Learned trunks pass only when a decoder recovers at least 95% of every required semantic
-field on both untouched whole-team and separate-battle splits. The one-batch test must pass first;
-the untouched splits remain the actual generalization gate.
-
-High-cardinality categorical fields use embeddings. Native set truth is represented as a `[6, 15]`
-integer grid:
+Native set truth is an integer `[6, 15]` grid:
 
 ```text
 species, item, ability, move0..move3,
 nature, ev_hp, ev_atk, ev_def, ev_spa, ev_spd, ev_spe, tera
 ```
 
-## Belief model
+Older typed checkpoints lack the EV-stat residual heads and identity embedding. Loading that
+complete older layout initializes the additions to zero, preserving EV predictions. Partial or
+unrelated missing weights still fail strict loading.
 
-Older typed checkpoints omit the EV-stat residual heads and identity embedding. Loading that
-complete older layout initializes only those additions to zero, preserving its EV predictions.
-Partially missing residual groups and unrelated missing tensors still fail strict loading.
+Public replays leave nature, EVs, and many set fields unknown. Those remain censored belief
+targets; complete-team supervision comes from team pastes or simulator self-play. The optional
+replay-policy imputer fills missing own-team fields from a compatible donor, with usage-based
+fallbacks. Inferred fields are not exact belief labels. Donor selection excludes the target game,
+duplicates, and later-dated games; leave held-out games out when building the bank. See the
+[imputation benchmark](docs/replay-candidate-imputation.md) for the split rules and results: it
+improved hidden-move reconstruction, regressed on items, and tied the matched policy pilot.
 
-`fog.models.belief.BeliefModel` is a set-autoregressive model over the opponent's complete team.
-Known facts are clamped before sampling. Hidden fields are generated through a mechanically legal
-route, with generated facts added back to the set context. Move order and team storage order are not
-intended to carry semantic meaning.
+## Search
 
-The autoregressive factorization is useful because plausible complete teams occupy a sparse subset
-of the combinatorial team space. Search consumes complete sampled candidates, not independent field
-marginals. Candidate scoring must account for generation-route probability rather than treating one
-arbitrary route as the probability of an unordered team.
+The intended search solves a two-sided Bayesian game over candidate private teams. It evaluates
+joint actions and chance outcomes, then executes the mixed-strategy row for the agent's actual
+private team. Solving types together lets them share opponent strategies and public belief
+updates, avoiding strategy fusion when the candidate support is adequate.
 
-Public replays do not reveal exact nature, EVs, or every submitted set field. Unrevealed facts remain
-censored belief targets. Complete team pastes and simulator-owned self-play truth are the sources for
-complete-team supervision.
+There are three paths in the repository:
 
-Replay-policy conversion can instead fill the acting player's unknown private fields from a
-compatible joint replay donor (`--candidate-bank`). Donor fields retain inferred provenance and
-never become exact belief targets. Target/duplicate logs and later-dated donors are excluded;
-held-out games must be excluded when building the bank. Residual holes use the pinned usage
-fallback. Opponent observations remain chronological. See the
-[imputation design and controlled benchmark](docs/replay-candidate-imputation.md).
+| Path | What it currently does |
+| --- | --- |
+| `pb_search` / `two_sided` | Experimental candidate grids and regret matching on the Rust engine |
+| `direct_two_sided` | Showdown legal actions and exact chance branches, with one private world per side |
+| Legacy determinized search | One-ply sampled worlds with a fixed reply policy |
 
-## Search target and current status
+The direct bridge solves simultaneous actions with complete information. It does not yet expand
+multiple hidden-team candidates in a mid-battle Showdown state. Transcript reconstruction is
+useful for debugging that work, but candidates can consume different irrelevant random calls;
+a reconstruction mismatch alone must not discard a plausible team.
 
-The intended expert is a two-sided public-belief search. It maintains candidate private teams for
-both players, evaluates their legal joint-action cells and chance outcomes, and solves for a mixed
-strategy over the supported private types. The executed policy is the averaged strategy row for the
-agent's actual private type. It is not the argmax against one assumed opponent response.
+The learned public-belief value model failed its public-only ablation, and the second search
+distillation generation regressed in direct play. Search remains experimental. Before using it
+as a training expert, check information isolation, exact-versus-sampled agreement, and held-out
+search-on/off strength.
 
-This construction is the mechanism intended to avoid strategy fusion: private types are solved
-together in one Bayesian game, so the opponent strategy and public belief updates are shared across
-types. It only provides that protection when the two-sided solver is actually used and its candidate
-support is adequate.
+Some source comments use these short references:
 
-Current implementation status:
+| ID | Constraint |
+| --- | --- |
+| S1 | Represent plausible private teams for both players; compare sampled candidates with exact enumeration. |
+| S2 | Leaf heads may use posterior features for what the opponent can infer about us. Cache the board encoding, but rescore heads when the posterior changes. |
+| S3 | Each simulated player and reply policy gets only its own perspective. Simulator truth stays out of ordinary policy inputs. |
+| S4 | Refresh belief data after material policy changes before relying on belief-dependent search or distillation. |
+| S5 | Measure sampling agreement and search strength on held-out team pools. |
+| S6 | Legacy joint search is a depth-one approximation with a fixed reply policy. |
 
-- `fog.search.pb_search` and `fog.search.two_sided` implement the experimental two-sided candidate
-  grid and regret-matching solve on the engine-backed research path.
-- `fog.search.direct_two_sided` and `FogPlayer`'s explicit `direct_two_sided` mode connect the same
-  regret solver to the authoritative in-memory Showdown action axes and exact chance branches. The
-  bridge currently has one private world per player; it is a simultaneous complete-information
-  action solve, not yet a hidden-team public-belief claim.
-- The older one-ply determinized search remains available only as a labeled legacy diagnostic. It
-  samples opponent worlds and does not solve the two-sided equilibrium.
-- Substituting multiple hidden-team candidates into a mid-battle direct Showdown state remains an
-  experimental research problem. Strict transcript reconstruction is diagnostic because a
-  candidate can consume a different sequence of irrelevant random calls; it must not silently
-  remove belief support.
-- The learned public-belief value network has not passed its public-only ablation and is not a
-  promoted default.
+## Training
 
-Consequently, all search modes are experimental data/evaluation paths, not production inference
-claims. The direct complete-information bridge now covers legality, simultaneous actions, and
-chance enumeration. Search-generated policy targets still require multi-candidate information
-isolation, search-on/off, and held-out strength gates before promotion.
+Battle reward is terminal and sparse. Typed-token experiments start from a retained imitation/DAgger
+checkpoint and test bounded PPO runs with auxiliary belief supervision and optional replay
+retention. They have not established a reliable strength gain over that checkpoint.
 
-### Search design invariants
+Belief cross-entropy is a dense auxiliary loss. Because ordinary policy inference does not read
+decoded beliefs, its policy benefit needs a retraining ablation. Exact self-play labels, censored
+replay facts, and imputed own sheets stay separate in the data.
 
-These identifiers replace references in source comments to untracked historical planning files:
+Reconstruction, value pretraining, imitation, and search distillation are also available. Before
+scaling a run, inspect value calibration, action-family suppression, and gradient interactions
+under a fixed opponent mix. Compare optional reward shaping with an unshaped terminal-win-rate
+control.
 
-- **S1 — Two-sided private-state support.** Search represents plausible private teams for both
-  players. Exact enumeration is a validation rung; sampled candidates are the scalable path.
-- **S2 — Posterior-aware leaf scoring.** Optional posterior features summarize what the opponent
-  may infer about our private state. Shared board encodings may be cached, while leaf heads are
-  rescored when those posterior features change.
-- **S3 — Information isolation.** Each simulated player and reply policy receives only information
-  available from its own perspective. Simulator-owned truth never becomes an ordinary policy input.
-- **S4 — Current-policy consistency.** When policy changes materially, belief training data should
-  be refreshed from the changed policy before belief-dependent search or distillation is treated as
-  consistent with that policy.
-- **S5 — Evaluation requirements.** Exact-versus-sampled agreement and search strength must be
-  measured on held-out team pools. Results confined to a small memorized pool are diagnostic only.
-- **S6 — Experimental one-ply limitation.** The legacy joint-search path pairs sampled worlds with
-  a fixed reply policy. It is a documented depth-one approximation, not the intended two-sided
-  equilibrium solver.
-
-## Training strategy
-
-The environment reward is terminal and sparse. The current typed-token experiments initialize
-from a retained imitation/DAgger checkpoint, then test bounded PPO interventions with auxiliary
-belief supervision and optional replay retention. The latest validation has not established a
-stronger replacement. See the [research boundaries](README.md#research-boundaries).
-
-Belief cross-entropy provides dense representation training; guessing hidden information is not
-an environment reward. Exact simulator-owned labels remain separate from censored public-replay
-facts and imputed own sheets. Policy benefit from that auxiliary objective requires a retraining
-ablation, since ordinary inference does not read decoded beliefs.
-
-Representation reconstruction, staged value pretraining, and policy imitation remain available
-as diagnostic training routes. The older flat-model 95% reconstruction gate is not the active
-typed-token promotion criterion. Before expanding capacity or training time, measure value
-calibration, action-family suppression, and gradient interactions under a fixed opponent mix.
-
-Search distillation is a later experiment, conditional on information isolation, supported hidden
-states, and a held-out strength gain. Its presence in the repository does not establish a useful
-expert. Optional shaping also needs a terminal-win-rate comparison against an unshaped control.
-
-One PPO or behavior-cloning run can be controlled through `fog.train.TrainingSession`:
+The CLI and Python API both use `fog.train.TrainingSession`:
 
 ```python
 from fog.train import TrainingSession
@@ -209,13 +135,11 @@ session.config["bc"]["lr"] = 2e-4
 metrics = session.run()
 ```
 
-The same interface is available as `python -m fog.train --config ...`. The automated block driver
-in `fog.scripts.automated_training` remains an orchestration layer around PPO; it is not a second
-training algorithm.
+The CLI equivalent is `python -m fog.train --config ...`. `fog.scripts.automated_training` runs
+blocks of PPO with evaluation and checkpoint retention around them.
 
-## Simulator authority
+## Simulators
 
-Pinned Pokémon Showdown is authoritative for mechanics, censored observations, final evaluation,
-and future search evaluations. The direct worker avoids a server without changing the observation
-protocol. Poke-engine remains useful for fast diagnostics and explicitly labeled approximation
-experiments. Cross-simulator agreement is a gate, not an assumption.
+Pinned Showdown is the mechanics reference, observation source, and final evaluation backend.
+The direct worker runs locally without a server. Poke-engine provides faster approximation
+experiments and diagnostics; compare it against Showdown before relying on its results.

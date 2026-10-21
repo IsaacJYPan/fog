@@ -34,7 +34,7 @@ def pair_posteriors(rho: Array, sigma1: Array, sigma2: Array) -> Array:
     """[K,J] belief x per-type strategies -> post[A, B, K, J]: the updated joint belief after the
     public simultaneous action pair (a, b) is observed, before any mechanical evidence.
 
-    post[a, b, k, j] ∝ rho[k, j] * sigma1[k, a] * sigma2[j, b]   (proposal §7.2)
+    post[a, b, k, j] ∝ rho[k, j] * sigma1[k, a] * sigma2[j, b]
 
     Each (a, b) slice is normalized to sum to one; a pair no type combination plays is all-zero,
     never NaN.
@@ -51,9 +51,9 @@ def pair_posteriors(rho: Array, sigma1: Array, sigma2: Array) -> Array:
 def floored_strategy(sigma: Array, avail: Array, floor: float) -> Array:
     """Mix a row-stochastic strategy with `floor` probability per available action (capped so the
     row stays a distribution). Unavailable columns stay exactly zero. Rows with no available
-    action stay all-zero. Used both as the in-solve exploration floor and as the behavior-
-    likelihood floor of proposal §7.2 ("the model says never" must become "the model says rarely",
-    because zeroing a candidate from a modeled action choice would destroy it permanently)."""
+    action stay all-zero. Used for exploration during solving and for behavior
+    likelihoods, where a poorly predicted legal action should not eliminate a team.
+    """
     sigma = np.asarray(sigma, dtype=np.float64)
     avail = np.asarray(avail, dtype=bool)
     n_avail = avail.sum(axis=1, keepdims=True).astype(np.float64)
@@ -64,7 +64,7 @@ def floored_strategy(sigma: Array, avail: Array, floor: float) -> Array:
 
 
 def behavior_update(rho: Array, like1: Array, like2: Array) -> tuple[Array, bool]:
-    """One persistent-belief step after a real observed action pair (proposal §7.2, §14 step 11).
+    """Update the joint belief after observing an action pair.
 
     `like1[K]` — modeled probability that OUR type k would play the action WE were observed to
     play; `like2[J]` — same for the opponent's observed action. Callers must build these from the
@@ -72,9 +72,8 @@ def behavior_update(rho: Array, like1: Array, like2: Array) -> tuple[Array, bool
     policy-only play, floored per `floored_strategy`); a type whose label set lacks the observed
     action gets exact zero (elimination is mechanical, not behavioral).
 
-    Returns (rho_next, alive). `alive=False` means every cell hit zero — the caller must trigger
-    evidence-conditioned particle rejuvenation (proposal §7.4); the returned table is then the
-    UNCHANGED input so no caller ever propagates an all-zero belief.
+    Returns (rho_next, alive). If every cell hits zero, returns a copy of the
+    previous belief and False so the caller can recover candidate support.
     """
     rho = np.asarray(rho, dtype=np.float64)
     unnorm = rho * np.outer(np.asarray(like1, dtype=np.float64),
@@ -184,30 +183,20 @@ def two_sided_regret_solve(
     tol: float = 1e-3,
     sample_seed: int | None = None,
 ) -> TwoSidedSolution:
-    """Solve one simultaneous public-belief decision for both players (proposal §10.1).
+    """Solve a simultaneous Bayesian game with regret matching for both players.
 
-    Per iteration: derive each side's play from its accumulated regrets (the initialization on
-    iteration 0), apply the annealed exploration floor, ask `values_fn` for the payoff tensor
-    under the current strategies, compute each type's expected action values against the other
-    side's mixture weighted by its conditional belief from `rho`, accumulate regrets for BOTH
-    players, and accumulate the un-floored strategies into linearly weighted running averages.
+    Each iteration queries `values_fn` under the current strategies, weights
+    action values by the conditional beliefs from `rho`, and updates regrets.
+    Returned strategies average iterations with weight t + 1. `init1/init2`
+    default to uniform over legal actions and affect initialization only.
 
-    `init1/init2` are strategy initializations (e.g. the policy networks' distributions,
-    proposal §10.2 — initialization, not anchoring: with linear weighting its influence on the
-    average vanishes as iterations grow). Default: uniform over available actions.
+    Exploration uses floor / (1 + t), excluded from the returned averages.
+    After `min_iters`, convergence is checked every `check_every` iterations:
+    both averages must change by less than `tol` total variation in every row.
 
-    Stops early when, at a `check_every` checkpoint past `min_iters`, the largest per-row
-    total-variation change of BOTH running averages since the previous checkpoint is below `tol`.
-
-    The floor anneals as floor / (1 + t) — it exists to keep in-solve posterior updates away
-    from exact zeros, and it is never part of the returned averages (settled decision 24).
-
-    `sample_seed` (Phase G1, proposal §9.3 mitigation 2): when given, one iteration is drawn
-    uniformly at random (reservoir sampling, so early stopping keeps the draw uniform over the
-    iterations actually run) and the CURRENT floored strategy pair of that iteration — the exact
-    arguments `values_fn` received — is returned in `sample_sigma1/sample_sigma2` with its
-    1-indexed `sample_iteration`. Value training computes posteriors under this pair so the net
-    sees the mid-solve belief queries, not only the final averages.
+    With `sample_seed`, reservoir sampling selects one executed iteration's
+    floored strategy pair as `sample_sigma1/sample_sigma2` and its 1-based
+    `sample_iteration`. Value training uses these to cover intermediate beliefs.
     """
     rho = np.asarray(rho, dtype=np.float64)
     rho = rho / rho.sum()

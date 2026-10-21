@@ -5,7 +5,7 @@ import argparse
 from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 from fog.config import load_config_with_args
 
@@ -15,43 +15,9 @@ class TrainerKind(StrEnum):
     BEHAVIOR_CLONING = "bc"
 
 
-class Trainer(Protocol):
-    """Training backend interface."""
-
-    config: dict[str, Any]
-
-    def run(self) -> dict[str, Any]: ...
-
-
-@dataclass(slots=True)
-class PPOTrainer:
-    config: dict[str, Any]
-
-    def run(self) -> dict[str, Any]:
-        from fog.training.ppo import train
-
-        return train(self.config)
-
-
-@dataclass(slots=True)
-class BehaviorCloningTrainer:
-    config: dict[str, Any]
-
-    def run(self) -> dict[str, Any]:
-        from fog.training.bc import train
-
-        return train(self.config)
-
-
-_TRAINERS: dict[TrainerKind, type[PPOTrainer | BehaviorCloningTrainer]] = {
-    TrainerKind.PPO: PPOTrainer,
-    TrainerKind.BEHAVIOR_CLONING: BehaviorCloningTrainer,
-}
-
-
 @dataclass(slots=True)
 class TrainingSession:
-    """A resolved experiment. Callers may edit ``config`` before calling :meth:`run`."""
+    """An experiment config that can be edited before calling ``run()``."""
 
     config: dict[str, Any]
     kind: TrainerKind | str | None = None
@@ -80,14 +46,7 @@ class TrainingSession:
         if configured is not None:
             return TrainerKind(str(configured))
 
-        candidates = [
-            kind
-            for kind, section in (
-                (TrainerKind.PPO, "ppo"),
-                (TrainerKind.BEHAVIOR_CLONING, "bc"),
-            )
-            if section in self.config
-        ]
+        candidates = [kind for kind in TrainerKind if kind.value in self.config]
         if len(candidates) == 1:
             return candidates[0]
         if not candidates:
@@ -98,11 +57,13 @@ class TrainingSession:
             "config contains both ppo and bc sections; set top-level trainer or pass kind="
         )
 
-    def build_trainer(self) -> Trainer:
-        return _TRAINERS[self.resolved_kind()](self.config)
-
     def run(self) -> dict[str, Any]:
-        return self.build_trainer().run()
+        if self.resolved_kind() is TrainerKind.PPO:
+            from fog.training.ppo import train
+        else:
+            from fog.training.bc import train
+
+        return train(self.config)
 
 
 def main() -> None:

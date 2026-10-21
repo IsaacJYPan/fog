@@ -1,32 +1,19 @@
-"""One experimental two-sided public-belief decision (ARCHITECTURE.md S1–S3).
+"""Build and solve a two-sided public-belief search grid.
 
-Assembles the landed pieces into the claim-bearing decision path: candidate worlds for both
-sides -> joint belief rho -> simulated K x J branch grid (pb_grid) -> leaf values (pb_values,
-the interim scalar head) -> two-sided regret solve (two_sided) -> **sample exactly
-from the averaged strategy row of the true private state**. The API deliberately has no
-temperature and no greedy mode (settled decisions 16.2/16.3): the sampled randomness IS the
-mixed strategy being executed, and any reshaping would play a strategy the solver never
-evaluated. A greedy diagnostic, if ever wanted, lives outside this function.
+Candidate teams and a joint belief define the simulated action grid. Leaf values
+feed the regret solver, then the action is sampled from the true private team's
+averaged strategy row. Changing its temperature would change the solved strategy.
 
-Two candidate-supply modes, because particle persistence is only half-landed (§7.4):
+With ``opp_tokens``, candidate identities stay fixed and an optional
+``JointBeliefTable`` supplies the prior. Without a table, source weights form an
+independent product prior. Without ``opp_tokens``, candidates are sampled afresh
+and deduplicated. Their count doubles up to ``j_max`` until the action row changes
+by at most ``j_tol`` total variation, the sampler saturates, or the cap is reached.
+Fresh identities cannot be combined with a persistent belief table.
 
-  * **Persistent mode** (exact pools): the caller passes `opp_tokens` — the same stable J
-    candidate identities every turn — and optionally the battle-lifetime `JointBeliefTable`
-    whose axes they index. rho comes from the table (the real §14 flow); without a table it is
-    the independent outer product of the source weights.
-  * **Adaptive sampled mode** (open spaces, interim): no `opp_tokens`; worlds are drawn fresh
-    from the belief chain via `opp_source`, deduplicated with empirical-frequency weights, and
-    GROWN (j doubling up to `j_max`, §13.1) until the executed action row stops moving by more
-    than `j_tol` total variation, the sampler saturates, or the cap is hit. Re-sampling fresh
-    worlds each decision is explicitly the §18 interim that particle rejuvenation replaces —
-    a persistent table cannot be used in this mode (identities are not stable), so passing one
-    raises.
-
-The search NEVER mutates the belief table (the runner conditions on the subsequent public
-observation, marginalizing hidden choices under the acting strategies). The result
-carries a subsample of the public-observation posteriors the values were computed under
-(`queried_beliefs`), plus the same subsampling under one uniformly drawn solver iteration's
-CURRENT strategies (`sample_beliefs`) — together the value-training query log.
+The runner updates the table after observing the turn; search only reads it.
+Results include posterior queries under the final strategies and one uniformly
+sampled solver iteration for value training.
 """
 from __future__ import annotations
 

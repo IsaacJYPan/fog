@@ -1,17 +1,17 @@
 # Candidate-imputed training data for Kaggle
 
-The selected method is **replay candidates with fixed June 2026 usage/spread priors**.
-It had the highest exact full-schema set accuracy in the known-team comparison (0.86%
-per Pokemon per draw). The native-prior hybrid had better move and partial-set scores,
-but lower full-set recovery. This is a choice based on that benchmark, not a guarantee
-that hidden sheets are accurate or that the resulting policy will be stronger.
+The current recipe uses replay candidates with fixed June 2026 usage/spread priors.
+In the [known-team comparison](metamon-native-comparison.md), this had the highest
+exact full-schema set accuracy: 0.86% per Pokemon per draw. Native priors gave better
+move and partial-set scores, but lower full-set recovery. Neither method produced a
+useful downstream gain in the small policy pilot.
 
 ## Training workflow
 
 Use [the immutable experiment workflow](kaggle-workflow.md) after preparing and validating the
 data below. `configs/automated_gen9ou_candidates_kaggle.yaml` is a bounded 24,000-decision
-baseline with candidate-imputed replays as an imitation regularizer. It does not run a separate
-behavior-cloning stage or automatically promote a model. Direct and replay audits are required.
+baseline with candidate-imputed replays as an imitation regularizer. It has no separate
+behavior-cloning stage. Direct and replay audits are required.
 
 The recipe uses `typed_dagger_2048.pt`, 512-row PPO minibatches, 256-row replay batches, and two
 CPU rollout workers feeding one centralized GPU learner. Multiple allocated GPUs do not imply
@@ -51,7 +51,7 @@ hashes, quarantine/quality reports, and validation reports are under
 portable repository-relative shard paths. `provenance.json` records source revision,
 bank hash, fixed-prior hashes, dates, and the serial/parallel comparison.
 
-Limitations remain explicit:
+Limitations:
 
 - Inferred own sheets are never promoted to exact truth. Opponent observations use
   only the chronological public prefix; inferred opponent targets are excluded.
@@ -82,14 +82,8 @@ Worker count affects throughput, not imputation seeds. Use fewer workers on a ma
 with less memory or fewer cores. Completed conversions are not overwritten. Retain the
 quality report and investigate quarantines rather than relaxing data checks to fill a quota.
 
-## Local verification
-
-The focused suite passed 41 tests, including chronological split isolation and
-required provenance bundling. Ruff passed on the changed Python modules and tests.
-A serial conversion and the eight-worker conversion produced identical values in
-all 21 arrays for the checked replay. The initial checkpoint loaded strictly and
-completed an eight-row forward pass with finite action loss and zero optimizer steps.
-The automated job also passed command-generation dry-run validation.
-All 2,000 shards and 330,452 rows passed validation: zero chosen-illegal actions,
-action-feature/legality mismatches, nonfinite action features, invalid retained policy
-rows, or inferred opponent fields. The complete bundle inventory has no missing inputs.
+The original serial and eight-worker conversions matched in all 21 arrays for the
+checked replay. Validation passed for all 2,000 shards and 330,452 rows, with no
+chosen-illegal actions, action-feature/legality mismatches, nonfinite action features,
+invalid retained policy rows, or inferred opponent fields. Re-run the validator above
+after rebuilding; the generated reports describe the actual inputs to a new run.

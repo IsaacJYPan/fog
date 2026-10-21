@@ -1,10 +1,4 @@
-"""Environment: poke-env wrappers, team pools, and the vectorized self-play runner.
-
-The Showdown simulator (Node) is the throughput bottleneck, not the GPU. The runner spins up N parallel
-Node Showdown processes via poke-env's async interface, all pushing trajectories to a single GPU
-learner over a queue. Measure battles/sec on day one (M0). Every schedule in the spec is stated in
-battles, not wall-clock.
-"""
+"""Showdown and poke-engine battle runners, player adapters, and team pools."""
 
 from fog.env.player import FogPlayer
 

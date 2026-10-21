@@ -1,20 +1,8 @@
-"""Branch leaf play for the two-sided public-belief search (ARCHITECTURE.md S1–S3).
+"""Simulate an action pair for one candidate-team pair in the search grid.
 
-One cell of the search grid is "our candidate world k, opponent candidate world j, our public
-action a, their public action b". This module commits one such simultaneous action pair on a
-(k, j) root fork and returns the turn's chance outcomes as exactly-weighted branches
-(`EngineBattle.step_branches` — enumerate and branch, never one frozen sample).
-
-The load-bearing rule (§10.5, settled decision 22): **a branch stops at the FIRST state where any
-player owes a new decision** — a completed turn, or a mid-turn state with a forced replacement
-pending for EITHER side. A forced replacement is a real decision with signaling content; no
-scripted stand-in ever chooses it inside a leaf. (The frozen baseline `fog/search/engine_step.py`
-resolves opponent replacements with a reply policy — that is the old one-sided interim's
-semantics, deliberately NOT reproduced here. The value network owns pending-replacement leaves.)
-
-Both action indices come from the solver's enumeration of each side's public labels (the grid
-grid builder), never from a policy or script: the opponent's simultaneous action is a solver
-variable, not a modeled reply (§21.2).
+Both actions come from the solver. Chance outcomes are enumerated, and each
+branch stops when either player next needs to choose, including forced replacements.
+The value network evaluates those leaves; no reply policy selects another action.
 """
 from __future__ import annotations
 
@@ -26,9 +14,9 @@ from typing import Any
 class BranchOutcome:
     """One chance branch of one committed (k, j, a, b) cell.
 
-    Exactly one of `terminal` / `leaf` is set. `probability` is renormalized over the KEPT
-    branches of this cell (the dropped remainder is the `pruned_mass` returned alongside — log
-    it, invariant 19.16)."""
+    Exactly one of `terminal` / `leaf` is set. Probabilities are renormalized
+    over kept branches; dropped mass is returned separately as `pruned_mass`.
+    """
     probability: float
     terminal: float | None       # game over inside the branch: +1 / -1 / 0 for `role`
     leaf: Any | None             # live EngineBattle fork stopped at the next decision
@@ -45,25 +33,16 @@ def commit_pair_branches(
 ) -> tuple[list[BranchOutcome], float]:
     """Commit both public actions on `root` and enumerate the turn's chance branches.
 
-    `root` is a disposable (k, j) world fork (`fork_for_own_world`); it is never advanced —
-    `step_branches` builds one child fork per kept chance outcome, each with a fresh independent
-    random future (settled decision 21). Only `root`'s random stream is consumed (fork seeding),
-    so results are deterministic given `root`'s rng state.
+    `root` is a disposable world fork. Its battle state stays unchanged, but its
+    random stream seeds a child fork for each chance outcome.
 
-    `opp_action_idx` is required exactly when the opponent is also pending (a normal simultaneous
-    turn). At a one-sided decision — e.g. `role`'s own forced replacement while the opponent
-    waits — it must be None. Passing an index for a non-pending opponent raises: silently
-    ignoring it would hide grid-builder indexing bugs.
+    Supply `opp_action_idx` when the opponent has a pending choice; otherwise use
+    None. Finished branches have a terminal payoff (+1 win, -1 loss, 0 tie from
+    `role`'s perspective); other branches hold a live battle at the next decision.
 
-    Classification per kept branch: a finished game becomes `terminal` (+1 win / -1 loss / 0 for
-    `role`, the project's standard convention); everything else is a live `leaf` exactly as the
-    branch fork stands — a completed turn (both sides pending the next decision) or a pending
-    forced replacement (§10.5). No further stepping happens here.
-
-    Returns `(outcomes, pruned_mass)` with kept probabilities summing to one.  The low-level
-    primitive is exact by default: it keeps every native engine branch.  Search budgets may pass
-    explicit pruning limits (and must record the resulting `pruned_mass`), but merely calling this
-    function never turns a rare valid outcome into an undocumented approximation.
+    Returns `(outcomes, pruned_mass)`. All chance branches are kept by default.
+    With pruning enabled, kept probabilities are renormalized to sum to one and
+    callers should record the dropped mass.
     """
     opp_role = "p2" if role == "p1" else "p1"
     pending = set(root.pending_sides())

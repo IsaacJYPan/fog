@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fog"
 version = "0.0.1"
-description = "FOG: a Gen 9 OU battle agent that reads the opponent's hidden team and controls its own information leakage."
+description = "A Gen 9 OU battle agent for experiments in hidden-team inference and search."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -18,11 +18,11 @@ dependencies = [
     "poke-engine==0.0.48",   # search/training simulator; mechanics are cross-checked vs Showdown
     "numpy>=1.26",
     "polars>=0.20",
-    "pyarrow>=15",           # parquet
+    "pyarrow>=15",
     "pyyaml>=6",
     "tensorboard>=2.16",
     "aiohttp>=3.9",          # replay scraping
-    "scikit-learn>=1.4",     # k-means for spread clustering (§1.6)
+    "scikit-learn>=1.4",     # spread clustering
     "tqdm>=4.66",
 ]
 
@@ -30,7 +30,7 @@ dependencies = [
 dev = [
     "pytest>=8",
     "pytest-asyncio>=0.23",
-    "hypothesis>=6",         # parser fuzzing (§4.3)
+    "hypothesis>=6",
     "ruff>=0.4",
     "mypy>=1.9",
 ]

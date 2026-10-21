@@ -1,8 +1,8 @@
 # Native Metamon reconstruction comparison
 
-This experiment runs Metamon's actual forward parser, backward reconstruction,
-`ReplayPredictor`, and both perspective-to-sequence validation paths. It replaces the
-earlier shared-prior sampling comparison as the test of native reconstruction.
+This experiment runs Metamon's forward parser, backward reconstruction,
+`ReplayPredictor`, and both perspective-to-sequence validation paths. The earlier
+[shared-prior comparison](replay-candidate-imputation.md) tests the sampler in isolation.
 Metamon source is unmodified; a predictor subclass records calls and fixes random seeds.
 Native dependencies are isolated from FOG's poke-env installation.
 
@@ -45,9 +45,9 @@ and available-output subsets in this run. Set metrics are per draw and per Pokem
 | Native Metamon end to end | 51.35% | 51.23% | 1.86% | 0.29% | 1.10254 |
 
 Every method and seed reached 65.48% policy top-1 on 1,231 test decisions, after
-training on the same 2,439 decisions. The near-identical losses and top-1 scores
-provide no evidence of a useful downstream gain in this pilot; they do not prove
-equivalence under longer training or on human decisions.
+training on the same 2,439 decisions. The losses were also nearly identical. This
+pilot found no useful downstream gain; longer training and human decisions remain
+untested.
 
 Native-minus-FOG-usage exploratory paired-game 95% bootstrap intervals include zero
 for hidden moves (-1.02 to +2.59 percentage points) and hidden items (-3.19 to +6.80).
@@ -57,8 +57,7 @@ they do not account for team-population uncertainty or multiple comparisons.
 
 Native priors help FOG candidates on the item/ability/moves/Tera joint score
 (+0.90 points; exploratory interval +0.42 to +1.38), but the full-schema score drops
-from 0.86% to 0.70%. Thus this is a promising hybrid experiment, not an unconditional
-improvement. It also remains below the usage baseline on hidden items.
+from 0.86% to 0.70%. Hidden-item accuracy remains below the usage baseline.
 
 The parser audit found 461 correct revealed moves in both methods, 186 versus 161
 correct item facts (FOG versus native), and 79 versus 205 correct ability facts.
@@ -66,12 +65,9 @@ Neither parser had incorrect revealed facts in these games. More native ability
 facts and broader species support do not offset every other difference: native
 end-to-end full-schema accuracy is also lower than its predictor on FOG evidence.
 
-**Decision:** retain the existing production default. Keep native priors injectable
-and both reconstruction paths available for evaluation. A useful next experiment
-would use a separate, more diverse known-sheet development set to investigate item
-fact retention and rare-species handling, followed by untouched evaluation games
-and a longer policy/win-rate comparison. Do not tune on this test pool and then
-claim the resulting numbers as independent validation.
+Keep the existing default. The next comparison needs a separate development set for
+item fact retention and rare species, then untouched evaluation games and a longer
+policy/win-rate comparison. Tuning on this test pool would invalidate it as a holdout.
 
 ## Coverage and limitations
 
@@ -99,7 +95,7 @@ and excludes IVs. Gen9 native prediction uses Metamon's usage-based fallback, no
 its experimental learned joint predictor. Improvements in plausible sheets alone
 do not establish stronger policies or calibrated beliefs.
 
-## Provenance and reproduction
+## Reproduce
 
 - Metamon: `https://github.com/UT-Austin-RPL/metamon`, commit
   `0a00a759c9a4382a2877088d828302ec294a05a5`.
@@ -121,11 +117,6 @@ historical probe queries/results, dataset metadata, isolated source/runtime/cach
 and `report.json`. The report also hashes the native output. Large artifacts are not
 committed. Keep both Python environments separate; invoke the native worker by file
 path so it does not import FOG.
-
-Validation: 39 focused regression tests passed; Ruff passed for the comparison,
-worker, modified imputer, and new tests. The production change is limited to optional
-usage/spread injection in `complete_private_team`; omitted arguments preserve the
-existing path. The native runner and six-arm comparison are evaluation utilities.
 
 ```sh
 # FOG environment; output paths must be fresh for prepare and worker.

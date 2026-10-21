@@ -1,6 +1,6 @@
 """Search implementations and baselines.
 
-The live player currently exposes one-ply determinization. The two-sided ``pb_*`` solver is an
-experimental engine-backed data/evaluation path and is not yet wired to live direct Showdown. See
-``ARCHITECTURE.md`` before treating a search module as the promoted inference path.
+The ``pb_*`` public-belief solver is used for engine-backed experiments. Direct
+Showdown has a separate two-sided solver over the simulator's current teams.
+See ``ARCHITECTURE.md`` for the available player modes and their limitations.
 """

@@ -1,10 +1,8 @@
-"""Two-sided simultaneous-action search on authoritative in-memory Showdown.
+"""Two-sided action search using in-memory Showdown.
 
-This module is the direct-simulator bridge for the pure regret solver.  It intentionally starts
-with the one-world-per-side case: both action axes and every finite chance branch are authoritative,
-but hidden-team candidate expansion is not claimed here.  That narrower boundary is still useful:
-it replaces the old fixed-reply one-ply approximation with a genuine simultaneous zero-sum solve
-and makes the remaining public-belief candidate substitution work explicit.
+Builds an action grid from the simulator's current teams and enumerates chance
+outcomes before solving. It does not sample hidden-team candidates. The value
+network receives the acting player's censored view at each leaf.
 """
 
 from __future__ import annotations
@@ -24,7 +22,7 @@ from fog.search.two_sided import TwoSidedSolution, two_sided_regret_solve
 
 @dataclass(frozen=True)
 class DirectTwoSidedResult:
-    """One solved direct-Showdown decision and its simulation accounting."""
+    """Selected action, solved strategy, and simulation counts."""
 
     action: int
     action_dist: np.ndarray
@@ -74,11 +72,11 @@ def direct_two_sided_action(
     max_branches: int | None = None,
     rng: random.Random | None = None,
 ) -> DirectTwoSidedResult:
-    """Solve the current direct-Showdown action pair with exact chance enumeration.
+    """Solve the action grid, with optional chance-branch pruning.
 
-    ``battle`` is the acting player's censored poke-env view.  The direct local runner attaches its
-    authoritative session as transport context.  No network server is used and no hidden state is
-    inserted into the model observation.
+    ``battle`` is the player's censored poke-env view, with the local simulator
+    session attached by the direct runner. ``pruned_mass_max`` records the most
+    probability dropped from any action pair when pruning is enabled.
     """
     local = getattr(battle, "_fog_local_battle", None)
     if local is None:
