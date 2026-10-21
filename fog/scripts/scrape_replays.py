@@ -145,7 +145,7 @@ def scrape(fmt: str, min_rating: int, target: int, out_dir: Path, delay: float =
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Scrape gen9ou replays (§4.2).")
+    ap = argparse.ArgumentParser(description="Scrape gen9ou replays.")
     ap.add_argument("--format", default="gen9ou")
     ap.add_argument("--min-rating", type=int, default=1300)
     ap.add_argument("--target-games", type=int, default=2000)

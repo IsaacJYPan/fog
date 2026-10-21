@@ -71,7 +71,7 @@ def _bluff_game(coupled: bool):
 
 
 def test_joint_finds_bluff_independent_does_not():
-    """THE defining property (SEARCH_PLAN §4.3 test (a)): with the belief coupling live, the weak
+    """Belief coupling: with the belief coupling live, the weak
     state mixes in bluffs (protecting the strong state's attack); with values frozen at the prior
     (exactly what K independent searches compute), the bluff never appears."""
     floor = 0.02

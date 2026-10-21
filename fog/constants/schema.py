@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import enum
 
-# --- §1.8 Action indexing (fixed, size 14) --------------------------------------------------------
+# --- Action indexing (fixed, size 14) --------------------------------------------------------
 # The legality mask is computed each turn from the Showdown request JSON — never learned.
 
 
@@ -37,7 +37,7 @@ SWITCH_SLOTS = range(8, 13)
 FORCED_SLOT = 13
 
 
-# --- §1.7 Field / condition enums -----------------------------------------------------------------
+# --- Field / condition enums -----------------------------------------------------------------
 class Status(enum.IntEnum):
     NONE = 0
     BRN = 1
@@ -93,11 +93,11 @@ TYPE_INDEX: dict[str, int] = {t: i for i, t in enumerate(TYPES)}
 # Tera type space = 18 types + Stellar.
 N_TERA_TYPES = N_TYPES + 1
 
-# Per-side hazard/screen layout (§1.7). Counters are stored separately in the field vector.
+# Per-side hazard/screen layout. Counters are stored separately in the field vector.
 HAZARDS = ("stealthrock", "spikes", "toxicspikes", "stickyweb")  # spikes 0-3, tspikes 0-2, others flag
 SCREENS = ("reflect", "lightscreen", "auroraveil", "tailwind")
 
-# Canonical volatile order for the entity-record multi-hot (§2.1). Curated for Gen 9 OU after the
+# Canonical volatile order for the entity-record multi-hot. Curated for Gen 9 OU after the
 # encoding audit (2026-07): includes paradox-era effects (Salt Cure, Glaive Rush, Cud Chew) and the
 # inference-relevant activation states (Flash Fire, Unburden). Order is FROZEN once training starts —
 # append only.
@@ -128,7 +128,7 @@ UNKNOWN_ITEM = "<UNKNOWN>"
 UNKNOWN = "<UNKNOWN>"
 OTHER_SPREAD = "<OTHER_SPREAD>"  # legacy usage-table sentinel; not a belief target
 
-MAX_SPREADS_PER_SPECIES = 16  # §1.6
+MAX_SPREADS_PER_SPECIES = 16
 
 # Submitted-set stat schema. EVs are represented in the units the battle stat formula consumes:
 # floor(EV / 4), hence one categorical value in [0, 63] per stat. Decoding multiplies by four, so

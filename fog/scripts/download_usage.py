@@ -2,7 +2,7 @@
 
 Produces, under the constants generated dir + data/usage/:
   * data/usage/gen9ou-<rating>-<month>.json  -- raw chaos file (immutable cache)
-  * constants/generated/spreads.json          -- SPREADS[species] via build_spreads (§1.6)
+  * constants/generated/spreads.json          -- SPREADS[species] via build_spreads
   * constants/generated/priors.json           -- item/move usage priors + teammate co-occurrence
 
 The chaos file schema (per species under `data`):
@@ -47,7 +47,7 @@ def fetch_chaos(month: str, rating: int, out_dir: Path = DATA_USAGE) -> Path:
 
 
 def build_spreads(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
-    """Cluster each species' chaos spreads into <=16 representatives (§1.6).
+    """Cluster each species' chaos spreads into <=16 representatives.
 
     Only species present in the generated SPECIES table get an entry; the rest fall back to
     <OTHER_SPREAD> at encode time. Returns the spreads.json payload {"species": {sid: [clusters]}}.
@@ -77,7 +77,7 @@ def build_spreads(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
 
 def build_priors(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
     """Per-species item/move/ability/tera usage priors + a teammate co-occurrence matrix (skip-gram
-    warm-start, §4.1). Normalized to distributions; only in-table ids kept. Ability priors are
+    warm-start). Normalized to distributions; only in-table ids kept. Ability priors are
     filtered to the species' legal abilities and tera priors to real types (the chaos file carries
     a "nothing" tera bucket for non-terastallized games — not a sheet attribute; dropped)."""
     from fog.constants.schema import TYPE_INDEX
@@ -127,7 +127,7 @@ def build_priors(chaos: dict[str, Any], tables: Tables) -> dict[str, Any]:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Download Smogon chaos usage + build derived tables (§4.1).")
+    ap = argparse.ArgumentParser(description="Download Smogon chaos usage + build derived tables.")
     ap.add_argument("--month", required=True, help="YYYY-MM (pinned)")
     ap.add_argument("--rating", type=int, default=1695)
     ap.add_argument("--out", type=Path, default=DATA_USAGE)

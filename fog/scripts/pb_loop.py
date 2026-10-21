@@ -1,39 +1,18 @@
-"""Generation loop driver: solver self-play -> distill -> belief refresh -> value retrain.
+"""Run solver self-play, policy distillation, belief refresh, and value retraining.
 
-One generation:
-  1. **generate** — solver-vs-solver self-play v2 logs, sharded over workers via
-     `pb_datagen.run_sharded_datagen` (the L2 machinery; single-process generation was ~4x
-     slower and broke the §6.2 day-per-generation arithmetic). The current agent is saved to
-     `agent_in.pt` and workers load it posterior-aware; `policy_init` warm-starts the solves
-     from the CURRENT policy (§10.2). Opening-solve caches are per-worker and per-generation —
-     cached solves are stale the moment the weights move.
-  2. **distill** — policy <- KL(solver executed distribution ‖ pi) at deployment inputs, value
-     <- outcome (fog/training/distill, v2 reader).
-  3. **refresh** — belief + self-belief retrained on FRESH policy self-play of the agent as it
-     now plays (fog/training/belief_refresh — the §11 step-8 consistency step).
-  4. **value retrain** (only when the loop runs with a trained PBValueNet, `--value-net`) —
-     the net warm-starts from the incoming generation's weights and retrains on this
-     generation's rows (fog/training/pb_value_train), because the belief/outcome distribution
-     it conditions on moves with the weights; the next generation's solves load the retrained
-     net. Without `--value-net` the loop runs on the §18 interim head (the pre-G5 mode).
+Each generation saves the current agent for sharded `pb_datagen` workers, distills
+solver distributions and outcomes, then refreshes beliefs on the updated policy's
+play. With `--value-net`, the public-belief value network is retrained too;
+otherwise search uses the scalar posterior-feature head. Opening caches are local
+to a worker and generation because weight updates invalidate the solved policies.
 
-Stopping (§15.4 gate 1, amended 2026-07-20 — A8): the WITHIN-generation gate is binding (held-out
-KL must improve over that generation's own data; if distillation stops helping, iterating is
-noise). The ACROSS-generation trend is reported two ways and is diagnostic, not a hard stop:
-per-generation holdout KL (each on its own data — the §15.4 number, but its data distribution
-moves with the loop), and KL on a FIXED reference set (generation 0's holdout), which is
-apples-to-apples across generations but measures against a frozen solver whose play later
-generations legitimately leave behind. Read the pair together; neither alone is a stop.
+Distillation must improve held-out KL on that generation's data. Across-generation
+KL is reported both on each generation's holdout and on generation zero's fixed
+reference set; the former changes distribution, while the latter keeps an older
+solver as its target. Neither trend alone stops the loop.
 
-Honesty of the gate battery: this driver RUNS the KL gates and the refresh-CE and value gates,
-and RECORDS the rest of §15.4 (fixed-gauntlet strength, solver-assisted >= policy-only, bounded
-best-response) as not_run — they are separate eval CLIs (fog/eval/search_gauntlet, harness) whose
-cadence and budget are an owner scheduling choice, not something to silently fake here. The
-report names them so no generation claims a gate it did not run.
-
-    python -m fog.scripts.pb_loop --ckpt runs/g0_v2_champion_resume/checkpoints/ppo_final.pt \
-        --pool data/teams/pool_a --generations 3 --games 400 --out runs/pb_loop \
-        --value-net runs/pb_value_a/pb_value.pt
+The driver checks distillation, belief CE, and value fitting. Strength and
+best-response evaluations run separately and remain `not_run` in its report.
 """
 from __future__ import annotations
 
@@ -171,7 +150,7 @@ def main() -> None:
                     help="warm-start solves from the current policy (--no-policy-init to "
                          "disable, e.g. for an iterations-to-stability A/B)")
     ap.add_argument("--value-net", default=None,
-                    help="trained PBValueNet state dict (G5): solves use it and each "
+                    help="trained PBValueNet state dict: solves use it and each "
                          "generation retrains it on its own rows; default = interim head")
     ap.add_argument("--value-recompute-every", type=int, default=8)
     ap.add_argument("--value-epochs", type=int, default=10)

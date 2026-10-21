@@ -1,4 +1,4 @@
-"""Measured Phase-G4 gates for a trained public-belief value model.
+"""Evaluate a trained public-belief value model against controls and perturbations.
 
 The trainer's held-out error answers only whether the model predicts unseen game outcomes.  This
 module checks the design-specific claims on the same game-level holdout: whether candidate/belief

@@ -93,12 +93,12 @@ class FogAgent(nn.Module):
         cfg = cfg or {}
         model_cfg = cfg.get("model", {})
         self.aux_into_trunk = model_cfg.get("aux_into_trunk", True)
-        self.oracle = model_cfg.get("oracle", "none")  # {none, set, action} — §3.4 eval ceilings
-        # blind_reactive (§9 closure baseline): force history to 0 and zero the belief conditioning,
+        self.oracle = model_cfg.get("oracle", "none")  # {none, set, action} evaluation ceilings
+        # blind_reactive baseline: force history to 0 and zero the belief conditioning,
         # so the agent reacts only to the current board with no memory/belief. Same weights.
         self.blind_reactive = model_cfg.get("blind_reactive", False)
-        # ARCHITECTURE.md invariant S2: give the policy/value head a posterior-features input (the opponent's
-        # belief over MY hidden state). Default OFF — existing checkpoints load unchanged.
+        # Optional features of the opponent's belief over our hidden state.
+        # Default off to preserve existing checkpoint widths.
         self.use_posterior_features = model_cfg.get("use_posterior_features", False)
         belief_dim = model_cfg.get("belief_dim", 128)
         self.sizes = sizes
@@ -265,7 +265,7 @@ class FogAgent(nn.Module):
             **belief_kwargs,
         )
         # Action oracle appends a committed-action embedding to `s`; a dedicated head keeps the base
-        # policy's weights comparable across oracle modes (§3.4).
+        # policy's weights comparable across oracle modes.
         self.action_oracle = None
         extra = 0
         if self.oracle == "action":
@@ -361,7 +361,7 @@ class FogAgent(nn.Module):
                 model_cfg.get("simple_rule_prior_strength", 0.0)
             ),
         )
-        # Team-preview lead selection (§3.1) — used LIVE by FogPlayer.teampreview and trained by the
+        # Team-preview lead selection — used by FogPlayer.teampreview and trained by the
         # REINFORCE-style preview term in ppo_update (game outcome as the bandit reward).
         from fog.models.heads import TeamPreviewHead
 
@@ -374,7 +374,7 @@ class FogAgent(nn.Module):
 
     @classmethod
     def from_tables(cls, cfg: dict | None = None, tables=None) -> FogAgent:
-        """Build with real cardinalities from the generated constants (§1). Use this — not the bare
+        """Build with real cardinalities from the generated constants. Use this — not the bare
         constructor — for anything touching real battles or parsed replays.
 
         Nature and EV cardinalities are fixed schema values: 25 natures and 64 effective EV units.
@@ -535,13 +535,13 @@ class FogAgent(nn.Module):
           opp_revealed  -- belief-net input dict (see belief.py contract). Drives the belief aux loss
                            and diagnostics; the POLICY no longer needs it, so it may be absent.
           opp_view      -- the OPPONENT's-view observation group (same tensor keys as above) plus a
-                           "my_view" sub-dict for the self-belief predictor (§3.3). Training only.
+                           "my_view" sub-dict for the self-belief predictor. Training only.
 
         `aux_into_trunk=False` detaches the fused belief context before belief/self-belief so their
         losses cannot shape either encoder path. The policy always sees the live paths.
         """
         if self.blind_reactive:
-            # §9 closure baseline: no memory (history=0) and no epistemic info (opp reveal tokens
+            # Reactive baseline: no memory (history=0) and no epistemic info (opp reveal tokens
             # blanked, so the belief chain is fed nothing). Architecture is UNCHANGED so the same
             # checkpoint loads — only the inputs are ablated.
             batch = dict(batch)
@@ -609,7 +609,7 @@ class FogAgent(nn.Module):
             initial = batch["history_len"].eq(0).to(matchup_value_logit.dtype)
             matchup_value_logit = matchup_value_logit * initial
 
-        # Set oracle (§3.4): condition the belief net on the opponent's TRUE tokens instead of the
+        # Set oracle: condition the belief net on the opponent's TRUE tokens instead of the
         # running reveal state, so the belief marginals are a perfect-information summary.
         opp_revealed = batch.get("opp_revealed")
         if self.oracle in ("set", "action") and batch.get("opp_truth_tokens") is not None:
@@ -641,7 +641,7 @@ class FogAgent(nn.Module):
                     belief_context_aux, opp_revealed, teacher_values=truth
                 )
 
-        # Action oracle (§3.4): append the opponent's committed action to the private context.
+        # Action oracle: append the opponent's committed action to the private context.
         policy_private = contexts.private_state
         if self.action_oracle is not None:
             policy_private = self.action_oracle.augment(
@@ -710,15 +710,13 @@ class FogAgent(nn.Module):
 
     def head_inputs(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor]:
         """(private_state, public_context) for direct policy/value calls and joint-search caching.
-        Per ARCHITECTURE.md invariant S2, the backbone pass over a leaf batch runs ONCE; each regret-matching
-        iteration then re-scores leaves through the cheap head with fresh posterior features. No
-        belief forward here (§3.6: the policy no longer conditions on a belief summary); no
-        oracle/blind handling — search never runs in those modes.
+        Search caches these encodings once per leaf batch and re-scores the small head
+        with fresh posterior features on each regret iteration. No belief prediction is
+        needed: the policy does not consume a pooled belief summary. This path does not
+        apply oracle or blind-reactive inputs.
 
-        Gradient contract: NOT decorated no_grad — full-scope distillation (training/distill.py)
-        backprops through this path. Inference callers (search, precompute loops) wrap their
-        calls in torch.no_grad(); a decorator here silently froze the trunk under distillation
-        (caught by tests/test_distill.py::test_distill_scope_freezes_correctly)."""
+        Gradients remain enabled for full-scope distillation. Inference callers should
+        wrap their calls in torch.no_grad()."""
         contexts = self.encode_contexts(batch)
         return contexts.private_state, self.public_context(contexts)
 
@@ -876,4 +874,4 @@ class FogAgent(nn.Module):
     def assert_within_budget(self) -> None:
         n = self.n_params()
         if n > PARAM_BUDGET:
-            raise ValueError(f"Model has {n:,} params > budget {PARAM_BUDGET:,} (spec §3/§11).")
+            raise ValueError(f"Model has {n:,} params > budget {PARAM_BUDGET:,}.")

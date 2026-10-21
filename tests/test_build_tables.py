@@ -1,4 +1,4 @@
-"""Fixture-based tests for constants/build.py + tables.py (§1) — no Showdown checkout needed.
+"""Fixture-based tests for constants/build.py + tables.py — no Showdown checkout needed.
 
 A miniature dex dump (same schema as server/dump-dex.cjs emits) exercises: usage filtering, learnset
 gen-9 source filtering + forme/prevo fallback, item usage cuts, sentinel indices, and the tables.py

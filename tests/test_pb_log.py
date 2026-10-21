@@ -119,7 +119,7 @@ def test_whole_game_logged_with_outcome_backfill(tmp_path):
         assert row["sigma1"].shape[0] == 2
         assert row["obs"] is not None and row["true_index"] == 0
         assert len(row["queried_beliefs"]) <= 2
-        # Phase-G value-training fields: j* found (opp team is the sole pool member), and the token
+        # Value-training fields: j* found (opp team is the sole pool member), and the token
         # grids index rho's axes (own_tokens is [K,6,15], opp_tokens is [J,6,15]).
         assert row["opp_true_index"] == 0
         assert row["own_tokens"].shape == (row["rho"].shape[0], 6, 15)
@@ -358,7 +358,7 @@ def test_selfplay_requires_shared_axes():
 
 def test_loop_generation_smoke(tmp_path):
     """I.5: one full generation — solver self-play -> distill v2 -> belief refresh — runs
-    in-process at smoke scale, mutates the agent, and reports the §15.4 gates it ran (and
+    in-process at smoke scale, mutates the agent, and reports the checks it ran (and
     names the ones it did not)."""
     from fog.models.agent import FogAgent
     from fog.scripts.pb_loop import run_generation

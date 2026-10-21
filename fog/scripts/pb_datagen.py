@@ -1,32 +1,14 @@
-"""Multiprocess two-sided-search data generation on a team pool (ARCHITECTURE.md S1–S3,
-cost lever L2; §6.2 acceptance bar: sustained >= 1,000 POOL-A games/day on this box).
+"""Generate sharded two-sided-search data on a finite team pool.
 
-Games are independent, the blind/interim value path needs no GPU, and the box has 20 cores; RAM
-is the binding constraint (16 GB), so the worker count is a measured, pinned choice — run with
-`--workers` and report, never assume. Each worker plays its shard of games through
-`play_and_log_pb_games` (persistent mode over the full pool, both sides' teams drawn round-robin
-over the K x K matchup grid so the L1 opening-solve cache and data coverage are both served) and
-writes an independent v2 log shard; the parent aggregates throughput.
+Workers call `play_and_log_pb_games` with stable pool candidates and round-robin
+team matchups, writing independent v2 logs. The parent aggregates throughput.
+Choose `--workers` to fit available memory. Each shard is atomically rewritten
+every `--flush-every` completed games so interrupted runs retain progress.
 
-Durability: workers flush their shard every `--flush-every` games (atomic rewrite, heartbeat
-line per flush — pb_log's incremental-save contract), so a killed run keeps its completed games.
-An overnight batch must never be one all-or-nothing save at hour nine (the G0 session-death
-lesson, applied here after batch A ran blind).
-
-The learner is `p1` with a `StablePoolOwnStates` source (battle-lifetime-stable table axes); the
-opponent defaults to the scripted max-damage bot (the data-plumbing default — solver-vs-solver
-self-play is `--selfplay`, Phase I.2). Budget knobs (`--iters`, `--min-prob`, `--max-branches`,
-`--top-k`, `--top-j`) are logged into each shard's meta so every row's generation profile is
-auditable (lever L4 is "run this with a reduced profile", not separate code).
-
-Phase I.5 hooks (the generation loop shells into `run_sharded_datagen` per generation):
-`posterior_aware=True` loads the checkpoint through `load_posterior_agent` (zero-pad expansion of
-a blind head — required once distillation has trained the posterior columns); `value_net=<path>`
-routes leaf values through a trained PBValueNet (the G5 switch) at `value_recompute_every`.
-
-Usage (POOL-A smoke, 4 workers):
-    python -m fog.scripts.pb_datagen --pool data/teams/pool_a --games 48 --workers 4 \
-        --out runs/pb_datagen_a
+The opponent defaults to MaxDamage; `--selfplay` uses the solver for both sides.
+Search budgets are recorded in each shard's metadata. `posterior_aware=True`
+loads expanded policy/value heads, and `value_net` supplies a PBValueNet checkpoint
+with refresh frequency controlled by `value_recompute_every`.
 """
 from __future__ import annotations
 
@@ -83,7 +65,7 @@ def _run_shard(cfg: dict) -> dict:
 
     search_kwargs = dict(cfg["search_kwargs"])
     if cfg.get("value_net"):
-        # G5 switch: leaf values from the trained PBValueNet instead of the interim head. The
+        # Leaf values from the trained PBValueNet instead of the scalar head. The
         # net OBJECT goes only into the runtime kwargs; shard meta stores its repr (pb_log
         # sanitizes) and the parent summary stores the path.
         from fog.models.pb_value import PBValueNet
@@ -197,20 +179,20 @@ def main() -> None:
                     help="explicit per-cell branch cap (default none: exact enumeration)")
     ap.add_argument("--top-k", type=int, default=None,
                     help="reserved; a cap that removes live own types is refused as truth-leaking")
-    ap.add_argument("--top-j", type=int, default=None, help="G2 opponent-side truncation cap")
+    ap.add_argument("--top-j", type=int, default=None, help="opponent candidate truncation cap")
     ap.add_argument("--n-queried", type=int, default=8)
     ap.add_argument("--checkpoint", default=None,
-                    help="agent weights (default: random weights — the blind G0-recipe path)")
+                    help="agent weights (default: random weights)")
     ap.add_argument("--selfplay", action="store_true",
-                    help="solver-vs-solver self-play (Phase I.2): both sides solve, 2x rows")
+                    help="solver-vs-solver self-play: both sides solve, 2x rows")
     ap.add_argument("--posterior-aware", action="store_true",
                     help="load the checkpoint posterior-aware (zero-pad expanded if blind) — "
                          "the I.5 loop path; requires --checkpoint")
     ap.add_argument("--value-net", default=None,
-                    help="trained PBValueNet state dict: G5 leaf-value switch (default: the "
+                    help="trained PBValueNet state dict (default: the "
                          "interim posterior-feature head)")
     ap.add_argument("--value-recompute-every", type=int, default=8,
-                    help="PBValueNet table refresh cadence N (G4's drift-chosen knob)")
+                    help="PBValueNet table refresh interval; measure drift before choosing it")
     ap.add_argument("--flush-every", type=int, default=25,
                     help="atomically save each worker's shard every N games (0 = only at end)")
     ap.add_argument("--torch-threads", type=int, default=None,

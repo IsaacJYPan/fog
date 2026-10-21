@@ -13,7 +13,7 @@ preflight:
   min_replay_dryruns: 10
   min_replay_hidden_targets: 1
 env:
-  # Do not inherit G0's approximate volume backend for the claim-bearing continuation.
+  # Use direct Showdown for this continuation, overriding the engine baseline.
   backend: showdown_direct
   # Conservative process-parallel baseline for the 16-logical-CPU development machine. Benchmark
   # 4/6/8 on the target machine; keep one inference thread per actor to avoid oversubscription.

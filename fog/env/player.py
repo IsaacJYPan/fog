@@ -1,23 +1,8 @@
-"""poke-env Player wrapper.
+"""Live battle decisions, rollout collection, and poke-env lifecycle hooks.
 
-The module stays import-light: it does not subclass poke-env's Player until `FogPlayer.build()` is
-called at runtime.
-
-Training integration: `attach_buffer(RolloutBuffer)` turns every `act` into a recorded decision
-(unbatched C3 fragment + action + log-prob + value + the mirror observation for self-belief training)
-and every battle end into `end_game(±1, final_leak_ce)`. All per-battle state (RevealLedger,
-BattleTracker, fed-turn bookkeeping) is keyed by battle_tag so `max_concurrent_battles > 1` is safe.
-History/ledger reset between battles is handled in the battle-finished callback — the M1 silent-bug
-guard.
-
-Leakage (§7): `phi_hat` is a `FrozenProbe` — a frozen (backbone + self-belief) pair, so the ΔI
-measurement never depends on live weights. Each decision records the probe's readability CE; the
-buffer differences consecutive CEs into per-turn ΔI, and the battle-finished hook contributes the
-final post-game measurement so end-of-game reveals are penalized too.
-
-Team preview: `teampreview` runs the agent's TeamPreviewHead over the preview entities and returns
-the sampled order; the preview pick is recorded into the buffer as a bandit decision (game outcome
-as reward — see ppo_update's preview term).
+The poke-env subclass is created by ``FogPlayer.build()``. Battle trackers and rollout game IDs
+are kept per battle tag so one player can handle concurrent games. Opponent-view recording and
+frozen-probe measurements live in ``MirrorRecorder``.
 """
 from __future__ import annotations
 
@@ -27,6 +12,11 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from fog.env.actions import active_entity_indices, map_action_to_order
+from fog.env.mirror_recording import MirrorRecorder
+from fog.env.mirror_recording import _own_truth_tokens as _own_truth_tokens
+from fog.env.mirror_recording import _species_id as _species_id
+from fog.env.mirror_recording import _t1 as _t1
+from fog.env.mirror_recording import _zero_mirror as _zero_mirror
 from fog.training.progress_reward import battle_progress_score as _progress_score
 
 if TYPE_CHECKING:
@@ -37,7 +27,7 @@ if TYPE_CHECKING:
 
 
 class FogPlayer:
-    """Thin adapter from `FogAgent` decisions to poke-env battle orders."""
+    """Coordinate agent decisions, battle state, and training hooks for poke-env."""
 
     def __init__(
         self,
@@ -63,21 +53,13 @@ class FogPlayer:
         self.on_battle_start: Callable[[Any], None] | None = None
         self.decision_delay_seconds = 0.0
         self._announced_battles: set[str] = set()
-        # Optional policy-distillation tap: called with the exact unbatched fragment and acting
-        # output before the decision is added to the rollout buffer. It is deliberately inert in
-        # ordinary training and evaluation.
+        # Distillation hooks receive the observation and policy output used for this action.
         self.decision_observer: Callable[[str, dict, Any], None] | None = None
-        # Optional exact action-label provider used by supervised policy collection. It receives
-        # the live battle, exact observation, and agent output, and must return a legal project
-        # action index. Ordinary PPO/inference leaves this unset.
+        # Overrides must return a legal action index.
         self.action_override: Callable[[Any, Any, Any], int] | None = None
-        # Optional DAgger labeler. Unlike ``action_override`` this never changes the live action:
-        # it only stores a legal target alongside the exact accepted rollout fragment, so rejected
-        # Showdown choices are rolled back atomically with their supervision.
+        # DAgger labels accompany the rollout row and are discarded with rejected choices.
         self.supervised_label_provider: Callable[[Any, Any, Any], int] | None = None
-        # Opt-in supervised-data metadata. When true, the finalized rollout fragment retains the
-        # donor's full masked policy distribution. It remains inside RolloutBuffer so a rejected
-        # Showdown choice is rolled back together with the action row.
+        # Retain the donor's masked policy distribution for supervised training.
         self.record_policy_reference = False
         # optional: finished battle -> [6,15] opponent truth tokens (self-play belief supervision)
         self.truth_provider: Callable[[Any], Any] | None = None
@@ -86,26 +68,16 @@ class FogPlayer:
         # here would incorrectly turn temporary in-battle changes (Skill Swap, Transform, etc.) into
         # self-belief labels.
         self.private_state_truth_provider: Callable[[Any], Any] | None = None
-        # optional leakage measurement (§7): a FrozenProbe (frozen backbone + self-belief). When set,
-        # each decision records the probe's self-readability CE so the rollout buffer can derive the
-        # per-turn ΔI penalty. `leak_family_weights` rescales per-family CE (weighted-ΔI ablation).
-        self.phi_hat = None
-        self.leak_family_weights: dict[str, float] | None = None
-        # mirror recording for self-belief TRAINING (§3.3): tri-state — None = auto (try once,
-        # disable permanently on first failure), True/False = forced. Only active with a buffer.
-        self.record_mirror: bool | None = None
-        self.mirror_last_error: str | None = None
-        # optional set-oracle truth injection (§3.4 eval): battle -> [6,15] opponent truth tokens fed
+        self._mirror_recorder = MirrorRecorder(self._record_diagnostic_error)
+        # Set-oracle truth injection: battle -> [6,15] opponent truth tokens fed
         # to the belief net as opp_truth_tokens (perfect-information ceiling).
         self.oracle_truth_provider: Callable[[Any], Any] | None = None
-        # optional determinized search at action time (§8): when set, act() selects via
+        # Optional determinized search at action time: when set, act() selects via
         # search.determinized instead of sampling the policy. Reconstructs an engine position from
         # the live battle + belief-sampled worlds and rolls one ply each (search/engine_step). Dict:
         # {"k": int, "prior_weight": float, "seed": int}. Inference-only; never during training.
         self.search: dict | None = None
-        # Search failures used to be swallowed by the policy fallback, making a broken search row
-        # look indistinguishable from policy-only play. Evaluations read these counters through the
-        # built player's `_fog_adapter` reference.
+        # Evaluations read search accounting through the built player's `_fog_adapter` reference.
         self.search_stats: dict[str, Any] = {
             "decisions": 0,
             "simulation_attempts": 0,
@@ -115,9 +87,41 @@ class FogPlayer:
             "last_error": None,
             "failure_reasons": {},
         }
-        # Optional subsystems may degrade without aborting a battle, but never silently.  Each
-        # boundary records a stable name, count, and last concrete error for run reports/tests.
+        # Retain errors from optional subsystems for run reports.
         self.diagnostic_errors: dict[str, dict[str, Any]] = {}
+
+    @property
+    def phi_hat(self):
+        return self._mirror_recorder.probe
+
+    @phi_hat.setter
+    def phi_hat(self, probe) -> None:
+        self._mirror_recorder.probe = probe
+
+    @property
+    def leak_family_weights(self) -> dict[str, float] | None:
+        return self._mirror_recorder.family_weights
+
+    @leak_family_weights.setter
+    def leak_family_weights(self, weights: dict[str, float] | None) -> None:
+        self._mirror_recorder.family_weights = weights
+
+    @property
+    def record_mirror(self) -> bool | None:
+        """None tries once; True keeps batch structure after failures; False disables recording."""
+        return self._mirror_recorder.enabled
+
+    @record_mirror.setter
+    def record_mirror(self, enabled: bool | None) -> None:
+        self._mirror_recorder.enabled = enabled
+
+    @property
+    def mirror_last_error(self) -> str | None:
+        return self._mirror_recorder.last_error
+
+    @mirror_last_error.setter
+    def mirror_last_error(self, error: str | None) -> None:
+        self._mirror_recorder.last_error = error
 
     def _record_diagnostic_error(self, name: str, exc: BaseException) -> None:
         entry = self.diagnostic_errors.setdefault(name, {"count": 0, "last_error": None})
@@ -139,10 +143,8 @@ class FogPlayer:
 
         adapter = self
 
-        # NOTE: the class name feeds poke-env's default username. It must contain no characters
-        # Showdown strips (a leading underscore once made the client log in as "_Player 1" while the
-        # server registered "Player 1" — the challenge handshake then targeted a ghost name and every
-        # battle hung forever). Prefer passing an explicit unique account via `unique_account()`.
+        # poke-env uses this class name in default usernames. Showdown strips punctuation,
+        # which can break the challenge handshake; use unique_account() for explicit accounts.
         class FogBot(Player):  # type: ignore[misc]
             def choose_move(self, battle):
                 return adapter.act(battle)
@@ -199,8 +201,7 @@ class FogPlayer:
     def _game_id(self, tag: str) -> int:
         gid = self._game_ids.get(tag)
         if gid is None:
-            # NOT setdefault(tag, start_game()): that evaluates start_game() eagerly on every
-            # decision and litters the buffer with phantom unfinished games.
+            # setdefault would call start_game() even when the battle already has a game ID.
             gid = self._buffer.start_game()
             self._game_ids[tag] = gid
         return gid
@@ -304,9 +305,8 @@ class FogPlayer:
                         )
                     frag["supervised_label"] = np.int64(supervised_label)
                 if self.oracle_truth_provider is not None:
-                    # The update-time forward must see what the acting forward saw (acting with
-                    # truth but updating without silently breaks the PPO ratio). Key always
-                    # present so fragment structure is batch-constant.
+                    # PPO recomputes the acting policy with the same oracle input.
+                    # Fill missing truth so fragments retain the same keys.
                     frag["opp_truth_tokens"] = (
                         oracle_truth if oracle_truth is not None
                         else np.full((6, 15), -1, dtype=np.int64)
@@ -328,7 +328,7 @@ class FogPlayer:
                     progress_score=_progress_score(battle),
                 )
 
-        # history retro-fidelity: snapshot + my chosen action for this turn (§2.3)
+        # Save the public state and chosen action for history encoding.
         from fog.constants.tables import TABLES
         from fog.encoding.events import record_history_decision
 
@@ -354,7 +354,7 @@ class FogPlayer:
 
     # ------------------------------------------------------------------------------- team preview
     def choose_teampreview(self, battle: Any) -> str:
-        """Order my team with the agent's TeamPreviewHead (§3.1). Falls back to default order."""
+        """Order my team with the agent's preview head, falling back to the default order."""
         if self.agent is None or getattr(self.agent, "preview", None) is None:
             return "/team 123456"
         try:
@@ -403,9 +403,7 @@ class FogPlayer:
 
     # -------------------------------------------------------------------------------------- search
     def _search_action(self, battle: Any, obs: Any, tracker: Any, batch: dict, device) -> int:
-        """Determinized action via engine rollouts reconstructed from the live battle (§8). Any
-        failure (engine missing, reconstruction/step error) falls back to policy sampling so a
-        search run never crashes a game."""
+        """Select by search, counting failures before falling back to policy sampling."""
         import torch
 
         self.search_stats["decisions"] += 1
@@ -491,92 +489,20 @@ class FogPlayer:
 
     # ------------------------------------------------------------------------------ mirror/leakage
     def _mirror(self, battle: Any, obs: Any, ledger: Any) -> tuple[dict, dict] | None:
-        """Unbatched (mirror_frag, my_view) numpy pair, or None when mirror recording is off/broken.
-
-        Auto-disables permanently on the first failure (before anything was recorded) so every frag
-        in a batch has identical structure; after the first success, failures degrade to a zero-fill
-        mirror with -1 labels (no loss contribution) instead of breaking frag structure.
-        """
-        if self.record_mirror is False or (self._buffer is None and self.phi_hat is None):
-            return None
-        try:
-            from fog.constants.tables import TABLES
-            from fog.encoding.mirror import build_opponent_view_np
-            from fog.encoding.reveals import tokens_from_views
-
-            team = getattr(battle, "team", None) or {}
-            my_keys = [str(k) for k in team]
-            my_species = [TABLES.species_index(_species_id(m)) for m in team.values()]
-            my_view_tokens = tokens_from_views(
-                ledger.views(my_keys, my_species) if ledger else []
-            )
-            my_truth_tokens = None
-            if self.private_state_truth_provider is not None:
-                try:
-                    my_truth_tokens = self.private_state_truth_provider(battle)
-                except Exception as exc:  # noqa: BLE001 - provider boundary; mirror records failure
-                    self._record_diagnostic_error("mirror_private_truth_provider", exc)
-                    my_truth_tokens = None
-            if my_truth_tokens is None:
-                paste = getattr(self._team_builder, "last_paste", None)
-            else:
-                paste = None
-            if paste:
-                from fog.env.team_truth import truth_tokens_from_paste
-
-                my_truth_tokens = truth_tokens_from_paste(paste, TABLES)
-            elif my_truth_tokens is None:
-                my_truth_tokens = _own_truth_tokens(battle, TABLES)
-            out = build_opponent_view_np(obs, my_view_tokens, my_truth_tokens, TABLES)
-            if self.record_mirror is None:
-                self.record_mirror = True
-            return out
-        except Exception as exc:  # noqa: BLE001 - optional mirror boundary; error retained below
-            self.mirror_last_error = f"{type(exc).__name__}: {exc}"
-            if self.record_mirror is None:
-                self.record_mirror = False   # never worked: drop the opp_view key entirely
-                return None
-            return _zero_mirror(obs)         # worked before: keep frag structure, no labels
+        return self._mirror_recorder.build(
+            battle,
+            obs,
+            ledger,
+            recording=self._buffer is not None,
+            private_truth_provider=self.private_state_truth_provider,
+            team_builder=self._team_builder,
+        )
 
     def _leakage_ce(self, mirror: tuple[dict, dict] | None, obs: Any, device) -> float | None:
-        """Frozen-probe self-readability CE for this decision (§7); None when leakage is off."""
-        if self.phi_hat is None or mirror is None:
-            return None
-        try:
-            import torch
-
-            mirror_frag, my_view = mirror
-            # Structure-preserving zero mirror (mid-game mirror failure): all labels are -1, its CE
-            # is 0 by construction, and differencing a real CE against it fabricates a large ΔI
-            # spike. No labels -> no measurement; the buffer forward-fills the gap.
-            sp_labels = np.asarray((my_view.get("labels") or {}).get("species", -1))
-            if not (sp_labels >= 0).any():
-                return None
-            mb = {
-                "entities": _t1(mirror_frag["entities"], torch.float32, device),
-                "entity_ids": _t1(mirror_frag["entity_ids"], torch.long, device),
-                "field": _t1(mirror_frag["field"], torch.float32, device),
-                "history": _t1(mirror_frag["history"], torch.float32, device),
-                "history_ids": _t1(mirror_frag["history_ids"], torch.long, device),
-                "history_state": _t1(mirror_frag["history_state"], torch.float32, device),
-                "history_len": torch.as_tensor(
-                    [mirror_frag["history_len"]], dtype=torch.long, device=device
-                ),
-                "active_idx": _t1(mirror_frag["active_idx"], torch.long, device),
-            }
-            mv = {
-                "tokens": _t1(my_view["tokens"], torch.long, device),
-                "masks": {k: _t1(v, torch.bool, device) for k, v in my_view["masks"].items()},
-                "labels": {k: _t1(v, torch.long, device) for k, v in my_view["labels"].items()},
-            }
-            ce = self.phi_hat.leakage_ce(mb, mv, family_weights=self.leak_family_weights)
-            return float(ce[0])
-        except Exception as exc:  # noqa: BLE001 - optional metric boundary; error is recorded
-            self._record_diagnostic_error("leakage_measurement", exc)
-            return None  # leakage measurement is never battle-critical
+        return self._mirror_recorder.leakage_ce(mirror, device)
 
     def _final_leak_ce(self, battle: Any, ledger: Any, tracker: Any) -> float | None:
-        """Post-game readability CE — the `after` term for the LAST decision's ΔI (§7)."""
+        """Post-game readability CE for the last decision's leakage penalty."""
         if self.phi_hat is None:
             return None
         try:
@@ -653,11 +579,10 @@ class FogPlayer:
 
 
 def unique_account(prefix: str = "fog"):
-    """A collision-proof poke-env AccountConfiguration (<=18 chars, Showdown's limit).
+    """A poke-env account with a process/random suffix, within Showdown's 18-character limit.
 
-    poke-env auto-numbers usernames only within one process; concurrent/successive processes (or a
-    zombie holding its socket) collide on the server and battles hang on |nametaken|. Always pass
-    one of these per player in scripts and training."""
+    poke-env's automatic numbering is local to each process; reused names can hang challenges.
+    """
     import os
     import random
 
@@ -667,84 +592,6 @@ def unique_account(prefix: str = "fog"):
     return AccountConfiguration(name[:18], None)
 
 
-def _species_id(mon) -> str:
-    from fog.encoding.events import submitted_species_id
-
-    return submitted_species_id(getattr(mon, "species", ""))
-
-
-def _own_truth_tokens(battle, tables):
-    """My own full team as [6,15] truth tokens for self-belief labels (§3.3)."""
-
-    from fog.constants.schema import TYPE_INDEX
-    from fog.encoding.events import submitted_species_id, to_id
-    from fog.encoding.reveals import SlotView, tokens_from_views
-
-    views = []
-    for mon in list((getattr(battle, "team", None) or {}).values())[:6]:
-        v = SlotView()
-        sp = getattr(mon, "species", None)
-        if sp:
-            v.species = tables.species_index(submitted_species_id(sp))
-        item = getattr(mon, "item", None)
-        if item and to_id(item) != "unknownitem":
-            v.item = tables.item_index(to_id(item))
-        ability = getattr(mon, "ability", None)
-        if ability:
-            v.ability = tables.ability_index(to_id(ability), default=None)
-        for mid in list(getattr(mon, "moves", None) or {})[:4]:
-            idx = tables.move_index(to_id(mid), default=None)
-            if idx is not None and idx not in v.moves:
-                v.moves.append(idx)
-        if sp:
-            from fog.encoding.entities import _own_nature_evs
-
-            v.nature, v.evs = _own_nature_evs(mon, to_id(sp), tables)
-        tt = getattr(mon, "tera_type", None)
-        if tt is not None:
-            v.tera = TYPE_INDEX.get(to_id(getattr(tt, "name", tt)), 18)
-        views.append(v)
-    while len(views) < 6:
-        views.append(SlotView())
-    return tokens_from_views(views)
-
-
-def _zero_mirror(obs) -> tuple[dict, dict]:
-    """Structure-preserving mirror fallback: zero entities, -1 tokens/labels (no loss contribution).
-
-    Masks are omitted entirely — my_view["masks"] = {} stacks consistently only if EVERY frag uses
-    {}; to avoid a mixed batch the fallback keeps the same mask keys as the real path but all-True.
-    """
-    import numpy as np
-
-    from fog.constants.schema import SET_N_ATTRS
-    from fog.constants.tables import TABLES
-
-    frag = {
-        "entities": np.zeros_like(obs.entities),
-        "entity_ids": np.zeros_like(obs.entity_ids),
-        "field": np.zeros_like(obs.field),
-        "active_idx": np.array([0, 6], dtype=np.int64),
-        # Opponent request legality is private and unavailable in a mirror fallback.  Keep the
-        # structure identical to real mirrors with a constant, non-informative public placeholder.
-        "legality_mask": np.ones(14, dtype=bool),
-    }
-    tokens = np.full((6, SET_N_ATTRS), -1, dtype=np.int64)
-    masks = {
-        "species": np.ones((6, TABLES.n_species), dtype=bool),
-        "ability": np.ones((6, TABLES.n_abilities), dtype=bool),
-        "move": np.ones((6, TABLES.n_moves), dtype=bool),
-    }
-    labels = {
-        "species": np.full(6, -1, dtype=np.int64), "item": np.full(6, -1, dtype=np.int64),
-        "ability": np.full(6, -1, dtype=np.int64), "move": np.full((6, 4), -1, dtype=np.int64),
-        "nature": np.full(6, -1, dtype=np.int64),
-        "ev": np.full((6, 6), -1, dtype=np.int64),
-        "tera": np.full(6, -1, dtype=np.int64),
-    }
-    return frag, {"tokens": tokens, "masks": masks, "labels": labels}
-
-
 def _agent_device(agent: FogAgent):
     import torch
 
@@ -752,13 +599,6 @@ def _agent_device(agent: FogAgent):
         return next(agent.parameters()).device
     except StopIteration:
         return torch.device("cpu")
-
-
-def _t1(a, dtype, device):
-    import torch
-
-    t = torch.as_tensor(np.ascontiguousarray(a), dtype=dtype)
-    return (t.to(device) if device is not None else t).unsqueeze(0)
 
 
 def _sample_action(
@@ -791,12 +631,9 @@ def _sample_action(
 
 
 def _temperature_log_probs(log_probs: Any, *, temperature: float):
-    """Return the exact normalized distribution sampled at a positive temperature.
+    """Normalized positive-temperature policy used by acting and PPO.
 
-    ``log_probs`` may contain ``-inf`` for illegal actions.  Keeping the transformation in one
-    helper lets rollout collection and PPO recompute byte-for-byte equivalent likelihoods.
-    Temperature zero is deterministic evaluation and has no differentiable sampling
-    distribution, so callers must handle it separately.
+    Illegal actions keep -inf. Callers handle deterministic temperature-zero selection separately.
     """
     return _behavior_log_probs(log_probs, temperature=temperature)
 
@@ -804,12 +641,9 @@ def _temperature_log_probs(log_probs: Any, *, temperature: float):
 def _behavior_log_probs(
     log_probs: Any, *, temperature: float = 1.0, tera_logit_bonus: float = 0.0
 ):
-    """Exact normalized training policy after optional temperature and Tera-only exploration.
+    """Normalize temperature-adjusted logits with an optional bonus for legal Tera actions.
 
-    A fixed Tera bonus is deliberately narrower than global temperature: it changes only the
-    relative mass of legal slots 4..7 versus all other legal actions, while preserving the policy's
-    learned preferences within each group.  The same transformation is used for acting and PPO's
-    update-time likelihood, so the importance ratio starts at one.
+    Acting and PPO use the same transformation so the initial importance ratio is one.
     """
     import torch
 

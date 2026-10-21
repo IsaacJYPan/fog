@@ -1,4 +1,4 @@
-"""Mechanics tests for the §3.7 conditioning-gate harness (fog/eval/belief_conditioning.py).
+"""Mechanics tests for the belief-conditioning harness (fog/eval/belief_conditioning.py).
 
 These pin the EXPERIMENT's correctness — the designed distribution, the reveal conventions, the
 exact reference CEs, and that the eval runs end-to-end on an untrained model — NOT the training

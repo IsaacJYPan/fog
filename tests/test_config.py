@@ -1,4 +1,4 @@
-"""Tests for config loading + hashing + `extends` resolution (spec §0 reproducibility)."""
+"""Tests for config loading + hashing + `extends` resolution."""
 from __future__ import annotations
 
 import pytest

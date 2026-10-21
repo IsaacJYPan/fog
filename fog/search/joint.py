@@ -1,36 +1,18 @@
-"""Legacy joint sampled counterfactual search. Inference-time only — NEVER in PPO.
+"""One-sided joint counterfactual search for inference.
 
-Where determinized search (search/determinized.py) samples worlds for MY uncertainty about the
-OPPONENT, this module reasons over the opposite direction: K candidate private states the OPPONENT
-considers possible for ME (fog/search/own_states.py). The K per-state policies are optimized
-TOGETHER, coupled through the opponent's belief update: the value of an action in state k is
-computed under the posterior over states that playing it would induce — the defining requirement
-of joint counterfactual search. Executed action: sampled from the TRUE state's averaged policy.
+Optimize policies for K possible private teams, coupled through the opponent's
+belief update after our public action. Actions use move/switch identities rather
+than slot indices, since the same slot can contain different moves across teams.
+Unavailable actions have zero likelihood in that team's posterior.
 
-Three design decisions that carry the correctness:
+Simulations and backbone encodings are cached once; regret iterations recompute
+posterior features and the value head. The head needs trained posterior inputs
+(`model.use_posterior_features`) for this coupling to affect values. Without them,
+the solve reduces to K independent searches.
 
-  1. **Coupling is over PUBLIC actions, not action-slot indices.** In different candidate worlds
-     the same move slot holds different moves; what the opponent observes is the move id (or the
-     switch species). Policies, posteriors and regret tables therefore live in a public-label
-     space (the `engine_action` string, kind-prefixed) — the union over worlds. A world that
-     lacks a label plays it with probability 0, so observing that action correctly ELIMINATES the
-     world in the posterior (using an unrevealed move is a hard reveal).
-  2. **Simulations run once; iterations re-score.** The expensive parts of a decision — one
-     engine ply per (state, public action) via `fork_for_own_world` + `_play_one_ply`, and one
-     batched backbone/belief pass over all fog leaves — happen once. Each regret-matching
-     iteration recomputes only the posterior features and re-runs the cheap policy/value HEAD
-     (`FogAgent.head_inputs` caches the trunk). Cost per extra iteration ≈ one [K·A, in_dim] MLP.
-  3. **The coupling needs a consumer.** Leaf values respond to the posterior only through the
-     head's posterior-features input (`model.use_posterior_features`, heads.N_POSTERIOR_FEATURES).
-     With the flag off the head ignores the features, values are posterior-independent, and the
-     joint optimization provably degenerates to K independent searches — that degenerate mode is
-     pinned by tests/test_joint_search.py as the contrast case, not a supported configuration.
-
-Two-sided worlds: the searcher doesn't know the OPPONENT's team either, so each own-state k is
-paired with one opponent world sampled from the agent's belief net. Opponent replies come from
-`opponent_policy` (default EngineMaxDamagePolicy —
-reads only its own side, so no engine truth leaks; it also cannot react to beliefs, which is the
-depth-one limitation documented by ARCHITECTURE.md invariant S6).
+Each own team is paired with a sampled opponent team. The default opponent is
+`EngineMaxDamagePolicy`, which reads its own side and does not react to beliefs.
+The executed action is sampled from the true team's averaged strategy.
 """
 from __future__ import annotations
 
@@ -161,7 +143,7 @@ def joint_search_action(
     device = _device(agent)
     agent.eval()
     if getattr(agent, "action_oracle", None) is not None:
-        raise ValueError("joint search does not support oracle-mode agents (§3.4 eval ceilings)")
+        raise ValueError("joint search does not support oracle-mode agents")
 
     if opponent_policy is None:
         from fog.env.engine_scripted import EngineMaxDamagePolicy

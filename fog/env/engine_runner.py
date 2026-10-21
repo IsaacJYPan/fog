@@ -1,20 +1,11 @@
-"""Batched lockstep self-play on poke-engine (ARCHITECTURE.md §3.2).
+"""Batched lockstep self-play on poke-engine.
 
-The throughput fix is architectural, not the engine alone: N `EngineBattle`s step in lockstep and
-every agent-driven decision wave becomes ONE batched forward, amortizing the Python->GPU round
-trip that capped the Showdown path at ~25 decisions/sec regardless of `concurrent_battles`.
+Agent decisions across active EngineBattles share a batched forward pass. Recording
+uses the same rollout format and opponent-view helpers as FogPlayer; submitted
+pastes provide exact belief labels. Scripted opponents act on engine state, while
+frozen-checkpoint opponents use a separate batched forward pass.
 
-Recording semantics mirror `FogPlayer.act` / `_battle_finished` exactly (same frag structure, same
-RolloutBuffer calls) so `ppo_update`, GAE, watchdogs and the dashboard run unchanged. The mirror /
-leakage measurement reuses FogPlayer's own helpers (`_mirror`, `_leakage_ce`) — one code path for
-both backends. Belief truth is exact by construction: the runner sampled both pastes.
-
-Scripted opponents (engine_scripted) act on raw engine state — their views are never encoded.
-Frozen-checkpoint opponents run as a second batched forward. Per-decision leakage CE (beta>0) is
-currently per-item like the Showdown path; batch it here first if a leakage run's probe shows it
-dominating.
-
-Throughput probe for selecting a safe local worker count:
+Probe throughput with:
 
     python -m fog.env.engine_runner --probe --pool data/teams/pool_a --config configs/default.yaml
 """
@@ -123,7 +114,7 @@ class EngineRunner:
         return slot
 
     def _preview(self, slot: _Slot) -> int:
-        """Learner team-preview lead pick (§3.1) — mirrors FogPlayer.choose_teampreview.
+        """Learner team-preview lead pick — mirrors FogPlayer.choose_teampreview.
         Unbatched on purpose: one preview per ~30 decisions is off the critical path."""
         import torch
 
@@ -445,7 +436,7 @@ def main() -> None:
     import argparse
     from pathlib import Path
 
-    ap = argparse.ArgumentParser(description="Engine self-play runner probe (plan §4).")
+    ap = argparse.ArgumentParser(description="Engine self-play throughput probe.")
     ap.add_argument("--probe", action="store_true")
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_b"))
     ap.add_argument("--config", type=str, default="configs/default.yaml")

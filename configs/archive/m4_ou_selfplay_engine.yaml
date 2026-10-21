@@ -1,6 +1,6 @@
 # Archived M4 self-play volume run on the poke-engine backend.
 # Same experiment as m4_ou_selfplay.yaml, ~13x the measured throughput (engine_runner --probe).
-# RULES (§5): run fuzz_sim --showdown on the pool first; the cross-sim gauntlet below HALTS on a
+# Run fuzz_sim --showdown on the pool first; the cross-sim gauntlet below HALTS on a
 # >3% engine-vs-Showdown win-rate gap; the final ~200k games + every headline eval stay on
 # Showdown (switch back with env.backend=showdown, warm-started from this run's checkpoint).
 #   python -m fog.training.ppo --config configs/archive/m4_ou_selfplay_engine.yaml

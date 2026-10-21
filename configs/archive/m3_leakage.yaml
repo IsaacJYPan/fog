@@ -17,7 +17,7 @@ env:
 loss:
   belief_coef: 1.0
   self_belief_coef: 1.0             # self-belief predictor trained alongside (leakage measurer)
-  self_belief_chain_coef: 1.0       # chain CE for the self-belief net (§3.6)
+  self_belief_chain_coef: 1.0       # chain CE for the self-belief net
 leakage:
   beta: 0.03                        # SET PER RUN from {0.0, 0.01, 0.03, 0.1}
   refreeze_every_decisions: 100000  # refreeze Phi-hat (a FrozenProbe: backbone + self-belief PAIR)
@@ -32,7 +32,7 @@ leakage:
   # at update ONE before this guard). Diversity/stalling detectors are simply OFF without
   # baseline_run.
   watchdog_warmup_decisions: 20000
-  # Per-step penalty estimator: true = max(0, ΔI) (§7 default); false = signed ΔI, which telescopes
+  # Per-step penalty estimator: true = max(0, ΔI) (default); false = signed ΔI, which telescopes
   # to CE_first − CE_final per game and is immune to the clipped form's probe-CE-noise bias.
   # Run at least one β cell with clip_delta=false as the estimator ablation.
   clip_delta: true

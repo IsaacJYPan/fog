@@ -1,4 +1,4 @@
-"""EngineBattle.step_branches (PROJECT_DESIGN_PROPOSAL.md §10.4): chance outcomes enumerated as
+"""EngineBattle.step_branches: chance outcomes enumerated as
 weighted forks instead of one sampled rollout. Pins: probability accounting, parent immutability,
 pruning rules, fresh per-fork random streams, sampled-step consistency (a plain step() lands on
 one of the enumerated branches), and determinism."""
@@ -114,7 +114,7 @@ def test_max_branches_cap_keeps_the_most_likely():
 
 
 def test_forks_draw_fresh_independent_random_futures():
-    """Settled decision 21.17: no shared random state between clones."""
+    """Clones have independent random state."""
     b = _battle()
     branches, _ = b.step_branches(_step_args(b))
     rngs = [f.rng for _, f in branches]
@@ -134,7 +134,7 @@ def test_step_branches_deterministic_given_parent_seed():
 
 def test_branch_forks_are_steppable():
     """A branch fork is a live battle: it can be stepped onward (the future grid builder will
-    walk forced replacements this way, stopping at the next pending decision — §10.5)."""
+    walk forced replacements this way, stopping at the next pending decision)."""
     b = _battle()
     branches, _ = b.step_branches(_step_args(b))
     _, fork = branches[0]

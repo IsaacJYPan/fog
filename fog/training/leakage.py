@@ -51,7 +51,7 @@ def delta_information(phi_hat, obs_before: dict, obs_after: dict) -> torch.Tenso
 def shaped_reward(
     terminal_reward: float, delta_I: torch.Tensor, beta: float, clip: bool = True
 ) -> torch.Tensor:
-    """r_t = r_game_terminal − β · max(0, ΔI_t)  (clip=True, §7 default).
+    """r_t = r_game_terminal − β · max(0, ΔI_t)  (clip=True).
 
     clip=False uses the signed ΔI: the per-game sum then TELESCOPES to CE_first − CE_final, so the
     total penalty is exactly the net readability handed over, credit-assigned to the step where it
@@ -67,12 +67,11 @@ def shaped_reward(
 
 @dataclass
 class DegenerateSolutionWatchdog:
-    """Scripted detectors for the §7 failure modes. Wire into the §6 dashboard.
+    """Detect move-diversity spikes, stale-probe exploitation, and stalling.
 
     Baselines come from the matched N-agent (β=0 control) or the pre-penalty checkpoint — pass them in
     at construction and refresh them when the control run's metrics update. Every check returns True
-    when the degenerate pattern is detected; the trainer should halt-for-inspection on any True (same
-    policy as the >2σ regression rule, spec §10).
+    when the degenerate pattern is detected; the trainer halts on any True.
     """
 
     # baselines (from the β=0 control at matched training progress — see update_to). None = the

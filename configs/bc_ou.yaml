@@ -1,4 +1,4 @@
-# M4 stage 1 — behavior cloning over parsed replays (§5).
+# Behavior cloning over parsed replays.
 # Prereqs (data commands, run once):
 #   python -m fog.scripts.scrape_replays --target-games 150000 --min-rating 1500
 #   python -m fog.scripts.parse_replays  --raw data/raw_replays --out data/parsed
@@ -18,7 +18,7 @@ loss:
   belief_coef: 1.0
   value_coef: 0.5
   self_belief_coef: 0.0            # self-belief trained in self-play (needs the mirror view); BC
-                                   # stores its labels but leaves the loss off by default (§5 note)
+                                   # stores its labels but leaves the loss off by default
 log:
   dir: runs/bc_ou
 gate:

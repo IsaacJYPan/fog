@@ -1,12 +1,8 @@
-"""Phase-1 policy-rewiring tests (BELIEF_POLICY_PLAN §7).
+"""Policy and belief inputs through the explicit encoder contexts.
 
-The V2 policy takes exactly three inputs and NO belief summary: (a) revealed/public info + (b) my own
-private state, public state, and history. Public state and history fuse into ``public_context``.
-These tests pin that policy responds to all three explicit encoder paths;
-  * the SIGNALING CHANNEL (§1): varying MY hidden attributes changes the action distribution — the
-    property joint search needs (without it every own-world policy is identical and search is inert);
-  * belief receives public context plus the observer's projected private state;
-  * no code path resurrects a belief mean-pool (b_vec) on the policy path.
+The policy consumes private state, public state, and history. Belief prediction
+adds the observer's projected private state to public context. Tests check that
+these inputs affect outputs without pooling belief predictions into the policy.
 """
 from __future__ import annotations
 
@@ -79,12 +75,12 @@ def test_policy_depends_on_current_state():
     assert not torch.allclose(_legal_logits(a), _legal_logits(b), atol=1e-4)
 
 
-# ------------------------------------------------------ §1 signaling channel: my private state
+# ---------------------------------------------------------- signaling: my private state
 def test_signaling_channel_my_hidden_attrs_change_action():
     """Varying MY OWN mons' hidden attributes (their embedded ids in slots 0-5, exactly what
     `fork_for_own_world` varies across own-worlds) must change the policy's action distribution.
     Without this the K per-world policies are identical, the posterior never moves, and joint search
-    collapses to perfect-info search (§1)."""
+    collapses to perfect-information search."""
     agent = _agent()
     base = _batch()
     variant = dict(base, entity_ids=base["entity_ids"].clone())
@@ -98,9 +94,7 @@ def test_signaling_channel_my_hidden_attrs_change_action():
 
 # --------------------------------------- explicit contexts feed chain and policy consistently
 def test_explicit_contexts_are_shared_by_chain_and_policy():
-    """The backbone's single c_dyn is what BOTH the belief chain and the policy head consume (§3.1,
-    'one vector, two consumers'). Feeding the backbone's own (s_board, c_dyn) back through each
-    consumer reproduces the agent's outputs exactly."""
+    """Explicit backbone contexts reproduce the agent's policy and belief outputs."""
     agent = _agent()
     batch = _batch()
     with torch.no_grad():

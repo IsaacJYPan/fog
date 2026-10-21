@@ -1,22 +1,14 @@
-"""Exact-versus-sampled own-state agreement (ARCHITECTURE.md invariants S1 and S5).
+"""Compare enumerated and sampled own-state search on identical positions.
 
-Phase 3 asks what the learned sampler costs: on pools, the opponent's belief over MY team can be
-enumerated exactly (EnumeratedPoolStates), but off-pool play (ladder, open teamsheets) must use
-SampledOwnStates — ancestral samples from the agent's own self-belief net. This module measures
-the decision-level gap between the two on identical positions.
+The learner follows `EnumeratedPoolStates` in engine games. At each nontrivial
+decision, `SampledOwnStates` is evaluated at every requested K using the same
+position and search seed. Agreement means equal argmax actions at temperature zero.
+Sampled choices do not steer the game, so this measures decisions on the exact
+source's trajectory rather than each sampler's resulting win rate. For that,
+use `search_gauntlet --own-source sampled`.
 
-Protocol: the learner plays engine games acting through joint search with the EXACT source — the
-reference trajectory. At every real decision (>1 legal action), the SAMPLED source at each
-requested K also computes its decision from the SAME battle state and the same search seed.
-Agreement = same executed action (temperature 0: both are argmax decisions). Execution always
-follows the exact arm, so every K is evaluated on the same on-reference state distribution —
-sampled decisions never steer the game (paired-measurement design; the complementary
-trajectory-level number is the gauntlet delta from `search_gauntlet --own-source sampled`).
-
-Cost: (1 + len(ks)) joint searches per decision — measurement, not play.
-
-    python -m fog.eval.source_agreement --pool data/teams/pool_gen \
-        --ckpt runs/value_finetune_m15/value_finetune.pt --games 64 --ks 8 16 32
+The measurement costs 1 + len(ks) searches per decision. Off-pool play needs sampled
+candidates because there is no finite pool to enumerate.
 """
 from __future__ import annotations
 

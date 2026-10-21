@@ -1,4 +1,4 @@
-"""Drift gate mechanism tests (proposal §9.2 / §15.3; fog/eval/pb_value_drift.py).
+"""Cached-table drift metrics (fog/eval/pb_value_drift.py).
 
 Engine-free, same hand-built grid + fake backbone as tests/test_pb_value_fn.py. With a random net
 these are MECHANISM tests: they prove the metric responds to real table drift and that the exact arm
@@ -92,7 +92,7 @@ def test_staleness_curve_responds_to_drift(monkeypatch):
         assert np.isfinite(r["mean"]) and np.isfinite(r["max"])
         assert r["mean"] >= 0.0 and r["max"] >= r["mean"]
     # the belief genuinely moves the table across iterations, so staleness produces real error
-    # (a value blind to rho would give an all-zero curve — the §5.1 degenerate case).
+    # (a value blind to rho would give an all-zero curve — the belief-independent case).
     assert max(r["max"] for r in curve.values()) > 1e-6
     # a more stale table is (weakly) worse: the mean error grows with staleness.
     means = [curve[s]["mean"] for s in (1, 2, 4, 8)]

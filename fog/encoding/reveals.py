@@ -1,27 +1,15 @@
-"""Information-state tracking: who provably knows what (spec §2.1 epistemic flags, §3.2/§3.3 inputs).
+"""Track the attributes visible to each player.
 
-This module is the single source of truth for building the C1 belief-net input dicts
-(ARCHITECTURE.md §4):
+`opp_revealed` is our view of the opponent, read from poke-env's censored battle
+state. `my_view` is the opponent's view of our team, reconstructed from public
+events in a `RevealLedger`; our private battle state would expose too much.
 
-  * `opp_revealed` — MY view of the OPPONENT's team: species from preview, everything else only if
-    publicly revealed. Read off poke-env's opponent battle state (which is itself an information
-    state — poke-env only ever knows what the protocol revealed).
-  * `my_view` — the OPPONENT's view of MY team, for the self-belief predictor (§3.3). This CANNOT be
-    read off my own battle state (I see everything); it is derived by running the same revelation
-    rules over my actions via a `RevealLedger` that the player/parser feeds from events.
+Tokens follow SET_SLOT_ATTRS order, with -1 for unknown attributes. Revealed moves
+occupy the earliest slots in reveal order, where the belief model clamps them.
+Align truth and candidate grids with `align_truth_to_views` before comparing them
+to these views. `<NO_ITEM>` after Knock Off is a known item state, not -1.
 
-Everything here is pure numpy + duck typing (no poke-env import), so the revelation logic is unit-
-testable with mock mons; the one battle-facing function (`opponent_views_from_battle`) uses getattr
-probing in the style of env/actions.py.
-
-Token conventions (schema.SET_SLOT_ATTRS order — species, item, ability, move0..3, nature,
-EV-unit hp/atk/def/spa/spd/spe, tera): value = categorical index, -1 = hidden/unknown. Revealed
-moves are packed into the EARLIEST move
-slots in reveal order (a §3.2 requirement — the belief net clamps them there), and every
-truth/candidate grid consumed against such a view must be passed through `align_truth_to_views`
-first so targets follow the same convention (the 2026-07-12 move-order fix). `<NO_ITEM>` after
-Knock Off is a *revealed* item state (its own index), NOT -1: the opponent knowing you hold nothing
-is information.
+The extraction code uses numpy and duck typing so it can run without poke-env.
 """
 from __future__ import annotations
 
@@ -316,7 +304,7 @@ class RevealLedger:
 def opponent_slots(battle) -> list[tuple[str | None, object | None]]:
     """Stable opponent slot order: (species_id, mon_or_None) x6.
 
-    Preview order when available (|poke| message order — the spec §2.1 convention), with revealed
+    Preview order when available (|poke| message order), with revealed
     mons matched onto their preview slot by species (unique under Species Clause; randombattle has
     no dupes either). Mons revealed but absent from preview (Illusion weirdness) append after.
     Without preview info, falls back to opponent_team insertion (reveal) order.

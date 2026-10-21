@@ -174,7 +174,7 @@ def pool_id_order_sensitivity(
     agent: Any, batch: dict, cand_tokens: np.ndarray, true_index: int, *, m_orders: int = 4,
     seed: int = 0,
 ) -> dict:
-    """Order-sensitivity diagnostic (§4.5.3): recompute the joint score under `m_orders` random tail
+    """Order-sensitivity diagnostic: recompute the joint score under `m_orders` random tail
     orders and report the dispersion of the true candidate's log-prob and how often the argmax stays
     the true candidate. Large dispersion = the learned joint is order-inconsistent (watch it across
     training). Returns {"true_logprob_std", "true_logprob_mean", "argmax_stability"}."""
@@ -312,8 +312,8 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
                 temperature: float = 0.0, max_turns: int = 300, tables=None,
                 os_sample: int = 64) -> dict:
     """Play engine games with the agent's raw policy vs MaxDamage and score opponent pool-id at
-    every learner decision. Headline = the JOINT score (§4.5.1); the fast marginal (§4.5.2) is
-    computed alongside for the joint-vs-fast argmax agreement, and order-sensitivity (§4.5.3) is
+    every learner decision. Headline = the joint score; the fast marginal is
+    computed alongside for the joint-vs-fast argmax agreement, and order-sensitivity is
     sampled on up to `os_sample` decisions. Returns the report dict (also printed)."""
     import random
 
@@ -341,7 +341,7 @@ def run_pool_id(agent: Any, pool: list[str], *, games: int = 200, seed: int = 0,
     records: list[tuple[int, int, bool, int, int, int]] = []
     posterior_records: list[tuple[int, int, float, float]] = []
     agree: list[bool] = []            # joint and fast argmax pick the same candidate
-    os_reports: list[dict] = []       # sampled order-sensitivity diagnostics (§4.5.3)
+    os_reports: list[dict] = []       # sampled order-sensitivity diagnostics
     failed = 0
 
     class _ScoringArm(ArmPlayer):

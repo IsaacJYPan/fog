@@ -1,47 +1,19 @@
-"""Legacy one-sided search gauntlet (ARCHITECTURE.md S5–S6).
+"""Compare policy, determinized, and one-sided joint search on poke-engine.
 
-Plays engine games where the SAME checkpoint acts through three arms:
+Each arm uses the same checkpoint against MaxDamage and a set-oracle policy,
+plus paired head-to-head games with teams swapped. The oracle receives the true
+opponent team, so concealment cannot deny it information. Head-to-head games
+measure the interaction between the learned policies.
 
-  * policy       — plain batched forward, no search (0 sims/decision);
-  * determinized — §8 root determinization over MY uncertainty about the OPPONENT
-                   (engine_step.EngineWorldStepper);
-  * joint        — §4.3 joint search over the OPPONENT's belief about ME
-                   (exact pool enumeration — the Phase-2 setting; no sampling noise).
+Rows report Wilson intervals and measured simulations per decision; the joint
+arm's candidate count shrinks with reveals, so nominal budgets can differ.
+`gate_report` compares joint search with both alternatives using point estimates
+and non-overlapping 95% intervals. These are approximate-engine diagnostics;
+Showdown evaluation is needed to check whether the results transfer.
 
-Two diagnostic measurements:
-
-  * gauntlet rows: each arm vs MaxDamage AND vs the set-oracle READING opponent — the same
-    checkpoint played with the learner's true team injected (`model.oracle: set`; engine truth is
-    exact, `battle.truth_tokens`). Signaling value is invisible against MaxDamage, so the reading
-    opponent is the row the gate reads. NOTE what the oracle reader is: an upper-bound READER
-    (truth is handed to it, concealment cannot deny it) — it makes information VALUE visible,
-    while the L-vs-N-style head-to-head below is where concealment/bluffing can pay.
-  * head-to-head rows: joint vs determinized and joint vs policy directly, PAIRED team schedule
-    (each sampled matchup (X, Y) is played twice with the arms' teams swapped, cancelling the
-    team-matchup lottery exactly as eval/readability.lvn_match does on the Showdown path).
-
-Gate (§5, evaluated in `gate_report`): joint > determinized AND joint > policy, vs the reading
-opponent and in head-to-head, with Wilson CIs. `pass_point` is the point-estimate ordering;
-`pass_ci` requires non-overlapping 95% intervals — quote the latter for claims.
-
-Matched simulation budget: both search arms spend ~(worlds × legal actions) one-ply engine sims
-per decision. Determinized's world count defaults to the pool size — the joint arm's enumeration
-CEILING — but joint's K shrinks as the game reveals my attributes while determinized's k stays
-fixed, so the match is verified, not assumed: every row reports measured sims/decision
-(`sims_per_decision`), and budget-sensitive conclusions should quote those numbers.
-
-Games run ONE at a time (search batches internally over worlds × actions — same reasoning as
-fog/search/posterior_log.py). Failure containment mirrors posterior_log: a game that raises is
-dropped and counted, and a >20% failure rate raises rather than reporting on a corrupted sample.
-All of this is engine-backend diagnostic validation — headline numbers stay on
-Showdown per the binding protocol; these rows never are.
-
-    python -m fog.eval.search_gauntlet --pool data/teams/pool_a \
-        --ckpt runs/value_finetune_m15/value_finetune.pt --games 400 --out runs/search_gauntlet
-
-Checkpoints: posterior-blind ones (e.g. raw M1.5) are zero-pad expanded on load
-(`value_finetune.load_posterior_agent`) — but the §4.2 fine-tune gate must have PASSED before any
-Phase-2 conclusion (untrained posterior columns = weak coupling = a vacuous joint arm).
+Failed games are counted and dropped; a failure rate above 20% raises. A loaded
+checkpoint may be expanded to accept posterior features, but those new columns
+need training before joint search can respond to its induced beliefs.
 """
 from __future__ import annotations
 
@@ -60,7 +32,7 @@ GAUNTLET_OPPONENTS = ("MaxDamage", "SetOracle")
 
 # ------------------------------------------------------------------------------------ arm players
 class ArmPlayer:
-    """Chooses actions for one side of a live EngineBattle under one §5 arm.
+    """Chooses actions for one side of a live EngineBattle under one evaluation arm.
 
     Same `choose(battle, role)` contract as the engine_scripted policies, so game loops treat
     scripted opponents and arms uniformly. Counters (`decisions`, `sims`, `failures`) accumulate
@@ -97,9 +69,8 @@ class ArmPlayer:
                              "this one would silently ignore the injected truth")
         if oracle_truth and arm != "policy":
             raise ValueError("the reading opponent is a policy-arm ceiling; searching with "
-                             "injected truth is not a §5 arm")
-        # joint arm's own-state source: exact pool enumeration by default (Phase 2); pass a
-        # SampledOwnStates for the Phase-3 sampled arm
+                             "injected truth is unsupported for search arms")
+        # Enumerate the pool by default; pass SampledOwnStates to use the learned sampler.
         self._own_source = own_source
         if arm == "joint" and self._own_source is None:
             from fog.search.own_states import EnumeratedPoolStates
@@ -304,7 +275,7 @@ def run_search_match(side_a: Any, side_b: Any, pool: list[str], n_games: int, *,
     return row
 
 
-# --------------------------------------------------------------------------------- the full §5 run
+# ---------------------------------------------------------------------------------- full gauntlet
 def run_search_gauntlet(
     ckpt: str, pool: list[str], cfg: dict, device, *,
     games_per: int = 200, h2h_games: int = 200, arms=ARMS,
@@ -314,11 +285,10 @@ def run_search_gauntlet(
     sample_k: int = 16,
 ) -> dict:
     """Gauntlet rows (each arm vs each opponent) + head-to-head rows (joint vs the other arms),
-    then the §5 gate report. Returns {"rows": [...], "gate": {...}} (also printed).
+    then the comparison report. Returns {"rows": [...], "gate": {...}} (also printed).
 
-    `own_source_kind`: 'enumerated' (exact pool enumeration — Phase 2) or 'sampled' (the learned
-    SelfBeliefPredictor sampler at `sample_k` states — the Phase-3 scalability arm; only the
-    joint arm consumes it)."""
+    `own_source_kind`: 'enumerated' (the finite pool) or 'sampled' (the learned
+    SelfBeliefPredictor sampler at `sample_k` states). Only the joint arm consumes it."""
     import copy
 
     from fog.training.value_finetune import load_posterior_agent
@@ -399,7 +369,7 @@ def run_search_gauntlet(
 
 
 def gate_report(rows: list[MatchRow]) -> dict:
-    """§5 gate: joint > determinized AND joint > policy — vs the reading opponent and in the
+    """Compare joint > determinized AND joint > policy — vs the reading opponent and in the
     head-to-head rows. Point ordering and CI separation reported separately; if the gate fails,
     that is a finding, not an error — so this reports, it never raises."""
     from fog.eval.stats import wilson_interval
@@ -427,14 +397,14 @@ def gate_report(rows: list[MatchRow]) -> dict:
     gate = {"checks": checks,
             "pass_point": bool(checks) and all(c["pass_point"] for c in checks),
             "pass_ci": bool(checks) and all(c["pass_ci"] for c in checks)}
-    print("\n[search_gauntlet] §5 gate:", flush=True)
+    print("\n[search_gauntlet] gate:", flush=True)
     for c in checks:
         print(f"  {c['check']:<40} joint {c['joint']:.3f} vs {c['other']:.3f} "
               f"| point {'PASS' if c['pass_point'] else 'FAIL'} "
               f"| CI {'PASS' if c['pass_ci'] else 'FAIL'}", flush=True)
     verdict = ("PASSED (CI-separated)" if gate["pass_ci"]
                else "point-passed only — more games or a real negative"
-               if gate["pass_point"] else "FAILED — debug §4.2's consumer or accept the negative")
+               if gate["pass_point"] else "FAILED — joint search did not improve on both baselines")
     print(f"  gate: {verdict}", flush=True)
     return gate
 
@@ -451,8 +421,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Legacy one-sided search gauntlet.")
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
     ap.add_argument("--ckpt", type=str, required=True,
-                    help="checkpoint (posterior-blind ones are expanded — but run the §4.2 "
-                         "fine-tune first; its gate must pass before Phase-2 conclusions)")
+                    help="checkpoint with trained posterior features (blind heads are expanded on load)")
     ap.add_argument("--config", type=str, default="configs/default.yaml")
     ap.add_argument("--out", type=Path, default=Path("runs/search_gauntlet"))
     ap.add_argument("--games", type=int, default=200, help="games per gauntlet row")
@@ -462,8 +431,7 @@ def main() -> None:
     ap.add_argument("--det-k", type=int, default=None,
                     help="determinized worlds/action (default: pool size = joint's ceiling)")
     ap.add_argument("--own-source", choices=("enumerated", "sampled"), default="enumerated",
-                    help="joint arm's own-state source: exact enumeration (Phase 2) or the "
-                         "learned sampler (Phase 3)")
+                    help="joint arm's own-state source: exact pool enumeration or the learned sampler")
     ap.add_argument("--sample-k", type=int, default=16,
                     help="states per decision for --own-source sampled")
     ap.add_argument("--iters", type=int, default=16)

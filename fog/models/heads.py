@@ -7,7 +7,7 @@ from torch import nn
 
 from fog.constants.schema import N_ACTIONS
 
-# Posterior features (ARCHITECTURE.md invariant S2): the opponent's belief over MY possible private states,
+# Features of the opponent's belief over our possible private states,
 # summarized per decision as [normalized entropy, mass on the state being evaluated, top-1 mass,
 # effective-state fraction exp(H)/K]. The value net cannot price signaling without them — this is
 # the consumer that makes joint search's belief coupling matter (see fog/search/joint.py).
@@ -20,7 +20,7 @@ class PolicyValueHead(nn.Module):
     ``private_state`` is the private-state encoding. ``public_context`` is the explicit fusion of the
     public-state and causal-history encodings. There is no pooled belief input.
 
-    `posterior_dim > 0` (ARCHITECTURE.md invariant S2, config `model.use_posterior_features`) additionally
+    `posterior_dim > 0` (config `model.use_posterior_features`) additionally
     concatenates posterior features describing the opponent's belief over my own hidden state; absent
     features fall back to zeros so training paths that don't compute them keep working unchanged.
     """
@@ -269,7 +269,7 @@ class PolicyValueHead(nn.Module):
 
 
 class TeamPreviewHead(nn.Module):
-    """Team-preview lead selection (spec §3.1).
+    """Team-preview lead selection.
 
     Consumes the encoded preview tokens (my 6 mons in slots 0-5) and scores each as a lead. Played
     live by `FogPlayer.choose_teampreview` and trained as a bandit on game outcome in ppo_update.

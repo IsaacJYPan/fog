@@ -50,8 +50,9 @@ uv run --no-sync python -m fog.train --config configs/set_ar_train.yaml --set pp
 ```
 
 These need the data and checkpoints named in the recipe. The set-AR recipes also require fresh
-mechanical and replay audit reports; check their `preflight` settings. Reports are tied to the
-source revision, so code changes can invalidate them.
+mechanical and replay audit reports; check their `preflight` settings. Reports are tied to battle,
+model, training, and parser code. Changes to unrelated tools or recipes do not invalidate them;
+training packages record their selected configuration and data separately.
 
 For replay imports, start with the [Metamon Gen9OU guide](docs/metamon-gen9ou.md). For repeated
 training blocks, evaluation, and checkpoint retention, see [KAGGLE_TRAINING.md](KAGGLE_TRAINING.md).
@@ -66,7 +67,8 @@ The doctor checks the job's GPU, input files, simulator build, and audit reports
 GPU job on a CPU-only installation even when the development setup works.
 
 [docs/kaggle-workflow.md](docs/kaggle-workflow.md) covers API-launched Kaggle runs and local result
-evaluation through `fog-experiment.cmd`. Older milestone recipes live in `configs/archive/`.
+evaluation through `fog-experiment.cmd`. The [config guide](configs/README.md) separates starting
+recipes from diagnostic runs and older experiments.
 
 ## Teams and replay data
 

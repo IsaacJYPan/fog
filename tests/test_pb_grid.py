@@ -1,8 +1,8 @@
-"""build_pb_grid (fog/search/pb_grid.py, PROPOSAL_IMPL_PLAN Phase C): the K x J x A x B branch
-table. Pins: budget accounting, probability bookkeeping, label spaces for BOTH sides, the
-availability factorization, duplicate-world invariance (identical candidate worlds must produce
-identical branch tables — the shared-opponent-particles property made testable), censored leaves,
-one-sided-root rejection, determinism, and the Phase-E value-assembly contract."""
+"""Public-belief chance grids: branch probabilities, action axes, availability, and censored leaves.
+
+Duplicate candidates must produce identical branch tables. One-sided decisions,
+seed independence, and value assembly are checked on engine fixtures.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -115,7 +115,7 @@ def test_branch_probabilities_sum_to_one_on_available_cells(grid_2x2):
 def test_identical_candidate_worlds_produce_identical_tables(grid_2x2):
     """Both own-worlds and both opponent-worlds are the same team here, so every derived table
     must be invariant across them: chance enumeration is deterministic given the state, and the
-    fresh per-fork rng seeds (settled 21) must not leak into branch structure."""
+    fresh per-fork RNG seeds must not leak into branch structure."""
     g = grid_2x2
     np.testing.assert_array_equal(g.avail1[0], g.avail1[1])
     np.testing.assert_array_equal(g.avail2[0], g.avail2[1])
@@ -146,7 +146,7 @@ def test_leaves_are_censored_observations(grid_2x2):
 
 
 def test_value_assembly_contract(grid_2x2):
-    """Phase E's u-tensor assembly: branch-weighted mix of terminal payoffs and stubbed leaf
+    """u-tensor assembly: branch-weighted mix of terminal payoffs and stubbed leaf
     values, no NaN on available cells, bounded by the payoff range."""
     g = grid_2x2
     v_leaf = np.full(len(g.leaf_obs), 0.5)
@@ -160,7 +160,7 @@ def test_value_assembly_contract(grid_2x2):
 
 def test_grid_rejects_decisions_we_do_not_own():
     """A one-sided state the OPPONENT owns (only p2 pending) is not ours to solve — F2 accepts our
-    own one-sided decisions but the symmetric opponent-only case stays an error (proposal §10.5)."""
+    own one-sided decisions but the symmetric opponent-only case stays an error."""
     from fog.env.engine_battle import EngineBattle
     from fog.search.pb_grid import build_pb_grid
     from fog.search.pb_leaves import commit_pair_branches

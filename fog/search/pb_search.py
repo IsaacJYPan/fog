@@ -49,27 +49,19 @@ class PBSearchResult:
     j_used: int                      # opponent candidates in the final solve
     sims_run: int                    # committed (k, j, a, b) pairs across all solves
     failed_cells: int
-    pruned_mass_max: float           # worst per-cell dropped chance mass (invariant 19.16)
+    pruned_mass_max: float           # worst per-cell dropped chance mass
     queried_beliefs: list = field(default_factory=list)   # ("public_observation", key, rho_after)
-    # Phase G1 (§9.3 mitigation 2): observation posteriors under the CURRENT strategy pair of one
-    # uniformly drawn solver iteration — mid-solve belief queries the final averages never revisit
-    # (early near-uniform beliefs especially). Same entry shape as queried_beliefs; the value
-    # trainer mixes both sets (plus the root rho) as belief inputs. sample_iteration is the
-    # 1-indexed iteration the snapshot came from (-1 on trivial decisions).
+    # Posteriors from one uniformly sampled solver iteration, for value training.
+    # sample_iteration is 1-indexed, or -1 on trivial decisions.
     sample_beliefs: list = field(default_factory=list)    # ("public_observation", key, rho_after)
     sample_iteration: int = -1
-    # Phase G2 posterior-mass truncation (persistent mode): which FULL-axis candidates the solve
-    # actually ran over. sigma/rho/tokens/true_index above all live on the KEPT axes; `own_kept` /
-    # `opp_kept` map them back to the passed candidate sets (and the belief table's axes — the
-    # persistent observation updates reject truncation of positive-mass candidates).
-    # Dropped mass is the root-belief probability the solve did not model, logged per side
-    # (§13.1/§13.2 applied to the persistent path). Without truncation kept = arange, dropped = 0.
+    # sigma/rho/tokens/true_index use the retained axes. These indices map them
+    # back to the full candidate sets; dropped mass is omitted root probability.
     own_kept: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.int64))
     opp_kept: np.ndarray = field(default_factory=lambda: np.zeros(0, dtype=np.int64))
     dropped_own_mass: float = 0.0
     dropped_opp_mass: float = 0.0
-    # The candidate identities rho / sigma / true_index index (proposal §10 shared particles). The
-    # Phase-G value trainer needs the raw token grids to embed each team; k*/j* index into these.
+    # Candidate teams indexed by rho, sigma, and true_index; [K, 6, 15] / [J, 6, 15].
     own_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 15), dtype=np.int64))
     opp_tokens: np.ndarray = field(default_factory=lambda: np.zeros((0, 6, 15), dtype=np.int64))
     search_depth: int = 1
@@ -119,14 +111,13 @@ def sample_opponent_worlds(agent: Any, battle: Any, role: str, j: int, *, seed: 
 
 def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int | None,
                    ) -> tuple[np.ndarray, np.ndarray]:
-    """Posterior-mass truncation for the persistent path (Phase G2, §13.1/§13.2 amendment A3).
+    """Return retained full-axis indices for persistent search.
 
-    Zero-mass candidates are ALWAYS dropped — exact, not an approximation (a zero-probability
-    type's strategy carries no weight in any update), and load-bearing for fork validity: a
-    candidate contradicted by reveals cannot be forked coherently. Opponent candidates may then be
-    capped by public margin mass. Own-side capping is refused when it would remove any live type:
-    forcing the actual private type back into a publicly selected subset makes the opponent model
-    depend on information the opponent does not possess. Returns ascending full-axis indices."""
+    Drop zero-mass candidates before forking: reveals may have made their worlds
+    inconsistent. Cap opponent candidates by public marginal mass. Own-side caps
+    that remove live types raise, since reinserting the true private team would
+    leak it into the calculated opponent strategy.
+    """
     row_mass = rho.sum(axis=1)
     col_mass = rho.sum(axis=0)
     if row_mass[true_k] <= 0.0:
@@ -148,16 +139,13 @@ def _truncate_axes(rho: np.ndarray, true_k: int, top_k: int | None, top_j: int |
 
 def _policy_inits(agent, battle, role: str, grid, own_toks: np.ndarray, opp_toks: np.ndarray,
                   rng: random.Random) -> tuple[np.ndarray | None, np.ndarray | None]:
-    """Phase I.3 (§10.2 initialization-not-anchoring): both sides' solver strategies initialized
-    from the CURRENT policy's masked distribution in each candidate world.
+    """Initialize strategies from the policy's masked distributions in candidate worlds.
 
-    Our side: the policy evaluated on OUR censored view with our private team swapped to
-    candidate k (the own-world fork — private info is the only thing that varies with k).
-    Opponent side: the policy on the OPPONENT's censored view with ITS private team swapped to
-    candidate j. One batched forward over K+J observations; label mapping through the grid's
-    local_action tables. Linear iteration weighting in the solver keeps this a warm start whose
-    influence vanishes with iterations (pinned by the washout test) — never a payoff bonus.
-    Returns (init1 [K, A], init2 [J, B] or None at a one-sided decision)."""
+    Evaluate each side's censored view with only its own private team swapped,
+    in one K+J batch, then map action indices through the grid's label tables.
+    Linear iteration weighting makes the initialization's influence decay.
+    Returns init1 [K, A] and init2 [J, B], or None for a one-sided decision.
+    """
     import torch
 
     from fog.encoding.observation import Observation
@@ -193,9 +181,7 @@ def _policy_inits(agent, battle, role: str, grid, own_toks: np.ndarray, opp_toks
 
 
 def _real_action_dist(row: np.ndarray, local_actions: np.ndarray, mask: np.ndarray) -> np.ndarray:
-    """Map the true state's averaged label row onto real-battle action indices, then defensively
-    renormalize over the REAL legality mask (the true-world fork must agree with the real battle;
-    trusting that blindly is how indexing bugs stay silent — the frozen baseline's convention)."""
+    """Map the true team's label row to action indices and renormalize over legal actions."""
     dist = np.zeros(N_ACTIONS, dtype=np.float64)
     for col in np.flatnonzero(local_actions >= 0):
         dist[local_actions[col]] += row[col]
@@ -247,37 +233,27 @@ def pb_search_action(
     depth2_min_reach: float = 0.01,
     depth2_child_iters: int = 64,
 ) -> PBSearchResult:
-    """One real decision under the two-sided solver. See the module docstring for the two
-    candidate-supply modes. Never mutates `battle` (beyond fork seeding) or `table`.
+    """Solve one decision without mutating the belief table or live battle state.
 
-    `top_j` (Phase G2, persistent mode only): opponent-axis truncation by public rho margin mass.
-    `top_k` is accepted for configuration compatibility but raises if it would remove a live own
-    type: forcing the actual private type back into support leaks truth into the opponent strategy.
-    Dropped opponent mass is reported and full-axis table entries persist.
-    Zero-mass candidates are always dropped in persistent mode regardless (exact — and required
-    before forking, see _truncate_axes).
+    In persistent mode, `top_j` caps the opponent axis by marginal belief mass;
+    omitted mass is reported and the full table remains intact. `top_k` raises
+    if it would remove live own types, since preserving the true team alone
+    would leak private information. Zero-mass candidates are dropped before forks.
 
-    `policy_init` (Phase I.3, §10.2): initialize both sides' solver strategies from the current
-    policy's per-world masked distributions (see _policy_inits) — a warm start whose influence
-    washes out under linear averaging. Default off; turning it on is a measured compute nicety
-    (iterations-to-stability), never a correctness change.
-
-    `value_net` (Phase G5 switch): a trained `PBValueNet` — leaf values come from
-    `make_pb_value_grid_values` (per-pair tables, refreshed every
-    `value_recompute_every` calls — the G4-drift-chosen N). Default None keeps the §18 interim
-    posterior-feature head (`make_grid_values`) as the baseline arm; the swap is claim-bearing
-    only after the G4 gates pass."""
+    `policy_init` warm-starts both strategies from per-world policy predictions.
+    `value_net` supplies per-pair PBValueNet values, refreshed every
+    `value_recompute_every` calls. With None, values use the scalar head's
+    posterior features. Choose the refresh interval using `fog.eval.pb_value_drift`.
+    """
     if int(search_depth) not in (1, 2):
         raise ValueError("search_depth currently supports 1 or 2; deeper traversal requires the "
                          "outcome-sampling public-belief search phase")
     rng = random.Random(seed) if rng is None else rng
     mask = battle.action_mask(role)
     real_legal = np.flatnonzero(mask)
-    # A single action has no choice entropy, but its public consequences can still carry chance
-    # evidence. Persistent filtering must model that transition. A one-sided forced replacement or
-    # pivot with 2+ live choices is NOT trivial: build_pb_grid collapses the absent opponent to a
-    # single synthetic label and the B=1 solve yields a real, type-conditioned replacement sigma1
-    # (F2, proposal §10.5) — it flows through the normal path below.
+    # Even a forced action can reveal chance evidence needed by a persistent table.
+    # At one-sided decisions, build_pb_grid gives the absent opponent a synthetic
+    # label, leaving our replacement strategy conditioned on the candidate team.
     if len(real_legal) == 0:
         return _trivial(13)
     if len(real_legal) == 1 and table is None:
@@ -285,7 +261,7 @@ def pb_search_action(
     if table is not None and opp_tokens is None:
         raise ValueError("a persistent belief table indexes stable candidates: pass the "
                          "opp_tokens it was built over (sampled fresh worlds have no stable "
-                         "identity for it — proposal §7.4)")
+                         "identity for it)")
 
     own = own_source.states(battle, role)
     kt = int(own.true_index)
@@ -377,7 +353,7 @@ def pb_search_action(
     else:                                                       # ---- adaptive sampled mode ----
         if top_k is not None or top_j is not None:
             raise ValueError("posterior-mass truncation (top_k/top_j) is a persistent-mode "
-                             "budget feature; adaptive mode already sizes J by the §13.1 "
+                             "budget feature; adaptive mode already sizes J by the "
                              "stability rule")
         if opp_source is None:
             def _default_opp_source(b, r, j, *, seed):
@@ -409,7 +385,7 @@ def pb_search_action(
     action_dist = _real_action_dist(sol.sigma1[kt], grid.local_action1[kt], mask)
     action = int(rng.choices(range(N_ACTIONS), weights=action_dist)[0])
 
-    # §9.3 seed data: a subsample of the public-observation posteriors the leaf values saw
+    # Subsample public-observation posteriors for value training.
     queried: list[tuple[str, str, np.ndarray]] = []
     sampled: list[tuple[str, str, np.ndarray]] = []
     observation_model = PublicObservationLikelihood(grid)
@@ -419,8 +395,8 @@ def pb_search_action(
         reachable = [leaf for leaf in leaves if post[leaf].sum() > 0]
         for leaf in rng.sample(reachable, min(n_queried, len(reachable))):
             queried.append(("public_observation", grid.leaf_public_keys[leaf], post[leaf].copy()))
-        # G1: the same subsampling under the random-iteration snapshot pair — the mid-solve
-        # queries (§9.3 mitigation 2). An independent leaf draw widens observation coverage.
+        # Include mid-solve beliefs as well as final-strategy beliefs. Draw leaves
+        # independently to cover more public observations.
         if sol.sample_sigma1 is not None:
             post_s = observation_model.posteriors(rho, sol.sample_sigma1, sol.sample_sigma2)
             reachable_s = [leaf for leaf in leaves if post_s[leaf].sum() > 0]

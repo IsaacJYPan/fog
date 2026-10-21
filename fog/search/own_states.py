@@ -1,28 +1,18 @@
-"""Sources of my possible private states from the opponent's point of view.
+"""Candidate private teams from the opponent's point of view.
 
-Joint search (fog/search/joint.py) reasons over K teams the opponent could believe the searcher
-has. This module supplies them behind one interface, two implementations:
+`EnumeratedPoolStates` filters a finite pool by the searcher's public reveals and
+renormalizes the pool prior. `StablePoolOwnStates` keeps the full pool in fixed
+order for a persistent belief table; the table handles reveal filtering.
+`SampledOwnStates` samples the self-belief model on the opponent's observation,
+deduplicates the draws, and weights them by frequency.
 
-  * `EnumeratedPoolStates` — EXACT: on pool runs the opponent's belief over my team ranges over a
-    finite set of known pastes (POOL-A: 8, pool_gen: 128). Filter to the pastes consistent with
-    everything I have revealed so far and weight by the pool prior. No sampling error, no missed
-    states — the debugging/validation rung. (An effect that only shows on the memorizable 8-team
-    pool is an artifact; pool_gen is the claim-bearing pool per ARCHITECTURE.md invariant S5.)
-  * `SampledOwnStates` — the scalability arm: ancestral samples from the agent's own
-    SelfBeliefPredictor (it inherits BeliefModel.sample_team) run on the OPPONENT's observation of
-    the battle, so hidden attributes are drawn from the learned model and revealed ones are
-    clamped. Weights are the empirical sample frequencies after dedup (an unbiased proxy for the
-    model's own probabilities that needs no extra scoring pass.)
+All sources include the true team. Enumeration raises if reveals exclude it;
+sampling inserts it with one pseudo-count if absent. Sampled weights therefore
+include this smoothing and are not exact model probabilities.
 
-Both ALWAYS include the true state (the doc rule: the system knows which state is real, but its
-weight must stay whatever the opponent would assign it):
-  * enumeration: the true team is a pool member, so it is present whenever it is consistent
-    (inconsistency would be a reveal-census bug — raised, not papered over);
-  * sampling: if absent from the draw it is inserted with one pseudo-count (add-one smoothing).
-
-The `states(battle, role)` contract takes a live `EngineBattle` and the searcher's role and
-returns an `OwnStates`: tokens [K,6,15] (SET_SLOT_ATTRS order), normalized weights [K], and the index
-of the true state.
+`states(battle, role)` returns tokens [K, 6, 15] in SET_SLOT_ATTRS order,
+normalized weights [K], and the true team's index. Small finite pools are useful
+for debugging but can be memorized; agreement there need not transfer off-pool.
 """
 from __future__ import annotations
 
@@ -103,15 +93,11 @@ class EnumeratedPoolStates:
 
 
 class StablePoolOwnStates:
-    """Full-pool own-state source with stable candidate identities (ARCHITECTURE.md S1).
+    """Keep all teams in pool order so persistent belief-table axes stay stable.
 
-    The persistent `JointBeliefTable`'s axes are fixed for the battle's lifetime (§7.4), so the
-    runner cannot use `EnumeratedPoolStates` (its reveal filtering changes K turn to turn).
-    This source always returns the WHOLE pool in pool order with the prior weights; reveal
-    filtering is the belief table's job (the runner's own-side mechanical step), and dropping
-    zero-mass candidates before forking is the search's job (pb_search truncation — forking a
-    reveal-inconsistent own world would silently build an incoherent state, since the fork
-    matches world rows to engine mons by species with a next-unused-row fallback)."""
+    The table handles reveal filtering. Search drops zero-mass candidates before
+    forking, since a reveal-inconsistent team cannot produce a coherent world.
+    """
 
     def __init__(self, pool_pastes: list[str], tables=None, prior: np.ndarray | None = None):
         from fog.env.team_truth import PoolTruth

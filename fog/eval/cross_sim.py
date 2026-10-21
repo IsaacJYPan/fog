@@ -1,14 +1,10 @@
-"""Cross-simulator divergence gauntlet (ARCHITECTURE.md §3.2).
+"""Compare a checkpoint's win rates on poke-engine and Showdown.
 
-PPO will farm any mechanic poke-engine gets wrong: a policy that beats MaxDamage on the engine but
-not on Showdown has learned the ENGINE, not Pokemon. This module plays the same matchup on both
-backends and reports the win-rate gap; the engine training loop halts when |gap| exceeds
-`cross_sim.halt_gap` (default 0.03 — the plan §7 rule).
-
-The Showdown half needs the local server (`node pokemon-showdown start --no-security`). A cross-sim
-check that silently skips would void the control, so a missing server RAISES: either start the
-server before an engine training run with `cross_sim.every_decisions > 0`, or set it to 0 and
-accept that the run has no online divergence control (fuzz + final Showdown fine-tune still apply).
+The engine training loop halts when the absolute gap exceeds `cross_sim.halt_gap`
+(default 0.03), helping detect policies that exploit approximate mechanics.
+The Showdown half requires a local server (`node pokemon-showdown start --no-security`)
+and raises if unreachable. Setting `cross_sim.every_decisions` to zero disables
+these online checks.
 """
 from __future__ import annotations
 

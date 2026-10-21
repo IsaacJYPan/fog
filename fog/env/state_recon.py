@@ -1,4 +1,4 @@
-"""Reconstruct a poke-engine `State` from a live Showdown position + one belief world (search §8).
+"""Reconstruct a poke-engine `State` from a live Showdown position + one belief world.
 
 This is the piece that lets determinized search run on the SHOWDOWN backend (the gauntlet), not
 just on engine self-play: poke-env gives the observable position, the belief chain samples the

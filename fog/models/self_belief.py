@@ -1,4 +1,4 @@
-"""Self-belief predictor — the leakage measurer. Mirror of the belief model (§3.2).
+"""Self-belief predictor — the leakage measurer. Mirror of the belief model.
 
 Identical architecture, SEPARATE weights, pointed at MY OWN team. Input: the opponent's view of me (my
 entity records with epistemic flags flipped to what THEY can see, plus the same history — history is
@@ -7,7 +7,7 @@ symmetric public info). Output: a distribution over MY hidden attributes.
 Trained with full ground-truth labels (I always know my own team). Its per-attribute cross-entropy on
 my still-hidden attributes is the leakage signal L_t: low CE = I am readable; high CE = I am opaque.
 
-Frozen copies `Φ̂` are used to compute the leakage penalty (§7) so the agent can't cheat by making the
+Frozen copies `Φ̂` are used to compute the leakage penalty so the agent can't cheat by making the
 predictor bad instead of the play deceptive.
 
 Tensor conventions (shared with BeliefModel):
@@ -92,16 +92,15 @@ class SelfBeliefPredictor(BeliefModel):
         family_weights: dict[str, float] | None = None,
         per_family: bool = False,
     ):
-        """Summed CE over MY still-hidden attributes = the leakage signal L_t (§3.3). Returns [B],
+        """Summed CE over MY still-hidden attributes = the leakage signal L_t. Returns [B],
         or a per-family {name: [B]} dict when `per_family` (family weights are NOT applied there —
         per-family output is for reporting, weights are for the scalar penalty).
 
         `my_view` is the opponent's view ({"tokens","masks"}, -1 where they can't see). Labels default
         to `my_view["labels"]` (per-family truth dict); still-hidden defaults to view tokens == -1.
         Attributes with label -1 never contribute. `family_weights` rescales each family's summed CE
-        in the scalar output (§7 weighted-ΔI ablation: not all bits are strategically equal — a tera
-        type is worth more than a fourth filler move). Differentiable when called with grad enabled
-        (used as a training loss); wrap in no_grad / use a FrozenProbe for the §7 penalty.
+        in the scalar output. Differentiable when called with grad enabled; wrap in no_grad
+        or use a FrozenProbe when computing the leakage penalty.
         """
         if labels is None:
             labels = my_view["labels"]
@@ -142,9 +141,11 @@ class SelfBeliefPredictor(BeliefModel):
         return by_family if per_family else total
 
     def frozen_copy(self) -> SelfBeliefPredictor:
-        """Detached, eval-mode deep copy of the HEAD ONLY. NOT the §7 penalty probe: a frozen head
-        fed by the live trunk drifts OOD (the v1 hole) — Φ̂ is `models.probe.FrozenProbe`, which
-        freezes the (backbone + self-belief) pair together."""
+        """Detached, eval-mode copy of this head.
+
+        Use `models.probe.FrozenProbe` for leakage rewards: it also freezes the
+        backbone, preventing representation drift from changing the measurement.
+        """
         clone = copy.deepcopy(self)
         clone.eval()
         for p in clone.parameters():

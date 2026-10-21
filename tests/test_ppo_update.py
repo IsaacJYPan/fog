@@ -1,4 +1,4 @@
-"""Tests for the PPO clipped update (§6) and the leakage penalty machinery (§7)."""
+"""Tests for the PPO clipped update and leakage penalties."""
 from __future__ import annotations
 
 import math
@@ -246,7 +246,7 @@ def test_kl_anchor_penalizes_drift():
     assert "kl_bc" in metrics and math.isfinite(metrics["kl_bc"])
 
 
-# --------------------------------------------------------------------------------------- leakage §7
+# --------------------------------------------------------------------------------------- leakage
 
 def test_shaped_reward_only_penalizes_revealing():
     di = torch.tensor([1.0, -2.0, 0.0])

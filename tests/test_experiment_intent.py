@@ -258,7 +258,7 @@ def test_watchdog_without_control_is_inert_not_trigger_happy():
     assert wd.check_all({"fresh_ce": 1.0, "frozen_ce": 2.0})["stale_phi_exploitation"] is False
 
 
-# ------------------------------------------------------------------- leakage estimator intent (§7)
+# ------------------------------------------------------------------- leakage estimator intent
 def _leak_frag():
     return {"obs": np.zeros(2, dtype=np.float32)}
 

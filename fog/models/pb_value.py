@@ -90,7 +90,7 @@ class TeamEncoder(nn.Module):
 
 
 def _weighted_messages(src: torch.Tensor, weight: torch.Tensor) -> torch.Tensor:
-    """Belief-weighted mean of `src` particles for each destination particle (§9.2 bipartite step).
+    """Belief-weighted mean of `src` particles for each destination particle in a bipartite message step.
 
     src    [L, S, d]   — the source set's tokens (e.g. the J opponent tokens).
     weight [L, D, S]   — nonnegative message weights dest<-src (a slice of rho or its transpose).
@@ -113,7 +113,7 @@ class PBValueCache:
 
 
 class PBValueNet(nn.Module):
-    """Public-belief value network (§9). `forward` returns V[L, K, J] (see module docstring)."""
+    """Public-belief value network. `forward` returns V[L, K, J] (see module docstring)."""
 
     @classmethod
     def from_tables(cls, tables=None, *, state_dim: int = 256, dyn_dim: int = 256,

@@ -1,8 +1,8 @@
-"""make_grid_values (fog/search/pb_values.py, PROPOSAL_IMPL_PLAN Phase E): the u tensor is
-branch-weighted and bounded; a posterior-blind agent gets ONE head sweep total (values cannot
-react, so iterating would be waste); a posterior-aware agent's u genuinely moves when the
-strategies move (the §5.1 coupling channel end-to-end); failed cells take the fallback; and the
-whole thing solves through two_sided_regret_solve on a real engine grid."""
+"""Scalar-head value assembly for public-belief search.
+
+Check branch weighting, posterior-dependent values, static caching for blind heads,
+failed-cell fallback, and integration with the regret solver on an engine grid.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -78,7 +78,7 @@ def test_blind_agent_static_u_and_single_head_pass(grid_k2):
 
 def test_aware_agent_values_move_with_the_strategies(grid_k2):
     """The coupling channel end-to-end: same cached leaves, different current strategies,
-    different induced posterior, different u (proposal §5.1)."""
+    different induced posterior, different u."""
     import torch
 
     from fog.models.agent import FogAgent
@@ -118,7 +118,7 @@ def test_failed_cells_take_the_fallback(grid_k2):
 
 
 def test_solves_end_to_end_through_the_two_sided_solver(grid_k2):
-    """The full Phase A-E chain on a real engine grid: build values, run the solver, get valid
+    """The simulation-to-solver chain on a real engine grid: build values, run the solver, get valid
     averaged strategies for BOTH sides and a finite root value."""
     from fog.models.agent import FogAgent
     from fog.search.pb_values import make_grid_values

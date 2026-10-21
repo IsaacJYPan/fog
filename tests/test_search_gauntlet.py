@@ -87,7 +87,7 @@ def test_arm_player_validation():
         ArmPlayer("determinized", plain)
     with pytest.raises(ValueError, match="model.oracle"):
         ArmPlayer("policy", plain, oracle_truth=True)
-    with pytest.raises(ValueError, match="not a §5 arm"):
+    with pytest.raises(ValueError, match="unsupported for search arms"):
         ArmPlayer("determinized", types.SimpleNamespace(oracle="set"),
                   det_k=4, oracle_truth=True)
 

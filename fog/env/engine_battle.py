@@ -1,4 +1,4 @@
-"""poke-engine battle wrapper: partial observability + event synthesis (ARCHITECTURE.md §3.2).
+"""poke-engine battle wrapper: partial observability + event synthesis.
 
 `EngineBattle` owns one poke-engine game and everything the perfect-information engine cannot:
 what each side has *seen*. It synthesizes pseudo-protocol events (the same ``['', 'move', ...]``
@@ -30,7 +30,7 @@ see tests/test_engine_battle.py::test_engine_contract):
     Intimidate for the leads (slower side wins conflicting weather, as on cartridge) and records
     the ability reveals.
 
-Reveal semantics are CONSERVATIVE by design (plan §3): when an instruction cannot be attributed,
+Reveal semantics are conservative: when an instruction cannot be attributed,
 we reveal less, never more — under-revealing keeps labels censored (a supported path everywhere);
 over-revealing would leak private choices into the belief input. Known under-reveals: passive item
 proof (Leftovers heals are unattributed), most ability activations (only weather/terrain setters
@@ -815,7 +815,7 @@ class EngineBattle:
     # ------------------------------------------------------------------------- search-world fork
     def fork_for_search(self, role: str, world_tokens: np.ndarray, *, seed: int = 0) -> EngineBattle:
         """A disposable copy of this battle with the opponent's HIDDEN attributes replaced by one
-        sampled belief world (search §8). `role` is the searcher; `world_tokens` is one [6,15] row-
+        sampled belief world. `role` is the searcher; `world_tokens` is one [6,15] row-
         per-slot sample from BeliefModel.sample_team (paste/preview slot order).
 
         The sampled world supplies exactly what `role` cannot see (item, ability, moves, nature,
@@ -840,7 +840,7 @@ class EngineBattle:
 
     def fork_for_own_world(self, role: str, world_tokens: np.ndarray, *, seed: int = 0,
                            opp_world_tokens: np.ndarray | None = None) -> EngineBattle:
-        """The mirror of `fork_for_search` for legacy joint search (ARCHITECTURE.md S6): a disposable copy
+        """The mirror of `fork_for_search` for legacy joint search: a disposable copy
         with `role`'s OWN hidden attributes replaced by one own-world sample — a team the OPPONENT
         considers possible for `role`. Public board state (HP fraction, status, boosts, tera state,
         disabled moves) stays real, exactly as in `fork_for_search`; only the sheet-hidden
@@ -1272,15 +1272,14 @@ class EngineBattle:
         Returns `(branches, pruned_mass)`. `branches` is a list of `(probability, fork)` pairs:
         the engine's enumerated outcomes of committing `moves` (hit/miss, critical or not,
         secondary effect or not, and their combinations — the engine's granularity; damage rolls
-        are collapsed to the average roll, see the §10.4 backend note). Probabilities are
+        are collapsed to the average roll). Probabilities are
         renormalized over the kept set so they always sum to one; `pruned_mass` is the total
-        probability dropped by `min_prob` / `max_branches` pruning (log it — §19.16). The most
+        probability dropped by `min_prob` / `max_branches` pruning. The most
         likely branch is always kept. Branch order follows the engine's enumeration order.
 
         `self` is NOT advanced (unlike step); it is mutated only through its random stream, which
-        seeds the forks. Every fork draws a fresh, independent random future — never a shared one
-        (settled decision 21.17) — so the whole call is deterministic given this battle's rng
-        state, while sibling forks stay uncorrelated if they are stepped further.
+        seeds the forks. Each fork gets an independent random stream, so results are
+        deterministic given this battle's rng state while siblings can be stepped independently.
         """
         m1, m2, pending = self._resolve_moves(moves)
         pre = self.state

@@ -34,9 +34,8 @@ SCOPES = ("heads", "full")
 # ------------------------------------------------------------------------------ v2 log reading
 def _own_posterior_features(post_own: np.ndarray, k_index: int) -> np.ndarray:
     """Four concentration features of an own-side posterior: [normalized entropy, mass on the
-    true candidate, top-1 mass, effective-candidate fraction]. Documented duplicate of the
-    interim formula (fog/search/pb_values.py `_posterior_features`, itself a duplicate of the
-    frozen baseline's) — distill must not couple its lifetime to the §18 interim value layer."""
+    true candidate, top-1 mass, effective-candidate fraction]. Kept local so the log
+    reader does not depend on the search value implementation."""
     p = np.asarray(post_own, dtype=np.float64)
     k = len(p)
     nz = p[p > 0]
@@ -300,7 +299,7 @@ def main() -> None:
                     help="v1: posterior_log dir (or decisions.npz); v2: a pb_log/pb_datagen "
                          ".pt file or shard directory (auto-detected)")
     ap.add_argument("--ckpt", type=str, default=None,
-                    help="agent checkpoint (the §4.2 fine-tuned one is the natural input; "
+                    help="agent checkpoint (posterior-aware weights are preferred; "
                          "blind ones are expanded); default: fresh (smoke only)")
     ap.add_argument("--config", type=str, default="configs/default.yaml")
     ap.add_argument("--out", type=Path, default=Path("runs/distill"))

@@ -1,6 +1,6 @@
 # Recent, representative SV OU ladder teams.
 #
-# This source is intentionally separate from the claim-bearing tournament/sample bank.  The first
+# This source is intentionally separate from the tournament/sample bank used for evaluation.  The first
 # six forum pages emphasize current ladder play, while a 1600 Elo floor admits representative
 # teams rather than only leaderboard peaks.  Every exported paste must still contain six Pokemon,
 # deduplicate semantically, and pass the repository's pinned current-gen9ou Showdown validator.

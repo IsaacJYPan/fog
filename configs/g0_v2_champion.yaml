@@ -1,13 +1,6 @@
-# G0 — the V2-architecture champion (PROPOSAL_IMPL_PLAN Phase G0 = BELIEF_POLICY_PLAN Phase 3).
-# The m1_5_belief experiment re-run FROM SCRATCH under the merged V2 architecture (policy on
-# s_board ‖ c_dyn; belief chain as aux loss + particle proposal; no b_vec), on the poke-engine
-# backend for throughput. Pure self-play PPO on POOL-A — the same recipe that produced m15, which
-# is exactly what the pb_* value program needs as its acting champion (the BC warmup line in
-# BELIEF_POLICY_PLAN Phase 3 targets the open-OU M4 track; a 150-replay BC warmup adds nothing to
-# a confined POOL-A run — decision recorded in PROPOSAL_IMPL_PLAN §5).
-# cross_sim stays off (default): the gauntlet needs a live Showdown server, and the halt gate
-# blocks CLAIMS, not machinery training; the champion's claim-bearing evaluations (G5, L) run on
-# Showdown separately.
+# Historical finite-pool baseline: self-play PPO from scratch on POOL-A.
+# Uses poke-engine and the three-encoder model with set-autoregressive belief loss.
+# Cross-simulator evaluation is separate and requires a live Showdown server.
 #   python -m fog.training.ppo --config configs/g0_v2_champion.yaml
 extends: archive/m1_5_belief.yaml
 

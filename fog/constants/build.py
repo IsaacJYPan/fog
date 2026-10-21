@@ -19,7 +19,7 @@ Generated JSON schemas (all carry `_meta: {showdown_commit, table}`):
   spreads.json   { species: { species_id: [ {nature, evs, stats, weight}... ] } }  # + <OTHER_SPREAD>
                                                                 # implicit last index per species
 
-Usage filtering (chaos file, §4.1): species >= 0.1% usage (plus anything in `extra_species`, e.g. from
+Usage filtering (chaos file): species >= 0.1% usage (plus anything in `extra_species`, e.g. from
 scraped replays); items >= 0.5% usage share on at least one included species. Without a usage file
 (early PoC), everything gen9-legal is included — bigger tables, same code paths.
 """
@@ -37,10 +37,10 @@ from fog.constants.schema import NO_ITEM, OTHER_ITEM, RARE_SPECIES, UNKNOWN_ITEM
 GENERATED_DIR = Path(__file__).resolve().parent / "generated"
 BRIDGE = Path(__file__).resolve().parents[2] / "server" / "dump-dex.cjs"
 
-SPECIES_USAGE_CUT = 0.001   # >= 0.1% (§1.1)
-ITEM_USAGE_CUT = 0.005      # >= 0.5% share on any included species (§1.4)
+SPECIES_USAGE_CUT = 0.001   # >= 0.1%
+ITEM_USAGE_CUT = 0.005      # >= 0.5% share on any included species
 
-# Grass Knot / Low Kick weight classes (kg cutoffs), §1.2. Bucket = index into this list.
+# Grass Knot / Low Kick weight classes (kg cutoffs). Bucket = index into this list.
 WEIGHT_CUTOFFS_KG = (10.0, 25.0, 50.0, 100.0, 200.0)  # <10, <25, <50, <100, <200, >=200 -> buckets 0-5
 
 HAZARD_MOVES = {"stealthrock", "spikes", "toxicspikes", "stickyweb", "stoneaxe", "ceaselessedge"}
@@ -157,7 +157,7 @@ def build_species_table(
 
 
 def build_moves_table(dex: dict[str, Any], species_table: dict[str, Any]) -> dict[str, Any]:
-    """Index over all moves appearing in any included species' learnset (§1.3), with static features."""
+    """Index over all moves appearing in any included species' learnset, with static features."""
     in_learnsets: set[str] = set()
     for feats in species_table["features"].values():
         in_learnsets.update(feats["learnset"])
@@ -191,8 +191,8 @@ def build_moves_table(dex: dict[str, Any], species_table: dict[str, Any]) -> dic
 def build_items_table(
     dex: dict[str, Any], usage: dict[str, Any] | None, species_table: dict[str, Any]
 ) -> dict[str, Any]:
-    """Items with >=0.5% usage share on any included species (§1.4) + sentinels, plus the per-species
-    nonzero-usage lists that back the belief model's usable-items mask (§3.2)."""
+    """Items with >=0.5% usage share on any included species + sentinels, plus the per-species
+    nonzero-usage lists that back the belief model's usable-items mask."""
     item_shares = _usage_item_shares(usage)
     included_species = [s for s in species_table["ids"] if s != RARE_SPECIES]
 
@@ -220,7 +220,7 @@ def build_items_table(
 
 
 def build_abilities_table(dex: dict[str, Any], species_table: dict[str, Any]) -> dict[str, Any]:
-    """Global ability index over abilities of included species (§1.5); prediction is always masked to
+    """Global ability index over abilities of included species; prediction is always masked to
     the species' legal 1-3 anyway."""
     keep: set[str] = set()
     for feats in species_table["features"].values():

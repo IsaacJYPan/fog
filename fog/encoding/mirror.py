@@ -237,7 +237,7 @@ def build_opponent_view(obs, my_view_tokens: np.ndarray, my_truth_tokens: np.nda
                         device=None) -> tuple[dict, dict]:
     """Batched-torch ([1, ...]) wrapper over `build_opponent_view_np`.
 
-    Used for the per-decision frozen-probe measurement (§7); training goes through the numpy path.
+    Used for the per-decision frozen-probe measurement; training goes through the numpy path.
     """
     frag, my_view = build_opponent_view_np(obs, my_view_tokens, my_truth_tokens, tables)
 

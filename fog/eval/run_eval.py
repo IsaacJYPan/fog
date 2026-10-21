@@ -3,10 +3,10 @@
     # gauntlet + closure (default)
     python -m fog.eval.run_eval --config configs/eval_ou.yaml --ckpt runs/.../ppo_final.pt
 
-    # §7b/§7c readability report (fresh probe trained on this checkpoint's play)
+    # Readability report (fresh probe trained on this checkpoint's play)
     python -m fog.eval.run_eval --config ... --ckpt CKPT --readability
 
-    # §7a L-vs-N head-to-head (CKPT is the L-agent)
+    # L-vs-N head-to-head (CKPT is the L-agent)
     python -m fog.eval.run_eval --config ... --ckpt L.pt --lvn N.pt
 
     # β-grid frontier: config eval.pareto = [{label, ckpt, beta}, ...]
@@ -28,12 +28,12 @@ from fog.config import load_config_with_args
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="FOG evaluation (§9).")
+    ap = argparse.ArgumentParser(description="FOG evaluation.")
     ap.add_argument("--config", required=True)
     ap.add_argument("--ckpt", required=True)
     ap.add_argument("--bc-ckpt", default=None)
-    ap.add_argument("--readability", action="store_true", help="§7b/§7c fresh-probe report")
-    ap.add_argument("--lvn", default=None, metavar="N_CKPT", help="§7a: play --ckpt (L) vs N_CKPT")
+    ap.add_argument("--readability", action="store_true", help="fresh-probe readability report")
+    ap.add_argument("--lvn", default=None, metavar="N_CKPT", help="play --ckpt (L) vs N_CKPT")
     ap.add_argument("--lvn-config", default=None, metavar="N_CONFIG",
                     help="config that builds the N side, when its architecture differs from "
                          "--config (e.g. the b_vec gate: M1.5 vs M1)")
@@ -66,7 +66,7 @@ def main() -> None:
             from fog.config import load_config
 
             cfg_n = load_config(args.lvn_config)
-        print("== L vs N (§7a) ==")
+        print("== L vs N ==")
         lvn_match(args.ckpt, args.lvn, int(ev.get("lvn_games", 3000)), fmt, team_pool, cfg,
                   cfg_n=cfg_n)
         ran_special = True

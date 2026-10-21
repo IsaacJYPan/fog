@@ -1,8 +1,8 @@
-"""pb_search_action (fog/search/pb_search.py, PROPOSAL_IMPL_PLAN Phase F): the assembled
-two-sided decision. Pins: the API has NO temperature (settled 16.2), the executed action is
-sampled from the true state's averaged row and stays inside the legality mask, persistent-table
-mode uses (and validates) the table's rho, the adaptive sampled mode terminates, trivial
-decisions skip the grid entirely, and the whole call is reproducible given its seeds."""
+"""Assembled public-belief search decisions.
+
+Check exact sampling from the true team's averaged strategy, legal actions,
+persistent table alignment, adaptive sampling termination, and seed reproducibility.
+"""
 from __future__ import annotations
 
 import inspect
@@ -89,7 +89,7 @@ def test_api_has_no_temperature_and_no_greedy_mode():
     from fog.search.pb_search import pb_search_action
 
     params = inspect.signature(pb_search_action).parameters
-    assert "temperature" not in params, "settled decision 16.2: exact sampling only"
+    assert "temperature" not in params, "sample the solved strategy without temperature scaling"
     assert "greedy" not in params
 
 
@@ -114,7 +114,7 @@ def test_persistent_mode_end_to_end(agent):
         assert lab1 == "public_observation" and lab2 in r.observation_model.keys
         assert post.shape == r.rho.shape
         assert post.sum() == pytest.approx(1.0) or post.sum() == pytest.approx(0.0)
-    # G1: the random-iteration snapshot posteriors ride alongside (§9.3 mitigation 2)
+    # Random-iteration posterior snapshots accompany the final-strategy queries.
     assert 1 <= r.sample_iteration <= r.iterations
     assert len(r.sample_beliefs) == 4
     for lab1, lab2, post in r.sample_beliefs:
@@ -177,7 +177,7 @@ def test_reproducible_given_seed(agent):
 
 def test_trivial_forced_decision_skips_the_grid(agent):
     """A pending forced replacement with one legal choice is executed directly: no simulation,
-    no solver — and no behavioral likelihood for the belief update (proposal §14)."""
+    no solver — and no behavioral likelihood for the belief update."""
     from fog.search.pb_leaves import commit_pair_branches
     from fog.search.pb_search import pb_search_action
 

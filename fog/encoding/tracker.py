@@ -1,4 +1,4 @@
-"""Incremental per-battle event tracking (2026-07 encoding audit fields; spec §2.1/§2.2/§2.3).
+"""Incremental per-battle event tracking.
 
 poke-env exposes most battle state, but several decision-relevant signals only exist in the event
 stream. `BattleTracker` consumes each completed turn's protocol events exactly once and maintains:
@@ -146,7 +146,7 @@ class BattleTracker:
         snapshot_ids: np.ndarray | None = None,
         snapshot_state: np.ndarray | None = None,
     ) -> None:
-        """Record the start-of-turn snapshot + my chosen action for turn `turn` (history §2.3)."""
+        """Record the start-of-turn snapshot + my chosen action for turn `turn`."""
         if snapshot is not None and turn not in self.snapshots:
             self.snapshots[turn] = np.asarray(snapshot, dtype=np.float32)
         if snapshot_ids is not None and turn not in self.snapshot_ids:

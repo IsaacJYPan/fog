@@ -1,4 +1,4 @@
-"""Belief consistency refresh (SEARCH_PLAN §7): only the belief nets train, play is untouched,
+"""Belief consistency refresh: only the belief nets train, play is untouched,
 and the whole collect->retrain loop runs on real engine self-play."""
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ def test_refresh_rejects_unknown_scope(monkeypatch):
 @engine
 def test_refresh_trains_only_beliefs_and_improves_train_ce():
     """End-to-end on real self-play: belief + self-belief move, policy/value/trunk/preview are
-    byte-identical (play unchanged — the §7 contract), labels exist, report is finite."""
+    byte-identical (play unchanged), labels exist, report is finite."""
     from fog.training.belief_refresh import refresh_beliefs
 
     torch.manual_seed(0)

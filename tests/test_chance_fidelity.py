@@ -1,4 +1,4 @@
-"""Phase H instrumentation (fog/eval/chance_fidelity.py): the Damage-instruction matcher finds
+"""Chance-fidelity instrumentation (fog/eval/chance_fidelity.py): the Damage-instruction matcher finds
 the engine's average-roll damage, the Gen 9 build reproduces Showdown's 1/24 crit branch
 weighting, and roll reconstruction flags a knockout straddle exactly when HP falls inside the
 16-roll span."""

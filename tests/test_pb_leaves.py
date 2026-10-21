@@ -1,8 +1,8 @@
-"""commit_pair_branches (fog/search/pb_leaves.py, PROPOSAL_IMPL_PLAN Phase B(ii)): committed
-action pairs enumerate into weighted branch outcomes that STOP at the next pending decision
-(PROJECT_DESIGN_PROPOSAL.md §10.5) — pending forced replacements are returned unresolved, never
-handed to a scripted chooser; finished branches carry the ±1/0 terminal convention; the whole
-walk from a fresh battle to a terminal result works by committing decision after decision."""
+"""Committed action pairs enumerate weighted outcomes up to the next pending decision.
+
+Forced replacements remain unresolved for the next chooser; terminal outcomes use
++1/0/-1 from the acting player's perspective.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -83,7 +83,7 @@ def _signature(battle) -> tuple:
 
 
 def test_pending_replacement_leaf_is_returned_unresolved():
-    """§10.5: the knockout branch stops at the opponent's pending forced replacement — the leaf
+    """The knockout branch stops at the opponent's pending forced replacement — the leaf
     still shows the fainted side owing a decision; the miss branch completes the turn."""
     from fog.search.pb_leaves import commit_pair_branches
 

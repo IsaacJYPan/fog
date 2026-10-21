@@ -1,4 +1,4 @@
-"""Reconstruction-fidelity fuzz (search §8 / ARCHITECTURE.md §3.2).
+"""Check reconstruction fidelity against the live battle state.
 
 Round-trips many random mid-battle engine positions through the Showdown-shaped view and back
 (engine state -> EngineView -> state_recon.reconstruct_battle -> engine state) and reports how
@@ -68,7 +68,7 @@ def _diverges(battle, role: str, tables) -> list[str]:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Reconstruction-fidelity fuzz (search §8).")
+    ap = argparse.ArgumentParser(description="Check reconstruction fidelity.")
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_b"))
     ap.add_argument("--games", type=int, default=200)
     ap.add_argument("--max-turns", type=int, default=12)

@@ -1,8 +1,7 @@
 """Team pools for gen9ou training: load Showdown pastes, sample per battle, validate.
 
-poke-env's `Player(team=...)` accepts a `Teambuilder`; its `yield_team()` is called once per battle,
-which is exactly the spec's "teams sampled per-game from the active pool" (§6). `PoolTeambuilder`
-wraps a directory of paste files.
+poke-env calls a `Teambuilder`'s `yield_team()` once per battle. `PoolTeambuilder`
+samples from a directory of paste files.
 
 Validation goes through the PINNED simulator's own validator (`node pokemon-showdown validate-team`)
 — the server is the source of truth for legality, so a pool that passes here cannot silently hang
@@ -68,7 +67,7 @@ def make_pool_teambuilder(teams: list[str], seed: int | None = None):
 def make_paired_teambuilders(teams: list[str], n_games: int, seed: int | None = None):
     """Two teambuilders sharing a paired schedule: each sampled (team_i, team_j) matchup is played
     twice in consecutive battles with sides swapped. Cuts team-matchup variance in head-to-head
-    evals (§7a L-vs-N) — on a 16-team pool the matchup, not the policy, dominates single-game
+    head-to-head evaluations — on a 16-team pool the matchup, not the policy, dominates single-game
     outcomes. Requires sequential battles (yield order == battle order)."""
     from poke_env.teambuilder import Teambuilder
 

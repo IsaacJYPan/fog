@@ -1,4 +1,4 @@
-"""Tests for the autoregressive belief model (§3.2), self-belief predictor (§3.3), and agent wiring."""
+"""Tests for the autoregressive belief model, self-belief predictor, and agent wiring."""
 from __future__ import annotations
 
 import math

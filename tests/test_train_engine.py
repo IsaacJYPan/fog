@@ -1,4 +1,4 @@
-"""Engine-backend training dispatch tests (ARCHITECTURE.md §3.2): `train()` must run the full
+"""Engine-backend training dispatch tests: `train()` must run the full
 rollout->update loop with NO server, and Showdown-only configs must fail loudly. Skipped without
 poke-engine."""
 from __future__ import annotations
@@ -83,7 +83,7 @@ def test_train_rejects_unknown_backend(tmp_path):
         train(cfg)
 
 
-# ------------------------------------------------------------- divergence controls (plan §5)
+# ------------------------------------------------------------- divergence controls
 def test_cross_sim_rejects_opponent_without_engine_port(tmp_path):
     from fog.eval.cross_sim import cross_sim_gauntlet
     from fog.models.agent import FogAgent

@@ -1,4 +1,4 @@
-"""Tests for determinized search (§8), the mirror/opponent-view (§3.3), and config overrides."""
+"""Tests for determinized search, the mirror/opponent-view, and config overrides."""
 from __future__ import annotations
 
 import numpy as np

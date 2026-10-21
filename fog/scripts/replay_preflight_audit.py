@@ -1,4 +1,4 @@
-"""Five-replay debugger-style gate for public-replay belief training.
+"""Inspect replay parsing, model inputs, and belief-loss backward passes.
 
 Unlike ``preflight_audit`` (fresh direct-Showdown mechanics), this drives the actual public replay
 parser, shard tensorization, replay dataset masks, model forward, censored marginal/chain losses,

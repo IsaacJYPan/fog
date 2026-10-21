@@ -1,4 +1,4 @@
-"""Five-game, zero-optimizer mechanical flight recorder.
+"""Inspect observations, legality, and belief queries during local Showdown games.
 
 Runs complete games on the pinned in-memory Pokemon Showdown simulator, through the same censored
 poke-env views and Observation encoder used by training. Every decision records enough state to

@@ -1,4 +1,4 @@
-"""Tests for the Gen 9 stat formula and weighted spread clustering (§1.6)."""
+"""Tests for the Gen 9 stat formula and weighted spread clustering."""
 from __future__ import annotations
 
 import numpy as np

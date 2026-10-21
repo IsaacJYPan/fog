@@ -1,45 +1,15 @@
-"""poke-engine (Rust) adapter — groundwork for the M3/M4 volume track (plan §7).
+"""Low-level poke-engine conversion helpers and a smoke-test proxy.
 
-STATUS (honest, post-audit 2026-07-05; updated 2026-07-08): this module is an ADAPTER AND SMOKE
-TEST. The partial-observability engine TRAINING path it flagged as unbuilt now lives in
-`env/engine_battle.py` (`EngineBattle` + reveal census + event synthesis) and `env/engine_runner.py`
-(batched self-play into RolloutBuffer) — use those, not this proxy, for volume self-play.
+Use EngineBattle and engine_runner for partial-observability self-play. The proxy
+here has a basic legality mask and either hidden or fully revealed opponent data;
+it does not track reveals. state_recon also uses the conversion helpers to build
+candidate positions for search.
 
-A SECOND consumer now exists: `env/state_recon.py` reconstructs a full engine `State` from a live
-Showdown position + one belief-sampled world, powering determinized search on the Showdown backend
-(`search/engine_step.ShowdownWorldStepper`, spec §8). That reconstruction is validated by
-`scripts/fuzz_recon.py` (round-trips random positions; ~0 divergence on the core fields).
-
-This proxy itself remains a smoke test / shape check. What it still does NOT do (use EngineBattle):
-  * partial-observability reveal tracking (RustBattleProxy exposes HIDDEN-only or, with
-    `reveal_opponent=True`, perfect information — NEVER train on that);
-  * legality nuance (choice lock, trapping, disable, forced switches) beyond the basic mask.
-
-Verified 2026-07: poke-engine 0.0.48 must be built with its `gen9` Cargo feature and older
-generation defaults disabled. The ordinary prebuilt wheel does not establish that requirement;
-the locked uv configuration compiles it from source. The Gen 9 build exposes the
-terastallization feature (`Pokemon.tera_type` / `.terastallized` exist) — the load-bearing coverage
-question. The proxy feeds the SAME encoders as the Showdown path, but note "same encoder" does not
-mean "same inputs": every proxy field below that approximates (see _ProxyMon) is a drift source the
-cross-sim fuzz must catch.
-
-Division of labor (see ARCHITECTURE.md simulator authority):
-  * poke-engine  -> self-play rollout volume (synchronous, no websocket, orders of magnitude faster)
-  * Showdown     -> ground truth: BC replays, gauntlet/Elo eval, fuzzing, ladder, final fine-tune
-
-Divergence control (the real risk — PPO will farm sim bugs):
-  * `fog/scripts/fuzz_sim.py` replays seeded action scripts through BOTH sims and diffs per-turn
-    hp/status/boost trajectories; run >=1k games before trusting the engine for training.
-  * cross-sim gauntlet every N checkpoints; HALT if the Rust-vs-Showdown win-rate gap exceeds 3%.
-  * final fine-tune (last ~200k games before any headline number) always on Showdown.
-
-Move strings (verified against the Gen 9 build of poke-engine 0.0.48): a move id ("earthquake"),
-a bare pokemon id for a switch ("ironvaliant" — no "switch " prefix), and "<moveid>-tera" to
-terastallize with the move.
-`generate_instructions(state, s1_move, s2_move)` returns probability-weighted StateInstructions;
-`state.apply_instructions(instructions[i])` advances (sample by `.percentage` for stochastic play).
-Re-run `smoke_roundtrip()` after any poke-engine upgrade — the string formats have drifted between
-releases before.
+Build poke-engine with its gen9 Cargo feature and default generations disabled, as
+configured in pyproject.toml. Re-run smoke_roundtrip() after an engine upgrade.
+Move strings are move IDs, bare Pokemon IDs for switches, and <moveid>-tera for
+Terastallization. generate_instructions returns probability-weighted outcomes;
+apply_instructions returns a new state.
 """
 from __future__ import annotations
 

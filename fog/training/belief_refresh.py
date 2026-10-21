@@ -1,21 +1,9 @@
-"""Belief retraining on the current agent's self-play (ARCHITECTURE.md invariant S4).
+"""Retrain beliefs on the current policy's self-play distribution.
 
-Distillation shifts the policy; the belief and self-belief nets still describe the agent that
-played BEFORE distillation, which reintroduces exactly the inconsistency approach A exists to
-avoid. This module closes one generation of
-that loop: engine self-play with the agent AS IT NOW PLAYS (both sides), then supervised retrain
-of ONLY the belief + self-belief nets on the recorded truth labels — policy, value, trunk and
-preview untouched, so the agent's play is byte-identical afterward and only its beliefs moved.
-
-Collection reuses the standard recording stack end-to-end (EngineRunner -> RolloutBuffer ->
-to_batch): the same frag structure, mirror recording and truth plumbing PPO trains on — no
-parallel data path to drift. The holdout is a SEPARATE collection run (disjoint seed), so the
-split is game-level by construction (belief targets are shared by every row of a game; a row
-split would leak them).
-
-Gate (reported, not raised): held-out belief CE and self-belief CE both <= their pre-refresh
-values. A refresh that worsens held-out CE means the new play distribution needs more games, not
-that the step should be skipped.
+Both sides play the same frozen policy. Collection uses EngineRunner and
+RolloutBuffer; a separate seeded collection supplies held-out games. Only belief
+and self-belief parameters train. Reports compare their held-out cross entropy
+before and after the refresh.
 
     python -m fog.training.belief_refresh --ckpt runs/distill_g1/distill.pt \
         --pool data/teams/pool_a --out runs/belief_refresh_g1
@@ -30,7 +18,7 @@ from typing import Any
 def _collect(agent: Any, pool: list[str], games: int, *, engine_batch: int, temperature: float,
              seed: int, device) -> dict:
     """Self-play decision batch via the standard recording stack. Opponent = a frozen copy of the
-    same agent (true self-play — §7 wants beliefs about the agent that actually plays)."""
+    same agent, so labels reflect the policy being refreshed."""
     import copy
 
     from fog.env.engine_runner import EngineRunner, FrozenAgentPolicy

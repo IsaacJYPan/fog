@@ -215,9 +215,8 @@ def _refresh_safety_reports(
 ) -> bool:
     """Refresh stale zero-update safety reports, then verify the new reports.
 
-    The source fingerprint intentionally changes when Python or training configuration changes.
-    Long jobs cross that boundary surprisingly often, so each block checks it explicitly.  An
-    opted-in refresh runs both no-optimizer audits; it never weakens or bypasses the gate.
+    The source fingerprint changes when battle, model, training, or parser code changes.
+    Each block checks it; an opted-in refresh runs both no-optimizer audits.
     """
     try:
         _require_current_safety_reports(config)

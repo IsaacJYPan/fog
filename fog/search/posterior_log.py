@@ -1,28 +1,14 @@
-"""Legacy one-sided joint-search posterior logger (ARCHITECTURE.md S6).
+"""Collect one-sided joint-search decisions for value fitting and distillation.
 
-The posterior-features head input (`model.use_posterior_features`) is UNTRAINED until the value
-head has seen real (state, posterior) pairs; before that the joint-search coupling is weak and
-Comparisons are premature until the posterior-aware value gate passes. This module generates the
-training pairs: engine self-play where the learner acts through `joint_search_action`, logging per
-decision the root observation, the posterior features of the EXECUTED public action at the true
-state (exactly the features the head would see for the continuation actually played), the search's
-full 14-dim distribution (Phase-4 distillation reuses this log format), and the game outcome.
+Engine self-play logs the root observation, the executed action's posterior
+features at the true team, the 14-action search distribution, and the game outcome.
+Trivial decisions and counterfactual leaf observations are omitted: no search runs
+for the former, and the latter have no observed game outcome.
 
-What is deliberately NOT logged:
-  * trivial decisions (0/1 legal actions) — no search ran, no posterior exists;
-  * per-leaf (state, action) pairs — the fine-tune trains the head at the ROOT of the executed
-    line; leaf-level pairs describe counterfactual worlds whose outcomes we never observe.
-
-Games run one at a time (search batches internally over K×A leaves; the
-outer batch size drops; this is data generation, not the training loop). Learner plays at
-`temperature` > 0 by default: sampling from the search's average policy is what makes the logged
-posteriors cover mixed-strategy support instead of a single greedy line.
-
-    python -m fog.search.posterior_log --pool data/teams/pool_a --games 64 \
-        --out runs/posterior_log [--ckpt runs/.../ppo_final.pt]
-
-A posterior-BLIND checkpoint (e.g. the M1.5 run) is expanded on load — see
-`fog.training.value_finetune.load_posterior_agent`.
+Games run sequentially, with search batching its own leaves. Positive temperature
+covers the mixed strategy's support. `load_posterior_agent` expands checkpoints
+that lack posterior inputs; those columns still need training before the value
+head can use them.
 """
 from __future__ import annotations
 
@@ -41,9 +27,11 @@ MASK_PREFIX = "mask_"  # opp_revealed mask families are stored as mask_<family> 
 
 # ------------------------------------------------------------------------------------ collection
 def executed_posterior_features(res, battle, role: str, action: int) -> np.ndarray | None:
-    """Features of the executed action's induced posterior at the true state — the §4.2 target
-    input. None when the real-battle action has no public-label column (a label-space mismatch
-    between the true-world fork and the real battle; counted by the caller, never fabricated)."""
+    """Executed-action posterior features at the true team.
+
+    Return None if the action has no public-label column in the true-world fork;
+    the caller counts this mismatch rather than filling in features.
+    """
     from fog.search.joint import _public_label, posterior_features_np
 
     label = _public_label(battle, role, action)
@@ -69,8 +57,8 @@ def collect_search_decisions(
     """Play `n_games` of learner-vs-scripted engine self-play with joint-search decisions and
     write `decisions.npz` + `meta.json` under `out_dir`. Returns the meta dict (stats included).
 
-    `own_source` defaults to exact pool enumeration (`EnumeratedPoolStates`) — the Phase-2
-    validation setting; pass a `SampledOwnStates` for the sampled arm. `opponent` defaults to a
+    `own_source` defaults to exact pool enumeration (`EnumeratedPoolStates`);
+    pass `SampledOwnStates` to use the learned sampler. `opponent` defaults to a
     seeded `EngineMaxDamagePolicy`.
     """
     import random
@@ -290,7 +278,7 @@ def batch_from_rows(data: dict[str, np.ndarray], idx: np.ndarray, device) -> dic
 # ------------------------------------------------------------------------------------------ CLI
 def _build_opponent(spec: str, agent, cfg: dict, device, temperature: float, seed: int):
     """None (scripted MaxDamage default inside the collector), a policy-arm of the learner
-    ('self' — Phase-4 self-play), a frozen checkpoint's policy, or another scripted name."""
+    ('self'), a frozen checkpoint's policy, or another scripted name."""
     if spec == "MaxDamage":
         return None  # the collector's default (fresh-seeded per game)
     from fog.eval.search_gauntlet import ArmPlayer
@@ -328,7 +316,7 @@ def main() -> None:
     ap.add_argument("--temperature", type=float, default=1.0)
     ap.add_argument("--opponent", type=str, default="MaxDamage",
                     help="'MaxDamage'/'Random' (scripted), 'self' (the same agent's raw policy — "
-                         "Phase-4 self-play data gen), or a checkpoint path (frozen policy)")
+                         "self-play data generation), or a checkpoint path (frozen policy)")
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--device", type=str, default="cuda")
     args = ap.parse_args()
@@ -343,7 +331,7 @@ def main() -> None:
         cfg.setdefault("model", {})["use_posterior_features"] = True
         agent = FogAgent.from_tables(cfg).to(device)
         print("[posterior_log] WARNING: no --ckpt — logging with a FRESH agent (smoke use only; "
-              "§4.2 pairs should come from a trained checkpoint).", flush=True)
+              "posterior training pairs should come from a trained checkpoint).", flush=True)
 
     meta = collect_search_decisions(
         agent, load_pool(args.pool), args.out, n_games=args.games, iters=args.iters,

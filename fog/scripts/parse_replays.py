@@ -286,7 +286,7 @@ class _PerspectiveState:
             self._pending_filter_reason = (
                 "accepted" if self._pending_policy_valid else "forced_or_unaligned_switch"
             )
-        if self._pending_action is not None:  # history retro-fidelity: my action per turn (§2.3)
+        if self._pending_action is not None:  # history retro-fidelity: my action per turn
             self.tracker.my_actions[int(getattr(battle, "turn", 0) or 0)] = self._pending_action
 
     def record_tera(self, parts: list[str]) -> None:
@@ -676,7 +676,7 @@ def replay_files(raw_dir: Path, limit: int = 0) -> list[Path]:
 def main() -> None:
     import polars as pl
 
-    ap = argparse.ArgumentParser(description="Parse raw replays -> parsed shards + manifest (§4.3).")
+    ap = argparse.ArgumentParser(description="Parse raw replays into shards and a manifest.")
     ap.add_argument("--raw", type=Path, default=Path("data/raw_replays"))
     ap.add_argument("--out", type=Path, default=Path("data/parsed"))
     ap.add_argument("--limit", type=int, default=0, help="max replays (0 = all)")
@@ -718,7 +718,7 @@ def main() -> None:
     print(f"parsed {parsed} replays ({sum(m['n_rows'] for m in manifest)} rows); "
           f"quarantined {len(quarantine)} ({rate:.1%})")
     if rate > 0.05:
-        print("WARNING: quarantine rate > 5% — investigate (§4.3).")
+        print("WARNING: quarantine rate > 5% — investigate.")
 
 
 if __name__ == "__main__":

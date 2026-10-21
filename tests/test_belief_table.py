@@ -1,7 +1,8 @@
-"""JointBeliefTable (fog/search/belief_table.py, PROPOSAL_IMPL_PLAN Phase D): hand-computed
-Bayes chains (the proposal's §5.1 Specs/Scarf example made exact), log-space equals direct
-multiplication, floored behavior likelihoods never eliminate, label-lacking candidates ARE
-eliminated, mechanical zeroing, the never-empty refusal, and effective-sample-size readouts."""
+"""Joint-belief Bayes updates, likelihood floors, mechanical elimination, and empty-support handling.
+
+The hand-computed Specs/Scarf examples check log-space updates against direct
+multiplication and distinguish unlikely actions from unavailable ones.
+"""
 from __future__ import annotations
 
 import numpy as np
@@ -15,7 +16,7 @@ def _uniform(k: int, j: int) -> JointBeliefTable:
 
 
 def test_specs_scarf_protect_chain_hand_computed():
-    """Proposal §5.1, strategy Y: the Specs version Protects 90%, the Scarf version 10%. Two
+    """A signaling strategy: the Specs version Protects 90%, the Scarf version 10%. Two
     observed Protects (floor disabled for the exact check) must give the exact posterior
     [0.81, 0.01] normalized — the behavioral update the four summary features could never carry."""
     t = _uniform(2, 1)                                   # K = {Specs, Scarf}, J trivial
@@ -54,7 +55,7 @@ def test_log_space_matches_direct_product_over_many_steps():
 
 
 def test_floor_keeps_wrong_model_candidates_alive_but_missing_labels_eliminate():
-    """§7.2: 'the model says never' shrinks; 'the world lacks the action' eliminates."""
+    """An unlikely action shrinks belief; an unavailable action eliminates the team."""
     t = _uniform(2, 1)
     sigma1 = np.array([[0.5, 0.5], [0.0, 1.0]])          # model: candidate 1 never plays col 0
     avail_all = np.ones((2, 2), dtype=bool)
@@ -71,7 +72,7 @@ def test_floor_keeps_wrong_model_candidates_alive_but_missing_labels_eliminate()
 
 
 def test_forced_single_choice_carries_no_behavior_but_mechanics_still_apply():
-    """§14: a forced action has no behavioral likelihood (side passed as None), yet the revealed
+    """A forced action has no behavioral likelihood (side passed as None), yet the revealed
     switch identity can still mechanically eliminate candidates."""
     t = _uniform(2, 3)
     before = t.normalized().copy()
@@ -84,7 +85,7 @@ def test_forced_single_choice_carries_no_behavior_but_mechanics_still_apply():
 
 
 def test_never_empty_refusal_and_collapse_flag():
-    """Invariant 19.18: a step that would kill every cell is refused loudly — the table keeps
+    """A step that would kill every cell is refused loudly — the table keeps
     its previous state and reports collapse for the caller's rejuvenation."""
     t = _uniform(2, 2)
     before = t.normalized().copy()
@@ -115,7 +116,7 @@ def test_prior_construction():
         JointBeliefTable(np.full((2, 2), -np.inf))
 
 
-def test_truncated_solve_kept_maps_floor_the_unmodeled(  # Phase G2
+def test_truncated_solve_kept_maps_floor_the_unmodeled(
 ):
     """G2 truncation: candidates OUTSIDE the solve's kept subset take the plain floor
     likelihood — shrunk relative to modeled candidates that liked the action, never zeroed,

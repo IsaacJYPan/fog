@@ -2,7 +2,7 @@
 #
 # First build the bank:
 #   python -m fog.scripts.collect_team_bank --target 150 --min-quality 70
-# Inspect data/teams/public_gen9ou/manifest.json before a claim-bearing run. Tournament/resource
+# Inspect data/teams/public_gen9ou/manifest.json before training. Tournament/resource
 # pastes and RMT candidates remain labeled separately there.
 extends: train_ou.yaml
 

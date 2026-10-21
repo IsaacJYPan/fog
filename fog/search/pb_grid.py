@@ -24,9 +24,7 @@ import numpy as np
 
 from fog.search.pb_leaves import commit_pair_branches
 
-# The opponent's synthetic single public label at a one-sided (our) decision: it owes no action
-# this step, so there is exactly one "column" — the solver sees B = 1 and the belief update takes
-# no opponent likelihood (proposal §10.5, F2).
+# At one-sided decisions, B = 1 and the belief update has no opponent-action likelihood.
 OBSERVE_LABEL = "<observe>"
 
 
@@ -87,7 +85,7 @@ def build_pb_grid(
     `own_tokens` are the K candidate versions of OUR team the opponent could believe in (the
     own-state sources' token grids); `opp_tokens` are the J shared opponent candidates (sampled
     once from the belief chain, deduplicated and weighted by the CALLER — this builder treats
-    both sets as given identities so the persistent belief table keys stay stable, §7.4).
+    both sets as given identities so the persistent belief table keys stay stable).
     Never mutates `battle`."""
     from fog.constants.schema import NO_ITEM
     from fog.encoding.observation import Observation
@@ -169,7 +167,7 @@ def build_pb_grid(
             avail2[j, col2[lab]] = True
             local_action2[j, col2[lab]] = idx
 
-    # ---- simulate every available cell once (invariant 19.13) --------------------------------
+    # Simulate each available cell once; solver iterations reuse the outcomes.
     cell_outcomes: dict[tuple[int, int, int, int], list] = {}
     pruned_mass = np.zeros((n_k, n_j, n_a, n_b))
     failed = np.zeros((n_k, n_j, n_a, n_b), dtype=bool)

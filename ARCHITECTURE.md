@@ -99,16 +99,11 @@ distillation generation regressed in direct play. Search remains experimental. B
 as a training expert, check information isolation, exact-versus-sampled agreement, and held-out
 search-on/off strength.
 
-Some source comments use these short references:
-
-| ID | Constraint |
-| --- | --- |
-| S1 | Represent plausible private teams for both players; compare sampled candidates with exact enumeration. |
-| S2 | Leaf heads may use posterior features for what the opponent can infer about us. Cache the board encoding, but rescore heads when the posterior changes. |
-| S3 | Each simulated player and reply policy gets only its own perspective. Simulator truth stays out of ordinary policy inputs. |
-| S4 | Refresh belief data after material policy changes before relying on belief-dependent search or distillation. |
-| S5 | Measure sampling agreement and search strength on held-out team pools. |
-| S6 | Legacy joint search is a depth-one approximation with a fixed reply policy. |
+Leaf values depend on what the opponent can infer about us. The board encoding
+can be cached, but posterior-dependent heads need rescoring as beliefs change.
+Each simulated player receives its own censored perspective. After a policy
+changes substantially, refresh belief-training data and compare sampled search
+against exact enumeration on held-out pools.
 
 ## Training
 

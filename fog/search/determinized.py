@@ -1,36 +1,18 @@
-"""Root-level determinized evaluation. Inference-time only — NEVER in the training loop.
+"""Root determinization for inference-time evaluation.
 
-For each legal action a (≤14): simulate one ply in each of k opponent worlds sampled from the
-belief model (clamped to reveals), evaluate the resulting position, average over worlds, and blend
-with the policy prior. Play the argmax.
+For each legal action, simulate one ply in K opponent worlds sampled from the
+belief model, score the censored leaf observations, and average their values.
+The final score adds `prior_weight * log policy_probability`; zero weight gives
+pure search, while larger weights favor the learned policy.
 
-Three properties are load-bearing (each fixes a defect of the original root determinization):
+`step_fn(action_idx, world_tokens)` supplies the simulator and returns a censored
+`Observation`, a terminal payoff in [-1, 1], or None on failure. Sampled hidden
+teams drive simulation but are not exposed to the leaf evaluator. Determinization
+does not model the opponent's uncertainty about our team.
 
-  1. `step_fn` is REQUIRED. Without a simulator nothing downstream of the root depends on the
-     action, every action ties, and argmax silently picks the lowest legal index — the old
-     `step_fn=None` fallback was exactly that bug. No simulator => no search; use the policy.
-  2. Leaves are evaluated UNDER FOG. `step_fn` returns the searcher's censored `Observation`
-     after the ply — root reveals plus whatever the simulated ply itself revealed, hidden
-     attributes still hidden. The sampled world drives the simulator only. This keeps the value
-     net on its training distribution AND prices information: scouting actions produce sharper
-     leaf beliefs, which the belief-conditioned value net can genuinely score higher. (Clamping
-     the full sampled team into the leaf belief input — what this module originally did — erases
-     information value and hands the value net an input it never trained on.)
-  3. The search score is blended with the policy prior: score(a) = mean leaf value + λ·log π(a).
-     Determinization is structurally blind to concealment (it assumes worlds resolve); the prior
-     is trained under the §7 leakage objective, so it carries what search cannot see. λ=0
-     recovers pure search; large λ recovers the policy.
-
-`step_fn(action_idx, world_tokens) -> Observation | float | None`
-  * Observation — the searcher's fog observation at the leaf (numpy, unbatched)
-  * float      — the simulated game ENDED: terminal outcome in [-1, 1] from the searcher's side
-  * None       — this (action, world) simulation failed; the sample is skipped
-
-`fog.search.engine_step.EngineWorldStepper` is the poke-engine implementation of this contract.
-
-All Observation leaves are scored in ONE batched value-net forward (chunked at
-`max_batch_forward`), not k×|legal| single-item calls. Actions whose every sample failed fall
-back to the root state's value (neutral: search neither favors nor buries them).
+Observation leaves are scored in batches of at most `max_batch_forward`. Failed
+samples are skipped; if every sample of an action fails, it uses the root value.
+`fog.search.engine_step.EngineWorldStepper` implements this contract for poke-engine.
 """
 from __future__ import annotations
 

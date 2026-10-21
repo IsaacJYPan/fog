@@ -1,6 +1,6 @@
 """Tensor dimension bookkeeping for the encoders.
 
-Kept in one place so the encoder network (§2.4) and the tests agree on every width. Widths that depend
+Kept in one place so the encoder network and the tests agree on every width. Widths that depend
 on generated tables (e.g. embedding input cardinalities) are looked up at model-build time; the widths
 here are the *layout* widths of the raw feature blocks before embedding.
 """
@@ -30,7 +30,7 @@ N_BOOST_STATS = 7        # atk, def, spa, spd, spe, acc, eva
 
 @dataclass(frozen=True)
 class Dims:
-    # --- §2.1 entity record raw blocks (pre-embedding floats/bits) ---------------------------------
+    # --- Entity record raw blocks (pre-embedding floats/bits) ---------------------------------
     species_embed: int = 64          # index -> embedding
     base_stats: int = 6              # /255
     typing: int = N_TYPES            # multi-hot (one or two)
@@ -61,7 +61,7 @@ class Dims:
     is_active: int = 1
     party_slot: int = 6              # one-hot
 
-    # --- §2.2 field vector -------------------------------------------------------------------------
+    # --- Field vector -------------------------------------------------------------------------
     field_weather: int = N_WEATHER + 1       # one-hot + turns-left/8
     field_terrain: int = N_TERRAIN + 1
     field_hazards: int = 2 * 6               # per-side: SR, spikes, tspikes, web, (+counters)
@@ -75,7 +75,7 @@ class Dims:
     field_delayed: int = 2 * 5
     field_gravity: int = 2                   # flag + counter (rare but cheap)
 
-    # --- §2.3 per-turn history record --------------------------------------------------------------
+    # --- Per-turn history record --------------------------------------------------------------
     hist_snapshot: int = 30          # both actives' species/hp/status/boost sums + field hash features
     hist_my_action: int = N_ACTIONS  # 14-way one-hot
     hist_opp_action: int = 40        # observed category: move idx / switch species / tera flag / <UNSEEN>

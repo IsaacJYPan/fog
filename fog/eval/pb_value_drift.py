@@ -1,36 +1,14 @@
-"""Drift gate for the per-pair value table: does a stale table approximate re-running the network?
+"""Measure cached public-belief value tables against full network re-evaluation.
 
-The error is measured against full re-evaluation on the exact small-pool harness, implementing
-ARCHITECTURE.md invariant S2 without depending on an untracked experiment plan.
+`reweight_staleness_curve` follows a reference solve that refreshes every iteration
+and compares each candidate pair's value with older tables on that same trajectory.
+`solution_gap` compares complete solves at different refresh intervals, including
+any feedback of stale values into later strategies.
 
-WHY THIS IS THE LOAD-BEARING MEASUREMENT. The whole Option-2 decision (per-pair table refreshed
-every N iterations, cheap table reuse in between) is only worth anything if the cached entries stay
-close to a full network re-evaluation. If it drifts badly at every usable N, the approximation
-collapses back to Option 1's cost (a full encoder pass per leaf per iteration). This module measures
-the drift so the choice of N is a MEASURED knob, not a hope.
-
-Two metrics, deliberately separated:
-
-  * `reweight_staleness_curve` — the ISOLATED approximation error. Run the exact reference solve
-    (recompute_every=1, so the table is refreshed every iteration) and, along that single
-    trajectory, ask: at iteration t, how wrong is the leaf value if the table were `s` iterations
-    stale? Compare the originating pair's `V[leaf,k,j]` in `V_{t-s}` with the same entry in `V_t`.
-    This isolates table staleness from any change in the solve trajectory.
-
-  * `solution_gap` — the END-TO-END consequence. Solve fully at recompute_every=N and compare the
-    FINAL averaged strategies and root value to the exact (N=1) solve. This captures the compounding
-    effect the staleness curve omits (a wrong value feeds back into the next strategy update). This
-    is what actually matters for decision quality; the staleness curve explains it.
-
-COST NOTE (honest budget). The reference arm here runs a full network pass EVERY iteration — exactly
-the cost Option 2 exists to avoid. That is fine: this is a measurement gate run on the small exact
-pools, not the deployment path. Both solves are deterministic given the same init, so the only
-difference between the N-arm and the reference is the value approximation.
-
-CAVEAT ON UNTRAINED NETS. Drift magnitude depends on how strongly the trained V depends on the belief
-it is conditioned on. On a randomly-initialized net the numbers are a MECHANISM smoke test only
-(they prove the metric responds to real table drift); the gate-quality numbers must be taken with a
-trained checkpoint.
+The reference is expensive and intended for small pools. Comparisons share their
+initialization so table refresh is the only changed approximation. Use a trained
+checkpoint to choose a refresh interval; random networks test the metric mechanics
+but need not have representative belief sensitivity.
 """
 from __future__ import annotations
 
@@ -146,7 +124,7 @@ def solution_gap(
 
 def format_report(staleness: dict[int, dict[str, float]], gap: dict[int, dict[str, float]]) -> str:
     """A compact human-readable summary of both metrics (for the gate log)."""
-    lines = ["cached-table drift vs full re-evaluation (§9.2/§15.3)",
+    lines = ["cached-table drift vs full re-evaluation",
              "  staleness  mean_err   max_err"]
     for s in sorted(staleness):
         r = staleness[s]
@@ -161,8 +139,7 @@ def format_report(staleness: dict[int, dict[str, float]], gap: dict[int, dict[st
 
 # ------------------------------------------------------------------------------------------ CLI
 def main() -> None:
-    """Measured drift numbers on real pool positions (the Phase G4 gate run — mechanism tests
-    live in tests/test_pb_value_drift.py; THIS produces the §15.3 NUMBERS with a trained net).
+    """Measure value-table drift on real pool positions with a trained network.
 
     Positions: random pool matchups advanced `--depths` decision-steps by the scripted
     max-damage policy on both sides, measured at the first decision we own. The conditioning
@@ -191,7 +168,7 @@ def main() -> None:
     from fog.search.own_states import StablePoolOwnStates
     from fog.search.pb_grid import build_pb_grid
 
-    ap = argparse.ArgumentParser(description="PBValueNet reweight-drift gate (§9.2/§15.3).")
+    ap = argparse.ArgumentParser(description="PBValueNet cached-table drift measurement.")
     ap.add_argument("--pool", required=True)
     ap.add_argument("--ckpt", required=True, help="champion agent checkpoint (frozen trunk)")
     ap.add_argument("--net", default=None,

@@ -1,4 +1,4 @@
-"""Phase-G value bridge: PBValueNet -> solver `values_fn` (proposal §9.2, §10 steps 6-7).
+"""Public-belief value bridge: PBValueNet -> solver `values_fn`.
 
 Engine-free: a hand-built PBGrid stand-in plus a fake backbone (`head_inputs` returns precomputed
 per-leaf s_board/c_dyn), with `_stack_obs`/`_device` monkeypatched so no battle is needed. The real
@@ -197,7 +197,7 @@ def test_all_terminal_grid_has_no_leaves(monkeypatch):
 
 
 def test_drives_the_two_sided_solver(monkeypatch):
-    """The whole Phase-G value path plugs into two_sided_regret_solve: the solver calls values_fn
+    """The public-belief value path plugs into two_sided_regret_solve: the solver calls values_fn
     every iteration, the network-backed u drives regret updates, and it returns a valid solution.
     This is the end-to-end wiring the interim path was a placeholder for."""
     from fog.search.pb_value_fn import make_pb_value_grid_values

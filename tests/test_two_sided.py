@@ -1,10 +1,8 @@
-"""Two-sided public-belief regret solver (fog/search/two_sided.py) — exact-game gates.
+"""Two-sided regret-solver tests on small games with known solutions.
 
-Every test here is a game small enough to know the answer exactly (PROJECT_DESIGN_PROPOSAL.md
-§15.1): hand-computed posteriors and action values, matrix games with unique known mixed
-equilibria, an exploitability gate computed by exact per-type best response, the bluff game whose
-analytic equilibrium the one-sided loop already pins (ported as a degenerate two-sided case), and
-the elimination/floor/never-empty rules of §7.2-7.4.
+Hand-computed posteriors, matrix-game equilibria, exact per-type best responses,
+and a bluff game check optimization and belief updates. Other cases cover
+unavailable actions, likelihood floors, and empty-support handling.
 """
 from __future__ import annotations
 
@@ -44,7 +42,7 @@ def test_pair_posteriors_hand_computed():
 
 
 def test_pair_posteriors_eliminates_type_lacking_the_label():
-    """§7.3 load-bearing property: a candidate type that cannot play an observed public action is
+    """Action availability: a candidate type that cannot play an observed public action is
     eliminated by observing it."""
     avail1 = np.array([[True, True], [True, False]])   # type 1 lacks label a=1
     s1 = floored_strategy(np.array([[0.5, 0.5], [1.0, 0.0]]), avail1, floor=0.1)
@@ -122,7 +120,7 @@ def test_rock_paper_scissors_uniform():
 # --------------------------------------------------------------- Bayesian games (private types)
 def test_bayesian_game_exploitability_gate():
     """K=2 x J=2 fixed-payoff Bayesian game with a CORRELATED joint belief: exploitability of the
-    averaged strategies passes a tight gate, and more iterations make it smaller (§15.1)."""
+    averaged strategies passes a tight gate, and more iterations make it smaller."""
     rng = np.random.default_rng(0)
     u = rng.normal(size=(2, 2, 3, 3))
     rho = RHO_2x2
@@ -137,7 +135,7 @@ def test_bayesian_game_exploitability_gate():
 
 
 def test_information_restriction_strategies_cannot_see_the_other_type():
-    """Sanity pin for §19.3: our solved strategy has shape [K, A] — one row per OUR type. If two
+    """Strategy shape: our solved strategy has shape [K, A] — one row per OUR type. If two
     of our types are identical in payoff and belief, their rows must coincide (nothing else could
     distinguish them), even though the OPPONENT's types differ wildly."""
     u = np.zeros((2, 2, 2, 2))
@@ -197,7 +195,7 @@ def test_frozen_posterior_never_bluffs():
 
 # ----------------------------------------------------------------- floors, elimination, updates
 def test_floor_never_survives_into_the_answer():
-    """Settled decision 24: action a=1 is strictly dominated for every type; the averaged output
+    """Dominated actions: action a=1 is strictly dominated for every type; the averaged output
     must carry (essentially) no probability on it even though the in-solve play was floored."""
     u = np.zeros((1, 1, 2, 2))
     u[..., 0, :] = 1.0
@@ -222,7 +220,7 @@ def test_floored_strategy_rows_and_zeros():
 
 
 def test_behavior_update_floor_keeps_wrong_model_candidates_alive():
-    """§7.2 safety rule 1: the model said 'type 1 never plays a=0'; type 1 must survive observing
+    """The model said 'type 1 never plays a=0'; type 1 must survive observing
     a=0 (shrunk, not destroyed), because behavior likelihoods are modeled, not mechanical."""
     rho = np.array([[0.5, 0.0], [0.5, 0.0]])
     avail1 = np.ones((2, 2), dtype=bool)
@@ -236,7 +234,7 @@ def test_behavior_update_floor_keeps_wrong_model_candidates_alive():
 
 def test_behavior_update_eliminates_on_missing_label_and_reports_death():
     """Elimination stays exact when the label is UNAVAILABLE (mechanical), and a fully
-    contradicted table reports alive=False with the input unchanged (§7.4 never-empty guard)."""
+    contradicted table reports alive=False with the input unchanged."""
     rho = np.array([[0.5], [0.5]])
     avail1 = np.array([[True, True], [True, False]])   # type 1 cannot play a=1
     sigma1 = floored_strategy(np.array([[0.5, 0.5], [1.0, 0.0]]), avail1, floor=0.02)
@@ -260,7 +258,7 @@ def test_solver_is_deterministic():
 
 
 def test_policy_prior_initialization_washes_out():
-    """§10.2: initialization is not anchoring. A wildly wrong prior (always the dominated action)
+    """Initialization is not anchoring. A wildly wrong prior (always the dominated action)
     must not survive linear-weighted averaging."""
     u = np.zeros((1, 1, 2, 2))
     u[..., 0, :] = 1.0
@@ -271,7 +269,7 @@ def test_policy_prior_initialization_washes_out():
     assert sol.sigma1[0, 0] > 0.99
 
 
-# ------------------------------------------------- random-iteration snapshot (Phase G1, §9.3)
+# ------------------------------------------------- random-iteration snapshot
 def test_snapshot_absent_without_seed():
     u, rho, a1, a2 = _matrix_game([[1.0, -1.0], [-1.0, 1.0]])
     sol = two_sided_regret_solve(lambda x, y: u, rho, a1, a2, iters=100)
@@ -282,7 +280,7 @@ def test_snapshot_absent_without_seed():
 def test_snapshot_is_the_current_strategy_values_fn_received():
     """The snapshot must be EXACTLY the floored per-iteration pair passed to values_fn at the
     reported iteration — that is what makes posteriors under it 'beliefs the values were queried
-    at' (§9.3 mitigation 2), and it is NOT the averaged answer."""
+    at', rather than the averaged answer."""
     u, rho, a1, a2 = _matrix_game([[2.0, -1.0], [-1.0, 1.0]])
     seen: list[tuple[np.ndarray, np.ndarray]] = []
 
@@ -301,7 +299,7 @@ def test_snapshot_is_the_current_strategy_values_fn_received():
 
 def test_snapshot_draw_is_uniform_and_deterministic():
     """Reservoir sampling: over many seeds the drawn iteration is roughly uniform on
-    [1, iters] (early AND late iterations both appear — the coverage §9.3 asks for), and a
+    [1, iters] (both early and late iterations appear), and a
     repeated seed reproduces the same snapshot exactly."""
     u, rho, a1, a2 = _matrix_game([[1.0, -1.0], [-1.0, 1.0]])
     draws = [two_sided_regret_solve(lambda x, y: u, rho, a1, a2, iters=64,

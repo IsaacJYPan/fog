@@ -114,8 +114,8 @@ class PoolTruth:
         return self._truth[candidates[0]].copy() if len(candidates) == 1 else None
 
     def consistent_indices(self, views) -> list[int]:
-        """Pool indices of EVERY team consistent with the revealed per-slot views (the exact
-        enumeration source for legacy joint search, ARCHITECTURE.md S6). Unlike `match_views` this does not
+        """Pool indices of every team consistent with the revealed per-slot views (the exact
+        enumeration source for legacy joint search). Unlike `match_views` this does not
         require uniqueness: before anything distinguishing is revealed it returns the whole pool.
         No revealed views => everything is consistent."""
         revealed = [v for v in views if v.species is not None and int(v.species) >= 0]

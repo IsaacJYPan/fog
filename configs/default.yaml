@@ -1,18 +1,18 @@
 # Base config. Every experiment yaml inherits these and overrides a subset.
-# Every run is fully reproducible from (this resolved config + seed). The loader records a config hash.
+# The loader records a hash of the resolved config.
 
 seed: 0
 device: cuda
 mixed_precision: true
 
-# --- Pinned external sources (reproducibility; §0) -------------------------------------------------
+# --- Pinned external sources (pinned versions) -------------------------------------------------
 pins:
   showdown_commit: e440c4a18385274f10c405d0b158b6a962ce6d94
   ou_banlist_date: "2026-06"   # metagame snapshot the usage month corresponds to
   usage_month: "2026-06"       # Smogon chaos month (data/usage + generated spreads/priors)
   usage_rating_cut: 1695       # gen9ou chaos rating bucket
 
-# --- Simulator / environment (§0, §10 M0) ----------------------------------------------------------
+# --- Simulator / environment  ----------------------------------------------------------
 env:
   # Direct is the default research backend: each rollout process owns one persistent local
   # Showdown worker, while observations still pass through poke-env's ordinary censored parser.
@@ -37,7 +37,7 @@ env:
   # disambiguate).
   concurrent_battles: 1
 
-# --- Encoding (§2) ---------------------------------------------------------------------------------
+# --- Encoding ---------------------------------------------------------------------------------
 encoding:
   history_cap: 60              # turns; pad/truncate from the front
   # Three-part backbone: public current-state MLP, public causal history, private-team MLP.
@@ -49,7 +49,7 @@ encoding:
   state_dim: 256               # private-state context (legacy caller name: s_board)
   dyn_dim: 256                 # fused public context (legacy caller name: c_dyn)
 
-# --- Model (§3) ------------------------------------------------------------------------------------
+# --- Model ------------------------------------------------------------------------------------
 model:
   history_transformer_layers: 2
   history_heads: 4
@@ -57,14 +57,14 @@ model:
   belief_decoder_layers: 2     # legacy key; current set-AR team encoder is two layers
   belief_dim: 128              # belief/self-belief set-encoder width d
   aux_into_trunk: true         # belief losses train current/history encoders + public fusion
-  oracle: none                 # {none, set, action} — §3.4 evaluation ceilings
+  oracle: none                 # {none, set, action} — evaluation ceilings
 
 # --- Losses / training shared ----------------------------------------------------------------------
 loss:
   value_coef: 0.5
-  belief_coef: 1.0              # marginal CE: calibrates the diagnostic/leakage marginal forward (§8.2)
+  belief_coef: 1.0              # marginal CE: calibrates the diagnostic/leakage marginal forward
   self_belief_coef: 1.0
-  belief_chain_coef: 1.0        # matched set-AR next-field CE; shapes c_dyn (§3.6)
+  belief_chain_coef: 1.0        # matched set-AR next-field CE; shapes c_dyn
   self_belief_chain_coef: 1.0
   preview_coef: 0.5
 

@@ -33,7 +33,7 @@ class Observation:
       history_state   [T, 14] individual boost stages of both start-of-turn actives
       history_len     scalar (true T before front-padding)
       legality_mask   [14] bool         -- from the request JSON, never learned
-      belief_labels   optional dict     -- censored ground-truth for aux losses (§3.2, §5)
+      belief_labels   optional dict     -- censored ground-truth for auxiliary losses
     """
 
     entities: np.ndarray

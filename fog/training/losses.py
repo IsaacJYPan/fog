@@ -74,7 +74,7 @@ def masked_cross_entropy(
 def belief_loss(
     attr_logits: dict, attr_targets: dict, attr_valid: dict, stats: dict | None = None
 ) -> torch.Tensor:
-    """Sum of masked CEs across all belief attributes (§3.2). `attr_valid` carries the censoring;
+    """Sum of masked CEs across all belief attributes. `attr_valid` carries the censoring;
     `stats` threads through to masked_cross_entropy's dropped-entry counter."""
     total = None
     for name, logits in attr_logits.items():

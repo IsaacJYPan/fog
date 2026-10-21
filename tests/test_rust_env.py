@@ -1,4 +1,4 @@
-"""Tests for the poke-engine adapter (plan §7). Skipped when poke-engine isn't installed."""
+"""Tests for the poke-engine adapter. Skipped when poke-engine isn't installed."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -59,7 +59,7 @@ def test_fuzz_trajectory_runs():
     traj2 = engine_trajectory(_paste("team1_balance.txt"), _paste("team3_bulky.txt"),
                               seed=7, max_turns=20)
     assert diff_trajectories(traj, traj2) == {}
-    # perturbations are detected and CLASSIFIED (the plan §5 divergence-by-cause requirement)
+    # perturbations are detected and CLASSIFIED by cause
     import copy
 
     traj3 = copy.deepcopy(traj)

@@ -1,4 +1,4 @@
-# M5 — Evaluation (§9): gauntlet vs baselines with Wilson CIs + oracle-gap closure.
+# Evaluate against scripted baselines and measure the oracle gap.
 #   python -m fog.eval.run_eval --config configs/eval_ou.yaml --ckpt runs/train_ou/checkpoints/ppo_final.pt \
 #       --bc-ckpt runs/bc_ou/checkpoints/bc_final.pt
 extends: default.yaml
@@ -16,8 +16,8 @@ eval:
   # what any reader could gain — the oracle is handed the truth, concealment cannot deny it).
   # Concealment's payoff channel is the learned reader in --lvn, not this entry.
   include_reading_opponent: true
-  lvn_games: 3000                  # --lvn head-to-head games (§7a; paired team schedule, sides swapped)
-  readability:                     # --readability (§7b/§7c): fresh-probe report
+  lvn_games: 3000                  # --lvn head-to-head games (paired teams, sides swapped)
+  readability:                     # --readability: fresh-probe report
     games: 200
     opponent: SimpleHeuristics
     probe_epochs: 8

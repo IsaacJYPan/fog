@@ -6,7 +6,7 @@ trunk drifted between refreezes the frozen head received out-of-distribution sta
 meaning "readability", and the agent could look opaque by moving its representations instead of its
 behavior. The probe closes that hole: every ΔI measurement runs end-to-end inside frozen weights.
 
-`TrainableProbe` is the independent "fresh predictor" (§7 watchdog + §9 readability eval): same
+`TrainableProbe` is the independent readability predictor: same
 architecture, separate weights, trained only to read the agent — never used for reward. Its CE vs the
 frozen probe's CE is the staleness-exploitation detector; trained from scratch on eval rollouts it is
 the readability curve measurement.
@@ -29,7 +29,7 @@ def _backbone_kwargs(batch: dict) -> dict:
 
 
 class FrozenProbe(nn.Module):
-    """Φ̂: frozen (backbone + self-belief) pair. Built via `from_agent`; refrozen on the §7 schedule."""
+    """Φ̂: frozen (backbone + self-belief) pair. Built via `from_agent`."""
 
     def __init__(
         self, backbone: nn.Module, private_to_belief: nn.Module, predictor: nn.Module
@@ -80,9 +80,9 @@ class TrainableProbe(nn.Module):
     """An independent reader of the agent: fresh backbone + self-belief predictor, same sizes.
 
     Used two ways:
-      * inside the §6/§7 training loop, fit on each rollout batch's opp_view so `fresh_ce` tracks how
+      * during training, fit on each rollout batch's opp_view so `fresh_ce` tracks how
         readable the CURRENT agent is to an up-to-date adversary (staleness watchdog input);
-      * in §9 eval, trained from scratch on collected trajectories of a finished checkpoint
+      * in evaluation, trained from scratch on collected trajectories of a finished checkpoint
         (the readability curve). Never used for reward.
     """
 

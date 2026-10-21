@@ -1,4 +1,4 @@
-"""Cross-simulator fuzz harness (ARCHITECTURE.md §3.2): poke-engine vs local Showdown.
+"""Cross-simulator fuzz harness: poke-engine vs local Showdown.
 
 PPO will farm any mechanic the fast simulator gets wrong, so before poke-engine enters the training
 loop, run the same seeded games through BOTH simulators and diff the per-decision trajectories.
@@ -19,8 +19,8 @@ fields: the legality MASK (choice lock / disable / trapping / forced-switch mode
     python -m fog.scripts.fuzz_sim --games 200 --pool data/teams/pool_b --showdown-direct
 
 Divergences are EXPECTED (the engine approximates; known gaps in fog/env/engine_battle.py's
-docstring and KNOWN_ISSUES); what matters is the rate and which mechanics. Per plan §5: patch
-upstream, exclude from team pools, or accept + document. The online control during engine training
+docstring and KNOWN_ISSUES). Reports identify the differing mechanics so they can be
+fixed, excluded from team pools, or recorded as known limitations. The online control during engine training
 is the cross-sim gauntlet (fog/eval/cross_sim.py, halt at >3% win-rate gap).
 """
 from __future__ import annotations
@@ -280,7 +280,7 @@ def diff_trajectories(a: list[dict], b: list[dict], hp_tol: float = 0.15) -> dic
 
 # -------------------------------------------------------------------------------------- main
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Cross-sim fuzz (ARCHITECTURE.md §3.2).")
+    ap = argparse.ArgumentParser(description="Cross-simulator trajectory comparison.")
     ap.add_argument("--games", type=int, default=50)
     ap.add_argument("--pool", type=Path, default=Path("data/teams/pool_b"))
     ap.add_argument("--seed", type=int, default=0)
@@ -345,7 +345,7 @@ def main() -> None:
             "sampled independently per sim and compound, surfacing as late 'hp'/'status'(fnt)/"
             "'schedule' causes. The mechanic signals are 'mask' at ANY turn (legality modeling: "
             "choice lock/trapping/disable) and hp/species/status divergence at turn 1-2 "
-            "(type chart, abilities, items). Per plan §5: patch upstream, exclude from pools, or "
+            "(type chart, abilities, items). Fix upstream, exclude from pools, or "
             "document in KNOWN_ISSUES — and keep the cross-sim gauntlet halt rule on for training."
         )
         summary = {

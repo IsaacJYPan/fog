@@ -75,7 +75,7 @@ class OpeningSolveCache:
     executable), both candidate token sets, the rounded rho, and the search kwargs. Exact-hit-
     only semantics: any difference is a miss, never an approximation. The runner re-samples the
     executed action from the stored distribution with the CURRENT game's rng, so exact sampling
-    of the solved strategy (invariant 19.7) is untouched."""
+    of the solved strategy is untouched."""
 
     def __init__(self) -> None:
         self._store: dict[tuple, Any] = {}
@@ -235,19 +235,18 @@ def play_and_log_pb_games(
 
     `flush_every` > 0 (with `out_path`): every N completed games, atomically rewrite the shard
     with the rows so far (meta carries partial=True + games_completed) and print a one-line
-    heartbeat. A killed run keeps its completed games — an overnight batch must never be a
-    single all-or-nothing save (the G0 session-death lesson). Default 0 = off (tests, small
-    in-process calls).
+    heartbeat. Interrupted runs retain their completed games. Default 0 disables
+    incremental saving.
 
     Row fields: game_id, turn, role, obs (deployment input), action, action_dist (the
     distillation target), labels1/labels2, sigma1, sigma2, rho, true_index (our k* on the row's
     KEPT own axis), opp_true_index (the opponent's j* on the row's KEPT opp axis, -1 if off-pool
     or truncated out this decision), own_tokens [K,6,15] / opp_tokens [J,6,15] (the KEPT candidate
-    identities rho indexes — the Phase-G value trainer embeds these and labels V[k*, j*] with
+    identities rho indexes — the value trainer embeds these and labels V[k*, j*] with
     the outcome), own_kept / opp_kept (full-pool indices behind those axes) with
-    dropped_own_mass / dropped_opp_mass (G2 truncation accounting), j_used, sims_run,
+    dropped_own_mass / dropped_opp_mass (truncation accounting), j_used, sims_run,
     iterations, converged, pruned_mass_max, queried_beliefs, sample_beliefs / sample_iteration
-    (the G1 random-iteration mid-solve posteriors, §9.3 mitigation 2), outcome (+1/-1/0 for
+    (posteriors from one random solver iteration), outcome (+1/-1/0 for
     `role`, backfilled at game end), truncated (True when the game hit `max_decisions` — its
     outcome 0 is an artifact, not a draw; the value trainer must drop those rows). `meta` also
     carries `opp_pool_tokens` and `search_kwargs`. Trivial one-legal-action decisions are
@@ -282,7 +281,7 @@ def play_and_log_pb_games(
                 np.log(np.asarray(own0.weights, dtype=np.float64)),
                 np.zeros(len(opp_pool_tokens)) - np.log(len(opp_pool_tokens)))
         # j*: the opponent's TRUE team index in the pool the belief axis is built over — the
-        # Phase-G value label is V[k*, j*] ~= outcome. -1 when the real opponent team is not in
+        # The value label is V[k*, j*] ~= outcome. -1 when the real opponent team is not in
         # `opp_pool_tokens` (an off-pool opponent); the value trainer drops those rows.
         opp_truth = np.asarray(battle.truth_tokens(opp_role), dtype=np.int64)
         opp_true_index = next(
@@ -326,9 +325,8 @@ def play_and_log_pb_games(
                                    "eliminated — a reveal-census bug")
             table.mechanical_step(keep_own=keep_own, keep_opp=keep_opp)
 
-        # Leads are public before the first decision — apply their evidence now, both so rho is
-        # honest and so pb_search never forks a lead-inconsistent own candidate (G2: the fork's
-        # species matching silently degrades on reveal-inconsistent worlds).
+        # Apply lead reveals before search: a contradicted candidate cannot be
+        # matched coherently to the engine's active species when forking.
         _mechanical("initial mechanical step")
 
         game_rows: list[dict] = []
@@ -448,7 +446,7 @@ def play_and_log_pb_selfplay_games(
     solve_cache: OpeningSolveCache | None = None,
     flush_every: int = 0,
 ) -> list[dict]:
-    """Shared-solve self-play (Phase I.2; module docstring).
+    """Shared-solve self-play; see the module docstring.
 
     At simultaneous decisions one call to ``pb_search_action`` produces both strategies; the
     second strategy is mirrored into the other player's result and is the one actually sampled.

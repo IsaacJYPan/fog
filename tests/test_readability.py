@@ -1,4 +1,4 @@
-"""Tests for the §7b/§7c readability eval driver (server-free parts)."""
+"""Tests for the readability evaluation driver (server-free parts)."""
 from __future__ import annotations
 
 import numpy as np

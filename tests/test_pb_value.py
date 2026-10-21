@@ -1,9 +1,7 @@
-"""PBValueNet architecture gates (PROJECT_DESIGN_PROPOSAL.md §9.1 required properties).
+"""Public-belief value-network tests on hand-built tensors.
 
-These are hand-built tensor tests — no engine, no backbone — so each §9.1 property is checked in
-isolation. The load-bearing ones are permutation-equivariance (property 5) and belief-conditioning
-responsiveness (property 3): the first guarantees particle order is irrelevant, the second is the
-entire reason the network takes the belief at all (a value blind to rho is the §5.1 degenerate mode).
+Check candidate permutation equivariance and sensitivity to belief changes without
+a simulator or backbone.
 """
 import torch
 
@@ -72,7 +70,7 @@ def test_permutation_equivariance_over_opp_particles():
 
 def test_belief_conditioning_is_wired():
     """Property 3: V must actually respond to rho. Same board and same candidate teams, two different
-    beliefs -> the value table must differ. A network that ignored rho would be the §5.1 collapse."""
+    beliefs -> the value table must differ. A network that ignored rho would be belief-independent values."""
     net = _net()
     s_board, c_dyn, own, opp, rho = _inputs(L=3, K=3, J=4)
     gen = torch.Generator().manual_seed(99)

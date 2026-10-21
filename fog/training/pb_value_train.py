@@ -1,23 +1,13 @@
-"""PBValueNet outcome training on two-sided decision logs (ARCHITECTURE.md S2).
+"""Train PBValueNet on played leaves from two-sided decision logs.
 
-The training target: at each public leaf actually reached, the net's per-pair table should price
-the TRUE cell — V[k*, j*] ≈ outcome — one labeled cell per example; off-diagonal cells are shaped by
-cross-example generalization (recorded G3 honesty note; the exact treatment — solver continuation
-values at queried beliefs — is the gated bootstrapping step, Phase I.6).
+Each example labels the true candidate pair, V[k*, j*], with the game outcome.
+Other candidate pairs learn through generalization. The leaf and its belief must
+be recorded together after the played actions; a root board paired with a later
+hypothetical belief would give the model inconsistent inputs.
 
-The public leaf and its belief are recorded together after the played actions and their truthful
-mechanical evidence. Hypothetical solver beliefs remain evaluation inputs only until a matching
-hypothetical leaf and a valid continuation target are available. Reusing the root board with those
-beliefs is forbidden: it creates internally inconsistent examples and encourages the net to ignore
-belief.
-
-Row filtering (G3 spec): rows with j* = -1 (off-pool or truncated-out opponent) and rows of
-cap-truncated games (outcome 0 is an artifact) are dropped at dataset build.
-
-The agent's trunk supplies private-state and public-context tensors per leaf — computed once and
-trunk is FROZEN here; only PBValueNet trains). Rows carry per-decision candidate sets, so the v1
-trainer runs one forward per row (L = 1); bucketing rows that share candidate sets is the known
-optimization if profiling demands it.
+Dataset construction drops off-pool opponents, truncated-out candidates, and
+cap-truncated games. The agent trunk is frozen and cached; only PBValueNet trains.
+Candidate sets vary per decision, so this trainer evaluates one row at a time.
 
     python -m fog.training.pb_value_train --data runs/pb_datagen_a \
         --ckpt runs/g0_v2_champion/checkpoints/ppo_final.pt --out runs/pb_value_g1
@@ -92,7 +82,7 @@ def build_pb_value_rows(path: str | Path) -> list[dict]:
 def public_only_ablation_rows(rows: list[dict]) -> list[dict]:
     """Destroy candidate identity and belief information while preserving each public board.
 
-    This creates the G4 public-history-only control. It is trained from scratch with the same
+    This creates the public-history-only control. It is trained from scratch with the same
     optimizer, split, seed, and architecture as the full model; merely zeroing inputs at evaluation
     would test robustness to an out-of-distribution corruption rather than whether the extra inputs
     improve generalization.
@@ -202,10 +192,10 @@ def main() -> None:
     from fog.models.agent import FogAgent
     from fog.models.pb_value import PBValueNet
 
-    ap = argparse.ArgumentParser(description="PBValueNet outcome training (Phase G3).")
+    ap = argparse.ArgumentParser(description="PBValueNet outcome training.")
     ap.add_argument("--data", type=Path, required=True, help="v2 shard file or directory")
     ap.add_argument("--ckpt", type=str, default=None,
-                    help="agent checkpoint for the frozen trunk (the G0 champion); "
+                    help="agent checkpoint for the frozen trunk; "
                          "default: random weights (smoke only)")
     ap.add_argument("--config", type=str, default="configs/default.yaml")
     ap.add_argument("--out", type=Path, default=Path("runs/pb_value_train"))
@@ -218,7 +208,7 @@ def main() -> None:
     ap.add_argument(
         "--public-only-ablation",
         action="store_true",
-        help="train the matched G4 control with candidate identities and belief weights removed",
+        help="train the matched public-history control with candidate identities and belief weights removed",
     )
     args = ap.parse_args()
 

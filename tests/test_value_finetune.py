@@ -99,7 +99,7 @@ def test_load_posterior_agent_expands_and_rejects(tmp_path):
 
 # ------------------------------------------------------------------------------- fine-tune core
 def test_fit_gate_prefers_posterior_when_signal_exists():
-    """The §4.2 regression in miniature: outcomes driven by a posterior feature must give the
+    """Posterior-dependent fitting: outcomes driven by a posterior feature must give the
     aware head a lower held-out MSE than the blind head trained identically."""
     torch.manual_seed(2)
     n, d = 512, 16

@@ -9,7 +9,7 @@ ppo:
   total_decisions: 2000000
   bc_anchor_ckpt: runs/bc_ou/checkpoints/bc_final.pt
   kl_anchor_coef: 0.02
-  kl_anchor_decisions: 2000000     # anneal window (first 2M decisions), per §6
+  kl_anchor_decisions: 2000000     # anneal window (first 2M decisions)
 loss:
   belief_coef: 1.0
   value_coef: 0.5

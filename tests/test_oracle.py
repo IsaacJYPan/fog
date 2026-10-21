@@ -1,4 +1,4 @@
-"""Oracle variants (§3.4): set oracle rewrites belief input to truth; action oracle augments s."""
+"""Oracle variants: set oracle rewrites belief input to truth; action oracle augments s."""
 from __future__ import annotations
 
 import numpy as np

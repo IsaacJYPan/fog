@@ -1,4 +1,4 @@
-"""Field record [D_field=51] (spec §2.2 + 2026-07 encoding audit).
+"""Field record [D_field=51].
 
 Layout (DIMS order): weather one-hot(5)+elapsed | terrain one-hot(5)+elapsed | per-side hazards(2x6)
 | per-side screens(2x5) | trick room(2) | turn/50 | forced-switch flags(2) | delayed effects(10)

@@ -1,4 +1,4 @@
-"""Engine-backed determinized search tests (§8): fork censoring/isolation, stepper leaf
+"""Engine-backed determinized search tests: fork censoring/isolation, stepper leaf
 semantics (fix 1: leaves under fog), end-to-end action selection. Skipped without poke-engine."""
 from __future__ import annotations
 

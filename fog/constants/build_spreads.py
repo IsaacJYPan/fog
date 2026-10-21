@@ -1,21 +1,12 @@
-"""Build SPREADS[species] via k-means on nature-modified stat vectors.
+"""Cluster usage spreads by nature-modified stats.
 
-For each species: cluster the (nature-modified stat vector) from the Smogon chaos *detailed* usage
-file, weighted by usage share, into <=16 clusters. Merge clusters whose representative stats differ by
-<4 points in every stat. Persist cluster -> representative spread; include <OTHER_SPREAD>.
+Weighted k-means groups each species' Smogon chaos spreads into at most 16 clusters,
+then merges representatives within four points in every stat. Saved tables map each
+cluster to a representative spread and include an <OTHER_SPREAD> fallback.
 
-Verification (test): cluster-representative stats reproduce the listed usage stats within 4 points; and
-damage-calc delta between true and clustered spreads has 95th percentile < 6% over 10k sampled
-matchups (justifies the only lossy step in the encoding — §2.1). The damage-delta check needs a damage
-calculator and runs as part of the M1.5 gate, not here.
-
-Chaos-file spread keys look like "Modest:0/0/0/252/4/252" (nature : HP/Atk/Def/SpA/SpD/Spe EVs);
-`parse_chaos_spread` converts them. IVs are not in the chaos files — assume 31 across the board (the
-rare 0-Atk/0-Spe sets differ by a few points; that error is inside the merge threshold).
-
-The k-means here is a ~30-line weighted implementation (k-means++ init, fixed seed) rather than
-sklearn: n <= a few hundred spreads per species, and determinism from an explicit seed is worth more
-than library speed.
+Chaos keys use nature:HP/Atk/Def/SpA/SpD/Spe EVs. IVs are unavailable, so stats assume
+31 in each slot; unusual zero-IV sets can therefore differ substantially. The small
+weighted k-means implementation uses explicit seeded initialization.
 """
 from __future__ import annotations
 

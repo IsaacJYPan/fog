@@ -1,4 +1,4 @@
-"""Engine-side scripted opponents (ARCHITECTURE.md §3.2).
+"""Engine-side scripted opponents.
 
 League ports of the poke-env scripted baselines for engine self-play. Only behaviors expressible
 on engine state are ported:

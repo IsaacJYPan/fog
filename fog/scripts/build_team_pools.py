@@ -26,7 +26,7 @@ TEAMS_DIR = Path("data/teams")
 def build(pool: str, battle_format: str = "gen9ou") -> Path:
     src = TEAMS_DIR / f"pool_{pool}"
     if not src.is_dir():
-        raise FileNotFoundError(f"{src} not found (author .txt pastes there first, §4.4)")
+        raise FileNotFoundError(f"{src} not found (add .txt team pastes there first)")
     errors = validate_pool(src, battle_format)
     if errors:
         raise ValueError(f"pool_{pool} has illegal teams:\n  " + "\n  ".join(errors))
@@ -38,7 +38,7 @@ def build(pool: str, battle_format: str = "gen9ou") -> Path:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Validate + package PoC team pools (§4.4).")
+    ap = argparse.ArgumentParser(description="Validate and package team pools.")
     ap.add_argument("--pool", choices=["a", "b", "all"], default="all")
     ap.add_argument("--format", default="gen9ou")
     args = ap.parse_args()

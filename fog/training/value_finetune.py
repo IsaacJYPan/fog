@@ -1,23 +1,10 @@
-"""Posterior-aware value fine-tuning (ARCHITECTURE.md invariant S2).
+"""Fine-tune posterior-aware values on logged search decisions.
 
-The value head is the coupling CONSUMER of joint search: it must price "what does the opponent
-now believe about me" or the joint optimization degenerates to independent per-world searches
-(fog/search/joint.py, design decision 3). Its posterior-features input columns are untrained by
-PPO (search never runs in the training loop), so before any Phase-2 conclusion the head is
-fine-tuned here on real (root observation, executed-action posterior, outcome) triples logged by
-`fog.search.posterior_log`.
-
-Protocol (the §4.2 regression, binding): train TWO copies of the value MLP from the same starting
-weights on the same batches — one seeing the logged posterior features, one seeing zeros (the
-posterior-blind control, exactly what the head computes when features are absent). The gate is
-held-out MSE: aware < blind. Split is BY GAME (decisions within a game share an outcome — a row
-split would leak labels into the holdout). Only the value MLP trains; the trunk/belief/policy are
-frozen, so private state and public context are precomputed once and fine-tuning cannot alter policy.
-
-Checkpoint compatibility: a posterior-blind checkpoint (posterior_dim=0, e.g. the M1.5 run) is
-loaded by zero-padding the first Linear of both head MLPs with the 4 posterior columns
-(`expand_state_dict_for_posterior`) — zero columns are behavior-preserving at zero features, so
-the expanded agent plays byte-identically until the fine-tune gives the new columns weight.
+The value head fits outcomes from root observations and executed-action posterior
+features. A matched control sees zeros in the posterior columns. Both start from
+the same weights and batches; holdout MSE compares them after splitting by game.
+Only the value MLP trains, so its cached trunk inputs and the playing policy stay
+fixed. Posterior-blind checkpoints are expanded with zero columns before training.
 
     python -m fog.training.value_finetune --data runs/posterior_log \
         [--ckpt runs/.../ppo_final.pt] --out runs/value_finetune
@@ -137,7 +124,7 @@ def _split_by_game(games: np.ndarray, holdout_frac: float, seed: int
 def finetune_value(agent: Any, data: dict[str, np.ndarray], *, holdout_frac: float = 0.2,
                    epochs: int = 30, lr: float = 1e-3, batch_size: int = 512, seed: int = 0,
                    precompute_batch: int = 256) -> dict:
-    """The §4.2 fine-tune + regression on a loaded decision log. Mutates `agent` in place
+    """Fine-tune and compare against a posterior-blind control on a decision log. Mutates `agent` in place
     (value MLP <- the posterior-aware fit) and returns the report dict, including
     `gate_passed` = aware held-out MSE < blind held-out MSE."""
     import torch
@@ -195,7 +182,7 @@ def main() -> None:
     from fog.models.agent import FogAgent
     from fog.search.posterior_log import load_decisions
 
-    ap = argparse.ArgumentParser(description="Posterior-aware value fine-tune (§4.2).")
+    ap = argparse.ArgumentParser(description="Posterior-aware value fine-tune.")
     ap.add_argument("--data", type=Path, required=True,
                     help="posterior_log output dir (or decisions.npz)")
     ap.add_argument("--ckpt", type=str, default=None,

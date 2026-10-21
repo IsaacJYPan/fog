@@ -7,7 +7,7 @@ stacking mistakes). The env side only has to do:
     buf = RolloutBuffer(gamma=1.0, lam=0.95, beta=cfg_beta)
     g = buf.start_game()
     ... per decision point:
-        buf.add_decision(g, frag, action=a, log_prob=lp, value=v, leak_delta=dI)  # dI from §7 Φ̂
+        buf.add_decision(g, frag, action=a, log_prob=lp, value=v, leak_delta=dI)  # dI from the frozen probe
     buf.end_game(g, outcome=+1.0 or -1.0, faints_bonus=0.0)
     ... when buf.n_decisions >= cfg batch size:
         batch = buf.to_batch(device); ppo_update(agent, opt, batch, cfg); buf.clear()
@@ -18,9 +18,9 @@ batch dim) — for FogAgent that is the C3 keys (entities [12,D], ..., legality_
 opp_revealed{tokens[6,15], masks{...}}, optional opp_view{...}) plus optional label dicts
 (belief_targets/belief_valid/...). `to_batch` stacks fragments recursively into [N, ...] tensors;
 the special key "history" ([T_i, D_turn], variable T_i) is front-padded to the longest T in the
-batch (front-padding is the spec §2.3 convention — most recent turn always last).
+batch, with the most recent turn always last.
 
-Reward layout (spec §6/§7): every step gets the leakage shaping −β·max(0, ΔI_t) (zero when β=0 or
+Reward layout: every step gets the leakage shaping −β·max(0, ΔI_t) (zero when β=0 or
 no leak); the LAST step additionally gets the terminal ±1 outcome and the optional per-opposing-
 faint bonus. γ=1, GAE bootstrap value at episode end is 0 (episodes are finite and terminal).
 """
@@ -42,7 +42,7 @@ class _Game:
     log_probs: list[float] = field(default_factory=list)
     values: list[float] = field(default_factory=list)
     leak_deltas: list[float] = field(default_factory=list)
-    # frozen-Φ̂ self-readability CE per decision (§7). When present, per-step ΔI (how much more
+    # frozen-Φ̂ self-readability CE per decision. When present, per-step ΔI (how much more
     # readable I became this turn) is derived as ce[t]-ce[t+1] at batch time; `final_leak_ce`
     # (measured after the battle ends) closes the last step so end-of-game reveals count too.
     leak_ce: list[float] = field(default_factory=list)
@@ -55,7 +55,7 @@ class _Game:
     # the belief net conditions on the running reveal state so the SAME final target is a valid
     # (censored, in the replay sense) label at every turn.
     belief_targets: np.ndarray | None = None  # [6,15] opponent truth tokens, -1 = no label
-    # team-preview pick (§3.1 head, trained as a bandit on the game outcome)
+    # team-preview pick (trained as a bandit on the game outcome)
     preview: dict | None = None               # {"frag": {...}, "slot": int, "log_prob": float}
 
 
@@ -68,7 +68,7 @@ class RolloutBuffer:
         clip_deltas: bool = True,
         progress_coef: float = 0.0,
     ) -> None:
-        """`clip_deltas`: True = penalize max(0, ΔI) per step (§7 default); False = signed ΔI,
+        """`clip_deltas`: True = penalize max(0, ΔI) per step; False = signed ΔI,
         whose per-game sum telescopes to CE_first − CE_final (estimator ablation — see
         training.leakage.shaped_reward for why the clipped form is biased by probe-CE noise)."""
         self.gamma = gamma
@@ -116,7 +116,7 @@ class RolloutBuffer:
         )
 
     def add_preview(self, game: int, frag: dict, *, slot: int, log_prob: float) -> None:
-        """Record the team-preview pick for `game` (one per game; §3.1 bandit training)."""
+        """Record the team-preview pick for `game` (one per game, trained as a bandit)."""
         g = self._games[game]
         if g.outcome is not None:
             raise RuntimeError(f"game {game} already ended — preview would leak across games")
@@ -224,7 +224,7 @@ class RolloutBuffer:
             t = len(g.frags)
             game_ids.extend([game_id] * t)
             # ΔI_t = ce[t]-ce[t+1] (readability increase) when Φ̂ CE was recorded; else stored deltas.
-            # Moving-mask estimator (§7, canonical — see training.leakage.delta_information): each
+            # Moving-mask estimator (see training.leakage.delta_information): each
             # CE sums over the attrs still hidden AT THAT measurement, so a hard reveal between t
             # and t+1 contributes its full surprisal under Φ̂ at time t. The post-game measurement
             # (final_leak_ce) closes the last step; without it the final decision's leak is 0.
@@ -349,7 +349,7 @@ class RolloutBuffer:
             batch["belief_targets"] = targets
             batch["belief_valid"] = valid
 
-        # opp_view (mirror) plumbing for self-belief training (§3.3): the mirror frag omits the
+        # opp_view (mirror) plumbing for self-belief training: the mirror frag omits the
         # public turn history (identical to the primary observation) — alias it here instead of
         # storing it twice; then surface the my_view labels as the C4 self-belief targets so
         # ppo_update's self-belief branch fires.
@@ -363,7 +363,7 @@ class RolloutBuffer:
             if labels:
                 from fog.models.self_belief import still_hidden_from_tokens
 
-                # §4.3 again: only MY attrs the opponent still can't see are trainable leakage
+                # Only my attributes the opponent still can't see are trainable leakage
                 # targets; the ones they've already seen are delta rows.
                 hidden = still_hidden_from_tokens(
                     opp_view["my_view"].get(
@@ -385,7 +385,7 @@ class RolloutBuffer:
                     valid[family] = family_valid
                 batch["self_belief_valid"] = valid
 
-        # preview sub-batch (§3.1): one row per game that recorded a preview pick. NOT per-decision —
+        # preview sub-batch: one row per game that recorded a preview pick. NOT per-decision —
         # ppo_update handles it outside the minibatch loop.
         previews = [g for g in games if g.preview is not None]
         if previews:
@@ -444,7 +444,7 @@ def _stack_frags(frags: list[dict], device=None) -> dict:
 
 
 def _stack_histories(histories: list, device=None, dtype=torch.float32) -> torch.Tensor:
-    """[T_i, D] with varying T_i -> [N, T_max, D], FRONT-padded with zeros (§2.3: recent turn last)."""
+    """[T_i, D] with varying T_i -> [N, T_max, D], front-padded with zeros (recent turn last)."""
     tensors = [torch.as_tensor(h, dtype=dtype) for h in histories]
     t_max = max(1, max(h.shape[0] for h in tensors))
     d = tensors[0].shape[1]

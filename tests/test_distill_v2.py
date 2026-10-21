@@ -1,4 +1,4 @@
-"""distill v2 reading (fog/training/distill.py, PROPOSAL_IMPL_PLAN Phase I.1): pb_log rows
+"""Distillation v2 reading (fog/training/distill.py): pb_log rows
 convert to the v1 column contract, the action-conditioned own posterior backs the features,
 cap-truncated games are dropped, and a real v2 shard distills end-to-end."""
 from __future__ import annotations

@@ -1,27 +1,13 @@
-"""Interim scalar leaf values for the two-sided search.
+"""Scalar-head leaf values for two-sided search.
 
-Bridges a simulated PBGrid to `two_sided_regret_solve`'s `values_fn` contract using the EXISTING
-value head. It is retained so the two-sided machinery can run end-to-end and expose
-information-flow defects; the real public-belief value network consumes candidate identities and
-the full joint weights.
+The policy's value head receives private/public encodings and four concentration
+features of the own-side posterior. It can respond to changing beliefs, but these
+features omit candidate identities and the full joint weights. The per-pair value
+network in `pb_value_fn` carries those inputs explicitly.
 
-What is interim here, named precisely:
-
-  * The leaf evaluator is the small policy/value head on `(private_state, public_context, four
-    posterior features)`. Four concentration numbers cannot say which candidate teams retain
-    probability; they only make leaf values react to the solver's changing posterior at all.
-  * The features summarize the OWN-side margin of the public-observation posterior (what the opponent
-    would now believe about us), evaluated at the leaf's own candidate index — the same semantics
-    the frozen one-sided baseline fed its head, so its §4.2 value fine-tune transfers.
-  * Public chance likelihood and reveal evidence condition those four features, but candidate
-    identities and the full joint weights are still absent from this interim head.
-
-Cost model (invariant 19.13): the expensive parts — engine simulation (already inside the grid)
-and the backbone trunk over all leaves — happen ONCE here at construction. Each solver iteration
-re-runs only the small head, and when the agent has no posterior-features input at all the u
-tensor is computed once and reused (leaf values cannot react to the posterior, so iterating the
-head would be waste — that configuration is the §18 degenerate mode, pinned by the baseline's
-tests, useful only as a contrast arm).
+Simulation and backbone encodings are cached once per decision. Solver iterations
+recompute posterior features and run the small head. If the head has no trained
+posterior inputs, its values are static and are cached too.
 """
 from __future__ import annotations
 
@@ -52,7 +38,7 @@ def _posterior_features(post_own: Array, k_index: int) -> Array:
 
 @dataclass
 class GridValueStats:
-    """Reported per decision (proposal §15 asks for honest budget accounting)."""
+    """Simulation and network work per decision."""
     leaves: int                  # live leaf observations behind the u tensor
     failed_cells: int            # simulation failures — their u entries are `fallback_value`
     trunk_forwards: int          # backbone batches run at construction (once)
@@ -76,8 +62,8 @@ def make_grid_values(
 
     `rho` is the decision's root joint belief (`JointBeliefTable.normalized()`): the per-leaf
     posterior features are the own-side margin after the leaf's public observation, including
-    latent actions and chance — recomputed from the CURRENT strategies every call, which is the
-    coupling channel (§5.1: same cached leaf, different iteration, different belief).
+    latent actions and chance. They are recomputed from current strategies on each call,
+    so the same cached leaf can have a different belief and value across iterations.
 
     `fallback_value` fills cells whose simulation failed (the caller passes the root value, the
     baseline's convention). Unavailable cells come out 0 and are masked by the solver.
@@ -99,7 +85,7 @@ def make_grid_values(
         if float(w[:, -posterior_dim:].abs().sum().item()) == 0.0:
             posterior_dim = 0
 
-    # ---- one-time trunk cache over every live leaf (the §19.13 expensive half) ----------------
+    # Cache the backbone encodings for all live leaves.
     head_cache: list[tuple] = []
     for lo in range(0, len(grid.leaf_obs), max_batch_forward):
         chunk = _stack_obs(grid.leaf_obs[lo: lo + max_batch_forward], device)

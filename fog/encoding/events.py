@@ -427,7 +427,7 @@ def parse_turn_events(
 
 # --------------------------------------------------------------------------------- ledger feeding
 def feed_ledger_from_events(events: list[list[str]], my_role: str, ledger, tables) -> None:
-    """Record MY public reveals (the opponent's growing view of me, §3.3) off one turn's events."""
+    """Record MY public reveals (the opponent's growing view of me) off one turn's events."""
     from fog.constants.schema import NO_ITEM
 
     for ev in events:

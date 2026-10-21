@@ -7,8 +7,8 @@ Everything here is lazy: tables load on first access so that modules importing `
 fail before `build_constants` has been run. Access raises a clear error if the generated files are
 missing. Index conventions:
   * species: unknown ids fall back to the <RARE_SPECIES> index (last).
-  * items:   unknown ids fall back to <OTHER_ITEM>; <NO_ITEM>/<UNKNOWN> are distinct indices (§2.1).
-  * moves/abilities: no sentinel — unknown ids raise KeyError (callers quarantine, §4.3), or pass
+  * items:   unknown ids fall back to <OTHER_ITEM>; <NO_ITEM>/<UNKNOWN> are distinct indices.
+  * moves/abilities: no sentinel — unknown ids raise KeyError (callers quarantine), or pass
     `default=` to get a fallback.
 """
 from __future__ import annotations
@@ -44,7 +44,7 @@ class Tables:
         path = self.gen_dir / f"{name}.json"
         if not path.exists():
             raise TablesNotBuilt(
-                f"{path} missing. Run `python -m fog.scripts.build_constants` first (see §1)."
+                f"{path} missing. Run `python -m fog.scripts.build_constants` first."
             )
         with open(path, encoding="utf-8") as f:
             return json.load(f)
@@ -104,7 +104,7 @@ class Tables:
         return {a: i for i, a in enumerate(self.abilities["ids"])}
 
     def species_index(self, species_id: str) -> int:
-        """Unknown species fall back to <RARE_SPECIES> (the expected rare-tail path, §1.1)."""
+        """Unknown species fall back to <RARE_SPECIES> (the expected rare-tail path)."""
         return self._species_idx.get(species_id, self._species_idx[RARE_SPECIES])
 
     def move_index(self, move_id: str, default: int | object = _MISSING) -> int:
@@ -116,7 +116,7 @@ class Tables:
         return idx
 
     def item_index(self, item_id: str) -> int:
-        """Unknown items fall back to <OTHER_ITEM> (§1.4)."""
+        """Unknown items fall back to <OTHER_ITEM>."""
         return self._item_idx.get(item_id, self._item_idx[OTHER_ITEM])
 
     def ability_index(self, ability_id: str, default: int | object = _MISSING) -> int:
@@ -127,7 +127,7 @@ class Tables:
             return default  # type: ignore[return-value]
         return idx
 
-    # --- masks consumed by the belief model (§3.2) --------------------------------------------------
+    # --- masks consumed by the belief model --------------------------------------------------
     # Cached as full [n_species, n_x] bool matrices; row lookup is a view. The <RARE_SPECIES> row is
     # all-True everywhere (uninformative prior — we know nothing about a rare species' options).
 

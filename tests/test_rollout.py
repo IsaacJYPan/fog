@@ -1,4 +1,4 @@
-"""Tests for RolloutBuffer: reward placement, GAE, leakage shaping, nested stacking (§6/§7)."""
+"""Tests for RolloutBuffer: reward placement, GAE, leakage shaping, nested stacking."""
 from __future__ import annotations
 
 import numpy as np

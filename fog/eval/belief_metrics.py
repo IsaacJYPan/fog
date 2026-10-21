@@ -1,9 +1,7 @@
-"""Belief-quality metrics (spec §9, §6 dashboard).
+"""Belief accuracy by turn, calibration, and accuracy before public reveals.
 
-  * per-attribute top-1 / top-3 vs turn number (MUST be monotone increasing within games — flat means
-    the history encoder is broken)
-  * calibration (ECE)
-  * on replays: accuracy at least 3 turns BEFORE the actual reveal (predicts early, not just reads log)
+Turn-bucket metrics describe how predictions change through a game; pre-reveal
+accuracy separates early prediction from reading attributes already revealed.
 """
 from __future__ import annotations
 
@@ -30,8 +28,7 @@ def expected_calibration_error(confidences: np.ndarray, correct: np.ndarray, n_b
 
 
 def accuracy_vs_turn(predictions, labels, turns, bucket: int = 5) -> dict[int, float]:
-    """Top-1 accuracy bucketed by turn number (§6 dashboard: MUST be monotone increasing within
-    games — a flat curve means the history encoder is broken).
+    """Top-1 accuracy bucketed by turn number.
 
     predictions/labels: [N] top-1 predicted class and true class; turns: [N] turn index. Returns
     {bucket_start_turn: accuracy}. Buckets of `bucket` turns.
@@ -48,8 +45,7 @@ def accuracy_vs_turn(predictions, labels, turns, bucket: int = 5) -> dict[int, f
 
 
 def pre_reveal_accuracy(predictions, labels, turns, reveal_turns, lead: int = 3) -> float:
-    """Accuracy on predictions made at least `lead` turns BEFORE each attribute's actual reveal (§9:
-    the belief net predicts early, not just reads the log).
+    """Accuracy on predictions made at least `lead` turns before an attribute's reveal.
 
     Every array is [N] and aligned per (attribute-instance, turn). `reveal_turns[i]` is the turn the
     i-th instance's attribute was actually revealed. Only rows with turn <= reveal_turn - lead count.

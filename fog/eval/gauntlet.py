@@ -1,8 +1,7 @@
 """Gauntlet vs fixed baselines.
 
 Random, MaxDamage, SimpleHeuristics (poke-env built-ins), BC-only checkpoint — each ≥2000 games.
-Report Wilson 95% CIs. Never conclude from <1000 games. Report search on/off as a separate column
-(§8).
+Report Wilson 95% CIs. Never conclude from <1000 games. Report search on/off as separate rows.
 """
 from __future__ import annotations
 
@@ -37,17 +36,17 @@ def run_gauntlet(
     team_pool=None, cfg=None, bc_ckpt=None, include_reading_opponent: bool = False,
     search=None,
 ) -> list[GauntletResult]:
-    """Run `games_per` games of `ckpt` vs each baseline (+ optional BC checkpoint). Wilson CIs (§9).
+    """Run `games_per` games of `ckpt` vs each baseline (+ optional BC checkpoint). Wilson confidence intervals.
 
     `ckpt`/`bc_ckpt` are checkpoint paths; `team_pool` a list of pastes (required for gen9ou).
     `include_reading_opponent` adds the same checkpoint as a set-oracle opponent. What that entry
     measures is the VALUE OF THE CONCEALED INFORMATION (an upper bound on any reader's gain): the
     oracle is handed the truth, so concealment cannot deny it and this number is insensitive to
     concealment by construction. The payoff of concealment is measured against a LEARNED reader
-    (§7a L-vs-N), not here.
+    in head-to-head play.
 
     `search` (dict {"k","prior_weight","seed"}) reports each opponent TWICE — search off and search
-    on — as separate rows (§8 on/off column). Search reconstructs engine positions from the live
+    on — as separate rows. Search reconstructs engine positions from the live
     Showdown battle; treat its numbers as EXPERIMENTAL until the reconstruction fuzz report
     (scripts/fuzz_recon.py) is clean on this format's pool.
     """

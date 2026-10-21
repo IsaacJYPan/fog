@@ -17,6 +17,9 @@ import torch
 from fog.training.dashboard import TrainingDashboard as _Dashboard
 from fog.training.gae import compute_gae
 from fog.training.league import League
+from fog.training.optimization import (
+    restricted_optimizer_groups as _restricted_optimizer_groups,
+)
 
 __all__ = ["compute_gae", "ppo_update", "train"]
 
@@ -400,7 +403,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                         f"belief_dropped_rate_{family}",
                         family_stats.get("dropped_nonfinite", 0) / max(1, family_total),
                     )
-                # Chain CE (§3.6): THE primary belief aux loss — the input pattern sampling/scoring
+                # Chain CE: the primary belief auxiliary loss — the input pattern sampling/scoring
                 # query, and (with aux_into_trunk) the gradient that makes the contexts informative
                 # for the policy. Separate coefficient + metric.
                 if out.belief_chain is not None:
@@ -416,7 +419,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             if out.self_belief is not None and mb.get("self_belief_targets") is not None:
                 sb_stats: dict = {}
                 # Marginal self-belief CE — keeps the leakage probe's marginal forward calibrated
-                # (the β arm reads it, §8.2). self_belief_coef=0 for a pure-chain ablation.
+                # (used by leakage shaping). self_belief_coef=0 for a pure-chain ablation.
                 sb_loss = belief_loss(
                     out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"],
                     stats=sb_stats,
@@ -486,7 +489,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
         if stopped_for_kl:
             break
-        # team-preview bandit (§3.1): one clipped-surrogate step per epoch over all preview rows.
+        # team-preview bandit: one clipped-surrogate step per epoch over all preview rows.
         # Reward = game outcome; baseline = batch mean outcome (variance reduction).
         if preview is not None and preview_coef > 0:
             logits = agent.preview_logits(preview)                                # [G, 6]
@@ -516,74 +519,13 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     return {k: sum(v) / len(v) for k, v in metrics.items()}
 
 
-def _restricted_optimizer_groups(
-    agent,
-    trainable_prefixes: tuple[str, ...],
-    lr_scales: dict[str, float],
-    base_lr: float,
-) -> tuple[list[dict], list[torch.nn.Parameter], dict[float, list[str]]]:
-    """Freeze unselected tensors and assign deterministic per-prefix learning-rate scales."""
-
-    if not trainable_prefixes:
-        if lr_scales:
-            raise ValueError("ppo.trainable_lr_scales requires trainable_prefixes")
-        trainable = list(agent.parameters())
-        return [{"params": trainable, "lr": base_lr}], trainable, {1.0: ["*"]}
-    for prefix, scale in lr_scales.items():
-        if not isinstance(prefix, str) or not prefix:
-            raise ValueError("ppo.trainable_lr_scales keys must be non-empty prefixes")
-        if not math.isfinite(float(scale)) or float(scale) <= 0:
-            raise ValueError(
-                f"ppo.trainable_lr_scales[{prefix!r}] must be finite and positive"
-            )
-    grouped: dict[float, list[torch.nn.Parameter]] = {}
-    group_names: dict[float, list[str]] = {}
-    matched_scale_prefixes: set[str] = set()
-    trainable: list[torch.nn.Parameter] = []
-    for name, parameter in agent.named_parameters():
-        selected = name.startswith(trainable_prefixes)
-        parameter.requires_grad_(selected)
-        if not selected:
-            continue
-        trainable.append(parameter)
-        matching = [prefix for prefix in lr_scales if name.startswith(prefix)]
-        scale_prefix = max(matching, key=len) if matching else None
-        scale = float(lr_scales[scale_prefix]) if scale_prefix is not None else 1.0
-        if scale_prefix is not None:
-            matched_scale_prefixes.add(scale_prefix)
-        grouped.setdefault(scale, []).append(parameter)
-        group_names.setdefault(scale, []).append(name)
-    if not trainable:
-        raise ValueError(
-            f"ppo.trainable_prefixes matched no parameters: {trainable_prefixes}"
-        )
-    unmatched = sorted(set(lr_scales) - matched_scale_prefixes)
-    if unmatched:
-        raise ValueError(
-            f"ppo.trainable_lr_scales prefixes matched no trainable parameters: {unmatched}"
-        )
-    groups = [
-        {"params": grouped[scale], "lr": base_lr * scale}
-        for scale in sorted(grouped, reverse=True)
-    ]
-    return groups, trainable, group_names
-
-
 def train(cfg: dict) -> dict:
-    """Self-play PPO loop (§6): rollouts collect into a RolloutBuffer against league opponents;
-    ppo_update consumes it; checkpoints snapshot into the league. Returns the last metrics dict.
+    """Train against league opponents and return the final update metrics.
 
-    `env.backend` selects the simulator (ARCHITECTURE.md §3.2):
-      * "showdown_direct" (project-config default) — Showdown rules and the poke-env parser through
-        a persistent local Node worker. No server, accounts, HTTP, or WebSockets.
-      * "showdown" — poke-env vs a live local server, retained for external/live compatibility.
-      * "engine"             — poke-engine batched lockstep self-play (fog.env.engine_runner);
-        volume track for M3/M4 grids. No server needed. Final fine-tune + all headline evals
-        stay on Showdown (divergence rules in ARCHITECTURE.md §3.2).
-
-    Config keys used (all under sensible defaults): env.{battle_format, team_pool, backend,
-    engine_batch}, ppo.{lr, total_decisions, batch_decisions, games_per_chunk, ...ppo_update keys},
-    league.snapshot_every_decisions, leakage.beta (0 = N-agent), log.dir.
+    ``env.backend`` selects a persistent local Showdown worker (``showdown_direct``),
+    a live server through poke-env (``showdown``), or batched poke-engine games
+    (``engine``). Each backend collects into RolloutBuffer and shares the update,
+    checkpoint, and league snapshot logic.
     """
     from fog.training.preflight import require_preflight
 
@@ -604,8 +546,7 @@ def train(cfg: dict) -> dict:
 
 
 class _TrainSetup:
-    """Backend-agnostic training state shared by _train_async and _train_engine (one code path
-    for the update tail — drift between backends is exactly the bug class the audits punished)."""
+    """Model, optimizer, league, and update state shared by all rollout backends."""
 
     def __init__(self, cfg: dict, *, scripted: tuple[str, ...] | None = None,
                  require_pool: bool = False):
@@ -685,9 +626,7 @@ class _TrainSetup:
             raise NotImplementedError(
                 "model.oracle=action cannot be trained in the online loop: the opponent's "
                 "committed action is not observable at decision time (choices resolve "
-                "simultaneously). The action-oracle ceiling needs an offline/replay pathway "
-                "(spec §3.4); failing loudly here beats silently training an N-agent and "
-                "reporting a fake ~0 oracle gap."
+                "simultaneously). Use an offline/replay pathway for action-oracle training."
             )
         if self.oracle_mode == "set" and self.pool_teams is None:
             raise ValueError(
@@ -779,7 +718,7 @@ class _TrainSetup:
                 raise FileNotFoundError(f"league.past_ckpts not found: {missing}")
             self.league.past_ckpts.extend(seed_past)
             self.league.latest_ckpt = seed_past[-1]
-        # leakage.clip_delta: True = per-step max(0, ΔI) (§7 default); False = signed ΔI, whose
+        # leakage.clip_delta: True = per-step max(0, ΔI); False = signed ΔI, whose
         # per-game sum TELESCOPES to CE_first − CE_final — immune to the clipped estimator's
         # CE-noise bias (E[Σ max(0,ΔI)] grows with probe-CE variance even at zero net reveal).
         # Run at least one β cell with clip_delta=false as the estimator ablation.
@@ -790,7 +729,7 @@ class _TrainSetup:
         )
         self.dash = _Dashboard(cfg.get("log", {}).get("dir", "runs"))
 
-        # pool truth (belief supervision fallback / oxygen check §7)
+        # Pool truth supplies belief labels and the hidden-information check.
         self.pool_truth = None
         self.pool_sample_counts = (
             np.zeros(len(self.pool_teams), dtype=np.int64)
@@ -810,7 +749,7 @@ class _TrainSetup:
                         "intentional."
                     )
 
-        # BC anchor (KL penalty, §6): freeze a copy of the BC/initial policy for early self-play.
+        # BC anchor (KL penalty): freeze a copy of the BC/initial policy for early self-play.
         self.bc_anchor = None
         self.kl_anchor_decisions = int(self.ppo_cfg.get("kl_anchor_decisions", 0))
         if self.ppo_cfg.get("bc_anchor_ckpt"):
@@ -825,7 +764,7 @@ class _TrainSetup:
             )
             self.bc_anchor.eval()
 
-        # entropy decay + leakage Φ̂ refreeze schedule (§7)
+        # Entropy decay and frozen-probe refresh schedule.
         self.entropy0 = float(self.ppo_cfg.get("entropy_coef", 0.01))
         self.entropy_decay_to = float(self.ppo_cfg.get("entropy_coef_final", self.entropy0))
         self.refreeze_every = int(self.leak_cfg.get("refreeze_every_decisions", 100_000))
@@ -854,7 +793,7 @@ class _TrainSetup:
                 self.leak_cfg.get("watchdog_warmup_decisions", 20_000)
             )
 
-        # fresh probe (§7 staleness watchdog + honest readability tracking): an independent
+        # Fresh probe for the staleness watchdog: an independent
         # reader trained on every rollout batch. On for any leakage run; optional otherwise.
         self.fresh_probe = None
         self.fresh_opt = None
@@ -927,7 +866,7 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
             batch["bc_log_probs"] = s.bc_anchor(batch).log_probs
     n = int(batch["actions"].shape[0])
 
-    # fresh probe (§7): fit the independent reader on this batch's mirror views, then measure
+    # Fresh probe: fit the independent reader on this batch's mirror views, then measure
     # fresh vs frozen readability CE for the staleness watchdog.
     probe_metrics = _fit_and_measure_probes(
         s.fresh_probe, s.fresh_opt, phi_owner.phi_hat, batch,
@@ -1001,7 +940,7 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         s.watchdog.update_to(s.decisions_seen)
         flags = s.watchdog.check_all(metrics)
         if any(flags.values()):
-            print(f"[ppo] WATCHDOG {flags} — HALTING for inspection (§7/§10).", flush=True)
+            print(f"[ppo] WATCHDOG {flags} — halting for inspection.", flush=True)
             from fog.training.training_state import save_training_state
 
             save_training_state(s, s.ckpt_dir / "ppo_watchdog_halt.pt")
@@ -1049,7 +988,7 @@ async def _train_async(cfg: dict) -> dict:
     concurrent = int(env_cfg.get("concurrent_battles", 1))
 
     def team_for(seed_offset: int):
-        """Per-player pool sampler (teams re-sampled every battle, spec §6)."""
+        """Per-player pool sampler; teams are re-sampled every battle."""
         if pool_teams is None:
             return None
         from fog.env.teams import make_pool_teambuilder
@@ -1067,11 +1006,8 @@ async def _train_async(cfg: dict) -> dict:
         # Φ̂ = frozen (backbone + self-belief) pair — freezing only the head leaves the reward a
         # function of the live trunk (staleness/OOD hole; see models/probe.py).
         adapter.phi_hat = FrozenProbe.from_agent(agent).to(device)
-    # Ground truth for belief supervision (§3.2) + the set oracle (§3.4). The EXACT source is the
-    # recording teambuilder — the trainer sampled the opponent's team, so with sequential battles it
-    # simply knows the paste. Species-multiset matching is only the concurrent-battles fallback: it
-    # is permanently ambiguous on shared-species pools (POOL-A), which once silently disabled belief
-    # supervision on exactly the pool where sets are hidden (audit 2026-07-05).
+    # The recording teambuilder supplies exact assigned-team labels. Species-multiset
+    # matching is only a concurrency fallback: pools with shared species make it ambiguous.
     current_opp_tb: dict[str, object] = {"tb": None}   # set per chunk in the rollout loop
     opp_teambuilders: dict[str, object] = {}
     if pool_teams is not None:
@@ -1136,7 +1072,7 @@ async def _train_async(cfg: dict) -> dict:
             )
         return ckpt_opponents[name]
 
-    # per-opponent rolling win records (dashboard §6: win-rate vs each league member, NOT cumulative)
+    # Per-opponent rolling win records for the dashboard.
     recent_results: dict[str, deque] = {}
     while s.decisions_seen < total:
         opp_spec = league.sample_opponent(s.rng, decisions_seen=s.decisions_seen)
@@ -1176,16 +1112,11 @@ async def _train_async(cfg: dict) -> dict:
 
 
 def _train_engine(cfg: dict) -> dict:
-    """Engine-backend training loop (ARCHITECTURE.md §3.2): synchronous batched lockstep
-    self-play on poke-engine, sharing the exact update tail with the Showdown path.
+    """Collect batched poke-engine games and run the shared training update.
 
-    Differences from _train_async, all deliberate:
-      * no server / poke-env players — EngineRunner drives EngineBattles directly;
-      * scripted league opponents are the engine ports (Random, MaxDamage). SimpleHeuristics is
-        Showdown-only and raises here (eval it on Showdown; ARCHITECTURE.md §3.2);
-      * belief/oracle truth is exact by construction (the runner sampled both pastes);
-      * the cross-sim divergence gauntlet (§5) runs every `cross_sim.every_decisions` when
-        enabled: engine-vs-Showdown win-rate gap > `cross_sim.halt_gap` (default 0.03) HALTS.
+    EngineRunner supplies sampled-team labels and engine-specific scripted opponents.
+    When enabled, ``cross_sim.every_decisions`` schedules Showdown comparisons;
+    exceeding ``cross_sim.halt_gap`` stops training and saves a checkpoint.
     """
     from collections import deque
     from pathlib import Path
@@ -1282,8 +1213,7 @@ def _train_engine(cfg: dict) -> dict:
             if gap is not None and abs(gap) > halt_gap:
                 print(
                     f"[ppo] CROSS-SIM HALT: engine-vs-Showdown win-rate gap {gap:+.3f} exceeds "
-                    f"{halt_gap:.3f} — the policy is exploiting simulator divergence "
-                    f"(ARCHITECTURE.md §3.2). Checkpoint saved for inspection.",
+                    f"{halt_gap:.3f}. Checkpoint saved for inspection.",
                     flush=True,
                 )
                 from fog.training.training_state import save_training_state
@@ -1881,7 +1811,7 @@ def _fit_and_measure_probes(fresh_probe, fresh_opt, phi_hat, batch: dict, steps:
     """Fit the fresh probe on this batch's mirror views + measure fresh vs frozen readability CE.
 
     Returns {} when there is no mirror data or no probe. `fresh_ce` < `frozen_ce` by a wide margin
-    is the §7 staleness-exploitation signature (agent opaque to Φ̂ but readable to an up-to-date
+    indicates stale-probe exploitation (agent opaque to Φ̂ but readable to an up-to-date
     adversary) — fed to DegenerateSolutionWatchdog.check_stale_phi_exploitation.
     """
     import torch
@@ -1922,8 +1852,7 @@ _TURN_BUCKETS = ((0, 5), (5, 10), (10, 15), (15, 1_000))
 
 
 def _belief_accuracy_vs_turn(agent, batch: dict, max_rows: int = 512) -> dict:
-    """Belief top-1 accuracy per turn bucket (§6 dashboard: MUST rise within games — flat means the
-    history encoder is broken). Aggregated over all attribute families with valid labels."""
+    """Belief top-1 accuracy per turn bucket, over all valid attribute labels."""
     import torch
 
     if "belief_targets" not in batch or "turn" not in batch or "opp_revealed" not in batch:
@@ -1966,7 +1895,7 @@ def _belief_accuracy_vs_turn(agent, batch: dict, max_rows: int = 512) -> dict:
 def main() -> None:
     from fog.config import load_config_with_args
 
-    ap = argparse.ArgumentParser(description="FOG self-play PPO (§6).")
+    ap = argparse.ArgumentParser(description="FOG self-play PPO.")
     ap.add_argument("--config", required=True)
     ap.add_argument("--set", nargs="*", dest="overrides", help="dotted overrides, e.g. leakage.beta=0.03")
     args = ap.parse_args()

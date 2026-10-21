@@ -1,4 +1,4 @@
-"""Phase-4 distillation (SEARCH_PLAN §7): the KL core, the deployment/PBS input asymmetry, both
+"""Search-policy distillation: the KL core, the deployment/PBS input asymmetry, both
 scopes actually move toward search play on held-out games, and belief nets never train here."""
 from __future__ import annotations
 
@@ -115,7 +115,7 @@ def test_distill_improves_holdout_kl(scope, aware_agent_factory):
 
 def test_distill_scope_freezes_correctly(aware_agent_factory):
     """heads scope: trunk and belief nets byte-identical after training. full scope: backbone
-    moves, belief/self-belief still frozen (their retraining is the §7 consistency step)."""
+    moves, belief/self-belief still frozen (their retraining is a separate consistency step)."""
     def snapshot(agent, module):
         return [p.detach().clone() for p in getattr(agent, module).parameters()]
 
@@ -129,7 +129,7 @@ def test_distill_scope_freezes_correctly(aware_agent_factory):
                  for m in before}
         assert moved["backbone"] == trunk_moves, f"{scope}: backbone frozen-ness wrong"
         assert not moved["belief"] and not moved["self_belief"], (
-            f"{scope}: belief nets must never train in distill (retrained separately, §7)"
+            f"{scope}: belief nets must never train in distill (retrained separately)"
         )
 
 

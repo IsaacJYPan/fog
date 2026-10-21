@@ -1,5 +1,5 @@
 # Archived M1.5 belief experiment: retained for reproduction, not active training.
-# Gate (§10): belief identifies the opponent's pool team >=80% top-1 by turn 4. Under V2 the belief
+# Historical target: belief identifies the opponent's pool team >=80% top-1 by turn 4. Under V2 the belief
 # shapes the trunk/c_dyn via its aux loss (no b_vec); policy conditions on (s_board ‖ c_dyn).
 #   python -m fog.training.ppo --config configs/archive/m1_5_belief.yaml
 extends: m1_poc.yaml
@@ -9,7 +9,7 @@ model:
   aux_into_trunk: true              # belief aux loss backprops into the trunk (shapes c_dyn)
 loss:
   belief_coef: 1.0                  # marginal CE (diagnostic/leakage calibration)
-  belief_chain_coef: 1.0            # chain CE — the primary belief aux loss (§3.6)
+  belief_chain_coef: 1.0            # chain CE — the primary belief aux loss
   value_coef: 0.5
 log:
   dir: runs/m1_5_belief

@@ -6,10 +6,10 @@ Pipeline (one command via `python -m fog.eval.run_eval ... --readability`):
   2. split whole games into fitting, validation, and test sets; train a FRESH TrainableProbe on
      fitting games and select its checkpoint using validation games;
   3. report the readability curve on held-out test games (probe CE over still-hidden attrs — lower = more
-     readable), per-attribute-family CE, and the §7c case studies (tera timing, choice-lock
+     readable), per-attribute-family CE, and the behavioral measurements (tera timing, choice-lock
      concealment delay, move-reveal-order entropy).
 
-`lvn_match` plays an L-checkpoint directly against an N-checkpoint with Wilson CIs (§7a), and
+`lvn_match` plays an L-checkpoint directly against an N-checkpoint with Wilson intervals, and
 `pareto_report` assembles the β-grid readability/win-rate frontier — the strength-controlled framing
 (a weaker agent is trivially harder to read; the frontier makes the trade explicit).
 """
@@ -31,7 +31,7 @@ _BACKBONE_KEYS = (
 # ------------------------------------------------------------------------------ per-game case studies
 @dataclass
 class CaseStudies:
-    """§7c behavioral extractions, one entry per game (or per mon-game where noted)."""
+    """Behavioral measurements, one entry per game (or per mon-game where noted)."""
 
     tera_turns: list[int] = field(default_factory=list)          # 0 = never terastallized
     choice_delays: list[int] = field(default_factory=list)       # turns from first move to lock evidence
@@ -213,7 +213,7 @@ def split_probe_games(batch: dict, *, train_fraction: float = 0.6,
 def train_fresh_probe(batch: dict, cfg: dict, device=None, epochs: int = 8,
                       minibatch: int = 512, lr: float = 3e-4, seed: int = 0,
                       validation: dict | None = None):
-    """Fit a from-scratch TrainableProbe on the collected mirror views (§7b fresh predictor)."""
+    """Fit a from-scratch TrainableProbe on the collected mirror views for readability evaluation."""
     import torch
 
     from fog.models.agent import FogAgent
@@ -264,7 +264,7 @@ def train_fresh_probe(batch: dict, cfg: dict, device=None, epochs: int = 8,
 
 
 def readability_curves(probe, batch: dict, minibatch: int = 512) -> dict:
-    """Probe CE over still-hidden attrs, bucketed by turn + split by family (§7b). Lower = readable."""
+    """Probe CE over still-hidden attrs, bucketed by turn + split by family. Lower = readable."""
     import torch
 
     from fog.eval.leakage_metrics import readability_curve
@@ -296,7 +296,7 @@ def readability_curves(probe, batch: dict, minibatch: int = 512) -> dict:
 # ------------------------------------------------------------------------------------------- drivers
 def run_readability(ckpt: str, cfg: dict, opponent: str | None = None, games: int | None = None,
                     device=None) -> dict:
-    """The one-command §7b/§7c report for a checkpoint. Returns (and prints) the full dict."""
+    """The readability and behavior report for a checkpoint. Returns (and prints) the full dict."""
     ev = cfg.get("eval", {})
     rd = ev.get("readability", {})
     fmt = cfg.get("env", {}).get("battle_format", "gen9ou")
@@ -345,7 +345,7 @@ def _print_readability(r: dict) -> None:
 
 def lvn_match(ckpt_l: str, ckpt_n: str, n_games: int, fmt: str, team_pool, cfg: dict,
               cfg_n: dict | None = None) -> dict:
-    """§7a headline: L-agent vs N-agent head-to-head with a Wilson CI.
+    """L-agent vs N-agent head-to-head with a Wilson CI.
 
     Paired design: each sampled team matchup is played twice with sides swapped, so the team-matchup
     lottery (which dominates single games on a small pool) cancels out of the comparison.

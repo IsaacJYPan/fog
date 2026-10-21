@@ -5,7 +5,7 @@ Two loaders over the npz shards listed in a parse manifest:
   * `ReplayDataset` — concatenates everything into memory. Right for small corpora (<~20k games);
     simplest and fastest per-batch.
   * `StreamingReplayDataset` — iterates shard-by-shard with shard-order + within-shard shuffling per
-    epoch. Right for the 150k-game M4 corpus, where full concat would blow RAM (history windows are
+    epoch. Useful for large corpora, where full concat would blow RAM (history windows are
     the big block). Approximate global shuffle: shards are visited in random order and rows within a
     shard are permuted; with one replay per shard this is close enough to i.i.d. for SGD.
 
@@ -152,7 +152,7 @@ class ReplayDataset:
 
 
 class StreamingReplayDataset:
-    """Shard-streaming loader for corpora that don't fit in RAM (M4 150k-game scale).
+    """Shard-streaming loader for corpora that don't fit in RAM.
 
     `batches()` visits shards in a per-epoch random order, loads `shard_buffer` shards at a time
     into one in-memory block, and yields shuffled batches from it. Rows spanning shard-buffer

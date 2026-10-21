@@ -1,4 +1,4 @@
-"""EngineBattle tests (ARCHITECTURE.md §3.2): engine API contract pins, partial-observability
+"""EngineBattle tests: engine API contract pins, partial-observability
 censoring, legality masks, event synthesis, determinism. Skipped without poke-engine."""
 from __future__ import annotations
 

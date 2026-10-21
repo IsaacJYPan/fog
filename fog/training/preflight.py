@@ -1,4 +1,4 @@
-"""Mechanical preflight gate for long-running training jobs."""
+"""Check battle and replay audit reports before a configured training run."""
 from __future__ import annotations
 
 import hashlib
@@ -7,20 +7,24 @@ from pathlib import Path
 
 
 def source_fingerprint(repo_root: str | Path = ".") -> str:
-    """Hash every local source/input that can change observation or direct-Showdown mechanics."""
+    """Hash the battle, model, and training code exercised by the audits.
+
+    Experiment recipes, team collections, and unrelated command-line tools are
+    excluded. Run packages record their selected inputs separately; these reports
+    check the implementation rather than certify every possible training corpus.
+    """
     root = Path(repo_root).resolve()
     files: set[Path] = set()
     suffixes = {".py", ".js", ".json"}
-    for relative in ("fog", "data/teams"):
+    for relative in (
+        "fog/constants", "fog/encoding", "fog/env", "fog/models", "fog/training",
+    ):
         base = root / relative
         if base.is_dir():
             files.update(
                 path for path in base.rglob("*")
-                if path.is_file() and path.suffix in suffixes | {".txt"}
+                if path.is_file() and path.suffix in suffixes
             )
-    config_root = root / "configs"
-    if config_root.is_dir():
-        files.update(config_root.rglob("*.yaml"))
     showdown = root / "server" / "pokemon-showdown"
     for relative in ("sim", "data", "lib"):
         base = showdown / relative
@@ -29,12 +33,19 @@ def source_fingerprint(repo_root: str | Path = ".") -> str:
                 path for path in base.rglob("*")
                 if path.is_file() and path.suffix in {".ts", ".js", ".json"}
             )
-    for name in ("pyproject.toml", "uv.lock"):
+    for name in (
+        "fog/__init__.py", "fog/config.py", "fog/config_schema.py",
+        "fog/team_bank.py", "fog/team_identity.py",
+        "fog/scripts/audit_support.py", "fog/scripts/preflight_audit.py",
+        "fog/scripts/replay_preflight_audit.py", "fog/scripts/parse_replays.py",
+        "pyproject.toml", "uv.lock", ".gitmodules",
+        "server/pokemon-showdown/package.json", "server/pokemon-showdown/package-lock.json",
+    ):
         path = root / name
         if path.is_file():
             files.add(path)
 
-    digest = hashlib.sha256(b"fog-preflight-source-v1\0")
+    digest = hashlib.sha256(b"fog-preflight-source-v2\0")
     for path in sorted(files, key=lambda item: item.relative_to(root).as_posix()):
         relative = path.relative_to(root).as_posix().encode("utf-8")
         digest.update(len(relative).to_bytes(4, "big"))
@@ -90,8 +101,8 @@ def require_preflight(cfg: dict) -> dict | None:
         problems.append(
             f"schema_version={report.get('schema_version')} (need >= {required_schema})"
         )
-    if gate.get("match_source", False):
-        current = source_fingerprint()
+    current = source_fingerprint() if gate.get("match_source", False) else None
+    if current is not None:
         recorded = report.get("source_fingerprint")
         if recorded != current:
             problems.append("the audited source fingerprint does not match the current workspace")
@@ -137,9 +148,9 @@ def require_preflight(cfg: dict) -> dict | None:
                     f"replay schema_version={replay_report.get('schema_version')} "
                     f"(need >= {replay_schema})"
                 )
-            if gate.get("match_source", False):
+            if current is not None:
                 replay_recorded = replay_report.get("source_fingerprint")
-                if replay_recorded != source_fingerprint():
+                if replay_recorded != current:
                     problems.append(
                         "the replay-audited source fingerprint does not match the current workspace"
                     )

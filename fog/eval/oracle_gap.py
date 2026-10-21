@@ -20,8 +20,8 @@ def closure(n_agent: float, blind_reactive: float, set_oracle: float) -> float:
 
 
 def run_closure_report(ckpt, opponent, games: int, fmt: str, team_pool, cfg: dict) -> dict:
-    """Play the same checkpoint in three modes vs a fixed opponent and compute the closure headline
-    (§9). The three modes are one-line config overrides on the SAME weights:
+    """Play the same checkpoint in three modes vs a fixed opponent and compute closure.
+    The three modes are one-line config overrides on the SAME weights:
       - N-agent:        model.blind_reactive=False, oracle=none
       - blind_reactive: model.blind_reactive=True  (history=0, belief conditioning off)
       - set_oracle:     model.oracle=set           (opponent truth fed to the belief net)

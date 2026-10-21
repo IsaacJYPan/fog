@@ -1,20 +1,7 @@
-"""Training stage 1 — behavior cloning.
+"""Behavior cloning from replay actions, outcomes, and censored belief labels.
 
-Objective:
-    CE(policy, human action)
-  + marginal belief loss (censored diagnostic)  [opponent-team belief head]
-  + set-AR next-field loss (censored auxiliary) [opponent-team generator]
-  + value MSE against final outcome (γ=1)
-  + self-belief losses (censored, own team)      [off by default in BC — see note]
-
-Self-belief note: its correct input is the OPPONENT's view of the acting player (a mirror encoding),
-which the replay shards don't carry. So in BC `self_belief_coef` defaults to 0; the self-belief /
-leakage predictor is trained in self-play (§7 / training/leakage) where both perspectives are natural.
-The self-belief LABELS are still parsed and stored for that path.
-
-Optimizer AdamW, lr 3e-4 cosine to 3e-5, batch 512, ~10 epochs, mixed precision on CUDA.
-Go/no-go (§5): action top-1 vs strong players ≥45%; belief item top-1 before reveal ≥55%; win-rate vs
-SimpleHeuristics ≥65% (the last two are measured by the eval suite once a checkpoint exists).
+Self-belief supervision is disabled by default: replay shards do not carry the
+opponent's view needed by the self-belief predictor. Self-play supplies that view.
 
     python -m fog.training.bc --config configs/bc_ou.yaml
 """
@@ -32,6 +19,13 @@ import torch
 
 from fog.config import config_hash
 from fog.training import losses
+from fog.training.optimization import (
+    cosine_schedule,
+    equal_norm_pcgrad_pair as _equal_norm_pcgrad_pair,
+    pcgrad_many as _pcgrad_many,
+    pcgrad_pair as _pcgrad_pair,
+    trainable_parameters,
+)
 
 
 def _tensor_digest(tensor: torch.Tensor) -> str:
@@ -287,110 +281,6 @@ def _concatenate_batches(primary: dict, auxiliary: dict) -> dict:
     return combined
 
 
-def _pcgrad_pair(
-    primary: tuple[torch.Tensor | None, ...],
-    auxiliary: tuple[torch.Tensor | None, ...],
-    parameters: list[torch.nn.Parameter],
-) -> tuple[list[torch.Tensor], dict[str, float]]:
-    """Symmetric two-task PCGrad over the complete trainable parameter vector."""
-
-    left = [torch.zeros_like(p) if g is None else g for p, g in zip(parameters, primary, strict=True)]
-    right = [torch.zeros_like(p) if g is None else g for p, g in zip(parameters, auxiliary, strict=True)]
-    dot = sum((a * b).sum() for a, b in zip(left, right, strict=True))
-    left_sq = sum(a.square().sum() for a in left)
-    right_sq = sum(b.square().sum() for b in right)
-    cosine = dot / (left_sq.sqrt() * right_sq.sqrt()).clamp_min(1e-12)
-    if float(dot) < 0.0:
-        left_scale = dot / right_sq.clamp_min(1e-12)
-        right_scale = dot / left_sq.clamp_min(1e-12)
-        combined = [
-            0.5 * ((a - left_scale * b) + (b - right_scale * a))
-            for a, b in zip(left, right, strict=True)
-        ]
-    else:
-        combined = [0.5 * (a + b) for a, b in zip(left, right, strict=True)]
-    return combined, {
-        "joint_gradient_cosine": float(cosine.detach()),
-        "joint_gradient_conflict": float(dot.detach() < 0),
-        "primary_gradient_norm": float(left_sq.sqrt().detach()),
-        "auxiliary_gradient_norm": float(right_sq.sqrt().detach()),
-    }
-
-
-def _pcgrad_many(
-    task_gradients: list[tuple[torch.Tensor | None, ...]],
-    parameters: list[torch.nn.Parameter],
-) -> tuple[list[torch.Tensor], dict[str, float]]:
-    """Deterministic symmetric PCGrad for three or more separately normalized tasks."""
-
-    if len(task_gradients) < 2:
-        raise ValueError("multi-task PCGrad requires at least two tasks")
-    original = [
-        [
-            torch.zeros_like(parameter) if gradient is None else gradient
-            for parameter, gradient in zip(parameters, gradients, strict=True)
-        ]
-        for gradients in task_gradients
-    ]
-    projected = [[gradient.clone() for gradient in task] for task in original]
-    metrics: dict[str, float] = {}
-    conflicts = 0
-    comparisons = 0
-    for index, task in enumerate(projected):
-        norm = sum(gradient.square().sum() for gradient in original[index]).sqrt()
-        metrics[f"task_{index}_gradient_norm"] = float(norm.detach())
-        for other_index, other in enumerate(original):
-            if index == other_index:
-                continue
-            dot = sum(
-                (left * right).sum() for left, right in zip(task, other, strict=True)
-            )
-            other_sq = sum(gradient.square().sum() for gradient in other)
-            conflict = float(dot.detach() < 0)
-            conflicts += int(conflict)
-            comparisons += 1
-            metrics[f"task_{index}_vs_{other_index}_conflict"] = conflict
-            if conflict:
-                scale = dot / other_sq.clamp_min(1e-12)
-                task[:] = [
-                    left - scale * right
-                    for left, right in zip(task, other, strict=True)
-                ]
-    combined = [
-        sum(task[parameter_index] for task in projected) / len(projected)
-        for parameter_index in range(len(parameters))
-    ]
-    metrics["joint_gradient_conflict"] = conflicts / max(1, comparisons)
-    return combined, metrics
-
-
-def _equal_norm_pcgrad_pair(
-    primary: tuple[torch.Tensor | None, ...],
-    auxiliary: tuple[torch.Tensor | None, ...],
-    parameters: list[torch.nn.Parameter],
-) -> tuple[list[torch.Tensor], dict[str, float]]:
-    """PCGrad after equalizing source norms without changing a family's geometric scale.
-
-    Replay and exact-simulator labels have different density and can produce very different
-    gradient magnitudes even after each loss is normalized.  Equalizing within one loss family
-    prevents the denser source from dominating while the geometric target preserves that
-    family's natural scale relative to belief, chain, and value siblings.
-    """
-
-    left = [torch.zeros_like(p) if g is None else g for p, g in zip(parameters, primary, strict=True)]
-    right = [torch.zeros_like(p) if g is None else g for p, g in zip(parameters, auxiliary, strict=True)]
-    left_norm = sum(g.square().sum() for g in left).sqrt()
-    right_norm = sum(g.square().sum() for g in right).sqrt()
-    target = (left_norm * right_norm).clamp_min(1e-24).sqrt()
-    if float(left_norm) > 0.0 and float(right_norm) > 0.0:
-        left = [g * (target / left_norm) for g in left]
-        right = [g * (target / right_norm) for g in right]
-    combined, metrics = _pcgrad_pair(tuple(left), tuple(right), parameters)
-    metrics["primary_gradient_norm_before_balance"] = float(left_norm.detach())
-    metrics["auxiliary_gradient_norm_before_balance"] = float(right_norm.detach())
-    return combined, metrics
-
-
 def _fixed_eval(
     agent,
     ds,
@@ -485,7 +375,7 @@ def _shared_latent_adaptive_modules(agent) -> list[torch.nn.Module]:
     """Trainable semantic parts of the shared state vector.
 
     The exact entity and field projections are deliberately excluded.  They are the
-    full-rank paths that provide the audited information-preservation guarantee.
+    full-rank paths used to preserve exact inputs.
     """
     if agent.shared_latent is None:
         raise ValueError("shared-latent scope requires model.shared_latent_trunk=true")
@@ -942,33 +832,15 @@ def train(cfg: dict) -> dict:
         encoder_lr_scale = float(bc_cfg.get("encoder_lr_scale", 0.1))
         if not 0.0 < encoder_lr_scale <= 1.0:
             raise ValueError("bc.encoder_lr_scale must be in (0, 1]")
-        policy_parameters = [
-            parameter
-            for module in _policy_modules(agent)
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
-        late_encoder_parameters = [
-            parameter
-            for module in _late_encoder_modules(agent)
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
+        policy_parameters = trainable_parameters(_policy_modules(agent))
+        late_encoder_parameters = trainable_parameters(_late_encoder_modules(agent))
         opt = torch.optim.AdamW(
             [
                 {"params": policy_parameters, "lr": lr0},
                 {"params": late_encoder_parameters, "lr": lr0 * encoder_lr_scale},
             ]
         )
-        final_ratio = lr1 / lr0
-
-        def cosine_ratio(step_index: int) -> float:
-            progress = min(1.0, max(0.0, step_index / total_steps))
-            return final_ratio + (1.0 - final_ratio) * 0.5 * (
-                1.0 + math.cos(math.pi * progress)
-            )
-
-        sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda=cosine_ratio)
+        sched = cosine_schedule(opt, lr1 / lr0, total_steps)
     elif scope in {"belief_shared", "belief_value_shared", "belief_value_prior_shared"}:
         shared_lr_scale = float(bc_cfg.get("shared_lr_scale", 0.1))
         if not 0.0 < shared_lr_scale <= 1.0:
@@ -978,34 +850,15 @@ def train(cfg: dict) -> dict:
             primary_modules.extend([agent.policy_value.value, agent.shared_to_value])
         if scope == "belief_value_prior_shared":
             primary_modules.append(agent.matchup_value_prior)
-        primary_parameters = [
-            parameter
-            for module in primary_modules
-            if module is not None
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
-        shared_parameters = [
-            parameter
-            for module in _shared_latent_adaptive_modules(agent)
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
+        primary_parameters = trainable_parameters(primary_modules)
+        shared_parameters = trainable_parameters(_shared_latent_adaptive_modules(agent))
         opt = torch.optim.AdamW(
             [
                 {"params": primary_parameters, "lr": lr0},
                 {"params": shared_parameters, "lr": lr0 * shared_lr_scale},
             ]
         )
-        final_ratio = lr1 / lr0
-
-        def cosine_ratio(step_index: int) -> float:
-            progress = min(1.0, max(0.0, step_index / total_steps))
-            return final_ratio + (1.0 - final_ratio) * 0.5 * (
-                1.0 + math.cos(math.pi * progress)
-            )
-
-        sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda=cosine_ratio)
+        sched = cosine_schedule(opt, lr1 / lr0, total_steps)
     elif scope == "policy_belief_value_prior_shared":
         shared_lr_scale = float(bc_cfg.get("shared_lr_scale", 0.05))
         auxiliary_head_lr_scale = float(bc_cfg.get("auxiliary_head_lr_scale", 0.5))
@@ -1043,15 +896,7 @@ def train(cfg: dict) -> dict:
                 {"params": shared_parameters, "lr": lr0 * shared_lr_scale},
             ]
         )
-        final_ratio = lr1 / lr0
-
-        def cosine_ratio(step_index: int) -> float:
-            progress = min(1.0, max(0.0, step_index / total_steps))
-            return final_ratio + (1.0 - final_ratio) * 0.5 * (
-                1.0 + math.cos(math.pi * progress)
-            )
-
-        sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda=cosine_ratio)
+        sched = cosine_schedule(opt, lr1 / lr0, total_steps)
     elif scope in {"value_shared", "policy_shared"}:
         shared_lr_scale = float(bc_cfg.get("shared_lr_scale", 0.1))
         if not 0.0 < shared_lr_scale <= 1.0:
@@ -1065,33 +910,15 @@ def train(cfg: dict) -> dict:
             if scope == "value_shared"
             else _policy_modules(agent)
         )
-        primary_parameters = [
-            parameter
-            for module in primary_modules
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
-        shared_parameters = [
-            parameter
-            for module in _shared_latent_adaptive_modules(agent)
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
+        primary_parameters = trainable_parameters(primary_modules)
+        shared_parameters = trainable_parameters(_shared_latent_adaptive_modules(agent))
         opt = torch.optim.AdamW(
             [
                 {"params": primary_parameters, "lr": lr0},
                 {"params": shared_parameters, "lr": lr0 * shared_lr_scale},
             ]
         )
-        final_ratio = lr1 / lr0
-
-        def cosine_ratio(step_index: int) -> float:
-            progress = min(1.0, max(0.0, step_index / total_steps))
-            return final_ratio + (1.0 - final_ratio) * 0.5 * (
-                1.0 + math.cos(math.pi * progress)
-            )
-
-        sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda=cosine_ratio)
+        sched = cosine_schedule(opt, lr1 / lr0, total_steps)
     elif scope in {"belief_structured", "value_structured", "policy_structured"}:
         reader_lr_scale = float(bc_cfg.get("reader_lr_scale", 0.1))
         if not 0.0 < reader_lr_scale <= 1.0:
@@ -1105,30 +932,15 @@ def train(cfg: dict) -> dict:
         else:
             primary_modules = _policy_modules(agent)
             reader_module = agent.policy_structured_memory
-        primary_parameters = [
-            parameter
-            for module in primary_modules
-            for parameter in module.parameters()
-            if parameter.requires_grad
-        ]
-        reader_parameters = [
-            parameter for parameter in reader_module.parameters() if parameter.requires_grad
-        ]
+        primary_parameters = trainable_parameters(primary_modules)
+        reader_parameters = trainable_parameters([reader_module])
         opt = torch.optim.AdamW(
             [
                 {"params": primary_parameters, "lr": lr0},
                 {"params": reader_parameters, "lr": lr0 * reader_lr_scale},
             ]
         )
-        final_ratio = lr1 / lr0
-
-        def cosine_ratio(step_index: int) -> float:
-            progress = min(1.0, max(0.0, step_index / total_steps))
-            return final_ratio + (1.0 - final_ratio) * 0.5 * (
-                1.0 + math.cos(math.pi * progress)
-            )
-
-        sched = torch.optim.lr_scheduler.LambdaLR(opt, lr_lambda=cosine_ratio)
+        sched = cosine_schedule(opt, lr1 / lr0, total_steps)
     else:
         opt = torch.optim.AdamW(trainable, lr=lr0)
         sched = torch.optim.lr_scheduler.CosineAnnealingLR(
@@ -1754,7 +1566,7 @@ def train(cfg: dict) -> dict:
 def main() -> None:
     from fog.config import load_config_with_args
 
-    ap = argparse.ArgumentParser(description="FOG behavior cloning (§5).")
+    ap = argparse.ArgumentParser(description="FOG behavior cloning.")
     ap.add_argument("--config", required=True)
     ap.add_argument("--set", nargs="*", dest="overrides", help="dotted overrides, e.g. bc.epochs=3")
     args = ap.parse_args()

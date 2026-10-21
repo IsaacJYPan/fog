@@ -1,36 +1,19 @@
-"""Posterior-aware leaf values wired into the solver's ``values_fn`` (ARCHITECTURE.md S2).
-This is the successor of the interim in fog/search/pb_values.py, which reused the
-policy's scalar value head with four posterior features.
+"""Per-pair leaf values for the public-belief regret solver.
 
-Expensive work runs once per decision: the
-backbone trunk over every leaf (shared with the interim path), and the encoding of the K own- and J
-opponent-candidate teams. The value network then produces, per leaf, the full per-pair table
-
-    V[leaf, k, j] = our continuation payoff from this leaf if the true teams are (k, j),
-                    conditioned on the belief at recompute time.
-
-Each simulated cell keeps the value of its OWN candidate pair.  The solver performs the only
-cross-pair averaging later, when it evaluates each private type against the other side's possible
-types.  Averaging the table here as well would use the belief twice and erase the type-specific
-continuation values the table exists to preserve:
+Backbone leaf encodings and candidate-team encodings are cached once per decision.
+A network refresh produces V[leaf, k, j], conditioned on that leaf's public-observation
+posterior under the current strategies:
 
     likelihood[o,k,j] = sum_{a,b} sigma1[k,a] sigma2[j,b] P(o | k,j,a,b)
-    post_leaf          = normalize(rho * likelihood[public_observation_of_leaf])
-    u[k, j, a, b]      = sum over branches of branch_prob * V[leaf, k, j]
+    post_leaf = normalize(rho * likelihood[public_observation_of_leaf])
+    u[k,j,a,b] = sum over branches of branch_prob * V[leaf,k,j]
 
-`recompute_every = N` controls how often the tables are refreshed by an actual network pass (the
-tables' belief-conditioning goes stale as the strategies move — a pair's continuation value depends
-on the belief carried into the leaf, the §5.1 thesis). Between refreshes the cached table is reused;
-there is no second belief average in the payoff bridge.
+Each simulated cell uses its own candidate pair's value. Cross-pair averaging
+happens in the solver; averaging here too would apply the belief twice.
 
-    recompute_every = 1  ==  THE CORRECTNESS REFERENCE: every iteration reruns the
-                            belief-dependent message/head path at the current
-                            evidence-conditioned belief. Static leaf/candidate representations
-                            remain cached. The N > 1 approximation is measured against this.
-    recompute_every = N  ==  the deployed approximation: one network pass per N iterations and
-                            cached-table reuse in between. The drift error vs. N = 1 is measured.
-
-`values_fn` counts its own calls to decide when a refresh is due, so the solver needs no changes.
+`recompute_every=1` refreshes on every call and is the reference calculation.
+Larger values reuse a table as the strategies change, trading stale belief
+conditioning for speed. `fog.eval.pb_value_drift` measures the resulting error.
 """
 from __future__ import annotations
 
@@ -72,9 +55,9 @@ def make_pb_value_grid_values(
 ) -> tuple[Callable[[Array, Array], Array], PBValueStats]:
     """Build `values_fn(sigma1, sigma2) -> u[K, J, A, B]` backed by the public-belief value network.
 
-    `agent` supplies the shared trunk (`head_inputs` -> private state and public context per leaf);
-    `PBValueNet`. `own_tokens [K,6,15]` / `opp_tokens [J,6,15]` are the SAME candidate identities the
-    grid was built from (proposal §10 shared particles). `rho [K,J]` is the decision's root joint
+    `agent` supplies the shared trunk (`head_inputs` -> private state and public context per leaf).
+    `own_tokens [K,6,15]` / `opp_tokens [J,6,15]` must match the candidate identities used to build
+    the grid. `rho [K,J]` is the decision's root joint
     belief. `recompute_every = 1` gives the exact single-query reference; larger N trades measured
     drift for speed.
 
@@ -95,7 +78,7 @@ def make_pb_value_grid_values(
     opp_t = torch.as_tensor(np.asarray(opp_tokens, dtype=np.int64), device=device)
     n_k, n_j = own_t.shape[0], opp_t.shape[0]
 
-    # ---- one-time trunk pass over every live leaf (the §19.13 expensive half) ------------------
+    # Cache the backbone encodings for all live leaves.
     private_state_parts: list = []
     public_context_parts: list = []
     trunk_forwards = 0
@@ -144,7 +127,7 @@ def make_pb_value_grid_values(
         return observation_model.posteriors(rho, sigma1, sigma2)
 
     def _refresh(post_leaf: Array) -> Array:
-        """One actual network pass: condition V on the current per-leaf posterior (§9.2)."""
+        """One actual network pass: condition V on the current per-leaf posterior."""
         stats.net_refreshes += 1
         rho_t = torch.as_tensor(post_leaf, dtype=torch.float32, device=device)
         out = np.zeros((n_leaves, n_k, n_j), dtype=np.float64)

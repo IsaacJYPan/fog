@@ -1,4 +1,4 @@
-"""Tests for FogAgent.from_tables() — real-cardinality construction (plan §2a)."""
+"""Tests for FogAgent.from_tables() — real-cardinality construction."""
 from __future__ import annotations
 
 import pytest

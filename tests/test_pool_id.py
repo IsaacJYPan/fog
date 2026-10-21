@@ -1,4 +1,4 @@
-"""Pool-id belief gate (M1.5, spec §10): the game-level gate bookkeeping, candidate scoring
+"""Pool-id belief evaluation: the game-level gate bookkeeping, candidate scoring
 mechanics, and the end-to-end engine run."""
 from __future__ import annotations
 

@@ -116,3 +116,89 @@ def test_teampreview_with_agent_orders_and_records():
     g = buf._games[gid]
     assert g.preview is not None and 0 <= g.preview["slot"] < 6
     assert np.isfinite(g.preview["log_prob"])
+
+
+def test_mirror_failure_can_batch_with_prior_decision(monkeypatch):
+    from fog.encoding import mirror
+    from fog.encoding.dims import DIMS
+    from fog.encoding.observation import Observation
+
+    battle = _Battle("mirror-failure")
+    obs = Observation.from_battle(battle)
+    obs.history = np.full((2, DIMS.turn_dim), 0.25, dtype=np.float32)
+    obs.history_ids = np.zeros((2, DIMS.hist_id_fields), dtype=np.int64)
+    obs.history_state = np.zeros((2, DIMS.hist_state), dtype=np.float32)
+    obs.history_len = 2
+    player = FogPlayer()
+    buffer = RolloutBuffer()
+    player.attach_buffer(buffer)
+    recorded = player._mirror(battle, obs, None)
+    assert recorded is not None
+    assert player.record_mirror is True
+
+    def fail(*args, **kwargs):
+        raise RuntimeError("missing mirror data")
+
+    monkeypatch.setattr(mirror, "build_opponent_view_np", fail)
+    fallback = player._mirror(battle, obs, None)
+    assert player.record_mirror is True
+    assert "missing mirror data" in player.mirror_last_error
+    assert fallback is not None
+    player.phi_hat = object()
+    assert player._leakage_ce(fallback, obs, None) is None
+
+    game = buffer.start_game()
+    for fragment, view in (recorded, fallback):
+        buffer.add_decision(
+            game,
+            {"history": obs.history, "opp_view": {**fragment, "my_view": view}},
+            action=0,
+            log_prob=0.0,
+            value=0.0,
+        )
+    buffer.end_game(game, outcome=1.0)
+    batch = buffer.to_batch()
+    assert batch["opp_view"]["entities"].shape[0] == 2
+    assert batch["opp_view"]["history_len"][1] == 0
+    assert not batch["opp_view"]["history"][1].any()
+    assert any(valid[0].any() for valid in batch["self_belief_valid"].values())
+    assert all(not valid[1].any() for valid in batch["self_belief_valid"].values())
+
+    first_attempt = FogPlayer()
+    first_attempt.attach_buffer(RolloutBuffer())
+    assert first_attempt._mirror(battle, obs, None) is None
+    assert first_attempt.record_mirror is False
+    assert player.record_mirror is True
+
+
+def test_replacing_probe_and_weights_reaches_mirror_measurement():
+    from fog.encoding.observation import Observation
+
+    class Probe:
+        def __init__(self, ce):
+            self.ce = ce
+            self.weights = None
+
+        def leakage_ce(self, batch, view, *, family_weights):
+            assert batch["entities"].shape[0] == 1
+            assert (view["labels"]["species"] >= 0).any()
+            self.weights = family_weights
+            return torch.tensor([self.ce])
+
+    battle = _Battle("replacement-probe")
+    obs = Observation.from_battle(battle)
+    player = FogPlayer()
+    original = Probe(2.5)
+    player.phi_hat = original
+    player.leak_family_weights = {"species": 0.5}
+    # A probe can request a mirror without an attached rollout buffer.
+    recorded = player._mirror(battle, obs, None)
+    assert player._leakage_ce(recorded, obs, None) == 2.5
+    assert original.weights == {"species": 0.5}
+
+    replacement = Probe(1.25)
+    player.phi_hat = replacement
+    player.leak_family_weights = {"item": 2.0}
+    assert player._leakage_ce(recorded, obs, None) == 1.25
+    assert replacement.weights == {"item": 2.0}
+    assert player.diagnostic_errors == {}

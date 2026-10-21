@@ -6,7 +6,7 @@
                    the policy head. Bounds the additional value of predicting intent.
 
 Both are config switches (`model.oracle: {none, set, action}`) consumed inside FogAgent.forward, so
-turning them on is a one-line config change (deliberate — §3.4). The heavy lifting is:
+their inputs are constructed by:
   - `apply_set_oracle`: rewrite the belief-net input tokens (opp_revealed) to the opponent's full
     truth so the belief marginals are computed from perfect information, and mark every opponent
     entity's epistemic flags known. Ground truth is supplied by the caller (simulator in self-play,
@@ -51,7 +51,7 @@ def _ref_device(opp_revealed: dict):
 
 
 class ActionOracleHead(nn.Module):
-    """Embeds the opponent's committed action and concatenates it to `s` (spec §3.4 action oracle).
+    """Embeds the opponent's committed action and concatenates it to `s`.
 
     Kept separate from the base policy so weights stay comparable across oracle modes: the base head
     still sees `s`; only this augmented head sees `s ‖ action_embed`.

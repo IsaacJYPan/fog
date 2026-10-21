@@ -101,7 +101,7 @@ def encode_history(
     battle: Any, tables=None, *, perspective: str = "p1", tracker: Any = None
 ) -> tuple[np.ndarray, int]:
     """Return (history[T, D_turn] float32, history_len) for completed turns, most recent LAST,
-    truncated to the last `DIMS.history_cap` turns (front-truncation, §2.3). battle=None or no
+    truncated to the last `DIMS.history_cap` turns (front-truncation). battle=None or no
     observations -> single zero row (shape-test path).
 
     `tracker` (BattleTracker, optional) supplies the per-turn start-of-turn snapshots, my recorded
