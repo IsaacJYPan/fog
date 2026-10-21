@@ -30,6 +30,21 @@ from fog.pretrained.prior_head_metrics import evaluation_queries, score_distribu
 from fog.pretrained.state import atomic_save, restore_rng, rng_state
 
 
+def configure_runtime(config, device):
+    """Share numerical settings between main training and standalone timing."""
+    torch.set_num_threads(config.get("cpu_threads", 1))
+    if device.startswith("cuda"):
+        torch.backends.cuda.matmul.allow_tf32 = False
+        torch.backends.cudnn.allow_tf32 = False
+        torch.use_deterministic_algorithms(True)
+    return {
+        "cpu_threads": torch.get_num_threads(),
+        "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+        "cuda_matmul_tf32": torch.backends.cuda.matmul.allow_tf32,
+        "cudnn_tf32": torch.backends.cudnn.allow_tf32,
+    }
+
+
 def run(config, out, *, device="cpu", resume=None, stop_after_steps=None, condition=None):
     if condition not in (None, "facts", "native"):
         raise ValueError("Unknown independent belief condition")
@@ -45,11 +60,7 @@ def run(config, out, *, device="cpu", resume=None, stop_after_steps=None, condit
             raise ValueError("Frozen positive integer required: " + key)
     if device.startswith("cuda") and not torch.cuda.is_available():
         raise ValueError("Actual CUDA device required")
-    torch.set_num_threads(config.get("cpu_threads", 1))
-    if device.startswith("cuda"):
-        torch.backends.cuda.matmul.allow_tf32 = False
-        torch.backends.cudnn.allow_tf32 = False
-        torch.use_deterministic_algorithms(True)
+    configure_runtime(config, device)
     if device.startswith("cuda") and config.get("allow_local_data"):
         raise ValueError("Local trial data are prohibited on the production CUDA path")
     data = FrozenBeliefData(

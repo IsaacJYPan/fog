@@ -349,3 +349,44 @@ def test_a_failed_condition_promptly_cancels_its_sibling(tmp_path):
     with pytest.raises(RuntimeError, match="exit code|sibling failure"):
         execute_pair(commands, dict(os.environ), tmp_path / "logs", 90)
     assert time.monotonic() - started < 15 and not marker.exists()
+
+
+def test_standalone_cuda_timing_uses_the_main_numerical_settings(tmp_path, monkeypatch):
+    """Reach each entrypoint's data boundary without needing local CUDA hardware."""
+    from fog.scripts import prior_heads_check, train_prior_heads
+
+    class AtDataBoundary(Exception):
+        pass
+
+    observed = []
+
+    def data(*_args, **_kwargs):
+        observed.append((torch.are_deterministic_algorithms_enabled(),
+                         torch.backends.cuda.matmul.allow_tf32,
+                         torch.backends.cudnn.allow_tf32, torch.get_num_threads()))
+        raise AtDataBoundary
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    monkeypatch.setattr(prior_heads_check, "FrozenBeliefData", data)
+    monkeypatch.setattr(train_prior_heads, "FrozenBeliefData", data)
+    cfg = {key: 1 for key in ("updates", "effective_batch", "microbatch", "chain_queries",
+                             "save_every", "warmup_updates", "cpu_threads")}
+    cfg.update(data="not-read", data_sha256="not-read")
+    before = (torch.are_deterministic_algorithms_enabled(),
+              torch.backends.cuda.matmul.allow_tf32, torch.backends.cudnn.allow_tf32,
+              torch.get_num_threads())
+    try:
+        for entry in (lambda: prior_heads_check.benchmark(cfg, tmp_path / "timing", device="cuda"),
+                      lambda: train_prior_heads.run(cfg, tmp_path / "main", device="cuda")):
+            # Model a fresh --benchmark-only process, rather than inheriting a proof's flags.
+            torch.use_deterministic_algorithms(False)
+            torch.backends.cuda.matmul.allow_tf32 = True
+            torch.backends.cudnn.allow_tf32 = True
+            with pytest.raises(AtDataBoundary):
+                entry()
+        assert observed == [(True, False, False, 1)] * 2
+    finally:
+        torch.use_deterministic_algorithms(before[0])
+        torch.backends.cuda.matmul.allow_tf32 = before[1]
+        torch.backends.cudnn.allow_tf32 = before[2]
+        torch.set_num_threads(before[3])

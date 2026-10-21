@@ -12,7 +12,7 @@ from fog.pretrained.frozen_belief import FrozenBeliefData, public_payload
 from fog.models.donor_prior import DonorPrior
 from fog.pretrained.joint import BeliefHeads
 from fog.scripts.kakuna_latent_resume_check import identical
-from fog.scripts.train_prior_heads import run
+from fog.scripts.train_prior_heads import configure_runtime, run
 
 
 def probabilities(heads, config, specifications, *, device="cuda", tolerance=1e-3):
@@ -145,6 +145,7 @@ def benchmark(config, out, *, device="cuda", condition="native"):
     out.mkdir(parents=True, exist_ok=False)
     if device.startswith("cuda") and not torch.cuda.is_available():
         raise ValueError("Throughput proof requires an actual CUDA device")
+    backend = configure_runtime(config, device)
     data = FrozenBeliefData(config["data"], config["data_sha256"])
     prior = DonorPrior(
         Path(config["prior"]), max_donors=config["max_donors"], smoothing=config["smoothing"]
@@ -187,6 +188,7 @@ def benchmark(config, out, *, device="cuda", condition="native"):
         "passed": estimate < config["training_seconds"],
         "actual_cuda": device.startswith("cuda"),
         "condition": condition,
+        "backend": backend,
         "measurement_started_unix": started_unix + sum(seconds[:2]),
         "measurement_finished_unix": time.time(),
         "production_batch": config["effective_batch"],

@@ -87,6 +87,12 @@ the sequential reference, including identical outcome heads. Public-only donor r
 uses a bounded deterministic cache; cold and warm retrieval produce identical
 probabilities and no cache state changes the optimizer or random streams.
 
+The recovery's standalone timing process did not explicitly configure the main
+training numerical flags. Its startup timing is an approximate forecast; actual
+completed-run durations and update counts remain required evidence. Subsequent
+packages share explicit runtime setup between timing and main training. This
+runner correction does not alter the already sealed recovery or its evaluation.
+
 Run ancestral evaluation separately on Kaggle CPU after training. Compare the
 same k=8 samples for the prior-only chain, both fitted conditions, the expanded
 existing donor sampler and the preserved preceding standalone decoder. Report
