@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 import torch
 
 from fog.pretrained.belief_diagnostics import DistributionMetrics
@@ -163,6 +165,7 @@ def score_samples(
     generator = torch.Generator(device=device).manual_seed(seed)
     rows = {r["path"]: r for split in data.rows.values() for r in split}
     total, by_game = SampleMetrics(), {}
+    timings = []
     for number, (name, index) in enumerate(specifications):
         record = rows[name]
         batch = data.batch([(name, index)], device=device)
@@ -174,7 +177,13 @@ def score_samples(
             latent = torch.zeros_like(latent)
         elif mode != "native":
             raise ValueError("Unknown belief-context mode")
+        if str(device).startswith("cuda"):
+            torch.cuda.synchronize(device)
+        started = time.perf_counter()
         sample = model.sample_team(latent, payload, k=draws, generator=generator, return_trace=True)
+        if str(device).startswith("cuda"):
+            torch.cuda.synchronize(device)
+        timings.append(time.perf_counter() - started)
         if not (
             torch.isfinite(sample.log_value_prob).all()
             and torch.isfinite(sample.log_route_prob).all()
@@ -240,4 +249,10 @@ def score_samples(
         "native_policy_changed": False,
         "search_connected": False,
         "prior_used": use_prior,
+        "sampler_timing": {
+            "contexts": len(timings), "draws_per_call": draws,
+            "maximum_seconds": max(timings), "mean_seconds": sum(timings) / len(timings),
+            "calls_over_five_seconds": sum(value > 5 for value in timings),
+            "scope": "Sampler call including context projection, excluding donor retrieval, policy and search.",
+        },
     }

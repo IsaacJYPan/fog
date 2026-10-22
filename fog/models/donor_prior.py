@@ -24,6 +24,7 @@ class DonorPriorBatch:
     tokens: torch.Tensor  # [batch,6,donors,15], canonical unordered donor moves
     weights: torch.Tensor  # [batch,6,donors], normalized over public-compatible sets
     smoothing: float
+    residual_mode: str = "all"
 
     def __post_init__(self):
         if (
@@ -36,15 +37,20 @@ class DonorPriorBatch:
             raise ValueError("Donor weights/smoothing disagree with their token batch")
         if not bool(torch.isfinite(self.weights).all()) or bool((self.weights < 0).any()):
             raise ValueError("Donor weights must be finite and nonnegative")
+        if self.residual_mode not in ("all", "fallback_only"):
+            raise ValueError("Unknown donor residual mode")
 
     def index_select(self, indices):
-        return DonorPriorBatch(self.tokens[indices], self.weights[indices], self.smoothing)
+        return DonorPriorBatch(
+            self.tokens[indices], self.weights[indices], self.smoothing, self.residual_mode
+        )
 
     def repeat_interleave(self, count):
         return DonorPriorBatch(
             self.tokens.repeat_interleave(count, dim=0),
             self.weights.repeat_interleave(count, dim=0),
             self.smoothing,
+            self.residual_mode,
         )
 
     def condition(self, logits, fed, position):
@@ -100,6 +106,12 @@ class DonorPriorBatch:
         probabilities = torch.where(
             total > 0, (1 - self.smoothing) * empirical + self.smoothing * uniform, uniform
         )
+        if self.residual_mode == "fallback_only":
+            # Preserve the donor conditional exactly while it has support. This
+            # conservative mode cannot learn to correct a supported but wrong
+            # donor prior; it is an explicit comparison, not a general posterior.
+            neutral = torch.where(legal, torch.zeros_like(logits), logits)
+            logits = torch.where(total > 0, neutral, logits)
         # Retain -inf on illegal values and a finite path to every legal target.
         return logits + probabilities.clamp_min(torch.finfo(logits.dtype).tiny).log()
 
@@ -113,11 +125,17 @@ class DonorPrior:
     a set that would not appear in an unconditional species top-k.
     """
 
-    def __init__(self, bank: ReplayCandidateBank | Path, *, max_donors=128, smoothing=0.001):
+    def __init__(
+        self, bank: ReplayCandidateBank | Path, *, max_donors=128, smoothing=0.001,
+        residual_mode="all",
+    ):
         if not isinstance(bank, ReplayCandidateBank):
             bank = ReplayCandidateBank(Path(bank))
         if max_donors < 1 or not 0 < smoothing < 1:
             raise ValueError("Positive donor cap and nonzero smoothing below one required")
+        if residual_mode not in ("all", "fallback_only"):
+            raise ValueError("Unknown donor residual mode")
+        self.residual_mode = residual_mode
         self.bank, self.max_donors, self.smoothing = bank, int(max_donors), float(smoothing)
         self.rosters = np.sort(bank.rosters, axis=1)
         if (bank.tokens < 0).any():
@@ -169,4 +187,5 @@ class DonorPrior:
             torch.as_tensor(tokens, device=device),
             torch.as_tensor(weights, device=device),
             self.smoothing,
+            self.residual_mode,
         )

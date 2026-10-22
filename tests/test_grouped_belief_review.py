@@ -45,6 +45,15 @@ def test_pooled_ece_and_identical_pairs_do_not_create_false_certainty():
     contrast = result["contrasts"]["native_residual_minus_prior_only"]["joint_recall_at_8"]
     assert contrast["point"] == 0 and contrast["low"] is None and contrast["high"] is None
     assert contrast["degenerate_bootstrap"]
+    custom = sampler_comparisons(
+        {"control": methods["prior_only"], "candidate": methods["native_residual"]},
+        pairs=[("control", "candidate")], replicates=200,
+    )
+    assert custom["contrasts"]["candidate_minus_control"] == result["contrasts"][
+        "native_residual_minus_prior_only"
+    ]
+    with pytest.raises(ValueError, match="missing sampler"):
+        sampler_comparisons(methods, pairs=[("missing", "prior_only")], replicates=200)
     methods["native_residual"]["by_game"]["a"]["team_rosters"] = ["changed"]
     with pytest.raises(ValueError, match="roster groups"):
         sampler_comparisons(methods, replicates=200)

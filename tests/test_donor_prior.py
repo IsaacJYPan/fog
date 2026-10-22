@@ -64,6 +64,42 @@ def test_contradicted_or_missing_donors_back_off_without_masking_legal_targets()
         p.condition(torch.full((1, 3), -torch.inf), fed, 7)
 
 
+def test_fallback_residual_preserves_supported_prior_and_only_trains_fallback_rows():
+    p = prior_batch(batch=2)
+    p.residual_mode = "fallback_only"
+    fed = public_tokens(batch=2).flatten(1)
+    fed[1, 1] = 2  # Only the second row has exhausted donor support.
+    neural = torch.tensor([[8.0, -4.0, 1.0], [8.0, -4.0, 1.0]], requires_grad=True)
+    got = p.condition(neural, fed, 7)
+    pure = p.condition(torch.zeros_like(neural), fed, 7)
+    assert torch.equal(got[0], pure[0])
+    assert torch.allclose(got[1].softmax(-1), neural[1].softmax(-1), atol=1e-7)
+    got.log_softmax(-1)[:, 0].sum().backward()
+    assert torch.equal(neural.grad[0], torch.zeros(3))
+    assert bool((neural.grad[1] != 0).any())
+    assert p.repeat_interleave(2).residual_mode == "fallback_only"
+    assert p.index_select(slice(0, 1)).residual_mode == "fallback_only"
+
+
+def test_fallback_mode_uses_legal_query_support_not_just_matching_donors():
+    p = prior_batch()
+    p.residual_mode = "fallback_only"
+    fed = public_tokens().flatten(1)
+    # All donor nature values are excluded by the query mask, despite matching prefixes.
+    logits = torch.tensor([[-torch.inf, -torch.inf, 2.0, -1.0]])
+    result = p.condition(logits, fed, 7)
+    assert torch.isfinite(result[:, 2:]).all() and torch.isneginf(result[:, :2]).all()
+    assert torch.allclose(result.softmax(-1), logits.softmax(-1), atol=1e-7)
+
+
+@pytest.mark.parametrize("mode", ["all", "fallback_only"])
+def test_donor_residual_mode_rejects_unknown_configuration(mode):
+    p = prior_batch()
+    assert DonorPriorBatch(p.tokens, p.weights, p.smoothing, mode).residual_mode == mode
+    with pytest.raises(ValueError, match="residual mode"):
+        DonorPriorBatch(p.tokens, p.weights, p.smoothing, "typo")
+
+
 def small_model():
     torch.manual_seed(14)
     model = BeliefModel(
@@ -102,6 +138,30 @@ def test_sampling_queries_and_scoring_use_the_same_prior():
     for i in range(16):
         score = model.path_logprob(context, payload, sampled.teams[:, i], order_mode="canonical")
         assert torch.allclose(score, sampled.log_value_prob[:, i], atol=1e-6)
+
+
+@pytest.mark.parametrize("fallback", [False, True])
+def test_fallback_mode_has_the_same_query_sample_and_path_probabilities(fallback):
+    model = small_model()
+    model.heads["item"].bias.data[1] = 4
+    public = prior_batch().tokens[:, :, 0].clone()
+    public[:, 0, 1] = -1
+    if fallback:
+        public[:, 0, 2] = 2  # No donor has the public ability, despite legal neural support.
+    prior = prior_batch()
+    prior.residual_mode = "fallback_only"
+    payload = {"tokens": public, "prior": prior}
+    context = torch.zeros(1, 8)
+    marginal = model(context, payload).logits["item"][0, 0].softmax(-1)
+    query = model.query_field(context, payload, slot=0, field="item").softmax(-1)[0]
+    assert torch.allclose(marginal, query, atol=1e-7)
+    samples = model.sample_team(context, payload, k=8, return_trace=True,
+                                generator=torch.Generator().manual_seed(14))
+    assert torch.allclose(samples.log_value_prob[0], marginal[samples.teams[0, :, 0, 1]].log(),
+                          atol=1e-6)
+    for i in range(8):
+        score = model.path_logprob(context, payload, samples.teams[:, i], order_mode="canonical")
+        assert torch.allclose(score, samples.log_value_prob[:, i], atol=1e-6)
 
 
 def test_prior_training_keeps_target_open_and_backpropagates_residual():
@@ -174,7 +234,8 @@ def test_prior_slot_permutation_tracks_the_public_team():
 
 
 @pytest.mark.parametrize("seed", [3, 83])
-def test_selected_training_queries_match_full_forward_values_and_gradients(seed):
+@pytest.mark.parametrize("residual_mode", ["all", "fallback_only"])
+def test_selected_training_queries_match_full_forward_values_and_gradients(seed, residual_mode):
     model = small_model().eval()
     for head in [*model.heads.values(), *model.ev_stat_heads]:
         torch.nn.init.normal_(head.weight, std=0.1)
@@ -183,6 +244,7 @@ def test_selected_training_queries_match_full_forward_values_and_gradients(seed)
     public = public_tokens(batch=16)
     context = torch.randn(16, 8)
     payload = {"tokens": public, "prior": prior_batch(batch=16)}
+    payload["prior"].residual_mode = residual_mode
     from fog.pretrained.joint import normalized_belief_loss
 
     results, gradients = [], []

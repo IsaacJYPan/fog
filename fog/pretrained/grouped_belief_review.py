@@ -42,7 +42,7 @@ def interval(point, draws):
     }
 
 
-def sampler_comparisons(methods, *, seed=20261020, replicates=20000):
+def sampler_comparisons(methods, *, seed=20261020, replicates=20000, pairs=None):
     names = sorted(next(iter(methods.values()))["by_game"])
     reference = next(iter(methods.values()))["by_game"]
     groups = connected_groups([reference[name]["team_rosters"] for name in names])
@@ -102,7 +102,7 @@ def sampler_comparisons(methods, *, seed=20261020, replicates=20000):
         summaries[method] = {key: interval(value, boot[key]) for key, value in point.items()}
         samples[method] = (point, boot)
     contrasts = {}
-    pairs = [
+    pairs = pairs if pairs is not None else [
         ("previous_neural", "prior_only"),
         ("prior_only", "facts_residual"),
         ("prior_only", "native_residual"),
@@ -110,6 +110,8 @@ def sampler_comparisons(methods, *, seed=20261020, replicates=20000):
         ("expanded_existing_prior", "native_residual"),
     ]
     for left, right in pairs:
+        if left not in samples or right not in samples:
+            raise ValueError("Comparison names a missing sampler")
         contrasts[right + "_minus_" + left] = {
             key: interval(
                 samples[right][0][key] - samples[left][0][key],
