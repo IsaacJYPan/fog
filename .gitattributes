@@ -1,0 +1,3 @@
+# Cached categorical labels bind the exact bytes of these schema sources.
+fog/constants/schema.py text eol=lf
+fog/constants/tables.py text eol=lf
