@@ -192,3 +192,28 @@ After the fix: model forward 48% (trunk and policy), observation encoding 33%, N
 8%. Batching the forward across battles (ROADMAP P0.5) is the next lever. Small leftovers of
 2–4% each: regex in `fog/env/actions.py`, scalar clipping and a heuristic call in action
 features, the legality mask computed twice.
+
+## 2026-11-11: batched Showdown rollout runner (ROADMAP P0.5, part)
+
+`fog/env/showdown_batch_runner.py` plays N in-memory Showdown battles in one process with one
+forward per wave. `python -m fog.eval.showdown_rollout_probe --batch N`, CPU, one torch thread,
+another job on about two of four cores, so approximate.
+
+| Batch | Decisions/s |
+| --- | ---: |
+| existing single-battle path | 87 |
+| 1 | 87 |
+| 8 | 137 |
+| 32 (32 games) | 158 |
+| 32 (96 games) | 175 |
+| 32 (96 games, 2 torch threads) | 194 |
+
+Batch 1 records exactly what the existing path records (hash-identical over 2, 4 and 32
+games). At batches 4 and 8 actions and observations are identical and log-probabilities and
+values differ by at most 5e-7. At batch 32: observation building 41%, forward 29%, Node step
+and parsing 19%, sampling and recording 10%.
+
+Not yet wired into PPO. That needs: the runner in place of the per-game loop in
+`_ShowdownRolloutWorker.run`; per-battle providers for private state and opponent; dropping
+per-game global seeding; per-battle heuristic-teacher state; a batch-size setting with more
+games per worker; and a GPU-resident actor for a GPU forward. Not checked with the leak probe on.

@@ -90,7 +90,11 @@ def _choice(controller: Any, battle: Any, request: dict[str, Any] | None, rng: r
         order = controller(battle)
     else:
         raise TypeError("local controller must be FogPlayer-like, a scripted name, or callable")
+    return order_message(order, battle)
 
+
+def order_message(order: Any, battle: Any) -> str:
+    """Showdown choice text for a controller's order, with switches mapped to request slots."""
     # poke-env's scripted baselines and frozen Player-like controllers bypass FogPlayer's action
     # mapper. Normalize their Pokemon switch orders here too: numeric-leading nicknames otherwise
     # reach Showdown as enormous party-slot numbers (for example nickname "6666" -> slot 6666).

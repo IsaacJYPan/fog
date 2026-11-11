@@ -95,7 +95,9 @@ cites the `fog` commit that produced the result.
       anything above 15% that is not model inference or the Node step. Likely suspects: per-step
       JSON state serialization in `fog/env/showdown_worker.js`, poke-env message parsing, and
       `fog/env/mirror_recording.py`.
-- [ ] **P0.5 Batched inference across battles.** Today each rollout process plays one battle at
+- [ ] **P0.5 Batched inference across battles.** The runner exists
+      (`fog/env/showdown_batch_runner.py`, numbers in the ledger); wiring it into
+      `_ShowdownRolloutWorker` and a GPU forward remain, with the steps listed in the ledger. Today each rollout process plays one battle at
       a time with batch-1 CPU inference (`_ShowdownRolloutWorker` in `fog/training/ppo.py`). Change
       to N concurrent battles per process with one batched forward per wave, as
       `EngineRunner._agent_wave` already does for the engine backend, and allow the forward to run

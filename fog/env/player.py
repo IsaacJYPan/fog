@@ -7,6 +7,7 @@ frozen-probe measurements live in ``MirrorRecorder``.
 from __future__ import annotations
 
 from collections.abc import Callable
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
@@ -24,6 +25,19 @@ if TYPE_CHECKING:
 
     from fog.models.agent import FogAgent
     from fog.training.rollout import RolloutBuffer
+
+
+@dataclass
+class PendingDecision:
+    """One battle's prepared decision between `prepare_decision` and `complete_decision`."""
+
+    battle: Any
+    tag: str
+    ledger: Any
+    tracker: Any
+    obs: Any
+    active_idx: np.ndarray
+    oracle_truth: np.ndarray | None
 
 
 class FogPlayer:
@@ -218,6 +232,28 @@ class FogPlayer:
         import torch
 
         from fog.encoding.batch import observation_to_batch
+
+        pending = self.prepare_decision(battle)
+        device = _agent_device(self.agent)
+        batch = observation_to_batch(pending.obs, device)
+        if pending.oracle_truth is not None:
+            batch["opp_truth_tokens"] = torch.as_tensor(
+                pending.oracle_truth, dtype=torch.long, device=device
+            ).unsqueeze(0)
+
+        with torch.no_grad():
+            if self._act_needs_belief():
+                out = self.agent(batch)
+            else:
+                out = self.agent(batch, need_belief=False)
+        return self.complete_decision(pending, out, 0, batch=batch)
+
+    def prepare_decision(self, battle: Any) -> PendingDecision:
+        """First phase of `act`: update per-battle state and build the observation.
+
+        Consumes no randomness and runs no model, so observations from many battles can be
+        collated into one forward before each is finished with `complete_decision`.
+        """
         from fog.encoding.observation import Observation
 
         tag, ledger, tracker, fed = self._battle_state(battle)
@@ -230,28 +266,32 @@ class FogPlayer:
         obs = Observation.from_battle(battle, tracker=tracker)
         obs.validate()
 
-        device = _agent_device(self.agent)
         active_idx = (
             obs.active_idx
             if obs.active_idx is not None
             else np.asarray(active_entity_indices(battle), dtype=np.int64)
         )
-        batch = observation_to_batch(obs, device)
         oracle_truth = None
         if self.oracle_truth_provider is not None:
             oracle_truth = self.oracle_truth_provider(battle)
             if oracle_truth is not None:
                 oracle_truth = np.asarray(oracle_truth, dtype=np.int64)
-                batch["opp_truth_tokens"] = torch.as_tensor(
-                    oracle_truth, dtype=torch.long, device=device
-                ).unsqueeze(0)
+        return PendingDecision(battle, tag, ledger, tracker, obs, active_idx, oracle_truth)
 
-        with torch.no_grad():
-            if self._act_needs_belief():
-                out = self.agent(batch)
-            else:
-                out = self.agent(batch, need_belief=False)
-        recorded_log_probs = out.log_probs[0]
+    def complete_decision(
+        self, pending: PendingDecision, out: Any, row: int, *, batch: dict | None = None
+    ):
+        """Last phase of `act`: sample from row `row` of `out`, record it, return the order.
+
+        `out` is the agent output for a batch in which this decision is row `row`. Hooks that
+        receive `out` (overrides, label providers, observers) and search assume a one-row batch.
+        """
+        player = self._player_ref
+        battle, tag, ledger, tracker = pending.battle, pending.tag, pending.ledger, pending.tracker
+        obs, active_idx, oracle_truth = pending.obs, pending.active_idx, pending.oracle_truth
+        device = _agent_device(self.agent)
+        log_probs = out.log_probs[row]
+        recorded_log_probs = log_probs
         if self.action_override is not None:
             action_idx = int(self.action_override(battle, obs, out))
             if not bool(obs.legality_mask[action_idx]):
@@ -260,7 +300,7 @@ class FogPlayer:
             action_idx = self._search_action(battle, obs, tracker, batch, device)
         else:
             action_idx = _sample_action(
-                out.log_probs[0],
+                log_probs,
                 temperature=self.temperature,
                 tera_logit_bonus=self.tera_logit_bonus,
             )
@@ -269,7 +309,7 @@ class FogPlayer:
                 # action.  Previously temperature changed the sample but the untempered policy
                 # probability was recorded, silently corrupting every importance ratio at T != 1.
                 recorded_log_probs = _behavior_log_probs(
-                    out.log_probs[0],
+                    log_probs,
                     temperature=self.temperature,
                     tera_logit_bonus=self.tera_logit_bonus,
                 )
@@ -294,7 +334,7 @@ class FogPlayer:
                 gid = self._game_id(tag)
                 frag["behavior_log_probs"] = recorded_log_probs.detach().cpu().numpy()
                 if self.record_policy_reference:
-                    frag["reference_log_probs"] = out.log_probs[0].detach().cpu().numpy()
+                    frag["reference_log_probs"] = log_probs.detach().cpu().numpy()
                 if self.supervised_label_provider is not None:
                     supervised_label = int(self.supervised_label_provider(battle, obs, out))
                     if not 0 <= supervised_label < len(obs.legality_mask):
@@ -326,7 +366,7 @@ class FogPlayer:
                     frag,
                     action=action_idx,
                     log_prob=float(recorded_log_probs[action_idx]),
-                    value=float(out.value[0]),
+                    value=float(out.value[row]),
                     leak_ce=self._leakage_ce(mirror, obs, device),
                     progress_score=_progress_score(battle),
                 )
