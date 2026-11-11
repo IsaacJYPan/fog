@@ -15,6 +15,7 @@ Live extraction:
 """
 from __future__ import annotations
 
+import functools
 import re
 from typing import Any
 
@@ -114,14 +115,28 @@ def _own_nature_evs(mon: Any, species_id: str, tables) -> tuple[int, list[int]]:
     stats = getattr(mon, "stats", None) or {}
     features = (tables.species.get("features", {}) or {}).get(species_id)
     try:
-        actual = np.asarray([int(stats[key]) for key in EV_STATS], dtype=np.int64)
-        base = np.asarray(features["base_stats"], dtype=np.int64)
+        actual = tuple(int(stats[key]) for key in EV_STATS)
+        base = tuple(int(value) for value in features["base_stats"])
     except (KeyError, TypeError, ValueError):
         return NATURE_INDEX["serious"], [0] * 6
 
+    level = int(getattr(mon, "level", 100) or 100)
+    nature, ev_units = _invert_nature_evs(base, actual, level)
+    return nature, list(ev_units)
+
+
+@functools.lru_cache(maxsize=8192)
+def _invert_nature_evs(
+    base: tuple[int, ...], actual: tuple[int, ...], level: int
+) -> tuple[int, tuple[int, ...]]:
+    """Invert calculated stats into (nature index, six EV units).
+
+    The result depends only on base stats, calculated stats and level, all of which are fixed for
+    a Pokemon during a battle. The encoder asks for it for every own Pokemon at every decision, and
+    the 25-nature search dominated observation encoding before it was memoized.
+    """
     from fog.constants.build_spreads import nature_multipliers
 
-    level = int(getattr(mon, "level", 100) or 100)
     units = np.arange(N_EV_UNITS, dtype=np.int64)
     best: tuple[int, int, list[int]] | None = None
     for nature in NATURES:
@@ -151,7 +166,7 @@ def _own_nature_evs(mon: Any, species_id: str, tables) -> tuple[int, list[int]]:
         if best is None or candidate[:2] < best[:2]:
             best = candidate
             best_nature = nature
-    return NATURE_INDEX[best_nature], best[2]  # type: ignore[index,has-type]
+    return NATURE_INDEX[best_nature], tuple(best[2])  # type: ignore[index,has-type]
 
 
 class _Layout:

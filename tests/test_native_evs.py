@@ -174,3 +174,33 @@ def test_compatible_loader_inserts_native_flags_without_discarding_board_project
     assert torch.equal(loaded[:, ep + 13], old[:, ep + 7])
     assert torch.equal(loaded[:, ep + 14 : ENTITY_RAW_DIM], old[:, ep + 8 : old_raw_dim])
     assert torch.equal(loaded[:, ENTITY_RAW_DIM:], old[:, old_raw_dim:])
+
+
+def test_stat_inversion_is_memoized_without_sharing_results():
+    """The encoder inverts calculated stats at every decision; repeats must be cached and safe."""
+    from types import SimpleNamespace
+
+    from fog.constants.build_spreads import nature_multipliers
+    from fog.constants.schema import EV_STATS
+    from fog.encoding.entities import _invert_nature_evs, _own_nature_evs
+
+    species = "greattusk"
+    base = TABLES.species["features"][species]["base_stats"]
+    ev_units = [63, 1, 0, 0, 63, 0]
+    mult = nature_multipliers("careful")
+    stats = {}
+    for index, key in enumerate(EV_STATS):
+        core = 2 * int(base[index]) + 31 + ev_units[index]
+        stats[key] = core + 110 if index == 0 else int((core + 5) * mult[index])
+    mon = SimpleNamespace(stats=stats, level=100)
+
+    _invert_nature_evs.cache_clear()
+    nature, first = _own_nature_evs(mon, species, TABLES)
+    assert nature == NATURE_INDEX["careful"]
+    assert first == ev_units
+
+    first[0] = -1  # a caller mutating its copy must not corrupt later lookups
+    nature_again, second = _own_nature_evs(mon, species, TABLES)
+    assert (nature_again, second) == (nature, ev_units)
+    info = _invert_nature_evs.cache_info()
+    assert (info.hits, info.misses) == (1, 1)
