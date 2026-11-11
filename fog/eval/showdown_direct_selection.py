@@ -11,7 +11,23 @@ One matched block therefore contains four games.  Every row receives the same te
 Showdown seeds, and controller seeds.  Outcomes can still differ because a changed action changes
 the later random-request sequence, but the exogenous schedule is identical.
 
+Any controller can be an entrant: ``--controller LABEL=module:factory`` imports ``factory`` and
+calls it (with ``--controller-kwargs LABEL=JSON`` as keyword arguments) once per row. The returned
+object either has the local runner's ``act(battle) -> order`` contract or a ``choose(battle)``
+method returning a FOG action index or an order. Optional hooks: ``take_game_counters()`` (per-game
+counters, recorded after every game), ``discard_last_uncommitted_decision(battle)`` (Showdown
+rejected the last choice) and ``_battle_finished(battle)``. A controller label named in
+``--opponent`` is an opponent; any other controller is a candidate like a checkpoint.
+
+``--sequential`` stops each row at the first ``BlockSPRT`` decision on per-block mean scores.
+Each finished row prints one Markdown results-ledger row.
+
 Example:
+    python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b \
+      --controller mcts=fog.search.engine_mcts:showdown_controller \
+      --controller-kwargs 'mcts={"k": 4, "budget_ms": 400}' \
+      --opponent simpleheuristics --games 100 --sequential --out runs/mcts_vs_sh.json
+
     python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a \
       --checkpoint g0=runs/pb_loop/gen_00/agent_in.pt \
       --checkpoint gen0=runs/pb_loop/gen_00/agent.pt \
@@ -22,6 +38,8 @@ Example:
 from __future__ import annotations
 
 import argparse
+import datetime
+import importlib
 import json
 import math
 import random
@@ -58,6 +76,26 @@ class MatchResult:
     turns: int = 0
     wall_s: float = 0.0
     game_scores: list[float | None] = field(default_factory=list)
+    # Per-game controller counters ({"a": {...}, "b": {...}}) for controllers that expose them.
+    game_counters: list[dict[str, Any]] = field(default_factory=list)
+    sequential: dict[str, Any] | None = None
+
+    def counter_totals(self, side: str) -> dict[str, float]:
+        totals: dict[str, float] = {}
+        for game in self.game_counters:
+            for key, value in (game.get(side) or {}).items():
+                if isinstance(value, (int, float)):
+                    totals[key] = totals.get(key, 0) + value
+        return totals
+
+    def block_means(self) -> list[float]:
+        """Mean score of each complete four-game block (unresolved games excluded)."""
+        means = []
+        for start in range(0, len(self.game_scores) - len(self.game_scores) % 4, 4):
+            scores = [s for s in self.game_scores[start:start + 4] if s is not None]
+            if scores:
+                means.append(sum(scores) / len(scores))
+        return means
 
     def as_dict(self) -> dict[str, Any]:
         from fog.eval.stats import wilson_interval
@@ -77,6 +115,8 @@ class MatchResult:
             "a_score": (self.a_wins + 0.5 * true_draws) / finished if finished else None,
             "mean_turns": self.turns / self.completed_games if self.completed_games else None,
             "games_per_second": self.completed_games / self.wall_s if self.wall_s else None,
+            "a_counter_totals": self.counter_totals("a"),
+            "b_counter_totals": self.counter_totals("b"),
         }
 
 
@@ -171,8 +211,13 @@ def run_match(
     max_turns: int = 200,
     initial: MatchResult | None = None,
     progress_callback: Callable[[MatchResult], None] | None = None,
+    stop_after_block: Callable[[MatchResult], bool] | None = None,
 ) -> MatchResult:
-    """Run one matched row; more than 20% failed games is a defect and aborts the row."""
+    """Run one matched row; more than 20% failed games is a defect and aborts the row.
+
+    ``stop_after_block`` is called after every complete four-game block; returning ``True`` ends
+    the row early (sequential stopping).
+    """
     from fog.env.showdown_local_runner import play_local_battle
 
     a, b = make_a(), make_b()
@@ -190,6 +235,20 @@ def run_match(
         raise ValueError("legacy evaluation lacks per-game outcomes; use a new report path")
     previous_wall_s = result.wall_s
     started = time.perf_counter()
+
+    def take_counters() -> None:
+        counters = {}
+        for side, controller in (("a", a), ("b", b)):
+            take = getattr(controller, "take_game_counters", None)
+            if take is not None:
+                counters[side] = take()
+        if counters:
+            result.game_counters.append(counters)
+
+    def stop_now(index: int) -> bool:
+        return (stop_after_block is not None and (index + 1) % 4 == 0
+                and bool(stop_after_block(result)))
+
     for index in range(start_index, len(schedule)):
         game = schedule[index]
         p1, p2 = (a, b) if game.p1_is_a else (b, a)
@@ -206,6 +265,7 @@ def run_match(
         except Exception as exc:
             result.failures += 1
             result.game_scores.append(None)
+            take_counters()
             print(f"[showdown-selection] {label} game {index} failed: {exc!r}", flush=True)
             if result.failures > max(1, len(schedule) // 5):
                 raise RuntimeError(
@@ -215,7 +275,10 @@ def run_match(
             result.wall_s = previous_wall_s + time.perf_counter() - started
             if progress_callback is not None and (index + 1) % 4 == 0:
                 progress_callback(result)
+            if stop_now(index):
+                break
             continue
+        take_counters()
         result.completed_games += 1
         result.turns += battle.turns
         result.truncated += int(battle.truncated)
@@ -239,10 +302,118 @@ def run_match(
                 flush=True,
             )
         result.wall_s = previous_wall_s + time.perf_counter() - started
+        stop = stop_now(index)
         if progress_callback is not None and (index + 1) % 4 == 0:
             progress_callback(result)
+        if stop:
+            break
     result.wall_s = previous_wall_s + time.perf_counter() - started
     return result
+
+
+class ChooseAdapter:
+    """Give a ``choose(battle)`` controller the local runner's ``act(battle)`` contract.
+
+    ``choose`` may return a FOG action index (mapped through ``map_action_to_order``) or an order.
+    Optional hooks of the wrapped object are forwarded.
+    """
+
+    def __init__(self, inner: Any) -> None:
+        self.inner = inner
+
+    def act(self, battle: Any) -> Any:
+        choice = self.inner.choose(battle)
+        if isinstance(choice, (int,)) and not isinstance(choice, bool):
+            from fog.env.actions import map_action_to_order
+            from fog.env.showdown_local_runner import LocalOrderFactory
+
+            return map_action_to_order(battle, int(choice), LocalOrderFactory())
+        return choice
+
+    def __getattr__(self, name: str) -> Any:
+        if name in ("take_game_counters", "discard_last_uncommitted_decision",
+                    "_battle_finished", "choose_teampreview"):
+            return getattr(self.inner, name)
+        raise AttributeError(name)
+
+
+def load_controller_factory(spec: str, kwargs: dict[str, Any] | None = None) -> Callable[[], Any]:
+    """``module:factory`` -> a zero-argument maker of local-runner controllers."""
+    module_name, separator, attr = spec.partition(":")
+    if not separator or not module_name or not attr:
+        raise ValueError(f"controller spec must be module:factory, got {spec!r}")
+    factory = getattr(importlib.import_module(module_name), attr)
+    options = dict(kwargs or {})
+
+    def make() -> Any:
+        controller = factory(**options)
+        if not hasattr(controller, "act") and hasattr(controller, "choose"):
+            controller = ChooseAdapter(controller)
+        if not (hasattr(controller, "act") or callable(controller)):
+            raise TypeError(f"{spec} returned neither an act() nor a choose() controller")
+        return controller
+
+    return make
+
+
+def sequential_stop(min_blocks: int, max_blocks: int, **sprt: Any) -> Callable[[MatchResult], bool]:
+    """A ``run_match`` stop rule: ``BlockSPRT`` over the row's block means, recomputed each block
+    (so it resumes correctly). Stores the decision in ``result.sequential``."""
+    from dataclasses import asdict as dc_asdict
+
+    from fog.eval.stats import BlockSPRT
+
+    min_blocks = max(2, min(min_blocks, max_blocks))
+
+    def stop(result: MatchResult) -> bool:
+        decision = BlockSPRT.evaluate(
+            result.block_means(), min_blocks=min_blocks, max_blocks=max_blocks, **sprt
+        )
+        result.sequential = {**dc_asdict(decision), "min_blocks": min_blocks,
+                             "max_blocks": max_blocks, **sprt}
+        return decision.decision != "continue"
+
+    return stop
+
+
+def git_short_hash() -> str:
+    import subprocess
+
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
+                             text=True, check=True, cwd=Path(__file__).resolve().parent)
+        dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+                               capture_output=True, text=True,
+                               cwd=Path(__file__).resolve().parent).stdout.strip()
+        return out.stdout.strip() + ("+dirty" if dirty else "")
+    except (OSError, subprocess.CalledProcessError):
+        return "unknown"
+
+
+def ledger_row(row: dict[str, Any], *, backend: str, commit: str, command: str,
+               date: str | None = None) -> str:
+    """One results-ledger Markdown row for a finished match row (candidate = A)."""
+    totals = row.get("a_counter_totals") or {}
+    decisions = totals.get("decisions") or 0
+    seconds = totals.get("decision_seconds")
+    per_decision = f"{seconds / decisions:.3f}" if decisions and seconds is not None else "n/a"
+    fallbacks = (f"{int(totals['fallbacks'])}/{int(decisions)}"
+                 if "fallbacks" in totals and decisions else "n/a")
+    point = row.get("a_win_rate_decisive")
+    if point is None or point != point:
+        rate = "n/a"
+    else:
+        rate = f"{point:.3f} [{row['wilson_95_low']:.3f}, {row['wilson_95_high']:.3f}]"
+    games = f"{row['completed_games']}"
+    if row.get("failures"):
+        games += f" (+{row['failures']} failed)"
+    sequential = row.get("sequential")
+    if sequential:
+        games += f", SPRT {sequential['decision']} at {sequential['blocks']} blocks"
+    cells = [date or datetime.date.today().isoformat(), row["a"], row["b"], backend, games,
+             f"{rate} ({row['a_wins']}-{row['b_wins']}-{row['draws'] - row['truncated']})",
+             per_decision, fallbacks, f"`{commit}`", f"`{command}`"]
+    return "| " + " | ".join(str(cell).replace("|", "\\|") for cell in cells) + " |"
 
 
 def _checkpoint_arg(value: str) -> tuple[str, str]:
@@ -292,8 +463,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Matched direct-Showdown checkpoint selection")
     parser.add_argument("--pool", type=Path, default=Path("data/teams/pool_a"))
     parser.add_argument("--config", default="configs/default.yaml")
-    parser.add_argument("--checkpoint", action="append", type=_checkpoint_arg, required=True,
+    parser.add_argument("--checkpoint", action="append", type=_checkpoint_arg, default=[],
                         metavar="LABEL=PATH")
+    parser.add_argument(
+        "--controller", action="append", type=_checkpoint_arg, default=[],
+        metavar="LABEL=MODULE:FACTORY",
+        help="an arbitrary controller entrant; a label also named in --opponent is an opponent",
+    )
+    parser.add_argument(
+        "--controller-kwargs", action="append", type=_checkpoint_arg, default=[],
+        metavar="LABEL=JSON", help="keyword arguments (a JSON object) for a controller factory",
+    )
     parser.add_argument(
         "--checkpoint-config", action="append", type=_checkpoint_arg, default=[],
         metavar="LABEL=CONFIG",
@@ -315,7 +495,7 @@ def main() -> None:
         ),
     )
     parser.add_argument("--opponent", action="append", default=[],
-                        choices=("random", "maxdamage", "simpleheuristics"))
+                        help="random, maxdamage, simpleheuristics, or a --controller label")
     parser.add_argument("--head-to-head", action="store_true")
     parser.add_argument("--games", type=int, default=256,
                         help="games per row; must be a multiple of four")
@@ -337,8 +517,20 @@ def main() -> None:
                         help="save raw Tera margins and temperature-one mass with action stats")
     parser.add_argument("--resume", action="store_true",
                         help="resume --out from its last complete four-game block")
+    parser.add_argument("--sequential", action="store_true",
+                        help="stop each row at the first BlockSPRT decision on block means")
+    parser.add_argument("--sprt-p0", type=float, default=0.50)
+    parser.add_argument("--sprt-p1", type=float, default=0.55)
+    parser.add_argument("--sprt-alpha", type=float, default=0.05)
+    parser.add_argument("--sprt-beta", type=float, default=0.05)
+    parser.add_argument("--sprt-min-blocks", type=int, default=100,
+                        help="capped at the row's block count (--games / 4), the maximum")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args()
+    import shlex
+    import sys
+
+    command = "python -m fog.eval.showdown_direct_selection " + shlex.join(sys.argv[1:])
 
     try:
         args.temperature = validate_evaluation_temperature(args.temperature)
@@ -347,6 +539,28 @@ def main() -> None:
 
     if len(dict(args.checkpoint)) != len(args.checkpoint):
         parser.error("checkpoint labels must be unique")
+    controller_specs = dict(args.controller)
+    if len(controller_specs) != len(args.controller) or set(controller_specs) & set(
+        dict(args.checkpoint)
+    ):
+        parser.error("controller labels must be unique and distinct from checkpoint labels")
+    controller_kwargs: dict[str, dict[str, Any]] = {}
+    for label, raw in args.controller_kwargs:
+        if label not in controller_specs:
+            parser.error(f"--controller-kwargs label {label!r} is not a --controller label")
+        try:
+            controller_kwargs[label] = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            parser.error(f"--controller-kwargs {label}: {exc}")
+        if not isinstance(controller_kwargs[label], dict):
+            parser.error(f"--controller-kwargs {label} must be a JSON object")
+    scripted_names = ("random", "maxdamage", "simpleheuristics")
+    for opponent in args.opponent:
+        if opponent not in scripted_names and opponent not in controller_specs:
+            parser.error(f"--opponent {opponent!r} is neither scripted nor a --controller label")
+    candidate_controllers = [label for label in controller_specs if label not in args.opponent]
+    if not args.checkpoint and not candidate_controllers:
+        parser.error("request at least one --checkpoint or candidate --controller")
     if not args.opponent and not args.head_to_head:
         parser.error("request at least one --opponent or --head-to-head")
 
@@ -378,6 +592,16 @@ def main() -> None:
     teams = load_pool(args.pool)
     packed = [to_packed(team) for team in teams]
     schedule = matched_schedule(len(teams), args.games, args.seed)
+    controller_makers = {
+        label: load_controller_factory(spec, controller_kwargs.get(label))
+        for label, spec in controller_specs.items()
+    }
+    stop_rule = None
+    if args.sequential:
+        stop_rule = sequential_stop(
+            args.sprt_min_blocks, args.games // 4, p0=args.sprt_p0, p1=args.sprt_p1,
+            alpha=args.sprt_alpha, beta=args.sprt_beta,
+        )
 
     agents = {}
     for label, checkpoint in args.checkpoint:
@@ -420,8 +644,15 @@ def main() -> None:
 
         return make
 
-    def scripted_factory(name: str) -> Callable[[], str]:
+    def scripted_factory(name: str) -> Callable[[], Any]:
+        if name in controller_makers:
+            return controller_makers[name]
         return lambda: name
+
+    def candidate_factory(label: str, stats_key: str) -> Callable[[], Any]:
+        if label in controller_makers:
+            return controller_makers[label]
+        return checkpoint_factory(label, stats_key)
 
     protocol = {
         "simulator": "pinned Pokemon Showdown, direct in-memory worker",
@@ -444,6 +675,16 @@ def main() -> None:
         "primary_score": "win=1, genuine draw=0.5, loss=0; truncations unresolved",
         "draws_excluded_from_win_rate": True,  # legacy decisive diagnostic only
     }
+    if controller_specs:
+        protocol["controllers"] = controller_specs
+        protocol["controller_kwargs"] = controller_kwargs
+    if args.sequential:
+        protocol["sequential"] = {
+            "test": "BlockSPRT on four-game block mean scores", "p0": args.sprt_p0,
+            "p1": args.sprt_p1, "alpha": args.sprt_alpha, "beta": args.sprt_beta,
+            "min_blocks": min(args.sprt_min_blocks, args.games // 4),
+            "max_blocks": args.games // 4,
+        }
     checkpoint_map = dict(args.checkpoint)
     rows: list[dict[str, Any]] = []
     current: MatchResult | None = None
@@ -476,7 +717,10 @@ def main() -> None:
     completed = {
         row["label"] for row in rows
         if int(row.get("completed_games", 0)) + int(row.get("failures", 0)) >= args.games
+        or (row.get("sequential") or {}).get("decision", "continue") != "continue"
     }
+    ledger_rows: list[str] = []
+    commit = git_short_hash()
 
     def finish(match: MatchResult) -> None:
         nonlocal current
@@ -493,6 +737,10 @@ def main() -> None:
             f"({match.a_wins}-{match.b_wins}, draws={match.draws})",
             flush=True,
         )
+        if match.sequential:
+            print(f"[showdown-selection] SPRT {match.label}: {match.sequential}", flush=True)
+        ledger_rows.append(ledger_row(row, backend="showdown_direct", commit=commit,
+                                      command=command))
 
     def run_row(client: Any, make_a: Callable[[], Any], make_b: Callable[[], Any], *,
                 label: str, a_name: str, b_name: str) -> None:
@@ -517,6 +765,7 @@ def main() -> None:
             label=label, a_name=a_name, b_name=b_name,
             fmt=args.format, progress_every=args.progress_every,
             max_turns=args.max_turns, initial=initial, progress_callback=progress,
+            stop_after_block=stop_rule,
         )
         finish(match)
 
@@ -525,28 +774,30 @@ def main() -> None:
     if showdown_root:
         client_kwargs["showdown_root"] = showdown_root
     with ShowdownDirectClient(**client_kwargs) as client:
-        for label in agents:
+        for label in [*agents, *candidate_controllers]:
             for opponent in args.opponent:
                 run_row(
                     client,
-                    checkpoint_factory(label, f"{label} vs {opponent}"),
+                    candidate_factory(label, f"{label} vs {opponent}"),
                     scripted_factory(opponent),
                     label=f"{label} vs {opponent}", a_name=label, b_name=opponent,
                 )
 
         if args.head_to_head:
-            labels = list(agents)
+            labels = [*agents, *candidate_controllers]
             for i, a_label in enumerate(labels):
                 for b_label in labels[i + 1:]:
                     run_row(
                         client,
-                        checkpoint_factory(a_label, f"{a_label} vs {b_label}:a"),
-                        checkpoint_factory(b_label, f"{a_label} vs {b_label}:b"),
+                        candidate_factory(a_label, f"{a_label} vs {b_label}:a"),
+                        candidate_factory(b_label, f"{a_label} vs {b_label}:b"),
                         label=f"{a_label} vs {b_label}", a_name=a_label, b_name=b_label,
                     )
 
     write_report("complete")
     print(f"[showdown-selection] report -> {args.out}", flush=True)
+    if ledger_rows:
+        print("\n".join(ledger_rows), flush=True)
 
 
 if __name__ == "__main__":
