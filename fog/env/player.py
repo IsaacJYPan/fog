@@ -247,7 +247,10 @@ class FogPlayer:
                 ).unsqueeze(0)
 
         with torch.no_grad():
-            out = self.agent(batch)
+            if self._act_needs_belief():
+                out = self.agent(batch)
+            else:
+                out = self.agent(batch, need_belief=False)
         recorded_log_probs = out.log_probs[0]
         if self.action_override is not None:
             action_idx = int(self.action_override(battle, obs, out))
@@ -486,6 +489,25 @@ class FogPlayer:
             with torch.no_grad():
                 out = self.agent(batch)
             return _sample_action(out.log_probs[0], temperature=self.temperature)
+
+    def _act_needs_belief(self) -> bool:
+        """True when anything at act time may read belief outputs; then skip nothing."""
+        from fog.models.agent import FogAgent
+
+        if not isinstance(self.agent, FogAgent):
+            return True
+        return any(
+            getattr(self, name, None) is not None
+            for name in (
+                "search",
+                "phi_hat",
+                "decision_observer",
+                "action_override",
+                "supervised_label_provider",
+                "oracle_truth_provider",
+                "private_state_truth_provider",
+            )
+        )
 
     # ------------------------------------------------------------------------------ mirror/leakage
     def _mirror(self, battle: Any, obs: Any, ledger: Any) -> tuple[dict, dict] | None:

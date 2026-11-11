@@ -252,8 +252,14 @@ class EngineRunner:
                 np.stack(rows), dtype=torch.long, device=device
             )
 
+        from fog.models.agent import FogAgent
+
+        # Acting reads only log_probs below; skip the belief heads for FogAgent policies.
         with torch.no_grad():
-            out = agent(batch)
+            if isinstance(agent, FogAgent):
+                out = agent(batch, need_belief=False)
+            else:
+                out = agent(batch)
 
         actions: list[int] = []
         for i, (slot, role) in enumerate(items):

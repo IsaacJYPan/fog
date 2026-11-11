@@ -526,7 +526,7 @@ class FogAgent(nn.Module):
             dim=-1,
         )
 
-    def forward(self, batch: dict) -> AgentOutput:
+    def forward(self, batch: dict, *, need_belief: bool = True) -> AgentOutput:
         """`batch` holds the stacked Observation tensors + auxiliary inputs.
 
         Required keys: entities [B,12,D_ent], entity_ids [B,12,N_id], field [B,D_field],
@@ -539,7 +539,18 @@ class FogAgent(nn.Module):
 
         `aux_into_trunk=False` detaches the fused belief context before belief/self-belief so their
         losses cannot shape either encoder path. The policy always sees the live paths.
+
+        `need_belief=False` skips the belief, self-belief and chain heads (and the opponent-view
+        encoding that only feeds self-belief); their `AgentOutput` fields are then None. This is
+        safe in every configuration because log_probs/value never read belief outputs: the set
+        oracle only rewrites the belief net's input, the action oracle reads
+        `opp_committed_action`, and posterior features come from the batch. The marginal belief
+        path draws no random numbers, so skipping it leaves the RNG stream unchanged. A batch that
+        explicitly asks for the belief chain (`compute_belief_chain`) conflicts with
+        `need_belief=False` and raises.
         """
+        if not need_belief and batch.get("compute_belief_chain", False):
+            raise ValueError("need_belief=False conflicts with compute_belief_chain=True")
         if self.blind_reactive:
             # Reactive baseline: no memory (history=0) and no epistemic info (opp reveal tokens
             # blanked, so the belief chain is fed nothing). Architecture is UNCHANGED so the same
@@ -577,9 +588,6 @@ class FogAgent(nn.Module):
             self.structured_encoder(contexts, self.backbone.embeds)
             if self.structured_encoder is not None
             else None
-        )
-        belief_structured_context = self.structured_context(
-            contexts, "belief", structured_memory
         )
         value_structured_context = self.structured_context(
             contexts, "value", structured_memory
@@ -622,13 +630,16 @@ class FogAgent(nn.Module):
         # route/cut and supplies the auxiliary loss.
         belief_out: BeliefOutput | None = None
         belief_chain: BeliefOutput | None = None
-        belief_context = self.belief_context(
-            contexts, belief_structured_context, shared_state
-        )
-        belief_context_aux = (
-            belief_context if self.aux_into_trunk else belief_context.detach()
-        )
-        if opp_revealed is not None:
+        if need_belief and opp_revealed is not None:
+            belief_structured_context = self.structured_context(
+                contexts, "belief", structured_memory
+            )
+            belief_context = self.belief_context(
+                contexts, belief_structured_context, shared_state
+            )
+            belief_context_aux = (
+                belief_context if self.aux_into_trunk else belief_context.detach()
+            )
             belief_out = self.belief(
                 belief_context_aux, opp_revealed
             )                                                             # marginals (diagnostic)
@@ -669,7 +680,7 @@ class FogAgent(nn.Module):
 
         self_belief_out: BeliefOutput | None = None
         self_belief_chain: BeliefOutput | None = None
-        opp_view = batch.get("opp_view")
+        opp_view = batch.get("opp_view") if need_belief else None
         if opp_view is not None:
             opponent_contexts = self.encode_contexts(opp_view)
             opponent_shared_state = (
