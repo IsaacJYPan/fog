@@ -89,7 +89,7 @@ cites the `fog` commit that produced the result.
       turn at every decision, which is quadratic in game length. Cache the parsed per-turn records
       on the tracker; completed turns never change. Acceptance: encoded history arrays identical
       on the golden battles in `tests/golden`; probe throughput recorded.
-- [ ] **P0.4 Profile the `showdown_direct` rollout path** with `cProfile` the same way (the
+- [x] **P0.4 Profile the `showdown_direct` rollout path** (done; profile and result in the ledger) with `cProfile` the same way (the
       command is in the ledger). It could not be profiled in the session that wrote this file
       because Showdown could not be built there. Record the top ten cumulative entries. Fix
       anything above 15% that is not model inference or the Node step. Likely suspects: per-step

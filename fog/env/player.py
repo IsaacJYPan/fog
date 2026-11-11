@@ -491,7 +491,12 @@ class FogPlayer:
             return _sample_action(out.log_probs[0], temperature=self.temperature)
 
     def _act_needs_belief(self) -> bool:
-        """True when anything at act time may read belief outputs; then skip nothing."""
+        """True when anything at act time may read belief outputs; then skip nothing.
+
+        The leakage probe (`phi_hat`) and the private-state truth provider feed only the mirror
+        recording and the probe's own forward; neither reads this agent's output, so they do not
+        force the belief heads (the engine backend skips them in the same situation).
+        """
         from fog.models.agent import FogAgent
 
         if not isinstance(self.agent, FogAgent):
@@ -500,12 +505,10 @@ class FogPlayer:
             getattr(self, name, None) is not None
             for name in (
                 "search",
-                "phi_hat",
                 "decision_observer",
                 "action_override",
                 "supervised_label_provider",
                 "oracle_truth_provider",
-                "private_state_truth_provider",
             )
         )
 

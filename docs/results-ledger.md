@@ -153,3 +153,42 @@ only at the root.
 | EngineMCTS, Tera allowed | EngineMCTS, Tera filtered | 100 | 47 | 11 | 42 |
 
 The difference is within noise at 100 games. The Tera-allowed player terastallized in 62 games.
+
+## 2026-11-11: Showdown rollout path profiled (ROADMAP P0.4)
+
+Pinned Showdown now builds in the work sandbox (`npm ci --ignore-scripts`, then `npm run build`).
+Probe: `python -m fog.eval.showdown_rollout_probe`, one process, CPU, random weights, self-play on
+`showdown_direct`, teams from `data/teams/pool_b`. Another job was using about two of the four
+cores, so the rates are approximate.
+
+Profile before (cProfile, 12 games, 1,666 decisions):
+
+| Share | Where |
+| ---: | --- |
+| 62% | model forward; belief heads alone 26% |
+| 23.5% | observation encoding (action features 9.1%, entities 5.4%, history about 6%) |
+| 5.9% | Node round trip and JSON |
+| 2.5% | species-key regex normalisation in `fog/env/actions.py` |
+| 2.0% | poke-env message parsing |
+| 1.4% | mirror recording |
+
+The Showdown simulator step is a small share here too. The Node worker already skips state
+serialisation.
+
+Fix: the rollout worker always attaches a private-truth provider, which kept the belief heads on
+for every acting forward although nothing reads them at act time. Removing that provider and the
+leak probe from the trigger list gives:
+
+| Code | Decisions/s | Games/s |
+| --- | ---: | ---: |
+| Before | about 42 | 0.24 |
+| After | about 77 | 0.45 |
+
+Every recorded fragment, action, log-probability, value and outcome hashes identically before
+and after over 8, 12 and 16 games (2,758 decisions in the largest). Not verified by hash: runs
+with the leak probe active (`beta > 0`), which this recipe does not use.
+
+After the fix: model forward 48% (trunk and policy), observation encoding 33%, Node round trip
+8%. Batching the forward across battles (ROADMAP P0.5) is the next lever. Small leftovers of
+2–4% each: regex in `fog/env/actions.py`, scalar clipping and a heuristic call in action
+features, the legality mask computed twice.
