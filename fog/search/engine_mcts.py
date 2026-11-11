@@ -12,17 +12,17 @@ No network. At each decision:
 5. play the argmax of ``p`` mapped to a legal FOG action index.
 
 Move-string mapping. The engine reports root options as strings: a move id (``stealthrock``), a
-switch (``switch greattusk``) or, in principle, a Tera move (``stealthrock-tera``). The controller
+switch (``switch greattusk``) or a Tera move (``stealthrock-tera``). The controller
 builds the reverse map from ``EngineBattle.engine_action`` over the legal indices of
 ``action_mask`` (so mask, mapping and the step contract can never disagree), normalising ids with
 ``to_id`` and prefixing switches with ``switch``. Search entries that do not map to a legal action
 are dropped before aggregation and their visits counted in ``unmapped_visits``.
 
-Terastallization. Probed on poke-engine 0.0.48 (Gen 9 build): the built-in search never lists a
-``-tera`` root option, before or after a side has terastallized, so EngineMCTS never
-terastallizes. Should a later build list them, ``-tera`` entries are dropped once the side has used
-Tera (``battle.tera_used``), and any other entry that is illegal under ``action_mask`` is dropped
-by the mapping anyway.
+Terastallization. poke-engine 0.0.48 must be built with its ``terastallization`` feature (see
+pyproject.toml); without it the search never lists a ``-tera`` root option. With it, the search
+lists ``<move>-tera`` for each move while no mon on that side has terastallized, and stops once one
+has. ``-tera`` entries are additionally dropped once the side has used Tera (``battle.tera_used``),
+and any other entry that is illegal under ``action_mask`` is dropped by the mapping anyway.
 
 The engine's per-option ``total_score / visits`` is in ``[0, 1]`` from the side's own perspective;
 ``last_value`` is its world-weighted mean over our side's kept visits.

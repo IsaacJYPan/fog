@@ -208,3 +208,44 @@ def test_controller_falls_back_when_every_world_fails(pool, monkeypatch):
     assert mcts.counters["worlds_dropped"] == mcts.counters["worlds_sampled"] > 0
     assert mcts.last_policy is None and mcts.last_value is None
     assert idx == mcts.fallback_policy.choose(battle, "p1")
+
+
+@engine_only
+def test_search_proposes_tera_and_controller_respects_tera_used(pool):
+    """The engine is built with Terastallization: the search lists ``-tera`` root options while a
+    side may still terastallize, and the controller never returns a Tera action afterwards."""
+    from fog.env.engine_battle import EngineBattle
+    from fog.env.engine_scripted import EngineMaxDamagePolicy
+    from fog.search.engine_mcts import EngineMCTSPolicy, engine_choice_map, search_world
+
+    battle = EngineBattle(pool[0], pool[1], seed=1)
+    root = search_world(battle.state, "p1", iterations=300)
+    assert any(choice.endswith("-tera") for choice in root.visits)
+
+    mcts = EngineMCTSPolicy(k=2, iterations=150, seed=0)
+    idx = mcts.choose(battle, "p1")
+    assert battle.action_mask("p1")[idx]
+    assert any(c.endswith("-tera") for w in mcts.last_root.worlds for c in w.visits)
+
+    tera_idx = min(i for k, i in engine_choice_map(battle, "p1").items() if k.endswith("-tera"))
+    battle.step({"p1": battle.engine_action("p1", tera_idx), "p2": battle.engine_action("p2", 0)})
+    assert battle.tera_used["p1"]
+    root = search_world(battle.state, "p1", iterations=300)
+    assert not any(choice.endswith("-tera") for choice in root.visits)
+
+    opp = EngineMaxDamagePolicy(seed=0)
+    for _ in range(60):
+        if battle.finished:
+            break
+        moves = {}
+        for role in battle.pending_sides():
+            if role == "p1":
+                idx = mcts.choose(battle, role)
+                assert battle.action_mask(role)[idx]
+                assert not 4 <= idx < 8, "Tera action after Tera was used"
+                if mcts.last_policy is not None:
+                    assert mcts.last_policy[4:8].sum() == 0
+            else:
+                idx = opp.choose(battle, role)
+            moves[role] = battle.engine_action(role, idx)
+        battle.step(moves)

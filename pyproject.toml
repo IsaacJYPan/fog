@@ -52,10 +52,12 @@ fog = ["env/*.js"]
 
 [tool.uv]
 # poke-engine's default Cargo feature is an older battle generation. The Gen 9 build changes
-# type interactions, critical-hit rates, Terastallization, and other mechanics. Always compile
-# this dependency from source with exactly the generation this project studies.
+# type interactions, critical-hit rates and other mechanics; the separate `terastallization`
+# feature (which implies gen9) makes the engine offer `-tera` move options while a side has not
+# yet terastallized, and applies the Tera type to type checks, effectiveness and the 60 BP floor.
+# Always compile this dependency from source with exactly the mechanics this project studies.
 no-binary-package = ["poke-engine"]
-config-settings-package = { poke-engine = { build-args = "--features poke-engine/gen9 --no-default-features" } }
+config-settings-package = { poke-engine = { build-args = "--features poke-engine/terastallization --no-default-features" } }
 
 [tool.ruff]
 line-length = 100
