@@ -120,7 +120,12 @@ Combined rollout speed on the engine backend is about 205 decisions/s at batch 3
 50) [verified, 4 cores, approximate; another job was running]. The throughput of PPO itself has
 not been re-measured because the batched runner is not wired in.
 
-### In progress, UNCOMMITTED in `/home/user/fog`
+### Reconstruction fixes: COMMITTED (after the note below was written) but not fully verified
+The work described next was committed once 70 engine and reconstruction tests passed and ruff was
+clean. The Showdown re-measurement never finished and Tera damage was not checked against
+Showdown, so P1.2c/d stay open in the roadmap. Treat the text below as the review checklist.
+
+### (original note) In progress
 A subagent was fixing reconstruction faults (roadmap P1.2c/d) when it hit the usage limit
 (the failed task says it can be resumed with `SendMessage` after 2pm UTC; names are not stable
 across restarts, so starting a fresh agent from this description is the safe route). On disk:
