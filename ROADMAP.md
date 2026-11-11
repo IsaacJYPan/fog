@@ -104,7 +104,7 @@ cites the `fog` commit that produced the result.
       on the GPU. Target: ≥ 150 decisions/s on four CPU cores plus one GPU on `showdown_direct`,
       ≥ 400 on the engine backend. If the target is missed, record the new profile and stop; do
       not start a simulator rewrite (see section 7).
-- [ ] **P0.6 One evaluation command.** Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
+- [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already
       plays four-game matched blocks crossing teams and sides) so that:
       (a) any controller can be an opponent, not only three scripted names and checkpoints: accept
@@ -153,7 +153,7 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       the header of `fog/env/engine_battle.py` notes that the engine does not enforce one Tera
       per side and that `EngineBattle` masks it. Test what the built-in search does after a side
       has already used Tera; if it still proposes Tera moves, drop those entries when mapping.
-- [ ] **P1.2a Run the Showdown adapter.** `ShowdownEngineMCTS` in `fog/search/engine_mcts.py`
+- [x] **P1.2a Run the Showdown adapter.** Done (`fog` commit `ef773aa`); first numbers in the ledger. `ShowdownEngineMCTS` in `fog/search/engine_mcts.py`
       has never been executed. Run it on `showdown_direct`, fix what breaks, and change its
       all-worlds-failed fallback from the first legal move to SimpleHeuristics.
 - [x] **P1.2b Terastallization in the built-in search.** Done in `fog` commit `cc9e2de`: the engine
@@ -168,7 +168,12 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       comment in that file, which still says the engine does not enforce one Tera per side.
       The engine itself records a Tera used during a Pursuit switch for side one regardless of
       side; note any effect seen.
-- [ ] **P1.3 Fidelity counters.** Log per game: decisions, worlds dropped, fallbacks, and the
+- [ ] **P1.2d Reconstruction fixes found on Showdown.** In `fog/env/state_recon.py`: 0 PP is
+      rebuilt as full PP (`current_pp or max_pp`); Rest sleep is rebuilt as ordinary sleep with
+      four turns, which makes the engine panic (all fallbacks so far); and the search still
+      proposes Tera after our side has used it, so the used-Tera state is not carried into the
+      rebuilt state. Fix each with a test, then re-run the ledger's smoke commands.
+- [ ] **P1.3 Fidelity counters.** Per-game counters now exist (`take_game_counters`). Log per game: decisions, worlds dropped, fallbacks, and the
       number of chosen actions Showdown rejected. Run `fog/scripts/fuzz_recon.py` on the
       validation teams and fix the top reconstruction failures until the gate's limit is met.
 - [ ] **P1.4 Budget curve.** Win rate vs `A2` at `budget_ms` 200, 800, 3200 and `K` 1, 8, 32

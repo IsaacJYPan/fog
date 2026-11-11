@@ -9,7 +9,7 @@ Row format for matches (printed by the evaluation command once ROADMAP P0.6 exis
 | Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 
-No match rows yet. No gate has passed.
+Match rows are in the dated sections below. No gate has passed.
 
 ## 2026-11-11: baseline measurements
 
@@ -217,3 +217,19 @@ Not yet wired into PPO. That needs: the runner in place of the per-game loop in
 `_ShowdownRolloutWorker.run`; per-battle providers for private state and opponent; dropping
 per-game global seeding; per-battle heuristic-teacher state; a batch-size setting with more
 games per worker; and a GPU-resident actor for a GPU forward. Not checked with the leak probe on.
+
+## 2026-11-11: EngineMCTS on pinned Showdown, first smoke rows
+
+**Smoke, not gate G1:** 100 games each, quarter budget (4 worlds, 400 ms per decision, one
+thread), and `data/teams/pool_b` is the only tracked pool (16 teams, not a held-out split).
+The SPRT minimum was lowered to 25 blocks for these runs.
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-11 | EngineMCTS | SimpleHeuristics | showdown_direct | 100 | 0.800 [0.711, 0.867] | 0.434 | 3/2645 | `ef773aa` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k": 4, "budget_ms": 400, "threads": 1}' --opponent simpleheuristics --games 100 --sequential --out runs/smoke/a.json` |
+| 2026-11-11 | EngineMCTS | MaxDamage | showdown_direct | 100 | 0.990 [0.946, 0.998] | 0.444 | 0/2399 | `ef773aa` | same with `--opponent maxdamage` |
+
+No illegal action was sent and Showdown rejected none. Twelve worlds were dropped against
+SimpleHeuristics. All three fallbacks came from Rest sleep being reconstructed as ordinary
+sleep, which makes the engine panic. Other reconstruction faults found: 0 PP rebuilt as full
+PP, and Tera still proposed after use (64 results, dropped correctly). See ROADMAP P1.2d.
