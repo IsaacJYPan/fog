@@ -24,6 +24,16 @@ fatal, and a stepped ply that trips the engine is caught upstream and the sample
     source (item vs move vs ability) is hidden — we seed nominal remaining counts.
   * Volatiles: mapped to the engine's known set; substitute HP seeded at 1/4 max when present.
   * Opponent move `disabled` flags: only set from a matched revealed move that reports disabled.
+
+Sleep: the engine keeps two counters. ``rest_turns`` (3 right after Rest, counting down once per
+move attempt, waking at 1) marks sleep from Rest; ``sleep_turns`` counts move attempts made in
+ordinary sleep and must stay at or below the engine's Gen 9 maximum of 3 (above it the wake-up
+chance divides by zero or goes negative and the engine panics). Rest sleep is recognised from the
+public log (``-status ... slp|[from] move: Rest``); an EngineView mon exposes ``rest_turns``.
+
+Terastallization: ``types`` keeps the pre-Tera typing; ``terastallized`` plus ``tera_type`` are what
+the engine reads for the Tera same-type bonus, defensive typing and the one-Tera-per-side rule (a
+side may Tera only while none of its Pokemon is terastallized, fainted or benched ones included).
 """
 from __future__ import annotations
 
@@ -31,6 +41,7 @@ from typing import Any
 
 import numpy as np
 
+from fog.encoding.events import event_mon_key
 from fog.encoding.pokemon_state import is_terastallized
 
 try:
@@ -64,6 +75,10 @@ _ENGINE_VOLATILES = {
     "attract", "curse", "nightmare", "torment", "disable", "saltcure",
 }
 _SCREEN_NOMINAL = {"reflect": 5, "light_screen": 5, "aurora_veil": 5, "tailwind": 4}
+# Engine sleep constants (Gen 9 build): Rest sleeps for three move attempts, ordinary sleep wakes
+# for certain on the third counted attempt.
+_REST_SLEEP_TURNS = 3
+_MAX_SLEEP_TURNS = 3
 
 
 def _require_engine() -> None:
@@ -81,14 +96,100 @@ def _engine_status(view_status: Any) -> str:
 
 
 def _types_for(mon: Any, feats: dict, tera_now: bool) -> tuple[str, str]:
-    tera = to_id(getattr(getattr(mon, "tera_type", None), "name", getattr(mon, "tera_type", None)))
-    if tera_now and tera:
-        return (tera, "typeless")
-    types = [to_id(getattr(t, "name", t)) for t in (getattr(mon, "types", None) or [])]
+    """Pre-Tera typing. The engine derives Tera typing from ``terastallized``/``tera_type``, so a
+    terastallized mon keeps its species types here (poke-env reports the Tera type as ``types``)."""
+    types = [] if tera_now else [to_id(getattr(t, "name", t))
+                                 for t in (getattr(mon, "types", None) or [])]
     types = [t for t in types if t and t != "typeless"] or [str(x) for x in feats["types"][:2]]
     while len(types) < 2:
         types.append("typeless")
     return (types[0], types[1])
+
+
+def _rest_attempts(view: Any) -> dict[str, int]:
+    """Public-log scan: mon key ('p1: Name') -> move attempts made since it fell asleep from Rest,
+    for every mon whose current sleep came from Rest."""
+    from fog.encoding.history import observations_by_turn
+
+    asleep: dict[str, int] = {}
+    try:
+        obs = observations_by_turn(view)
+    except Exception:  # noqa: BLE001 - a view without a log simply has no Rest information
+        return asleep
+    for t in sorted(obs):
+        for ev in getattr(obs[t], "events", None) or []:
+            if len(ev) < 3:
+                continue
+            kind, key = ev[1], event_mon_key(ev[2])
+            if kind == "-status":
+                if (len(ev) > 3 and to_id(ev[3]) == "slp"
+                        and any(to_id(a) == "frommoverest" for a in ev[4:])):
+                    asleep[key] = 0
+                else:
+                    asleep.pop(key, None)
+            elif kind in ("-curestatus", "faint"):
+                asleep.pop(key, None)
+            elif key in asleep and (
+                (kind == "cant" and len(ev) > 3 and to_id(ev[3]) == "slp")
+                or (kind == "move" and not any(str(a).startswith("[from]") for a in ev[4:]))
+            ):
+                asleep[key] += 1
+    return asleep
+
+
+def _tera_from_log(view: Any) -> dict[str, str]:
+    """Public-log scan: mon key ('p1: Name') -> Tera type for every ``-terastallize`` event. This
+    backs up the parser's per-mon flag so a side's used Tera is never lost from the rebuilt state
+    (the engine offers Tera to a side while none of its Pokemon is terastallized)."""
+    from fog.encoding.history import observations_by_turn
+
+    out: dict[str, str] = {}
+    try:
+        obs = observations_by_turn(view)
+    except Exception:  # noqa: BLE001 - a view without a log falls back to the parser flags
+        return out
+    for t in sorted(obs):
+        for ev in getattr(obs[t], "events", None) or []:
+            if len(ev) >= 4 and ev[1] == "-terastallize":
+                out[event_mon_key(ev[2])] = to_id(ev[3])
+    return out
+
+
+def _pre_tera_species(sid: str, tables) -> str:
+    """'ogerponwellspringtera' -> 'ogerponwellspring': sampled worlds and team preview use the
+    pre-Tera forme, while the battle log switches the species on Terastallization."""
+    if sid.endswith("tera") and sid[:-4] in tables.species["features"]:
+        return sid[:-4]
+    return sid
+
+
+def _sleep_fields(mon: Any, status: str, rest_attempts: int | None) -> dict[str, int]:
+    """Engine ``sleep_turns`` / ``rest_turns`` for a view mon with engine status `status`."""
+    if status != "sleep":
+        return {"sleep_turns": 0, "rest_turns": 0}
+    rest = getattr(mon, "rest_turns", None)  # EngineView mons carry the engine counter directly
+    if rest is None and rest_attempts is not None:
+        rest = max(1, _REST_SLEEP_TURNS - int(rest_attempts))
+    if rest:
+        return {"sleep_turns": 0, "rest_turns": min(_REST_SLEEP_TURNS, max(1, int(rest)))}
+    counter = int(getattr(mon, "status_counter", 0) or 0)
+    return {"sleep_turns": min(_MAX_SLEEP_TURNS, max(0, counter)), "rest_turns": 0}
+
+
+def _move_pp(view_move: Any, default: int) -> int:
+    """Current PP of a view move: 0 stays 0; unknown falls back to max PP, then `default`."""
+    pp = getattr(view_move, "current_pp", None)
+    if pp is None:
+        pp = getattr(view_move, "max_pp", None)
+    return int(default if pp is None else pp)
+
+
+def _own_tera_type(mon: Any) -> str:
+    """Own mon's Tera type. poke-env only learns it on use, so read the request's ``teraType``."""
+    tera = getattr(getattr(mon, "tera_type", None), "name", getattr(mon, "tera_type", None))
+    if not tera:
+        tera = (getattr(mon, "_last_request", None) or {}).get("teraType")
+    return to_id(tera) or "normal"
 
 
 def _hp_int(frac: float, maxhp: int, alive: bool) -> int:
@@ -96,7 +197,8 @@ def _hp_int(frac: float, maxhp: int, alive: bool) -> int:
     return (max(1, hp) if alive else 0)
 
 
-def _engine_mon_from_self(mon: Any, tables) -> pe.Pokemon:
+def _engine_mon_from_self(mon: Any, tables, rest_attempts: int | None = None,
+                          logged_tera: str | None = None) -> pe.Pokemon:
     """Searcher's own mon (full knowledge) -> pe.Pokemon with EXACT stats."""
     sid = to_id(getattr(mon, "species", ""))
     feats = tables.species["features"][sid]
@@ -115,18 +217,17 @@ def _engine_mon_from_self(mon: Any, tables) -> pe.Pokemon:
         return int((2 * b) * level / 100 + 5)
 
     maxhp = stat("hp", 0)
-    tera_now = is_terastallized(mon)
+    tera_now = is_terastallized(mon) or bool(logged_tera)
     base_types = tuple(str(t) for t in feats["types"][:2])
     while len(base_types) < 2:
         base_types = (*base_types, "typeless")
     moves = []
     for mid, mv in (getattr(mon, "moves", None) or {}).items():
         moves.append(pe.Move(
-            id=to_id(mid), pp=int(getattr(mv, "current_pp", None) or getattr(mv, "max_pp", 16) or 16),
-            disabled=bool(getattr(mv, "disabled", False)),
+            id=to_id(mid), pp=_move_pp(mv, 16), disabled=bool(getattr(mv, "disabled", False)),
         ))
-    tera_id = to_id(getattr(getattr(mon, "tera_type", None), "name",
-                            getattr(mon, "tera_type", None)) or "normal")
+    tera_id = logged_tera or _own_tera_type(mon)
+    status = _engine_status(getattr(mon, "status", None))
     item = to_id(getattr(mon, "item", None) or "none")
     return pe.Pokemon(
         id=sid, level=level, types=_types_for(mon, feats, tera_now), base_types=base_types,
@@ -138,14 +239,15 @@ def _engine_mon_from_self(mon: Any, tables) -> pe.Pokemon:
         special_defense=stat("spd", 4), speed=stat("spe", 5),
         ability=to_id(getattr(mon, "ability", None) or ""),
         item="none" if item in ("", "none", "unknownitem") else item,
-        moves=moves, nature="serious",
-        status=_engine_status(getattr(mon, "status", None)),
-        sleep_turns=int(getattr(mon, "status_counter", 0) or 0),
+        moves=moves, nature="serious", status=status,
+        **_sleep_fields(mon, status, rest_attempts),
         terastallized=tera_now, tera_type=tera_id,
     )
 
 
-def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, tables) -> pe.Pokemon:
+def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, tables,
+                           rest_attempts: int | None = None,
+                           logged_tera: str | None = None) -> pe.Pokemon:
     """Opponent mon: hidden set from the sampled `row`, public board overlaid from `view_mon`
     (None => never seen: full HP, no status, not terastallized)."""
     base = build_engine_pokemon(_decode_world_slot(row, level, tables), tables)
@@ -153,14 +255,20 @@ def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, ta
     if view_mon is None:
         hp, status, tera_now = base.maxhp, "none", False
         disabled: set[str] = set()
+        seen_moves: dict[str, Any] = {}
     else:
-        tera_now = is_terastallized(view_mon)
+        tera_now = is_terastallized(view_mon) or bool(logged_tera)
         hp = _hp_int(getattr(view_mon, "current_hp_fraction", 1.0), base.maxhp,
                      not bool(getattr(view_mon, "fainted", False)))
         status = _engine_status(getattr(view_mon, "status", None))
-        disabled = {to_id(mid) for mid, mv in (getattr(view_mon, "moves", None) or {}).items()
-                    if bool(getattr(mv, "disabled", False))}
-    moves = [pe.Move(id=str(m.id), pp=int(m.pp), disabled=to_id(m.id) in disabled)
+        seen_moves = {to_id(mid): mv for mid, mv in (getattr(view_mon, "moves", None) or {}).items()}
+        disabled = {mid for mid, mv in seen_moves.items() if bool(getattr(mv, "disabled", False))}
+    # A revealed move's observed PP is public; only values below the sampled default matter (the
+    # engine tracks PP from 10 down, and 0 PP removes the move from the options).
+    moves = [pe.Move(id=str(m.id),
+                     pp=min(int(m.pp), _move_pp(seen_moves[to_id(m.id)], int(m.pp)))
+                     if to_id(m.id) in seen_moves else int(m.pp),
+                     disabled=to_id(m.id) in disabled)
              for m in base.moves]
     return pe.Pokemon(
         id=base.id, level=base.level,
@@ -171,9 +279,16 @@ def _engine_mon_from_world(row: np.ndarray, view_mon: Any | None, level: int, ta
         special_defense=base.special_defense, speed=base.speed,
         evs=tuple(base.evs), nature=base.nature, ability=base.ability, item=base.item,
         moves=moves, status=status,
-        sleep_turns=int(getattr(view_mon, "status_counter", 0) or 0) if view_mon is not None else 0,
-        terastallized=tera_now, tera_type=base.tera_type,
+        **(_sleep_fields(view_mon, status, rest_attempts) if view_mon is not None else {}),
+        # a used Tera type is public: it overrides the sampled one
+        terastallized=tera_now, tera_type=(_revealed_tera(view_mon, logged_tera) if tera_now
+                                           else None) or base.tera_type,
     )
+
+
+def _revealed_tera(view_mon: Any, logged_tera: str | None) -> str | None:
+    tera = getattr(view_mon, "tera_type", None)
+    return logged_tera or to_id(getattr(tera, "name", tera)) or None
 
 
 def _side_conditions(cond_dict: dict, turn: int) -> pe.SideConditions:
@@ -269,18 +384,28 @@ def reconstruct_battle(
     turn = int(getattr(view, "turn", 1) or 1)
 
     # ---- my side (searcher, exact) --------------------------------------------------------------
-    my_view_mons = list((getattr(view, "team", None) or {}).values())[:N_SLOTS]
-    my_mons = [_engine_mon_from_self(m, tables) for m in my_view_mons]
+    rest = _rest_attempts(view)
+    tera_log = _tera_from_log(view)
+    my_items = list((getattr(view, "team", None) or {}).items())[:N_SLOTS]
+    my_view_mons = [m for _, m in my_items]
+    my_mons = [_engine_mon_from_self(m, tables, rest.get(str(k)), tera_log.get(str(k)))
+               for k, m in my_items]
     my_active_view = getattr(view, "active_pokemon", None)
     my_active = next((i for i, m in enumerate(my_view_mons) if m is my_active_view), 0)
     my_species = [to_id(getattr(m, "species", "")) for m in my_view_mons]
 
     # ---- opponent side (sampled world + public overlay) -----------------------------------------
     opp_by_species: dict[str, Any] = {}
-    for m in (getattr(view, "opponent_team", None) or {}).values():
-        opp_by_species[to_id(getattr(m, "species", ""))] = m
+    opp_rest: dict[str, int | None] = {}
+    opp_tera: dict[str, str | None] = {}
+    for k, m in (getattr(view, "opponent_team", None) or {}).items():
+        sid = _pre_tera_species(to_id(getattr(m, "species", "")), tables)
+        opp_by_species[sid] = m
+        opp_rest[sid] = rest.get(str(k))
+        opp_tera[sid] = tera_log.get(str(k))
     opp_active_view = getattr(view, "opponent_active_pokemon", None)
-    opp_active_species = to_id(getattr(opp_active_view, "species", "")) if opp_active_view else None
+    opp_active_species = (_pre_tera_species(to_id(getattr(opp_active_view, "species", "")), tables)
+                          if opp_active_view else None)
 
     opp_mons, opp_species = [], []
     opp_active = 0
@@ -294,7 +419,8 @@ def reconstruct_battle(
         level = int(getattr(vm, "level", 100) or 100) if vm is not None else 100
         if opp_active_species is not None and sid == opp_active_species:
             opp_active = len(opp_mons)
-        opp_mons.append(_engine_mon_from_world(world_tokens[j], vm, level, tables))
+        opp_mons.append(_engine_mon_from_world(world_tokens[j], vm, level, tables,
+                                               opp_rest.get(sid), opp_tera.get(sid)))
         opp_species.append(sid)
 
     # ---- assemble sides + field (searcher's actual role decides side_one/side_two) --------------
@@ -306,9 +432,10 @@ def reconstruct_battle(
     state = pe.State(side_one=sides["p1"], side_two=sides["p2"], **_field_kwargs(view, turn))
 
     tera_used = {
-        role: any(is_terastallized(m) for m in my_view_mons),
-        opp_role: any(is_terastallized(m)
-                      for m in (getattr(view, "opponent_team", None) or {}).values()),
+        role: any(bool(m.terastallized) for m in my_mons)
+        or any(is_terastallized(m) for m in my_view_mons),
+        opp_role: any(bool(m.terastallized) for m in opp_mons)
+        or any(is_terastallized(m) for m in (getattr(view, "opponent_team", None) or {}).values()),
     }
     return EngineBattle._from_reconstruction(
         state, role=role, tables=tables, tracker=tracker.clone(),

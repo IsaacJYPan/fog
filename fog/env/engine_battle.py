@@ -23,7 +23,11 @@ see tests/test_engine_battle.py::test_engine_contract):
   * Faint: no Faint instruction; detect hp<=0. The fainted side sends a bare pokemon id next call,
     the opponent sends "none". Pivot (U-turn): ToggleSide*ForceSwitch + the opponent's saved move
     fires after the replacement (engine-internal).
-  * One tera per battle per side is NOT enforced by the engine — `EngineBattle` masks it.
+  * Terastallization is modeled natively (built with the ``terastallization`` feature): a side may
+    Tera only while none of its Pokemon has ``terastallized`` set, so one Tera per side is enforced
+    as long as the flag stays on the Pokemon that used it (fainted or benched). ``types`` keeps the
+    pre-Tera typing; the engine reads ``tera_type`` for STAB and defense. `EngineBattle` also
+    masks Tera from ``tera_used`` for the legality mask.
   * PP never decrements (no Struggle) and switch-trapping abilities (Shadow Tag / Arena Trap) are
     not modeled: documented divergences the cross-sim fuzz must watch (KNOWN_ISSUES).
   * Lead abilities do not activate at State construction; `_lead_patches` seeds weather/terrain/
@@ -292,9 +296,10 @@ def _world_engine_mon(
     hp = max(1, hp) if src.hp > 0 else 0
     tera_now = bool(src.terastallized)
     base_types = tuple(str(t) for t in base.types)
-    types = (to_id(base.tera_type), "typeless") if tera_now else base_types
+    # Keep the pre-Tera typing even when terastallized: the engine applies the Tera typing and the
+    # Tera same-type bonus itself from ``terastallized`` + ``tera_type``.
     return pe.Pokemon(
-        id=base.id, level=base.level, types=types, base_types=base_types,
+        id=base.id, level=base.level, types=base_types, base_types=base_types,
         weight_kg=base.weight_kg,
         hp=hp, maxhp=base.maxhp,
         attack=base.attack, defense=base.defense, special_attack=base.special_attack,
@@ -381,6 +386,8 @@ class _ViewMon:
         status = to_id(getattr(ep, "status", "none") or "none")
         self.status = _STATUS_MAP.get(status, status) if status else None
         self.status_counter = int(getattr(ep, "sleep_turns", 0) or 0)
+        # Rest sleep is public (the Rest move and the sleep it causes are both announced).
+        self.rest_turns = int(getattr(ep, "rest_turns", 0) or 0)
         self.boosts: dict[str, int] = {}
         self.effects: dict[str, int] = {}
 
