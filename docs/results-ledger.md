@@ -1,0 +1,155 @@
+# Results ledger
+
+Append-only. One row or short entry per measured result, with the command and commit that
+produced it. Negative and interrupted results are recorded too. Gates in
+[ROADMAP.md](../ROADMAP.md) are judged only from this file.
+
+Row format for matches (printed by the evaluation command once ROADMAP P0.6 exists):
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+No match rows yet. No gate has passed.
+
+## 2026-11-11: baseline measurements
+
+Machine: 4 CPU cores, no GPU, Python 3.13, locked environment (`uv sync --locked --extra dev`).
+Showdown could not be built in this session, so every number below is on the Rust engine
+backend. Throughput numbers vary by about ±20% between runs on this machine.
+
+Model: `configs/gen9ou_typed_token_selfplay.yaml` builds 5,853,084 parameters. Belief and
+self-belief heads are 2.58 million of them; the typed-token trunk 1.20 million; the earlier
+backbone 1.41 million; policy and value heads 0.31 million.
+
+### Self-play throughput (random weights vs MaxDamage, engine backend)
+
+Command:
+
+```sh
+python -m fog.env.engine_runner --probe --pool data/teams/pool_b \
+  --config configs/gen9ou_typed_token_selfplay.yaml --device cpu --games 32 --batches 1,32
+```
+
+| Code | Batch 1 decisions/s | Batch 32 decisions/s |
+| --- | ---: | ---: |
+| Before (`fog` commit `cd7c5e8`) | 29 | 46–54 |
+| After memoizing nature/EV inversion (ROADMAP P0.1) | 50 | 117–167 |
+
+For reference, the recorded hosted PPO baseline in `docs/kaggle-candidate-training.md` processed
+24,079 decisions in about 23 minutes on two rollout workers: about 17 decisions/s end to end.
+
+### Where the time went (cProfile, batch 16, 16 games, before the fix)
+
+Same command under `python -m cProfile -o probe.prof`, sorted by cumulative time. Total 16.2 s.
+
+| Share | Where |
+| ---: | --- |
+| 59% | `fog/encoding/entities.py:_own_nature_evs`, called for every own Pokémon at every decision from `encode_entities` and `mirror_recording._own_truth_tokens` |
+| 13% | model forward, over half of it in the belief heads |
+| 4% | history encoding |
+| < 3% | engine step (`EngineBattle.step`) |
+
+After the fix (batch 32, 32 games, total 14.9 s under the profiler):
+
+| Share | Where |
+| ---: | --- |
+| 40% | `Observation.from_battle`: history encoding 10% (re-parses every past turn each decision), entity encoding 9%, action features 7% |
+| 29% | model forward: belief heads 16%, earlier backbone 6%, typed-token trunk 4% |
+| 8% | `EngineBattle.view` construction |
+| 7% | opponent-view mirror recording |
+| 7% | engine step and applying the chosen branch |
+
+Conclusion: rollout speed is bounded by Python observation encoding and by heads the acting
+policy does not read, not by the simulator. ROADMAP P0.2–P0.5 follow from this table.
+
+### Rust engine search speed
+
+One opening position built from two teams in `data/teams/pool_b` via `EngineBattle(...).state`,
+single thread.
+
+| Call | Result |
+| --- | --- |
+| `poke_engine.monte_carlo_tree_search(state, duration_ms=50)` | 23,000 iterations (about 415,000/s) |
+| `duration_ms=200` | 81,000 iterations (about 380,000/s) |
+| `duration_ms=1000` | 347,000 iterations (about 324,000/s) |
+| `poke_engine.generate_instructions(state, a1, a2)` called from Python | about 25,000 calls/s |
+
+The result object has `side_one`, `side_two` (lists with `move_choice`, `visits`,
+`total_score`) and `total_visits`. This is the basis for the EngineMCTS anchor (ROADMAP P1).
+
+### Checks run for the P0.1 change
+
+- Old and new `_own_nature_evs` return identical results on 3,000 randomized
+  (species, level, nature, spread) cases, including perturbed stats, the attribute path and both
+  failure paths.
+- `pytest tests/test_native_evs.py tests/test_encoding.py tests/test_events.py
+  tests/test_engine_runner.py tests/test_player_observation_boundary.py
+  tests/test_engine_battle.py tests/test_player_state.py`: 62 passed.
+- The full test suite was not run.
+
+## 2026-11-11: throughput after P0.2 and P0.3, and first EngineMCTS smoke run
+
+Same machine and command as the baseline entry, idle machine, two runs each. `fog` commit
+`bdcd63a`.
+
+| Code | Batch 1 decisions/s | Batch 32 decisions/s |
+| --- | ---: | ---: |
+| Baseline (`cd7c5e8`) | 29 | 46–54 |
+| + nature/EV memo (`b3efdbe`) | 50 | 117–167 |
+| + belief heads skipped when acting (`3712b45`) and history cache (`1719a31`) | 94–95 | 203–212 |
+
+The two later changes were measured together, not separately. Equivalence checks: action
+log-probabilities and values bit-identical with belief on and off on real engine batches;
+cached and uncached history arrays identical at all 214 decisions of three engine games.
+`pytest` on the nine affected test files: 66 passed. The full suite was not run.
+
+Sequential test (`BlockSPRT`, `fog` commit `d3d0bef`), 2,000 simulated matches per row,
+four-game blocks, defaults `p0 = 0.50`, `p1 = 0.55`, `alpha = beta = 0.05`:
+
+| True win rate | Wrong decision | Mean blocks used |
+| ---: | ---: | ---: |
+| 0.50 | 3.75% accept H1 | 162 |
+| 0.55 | 3.8% accept H0 | 160 |
+| 0.60 | none | 101 |
+
+So a typical comparison needs about 650 games rather than a fixed 2,000–4,000.
+
+EngineMCTS smoke run. **Not a gate result:** approximate engine backend, 40 games, a reduced
+budget, and the opponent is the weakest anchor. Command: `python -m fog.eval.engine_mcts_smoke`
+with 4 worlds and 2,000 iterations per world, teams from `data/teams/pool_b`, sides and teams
+alternated.
+
+| Opponent | Games | Result | Fallbacks | Worlds dropped | s/decision |
+| --- | ---: | --- | ---: | ---: | ---: |
+| MaxDamage (engine policy) | 40 | 39 wins, 1 draw, 0 losses | 0 | 0 | 0.038 |
+
+Findings from building it:
+
+- The engine build's tree search never proposes a Terastallization move, so EngineMCTS does not
+  terastallize. Tracked as ROADMAP P1.2b.
+- `data/usage` is empty in the checkout and `priors.json` has no species-usage marginal; the
+  sampler uses each species' total teammate co-occurrence mass instead.
+- The Showdown adapter has not been run (ROADMAP P1.2a). Gate G1 is open.
+
+## 2026-11-11: engine rebuilt with Terastallization
+
+`fog` commit `cc9e2de`. The engine was built with `--features poke-engine/gen9`; its separate
+`terastallization` feature was off, so the built-in search never proposed a Tera move. With the
+feature on, the search lists Tera moves until a side has terastallized, type checks and
+effectiveness use the Tera type for a terastallized Pokémon, and Tera-type moves get the
+60 base-power floor. `uv.lock` did not change.
+
+Checks: eight engine and encoder test files, 59 passed before the rebuild and 60 after (one new
+test). Equivalence with pinned Showdown for terastallized Pokémon has **not** been checked;
+see ROADMAP P1.2c for a known typing error in sampled worlds.
+
+Tera ablation. **Not a gate result:** engine backend, reduced budget (4 worlds, 2,000
+iterations per world), single thread, sides and teams alternated. Command:
+`python -m fog.eval.engine_mcts_smoke --tera-ablation`. The Tera-off player drops Tera moves
+only at the root.
+
+| Candidate | Opponent | Games | Wins | Draws | Losses |
+| --- | --- | ---: | ---: | ---: | ---: |
+| EngineMCTS, Tera allowed | EngineMCTS, Tera filtered | 100 | 47 | 11 | 42 |
+
+The difference is within noise at 100 games. The Tera-allowed player terastallized in 62 games.
