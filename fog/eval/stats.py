@@ -66,3 +66,84 @@ def paired_block_interval(scores, *, alpha: float = 0.05, block_size: int = 4,
     ])
     low, high = np.quantile(boot, [alpha / 2, 1 - alpha / 2])
     return Interval(point, float(low), float(high))
+
+
+_VAR_FLOOR = 1e-6
+
+
+@dataclass
+class SequentialDecision:
+    decision: str  # "accept_h1" | "accept_h0" | "continue" | "max_reached"
+    blocks: int
+    mean: float
+    llr: float
+    lower: float
+    upper: float
+
+
+class BlockSPRT:
+    """Generalized SPRT on matched-block scores in [0, 1] (H0: mean=p0 vs H1: mean=p1).
+
+    Uses a normal approximation, LLR = n (p1-p0)(2m-p0-p1) / (2 s^2), so error rates are
+    approximate. "max_reached" means no decision was reached, not that the players are equal.
+    """
+
+    def __init__(self, p0: float = 0.50, p1: float = 0.55, alpha: float = 0.05,
+                 beta: float = 0.05, min_blocks: int = 100, max_blocks: int = 1000):
+        if not (0.0 < p0 < p1 < 1.0):
+            raise ValueError("require 0 < p0 < p1 < 1")
+        if not (0.0 < alpha < 0.5 and 0.0 < beta < 0.5):
+            raise ValueError("alpha and beta must be in (0, 0.5)")
+        if min_blocks < 2 or max_blocks < min_blocks:
+            raise ValueError("require 2 <= min_blocks <= max_blocks")
+        self.p0, self.p1 = p0, p1
+        self.min_blocks, self.max_blocks = min_blocks, max_blocks
+        self.lower = math.log(beta / (1.0 - alpha))
+        self.upper = math.log((1.0 - beta) / alpha)
+        self.n = 0
+        self._sum = 0.0
+        self._sumsq = 0.0
+        self.finished: SequentialDecision | None = None
+
+    def _llr(self, n: int, mean: float, var: float) -> float:
+        var = max(var, _VAR_FLOOR)
+        return n * (self.p1 - self.p0) * (2.0 * mean - self.p0 - self.p1) / (2.0 * var)
+
+    def _decide(self, n: int, mean: float, llr: float) -> str:
+        if n >= self.min_blocks:
+            if llr >= self.upper:
+                return "accept_h1"
+            if llr <= self.lower:
+                return "accept_h0"
+            if n >= self.max_blocks:
+                return "max_reached"
+        return "continue"
+
+    def update(self, block_score: float) -> SequentialDecision:
+        if self.finished is not None:
+            return self.finished
+        s = float(block_score)
+        if not (0.0 <= s <= 1.0):
+            raise ValueError("block score must be in [0, 1]")
+        self.n += 1
+        self._sum += s
+        self._sumsq += s * s
+        n = self.n
+        mean = self._sum / n
+        var = (self._sumsq - n * mean * mean) / (n - 1) if n > 1 else 0.0
+        llr = self._llr(n, mean, var)
+        d = SequentialDecision(self._decide(n, mean, llr), n, mean, llr, self.lower, self.upper)
+        if d.decision != "continue":
+            self.finished = d
+        return d
+
+    @classmethod
+    def evaluate(cls, scores, **kwargs) -> SequentialDecision:
+        """Run the test over a sequence of block scores, stopping at the first decision."""
+        test = cls(**kwargs)
+        d = SequentialDecision("continue", 0, float("nan"), 0.0, test.lower, test.upper)
+        for s in scores:
+            d = test.update(s)
+            if d.decision != "continue":
+                break
+        return d
