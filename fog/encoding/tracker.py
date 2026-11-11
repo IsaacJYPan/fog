@@ -72,6 +72,9 @@ class BattleTracker:
         self.snapshot_state: dict[int, np.ndarray] = {}
         self.my_actions: dict[int, int] = {}          # turn -> chosen action index 0-13
         self.hp_at_turn_start: dict[int, dict[str, float]] = {}
+        # Per-turn history record cache owned by fog.encoding.history. Entries are immutable
+        # (input fingerprint + read-only array) and validated against current inputs on lookup.
+        self._history_record_cache: dict = {}
 
     def clone(self) -> BattleTracker:
         """A copy safe to feed one more turn without touching the original (search-fork leaves).
@@ -104,6 +107,8 @@ class BattleTracker:
         new.snapshot_state = self.snapshot_state
         new.my_actions = self.my_actions      # shared: feed_turn never writes it
         new.hp_at_turn_start = dict(self.hp_at_turn_start)
+        # Own dict (so a fork's insertions never leak back), sharing the immutable entries.
+        new._history_record_cache = dict(getattr(self, "_history_record_cache", None) or {})
         return new
 
     # ---------------------------------------------------------------------------- player recordings

@@ -74,6 +74,63 @@ def observations_by_turn(battle: Any) -> dict[int, Any]:
     return cache
 
 
+# ------------------------------------------------------------------------------ per-turn cache
+# Completed turns never change, so their parsed records are memoised on the per-battle tracker.
+# Every cache entry stores a fingerprint of *all* inputs the parser reads (the turn's event list
+# content, observer role, table identity, and the tracker/battle-derived arguments). A lookup only
+# hits when the current inputs compare equal to the stored fingerprint, so a turn whose events are
+# still growing, a later-revealed opponent species, or an overwritten action recording simply
+# recomputes. Cached records are read-only; callers always receive freshly stacked arrays.
+_CACHE_ATTR = "_history_record_cache"
+
+
+def _array_fp(value: Any) -> Any:
+    if value is None:
+        return None
+    arr = np.asarray(value)
+    return (arr.dtype.str, arr.shape, arr.tobytes())
+
+
+def _event_matches(event: Any, stored: list) -> bool:
+    return (event if event.__class__ is list else list(event)) == stored
+
+
+def _events_match(events: list, stored: list) -> bool:
+    return len(events) == len(stored) and all(map(_event_matches, events, stored))
+
+
+def _cache_for(tracker: Any) -> dict | None:
+    if tracker is None:
+        return None
+    cache = getattr(tracker, _CACHE_ATTR, None)
+    if cache is None:
+        cache = {}
+        try:
+            setattr(tracker, _CACHE_ATTR, cache)
+        except AttributeError:
+            return None
+    return cache
+
+
+def _cached_record(cache, key, events, tables, inputs, compute) -> np.ndarray:
+    """Return the cached record for ``key`` when every input matches, else compute and store."""
+    if cache is None:
+        return compute()
+    hit = cache.get(key)
+    if (
+        hit is not None
+        and hit[1] is tables
+        and hit[2] == inputs
+        and _events_match(events, hit[0])
+    ):
+        return hit[3]
+    record = compute()
+    frozen = np.array(record, copy=True)
+    frozen.setflags(write=False)
+    cache[key] = ([list(ev) for ev in events], tables, inputs, frozen)
+    return frozen
+
+
 def _my_movesets(battle: Any) -> dict[str, dict[str, int]]:
     """{mon_key: {move_id: slot 0-3}} for retro my-action inference (events.parse_turn_events)."""
     out: dict[str, dict[str, int]] = {}
@@ -98,14 +155,20 @@ def _species_by_key(battle: Any, tables) -> dict[str, int]:
 
 
 def encode_history(
-    battle: Any, tables=None, *, perspective: str = "p1", tracker: Any = None
+    battle: Any,
+    tables=None,
+    *,
+    perspective: str = "p1",
+    tracker: Any = None,
+    use_cache: bool = True,
 ) -> tuple[np.ndarray, int]:
     """Return (history[T, D_turn] float32, history_len) for completed turns, most recent LAST,
     truncated to the last `DIMS.history_cap` turns (front-truncation). battle=None or no
     observations -> single zero row (shape-test path).
 
     `tracker` (BattleTracker, optional) supplies the per-turn start-of-turn snapshots, my recorded
-    action indices, and hp seeds — the retro-fidelity fields that raw event parsing can't recover."""
+    action indices, and hp seeds — the retro-fidelity fields that raw event parsing can't recover.
+    It also hosts the per-turn record cache (``use_cache=False`` bypasses it)."""
     obs_map = observations_by_turn(battle)
     current = int(getattr(battle, "turn", 0) or 0)
     turns = sorted(t for t in obs_map if 1 <= t < current)
@@ -117,31 +180,54 @@ def encode_history(
     role = getattr(battle, "player_role", None) or perspective
     movesets = _my_movesets(battle)
     turns = turns[-DIMS.history_cap :]
-    records = np.stack(
-        [
-            parse_turn_events(
-                getattr(obs_map[t], "events", None) or [],
+    cache = _cache_for(tracker) if use_cache else None
+    rows = []
+    for t in turns:
+        events = getattr(obs_map[t], "events", None) or []
+        action = tracker.my_actions.get(t) if tracker is not None else None
+        snapshot = tracker.snapshots.get(t) if tracker is not None else None
+        hp_seed = tracker.hp_at_turn_start.get(t) if tracker is not None else None
+
+        def compute(events=events, action=action, snapshot=snapshot, hp_seed=hp_seed):
+            return parse_turn_events(
+                events,
                 role,
                 tables,
                 my_movesets=movesets,
-                my_action_idx=(tracker.my_actions.get(t) if tracker is not None else None),
-                snapshot=(tracker.snapshots.get(t) if tracker is not None else None),
-                hp_seed=(tracker.hp_at_turn_start.get(t) if tracker is not None else None),
+                my_action_idx=action,
+                snapshot=snapshot,
+                hp_seed=hp_seed,
             )
-            for t in turns
-        ]
-    ).astype(np.float32)
+
+        if cache is None:
+            rows.append(compute())
+            continue
+        inputs = (
+            action,
+            # movesets are read only for retro inference when no action was recorded
+            movesets if action is None else None,
+            _array_fp(snapshot),
+            dict(hp_seed) if hp_seed is not None else None,
+        )
+        rows.append(_cached_record(cache, ("rec", role, t), events, tables, inputs, compute))
+    records = np.stack(rows).astype(np.float32)
     return records, len(turns)
 
 
 def encode_history_sidecars(
-    battle: Any, tables=None, *, perspective: str = "p1", tracker: Any = None
+    battle: Any,
+    tables=None,
+    *,
+    perspective: str = "p1",
+    tracker: Any = None,
+    use_cache: bool = True,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Return categorical ids and per-stat start state aligned one-for-one with ``encode_history``.
 
     The sidecars are optional model inputs so old replay shards and checkpoints remain usable.
     Real rows follow completed-turn protocol order; the zero row is used only for a length-zero
-    history and is masked by ``history_len``.
+    history and is masked by ``history_len``. Id rows are memoised on ``tracker`` unless
+    ``use_cache=False``; the per-stat state rows are cheap copies and are never cached.
     """
     from fog.encoding.events import N_HISTORY_ID_FIELDS, parse_turn_event_ids
 
@@ -156,6 +242,7 @@ def encode_history_sidecars(
 
     role = getattr(battle, "player_role", None) or perspective
     species = _species_by_key(battle, tables)
+    cache = _cache_for(tracker) if use_cache else None
     ids = []
     states = []
     for turn in turns:
@@ -166,15 +253,24 @@ def encode_history_sidecars(
             recovered = np.rint(legacy[:2] * 1000.0).astype(np.int64)
             recovered[(recovered < 0) | (recovered >= tables.n_species)] = tables.n_species
             snapshot_ids = recovered
-        ids.append(
-            parse_turn_event_ids(
-                getattr(obs_map[turn], "events", None) or [],
+        events = getattr(obs_map[turn], "events", None) or []
+
+        def compute(events=events, snapshot_ids=snapshot_ids):
+            return parse_turn_event_ids(
+                events,
                 role,
                 tables,
                 snapshot_ids=snapshot_ids,
                 species_by_key=species,
             )
-        )
+
+        if cache is None:
+            ids.append(compute())
+        else:
+            inputs = (_array_fp(snapshot_ids), species)
+            ids.append(
+                _cached_record(cache, ("ids", role, turn), events, tables, inputs, compute)
+            )
         state = tracker.snapshot_state.get(turn) if tracker is not None else None
         states.append(
             np.asarray(state, dtype=np.float32)
