@@ -1,0 +1,2 @@
+rows=104037 policy_rows=103981 top1=0.1000 lift=1.047 nll=2.3065 brier=0.2533 ece=0.0575 seconds=137.6 -> docs/briefs/01-artifacts/untrained-holdout.json
+[peakrss] exit=0 wall_s=139.9 max_rss_mb=1138

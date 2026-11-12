@@ -1,0 +1,18 @@
+Stage 3c timing (4 vCPU Intel Xeon @ 2.10GHz, 15.7 GB, no GPU, torch 2.13.0+cu130 on CPU)
+
+Command: see stage3c-timing-output.txt header; run under a wrapper that reports wall-clock and
+peak RSS of the child (/usr/bin/time is not installed on this machine).
+
+1 epoch on train_1000 (52,983 rows) with two 8-batch evaluations (baseline and epoch 1):
+  total wall-clock 488.7 s, peak RSS 2,292 MB
+  training rows/s ~112 (52,983 rows / ~473 s; the ~16 s for start-up and the two 8-batch
+  evaluations is an estimate, the trainer does not log per-phase times)
+Model parameters: 5,853,084 (all trainable), counted with FogAgent.from_tables(cfg).
+Full holdout evaluation (stage 4 tool, untrained model, 104,037 rows): 137.6 s (756 rows/s),
+  wall 139.9 s, peak RSS 1,138 MB.
+
+Projection per curve run = rows x 6 epochs / 112 rows/s + 7 full holdout evaluations (~140 s each):
+  g1000   52,983 rows   ->  2,838 s + 980 s  ~ 1.1 h   run
+  g3000  156,597 rows   ->  8,389 s + 980 s  ~ 2.6 h   run
+  g10000 514,103 rows   -> 27,541 s + 980 s  ~ 7.9 h   over 6 h: not started
+  g20000 1,023,525 rows -> 54,832 s + 980 s  ~ 15.5 h  over 6 h: not started

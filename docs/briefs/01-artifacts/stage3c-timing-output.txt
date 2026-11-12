@@ -1,0 +1,6 @@
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=0e12ebb44fae)
+[bc] baseline  loss=3.717  belief=13.195  chain=3.985
+[bc] epoch 1/1  train_loss=3.151  eval_loss=3.088  belief=8.721  chain=2.537  value=0.982  query_p=0.177  dropped=0.000%
+[bc] done -> runs/blueprint/timing/checkpoints/bc_final.pt  (best eval epoch=1, loss=3.088)
+[peakrss] exit=0 wall_s=488.7 max_rss_mb=2292
+EXIT 0
