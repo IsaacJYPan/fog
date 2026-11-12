@@ -210,6 +210,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       20,000 and ≥ 100,000 games. Keep one fixed chronological holdout of 2,000 games that is
       newer than every training game, and exclude it from the candidate bank as
       `docs/kaggle-candidate-training.md` describes.
+      _2026-11-12: 22,000 games imported (2 shards, 34 s) with a chronological 2,000-game holdout
+      newer than all training games; see the ledger section
+      "replay blueprint learning curve at 1k–20k games"._
 - [ ] **P2.2 Convert** with `fog/scripts/convert_replay_decisions.py` (one imputation per game is
       enough at this scale; three triples storage for correlated rows). Time the conversion on
       1,000 games first and record games/s and stored bytes per decision. If 100,000 games would
@@ -218,18 +221,30 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       available where training runs, do not shrink the corpus: store one compressed record per
       game and build decision rows in the data loader. If fewer than 100,000 games pass the
       filters, lower the rating floor to 1300 before widening the dates, and record the counts.
+      _2026-11-12, at 22,000 games: converted in 28.5 min on 4 cores (12.9 games/s, 1,127,562
+      rows, 624 MB, ~580 bytes per decision); see the ledger section
+      "replay blueprint learning curve at 1k–20k games"._
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
       (start `lr 3e-4` cosine, batch ≥ 1,024, until holdout loss stops improving), not the PPO
       continuation settings.
+      _2026-11-12: trained from scratch on 1,000 and 3,000 games on CPU at batch 256 (not ≥ 1,024);
+      10,000 and 20,000 not run (over 6 h on 4 cores); see the ledger section
+      "replay blueprint learning curve at 1k–20k games"._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
       anything else; if it improves by < 0.005 and training NLL is close to holdout NLL, the model
       is the limit: train the `gen9ou_typed_token_wide.yaml` variant and compare.
+      _2026-11-12, 1k and 3k points only: holdout NLL 2.307 (untrained) → 1.841 → 1.635, −0.43 per
+      tenfold data (more data next); value ECE 0.032 at 3k; see the ledger section
+      "replay blueprint learning curve at 1k–20k games"._
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
+      _2026-11-12, smoke only (400 games, `pool_b`, 3k model): 0.258 vs SimpleHeuristics, 0.623 vs
+      MaxDamage greedy; see the ledger section
+      "replay blueprint learning curve at 1k–20k games"._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 on the holdout.

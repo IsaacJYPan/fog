@@ -1,0 +1,10 @@
+for T in 0 0.5; do
+  uv run --no-sync python -m fog.eval.showdown_direct_selection \
+    --pool data/teams/pool_b --device cpu \
+    --config configs/replay_blueprint_cpu.yaml \
+    --checkpoint blueprint=runs/blueprint/g3000/checkpoints/bc_best.pt \
+    --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml \
+    --opponent simpleheuristics --opponent maxdamage \
+    --games 400 --temperature $T --out runs/blueprint/play_t$T.json
+  echo "EXIT_T$T $?"
+done

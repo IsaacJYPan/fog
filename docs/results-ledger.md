@@ -363,3 +363,73 @@ first shard of the pinned revision `792a86b5cdbcab9696032e947483b218453a0d4f` in
 --imputations 1 --workers 4` turned them into 149,559 decision rows in 3 min 32 s on four cores
 (about 14 games/s; 84 MB of shards, about 560 bytes per decision), with 374 rows excluded
 (306 called or unaligned moves, 68 forced or unaligned switches).
+
+## 2026-11-12: replay blueprint learning curve at 1k–20k games (ROADMAP P2)
+
+Brief `docs/briefs/01-p2-replay-learning-curve.md`; report `docs/briefs/01-report.md`; every
+number below is in a file under `docs/briefs/01-artifacts/`. Machine: 4 vCPU, 15.7 GB, no GPU.
+Recipe `configs/replay_blueprint_cpu.yaml` unchanged (from scratch, lr 3e-4 cosine to 3e-5,
+batch 256, 6 epochs, early stopping patience 2). Deviations from the roadmap: batch 256 instead of
+≥ 1,024; the largest point is 3,000 games instead of 100,000; 10,000 and 20,000 were not run
+(projected 6.3 h and over 15 h on this CPU, above the brief's 6-hour limit).
+
+Data (`fog` commit `41cc7b9` for import and conversion). `import_metamon_replays` at revision
+`792a86b5cdbcab9696032e947483b218453a0d4f`, rating ≥ 1500, uploaded ≥ 2024-02-01: 22,000
+games from the first 2 shards (104,736 source rows scanned) in 34 s. `convert_replay_decisions
+--imputations 1 --workers 4`: 22,000 games, 0 quarantined, 1,127,562 decision rows (2,366 called or
+unaligned moves and 554 forced or unaligned switches excluded), 624 MB, 28 min 29 s
+(12.9 games/s). Chronological split (`split_replay_manifest --chronological-holdout-games 2000
+--train-sizes 40 1000 3000 10000 20000`, commit `c895fac`): holdout = the 2,000 newest games,
+104,037 rows, uploaded 2026-02-20 to 2026-05-19; training 20,000 games, 1,023,525 rows,
+2024-02-01 to 2026-02-20; nested training sets of 1,000 / 3,000 games = 52,983 / 156,597 rows.
+
+Checks. Policy rows (train_1000): 100% `policy_valid`, 99.97% with exact chosen-action features,
+100% exact chosen legality (the recipe's `require_exact_*` flags kept); mean 10.45 legal actions
+per row (not about 3.5 as the 2026-11-12 entry says), 28.2% switches. Overfit 40 games at
+batch 256 × 40 epochs (320 steps): top-1 0.614, below the brief's 0.90 pass mark; action loss
+2.286 → 1.055. Diagnostic with `bc.batch_size=32`: top-1 0.988, loss 0.036. The owner chose to
+run the curve. Training speed about 112–141 rows/s on CPU, 2.4 GB peak, 5,853,084 parameters.
+
+Holdout scores of `bc_best.pt` with `python -m fog.eval.replay_holdout_report --config
+configs/replay_blueprint_cpu.yaml --checkpoint runs/blueprint/g<S>/checkpoints/bc_best.pt
+--manifest runs/blueprint/split/holdout_manifest.parquet --out <file>` (`--untrained` for the
+zero row; commits `87de3a1`, `abd3c96`, `5442ef5` for the untrained, 1,000 and 3,000 rows as each
+JSON records). Training command for each size: `python -m fog.training.bc
+--config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_<S>.parquet
+bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true
+log.dir=runs/blueprint/g<S>`, started at commits `5577c52` (1,000) and `5442ef5` (3,000). No code changed between them; the
+commits in between touch only documents.
+Diagnostics, not gates.
+
+| Games | Rows | Epochs (best) | Wall | Holdout top-1 | Lift | NLL | Value Brier | ECE | Train top-1 | Train action loss |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 (untrained) | – | – | – | 0.100 | 1.05 | 2.307 | 0.253 | 0.058 | – | – |
+| 1,000 | 52,983 | 6 (4) | 55.8 min | 0.328 | 3.44 | 1.841 | 0.264 | 0.131 | 0.366 | 1.731 |
+| 3,000 | 156,597 | 6 (4) | 2 h 6 min | 0.413 | 4.32 | 1.635 | 0.229 | 0.032 | 0.449 | 1.523 |
+| 10,000 | 514,103 | not run | | | | | | | | |
+| 20,000 | 1,023,525 | not run | | | | | | | | |
+
+Reliability of the 3,000-game value head (ten equal bins of predicted win probability; count,
+mean predicted, observed): 244, 0.095, 0.102 · 6,725, 0.155, 0.211 · 10,052, 0.252, 0.322 ·
+14,239, 0.353, 0.403 · 22,395, 0.454, 0.480 · 23,540, 0.545, 0.542 · 12,170, 0.646, 0.616 ·
+8,152, 0.748, 0.711 · 5,833, 0.845, 0.807 · 687, 0.912, 0.897 (bin 0.0–0.1 to 0.9–1.0).
+
+Reading: holdout NLL falls by 0.433 per tenfold data over the two trained points, far above the
+P2.4 threshold of 0.02, so more data is the next step. The 1,000 → 10,000 change is not
+available. Lift 4.32 at 3,000 games is clearly above chance. At 3,000 games move rows have lift
+5.13 and switch rows 2.12; value Brier is 0.248 / 0.235 / 0.204 in the early / middle / late third
+of the game.
+
+**Smoke, not gate G2:** 400 games per row, `data/teams/pool_b` (not a held-out team split), the
+3,000-game `bc_best.pt` with no search, loaded natively with `--checkpoint-config` (the default
+loader widens the checkpoint with posterior features it was not trained with).
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-12 | blueprint | simpleheuristics | showdown_direct | 400 | 0.258 [0.217, 0.303] (103-297-0) | n/a | n/a | `62f16ae` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/blueprint/g3000/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0 --out runs/blueprint/play_t0.json` |
+| 2026-11-12 | blueprint | maxdamage | showdown_direct | 400 | 0.623 [0.574, 0.669] (249-151-0) | n/a | n/a | `62f16ae` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/blueprint/g3000/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0 --out runs/blueprint/play_t0.json` |
+| 2026-11-12 | blueprint | simpleheuristics | showdown_direct | 400 | 0.223 [0.184, 0.266] (89-311-0) | n/a | n/a | `62f16ae` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/blueprint/g3000/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0.5 --out runs/blueprint/play_t0.5.json` |
+| 2026-11-12 | blueprint | maxdamage | showdown_direct | 400 | 0.517 [0.469, 0.566] (207-193-0) | n/a | n/a | `62f16ae` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/blueprint/g3000/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0.5 --out runs/blueprint/play_t0.5.json` |
+
+These rows do not decide G2. Checkpoints are git-ignored and were not kept; their SHA-256 values
+are in the report.
