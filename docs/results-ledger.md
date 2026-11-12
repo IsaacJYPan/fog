@@ -337,3 +337,29 @@ flags of the searcher's own moves (266; on Showdown the request overlay supplies
 weather turns (196; the engine log has no upkeep marker, so the start turn is used and is off by
 one for weather set by a replacement). Running it also showed that on the engine backend a
 lead's weather ability set weather with no end; it is now five turns (`8f9afc7`).
+
+## 2026-11-12: smoke after the Showdown-state fixes, and first replay conversion at 3,000 games
+
+Both entries below are **transcribed from the session notes**. The sandbox that produced them was
+reclaimed before the report files (`runs/smoke/v5_sh.json`, `runs/smoke/v5_sh.log`, and the data
+directories) could be kept, so they cannot be re-read; re-running the commands is the only check.
+
+**Smoke, not gate G1:** 100 games, quarter budget (4 worlds, 400 ms, one thread),
+`data/teams/pool_b` (not a held-out split), SPRT minimum lowered to 25 blocks.
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-12 | EngineMCTS | SimpleHeuristics | showdown_direct | 100 | 0.880 [0.802, 0.930] | 0.450 | 0/2404 | `8f9afc7` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k": 4, "budget_ms": 400, "threads": 1}' --opponent simpleheuristics --games 100 --sequential --sprt-min-blocks 25 --out runs/smoke/v5_sh.json` |
+
+No dropped worlds and no rejected choices. The three smoke rows (0.800 at `ef773aa`, 0.830 at
+`679f79b`, 0.880 here) are inside each other's intervals; 100 games cannot rank them. Two
+default-budget shards (8 worlds, 1600 ms) were started and killed after 4 and 8 games to free the
+CPU; they are not results.
+
+Replay import and conversion (ROADMAP P2.1, P2.2; a timing check, no model was trained):
+`import_metamon_replays` with rating ≥ 1500 and upload date ≥ 2024-02-01 took 3,000 games from the
+first shard of the pinned revision `792a86b5cdbcab9696032e947483b218453a0d4f` in 16 s
+(14,141 source rows scanned, 10,406 below the rating floor). `convert_replay_decisions
+--imputations 1 --workers 4` turned them into 149,559 decision rows in 3 min 32 s on four cores
+(about 14 games/s; 84 MB of shards, about 560 bytes per decision), with 374 rows excluded
+(306 called or unaligned moves, 68 forced or unaligned switches).
