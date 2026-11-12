@@ -116,7 +116,10 @@ cites the `fog` commit that produced the result.
       (c) it writes its JSON report and prints one ready-to-paste Markdown ledger row (candidate,
       opponent, games, win rate, 95% interval, mean seconds per decision, fallback count, commit,
       command). Paste that row into `docs/results-ledger.md`.
-- [ ] **P0.7 Fix the anchor set and the team split.** Anchors: `A0` Random, `A1` MaxDamage, `A2`
+- [ ] **P0.7 Fix the anchor set and the team split.** Blocked in cloud sandboxes on
+      2026-11-12 (ledger): the forum pages the collector reads answered it with a login page
+      (HTTP 403), so the bank has to be collected on a machine where those pages open, then
+      made available to sandboxes (owner decision in section 8). Anchors: `A0` Random, `A1` MaxDamage, `A2`
       SimpleHeuristics, `A3` the retained imitation checkpoint, `A4` EngineMCTS (from P1), `A5`
       any public learned Gen 9 OU agent that can be run locally (optional). Teams: build the
       public team bank per `KAGGLE_TRAINING.md`, split once into train/validation/test by
@@ -139,8 +142,8 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       rather than writing a second prior. Unrevealed team members are sampled from team-mate
       usage. Unit-test: revealed facts are never contradicted; outputs pass
       `truth_tokens`-style legality checks.
-- [ ] **P1.2 EngineMCTS controller.** Built and tested on the engine backend (`fog` commit
-      `bdcd63a`); the two follow-ups P1.2a and P1.2b below keep this open. New file `fog/search/engine_mcts.py`. At each decision:
+- [x] **P1.2 EngineMCTS controller.** Built and tested on the engine backend (`fog` commit
+      `bdcd63a`); follow-ups P1.2a to P1.2d below are done. New file `fog/search/engine_mcts.py`. At each decision:
       sample `K` worlds; reconstruct an engine state for each with
       `fog.env.state_recon.reconstruct_battle` (as `ShowdownWorldStepper` in
       `fog/search/engine_step.py` does); call
@@ -158,7 +161,10 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       all-worlds-failed fallback from the first legal move to SimpleHeuristics.
 - [x] **P1.2b Terastallization in the built-in search.** Done in `fog` commit `cc9e2de`: the engine
       is now built with its `terastallization` feature and the search proposes Tera moves.
-- [ ] **P1.2c Tera typing in sampled worlds.** `fog/env/engine_battle.py` builds a search world
+- [x] **P1.2c Tera typing in sampled worlds.** Done (`fog` commits `8d9d8b9`, `616711c`):
+      original types are kept, and `python -m fog.eval.tera_damage_check` agrees with pinned
+      Showdown within 1 HP in 20 of 22 cases. The engine does not model Tera Stellar (ledger).
+      `fog/env/engine_battle.py` builds a search world
       for an already-terastallized opponent Pokémon by setting its `types` to (Tera type,
       typeless). The engine now models Tera itself and derives the same-type attack bonus from
       `types`, so in those worlds the opponent loses the bonus on its original types and gets a
@@ -168,12 +174,20 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       comment in that file, which still says the engine does not enforce one Tera per side.
       The engine itself records a Tera used during a Pursuit switch for side one regardless of
       side; note any effect seen.
-- [ ] **P1.2d Reconstruction fixes found on Showdown.** In `fog/env/state_recon.py`: 0 PP is
+- [x] **P1.2d Reconstruction fixes found on Showdown.** Done (`fog` commit `8d9d8b9`; the
+      re-run smoke has 0 fallbacks, 0 dropped worlds and 0 Tera entries after use). In
+      `fog/env/state_recon.py`: 0 PP is
       rebuilt as full PP (`current_pp or max_pp`); Rest sleep is rebuilt as ordinary sleep with
       four turns, which makes the engine panic (all fallbacks so far); and the search still
       proposes Tera after our side has used it, so the used-Tera state is not carried into the
       rebuilt state. Fix each with a test, then re-run the ledger's smoke commands.
-- [ ] **P1.3 Fidelity counters.** Per-game counters now exist (`take_game_counters`). Log per game: decisions, worlds dropped, fallbacks, and the
+- [ ] **P1.3 Fidelity counters.** Per-game counters are in every evaluation report and each
+      row prints a fidelity summary (`fog` commit `8b3cdb2`). `fog/scripts/fuzz_recon_showdown.py`
+      compares rebuilt states with Showdown's own state; its first run on `pool_b` found and fixed
+      ignored Stealth Rock and Sticky Web, missing rain, sun and snow, and stale field timers
+      (`fog` commit `8f9afc7`, ledger). Remaining: run both fuzzers on the validation teams once
+      P0.7 provides them and fix what they show. Original text: log per game: decisions, worlds
+      dropped, fallbacks, and the
       number of chosen actions Showdown rejected. Run `fog/scripts/fuzz_recon.py` on the
       validation teams and fix the top reconstruction failures until the gate's limit is met.
 - [ ] **P1.4 Budget curve.** Win rate vs `A2` at `budget_ms` 200, 800, 3200 and `K` 1, 8, 32
@@ -358,6 +372,10 @@ their tests; do not delete them.
 - Which three to five teams represent the agent on the ladder.
 - Spending on compute, and where long CPU jobs run.
 - Whether any public learned agent is installed as anchor `A5`, subject to its licence.
+- The public team bank (P0.7): collecting it needs a machine where the forum pages open to the
+  collector. The split is git-ignored (`data/teams/gen9ou_public_v*/`), so a cloud sandbox
+  cannot see it; either track the three split packages in this repository or keep evaluation
+  on a machine that has them. Until one of these happens, gates G0 and G1 cannot be closed.
 - Un-freezing anything in section 7 ahead of its gate.
 
 ## 9. Parking lot

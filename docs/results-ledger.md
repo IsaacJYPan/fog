@@ -233,3 +233,107 @@ No illegal action was sent and Showdown rejected none. Twelve worlds were droppe
 SimpleHeuristics. All three fallbacks came from Rest sleep being reconstructed as ordinary
 sleep, which makes the engine panic. Other reconstruction faults found: 0 PP rebuilt as full
 PP, and Tera still proposed after use (64 results, dropped correctly). See ROADMAP P1.2d.
+
+## 2026-11-12: reconstruction checked against Showdown's own state
+
+New sandbox, same shape as before: 4 CPU cores, no GPU, locked environment, pinned Showdown
+built with `npm ci --ignore-scripts` and `npm run build`. Nothing else was running during the
+match rows unless a row says so.
+
+Tests at `fog` commit `679f79b`: the fifteen engine, search and rollout test files listed in
+`HANDOFF.md` plus `tests/test_state_recon_fixes.py`, 115 passed. At `8f9afc7`: the same files plus
+the two new ones, 124 passed, and fifteen further files that import the changed modules
+(`test_search_gauntlet`, `test_pb_*`, `test_joint_search`, `test_step_branches`,
+`test_train_engine`, `test_distill_v2`, `test_belief_refresh`, `test_value_finetune`,
+`test_source_agreement`, `test_pool_id`), 110 passed. The full suite was not run.
+
+### Smoke re-run after the first reconstruction fixes (ROADMAP P1.2d)
+
+**Smoke, not gate G1:** 100 games, quarter budget (4 worlds, 400 ms, one thread),
+`data/teams/pool_b` (not a held-out split), SPRT minimum lowered to 25 blocks. The Tera damage
+check below ran on another core for a few minutes of this run.
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-12 | EngineMCTS | SimpleHeuristics | showdown_direct | 100, SPRT accept_h1 at 25 blocks | 0.830 [0.745, 0.891] (83-17-0) | 0.447 | 0/2640 | `679f79b` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k": 4, "budget_ms": 400, "threads": 1}' --opponent simpleheuristics --games 100 --sequential --sprt-min-blocks 25 --out runs/smoke/v4_sh.json` |
+
+Against the first smoke row (`ef773aa`): fallbacks 3 to 0, dropped worlds 12 to 0 of 10,312
+sampled, Tera entries proposed after the side had used Tera 64 to 0, rejected choices 0. The
+three faults in P1.2d are closed. The win rate is inside the earlier interval; 100 games cannot
+show a difference of this size.
+
+### Terastallization damage against pinned Showdown (ROADMAP P1.2c)
+
+`python -m fog.eval.tera_damage_check` (`fog` commit `616711c`): 22 one-move cases in a
+one-versus-one custom game. Showdown's exact non-critical damage rolls come from
+`ShowdownDirectClient.enumerate`; the engine side is `poke_engine.calculate_damage` (maximum
+roll) on a state with `terastallized=True` and the original `types` kept, which is what
+reconstruction builds, and the `Damage` instruction of a `<move>-tera` turn.
+
+| Case (Great Tusk into Snorlax unless noted) | Showdown rolls | Engine max | Engine Tera turn |
+| --- | ---: | ---: | ---: |
+| Earthquake, no Tera | 193–228 | 228 | 210 |
+| Liquidation, Tera Water (new type) | 165–195 | 195 | 180 |
+| Earthquake, Tera Ground (matches an original type) | 258–304 | 304 | 281 |
+| Water Gun, Tera Water (60 base-power floor) | 36–43 | 43 | 39 |
+| Crawdaunt Adaptability Liquidation, Tera Water | 229–270 | 270 | 249 |
+| Earthquake into Snorlax that terastallizes to Steel | 386–456 | 456 | 421 |
+| Earthquake, Tera Stellar | 258–304 | 228 | 210 |
+| Liquidation, Tera Stellar | 132–156 | 130 | 120 |
+
+20 of 22 cases agree within 1 HP, including the bonus for a new Tera type (1.5x), a kept
+original type (1.5x), a matching Tera type (2.0x), Adaptability, the floor (and its priority
+exception) and defensive typing in both directions. **The engine does not model Tera Stellar**:
+it applies neither the 2.0x on an original type nor the 1.2x on other types. Stellar is legal in
+this format; no fix is planned here because the engine is an external dependency. The Pursuit
+note in P1.2c (the engine records a Tera during a Pursuit switch for side one regardless of
+side) was not exercised.
+
+### Rebuilt engine states against Showdown's state (ROADMAP P1.3)
+
+`python -m fog.scripts.fuzz_recon_showdown --pool data/teams/pool_b --games 30` plays scripted
+games (random, SimpleHeuristics and MaxDamage in rotation) on pinned Showdown and, at every
+decision, rebuilds the engine state the way `ShowdownEngineMCTS` does, with the opponent's true
+sheet as the world, then compares it with Showdown's own battle state. 1,779 positions.
+
+| Field | Positions wrong at `679f79b` | At `8f9afc7` |
+| --- | ---: | ---: |
+| Any field | 892 (50.1%) | 236 (13.3%) |
+| Stealth Rock on either side | 264 | 0 |
+| Rain, sun or snow missing | 192 | 0 |
+| Weather turns remaining | 33 | 0 |
+| Terrain turns remaining | 17 | 0 |
+| Quark Drive or Protosynthesis boost missing | about 320 | 0 |
+| Binding (partial trap) missing | 18 | 0 |
+| Opponent HP of a benched Regenerator (cannot be observed) | 142 | 142 |
+| Semi-invulnerable turn of a two-turn move (Phantom Force) | 37 | 37 |
+| Locked move (Outrage-style) | 25 | 25 |
+| Reflect or Light Screen turns | 24 | 24 |
+| Flash Fire boost missing | 13 | 11 |
+
+Causes: poke-env stores the start turn as the value of Stealth Rock and Sticky Web, and the
+engine applies them only when the value is exactly 1, so every search since `ef773aa` ignored
+existing Stealth Rock and Sticky Web unless they were set on turn 1; poke-env's names for rain,
+sun and snow were missing from the weather map; field timers were rebuilt as a fresh five turns;
+the boosted-stat volatiles were filtered out. Timers now count `|upkeep|` lines in the public
+log, and weather or terrain lasts eight turns when its setter holds the matching item in the
+state being built (the searcher's real item, or the sampled world's). A second seed (60 games,
+3,873 positions) gives the same 13.3%, of which 329 positions are benched Regenerator HP.
+
+Correction: the message of commit `8f9afc7` says the mismatch rate fell "from 66.6%". That
+figure came from an earlier version of the checker that also counted two things that are not
+faults (Showdown clears the Tera flag of a fainted Pokémon; Rest sleep was detected wrongly).
+The 50.1% above is the same checker on both commits. The same message lists Flash Fire as fixed;
+it still differs in 11 positions.
+
+Not fixed, by choice (rare in play or not public): the three volatiles above, screen timers
+with Light Clay, the side's last used move (Fake Out and Encore legality, choice locks on the
+opponent's side), Wish and Future Sight, the toxic counter.
+
+Engine round-trip (`python -m fog.scripts.fuzz_recon --pool data/teams/pool_b --games 2000
+--max-turns 40 --extended`, 3,454 positions): the core fields still match everywhere. The new
+`--extended` fields differ in 42.3% of positions, led by the last used move (455) and disabled
+flags of the searcher's own moves (266; on Showdown the request overlay supplies these), then
+weather turns (196; the engine log has no upkeep marker, so the start turn is used and is off by
+one for weather set by a replacement). Running it also showed that on the engine backend a
+lead's weather ability set weather with no end; it is now five turns (`8f9afc7`).
