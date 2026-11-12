@@ -1,0 +1,49 @@
+# ROADMAP P2.3: policy and value from human replays, from scratch, at a normal supervised
+# learning rate (the earlier recipes continued a checkpoint at lr 3e-5 or 1e-5, which cannot move
+# the policy measurably). CPU-sized: the learning-curve runs (2k, 3k, ... games) use this file
+# with different manifests; the Kaggle run uses the same file with device=cuda and a larger corpus.
+#
+#   python -m fog.scripts.split_replay_manifest --manifest data/metamon_gen9ou_decisions/manifest.parquet \
+#       --out runs/blueprint/split --holdout-fraction 0.1
+#   python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml
+extends: gen9ou_typed_token_trunk.yaml
+
+experiment: replay_blueprint_cpu
+seed: 20261201
+device: cpu
+mixed_precision: false
+
+bc:
+  manifest: runs/blueprint/split/train_manifest.parquet
+  holdout_manifest: runs/blueprint/split/holdout_manifest.parquet
+  holdout_fraction: 0.0
+  scope: full
+  epochs: 6
+  batch_size: 256
+  lr: 3.0e-4
+  lr_final: 3.0e-5
+  eval_batches: 0               # evaluate on the whole holdout
+  early_stopping_patience: 2
+  early_stopping_min_delta: 0.002
+  streaming: false
+
+loss:
+  action_coef: 1.0
+  # Only rows whose chosen action and legality are exact supervise the policy.
+  require_exact_chosen_action_features: true
+  require_exact_chosen_legality: true
+  value_coef: 0.5               # game outcome from the acting player's side
+  belief_coef: 0.05
+  belief_chain_coef: 0.05
+  self_belief_coef: 0.0         # replay shards carry no opponent view
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+log:
+  dir: runs/blueprint
+  tensorboard: false
+
+# The audit reports named by the older recipes are not part of this clone; the ledger and the
+# commit hash are the provenance (AGENTS.md).
+preflight:
+  required: false
