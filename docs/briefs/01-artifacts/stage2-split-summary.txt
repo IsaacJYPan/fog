@@ -1,0 +1,9 @@
+holdout_manifest: games=2000 rows=104037 upload 2026-02-20 04:17 .. 2026-05-19 04:52 UTC
+train_manifest: games=20000 rows=1023525 upload 2024-02-01 03:26 .. 2026-02-20 02:05 UTC
+train_40: games=40 rows=2020 upload 2024-03-07 08:03 .. 2026-01-16 08:03 UTC
+train_1000: games=1000 rows=52983 upload 2024-02-02 12:24 .. 2026-02-20 02:05 UTC
+train_3000: games=3000 rows=156597 upload 2024-02-01 03:26 .. 2026-02-20 02:05 UTC
+train_10000: games=10000 rows=514103 upload 2024-02-01 03:26 .. 2026-02-20 02:05 UTC
+train_20000: games=20000 rows=1023525 upload 2024-02-01 03:26 .. 2026-02-20 02:05 UTC
+disjoint True train max <= holdout min True
+columns ['id', 'n_rows', 'shard', 'rating', 'p1_win', 'imputations', 'uploadtime', 'source_provider', 'source_revision', 'source_shard_sha256', 'private_truth', 'imputation_method', 'candidate_bank_sha256']

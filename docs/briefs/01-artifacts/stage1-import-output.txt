@@ -1,0 +1,16 @@
+{
+  "status": "target_reached",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "kept_games": 22000,
+  "filter_counts": {
+    "below_rating": 77225,
+    "invalid_metadata": 4176,
+    "outside_dates": 495,
+    "other_format": 840
+  }
+}
+
+real	0m33.932s
+user	0m7.707s
+sys	0m2.101s
+EXIT 0

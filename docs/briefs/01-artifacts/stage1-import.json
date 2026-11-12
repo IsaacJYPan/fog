@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "repository": "jakegrigsby/metamon-raw-replays",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "filters": {
+    "format": "gen9ou",
+    "min_rating": 1500,
+    "after": 1706745600,
+    "before": null
+  },
+  "sources": {
+    "data/train-00000-of-00046.parquet": {
+      "name": "data/train-00000-of-00046.parquet",
+      "path": "/home/user/fog/data/metamon_cache/792a86b5cdbcab9696032e947483b218453a0d4f/train-00000-of-00046.parquet",
+      "sha256": "8d63af71f07158e76a08d18980dc85eebe75765df6d7b4f3909d8f87aadd2448"
+    },
+    "data/train-00001-of-00046.parquet": {
+      "name": "data/train-00001-of-00046.parquet",
+      "path": "/home/user/fog/data/metamon_cache/792a86b5cdbcab9696032e947483b218453a0d4f/train-00001-of-00046.parquet",
+      "sha256": "95a984b593e7bcc6847fc3a3c7aa96563c4b14a0bb8bade896e333d0572c84c5"
+    }
+  },
+  "progress": {
+    "data/train-00000-of-00046.parquet": 58301,
+    "data/train-00001-of-00046.parquet": 46435
+  },
+  "filter_counts": {
+    "below_rating": 77225,
+    "invalid_metadata": 4176,
+    "outside_dates": 495,
+    "other_format": 840
+  },
+  "status": "target_reached",
+  "kept_games": 22000,
+  "target_games": 22000,
+  "private_truth": false,
+  "observation_source": "public_spectator_protocol"
+}
