@@ -1,0 +1,44 @@
+BC dataset: train=2020 decision rows; holdout=2020 rows  (config_hash=6ad2c3f9e221)
+[bc] baseline  loss=3.654  belief=13.194  chain=4.022
+[bc] epoch 1/40  train_loss=3.614  eval_loss=3.523  belief=11.425  chain=3.708  value=0.998  query_p=0.059  dropped=0.000%
+[bc] epoch 2/40  train_loss=3.466  eval_loss=3.369  belief=9.628  chain=3.204  value=0.997  query_p=0.088  dropped=0.000%
+[bc] epoch 3/40  train_loss=3.299  eval_loss=3.200  belief=8.420  chain=2.722  value=0.943  query_p=0.132  dropped=0.000%
+[bc] epoch 4/40  train_loss=3.072  eval_loss=2.853  belief=7.764  chain=2.492  value=0.504  query_p=0.163  dropped=0.000%
+[bc] epoch 5/40  train_loss=2.709  eval_loss=2.568  belief=7.354  chain=2.366  value=0.102  query_p=0.182  dropped=0.000%
+[bc] epoch 6/40  train_loss=2.569  eval_loss=2.580  belief=7.058  chain=2.275  value=0.073  query_p=0.196  dropped=0.000%
+[bc] epoch 7/40  train_loss=2.527  eval_loss=2.453  belief=6.822  chain=2.201  value=0.061  query_p=0.207  dropped=0.000%
+[bc] epoch 8/40  train_loss=2.432  eval_loss=2.375  belief=6.591  chain=2.145  value=0.048  query_p=0.218  dropped=0.000%
+[bc] epoch 9/40  train_loss=2.353  eval_loss=2.292  belief=6.374  chain=2.091  value=0.047  query_p=0.232  dropped=0.000%
+[bc] epoch 10/40  train_loss=2.284  eval_loss=2.214  belief=6.150  chain=2.044  value=0.046  query_p=0.242  dropped=0.000%
+[bc] epoch 11/40  train_loss=2.214  eval_loss=2.135  belief=5.906  chain=1.992  value=0.046  query_p=0.252  dropped=0.000%
+[bc] epoch 12/40  train_loss=2.175  eval_loss=2.136  belief=5.634  chain=1.949  value=0.046  query_p=0.261  dropped=0.000%
+[bc] epoch 13/40  train_loss=2.127  eval_loss=2.039  belief=5.422  chain=1.912  value=0.046  query_p=0.272  dropped=0.000%
+[bc] epoch 14/40  train_loss=2.075  eval_loss=2.040  belief=5.175  chain=1.863  value=0.042  query_p=0.281  dropped=0.000%
+[bc] epoch 15/40  train_loss=2.020  eval_loss=1.923  belief=4.931  chain=1.820  value=0.040  query_p=0.289  dropped=0.000%
+[bc] epoch 16/40  train_loss=1.957  eval_loss=1.922  belief=4.719  chain=1.787  value=0.040  query_p=0.300  dropped=0.000%
+[bc] epoch 17/40  train_loss=1.933  eval_loss=1.838  belief=4.550  chain=1.756  value=0.041  query_p=0.307  dropped=0.000%
+[bc] epoch 18/40  train_loss=1.884  eval_loss=1.806  belief=4.405  chain=1.730  value=0.040  query_p=0.314  dropped=0.000%
+[bc] epoch 19/40  train_loss=1.854  eval_loss=1.789  belief=4.235  chain=1.696  value=0.040  query_p=0.326  dropped=0.000%
+[bc] epoch 20/40  train_loss=1.800  eval_loss=1.725  belief=4.102  chain=1.668  value=0.039  query_p=0.334  dropped=0.000%
+[bc] epoch 21/40  train_loss=1.769  eval_loss=1.723  belief=4.007  chain=1.654  value=0.040  query_p=0.343  dropped=0.000%
+[bc] epoch 22/40  train_loss=1.760  eval_loss=1.644  belief=3.865  chain=1.623  value=0.039  query_p=0.346  dropped=0.000%
+[bc] epoch 23/40  train_loss=1.699  eval_loss=1.687  belief=3.757  chain=1.599  value=0.040  query_p=0.351  dropped=0.000%
+[bc] epoch 24/40  train_loss=1.706  eval_loss=1.623  belief=3.673  chain=1.581  value=0.039  query_p=0.357  dropped=0.000%
+[bc] epoch 25/40  train_loss=1.674  eval_loss=1.599  belief=3.609  chain=1.571  value=0.039  query_p=0.353  dropped=0.000%
+[bc] epoch 26/40  train_loss=1.641  eval_loss=1.587  belief=3.533  chain=1.553  value=0.039  query_p=0.363  dropped=0.000%
+[bc] epoch 27/40  train_loss=1.611  eval_loss=1.526  belief=3.446  chain=1.537  value=0.040  query_p=0.370  dropped=0.000%
+[bc] epoch 28/40  train_loss=1.575  eval_loss=1.498  belief=3.395  chain=1.523  value=0.039  query_p=0.375  dropped=0.000%
+[bc] epoch 29/40  train_loss=1.549  eval_loss=1.464  belief=3.355  chain=1.512  value=0.039  query_p=0.379  dropped=0.000%
+[bc] epoch 30/40  train_loss=1.519  eval_loss=1.450  belief=3.262  chain=1.488  value=0.038  query_p=0.383  dropped=0.000%
+[bc] epoch 31/40  train_loss=1.502  eval_loss=1.430  belief=3.216  chain=1.478  value=0.038  query_p=0.384  dropped=0.000%
+[bc] epoch 32/40  train_loss=1.473  eval_loss=1.406  belief=3.172  chain=1.468  value=0.038  query_p=0.390  dropped=0.000%
+[bc] epoch 33/40  train_loss=1.466  eval_loss=1.386  belief=3.133  chain=1.457  value=0.038  query_p=0.392  dropped=0.000%
+[bc] epoch 34/40  train_loss=1.435  eval_loss=1.374  belief=3.102  chain=1.450  value=0.038  query_p=0.394  dropped=0.000%
+[bc] epoch 35/40  train_loss=1.428  eval_loss=1.355  belief=3.073  chain=1.439  value=0.038  query_p=0.396  dropped=0.000%
+[bc] epoch 36/40  train_loss=1.425  eval_loss=1.335  belief=3.044  chain=1.433  value=0.038  query_p=0.400  dropped=0.000%
+[bc] epoch 37/40  train_loss=1.390  eval_loss=1.325  belief=3.020  chain=1.425  value=0.038  query_p=0.400  dropped=0.000%
+[bc] epoch 38/40  train_loss=1.388  eval_loss=1.314  belief=2.997  chain=1.420  value=0.038  query_p=0.402  dropped=0.000%
+[bc] epoch 39/40  train_loss=1.365  eval_loss=1.306  belief=2.977  chain=1.413  value=0.038  query_p=0.404  dropped=0.000%
+[bc] epoch 40/40  train_loss=1.368  eval_loss=1.292  belief=2.955  chain=1.409  value=0.038  query_p=0.406  dropped=0.000%
+[bc] done -> runs/blueprint/overfit40/checkpoints/bc_final.pt  (best eval epoch=40, loss=1.292)
+[peakrss] exit=0 wall_s=666.3 max_rss_mb=2245
