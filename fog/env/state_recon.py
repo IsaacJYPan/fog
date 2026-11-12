@@ -64,7 +64,10 @@ _SHOWDOWN_TO_ENGINE = {
     "tox": "toxic", "slp": "sleep", "frz": "freeze",
 }
 # poke-env / EngineView weather + terrain names (id form) -> engine strings
-_WEATHER_TO_ENGINE = {"sun": "sun", "harshsun": "sun", "desolateland": "sun",
+# Keys are ids of poke-env `Weather` names (SUNNYDAY, RAINDANCE, SANDSTORM, SNOWSCAPE, ...) and of
+# the engine view's own names (SUN, RAIN, SAND, SNOW).
+_WEATHER_TO_ENGINE = {"sun": "sun", "sunnyday": "sun", "harshsun": "sun", "desolateland": "sun",
+                      "raindance": "rain", "snowscape": "snow",
                       "rain": "rain", "heavyrain": "rain", "primordialsea": "rain",
                       "sand": "sand", "sandstorm": "sand", "snow": "snow", "hail": "snow"}
 # engine's known volatile-status vocabulary (engine_battle._active_effects + trapping set); we pass
@@ -73,10 +76,23 @@ _ENGINE_VOLATILES = {
     "confusion", "encore", "taunt", "yawn", "slowstart", "lockedmove", "substitute",
     "partiallytrapped", "leechseed", "protect", "endure", "flinch", "destinybond",
     "attract", "curse", "nightmare", "torment", "disable", "saltcure",
+    # public, announced with `-start`: the boosted stat from Protosynthesis / Quark Drive (sun,
+    # Electric Terrain or Booster Energy) and an activated Flash Fire
+    "protosynthesisatk", "protosynthesisdef", "protosynthesisspa", "protosynthesisspd",
+    "protosynthesisspe", "quarkdriveatk", "quarkdrivedef", "quarkdrivespa", "quarkdrivespd",
+    "quarkdrivespe", "flashfire",
 }
+# poke-env names a binding move by the move itself; the engine has one volatile for all of them
+_BINDING_EFFECTS = {"bind", "clamp", "firespin", "infestation", "magmastorm", "sandtomb",
+                    "snaptrap", "thundercage", "whirlpool", "wrap"}
+_HAZARD_MAX_LAYERS = {"stealthrock": 1, "stickyweb": 1, "spikes": 3, "toxicspikes": 2}
 _SCREEN_NOMINAL = {"reflect": 5, "light_screen": 5, "aurora_veil": 5, "tailwind": 4}
 # Engine sleep constants (Gen 9 build): Rest sleeps for three move attempts, ordinary sleep wakes
 # for certain on the third counted attempt.
+_FIELD_NOMINAL_TURNS = 5   # weather, terrain and Trick Room without an extending item
+_FIELD_EXTENDED_TURNS = 8  # weather or terrain set by a holder of the matching item
+_WEATHER_EXTENDERS = {"rain": "damprock", "sun": "heatrock", "sand": "smoothrock",
+                      "snow": "icyrock"}
 _REST_SLEEP_TURNS = 3
 _MAX_SLEEP_TURNS = 3
 
@@ -301,7 +317,11 @@ def _side_conditions(cond_dict: dict, turn: int) -> pe.SideConditions:
     for cond, value in (cond_dict or {}).items():
         name = to_id(getattr(cond, "name", cond))
         if name in hazards:
-            kw[hazards[name]] = int(value or 1)
+            # poke-env stores a layer count only for the stackable hazards; for Stealth Rock and
+            # Sticky Web the value is the turn they were set. The engine applies those two only
+            # when the field is exactly 1, so a turn number silently removed them from the search.
+            layers = _HAZARD_MAX_LAYERS[name]
+            kw[hazards[name]] = 1 if layers == 1 else max(1, min(layers, int(value or 1)))
         elif name in screens:
             eng = screens[name]
             kw[eng] = max(1, _SCREEN_NOMINAL[eng] - max(0, turn - int(value or turn)))
@@ -311,6 +331,8 @@ def _side_conditions(cond_dict: dict, turn: int) -> pe.SideConditions:
 def _active_volatiles(mon: Any) -> tuple[set[str], int]:
     """(engine volatile-status set, substitute health) from a view mon's effects dict."""
     vols = {to_id(getattr(e, "name", e)) for e in (getattr(mon, "effects", None) or {})}
+    if vols & _BINDING_EFFECTS:
+        vols.add("partiallytrapped")
     vols &= _ENGINE_VOLATILES
     sub_hp = 1 if "substitute" in vols else 0  # health >0 flags the sub; exact value is hidden
     return vols, sub_hp
@@ -334,18 +356,98 @@ def _build_side(mons: list, active_idx: int, active_view: Any | None, cond_dict:
     )
 
 
-def _field_kwargs(view: Any, turn: int) -> dict:
+def _turns_left(start: Any, turn: int, nominal: int = _FIELD_NOMINAL_TURNS) -> int:
+    """Turns remaining for a field effect that began on turn `start` (poke-env stores the start
+    turn as the dict value). The duration is the nominal five turns: an extending item (Heat Rock,
+    Terrain Extender, ...) is hidden information, so it is not assumed. Never below 1 while the
+    effect is still on the field; an unknown start falls back to the full nominal duration."""
+    try:
+        elapsed = int(turn) - int(start)
+    except (TypeError, ValueError):
+        return nominal
+    return max(1, nominal - max(0, elapsed))
+
+
+def _field_clocks(view: Any) -> dict[str, tuple[int, str | None]] | None:
+    """Public-log scan for the weather, terrain and Trick Room now on the field (keys ``weather``,
+    ``terrain``, ``trickroom``): ``(upkeeps passed since it began, mon key of whoever set it)``.
+
+    Showdown prints ``|upkeep|`` after each end-of-turn residual step, which is when these timers
+    tick, so counting upkeeps is exact where the start turn alone is off by one (an effect set by a
+    lead or by a replacement after a faint has not ticked yet). The setter ('p1: Pelipper') lets
+    the caller apply an extending item. Returns None when the log has no upkeep markers to count
+    (the engine backend's synthesized log), so the caller falls back to the start turn."""
+    from fog.encoding.history import observations_by_turn
+
+    try:
+        obs = observations_by_turn(view)
+    except Exception:  # noqa: BLE001 - a view without a log falls back to start turns
+        return None
+    clocks: dict[str, tuple[int, str | None]] = {}
+    saw_upkeep = False
+    last_turn = 0
+    for t in sorted(obs):
+        last_turn = max(last_turn, int(t))
+        last_mover: str | None = None
+        for ev in getattr(obs[t], "events", None) or []:
+            if len(ev) < 2:
+                continue
+            kind = ev[1]
+            if kind == "upkeep":
+                saw_upkeep = True
+                clocks = {key: (count + 1, who) for key, (count, who) in clocks.items()}
+                continue
+            if kind == "move" and len(ev) > 2:
+                last_mover = event_mon_key(ev[2])
+                continue
+            name = to_id(ev[2]) if len(ev) > 2 else ""
+            source = next((event_mon_key(str(a)[len("[of] "):]) for a in ev[3:]
+                           if str(a).startswith("[of] ")), last_mover)
+            if kind == "-weather":
+                if name in ("none", ""):
+                    clocks.pop("weather", None)
+                elif not any(str(a).startswith("[upkeep]") for a in ev[3:]):
+                    clocks["weather"] = (0, source)
+            elif kind in ("-fieldstart", "-fieldend"):
+                key = ("terrain" if name.endswith("terrain") else
+                       "trickroom" if name.endswith("trickroom") else None)
+                if key is None:
+                    continue
+                if kind == "-fieldstart":
+                    clocks[key] = (0, source)
+                else:
+                    clocks.pop(key, None)
+    return clocks if saw_upkeep or last_turn <= 1 else None
+
+
+def _field_kwargs(view: Any, turn: int, items: dict[str, str] | None = None) -> dict:
+    """Engine field arguments. `items` maps a mon key ('p1: Pelipper') to its item id in the state
+    being built (the searcher's real item, or the sampled world's item for an opponent), so
+    weather or terrain set by a holder of the matching extending item lasts eight turns."""
     kw: dict[str, Any] = {}
-    for w in (getattr(view, "weather", None) or {}):
+    clocks = _field_clocks(view)
+
+    def left(key: str, start: Any, extender: str | None = None) -> int:
+        if clocks is None or key not in clocks:
+            return _turns_left(start, turn)
+        upkeeps, setter = clocks[key]
+        extended = extender is not None and to_id((items or {}).get(setter or "", "")) == extender
+        nominal = _FIELD_EXTENDED_TURNS if extended else _FIELD_NOMINAL_TURNS
+        return max(1, nominal - upkeeps)
+
+    for w, start in (getattr(view, "weather", None) or {}).items():
         eng = _WEATHER_TO_ENGINE.get(to_id(getattr(w, "name", w)))
         if eng:
-            kw["weather"], kw["weather_turns_remaining"] = eng, 5
-    for f in (getattr(view, "fields", None) or {}):
+            kw["weather"] = eng
+            kw["weather_turns_remaining"] = left("weather", start, _WEATHER_EXTENDERS.get(eng))
+    for f, start in (getattr(view, "fields", None) or {}).items():
         name = to_id(getattr(f, "name", f))
         if name.endswith("terrain"):
-            kw["terrain"], kw["terrain_turns_remaining"] = name, 5
+            kw["terrain"] = name
+            kw["terrain_turns_remaining"] = left("terrain", start, "terrainextender")
         elif name == "trickroom":
-            kw["trick_room"], kw["trick_room_turns_remaining"] = True, 5
+            kw["trick_room"] = True
+            kw["trick_room_turns_remaining"] = left("trickroom", start)
     return kw
 
 
@@ -429,7 +531,14 @@ def reconstruct_battle(
     opp_side = _build_side(opp_mons, opp_active, opp_active_view,
                            getattr(view, "opponent_side_conditions", None) or {}, turn)
     sides = {role: my_side, opp_role: opp_side}
-    state = pe.State(side_one=sides["p1"], side_two=sides["p2"], **_field_kwargs(view, turn))
+    # items as they stand in this rebuilt state, keyed like the public log ('p1: Pelipper')
+    items = {str(k): str(mon.item) for (k, _), mon in zip(my_items, my_mons)}
+    for k, m in (getattr(view, "opponent_team", None) or {}).items():
+        sid = _pre_tera_species(to_id(getattr(m, "species", "")), tables)
+        if sid in opp_species:
+            items[str(k)] = str(opp_mons[opp_species.index(sid)].item)
+    state = pe.State(side_one=sides["p1"], side_two=sides["p2"],
+                     **_field_kwargs(view, turn, items))
 
     tera_used = {
         role: any(bool(m.terastallized) for m in my_mons)

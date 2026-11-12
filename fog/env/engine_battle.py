@@ -646,7 +646,7 @@ class EngineBattle:
             other = "p2" if role == "p1" else "p1"
             if ability in _LEAD_WEATHER:
                 state_kw["weather"] = _LEAD_WEATHER[ability]
-                state_kw["weather_turns_remaining"] = -1
+                state_kw["weather_turns_remaining"] = 5  # Gen 9: ability weather lasts five turns
                 self._record_reveal(role, lead.id, ability=str(lead.ability))
             elif ability in _LEAD_TERRAIN:
                 state_kw["terrain"] = _LEAD_TERRAIN[ability]

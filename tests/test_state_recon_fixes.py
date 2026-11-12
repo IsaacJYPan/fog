@@ -316,3 +316,112 @@ def test_used_tera_from_the_public_log_backs_up_the_parser_flag():
     # a Tera forme in the log maps back to the sampled (pre-Tera) forme
     assert _pre_tera_species("ogerponwellspringtera", _tables()) == "ogerponwellspring"
     assert _pre_tera_species("greattusk", _tables()) == "greattusk"
+
+
+def test_field_timers_count_down_from_the_public_start_turn():
+    """Without upkeep markers in the log (engine backend) the start turn gives the time left."""
+    from fog.env.state_recon import _field_kwargs, _turns_left
+
+    view = SimpleNamespace(weather={"raindance": 3},
+                           fields={"electricterrain": 6, "trickroom": 1})
+    kw = _field_kwargs(view, turn=6)
+    assert kw["weather"] == "rain" and kw["weather_turns_remaining"] == 2
+    assert kw["terrain_turns_remaining"] == 5
+    assert kw["trick_room"] is True and kw["trick_room_turns_remaining"] == 1
+    # never below one while the effect is on the field; unknown start keeps the nominal duration
+    assert _turns_left(1, 40) == 1 and _turns_left(None, 4) == 5 and _turns_left(9, 4) == 5
+
+
+def test_poke_env_weather_names_reach_the_engine_state():
+    """poke-env calls rain, sun and snow RAINDANCE, SUNNYDAY and SNOWSCAPE; all must map."""
+    from poke_env.battle import Weather
+
+    from fog.env.state_recon import _field_kwargs
+
+    expected = {Weather.RAINDANCE: "rain", Weather.SUNNYDAY: "sun", Weather.SANDSTORM: "sand",
+                Weather.SNOWSCAPE: "snow", Weather.HAIL: "snow",
+                Weather.PRIMORDIALSEA: "rain", Weather.DESOLATELAND: "sun"}
+    for weather, engine_name in expected.items():
+        kw = _field_kwargs(SimpleNamespace(weather={weather: 1}, fields={}), turn=2)
+        assert kw.get("weather") == engine_name, weather
+
+
+def test_field_timers_count_upkeeps_and_extending_items_from_the_log():
+    from fog.env.state_recon import _field_clocks, _field_kwargs
+
+    def view(turns):
+        return SimpleNamespace(
+            weather={"RAINDANCE": 0}, fields={"ELECTRIC_TERRAIN": 2}, turn=len(turns),
+            observations={t: SimpleNamespace(events=events) for t, events in enumerate(turns)})
+
+    lead = [["", "switch", "p1a: Pelipper", "Pelipper", "100/100"],
+            ["", "-weather", "RainDance", "[from] ability: Drizzle", "[of] p1a: Pelipper"]]
+    tick = [["", "-weather", "RainDance", "[upkeep]"], ["", "upkeep"]]
+    terrain = [["", "move", "p2a: Iron Hands", "Electric Terrain", "p2a: Iron Hands"],
+               ["", "-fieldstart", "move: Electric Terrain"], *tick]
+    battle = view([lead, tick, terrain])
+    assert _field_clocks(battle) == {"weather": (2, "p1: Pelipper"),
+                                     "terrain": (1, "p2: Iron Hands")}
+    # lead weather has not ticked before the first upkeep: five turns at the turn-1 decision
+    assert _field_kwargs(view([lead]), turn=1)["weather_turns_remaining"] == 5
+    plain = _field_kwargs(battle, turn=3)
+    assert plain["weather_turns_remaining"] == 3 and plain["terrain_turns_remaining"] == 4
+    # the setter's item in the state being built decides the duration (own item, or the world's)
+    rocks = _field_kwargs(battle, turn=3, items={"p1: Pelipper": "damprock",
+                                                 "p2: Iron Hands": "terrainextender"})
+    assert rocks["weather_turns_remaining"] == 6 and rocks["terrain_turns_remaining"] == 7
+    wrong_rock = _field_kwargs(battle, turn=3, items={"p1: Pelipper": "heatrock"})
+    assert wrong_rock["weather_turns_remaining"] == 3
+    # weather that ended is forgotten
+    ended = view([lead, tick, [["", "-weather", "none"], ["", "upkeep"]]])
+    assert "weather" not in _field_clocks(ended)
+
+
+def test_hazards_use_layers_not_the_turn_poke_env_stores():
+    """poke-env stores the start turn for Stealth Rock and Sticky Web. The engine applies them
+    only when the field is exactly 1, so the turn number used to hide them from the search."""
+    import poke_engine as pe
+    from poke_env.battle import SideCondition
+
+    from fog.env.state_recon import _side_conditions
+
+    conditions = _side_conditions({SideCondition.STEALTH_ROCK: 23, SideCondition.STICKY_WEB: 9,
+                                   SideCondition.SPIKES: 2, SideCondition.TOXIC_SPIKES: 2}, 30)
+    assert (conditions.stealth_rock, conditions.sticky_web) == (1, 1)
+    assert (conditions.spikes, conditions.toxic_spikes) == (2, 2)
+
+    def mon(name):
+        return pe.Pokemon(id=name, level=100, types=("normal", "typeless"),
+                          base_types=("normal", "typeless"), hp=300, maxhp=300, attack=100,
+                          defense=100, special_attack=100, special_defense=100, speed=100,
+                          ability="none", item="none", moves=[pe.Move(id="splash")])
+
+    state = pe.State(
+        side_one=pe.Side(pokemon=[mon("snorlax"), mon("blissey")],
+                         side_conditions=_side_conditions({SideCondition.STEALTH_ROCK: 23}, 30)),
+        side_two=pe.Side(pokemon=[mon("chansey")]))
+    instructions = [str(i) for b in pe.generate_instructions(state, "blissey", "splash")
+                    for i in b.instruction_list]
+    assert any(i.startswith("Damage SideOne") for i in instructions)
+
+
+def test_public_volatiles_reach_the_engine_state():
+    from poke_env.battle import Effect
+
+    from fog.env.state_recon import _active_volatiles
+
+    vols, _ = _active_volatiles(SimpleNamespace(effects={Effect.QUARKDRIVESPE: 0,
+                                                         Effect.WHIRLPOOL: 0}))
+    assert vols == {"quarkdrivespe", "partiallytrapped"}
+    vols, _ = _active_volatiles(SimpleNamespace(effects={Effect.PROTOSYNTHESISATK: 0}))
+    assert vols == {"protosynthesisatk"}
+
+
+def test_lead_weather_ability_lasts_five_turns_on_the_engine_backend():
+    from fog.env.engine_battle import EngineBattle
+
+    pelipper = P_ONE.replace("Great Tusk @ Heavy-Duty Boots\nAbility: Protosynthesis",
+                             "Pelipper @ Heavy-Duty Boots\nAbility: Drizzle")
+    battle = EngineBattle(pelipper, P_ONE, seed=1, battle_tag="lead-weather")
+    assert str(battle.state.weather).lower() == "rain"
+    assert int(battle.state.weather_turns_remaining) == 5
