@@ -62,3 +62,12 @@ def test_policy_summary_splits_moves_and_switches():
     assert result["nll"] == pytest.approx(0.9)
     assert result["move"]["rows"] == 2 and result["move"]["top1"] == pytest.approx(0.5)
     assert result["switch"]["nll"] == pytest.approx(1.5)
+
+
+def test_game_phase_uses_each_games_last_turn():
+    from fog.eval.replay_holdout_report import game_phase
+
+    # Game 0 lasts 9 turns, game 1 lasts 3; rows of one game need not be in order.
+    turn = np.array([1, 3, 4, 6, 7, 9, 9, 1, 2, 3, 1])
+    game = np.array([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0])
+    assert game_phase(turn, game).tolist() == [0, 0, 1, 1, 2, 2, 2, 0, 1, 2, 0]

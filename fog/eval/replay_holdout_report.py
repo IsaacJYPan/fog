@@ -11,8 +11,11 @@ Policy metrics use the rows the training loss would supervise (``_policy_supervi
 the config's ``loss`` section). Value metrics use every row: the model value ``v`` in [-1, 1] and
 the outcome (+1 win, -1 loss, 0 draw) are mapped to win probabilities ``(x + 1) / 2``.
 
-Game phase: each shard holds one game with its decision rows in game order, so a row's phase is
-its position in the shard (first, middle, last third of the rows).
+Game phase: a shard holds one game, with each player's rows as a separate block, so row position
+is not game time. The turn is read from the observation's field vector (stored as
+``min(turn, 50) / 50``); a row's phase is ``(turn - 1) * 3 // last_turn`` where ``last_turn`` is
+the largest stored turn in its game. Turns past 50 are stored as 50, so in games longer than 50
+turns the rows after turn 50 all count as late.
 """
 from __future__ import annotations
 
@@ -26,6 +29,24 @@ import numpy as np
 
 SWITCH_ACTION_START = 8
 PHASES = ("early", "middle", "late")
+TURN_CAP = 50
+
+
+def _turn_column() -> int:
+    from fog.encoding.dims import DIMS
+
+    return (DIMS.field_weather + DIMS.field_terrain + DIMS.field_hazards
+            + DIMS.field_screens + DIMS.field_trickroom)
+
+
+def game_phase(turn: np.ndarray, game: np.ndarray) -> np.ndarray:
+    """Phase 0/1/2 (first, middle, last third of the game's turns) for every row."""
+    turn = np.asarray(turn, dtype=np.int64)
+    game = np.asarray(game, dtype=np.int64)
+    last = np.zeros(int(game.max()) + 1 if len(game) else 0, dtype=np.int64)
+    np.maximum.at(last, game, turn)
+    last_turn = np.maximum(last[game], 1)
+    return np.clip((np.maximum(turn, 1) - 1) * 3 // last_turn, 0, 2)
 
 
 def value_calibration(value: np.ndarray, outcome: np.ndarray, bins: int = 10) -> dict:
@@ -121,13 +142,14 @@ def score(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
 
     table = pl.read_parquet(manifest)
     rows_col = next(c for c in ("n_rows", "rows") if c in table.columns)
-    position = np.concatenate([
-        (np.arange(n) + 0.5) / n for n in table[rows_col].to_list() if n > 0
-    ])
+    counts = table[rows_col].to_list()
+    game_of_row = np.repeat(np.arange(len(counts)), counts)
+    turn_column = _turn_column()
 
     dataset = StreamingReplayDataset(manifest, shard_buffer=64)
     parts: dict[str, list[np.ndarray]] = {
-        key: [] for key in ("action", "nll", "correct", "legal", "policy", "value", "outcome")
+        key: [] for key in ("action", "nll", "correct", "legal", "policy", "value", "outcome",
+                            "turn")
     }
     with torch.no_grad():
         for batch in dataset.batches(batch_size, shuffle=False, seed=0):
@@ -142,10 +164,13 @@ def score(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
             parts["policy"].append(policy.numpy())
             parts["value"].append(out.value.float().reshape(-1).numpy())
             parts["outcome"].append(batch["outcome"].float().reshape(-1).numpy())
+            parts["turn"].append(
+                np.rint(batch["field"][:, turn_column].numpy() * TURN_CAP).astype(np.int64)
+            )
     data = {key: np.concatenate(value) for key, value in parts.items()}
     rows = len(data["action"])
-    if rows != len(position):
-        raise RuntimeError(f"manifest lists {len(position)} rows but shards held {rows}")
+    if rows != len(game_of_row):
+        raise RuntimeError(f"manifest lists {len(game_of_row)} rows but shards held {rows}")
     policy = data["policy"]
 
     report = {
@@ -160,10 +185,12 @@ def score(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
                                  data["legal"][policy], data["action"][policy]),
         "value": value_calibration(data["value"], data["outcome"]),
         "value_by_phase": {},
-        "phase_definition": "row position within its game's shard: first, middle, last third",
+        "phase_definition": "(turn - 1) * 3 // last turn of the game; turn read from field, "
+                            "capped at 50",
+        "rows_at_turn_cap": int((data["turn"] >= TURN_CAP).sum()),
         "constant_half_brier_reference": 0.25,
     }
-    phase = np.minimum((position * 3).astype(np.int64), 2)
+    phase = game_phase(data["turn"], game_of_row)
     for index, name in enumerate(PHASES):
         selected = phase == index
         calibration = value_calibration(data["value"][selected], data["outcome"][selected])
