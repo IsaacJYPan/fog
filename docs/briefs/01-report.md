@@ -6,17 +6,20 @@ below are in `docs/briefs/01-artifacts/`.
 
 ## Answer
 
-_In progress: the 1,000-game run is training._
+_In progress: the 3,000-game run is training._
 
 ## Curve table
 
 Holdout: the 2,000 newest games, 104,037 decision rows (103,981 policy rows), uploaded
 2026-02-20 to 2026-05-19. Chance top-1 lift is 1.0; a constant 0.5 value has Brier 0.25.
 
+Holdout columns score `bc_best.pt` (chosen by total eval loss); train columns are the last epoch's
+row-weighted training means from `metrics.csv`.
+
 | Games | Rows | Epochs (best) | Wall | Top-1 | Lift | NLL | Brier | ECE | Train top-1 | Train action loss | File |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 0 (untrained) | – | – | – | 0.100 | 1.047 | 2.307 | 0.253 | 0.058 | – | – | `untrained-holdout.json` |
-| 1,000 | 52,983 | pending | | | | | | | | | |
+| 1,000 | 52,983 | 6 (4) | 55.8 min | 0.328 | 3.44 | 1.841 | 0.264 | 0.131 | 0.366 | 1.731 | `g1000-holdout.json`, `g1000-metrics.csv` |
 | 3,000 | 156,597 | pending | | | | | | | | | |
 | 10,000 | 514,103 | not started (projected 7.9 h) | | | | | | | | | |
 | 20,000 | 1,023,525 | not started (projected 15.5 h) | | | | | | | | | |
@@ -32,7 +35,7 @@ Holdout: the 2,000 newest games, 104,037 decision rows (103,981 policy rows), up
 | 3b Overfit 40 games | **failed the pass rule**, then a diagnostic passed | 11 min 6 s; diagnostic 19 min 48 s | top-1 0.614 (< 0.90), action loss 2.286 → 1.055. Diagnostic at batch 32: top-1 0.988, loss 0.036. See below. |
 | 3c Timing | done | 8 min 9 s | ~112 training rows/s, 2.3 GB peak, 5,853,084 parameters; full holdout evaluation 138 s. `stage3c-timing.txt` |
 | 4 Holdout tool | done | 140 s per full holdout | `fog/eval/replay_holdout_report.py`, tests in `tests/test_replay_holdout_report.py` |
-| 5 Curve | in progress | | |
+| 5 Curve | in progress | g1000: 55 min 45 s (2.4 GB peak) | g1000 early-stopped after epoch 6 (best 4); g3000 running |
 | 6 Reading | pending | | |
 | 7 Play smoke | pending | | |
 

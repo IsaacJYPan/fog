@@ -1,0 +1,12 @@
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=5b5738d94200)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+[bc] epoch 1/6  train_loss=3.141  eval_loss=3.115  belief=8.681  chain=2.671  value=1.010  query_p=0.183  dropped=0.000%
+[bc] epoch 2/6  train_loss=2.943  eval_loss=2.982  belief=7.204  chain=2.340  value=1.031  query_p=0.231  dropped=0.000%
+[bc] epoch 3/6  train_loss=2.763  eval_loss=2.914  belief=6.807  chain=2.217  value=1.108  query_p=0.236  dropped=0.000%
+[bc] epoch 4/6  train_loss=2.562  eval_loss=2.799  belief=6.485  chain=2.119  value=1.055  query_p=0.252  dropped=0.000%
+[bc] epoch 5/6  train_loss=2.418  eval_loss=2.821  belief=6.433  chain=2.103  value=1.150  query_p=0.263  dropped=0.000%
+[bc] epoch 6/6  train_loss=2.324  eval_loss=2.849  belief=6.406  chain=2.093  value=1.240  query_p=0.270  dropped=0.000%
+[bc] early stop: no held-out improvement of at least 0.002 for 2 epochs
+[bc] done -> runs/blueprint/g1000/checkpoints/bc_final.pt  (best eval epoch=4, loss=2.799)
+[peakrss] exit=0 wall_s=3345.4 max_rss_mb=2391
+EXIT 0
