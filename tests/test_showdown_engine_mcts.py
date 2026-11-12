@@ -92,6 +92,27 @@ def test_ledger_row_reports_counters():
     assert cells[6:9] == ["0.200", "1/10", "`abc`"]
 
 
+def test_fidelity_summary_aggregates_per_game_counters():
+    result = MatchResult(label="m vs s", a="m", b="s", requested_games=4, completed_games=2)
+    result.game_counters = [
+        {"a": {"decisions": 10, "decision_seconds": 2.0, "fallbacks": 1, "worlds_sampled": 40,
+               "worlds_dropped": 4, "rejected": 0, "failure_reasons": {"PanicException: x": 4}}},
+        {"a": {"decisions": 30, "decision_seconds": 6.0, "fallbacks": 0, "worlds_sampled": 120,
+               "worlds_dropped": 0, "rejected": 1, "failure_reasons": {"PanicException: x": 1,
+                                                                       "KeyError: y": 2}}},
+    ]
+    fidelity = result.as_dict()["a_fidelity"]
+    assert fidelity["games"] == 2 and fidelity["decisions"] == 40
+    assert fidelity["fallback_rate"] == pytest.approx(1 / 40)
+    assert fidelity["games_with_fallback"] == 1 and fidelity["max_fallbacks_in_a_game"] == 1
+    assert fidelity["world_drop_rate"] == pytest.approx(4 / 160)
+    assert fidelity["rejected"] == 1
+    assert fidelity["seconds_per_decision"] == pytest.approx(0.2)
+    assert fidelity["failure_reasons"] == {"PanicException: x": 5, "KeyError: y": 2}
+    # a scripted opponent reports no counters, so it has no summary
+    assert result.as_dict()["b_fidelity"] is None
+
+
 # ---------------------------------------------------------------------- request overlay (engine)
 @needs_engine
 def test_request_overlay_forces_switch_and_disables_unoffered_moves():

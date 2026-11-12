@@ -88,6 +88,40 @@ class MatchResult:
                     totals[key] = totals.get(key, 0) + value
         return totals
 
+    def fidelity(self, side: str) -> dict[str, Any] | None:
+        """Search-fidelity summary for a controller that reports per-game counters (ROADMAP P1.3):
+        totals, rates over decisions and sampled worlds, the worst game, and failure reasons."""
+        games = [game.get(side) or {} for game in self.game_counters]
+        games = [game for game in games if "decisions" in game]
+        if not games:
+            return None
+        totals = self.counter_totals(side)
+        decisions = totals.get("decisions", 0)
+        sampled = totals.get("worlds_sampled", 0)
+        reasons: dict[str, int] = {}
+        for game in games:
+            for reason, count in (game.get("failure_reasons") or {}).items():
+                reasons[reason] = reasons.get(reason, 0) + int(count)
+        top = sorted(reasons.items(), key=lambda item: -item[1])[:10]
+        return {
+            "games": len(games),
+            "decisions": int(decisions),
+            "fallbacks": int(totals.get("fallbacks", 0)),
+            "fallback_rate": totals.get("fallbacks", 0) / decisions if decisions else None,
+            "games_with_fallback": sum(1 for game in games if game.get("fallbacks", 0) > 0),
+            "max_fallbacks_in_a_game": int(max(game.get("fallbacks", 0) for game in games)),
+            "worlds_sampled": int(sampled),
+            "worlds_dropped": int(totals.get("worlds_dropped", 0)),
+            "world_drop_rate": totals.get("worlds_dropped", 0) / sampled if sampled else None,
+            "rejected": int(totals.get("rejected", 0)),
+            "order_errors": int(totals.get("order_errors", 0)),
+            "tera_entries_dropped": int(totals.get("tera_entries_dropped", 0)),
+            "unmapped_visits": int(totals.get("unmapped_visits", 0)),
+            "seconds_per_decision": (totals["decision_seconds"] / decisions
+                                     if decisions and "decision_seconds" in totals else None),
+            "failure_reasons": dict(top),
+        }
+
     def block_means(self) -> list[float]:
         """Mean score of each complete four-game block (unresolved games excluded)."""
         means = []
@@ -117,6 +151,8 @@ class MatchResult:
             "games_per_second": self.completed_games / self.wall_s if self.wall_s else None,
             "a_counter_totals": self.counter_totals("a"),
             "b_counter_totals": self.counter_totals("b"),
+            "a_fidelity": self.fidelity("a"),
+            "b_fidelity": self.fidelity("b"),
         }
 
 
@@ -739,6 +775,10 @@ def main() -> None:
         )
         if match.sequential:
             print(f"[showdown-selection] SPRT {match.label}: {match.sequential}", flush=True)
+        for side in ("a", "b"):
+            if row.get(f"{side}_fidelity"):
+                print(f"[showdown-selection] FIDELITY {match.label} ({side}): "
+                      f"{json.dumps(row[f'{side}_fidelity'])}", flush=True)
         ledger_rows.append(ledger_row(row, backend="showdown_direct", commit=commit,
                                       command=command))
 
