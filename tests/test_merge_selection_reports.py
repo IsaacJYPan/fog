@@ -39,3 +39,26 @@ def test_merge_refuses_shards_that_are_not_comparable():
     unfinished["status"] = "in_progress"
     with pytest.raises(ValueError, match="complete"):
         merge_reports([_report(1, 6, 2), unfinished])
+
+
+def test_run_shards_splits_whole_blocks_and_resumes(tmp_path):
+    import json
+
+    from fog.eval.run_shards import shard_commands, split_games
+
+    assert split_games(1000, 3) == [336, 332, 332]
+    assert split_games(8, 2) == [4, 4]
+    with pytest.raises(ValueError):
+        split_games(10, 2)
+    with pytest.raises(ValueError):
+        split_games(8, 3)
+
+    (tmp_path / "shard_0.json").write_text(json.dumps({"status": "complete"}))
+    (tmp_path / "shard_1.json").write_text(json.dumps({"status": "in_progress"}))
+    commands = shard_commands(["--pool", "p", "--opponent", "random"], tmp_path, 24, 3, 50)
+    assert [report.name for report, _ in commands] == ["shard_1.json", "shard_2.json"]
+    resumed, fresh = commands[0][1], commands[1][1]
+    assert resumed[-1] == "--resume" and "--resume" not in fresh
+    assert fresh[fresh.index("--seed") + 1] == "52" and fresh[fresh.index("--games") + 1] == "8"
+    with pytest.raises(ValueError, match="--seed"):
+        shard_commands(["--seed", "3"], tmp_path, 24, 3, 50)
