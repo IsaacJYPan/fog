@@ -618,3 +618,15 @@ stage 1 budget 334,049, fallback-grid budget 167,024 each, stage 2 budget 556,74
 The normal 100k / 200k evaluation cadence and game counts stay unchanged; report the actual
 whole-update checkpoint counters, and also score the final checkpoint. Stage 1 starts from
 fresh random weights; neither throughput checkpoint is used as its start.
+
+Stage 1 untrained baselines (smoke), greedy, first `pool_a` team on both sides, matched
+four-game blocks. Both rows completed all 200 games with zero failures, truncations or draws.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 0 | maxdamage (smoke) | 200 | 0.160 [0.116, 0.217] | `2793b3087b54bccd915831358f813b3f3e070198` | `scratch-0-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/untrained.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-0-maxdamage.json --resume` |
+| 0 | simpleheuristics (smoke) | 200 | 0.135 [0.094, 0.189] | `2793b3087b54bccd915831358f813b3f3e070198` | `scratch-0-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/untrained.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-0-simpleheuristics.json --resume` |
+
+Stage 1 training uses the logged CLI in `commands.jsonl`. Intermediate snapshot evaluations
+run concurrently on one CPU thread; only stage 0 is used for the isolated cost breakdown.
+The final controller skips snapshots already scored by the watcher. No second training job runs.
