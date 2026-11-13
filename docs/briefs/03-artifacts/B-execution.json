@@ -5,9 +5,22 @@
   "commit": "620d6c263e77974e84a8413a3a3adef0baf25aa5",
   "attempts": [
     {
-      "started_utc": "2026-11-13 10:52:34 UTC"
+      "started_utc": "2026-11-13 10:52:34 UTC",
+      "exit_code": null,
+      "seconds": null,
+      "status": "interrupted_environment_at_unobserved_time",
+      "wall_seconds_unknown": true,
+      "exit_status_unknown": true,
+      "completed_checkpoint_epoch_at_resume": 15,
+      "completed_epoch_timers_lower_bound_seconds": 18121.329808917,
+      "explanation": "The prior environment stopped at an unobserved time. No live trainer remained on return; elapsed time since launch includes unknown downtime and is not training wall time."
+    },
+    {
+      "started_utc": "2026-11-13 21:28:09 UTC"
     }
   ],
   "reports": [],
-  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_3000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g3000e18"
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_3000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g3000e18",
+  "environment_restart_observed_utc": "2026-11-13 21:27:41 UTC",
+  "environment_resume_prefix_file": "docs/briefs/03-artifacts/B-environment-resume-prefix.csv"
 }

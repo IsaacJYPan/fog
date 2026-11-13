@@ -824,3 +824,17 @@ policy NLL 1.604685, training policy NLL 1.517395, value MSE 1.191609. These
 checkpoints have an unfinished 18-epoch schedule and do not replace the legacy
 six-epoch completed-schedule reference. The supervisor remains live beyond two
 hours; no extra interruption or runtime variant was introduced.
+
+B later stopped when the environment ended at an unobserved time. On return
+at 21:27 UTC no trainer was live; atomic state and CSV both held epoch 15
+(state step 9,523). The original attempt retains unknown exit code and wall
+time in `B-execution.json`; no UTC gap or downtime is counted as training.
+Its completed epoch timers sum to 18,121.330 s, a lower bound that excludes
+startup, file writes and any uncheckpointed partial epoch. The existing
+`run_comparison.py B` command was launched exactly once at 21:28:09 UTC,
+restoring epoch 15 with rows 0–15 exactly unchanged. Reported runtime remains
+AMD EPYC9V74, affinity five/quota four, 16 GiB memory, Torch2.13.0+cu130,
+five intra/inter-op threads, no CUDA. Evidence: `B-environment-resume.json`,
+prefix CSV and resume tail. Final B wall will remain unknown; its completed
+epoch timers plus the measured resumed attempt will be reported as a lower
+bound, without inventing the missing original timing or exit status.

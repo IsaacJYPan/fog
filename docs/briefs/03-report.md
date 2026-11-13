@@ -60,6 +60,10 @@ controlled deltas are retained in the run summaries and metrics.
   saved projection is 18,060.446 s from the stage-1 rate, or a conservative
   21,405.112 s from recent measured rates, below eight hours (`B-projection.json`).
   Settings remain frozen. Partial B metrics are explicitly snapshots.
+  The environment stopped with atomic epoch 15 saved. B resumed identically
+  at 21:28:09 UTC, preserving rows 0–15. Its original exit/total wall are unknown;
+  completed epoch timers provide an 18,121.330 s lower bound, excluding downtime
+  (`B-environment-resume.json`).
 - **Stage 3: done on real data.** A was SIGTERM-killed after atomic state epoch 2
   (exit −15, 1,197.492 s) and restarted with the identical command. It continued
   through epoch 18; the original CSV prefix is exactly unchanged, including
