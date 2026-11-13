@@ -663,7 +663,7 @@ per-epoch policy/value curves and timing formulas: `R-summary.json`,
 | Run | Games / epochs / actual steps | Trainer wall / pure training rows/s | Last epoch policy NLL / top-1 | Best report policy NLL / top-1 (epoch) | Final training policy NLL | Holdout value MSE min / final | Commit |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | R | 1,000 / 6 / 1,286 | 2,799.785 s / 187.060 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 | `247a1e1` |
-| A | 1,000 / 18 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
+| A | 1,000 / 18 / 3,870 | 9,355.371 s / 157.725 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 | `41b6ffd` |
 | S | 1,000 / 6 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
 | B | 3,000 / 18 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
 
@@ -753,3 +753,24 @@ Evidence/command/commit: `A-resume-evidence.json`, `A-execution.json`,
 interruption, not a generated-data test; remaining A epochs and both reports
 are still running/pending. The final supervisor check will compare the same
 prefix again after all 18 epochs complete.
+
+A **completed all 18 epochs**, final resume-prefix comparison exact. Trainer
+attempts total 9,355.371 s (1,197.492 s interrupted plus 8,157.878 s resumed);
+best/final reports 128.951/127.414 s, combined 9,611.736 s versus the pre-launch
+8,072.140 s projection. Actual aggregate pure training is 157.725 rows/s and
+mean validation 172.194 s, slower than R with the same runtime settings. State
+records 3,870 optimizer updates and selected epoch 8. Sources: `A-summary.json`
+(all formulas/per-epoch policy/value curves), `A-metrics.csv`, `A-tail.txt`,
+both holdout JSON/output files and the final `A-execution.json`. Checkpoint
+sizes/SHA-256 are appended to `checkpoints.json`.
+
+A's final policy NLL is 0.138436 worse than R's on this machine, despite a
+higher final top-1. Its training/holdout gap reaches 0.707102 NLL
+(1.241824 versus 1.948926); best policy NLL is 1.736081 at epoch 8, then
+overfitting dominates. Trained value MSE never beats constant zero (minimum
+1.015312, final 1.595830). Exact controlled deltas are in
+`A-summary.json: controlled_comparison_with_R`; the S seed-noise estimate is
+still pending, so the final effect-size reading waits. Legacy 3k comparisons
+remain cross-platform references. A fresh-process original/current real-20
+control runs serially before S, closing the shared-process startup-order gap
+without changing the application or runtime recipe.

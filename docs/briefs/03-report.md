@@ -15,7 +15,7 @@ throughput and memory remain untested.
 | Run (games × epochs) | Steps | Train wall / rows/s | Last NLL / top-1 | Best report NLL / top-1 (epoch) | Final train NLL | Value MSE min / last |
 | --- | ---: | --- | --- | --- | ---: | --- |
 | R (1,000 × 6) | 1,286 | 2,799.8 s / 187.06 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 |
-| A (1,000 × 18) | — | running; resumed epoch 3 completed | — | — | — | — |
+| A (1,000 × 18) | 3,870 | 9,355.4 s / 157.72 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 |
 | S (1,000 × 6) | — | not started | — | — | — | — |
 | B (3,000 × 18) | — | projection pending | — | — | — | — |
 
@@ -36,6 +36,11 @@ The historical CPU differs and its thread count was not recorded, so hardware
 versus thread/kernel contributions remain unisolated. No data-versus-steps or seed-noise conclusion
 exists yet; R's value MSE barely beats constant zero at its best and rises above
 1.0 afterward. Per-epoch value/policy curves are retained in `R-summary.json`.
+A overfits: its last training/holdout policy NLL are 1.241824/1.948926, a
+0.707102 gap; its selected epoch-8 policy is better than its final policy.
+At the completed schedule, A is 0.138436 NLL worse than R despite higher top-1;
+the S noise estimate remains pending (`A-summary.json`). This is a controlled
+same-machine comparison. Legacy 3k comparisons remain cross-platform references.
 
 ## Per stage
 
@@ -68,12 +73,16 @@ exists yet; R's value MSE barely beats constant zero at its best and rises above
   (`reproduction-platform.json`).
   A started at 06:47:15 UTC after the diagnosis was pushed. Its pre-launch
   projection is 4,914.936 s training plus 19 validation passes and two reports,
-  8,072.140 s total (`A-projection.json`); its required kill/restart is planned
-  after at least two completed epochs. That real interruption/recovery now
+  8,072.140 s total (`A-projection.json`). It completed in 9,355.371 s trainer
+  wall plus 128.951/127.414 s reports, 9,611.736 s combined. Pure training was
+  157.725 rows/s, mean validation 172.194 s, slower than R without a code/runtime
+  change (`A-summary.json`). Its real interruption/recovery
   passed: SIGTERM at completed epoch 2 exited −15 after 1,197.492 s; the identical
   command resumed at epoch 2 and completed epoch 3, with all earlier CSV rows
   (including timing fields) exactly unchanged (`A-resume-evidence.json`,
-  `A-resume-metrics.csv`, `A-resume-tail.txt`). A continues; S/B remain unstarted.
+  `A-resume-metrics.csv`, `A-resume-tail.txt`). The final prefix check also passed.
+  S/B remain unstarted while a serial fresh-process original/current real-20
+  control closes a residual shared-process startup-order question.
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
   were deleted. The identical command skipped import/conversion/split, was killed
@@ -96,7 +105,7 @@ exists yet; R's value MSE barely beats constant zero at its best and rises above
 
 The owner corrected the requested assignment from brief 02 to brief 03 during setup.
 Work continued from `work/roadmap` on the required `work/p2-scale-measure` branch;
-existing brief 02 reports/artifacts remain unchanged. The setup and first real
+on this branch, the existing brief 02 report/artifacts remain unchanged. The setup and first real
 runner test were already underway and are retained as evidence. No question was
 put to the owner. Commands and original outputs are in `03-artifacts/`; setup
 evidence names retain a `continuation-` prefix. The import source shard was cached
@@ -110,7 +119,7 @@ data effect. No application code or runtime tuning was introduced for diagnosis.
 ## Not verified
 
 R's historical curve reproduction (failed; full flag-off and original/current
-real-20 equality passed); A/S/B;
+real-20 equality passed; fresh-process startup control pending); S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints
@@ -118,7 +127,7 @@ hosted GPU execution; play strength. No gate is claimed.
 R's best checkpoint is `runs/blueprint/g1000e6/checkpoints/bc_best.pt`, 23,548,503
 bytes, SHA-256 `2126f07ad1d115d9f82d00a72a32485158cca17cda379eb90ed4d2a0746fd398`.
 Paths/sizes/hashes for its final weights and resumable state, plus the engineering
-smoke and flag-off repeat weights, are in `03-artifacts/checkpoints.json`. The machine may be
+smoke, flag-off repeat and A weights, are in `03-artifacts/checkpoints.json`. The machine may be
 reclaimed; ignored checkpoints are not retained by pushing this branch.
 
 ## Suggestions

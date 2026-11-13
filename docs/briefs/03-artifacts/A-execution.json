@@ -11,10 +11,22 @@
       "deliberately_interrupted": true
     },
     {
-      "started_utc": "2026-11-13 07:07:12 UTC"
+      "started_utc": "2026-11-13 07:07:12 UTC",
+      "exit_code": 0,
+      "seconds": 8157.878293657999,
+      "deliberately_interrupted": false
     }
   ],
-  "reports": [],
+  "reports": [
+    {
+      "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint/split/holdout_manifest.parquet --checkpoint runs/blueprint/g1000e18/checkpoints/bc_best.pt --out runs/blueprint/g1000e18/holdout-best.json",
+      "seconds": 128.95075306199942
+    },
+    {
+      "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint/split/holdout_manifest.parquet --checkpoint runs/blueprint/g1000e18/checkpoints/bc_final.pt --out runs/blueprint/g1000e18/holdout-final.json",
+      "seconds": 127.41436702400097
+    }
+  ],
   "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e18",
   "interruption_performed": true,
   "metrics_before_resume": [
@@ -298,5 +310,27 @@
       "train_value": "0.94605046385149"
     }
   ],
-  "completed_epoch_at_interruption": 2
+  "completed_epoch_at_interruption": 2,
+  "completed_epochs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+  ],
+  "earlier_metrics_unchanged": true
 }

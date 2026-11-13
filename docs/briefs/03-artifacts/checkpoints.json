@@ -48,5 +48,20 @@
     "path": "runs/blueprint/g1000e6-default/checkpoints/bc_final.pt",
     "bytes": 23549265,
     "sha256": "5e6f16ffc5df0729b3766e3301630a3455b39a934ad7a61ee5216488e2ad51d2"
+  },
+  {
+    "path": "runs/blueprint/g1000e18/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "02dfddcf7f52bcf45b225bf87778c16b33fbb8056fd55ba0b5c3588d47405a1b"
+  },
+  {
+    "path": "runs/blueprint/g1000e18/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "a0e1418f94461c21283b7b2fbf967372c78b5fe5f6ed026cdd3ac16816db9616"
+  },
+  {
+    "path": "runs/blueprint/g1000e18/checkpoints/bc_state.pt",
+    "bytes": 75726280,
+    "sha256": "8618be1713a858502241f6635814034cfd97cbfbefe0c6ee932fd5d341107064"
   }
 ]
