@@ -19,7 +19,7 @@ and use a machine with access.
    set -e
    git clone https://github.com/IsaacJYPan/fog /kaggle/working/fog
    cd /kaggle/working/fog
-   git checkout c5938bcb1573a4a4b6fd53200373e541cefc86ae
+   git checkout 5d2d7d5dc94b88488f1a57b4d957364cb1e2e7d3
    git submodule update --init --recursive
    ```
 
@@ -110,13 +110,22 @@ and use a machine with access.
 
    - Run cell 4 again. Completed stages are skipped; training prints
      `[bc] resume: completed epoch N/6`. It restores the last complete epoch and
-     repeats an unfinished epoch. Retain all of `raw/`, `cache/`, `decisions/`,
+     repeats an unfinished epoch. An unfinished conversion is rerun. Retain all of
+     `raw/`, `cache/`, `decisions/`,
      `split/`, `training/`, `output/` and `run.json`; `results/` alone cannot resume.
 
 6. When the runner prints `Results:`, download and hand back exactly
    **`/kaggle/working/fog/runs/blueprint_scale/results/`**, including `bc_best.pt`,
    `metrics.csv`, both holdout JSONs, `train-tail.txt` and `run-summary.txt`.
-   Keep the larger resume archive separately.
+   Package that one folder with this cell, then download
+   `blueprint_scale-results.tar.gz` from the Files pane. Keep the larger resume
+   archive separately.
+
+   ```bash
+   %%bash
+   tar -czf /kaggle/working/blueprint_scale-results.tar.gz \
+     -C /kaggle/working/fog/runs/blueprint_scale results
+   ```
 
 For a CPU-only machine, clone the same commit, run `uv sync --locked --extra dev`,
 build Showdown as in cell 3, and run from the repository root:
