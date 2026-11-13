@@ -1,0 +1,82 @@
+{
+  "source": "play3_t0.json",
+  "execution": "play-execution.json",
+  "printed_output": "play-output.txt",
+  "scope": "Smoke only: pool_b is not a held-out team split; 400 games per opponent, greedy, no search, no gate.",
+  "checkpoint": "runs/blueprint/g3000e18/checkpoints/bc_best.pt",
+  "selection": "lowest standalone holdout policy NLL among R/A/S/B best checkpoints; B epoch8",
+  "rows": [
+    {
+      "label": "blueprint vs simpleheuristics",
+      "a_wins": 144,
+      "b_wins": 256,
+      "draws": 0,
+      "completed_games": 400,
+      "failures": 0,
+      "truncated": 0,
+      "a_win_rate_decisive": 0.36,
+      "wilson_95_low": 0.3144979076102711,
+      "wilson_95_high": 0.40816553480333195,
+      "wall_s": 322.214636318,
+      "decisions": 13099,
+      "switches": 3749,
+      "switch_rate": 0.28620505382090233,
+      "slot13_forced": 0
+    },
+    {
+      "label": "blueprint vs maxdamage",
+      "a_wins": 309,
+      "b_wins": 91,
+      "draws": 0,
+      "completed_games": 400,
+      "failures": 0,
+      "truncated": 0,
+      "a_win_rate_decisive": 0.7725,
+      "wilson_95_low": 0.7289390669951599,
+      "wilson_95_high": 0.8108767325926485,
+      "wall_s": 343.41231488999983,
+      "decisions": 14163,
+      "switches": 3349,
+      "switch_rate": 0.23646120172279883,
+      "slot13_forced": 12
+    }
+  ],
+  "combined": {
+    "decisions": 27262,
+    "switches": 7098,
+    "switch_rate": 0.26036240921429094
+  },
+  "human_switch_reference": {
+    "rate": 0.28,
+    "exact_holdout_rate": 0.2799261403525644,
+    "switch_rows": 29107,
+    "policy_rows": 103981
+  },
+  "formulas": {
+    "switch_rate": "selected_by_family.switch / decisions; equivalently sum slots8..12 / decisions; slot13 is forced/default and excluded",
+    "combined_switch_rate": "sum switches / sum decisions across both opponents"
+  },
+  "comparison_limits": "Play switch counts include forced replacements, while retained human replay decisions omit forced/single-choice rows. Raw rates are descriptive, not a like-for-like voluntary-switch comparison.",
+  "legacy_smoke_reference": {
+    "simpleheuristics": {
+      "win_rate": 0.258,
+      "wilson95": [
+        0.217,
+        0.303
+      ]
+    },
+    "maxdamage": {
+      "win_rate": 0.623,
+      "wilson95": [
+        0.574,
+        0.669
+      ]
+    },
+    "source": "docs/results-ledger.md, 'replay blueprint learning curve at 1k\u201320k games'; 400 games/opponent on pool_b"
+  },
+  "legacy_comparison": "Both new smoke Wilson intervals lie wholly above their legacy smoke intervals; this does not establish held-out strength or pass a gate.",
+  "wall_seconds": 668.3039773319997,
+  "decision_timing_and_fallbacks": "n/a in the evaluator printed rows; not inferred from total wall.",
+  "commit_stamp": "26107f2+dirty",
+  "dirty_scope": "Pending measurement documentation/artifacts at launch; application/config/dependency/submodule code matches the reviewed base."
+}

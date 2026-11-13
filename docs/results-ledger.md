@@ -766,7 +766,7 @@ CPU time/disk arithmetic. Idle fixed split: 2.154823 s at 22k, output 700,419
 bytes, projected about 11 s at 112k (`split-timing.json` and output).
 Six-epoch checkpoints plus result-best duplicate: 287,619,529 bytes
 (`checkpoint-storage.json`). Full rates/profile range is 157.29–194.04 rows/s;
-The CPU pipeline for 20k training games projects to 9.618–11.737 h; importing
+the CPU pipeline for 20k training games projects to 9.618–11.737 h; importing
 112k and training about 100k projects to 46.674–57.009 h on CPU
 (`scale-projections.json`, complete inputs/formulas).
 These are batch-256 CPU references. Actual batch-1,024/GPU speed and memory
@@ -779,7 +779,34 @@ SHA-256 values. Winner: `runs/blueprint/g3000e18/checkpoints/bc_best.pt`,
 Ignored weights may disappear if the machine is reclaimed; text evidence is
 pushed after each stage.
 
-Stage 6 smoke results are pending for B epoch 8, 400 games per opponent on
-`pool_b`, greedy and without search. No play-strength, held-out-team or roadmap
-gate claim is made here; the completed smoke and action statistics will be
-recorded separately in this section.
+### Stage 6: play smoke, no gate
+
+B epoch 8 played 400 games per opponent on `data/teams/pool_b`, greedy and
+without search: 800 completed games, zero failures, draws or truncations.
+Total wall: 668.304 s (row walls 322.215/343.412 s). Sources: `play3_t0.json`,
+`play-output.txt`, `play-execution.json`, `play-summary.json`. The following
+rows are pasted exactly from the evaluator and are **smoke only**:
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95% Wilson] (W-L-D) | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-13 | blueprint | simpleheuristics | showdown_direct | 400 | 0.360 [0.314, 0.408] (144-256-0) | n/a | n/a | `26107f2+dirty` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/blueprint/g3000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0 --action-stats --out runs/blueprint/play3_t0.json` |
+| 2026-11-13 | blueprint | maxdamage | showdown_direct | 400 | 0.772 [0.729, 0.811] (309-91-0) | n/a | n/a | `26107f2+dirty` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/blueprint/g3000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0 --action-stats --out runs/blueprint/play3_t0.json` |
+
+The `+dirty` stamp reflects pending measurement documents/artifacts at launch;
+application/config/dependency/submodule code matches the reviewed base. The
+evaluator emitted `n/a` for decision timing and fallbacks; total wall is not
+substituted for those fields. Exact MaxDamage win rate is 309/400 = 0.7725;
+the printed row rounds it to 0.772.
+
+New SimpleHeuristics 0.360 [0.314, 0.408] and MaxDamage 0.7725 [0.729, 0.811]
+smoke intervals are wholly above brief 01's 0.258 [0.217, 0.303] and
+0.623 [0.574, 0.669]. This supports improved results in these smoke matches;
+400 games and `pool_b` do not establish held-out strength or pass G2.
+
+Switching in play: SimpleHeuristics 3,749/13,099 = 28.62%; MaxDamage
+3,349/14,163 = 23.65%; combined 7,098/27,262 = 26.04%, beside the human
+replay reference 28% (29,107/103,981 = 27.99%). The numerator is action family
+`switch`, slots 8–12; slot 13 is forced/default and excluded. Play includes
+forced replacements while retained replay decisions omit forced/single-choice
+rows, so these raw rates are not a like-for-like voluntary-switch comparison.
+Formulas and counts are in `play-summary.json`. P2.3–P2.5 and G2 remain open.

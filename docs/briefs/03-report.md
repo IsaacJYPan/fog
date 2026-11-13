@@ -7,9 +7,9 @@ with 96% of the profiled step spent in model computation. The best policy reache
 NLL 1.579/top-1 0.441; longer training overfits at both sizes, supporting a
 data/generalization limit rather than extra updates alone explaining the earlier
 gain. The exact historical data effect remains unisolated across CPUs, and value
-learns only weak early signal before finishing worse than constant zero. The CPU
-scale pipeline and real recovery tests pass; hosted GPU throughput and memory
-remain untested.
+learns only weak early signal before finishing worse than constant zero. The
+real-data CPU pipeline and recovery tests pass; hosted GPU throughput, memory
+and batch-1,024 performance remain untested.
 
 ## Stage 2 table and reading
 
@@ -84,7 +84,14 @@ reference and exact comparisons are in `comparison-curves.txt` and
   arithmetic. CPU20k pipeline reference: 9.62–11.74 h at batch-256 measured/profile
   rates. Actual runner batch-1,024/GPU performance is unmeasured
   (`scale-projections.json`).
-- **Stage 6: pending smoke results.** B epoch 8 is selected; no gate is claimed.
+- **Stage 6: done, smoke only.** B epoch 8 played 400 games per opponent in
+  668.304 s, zero failures/truncations: SimpleHeuristics 0.360 [0.314, 0.408],
+  MaxDamage 0.7725 [0.729, 0.811]. Both Wilson intervals lie above brief 01's
+  smoke intervals; `pool_b` is not a held-out team split and no gate is claimed.
+  Raw switch rates are 28.62%/23.65%, combined 26.04%, beside human 28%.
+  Play includes forced replacements, unlike retained replay decisions. Exact
+  printed ledger rows, counts and formulas are in `play-{output.txt,summary.json}`
+  and `play3_t0.json`; decision timing/fallbacks are `n/a`.
 
 ## Deviations and corrections
 
@@ -103,12 +110,14 @@ no measured difference in tested update/startup paths without isolating historic
 hardware/thread/kernel contributions (`R-default-summary.json`, `real20-*`,
 `fresh-real20/`, `reproduction-platform.json`). No model, loss, learning rate,
 batch or runtime setting changed for diagnosis or recovery.
+Play's `+dirty` stamp refers to pending measurement documents/artifacts;
+application/config code is unchanged, as detailed in the ledger.
 
 ## Not verified
 
-The exact historical trajectory, B's exact total wall/old exit, play strength,
-hosted CUDA execution/memory/speed, and scale projections as actual runs remain
-unverified. No roadmap task or gate is claimed.
+The exact historical trajectory, B's exact total wall/old exit, held-out play
+strength, hosted CUDA execution/memory/speed, and scale projections as actual
+runs remain unverified. No roadmap task or gate is claimed.
 
 ## Checkpoints
 

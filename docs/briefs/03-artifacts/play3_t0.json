@@ -1,0 +1,5017 @@
+{
+  "status": "complete",
+  "protocol": {
+    "simulator": "pinned Pokemon Showdown, direct in-memory worker",
+    "format": "gen9ou",
+    "pool": "data/teams/pool_b",
+    "pool_size": 16,
+    "games_per_row": 400,
+    "block_size": 4,
+    "block_design": "both team assignments crossed with both player positions",
+    "seed": 0,
+    "temperature": 0.0,
+    "max_turns": 200,
+    "device": "cpu",
+    "checkpoint_configs": {
+      "blueprint": "configs/replay_blueprint_cpu.yaml"
+    },
+    "checkpoint_tera_logit_bonuses": {},
+    "score_schema_version": 2,
+    "action_stats_schema_version": 2,
+    "action_stats": true,
+    "policy_diagnostics": false,
+    "primary_score": "win=1, genuine draw=0.5, loss=0; truncations unresolved",
+    "draws_excluded_from_win_rate": true
+  },
+  "checkpoints": {
+    "blueprint": "runs/blueprint/g3000e18/checkpoints/bc_best.pt"
+  },
+  "rows": [
+    {
+      "label": "blueprint vs simpleheuristics",
+      "a": "blueprint",
+      "b": "simpleheuristics",
+      "requested_games": 400,
+      "completed_games": 400,
+      "a_wins": 144,
+      "b_wins": 256,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "turns": 10816,
+      "wall_s": 322.214636318,
+      "game_scores": [
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+      ],
+      "game_counters": [],
+      "sequential": null,
+      "decisive_games": 400,
+      "a_win_rate_decisive": 0.36,
+      "wilson_95_low": 0.3144979076102711,
+      "wilson_95_high": 0.40816553480333195,
+      "finished_games": 400,
+      "true_draws": 0,
+      "a_score": 0.36,
+      "mean_turns": 27.04,
+      "games_per_second": 1.2414085361573461,
+      "a_counter_totals": {},
+      "b_counter_totals": {},
+      "a_fidelity": null,
+      "b_fidelity": null
+    },
+    {
+      "label": "blueprint vs maxdamage",
+      "a": "blueprint",
+      "b": "maxdamage",
+      "requested_games": 400,
+      "completed_games": 400,
+      "a_wins": 309,
+      "b_wins": 91,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "turns": 12197,
+      "wall_s": 343.41231488999983,
+      "game_scores": [
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0
+      ],
+      "game_counters": [],
+      "sequential": null,
+      "decisive_games": 400,
+      "a_win_rate_decisive": 0.7725,
+      "wilson_95_low": 0.7289390669951599,
+      "wilson_95_high": 0.8108767325926485,
+      "finished_games": 400,
+      "true_draws": 0,
+      "a_score": 0.7725,
+      "mean_turns": 30.4925,
+      "games_per_second": 1.164780593637494,
+      "a_counter_totals": {},
+      "b_counter_totals": {},
+      "a_fidelity": null,
+      "b_fidelity": null
+    }
+  ],
+  "action_stats": {
+    "blueprint vs simpleheuristics": {
+      "decisions": 13099,
+      "selected_by_slot": [
+        5508,
+        2736,
+        993,
+        101,
+        11,
+        0,
+        1,
+        0,
+        894,
+        746,
+        670,
+        756,
+        683,
+        0
+      ],
+      "legal_opportunities_by_slot": [
+        10536,
+        10286,
+        10319,
+        10394,
+        10503,
+        10255,
+        10263,
+        10361,
+        7527,
+        8249,
+        8694,
+        8729,
+        8793,
+        1
+      ],
+      "selected_by_family": {
+        "ordinary_move": 9338,
+        "tera_move": 12,
+        "switch": 3749,
+        "forced": 0
+      },
+      "legal_decisions_by_family": {
+        "ordinary_move": 10815,
+        "tera_move": 10759,
+        "switch": 12232,
+        "forced": 1
+      },
+      "games": {
+        "battle-select-blueprint-vs-simpleheuristics-0": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-1": {
+          "decisions": 53,
+          "tera_legal_decisions": 48,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-2": {
+          "decisions": 45,
+          "tera_legal_decisions": 43,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-3": {
+          "decisions": 35,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-4": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-5": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-6": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-7": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-8": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-9": {
+          "decisions": 57,
+          "tera_legal_decisions": 41,
+          "first_tera_turn": 41
+        },
+        "battle-select-blueprint-vs-simpleheuristics-10": {
+          "decisions": 31,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-11": {
+          "decisions": 18,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-12": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-13": {
+          "decisions": 26,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-14": {
+          "decisions": 28,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-15": {
+          "decisions": 21,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-16": {
+          "decisions": 63,
+          "tera_legal_decisions": 57,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-17": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-18": {
+          "decisions": 40,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-19": {
+          "decisions": 63,
+          "tera_legal_decisions": 58,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-20": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-21": {
+          "decisions": 43,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-22": {
+          "decisions": 31,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-23": {
+          "decisions": 35,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-24": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-25": {
+          "decisions": 28,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-26": {
+          "decisions": 32,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-27": {
+          "decisions": 31,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": 21
+        },
+        "battle-select-blueprint-vs-simpleheuristics-28": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-29": {
+          "decisions": 32,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": 21
+        },
+        "battle-select-blueprint-vs-simpleheuristics-30": {
+          "decisions": 30,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-31": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-32": {
+          "decisions": 24,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-33": {
+          "decisions": 32,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-34": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-35": {
+          "decisions": 22,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-36": {
+          "decisions": 62,
+          "tera_legal_decisions": 58,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-37": {
+          "decisions": 44,
+          "tera_legal_decisions": 39,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-38": {
+          "decisions": 43,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-39": {
+          "decisions": 61,
+          "tera_legal_decisions": 58,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-40": {
+          "decisions": 34,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-41": {
+          "decisions": 32,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-42": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-43": {
+          "decisions": 26,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-44": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-45": {
+          "decisions": 32,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-46": {
+          "decisions": 27,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-47": {
+          "decisions": 23,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-48": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-49": {
+          "decisions": 22,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": 16
+        },
+        "battle-select-blueprint-vs-simpleheuristics-50": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-51": {
+          "decisions": 17,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-52": {
+          "decisions": 40,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-53": {
+          "decisions": 39,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-54": {
+          "decisions": 35,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-55": {
+          "decisions": 32,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-56": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-57": {
+          "decisions": 61,
+          "tera_legal_decisions": 57,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-58": {
+          "decisions": 29,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-59": {
+          "decisions": 30,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-60": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-61": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-62": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-63": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-64": {
+          "decisions": 33,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-65": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-66": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-67": {
+          "decisions": 35,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-68": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-69": {
+          "decisions": 49,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-70": {
+          "decisions": 39,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-71": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-72": {
+          "decisions": 45,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-73": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-74": {
+          "decisions": 26,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-75": {
+          "decisions": 31,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-76": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-77": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-78": {
+          "decisions": 32,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-79": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-80": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-81": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-82": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-83": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-84": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-85": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-86": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-87": {
+          "decisions": 26,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-88": {
+          "decisions": 27,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-89": {
+          "decisions": 25,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-90": {
+          "decisions": 29,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-91": {
+          "decisions": 24,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-92": {
+          "decisions": 33,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-93": {
+          "decisions": 28,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-94": {
+          "decisions": 41,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-95": {
+          "decisions": 55,
+          "tera_legal_decisions": 46,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-96": {
+          "decisions": 41,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-97": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-98": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-99": {
+          "decisions": 41,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-100": {
+          "decisions": 58,
+          "tera_legal_decisions": 53,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-101": {
+          "decisions": 57,
+          "tera_legal_decisions": 50,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-102": {
+          "decisions": 60,
+          "tera_legal_decisions": 54,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-103": {
+          "decisions": 125,
+          "tera_legal_decisions": 120,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-104": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-105": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-106": {
+          "decisions": 24,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": 17
+        },
+        "battle-select-blueprint-vs-simpleheuristics-107": {
+          "decisions": 33,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": 27
+        },
+        "battle-select-blueprint-vs-simpleheuristics-108": {
+          "decisions": 60,
+          "tera_legal_decisions": 46,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-109": {
+          "decisions": 50,
+          "tera_legal_decisions": 43,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-110": {
+          "decisions": 40,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-111": {
+          "decisions": 52,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-112": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-113": {
+          "decisions": 43,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-114": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-115": {
+          "decisions": 30,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-116": {
+          "decisions": 30,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-117": {
+          "decisions": 33,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-118": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-119": {
+          "decisions": 30,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-120": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-121": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-122": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-123": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-124": {
+          "decisions": 80,
+          "tera_legal_decisions": 73,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-125": {
+          "decisions": 40,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-126": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-127": {
+          "decisions": 53,
+          "tera_legal_decisions": 50,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-128": {
+          "decisions": 16,
+          "tera_legal_decisions": 11,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-129": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-130": {
+          "decisions": 20,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-131": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-132": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-133": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-134": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-135": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-136": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-137": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-138": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-139": {
+          "decisions": 23,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": 15
+        },
+        "battle-select-blueprint-vs-simpleheuristics-140": {
+          "decisions": 39,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-141": {
+          "decisions": 23,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-142": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-143": {
+          "decisions": 34,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-144": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-145": {
+          "decisions": 32,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-146": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-147": {
+          "decisions": 34,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-148": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-149": {
+          "decisions": 40,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-150": {
+          "decisions": 38,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-151": {
+          "decisions": 16,
+          "tera_legal_decisions": 11,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-152": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-153": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-154": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-155": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-156": {
+          "decisions": 43,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-157": {
+          "decisions": 23,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-158": {
+          "decisions": 18,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-159": {
+          "decisions": 64,
+          "tera_legal_decisions": 55,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-160": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-161": {
+          "decisions": 31,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-162": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-163": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-164": {
+          "decisions": 56,
+          "tera_legal_decisions": 49,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-165": {
+          "decisions": 17,
+          "tera_legal_decisions": 12,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-166": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-167": {
+          "decisions": 51,
+          "tera_legal_decisions": 41,
+          "first_tera_turn": 41
+        },
+        "battle-select-blueprint-vs-simpleheuristics-168": {
+          "decisions": 38,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-169": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-170": {
+          "decisions": 34,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-171": {
+          "decisions": 37,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-172": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-173": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-174": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-175": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-176": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-177": {
+          "decisions": 30,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-178": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-179": {
+          "decisions": 23,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-180": {
+          "decisions": 26,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-181": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-182": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-183": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-184": {
+          "decisions": 31,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-185": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-186": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-187": {
+          "decisions": 30,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-188": {
+          "decisions": 71,
+          "tera_legal_decisions": 67,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-189": {
+          "decisions": 113,
+          "tera_legal_decisions": 106,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-190": {
+          "decisions": 126,
+          "tera_legal_decisions": 104,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-191": {
+          "decisions": 63,
+          "tera_legal_decisions": 60,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-192": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-193": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-194": {
+          "decisions": 23,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-195": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-196": {
+          "decisions": 35,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-197": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-198": {
+          "decisions": 32,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-199": {
+          "decisions": 32,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-200": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-201": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-202": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-203": {
+          "decisions": 35,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-204": {
+          "decisions": 72,
+          "tera_legal_decisions": 66,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-205": {
+          "decisions": 41,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-206": {
+          "decisions": 31,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-207": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-208": {
+          "decisions": 17,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-209": {
+          "decisions": 25,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-210": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-211": {
+          "decisions": 13,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-212": {
+          "decisions": 67,
+          "tera_legal_decisions": 51,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-213": {
+          "decisions": 23,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-214": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-215": {
+          "decisions": 59,
+          "tera_legal_decisions": 44,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-216": {
+          "decisions": 44,
+          "tera_legal_decisions": 39,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-217": {
+          "decisions": 45,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-218": {
+          "decisions": 68,
+          "tera_legal_decisions": 64,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-219": {
+          "decisions": 41,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-220": {
+          "decisions": 35,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-221": {
+          "decisions": 25,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-222": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-223": {
+          "decisions": 29,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-224": {
+          "decisions": 32,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-225": {
+          "decisions": 37,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-226": {
+          "decisions": 30,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-227": {
+          "decisions": 37,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-228": {
+          "decisions": 38,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-229": {
+          "decisions": 31,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-230": {
+          "decisions": 31,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-231": {
+          "decisions": 46,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-232": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-233": {
+          "decisions": 30,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-234": {
+          "decisions": 27,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-235": {
+          "decisions": 30,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-236": {
+          "decisions": 28,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-237": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-238": {
+          "decisions": 35,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-239": {
+          "decisions": 37,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": 27
+        },
+        "battle-select-blueprint-vs-simpleheuristics-240": {
+          "decisions": 90,
+          "tera_legal_decisions": 83,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-241": {
+          "decisions": 51,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-242": {
+          "decisions": 70,
+          "tera_legal_decisions": 68,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-243": {
+          "decisions": 47,
+          "tera_legal_decisions": 43,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-244": {
+          "decisions": 22,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-245": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-246": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-247": {
+          "decisions": 22,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": 13
+        },
+        "battle-select-blueprint-vs-simpleheuristics-248": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-249": {
+          "decisions": 68,
+          "tera_legal_decisions": 47,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-250": {
+          "decisions": 48,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-251": {
+          "decisions": 16,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-252": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-253": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-254": {
+          "decisions": 35,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-255": {
+          "decisions": 30,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-256": {
+          "decisions": 28,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-257": {
+          "decisions": 32,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-258": {
+          "decisions": 26,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-259": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-260": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-261": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-262": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-263": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-264": {
+          "decisions": 34,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-265": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-266": {
+          "decisions": 19,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-267": {
+          "decisions": 29,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-268": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-269": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-270": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-271": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-272": {
+          "decisions": 21,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-273": {
+          "decisions": 64,
+          "tera_legal_decisions": 51,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-274": {
+          "decisions": 33,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-275": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-276": {
+          "decisions": 60,
+          "tera_legal_decisions": 55,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-277": {
+          "decisions": 35,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-278": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-279": {
+          "decisions": 160,
+          "tera_legal_decisions": 155,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-280": {
+          "decisions": 33,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-281": {
+          "decisions": 37,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-282": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-283": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-284": {
+          "decisions": 22,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-285": {
+          "decisions": 31,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-286": {
+          "decisions": 25,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-287": {
+          "decisions": 38,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-288": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-289": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-290": {
+          "decisions": 24,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-291": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-292": {
+          "decisions": 37,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-293": {
+          "decisions": 30,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-294": {
+          "decisions": 30,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-295": {
+          "decisions": 52,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-296": {
+          "decisions": 58,
+          "tera_legal_decisions": 42,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-297": {
+          "decisions": 61,
+          "tera_legal_decisions": 55,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-298": {
+          "decisions": 60,
+          "tera_legal_decisions": 55,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-299": {
+          "decisions": 54,
+          "tera_legal_decisions": 43,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-300": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-301": {
+          "decisions": 20,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-302": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-303": {
+          "decisions": 17,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-304": {
+          "decisions": 28,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-305": {
+          "decisions": 25,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-306": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-307": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-308": {
+          "decisions": 16,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-309": {
+          "decisions": 32,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-310": {
+          "decisions": 43,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-311": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-312": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-313": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-314": {
+          "decisions": 27,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-315": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-316": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-317": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-318": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-319": {
+          "decisions": 30,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-320": {
+          "decisions": 39,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-321": {
+          "decisions": 50,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-322": {
+          "decisions": 39,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-323": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-324": {
+          "decisions": 19,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-325": {
+          "decisions": 17,
+          "tera_legal_decisions": 11,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-326": {
+          "decisions": 25,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-327": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-328": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-329": {
+          "decisions": 23,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-330": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-331": {
+          "decisions": 20,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-332": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-333": {
+          "decisions": 17,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-334": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-335": {
+          "decisions": 23,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": 15
+        },
+        "battle-select-blueprint-vs-simpleheuristics-336": {
+          "decisions": 31,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-337": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-338": {
+          "decisions": 27,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-339": {
+          "decisions": 27,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-340": {
+          "decisions": 26,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-341": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-342": {
+          "decisions": 27,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-343": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-344": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-345": {
+          "decisions": 37,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-346": {
+          "decisions": 34,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-347": {
+          "decisions": 31,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-348": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-349": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-350": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-351": {
+          "decisions": 36,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-352": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-353": {
+          "decisions": 21,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-354": {
+          "decisions": 75,
+          "tera_legal_decisions": 54,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-355": {
+          "decisions": 28,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-356": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-357": {
+          "decisions": 36,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-358": {
+          "decisions": 34,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-359": {
+          "decisions": 38,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-360": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-361": {
+          "decisions": 18,
+          "tera_legal_decisions": 12,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-362": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-363": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-364": {
+          "decisions": 21,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-365": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-366": {
+          "decisions": 18,
+          "tera_legal_decisions": 12,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-367": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-368": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-369": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": 18
+        },
+        "battle-select-blueprint-vs-simpleheuristics-370": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-371": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-372": {
+          "decisions": 176,
+          "tera_legal_decisions": 157,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-373": {
+          "decisions": 52,
+          "tera_legal_decisions": 47,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-374": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-375": {
+          "decisions": 167,
+          "tera_legal_decisions": 149,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-376": {
+          "decisions": 25,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-377": {
+          "decisions": 53,
+          "tera_legal_decisions": 49,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-378": {
+          "decisions": 53,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-379": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-380": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-381": {
+          "decisions": 41,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-382": {
+          "decisions": 65,
+          "tera_legal_decisions": 61,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-383": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-384": {
+          "decisions": 25,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-385": {
+          "decisions": 39,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-386": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-387": {
+          "decisions": 27,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-388": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-389": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-390": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-391": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-392": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-393": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-394": {
+          "decisions": 28,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-395": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-396": {
+          "decisions": 25,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-397": {
+          "decisions": 35,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-398": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-simpleheuristics-399": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        }
+      },
+      "games_with_tera": 12,
+      "first_tera_turns": [
+        41,
+        21,
+        21,
+        16,
+        17,
+        27,
+        15,
+        41,
+        27,
+        13,
+        15,
+        18
+      ]
+    },
+    "blueprint vs maxdamage": {
+      "decisions": 14163,
+      "selected_by_slot": [
+        5578,
+        3712,
+        1260,
+        246,
+        6,
+        0,
+        0,
+        0,
+        827,
+        682,
+        634,
+        661,
+        545,
+        12
+      ],
+      "legal_opportunities_by_slot": [
+        11853,
+        11083,
+        11347,
+        11659,
+        11837,
+        11067,
+        11298,
+        11643,
+        9151,
+        10233,
+        10855,
+        10656,
+        10670,
+        31
+      ],
+      "selected_by_family": {
+        "ordinary_move": 10796,
+        "tera_move": 6,
+        "switch": 3349,
+        "forced": 12
+      },
+      "legal_decisions_by_family": {
+        "ordinary_move": 12166,
+        "tera_move": 12117,
+        "switch": 13528,
+        "forced": 31
+      },
+      "games": {
+        "battle-select-blueprint-vs-maxdamage-0": {
+          "decisions": 20,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-1": {
+          "decisions": 67,
+          "tera_legal_decisions": 64,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-2": {
+          "decisions": 60,
+          "tera_legal_decisions": 55,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-3": {
+          "decisions": 37,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-4": {
+          "decisions": 23,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-5": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-6": {
+          "decisions": 36,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-7": {
+          "decisions": 23,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-8": {
+          "decisions": 27,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-9": {
+          "decisions": 31,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-10": {
+          "decisions": 26,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-11": {
+          "decisions": 24,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-12": {
+          "decisions": 21,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-13": {
+          "decisions": 35,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-14": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-15": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-16": {
+          "decisions": 37,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-17": {
+          "decisions": 39,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-18": {
+          "decisions": 36,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-19": {
+          "decisions": 37,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-20": {
+          "decisions": 37,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-21": {
+          "decisions": 36,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-22": {
+          "decisions": 31,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-23": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-24": {
+          "decisions": 30,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-25": {
+          "decisions": 37,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-26": {
+          "decisions": 31,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-27": {
+          "decisions": 36,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-28": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-29": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-30": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-31": {
+          "decisions": 18,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-32": {
+          "decisions": 41,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-33": {
+          "decisions": 43,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-34": {
+          "decisions": 37,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-35": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-36": {
+          "decisions": 54,
+          "tera_legal_decisions": 51,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-37": {
+          "decisions": 42,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-38": {
+          "decisions": 34,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-39": {
+          "decisions": 43,
+          "tera_legal_decisions": 39,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-40": {
+          "decisions": 24,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-41": {
+          "decisions": 25,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-42": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-43": {
+          "decisions": 29,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-44": {
+          "decisions": 20,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-45": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-46": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-47": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-48": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-49": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-50": {
+          "decisions": 36,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": 27
+        },
+        "battle-select-blueprint-vs-maxdamage-51": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-52": {
+          "decisions": 45,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-53": {
+          "decisions": 32,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-54": {
+          "decisions": 33,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-55": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-56": {
+          "decisions": 42,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-57": {
+          "decisions": 59,
+          "tera_legal_decisions": 53,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-58": {
+          "decisions": 40,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-59": {
+          "decisions": 44,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-60": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-61": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-62": {
+          "decisions": 24,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-63": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-64": {
+          "decisions": 33,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-65": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-66": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-67": {
+          "decisions": 47,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-68": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-69": {
+          "decisions": 51,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-70": {
+          "decisions": 42,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-71": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-72": {
+          "decisions": 57,
+          "tera_legal_decisions": 47,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-73": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-74": {
+          "decisions": 25,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-75": {
+          "decisions": 35,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-76": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-77": {
+          "decisions": 56,
+          "tera_legal_decisions": 52,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-78": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-79": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-80": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-81": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-82": {
+          "decisions": 25,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": 17
+        },
+        "battle-select-blueprint-vs-maxdamage-83": {
+          "decisions": 17,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-84": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-85": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-86": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-87": {
+          "decisions": 22,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-88": {
+          "decisions": 43,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-89": {
+          "decisions": 25,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-90": {
+          "decisions": 34,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-91": {
+          "decisions": 42,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-92": {
+          "decisions": 51,
+          "tera_legal_decisions": 43,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-93": {
+          "decisions": 60,
+          "tera_legal_decisions": 56,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-94": {
+          "decisions": 68,
+          "tera_legal_decisions": 60,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-95": {
+          "decisions": 53,
+          "tera_legal_decisions": 44,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-96": {
+          "decisions": 22,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-97": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-98": {
+          "decisions": 28,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-99": {
+          "decisions": 26,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-100": {
+          "decisions": 65,
+          "tera_legal_decisions": 63,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-101": {
+          "decisions": 147,
+          "tera_legal_decisions": 138,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-102": {
+          "decisions": 51,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-103": {
+          "decisions": 114,
+          "tera_legal_decisions": 112,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-104": {
+          "decisions": 21,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-105": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-106": {
+          "decisions": 15,
+          "tera_legal_decisions": 11,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-107": {
+          "decisions": 23,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-108": {
+          "decisions": 68,
+          "tera_legal_decisions": 59,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-109": {
+          "decisions": 38,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-110": {
+          "decisions": 34,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-111": {
+          "decisions": 41,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-112": {
+          "decisions": 47,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-113": {
+          "decisions": 22,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-114": {
+          "decisions": 28,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-115": {
+          "decisions": 49,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-116": {
+          "decisions": 27,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-117": {
+          "decisions": 34,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-118": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-119": {
+          "decisions": 35,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-120": {
+          "decisions": 20,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-121": {
+          "decisions": 29,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-122": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-123": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-124": {
+          "decisions": 151,
+          "tera_legal_decisions": 148,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-125": {
+          "decisions": 40,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-126": {
+          "decisions": 44,
+          "tera_legal_decisions": 42,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-127": {
+          "decisions": 114,
+          "tera_legal_decisions": 112,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-128": {
+          "decisions": 40,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-129": {
+          "decisions": 17,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-130": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-131": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-132": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-133": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-134": {
+          "decisions": 14,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-135": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-136": {
+          "decisions": 17,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-137": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-138": {
+          "decisions": 22,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-139": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-140": {
+          "decisions": 44,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-141": {
+          "decisions": 25,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-142": {
+          "decisions": 30,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-143": {
+          "decisions": 53,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-144": {
+          "decisions": 53,
+          "tera_legal_decisions": 46,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-145": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-146": {
+          "decisions": 45,
+          "tera_legal_decisions": 39,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-147": {
+          "decisions": 47,
+          "tera_legal_decisions": 44,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-148": {
+          "decisions": 27,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-149": {
+          "decisions": 39,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-150": {
+          "decisions": 21,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-151": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-152": {
+          "decisions": 23,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-153": {
+          "decisions": 19,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-154": {
+          "decisions": 23,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-155": {
+          "decisions": 14,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-156": {
+          "decisions": 86,
+          "tera_legal_decisions": 76,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-157": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-158": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-159": {
+          "decisions": 42,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-160": {
+          "decisions": 27,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-161": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-162": {
+          "decisions": 27,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-163": {
+          "decisions": 30,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-164": {
+          "decisions": 25,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-165": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-166": {
+          "decisions": 20,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-167": {
+          "decisions": 42,
+          "tera_legal_decisions": 39,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-168": {
+          "decisions": 49,
+          "tera_legal_decisions": 41,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-169": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-170": {
+          "decisions": 41,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-171": {
+          "decisions": 45,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-172": {
+          "decisions": 34,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-173": {
+          "decisions": 40,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-174": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-175": {
+          "decisions": 39,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-176": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-177": {
+          "decisions": 25,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-178": {
+          "decisions": 33,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-179": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-180": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-181": {
+          "decisions": 18,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-182": {
+          "decisions": 21,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-183": {
+          "decisions": 18,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-184": {
+          "decisions": 32,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-185": {
+          "decisions": 22,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-186": {
+          "decisions": 21,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-187": {
+          "decisions": 35,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-188": {
+          "decisions": 118,
+          "tera_legal_decisions": 115,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-189": {
+          "decisions": 92,
+          "tera_legal_decisions": 86,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-190": {
+          "decisions": 52,
+          "tera_legal_decisions": 46,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-191": {
+          "decisions": 70,
+          "tera_legal_decisions": 65,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-192": {
+          "decisions": 26,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-193": {
+          "decisions": 24,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-194": {
+          "decisions": 22,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-195": {
+          "decisions": 23,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-196": {
+          "decisions": 37,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-197": {
+          "decisions": 40,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-198": {
+          "decisions": 34,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-199": {
+          "decisions": 55,
+          "tera_legal_decisions": 42,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-200": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-201": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-202": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-203": {
+          "decisions": 40,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-204": {
+          "decisions": 16,
+          "tera_legal_decisions": 12,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-205": {
+          "decisions": 41,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-206": {
+          "decisions": 41,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-207": {
+          "decisions": 32,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-208": {
+          "decisions": 23,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-209": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-210": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-211": {
+          "decisions": 13,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-212": {
+          "decisions": 65,
+          "tera_legal_decisions": 49,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-213": {
+          "decisions": 35,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-214": {
+          "decisions": 15,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-215": {
+          "decisions": 31,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-216": {
+          "decisions": 39,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-217": {
+          "decisions": 54,
+          "tera_legal_decisions": 51,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-218": {
+          "decisions": 76,
+          "tera_legal_decisions": 70,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-219": {
+          "decisions": 42,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-220": {
+          "decisions": 39,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-221": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-222": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-223": {
+          "decisions": 29,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-224": {
+          "decisions": 27,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-225": {
+          "decisions": 66,
+          "tera_legal_decisions": 53,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-226": {
+          "decisions": 35,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-227": {
+          "decisions": 33,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-228": {
+          "decisions": 42,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-229": {
+          "decisions": 30,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-230": {
+          "decisions": 27,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-231": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-232": {
+          "decisions": 14,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-233": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-234": {
+          "decisions": 30,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-235": {
+          "decisions": 31,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-236": {
+          "decisions": 54,
+          "tera_legal_decisions": 48,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-237": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-238": {
+          "decisions": 44,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-239": {
+          "decisions": 44,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-240": {
+          "decisions": 38,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-241": {
+          "decisions": 185,
+          "tera_legal_decisions": 167,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-242": {
+          "decisions": 40,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-243": {
+          "decisions": 43,
+          "tera_legal_decisions": 41,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-244": {
+          "decisions": 21,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-245": {
+          "decisions": 27,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-246": {
+          "decisions": 27,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-247": {
+          "decisions": 44,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-248": {
+          "decisions": 16,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-249": {
+          "decisions": 71,
+          "tera_legal_decisions": 50,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-250": {
+          "decisions": 34,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-251": {
+          "decisions": 27,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-252": {
+          "decisions": 32,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-253": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-254": {
+          "decisions": 35,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-255": {
+          "decisions": 25,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-256": {
+          "decisions": 32,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-257": {
+          "decisions": 26,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-258": {
+          "decisions": 22,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-259": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-260": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-261": {
+          "decisions": 26,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-262": {
+          "decisions": 38,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-263": {
+          "decisions": 23,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-264": {
+          "decisions": 51,
+          "tera_legal_decisions": 41,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-265": {
+          "decisions": 22,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-266": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-267": {
+          "decisions": 36,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-268": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-269": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-270": {
+          "decisions": 21,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-271": {
+          "decisions": 23,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-272": {
+          "decisions": 39,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-273": {
+          "decisions": 37,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-274": {
+          "decisions": 32,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-275": {
+          "decisions": 60,
+          "tera_legal_decisions": 50,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-276": {
+          "decisions": 53,
+          "tera_legal_decisions": 44,
+          "first_tera_turn": 44
+        },
+        "battle-select-blueprint-vs-maxdamage-277": {
+          "decisions": 32,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-278": {
+          "decisions": 35,
+          "tera_legal_decisions": 30,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-279": {
+          "decisions": 34,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-280": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-281": {
+          "decisions": 31,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-282": {
+          "decisions": 35,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-283": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-284": {
+          "decisions": 21,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-285": {
+          "decisions": 18,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-286": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-287": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-288": {
+          "decisions": 19,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-289": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-290": {
+          "decisions": 23,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-291": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-292": {
+          "decisions": 19,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-293": {
+          "decisions": 37,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-294": {
+          "decisions": 36,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-295": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-296": {
+          "decisions": 63,
+          "tera_legal_decisions": 51,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-297": {
+          "decisions": 126,
+          "tera_legal_decisions": 122,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-298": {
+          "decisions": 106,
+          "tera_legal_decisions": 103,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-299": {
+          "decisions": 55,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-300": {
+          "decisions": 29,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": 20
+        },
+        "battle-select-blueprint-vs-maxdamage-301": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-302": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-303": {
+          "decisions": 25,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-304": {
+          "decisions": 39,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-305": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-306": {
+          "decisions": 29,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-307": {
+          "decisions": 19,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-308": {
+          "decisions": 38,
+          "tera_legal_decisions": 37,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-309": {
+          "decisions": 35,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-310": {
+          "decisions": 32,
+          "tera_legal_decisions": 29,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-311": {
+          "decisions": 32,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-312": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-313": {
+          "decisions": 26,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-314": {
+          "decisions": 26,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-315": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-316": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-317": {
+          "decisions": 23,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-318": {
+          "decisions": 26,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-319": {
+          "decisions": 19,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-320": {
+          "decisions": 46,
+          "tera_legal_decisions": 42,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-321": {
+          "decisions": 59,
+          "tera_legal_decisions": 52,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-322": {
+          "decisions": 40,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-323": {
+          "decisions": 39,
+          "tera_legal_decisions": 34,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-324": {
+          "decisions": 16,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-325": {
+          "decisions": 18,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-326": {
+          "decisions": 23,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-327": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-328": {
+          "decisions": 27,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": 20
+        },
+        "battle-select-blueprint-vs-maxdamage-329": {
+          "decisions": 26,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-330": {
+          "decisions": 27,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-331": {
+          "decisions": 24,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-332": {
+          "decisions": 19,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-333": {
+          "decisions": 20,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-334": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-335": {
+          "decisions": 19,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-336": {
+          "decisions": 47,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-337": {
+          "decisions": 31,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-338": {
+          "decisions": 67,
+          "tera_legal_decisions": 60,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-339": {
+          "decisions": 29,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-340": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-341": {
+          "decisions": 26,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-342": {
+          "decisions": 26,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-343": {
+          "decisions": 33,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-344": {
+          "decisions": 25,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-345": {
+          "decisions": 37,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-346": {
+          "decisions": 29,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-347": {
+          "decisions": 34,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-348": {
+          "decisions": 23,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-349": {
+          "decisions": 19,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-350": {
+          "decisions": 23,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-351": {
+          "decisions": 23,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-352": {
+          "decisions": 16,
+          "tera_legal_decisions": 14,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-353": {
+          "decisions": 22,
+          "tera_legal_decisions": 17,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-354": {
+          "decisions": 49,
+          "tera_legal_decisions": 36,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-355": {
+          "decisions": 21,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-356": {
+          "decisions": 30,
+          "tera_legal_decisions": 25,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-357": {
+          "decisions": 46,
+          "tera_legal_decisions": 40,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-358": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-359": {
+          "decisions": 43,
+          "tera_legal_decisions": 42,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-360": {
+          "decisions": 20,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-361": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-362": {
+          "decisions": 19,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-363": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-364": {
+          "decisions": 20,
+          "tera_legal_decisions": 16,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-365": {
+          "decisions": 21,
+          "tera_legal_decisions": 15,
+          "first_tera_turn": 15
+        },
+        "battle-select-blueprint-vs-maxdamage-366": {
+          "decisions": 28,
+          "tera_legal_decisions": 23,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-367": {
+          "decisions": 24,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-368": {
+          "decisions": 28,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-369": {
+          "decisions": 39,
+          "tera_legal_decisions": 35,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-370": {
+          "decisions": 44,
+          "tera_legal_decisions": 38,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-371": {
+          "decisions": 38,
+          "tera_legal_decisions": 32,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-372": {
+          "decisions": 169,
+          "tera_legal_decisions": 146,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-373": {
+          "decisions": 83,
+          "tera_legal_decisions": 78,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-374": {
+          "decisions": 73,
+          "tera_legal_decisions": 68,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-375": {
+          "decisions": 222,
+          "tera_legal_decisions": 196,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-376": {
+          "decisions": 30,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-377": {
+          "decisions": 102,
+          "tera_legal_decisions": 101,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-378": {
+          "decisions": 143,
+          "tera_legal_decisions": 138,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-379": {
+          "decisions": 45,
+          "tera_legal_decisions": 42,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-380": {
+          "decisions": 51,
+          "tera_legal_decisions": 45,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-381": {
+          "decisions": 29,
+          "tera_legal_decisions": 27,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-382": {
+          "decisions": 28,
+          "tera_legal_decisions": 26,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-383": {
+          "decisions": 71,
+          "tera_legal_decisions": 66,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-384": {
+          "decisions": 24,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-385": {
+          "decisions": 41,
+          "tera_legal_decisions": 39,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-386": {
+          "decisions": 51,
+          "tera_legal_decisions": 47,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-387": {
+          "decisions": 32,
+          "tera_legal_decisions": 28,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-388": {
+          "decisions": 27,
+          "tera_legal_decisions": 22,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-389": {
+          "decisions": 18,
+          "tera_legal_decisions": 13,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-390": {
+          "decisions": 35,
+          "tera_legal_decisions": 31,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-391": {
+          "decisions": 31,
+          "tera_legal_decisions": 24,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-392": {
+          "decisions": 24,
+          "tera_legal_decisions": 21,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-393": {
+          "decisions": 24,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-394": {
+          "decisions": 20,
+          "tera_legal_decisions": 18,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-395": {
+          "decisions": 26,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-396": {
+          "decisions": 27,
+          "tera_legal_decisions": 20,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-397": {
+          "decisions": 21,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-398": {
+          "decisions": 35,
+          "tera_legal_decisions": 33,
+          "first_tera_turn": null
+        },
+        "battle-select-blueprint-vs-maxdamage-399": {
+          "decisions": 27,
+          "tera_legal_decisions": 19,
+          "first_tera_turn": null
+        }
+      },
+      "games_with_tera": 6,
+      "first_tera_turns": [
+        27,
+        17,
+        44,
+        20,
+        20,
+        15
+      ]
+    }
+  }
+}
