@@ -1,0 +1,109 @@
+{
+  "sources": {
+    "summaries": [
+      "R-summary.json",
+      "A-summary.json",
+      "S-summary.json",
+      "B-summary.json"
+    ],
+    "metrics": [
+      "R-metrics.csv",
+      "A-metrics.csv",
+      "S-metrics.csv",
+      "B-metrics.csv"
+    ],
+    "legacy3k6_metrics": "docs/briefs/01-artifacts/g3000-metrics.csv",
+    "legacy1k6_metrics": "docs/briefs/01-artifacts/g1000-metrics.csv",
+    "combined_curves": "comparison-curves.txt"
+  },
+  "primary_metric": "last-epoch holdout policy NLL, with each prescribed schedule completed",
+  "seed_noise": {
+    "S_minus_R": -0.015515575467418996,
+    "absolute_difference": 0.015515575467418996,
+    "twice_absolute_difference": 0.031031150934837992,
+    "method": "two six-epoch seeds on the same machine; per brief do not call smaller differences effects"
+  },
+  "controlled_1k_training_length": {
+    "A_minus_R_last_nll": 0.1384358569291162,
+    "A_minus_R_best_report_nll": -0.07441416424535152,
+    "last_deterioration_exceeds_twice_noise": true
+  },
+  "legacy_cross_platform_references": {
+    "legacy3k6_last_nll": 1.6123282966364252,
+    "legacy3k6_value_mse_by_epoch": [
+      1.013186658976307,
+      0.9944285844135632,
+      0.9384438159051295,
+      0.9587807790411292,
+      0.9155851769531201,
+      0.9600770380429787,
+      1.0548119085912504
+    ],
+    "A_last_minus_legacy3k6": 0.33659759432182534,
+    "B_last_minus_legacy3k6": 0.2302210032954235,
+    "B_best_report_minus_legacy3k6_last": -0.03331043406027967,
+    "R_last_minus_legacy1k6": 0.006311444889155471,
+    "causal_limit": "Historical R reproduction failed. These are cross-platform references, not isolated data/steps effect estimates."
+  },
+  "overfitting": {
+    "A": {
+      "best_policy_epoch": 8,
+      "minimum_holdout_policy_nll": 1.736087490027823,
+      "training_nll_at_best_policy_epoch": 1.5934236035814886,
+      "holdout_minus_train_gap_at_best_policy_epoch": 0.14266388644633432,
+      "last_holdout_policy_nll": 1.9489258909582505,
+      "last_training_policy_nll": 1.2418242923230134,
+      "last_holdout_minus_train_gap": 0.7071015986352371,
+      "holdout_nll_upturn_after_minimum": 0.2128384009304276
+    },
+    "B": {
+      "best_policy_epoch": 8,
+      "minimum_holdout_policy_nll": 1.579014746195896,
+      "training_nll_at_best_policy_epoch": 1.425355260317824,
+      "holdout_minus_train_gap_at_best_policy_epoch": 0.1536594858780722,
+      "last_holdout_policy_nll": 1.8425492999318487,
+      "last_training_policy_nll": 1.0627513144394864,
+      "last_holdout_minus_train_gap": 0.7797979854923622,
+      "holdout_nll_upturn_after_minimum": 0.2635345537359526,
+      "epoch15_nll_before_environment_interruption": 1.7794626391809294,
+      "upturn_already_present_before_interruption": true
+    }
+  },
+  "value": {
+    "constant_zero_mse": 1.0,
+    "runs": {
+      "R": {
+        "minimum_trained_epoch_mse": 0.9938272327995069,
+        "final_mse": 1.2470203358916876
+      },
+      "A": {
+        "minimum_trained_epoch_mse": 1.015312085985027,
+        "final_mse": 1.5958303946765762
+      },
+      "S": {
+        "minimum_trained_epoch_mse": 0.9996323138273464,
+        "final_mse": 1.2378855574909837
+      },
+      "B": {
+        "minimum_trained_epoch_mse": 0.9565520444353067,
+        "final_mse": 1.6011739945509322
+      }
+    }
+  },
+  "winner": {
+    "run": "B",
+    "checkpoint": "runs/blueprint/g3000e18/checkpoints/bc_best.pt",
+    "policy_nll": 1.5790178625761455,
+    "policy_top1": 0.44080168492320715,
+    "value_mse": 1.3780044139488663,
+    "human_switch_row_global_top1": 0.21142680454873397,
+    "switch_diagnostics": {
+      "human_switch_rows": 29107,
+      "human_move_rows": 74874,
+      "mean_switch_probability_on_human_switch": 0.4549105330730017,
+      "mean_switch_probability_on_human_move": 0.19294228787027803,
+      "switch_target_top1": 0.44978871061943865
+    },
+    "source": "B-holdout-best.json"
+  }
+}

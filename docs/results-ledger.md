@@ -570,45 +570,48 @@ access and is now tracked as `data/replay_splits/p2_holdout_2000_ids.txt`:
 
 ## 2026-11-12: replay trainer profile and the data-or-steps runs (ROADMAP P2)
 
-Brief `docs/briefs/03-p2-scale-measure.md`; branch `work/p2-scale-measure`, started
-from reviewed `work/roadmap` at `4f9d75c`. Report: `docs/briefs/03-report.md`;
-evidence: `docs/briefs/03-artifacts/`. Executor timestamps are UTC on 2026-11-13;
-section date uses the owner's local date. Work is in progress.
+Brief `docs/briefs/03-p2-scale-measure.md`; branch `work/p2-scale-measure`, base
+`4f9d75c`; report `docs/briefs/03-report.md`; evidence
+`docs/briefs/03-artifacts/`. Section date uses the owner's local start date;
+execution timestamps below are UTC. Application/model/dataset/loss/recipe code
+is unchanged from the reviewed base; this work adds measurements, supervision
+helpers and instructions. P2.3–P2.5 and G2 remain open.
 
-Setup: metadata endpoint HTTP 200. Pinned import of 22,000 games completed in 194 s
-with exactly brief 01's filter counts: 77,225 below rating, 4,176 invalid metadata,
-495 outside dates, 840 other format (`continuation-import.txt`,
-`continuation-import-wall.txt`; exact command in `continuation-commands.txt`).
-Conversion completed with 22,000 accepted games and 1,127,562 rows in 2,225 s wall, including the 758 s pause (`convert-output.txt`, `convert-quality.json`, `convert-wall.txt`). Every nested split matches brief 01: 40/1k/3k/10k/20k games have 2,020/52,983/156,597/514,103/1,023,525 rows. Holdout: 2,000 games, 104,037 rows, exact fixed IDs, uploads 2026-02-20 04:17:33 to 2026-05-19 04:52:01 UTC. Fixed splitting drops zero newer games; holdout/train20k memberships equal the chronological split (`verify-split-output.txt`, `split-fixed-output.txt`; script `verify_split.py`). File bytes by component are measured in `disk-bytes.json`. Machine: four CPU cores of quota,
-16 GiB memory, PyTorch 2.13.0+cu130, no CUDA device; intra/inter-op threads 5/5
-(`continuation-environment.json`). Locked install and pinned Showdown build pass.
-All 82 focused tests passed in 20.26 s; Ruff clean (`continuation-tests.txt`,
-`continuation-ruff.txt`; commands in `continuation-commands.txt`).
+### Setup, exact data and checks
 
-Stage 4 real-data runner **passed**, at `fa35867` (model/trainer/runner unchanged
-from reviewed `4f9d75c`). Command:
-`uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 600 --work-dir runs/blueprint_runner_smoke --device cpu --batch-size 256 --epochs 2 --chronological-holdout-games 100`.
-The recorded script invokes that environment's Python directly. Its first source
-shard was cached from the genuine pinned import; the existing importer verifies it.
-600 imported/converted games, 29,508 rows; train 500/24,278, holdout 100/5,230.
-After first completion, delete **only** training/results and repeat: import,
-conversion and split skip; SIGTERM after epoch one exits 143 after 147.248 s;
-identical command resumes epoch two and exits 0 after 151.991 s. CSV epochs
-`[0,1]` become `[0,1,2]`; earlier rows are exactly unchanged. All numeric metric
-fields also equal the first completion exactly (timing columns excluded).
-Post-completion step walls: training attempts combined 284.380 s; best report
-7.216 s; untrained report 7.133 s. Sources: `runner-smoke/interruption-test.json`,
-`post-completion-step-seconds.json`, `repeat-comparison.json`, results/output
-folders, and `check_real_runner.py`. Initial import/conversion/split walls were
-1.684/74.546/2.260 s, but competed with the main converter and are not idle CPU
-measurements. The first completion also includes an earlier authorized recovery
-attempt before the owner corrected the brief number; its evidence is retained
-under `runner-first-completion/`. Main conversion was paused 758 s, 04:02:31 to
-04:15:09 UTC (`conversion-pauses.txt`), to serialize CPU work after severe
-contention during the first baseline evaluation. Checkpoint sizes/hashes are in
-`checkpoints.json`; these small-run weights are engineering smoke, not a gate.
+The dataset metadata endpoint returned HTTP 200. The pinned revision
+`792a86b5cdbcab9696032e947483b218453a0d4f`, rating floor 1500 and upload date
+from 2024-02-01 produced 22,000 games in 194 s, with brief 01's filter counts:
+77,225 below rating, 4,176 invalid metadata, 495 outside dates, 840 other format.
+Conversion produced 22,000 accepted games/1,127,562 rows in 2,225 s wall,
+including the documented 758 s main-converter pause (04:02:31–04:15:09 UTC).
+Nested 40/1k/3k/10k/20k splits have
+2,020/52,983/156,597/514,103/1,023,525 rows. Holdout: 2,000 games/104,037 rows,
+exactly the committed IDs, uploaded 2026-02-20 04:17:33 through
+2026-05-19 04:52:01 UTC. Fixed splitting drops zero games and matches both
+chronological holdout and train20k membership.
 
-Stage 1 **done; no source change qualifies**. Commands: `uv run --no-sync python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-before` and the same with `profile-after`, at `2a608ad`; both 20 warm-ups and 200 measured CPU steps, five threads, unchanged recipe. Profiles took 330/321 s wall. Raw timing/output and cumulative top-15 cProfile files are `profile-before-*` and `profile-after-*`.
+Commands/outputs: `continuation-commands.txt`, `continuation-import.txt`,
+`continuation-import-wall.txt`, `convert-output.txt`, `convert-quality.json`,
+`convert-wall.txt`, `verify_split.py`, `verify-split-output.txt`,
+`split-fixed-output.txt`. Component bytes are in `disk-bytes.json`.
+The owner corrected the assignment from brief 02 to brief 03 during setup;
+initial brief-02 commit `9867251` remains on its separate `work/p2-scale-prep`
+branch. Existing brief-01/02 files on this branch are unchanged.
+
+Reported machine: AMD EPYC 9V74, affinity five, four cores of quota, 16 GiB,
+PyTorch 2.13.0+cu130, no CUDA device, five intra/inter-op threads. Locked setup and
+pinned Showdown build pass. All 82 focused tests passed in 20.26 s; Ruff clean;
+no full suite ran (`continuation-tests.txt`, `continuation-ruff.txt`, commands
+above). No model, loss, learning rate, batch or thread tuning was introduced.
+
+### Stage 1: measured; no source optimization qualifies
+
+Commands: `uv run --no-sync python -m fog.scripts.profile_replay_training --out
+runs/blueprint/profile-before` and the same with `profile-after`, at `2a608ad`.
+Both use the unchanged CPU recipe, five threads, 20 warm-ups and 200 measured
+updates. Wall times: 330/321 s. Sources: `profile-before-*`, `profile-after-*`,
+`profile-comparison.json`; cumulative top-15 cProfile files are retained.
 
 | Measurement | Before | Unchanged-default repeat |
 | --- | ---: | ---: |
@@ -622,219 +625,161 @@ Stage 1 **done; no source change qualifies**. Commands: `uv run --no-sync python
 | Training rows/s | 188.123 | 194.040 |
 | Batch-only rows/s | 7,182.28 | 7,100.46 |
 
-The first 20 training losses are exactly identical (`profile-comparison.json`).
-Batch building is only 3.03%/2.99% of a step and exceeds 3,000 rows/s alone, so
-neither loader optimization nor prefetch qualifies; no batch changes need a
-50-batch equivalence check. Model compute dominates, including belief heads;
-no architecture/loss/head computation was changed. Short thread screens
-(`thread-benchmarks.json`; exact commands/raw timing/cProfile beside it) use
-5 warm-ups, 30 measured updates and one separate cProfile update: 1 thread
-2.417102 s/step, 102.133 rows/s, wall 95.067 s; 2 threads 1.561363 s/step,
-158.110 rows/s, wall 62.085 s; 4 threads 1.234657 s/step, 199.948 rows/s,
-wall 49.680 s. Four threads save only 6.05% step time versus the default,
-below the required 10%. Alternatives also change the first 20 losses by up
-to 1.54e-4. The five-thread runtime default remains unchanged. The repeat's
-3% timing difference is observed variation, not a code speedup.
+First 20 losses match exactly. Batch building is 3.03%/2.99% of a step and
+exceeds 3,000 rows/s alone, so neither loader optimization nor prefetch qualifies;
+no batch change requires a 50-batch equivalence check. Model computation accounts
+for 96% of the repeated step. Thread screens used five warm-ups, 30 updates and
+one separate cProfile update (`thread-benchmarks.json`, raw files beside it):
 
-Stages 2–3: R started 04:47:27 UTC at `247a1e1`, with the unchanged five-thread
-recipe. Projection saved before launch (`R-projection.json`): six passes over
-52,983 training rows at 194.039961 rows/s = 1,638.312 s; seven projected holdout
-passes at 269.059 s = 1,883.416 s; total 3,521.728 s through training/evaluation,
-or 4,059.847 s including two standalone reports. The holdout projection scales
-profile batch/forward/loss time per measured row; it is not an observed evaluation
-time. Command and attempts are in `R-execution.json`; invoked with
-`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R`.
-A/S/B and stage 6 remain pending. Stage 5 instructions now use public
-cloning and the committed holdout IDs, with CPU time/disk arithmetic in
-`scale-projections.json`; R-derived validation/report overhead is included. Stage
-5 is complete, with a 9.62–11.69 h CPU20k full-pipeline reference at observed/profile batch
-256. Batch 1,024 throughput and hosted GPU execution remain unmeasured. No data-versus-
-steps, seed-noise, value-learning or play-strength conclusion exists yet.
-P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.
+| Threads | s/step | rows/s | Wall s |
+| --- | ---: | ---: | ---: |
+| 1 | 2.417102 | 102.133 | 95.067 |
+| 2 | 1.561363 | 158.110 | 62.085 |
+| 4 | 1.234657 | 199.948 | 49.680 |
 
-Stage 2 R **completed; historical reproduction failed**. Trainer command and
-commit are in `R-execution.json` (`247a1e1`); invocation
-`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R`.
-The trainer and both reports exited successfully; the supervisor then exited
-one deliberately because the rounded historical curve differs. Exact sources,
-per-epoch policy/value curves and timing formulas: `R-summary.json`,
-`R-metrics.csv`, `R-tail.txt`, and `R-holdout-{best,final}.json`.
+Four threads save only 6.05% versus the five-thread baseline, below 10%;
+alternatives also change the first 20 losses by up to 1.54e-4. Five threads
+remain unchanged. The repeat's 3% timing difference is observed variation,
+not a code speedup. Belief computations/losses were retained.
 
-| Run | Games / epochs / actual steps | Trainer wall / pure training rows/s | Last epoch policy NLL / top-1 | Best report policy NLL / top-1 (epoch) | Final training policy NLL | Holdout value MSE min / final | Commit |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| R | 1,000 / 6 / 1,286 | 2,799.785 s / 187.060 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 | `247a1e1` |
-| A | 1,000 / 18 / 3,870 | 9,355.371 s / 157.725 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 | `41b6ffd` |
-| S | 1,000 / 6 / 1,286 | 3,224.913 s / 158.587 | 1.794974 / 0.345247 | 1.794978 / 0.345246 (6) | 1.718056 | 0.999632 / 1.237886 | `aed6f68` |
-| B | 3,000 / 18 / unmeasured | running; conservative budget 21,405 s | — | — | — | — | — |
+### Completed comparisons and checkpoint selection
 
-R best/final reports took 108.494/110.127 s, total trainer+reports 3,018.406 s.
-Mean epoch validation is 154.662 s, derived as
-`seconds_per_epoch - 52983/train_rows_per_second`; the 172.372 s outside epoch
-timers includes startup/baseline/writes and was not separated further. The brief's
-step counts were approximate; streaming buffer boundaries add partial batches.
-The required repeat omitting resume/selection runs before any A/S/B. No data or
-training-length effect or seed noise is established. R's value MSE reaches only
-0.993827 before rising above the constant-zero reference of 1.0; all epoch values
-and that reference are in `R-summary.json`. Checkpoint paths/sizes/SHA-256 are in
-`checkpoints.json`; these ignored weights may disappear if the machine is reclaimed.
+All runs retain the recipe's batch 256, learning rate/cosine, loss coefficients,
+exact-feature/legality requirements and five runtime threads, with
+`bc.streaming=true bc.selection_metric=action_ce bc.resume=true
+bc.early_stopping_patience=0`. R/A/B seed 20261201; S seed 20261202.
+Let `C` mean `uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py`.
+Every expanded trainer/report command is in `<run>-execution.json`; metrics,
+last 60 output lines and both standalone reports are `<run>-metrics.csv`,
+`<run>-tail.txt`, `<run>-holdout-{best,final}.json` and matching output files.
+`<run>-summary.json` records exact values, formulas, state steps and curves.
+Trainer wall includes validation; rows/s measures pure training. Last fields use
+epoch metrics; best fields use standalone reports.
 
-R reproducibility is under diagnosis: epoch-1 policy NLL is 2.045422 versus
-brief 01's 2.042711, so A/S/B remain stopped until the required repeat without
-resume/selection is completed and investigated. Epoch-0 normalized evaluation
-metrics agree within 2.49e-8. The current CPU is AMD EPYC 9V74, affinity five,
-quota four; brief 01 recorded Intel Xeon 2.10 GHz, with actual PyTorch thread
-count unrecorded. The model/constants/encoding/dataset/loss/recipe source diff
-from `41cc7b9` to `4f9d75c` is empty. Sources and the complete baseline-difference
-table are in `reproduction-platform.json`. These observations do not establish
-the cause of the historical trajectory difference.
+| Run | Games / epochs / actual steps | Trainer wall / rows/s | Last NLL / top-1 | Best report NLL / top-1 (epoch) | Final train NLL | Value MSE min / final | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| R | 1,000 / 6 / 1,286 | 2,799.785 s / 187.060 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 | `247a1e1` | `C R` |
+| A | 1,000 / 18 / 3,870 | 9,355.371 s / 157.725 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 | `41b6ffd` | `C A` |
+| S | 1,000 / 6 / 1,286 | 3,224.913 s / 158.587 | 1.794974 / 0.345247 | 1.794978 / 0.345246 (6) | 1.718056 | 0.999632 / 1.237886 | `aed6f68` | `C S` |
+| B | 3,000 / 18 / 11,431 | unknown, ≥21,149.912 s / 157.288 | 1.842549 / 0.426488 | 1.579018 / 0.440802 (8) | 1.062751 | 0.956552 / 1.601174 | `620d6c2`; resume `1041c20` | `C B` |
 
-Required flag-off repeat **completed** at `c5938bc`, invoked as
-`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R-default`;
-exact trainer/report commands and attempts: `R-default-execution.json`. Only
-`bc.resume`/`bc.selection_metric` are omitted (new log directory); the six-epoch
-recipe, seed, batch, learning rate, streaming and disabled early stopping remain.
-All non-timing CSV fields for epochs 0–6 match R exactly. A direct CPU
-`torch.equal` comparison of every final state-dict tensor passes: 376/376
-parameters/persistent buffers equal, no differing names. This isolates the new
-options from the historical curve drift; it does not isolate the platform's
-contribution. The original/current 20-real-update diagnostic runs next, before
-any A/S/B (`check_real_updates.py` was reviewed; no application code changed).
+R/A/S trainer-plus-report walls: 3,018.406/9,611.736/3,487.043 s. Their best/final
+report walls are 108.494/110.127, 128.951/127.414 and 131.955/130.175 s.
+Each projection was saved before launch (`R/A/S/B-projection.json`). B's
+stage-1-rate reference was 18,060.446 s; conservative recent-rate budget
+21,405.112 s (5.95 h), below eight hours, so B was run. Actual step counts exceed
+the brief's approximations because streaming buffers end in partial batches.
 
-Flag-off trainer wall 2,737.795 s; best/final report walls 107.419/125.688 s;
-combined 2,970.903 s versus a pre-launch projection of 2,939.569 s
-(`R-default-projection.json`). Aggregate pure training 191.444 rows/s, mean
-validation 151.639 s. Default loss selection picks epoch 5 (standalone policy
-NLL 1.825620, top-1 0.333946) versus action-CE selection at epoch 6 (1.810496,
-0.340476); final weights and report equal R. No resume state is written with
-the option omitted. Sources/formulas/tensor comparison: `R-default-summary.json`,
-`R-default-metrics.csv`, both holdout JSONs and `R-default-tail.txt`. Checkpoint
-sizes/hashes are appended to `checkpoints.json`; no hosted GPU gate is claimed.
+B's original attempt ended with the environment at an unobserved time. On return
+no trainer was live; atomic state/CSV held epoch 15, step 9,523. Original wall
+and exit remain null in `B-execution.json`. Its completed epoch timers sum to
+18,121.330 s; the identical command resumed at 21:28:09 UTC, took 3,028.582 s
+and exited 0. Thus trainer wall is at least 21,149.912 s; best/final reports add
+108.992/104.027 s, giving at least 21,362.931 s combined. The UTC gap/downtime
+is not charged to training. Reported CPU/runtime/settings were unchanged;
+rows 0–15 remain exact after epoch 18. `B-environment-resume.json`, its prefix
+CSV/tail, final metadata and `B-summary.json` retain the evidence. The six-epoch
+snapshot is explicitly intermediate, not a completed six-epoch schedule.
 
-Original/current real-input diagnostic **passed** at `5d2d7d5`, command
-`uv run --no-sync python docs/briefs/03-artifacts/check_real_updates.py`.
-Original `f0dc3d1` and current trainers each evaluated the complete fixed holdout
-normally, retained the six-epoch learning-rate schedule and stopped immediately
-before update 21's forward. All 20 training losses are identical (max difference
-0); all 376 parameter/persistent-buffer tensors after 20 completed updates are
-`torch.equal`. The current losses also match the profiler's first 20 exactly.
-Overall wall 426 s, exit 0; old/current trainer calls 222.034/201.122 s including
-their full baseline evaluations. Evidence: `real20-comparison.json`,
-`real20-profile-equality.json`, `real20-output.txt`, `real20-wall.txt`.
+### Historical reproduction guard and actual recovery
 
-Historical three-decimal reproduction remains **failed**. The full six-epoch
-flag-off control and tested original/current updates show no measured regression
-from the new options/trainer edits on this machine. Platform/runtime differences
-remain: AMD versus the historical Intel CPU, with the historical thread count
-unrecorded; specific hardware/thread/kernel contributions are not isolated.
-A/S/B can now continue unchanged. A−R and S−R are controlled comparisons on this
-machine; A/B comparisons with the legacy 3k result must be labeled cross-platform
-references. They cannot automatically establish a clean data effect, especially
-when close to seed noise or the observed R drift. No model/loss/learning-rate/
-batch/thread setting was changed for diagnosis; the historical guard was not
-relabelled as passing. `reproduction-platform.json` collects the source evidence.
+R's historical three-decimal guard **failed**, and remains failed. Current
+baseline/epochs 1–6: 2.306/2.045/1.992/1.917/1.850/1.826/1.810; legacy:
+2.306/2.043/1.990/1.909/1.841/1.819/1.804. Last NLL drift is 0.006311.
+Baseline normalized metrics agree within 2.49e-8. Current AMD versus historical
+Intel CPU differs, while the old thread count is unrecorded; specific hardware/
+thread/kernel contributions are not isolated. Source comparison over model,
+constants, encoding, dataset and recipe is empty. See `reproduction-platform.json`.
 
-A started at 06:47:15 UTC at `41b6ffd` after diagnosis was pushed (`cdde5e9`), invoked with
-`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py A`; full
-trainer command/attempts are retained in `A-execution.json`. Pre-launch
-projection (`A-projection.json`): 18×52,983/194.039961 = 4,914.936 s training,
-plus 19×154.662233 s validation and 218.621 s standalone reports = 8,072.140 s.
-The required actual SIGTERM/restart is planned after at least two completed
-epochs, with earlier CSV rows compared exactly; its repeated partial-epoch and
-startup cost is not included in that projection. S/B have not started.
+Before A/S/B, the required six-epoch repeat with resume/selection omitted
+(`C R-default`, at `c5938bc`) matched every non-timing metric and all 376 final
+parameter/buffer tensors exactly. Trainer wall 2,737.795 s, reports
+107.419/125.688 s, total 2,970.903 s. Default loss selection chooses epoch 5
+(NLL 1.825620) versus action-CE selection's epoch 6 (1.810496). No resume state
+is written with the option omitted (`R-default-summary.json` and raw files).
 
-Stage 3 actual A interruption/recovery **passed** while the 18-epoch run
-continues. The supervisor loaded atomic `bc_state.pt` and confirmed completed
-epoch 2, sent SIGTERM (child exit −15, first-attempt wall 1,197.492 s), then
-started the identical command at 07:07:12 UTC. Training printed
-`[bc] resume: completed epoch 2/18` and completed epoch 3. Snapshot CSV epochs
-`[0,1,2,3]` retain exactly the original `[0,1,2]` rows, including timing fields.
-Evidence/command/commit: `A-resume-evidence.json`, `A-execution.json`,
-`A-resume-metrics.csv`, `A-resume-tail.txt`. This is a real replay training
-interruption, not a generated-data test; remaining A epochs and both reports
-are still running/pending. The final supervisor check will compare the same
-prefix again after all 18 epochs complete.
+Original `f0dc3d1` and current trainers then matched all 20 real-input losses
+(max difference 0) and all 376 tensors after 20 completed updates, retaining
+normal full baseline evaluation and six-epoch schedule. Shared-process control
+wall 426 s (`check_real_updates.py`, `real20-*`); clean fresh children confirmed
+NumPy/Torch initially absent and matched the shared losses and each other, wall
+451.193 s (`check_fresh_updates.py`, `fresh-real20/`). Current losses also match
+the profiler exactly. These isolate the tested update/startup paths without
+turning the failed historical guard into a pass or introducing runtime variants.
 
-A **completed all 18 epochs**, final resume-prefix comparison exact. Trainer
-attempts total 9,355.371 s (1,197.492 s interrupted plus 8,157.878 s resumed);
-best/final reports 128.951/127.414 s, combined 9,611.736 s versus the pre-launch
-8,072.140 s projection. Actual aggregate pure training is 157.725 rows/s and
-mean validation 172.194 s, slower than R with the same runtime settings. State
-records 3,870 optimizer updates and selected epoch 8. Sources: `A-summary.json`
-(all formulas/per-epoch policy/value curves), `A-metrics.csv`, `A-tail.txt`,
-both holdout JSON/output files and the final `A-execution.json`. Checkpoint
-sizes/SHA-256 are appended to `checkpoints.json`.
+A was actually SIGTERM-killed after atomic epoch 2 (exit −15, 1,197.492 s), then
+resumed the identical command at 07:07:12 UTC. It completed epoch 18; the original
+CSV prefix, including timing fields, is exact (`A-resume-evidence.json`,
+`A-resume-metrics.csv`, `A-resume-tail.txt`, final `A-execution.json`). This
+completes the required real-data recovery stage. B's later environment recovery
+is additional recorded evidence, not a planned timing experiment.
 
-A's final policy NLL is 0.138436 worse than R's on this machine, despite a
-higher final top-1. Its training/holdout gap reaches 0.707102 NLL
-(1.241824 versus 1.948926); best policy NLL is 1.736081 at epoch 8, then
-overfitting dominates. Trained value MSE never beats constant zero (minimum
-1.015312, final 1.595830). Exact controlled deltas are in
-`A-summary.json: controlled_comparison_with_R`; the S seed-noise estimate is
-still pending, so the final effect-size reading waits. Legacy 3k comparisons
-remain cross-platform references. A fresh-process original/current real-20
-control runs serially before S, closing the shared-process startup-order gap
-without changing the application or runtime recipe.
+### Reading: data, steps, value and switching
 
-Fresh-process startup control **passed**, command
-`uv run --no-sync python docs/briefs/03-artifacts/check_fresh_updates.py`, at
-`0e93755`. The controller/child entry points used only stdlib until each target
-trainer initialized; both children confirmed NumPy/Torch initially absent.
-Original/current children then evaluated the full baseline and completed 20
-updates with the normal six-epoch schedule. All 20 losses and all 376 parameter/
-buffer tensors match exactly; both loss lists also match the earlier shared
-process control. Child walls 223.349/226.382 s; controller 451.193 s, supervisor
-452 s, exit 0. Sources: `fresh-real20/comparison.json`, original/current JSONs,
-their output files and supervisor output/result. Tensor snapshots remain
-ignored; only text/JSON are pushed. The tested startup-order gap changes no
-measured updates. Historical reproduction remains failed with specific runtime/
-platform contributions unisolated; this control does not turn it into a pass.
+The two-seed NLL difference |S−R| is 0.015516; twice that is 0.031031. No smaller
+difference is called an effect. Controlled A−R ends 0.138436 worse, above that
+threshold. B ends 0.230221 above legacy 3k6, a cross-platform reference. A/B
+train–holdout gaps open from 0.142664/0.153659 at their epoch-8 minima to
+0.707102/0.779798 at the end; holdout NLL rises 0.212838/0.263535 after the
+minima. B's upturn already exists at epoch 15 before interruption (NLL 1.779463).
+Both longer runs overfit. This supports a data/generalization limit: extra
+updates alone do not explain the earlier gain. A versus legacy 3k6 differs by
+0.336598 at roughly matched steps, but exact historical data-effect size remains
+unisolated across CPUs; a same-runtime 3k six-epoch run would resolve it.
+B's selected-checkpoint difference from legacy 3k6 is −0.033310, barely above
+the rough noise threshold and cross-platform, so it is not a clean step gain.
 
-S started at 09:48:45 UTC after the fresh control was reviewed and pushed,
-invocation `uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py S`.
-The only intended difference from R is seed 20261202. Pre-launch projection
-`S-projection.json` retains the stage-1 rate: 6×52,983/194.039961 plus seven
-recent-A validation passes and its two report walls = 3,100.036 s. A conservative
-budget using A's observed 157.724799 rows/s is 3,477.248 s. Runtime settings
-remain unchanged; the different measured rates are planning sensitivity, not
-runtime variants. Exact command/commit/attempts are in `S-execution.json`.
+Value learns weak early signal (B minimum MSE 0.956552), then overfits: all final
+heads are worse than constant zero's MSE 1.0. B's policy-selected value MSE is
+1.378004. `comparison-curves.txt` places every current/legacy epoch's training/
+holdout policy NLL and value MSE beside the constant reference; exact deltas,
+source links and noise formulas are in `comparison-reading.json`.
 
-S **completed**, 1,286 updates, selected epoch 6. Trainer wall 3,224.913 s;
-best/final reports 131.955/130.175 s; combined 3,487.043 s versus the conservative
-3,477.248 s projection. Pure training 158.587 rows/s, mean validation 170.227 s.
-Sources/formulas/per-epoch policy/value curves: `S-summary.json`, `S-metrics.csv`,
-`S-tail.txt`, both holdout JSON/output files; checkpoints in `checkpoints.json`.
-S−R last-epoch NLL is −0.015516, absolute seed difference 0.015516, twice that
-0.031031. Per the brief, no smaller difference is called an effect. A−R's
-0.138436 final deterioration is above that rough threshold; A overfits, while
-its epoch-8 selected policy is better than its final policy. Exact controlled
-deltas/noise calculations are in the S/A summaries. Legacy 3k comparisons remain
-cross-platform references.
+B epoch 8 is the lowest-NLL completed policy: 1.579018, top-1 0.440802. Its
+mean switching probability is 0.454911 on human-switch rows and 0.192942 on
+human-move rows; switch-only target accuracy 0.449789, versus full-action top-1
+0.211427 on human-switch rows. Sources: `B-holdout-best.json`,
+`comparison-reading.json`. These diagnose the remaining action-family/target
+limitations; they are not a play-strength gate.
 
-B budget saved before launch in `B-projection.json`: 18×156,597/194.039961
-training seconds plus 19 holdout passes and two reports; it also budgets the
-slower observed A/S training rate and larger validation/report times. Both the
-stage-1 reference (18,060.446 s, 5.02 h) and conservative recent-rate total
-(21,405.112 s, 5.95 h) are below the eight-hour limit, so B will run serially
-with every prescribed training setting unchanged.
+### Real runner, scale instructions and checkpoints
 
-B launched at 10:52:34 UTC, commit `620d6c2`, with the exact command in
-`B-execution.json`. An intermediate six-epoch snapshot is preserved in
-`B-epoch6-{metrics.csv,tail.txt,progress.json}` while the 18-epoch run continues:
-policy NLL 1.604685, training policy NLL 1.517395, value MSE 1.191609. These
-checkpoints have an unfinished 18-epoch schedule and do not replace the legacy
-six-epoch completed-schedule reference. The supervisor remains live beyond two
-hours; no extra interruption or runtime variant was introduced.
+Real 600-game runner command at `fa35867`:
+`uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 600 --work-dir runs/blueprint_runner_smoke --device cpu --batch-size 256 --epochs 2 --chronological-holdout-games 100`.
+It called the existing importer on the genuine cached source shard, converted
+600 games/29,508 rows, split train 500/24,278 and holdout 100/5,230, trained and
+scored. After first completion, only training/results were deleted. The same
+command skipped import/conversion/split, was terminated after epoch one (exit
+143, 147.248 s), then resumed epoch two (exit 0, 151.991 s). CSV `[0,1]` became
+`[0,1,2]` with earlier rows exact; all numeric metrics also match the first
+completion (timings excluded). Post-completion training attempts total
+284.380 s; best/untrained scores 7.216/7.133 s. Evidence:
+`runner-smoke/`, `runner-first-completion/`, `check_real_runner.py`,
+`post-completion-step-seconds.json`, `repeat-comparison.json`.
+The initial 1.684/74.546/2.260 s import/conversion/split walls competed with the
+main converter and are not idle measurements; earlier authorized recovery and
+the 758 s main-converter pause are retained, not relabeled as uninterrupted.
 
-B later stopped when the environment ended at an unobserved time. On return
-at 21:27 UTC no trainer was live; atomic state and CSV both held epoch 15
-(state step 9,523). The original attempt retains unknown exit code and wall
-time in `B-execution.json`; no UTC gap or downtime is counted as training.
-Its completed epoch timers sum to 18,121.330 s, a lower bound that excludes
-startup, file writes and any uncheckpointed partial epoch. The existing
-`run_comparison.py B` command was launched exactly once at 21:28:09 UTC,
-restoring epoch 15 with rows 0–15 exactly unchanged. Reported runtime remains
-AMD EPYC9V74, affinity five/quota four, 16 GiB memory, Torch2.13.0+cu130,
-five intra/inter-op threads, no CUDA. Evidence: `B-environment-resume.json`,
-prefix CSV and resume tail. Final B wall will remain unknown; its completed
-epoch timers plus the measured resumed attempt will be reported as a lower
-bound, without inventing the missing original timing or exit status.
+Stage 5 is complete in `docs/replay-blueprint-scale-run.md`: public clone,
+fixed IDs, pinned code, numbered cells, exact resume/download steps and measured
+CPU time/disk arithmetic. Idle fixed split: 2.154823 s at 22k, output 700,419
+bytes, projected about 11 s at 112k (`split-timing.json` and output).
+Six-epoch checkpoints plus result-best duplicate: 287,619,529 bytes
+(`checkpoint-storage.json`). Full rates/profile range is 157.29–194.04 rows/s;
+The CPU pipeline for 20k training games projects to 9.618–11.737 h; importing
+112k and training about 100k projects to 46.674–57.009 h on CPU
+(`scale-projections.json`, complete inputs/formulas).
+These are batch-256 CPU references. Actual batch-1,024/GPU speed and memory
+remain unmeasured; the page says **not run on a hosted GPU**.
+
+`checkpoints.json` lists actual retained best/final/state paths, sizes and
+SHA-256 values. Winner: `runs/blueprint/g3000e18/checkpoints/bc_best.pt`,
+23,548,503 bytes, SHA-256
+`bed0804dc21d83b27acba45d3359c5a8ec88cb3233210c21a65d719df5a02c8a`.
+Ignored weights may disappear if the machine is reclaimed; text evidence is
+pushed after each stage.
+
+Stage 6 smoke results are pending for B epoch 8, 400 games per opponent on
+`pool_b`, greedy and without search. No play-strength, held-out-team or roadmap
+gate claim is made here; the completed smoke and action statistics will be
+recorded separately in this section.

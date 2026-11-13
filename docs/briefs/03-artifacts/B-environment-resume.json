@@ -1,6 +1,6 @@
 {
   "recorded_utc": "2026-11-13 21:27:41 UTC",
-  "status": "atomic_epoch15_confirmed_before_identical_resume",
+  "status": "completed_epoch18_after_identical_environment_resume",
   "original_attempt_started_utc": "2026-11-13 10:52:34 UTC",
   "original_attempt_wall_seconds": null,
   "original_attempt_exit_code": null,
@@ -49,9 +49,13 @@
     "bc.selection_metric": "action_ce"
   },
   "prefix_unchanged_after_resume": true,
-  "prefix_unchanged_after_completion": null,
+  "prefix_unchanged_after_completion": true,
   "note": "No wall time is inferred from the UTC gap. The lower bound includes only completed epoch timers, excluding startup, writes and any uncheckpointed partial epoch.",
   "resume_log_line_observed": true,
   "resume_checked_utc": "2026-11-13 21:28:22 UTC",
-  "resume_launch_commit": "1041c20eeec8b73ca2e27aded9135eae995ac659"
+  "resume_launch_commit": "1041c20eeec8b73ca2e27aded9135eae995ac659",
+  "final_completed_epoch": 18,
+  "final_optimizer_steps": 11431,
+  "known_resumed_attempt_wall_seconds": 3028.582033958,
+  "training_wall_lower_bound_seconds": 21149.911842874997
 }
