@@ -1,6 +1,7 @@
 """Profile the existing PPO worker against MaxDamage (diagnostic, smoke)."""
 import cProfile
 import json
+import os
 import pstats
 import random
 import time
@@ -27,6 +28,11 @@ def main():
     rng = random.Random(0)
     assigned = [WorkerGame(0, n, rng.getrandbits(62), 0, 0) for n in range(64)]
     profile = cProfile.Profile()
+    def node_cpu():
+        fields = Path(f'/proc/{worker.client._process.pid}/stat').read_text().split()
+        return (int(fields[13]) + int(fields[14])) / os.sysconf('SC_CLK_TCK')
+
+    cpu_before = node_cpu()
     start = time.perf_counter()
     try:
         profile.enable()
@@ -34,6 +40,7 @@ def main():
         profile.disable()
         elapsed = time.perf_counter() - start
         decisions = buf.n_decisions
+        node_cpu_seconds = node_cpu() - cpu_before
     finally:
         worker.close()
     stats = pstats.Stats(profile)
@@ -42,6 +49,7 @@ def main():
                    if f.endswith(file_suffix) and name == function)
     result = dict(smoke=True, games=64, learner_decisions=decisions, wins=wins,
                   profiled_seconds=elapsed, learner_decisions_per_sec=decisions/elapsed,
+                  node_cpu_seconds=node_cpu_seconds,
                   node_roundtrip_seconds=cumulative('showdown_direct.py', '_request'),
                   observation_seconds=cumulative('observation.py', 'from_battle'),
                   forward_seconds=cumulative('agent.py', 'forward'), belief_calls=belief_calls)
