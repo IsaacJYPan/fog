@@ -33,3 +33,7 @@ Idle baseline profile, started only after verify_split.py returned zero:
 uv run --no-sync python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-before
 Comparison supervisor (run only after the profile):
 uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R
+
+Full unchanged-default repeat after thread tests:
+uv run --no-sync python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-after
+First20 losses compared directly between profile-before-timing.json and profile-after-timing.json; exact equality (profile-comparison.json).

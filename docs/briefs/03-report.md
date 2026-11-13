@@ -2,11 +2,10 @@
 
 ## Answer
 
-Measurements are in progress. The pinned dataset is accessible and the 22,000-game
+Training measures 194 rows/s (1.27 s/step) on this CPU, and model compute accounts for 97% of the step. The pinned dataset is accessible and the 22,000-game
 import and split reproduce brief 01 exactly, including all fixed holdout IDs. The reviewed
 trainer/runner code passed all 82 focused tests, and the real 600-game runner
-passed its post-completion kill/restart test. Training throughput, the data-versus-steps reading
-and hosted GPU readiness are not yet established.
+passed its post-completion kill/restart test. The data-versus-steps reading is pending R/A/S/B; the scale pipeline works on real data, but hosted GPU throughput and memory remain untested.
 
 ## Stage 2 table
 
@@ -24,7 +23,7 @@ No data-versus-steps conclusion or seed-noise estimate exists yet.
 - Setup: locked install and pinned Showdown build complete; four cores of CPU quota,
   16 GiB memory, PyTorch 2.13.0+cu130, no CUDA device. Import: 22,000 games in 194 s,
   with brief 01's rejection counts. Conversion: 22,000 games / 1,127,562 rows in 2,225 s wall, including the 758 s pause. The holdout has 2,000 games / 104,037 rows, uploaded 2026-02-20 04:17:33 through 2026-05-19 04:52:01 UTC. Training sets 1k/3k/20k have 52,983/156,597/1,023,525 rows. Fixed-ID splitting drops zero games and matches chronological holdout/train membership (`verify-split-output.txt`, `split-fixed-output.txt`).
-- Stage 1: the idle CPU baseline profile is running; no loader/model changes made.
+- Stage 1: done, with no qualifying source changes. Before/repeat: 1.314/1.274 s per step, 188.123/194.040 rows/s; batch construction 0.039762/0.038087 s (3.03%/2.99%); forward 0.608237/0.589191 s; backward+optimizer 0.654632/0.634710 s; remainder 0.011513/0.012080 s. Belief heads: 46.11%/45.76% of forward. Batch-only: 7,182.28/7,100.46 rows/s. Both profiles used 20 warm-ups and 200 measured steps; separate cProfile top-15 files are retained. The first 20 losses match exactly (`profile-comparison.json`). No loader/prefetch criterion qualifies. Thread1/2/4 screens used 5 warm-ups and 30 measured steps: 2.417/1.561/1.235 s, slower or only 6.05% faster than the five-thread baseline, below 10%; alternatives change losses, so preserve five threads. Profile walls 330/321 s; screens 95.067/62.085/49.680 s (`profile-*-timing.json`, `profile-*-cprofile.txt`, `thread-benchmarks.json`).
 - Stages 2–3: not started.
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
@@ -55,7 +54,7 @@ verified the existing importer.
 
 ## Not verified
 
-Idle-machine throughput; R reproduction; A/S/B;
+R reproduction; A/S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints

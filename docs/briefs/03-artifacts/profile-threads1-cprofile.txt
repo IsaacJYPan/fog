@@ -1,0 +1,23 @@
+         327860 function calls (311459 primitive calls) in 2.723 seconds
+
+   Ordered by: cumulative time
+   List reduced from 518 to 15 due to restriction <15>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.000    0.000    2.723    2.723 profile_replay_training.py:41(measure_steps)
+        1    0.000    0.000    1.370    1.370 _tensor.py:566(backward)
+        1    0.000    0.000    1.370    1.370 __init__.py:255(backward)
+        1    0.000    0.000    1.370    1.370 graph.py:966(_engine_run_backward)
+        1    1.370    1.370    1.370    1.370 {method 'run_backward' of 'torch._C._EngineBase' objects}
+        1    0.000    0.000    1.031    1.031 bc.py:67(bc_loss)
+    577/1    0.001    0.000    1.020    1.020 module.py:1774(_wrapped_call_impl)
+    577/1    0.002    0.000    1.020    1.020 module.py:1782(_call_impl)
+      3/1    0.000    0.000    1.020    1.020 module.py:1794(inner)
+        1    0.000    0.000    1.020    1.020 agent.py:529(forward)
+      361    0.504    0.001    0.504    0.001 {built-in method torch._C._nn.linear}
+        4    0.000    0.000    0.496    0.124 transformer.py:405(forward)
+       10    0.004    0.000    0.494    0.049 transformer.py:795(forward)
+        2    0.002    0.001    0.482    0.241 belief.py:606(forward)
+      329    0.001    0.000    0.410    0.001 linear.py:130(forward)
+
+

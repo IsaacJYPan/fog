@@ -608,7 +608,35 @@ under `runner-first-completion/`. Main conversion was paused 758 s, 04:02:31 to
 contention during the first baseline evaluation. Checkpoint sizes/hashes are in
 `checkpoints.json`; these small-run weights are engineering smoke, not a gate.
 
-Stage 1 baseline profile is running on the verified corpus; stages 2–3 and 6 are pending. Stage 5 instructions now use public
+Stage 1 **done; no source change qualifies**. Commands: `uv run --no-sync python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-before` and the same with `profile-after`, at `2a608ad`; both 20 warm-ups and 200 measured CPU steps, five threads, unchanged recipe. Profiles took 330/321 s wall. Raw timing/output and cumulative top-15 cProfile files are `profile-before-*` and `profile-after-*`.
+
+| Measurement | Before | Unchanged-default repeat |
+| --- | ---: | ---: |
+| Batch building, s/step | 0.039762 | 0.038087 |
+| Forward, s/step | 0.608237 | 0.589191 |
+| Belief heads within forward, s/step | 0.280480 | 0.269641 |
+| Belief share of forward | 46.11% | 45.76% |
+| Backward + optimizer, s/step | 0.654632 | 0.634710 |
+| Other, s/step | 0.011513 | 0.012080 |
+| Total, s/step | 1.314143 | 1.274067 |
+| Training rows/s | 188.123 | 194.040 |
+| Batch-only rows/s | 7,182.28 | 7,100.46 |
+
+The first 20 training losses are exactly identical (`profile-comparison.json`).
+Batch building is only 3.03%/2.99% of a step and exceeds 3,000 rows/s alone, so
+neither loader optimization nor prefetch qualifies; no batch changes need a
+50-batch equivalence check. Model compute dominates, including belief heads;
+no architecture/loss/head computation was changed. Short thread screens
+(`thread-benchmarks.json`; exact commands/raw timing/cProfile beside it) use
+5 warm-ups, 30 measured updates and one separate cProfile update: 1 thread
+2.417102 s/step, 102.133 rows/s, wall 95.067 s; 2 threads 1.561363 s/step,
+158.110 rows/s, wall 62.085 s; 4 threads 1.234657 s/step, 199.948 rows/s,
+wall 49.680 s. Four threads save only 6.05% step time versus the default,
+below the required 10%. Alternatives also change the first 20 losses by up
+to 1.54e-4. The five-thread runtime default remains unchanged. The repeat's
+3% timing difference is observed variation, not a code speedup.
+
+Stages 2–3 and 6 are pending. Stage 5 instructions now use public
 cloning and the committed holdout IDs; projections are pending. No data-versus-
 steps, seed-noise, value-learning or play-strength conclusion exists yet.
 P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.
