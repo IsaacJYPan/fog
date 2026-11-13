@@ -1,4 +1,4 @@
-Using CPython 3.12.14 interpreter at: /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3
+Using CPython 3.12.14 interpreter at: [environment-specific path omitted]
 Creating virtual environment at: .venv
 Resolved 88 packages in 4ms
    Building fog @ file:///workspace/fog-roadmap
