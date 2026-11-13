@@ -1,0 +1,12 @@
+Base implementation commit: ddd83638f8068a85c740eb90029e8201cd98279c
+UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_bc_resume.py tests/test_bc_metrics.py tests/test_bc_scope.py tests/test_profile_replay_training.py tests/test_replay_holdout_report.py tests/test_split_replay_manifest.py tests/test_run_replay_blueprint.py
+Result: 81 passed in 15.40s, focused-tests.txt. Test collection preceded the last added hard-interruption timing test.
+UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_run_replay_blueprint.py::test_runner_reports_unrecorded_wall_time_after_hard_interruption
+Result: 1 passed in 1.63s, hard-interruption-test.txt.
+UV_CACHE_DIR=/tmp/fog-uv-cache RUFF_CACHE_DIR=/tmp/fog-ruff-cache uv run --no-sync python -m ruff check fog tests
+Result: All checks passed, ruff.txt.
+UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python docs/briefs/02-artifacts/check_default_updates.py
+Result: 24 identical original/new losses and all final tensors, stage2-default-equivalence.json.
+UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python docs/briefs/02-artifacts/runner-fixture-setup.py
+UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python docs/briefs/02-artifacts/runner-fixture-interrupt.py
+Result: real subprocess SIGTERM after epoch 1, exit143, next command resumed epoch2 and reports exit0; runner-smoke/interruption-test.json.

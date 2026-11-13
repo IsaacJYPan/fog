@@ -2,11 +2,14 @@
 
 ## Answer
 
-Training throughput on the pinned replay corpus is unmeasured: this environment refuses
-the dataset host, and the previous shards are absent. The brief 01 gain still cannot be
-separated into data and training length because R, A, S and B need that corpus. Trainer
-resume and selection are implemented and tested; the scale run still needs the missing fixed
-holdout IDs, real-data performance qualification, and hosted GPU verification.
+Training speed and its bottleneck on the pinned replay corpus remain unmeasured because
+this environment refuses the dataset host and the previous shards are absent. The brief 01
+gain still cannot be separated into data and training length because R, A, S and B are
+blocked. Resume, policy-loss selection, switch diagnostics and the restartable runner are
+implemented: 82 focused checks passed, including a real subprocess interruption test, and
+a generated 600-game pipeline recovered after termination. The scale command still needs
+the exact fixed holdout IDs and real-data performance qualification; it has not run on a
+hosted GPU.
 
 ## Stage 3 table
 
@@ -57,8 +60,20 @@ run-to-run variation. There is no measured runtime projection for B and no new p
   `uv run --no-sync python docs/briefs/02-artifacts/check_default_updates.py`). This is
   supplemental default-behaviour evidence, not run R.
 - **Stage 3: not run.** Dataset access blocks every run; no losses or runtimes invented.
-- **Stage 4: in progress.** Fixed-ID splitter and restartable runner; the actual 2,000
-  replay IDs cannot be recovered without the pinned import. No substitute IDs are committed.
+- **Stage 4: partial.** Fixed-ID splitter, restartable runner and
+  `docs/replay-blueprint-scale-run.md` are implemented. Exact replay IDs remain blocked;
+  the runner fails clearly before import when the file is absent. Resolved recipe/holdout
+  changes are refused, existing import revision/filters are checked, completed work is
+  skipped, and runner-owned shard paths survive moving the work directory. The genuine
+  600-game import smoke is blocked. A **generated-data** 600-game smoke at code commit
+  `ddd83638f8068a85c740eb90029e8201cd98279c` actually ran import→convert→split→full-model
+  training→scoring: 2,400 rows, train 500 games/2,000 rows, holdout 100/400. SIGTERM after
+  epoch one exited 143 (16.890 s); the identical command resumed epoch two and exited 0
+  (15.349 s), with CSV epochs `[0,1]` then `[0,1,2]`. Outputs:
+  `runner-smoke/interruption-test.json` and `runner-smoke/results/` without checkpoint.
+  Step walls in `run-summary.txt`: import 0.210 s, convert 3.232 s, split 1.067 s,
+  training attempts combined 24.157 s, best/untrained scoring 1.620/1.656 s.
+  These short duplicate protocols do not measure real replay throughput or learning.
 - **Stage 5: not run.** No stage 3 checkpoint exists to evaluate.
 
 Exact blocked import command, at `f0dc3d1` plus the profiler changes:
@@ -79,18 +94,32 @@ creating the requested branches. No owner question was needed. Dataset access re
 recorded, with no alternate host or access workaround. The first dependency installation
 failed on a read-only home cache; retrying with writable XDG/Rust/uv caches succeeded.
 Likewise npm needed `npm_config_cache=/tmp/fog-npm-cache`.
+The runner exposes `--parquet` and `--config` for offline testing. The generated source uses
+the importer's required revision argument only to exercise its interface; it did not come
+from that revision. Reproduce the fixture with `runner-fixture-setup.py` then
+`runner-fixture-interrupt.py` in `02-artifacts/` from the repository root. CPU fallback
+instructions import 22k games to retain the fixed 2k holdout and train on 20k; importing
+only 20k could omit fixed IDs. Historical estimates are explicitly separated from missing
+stage 1 projections. All validation commands are in `02-artifacts/test-commands.txt`:
+81 tests passed in 15.40 s plus the final timing test in 1.63 s, Ruff clean. The pytest
+warning about `cache_dir` follows the requested disabled cache provider; no full suite ran.
 
 ## Not verified
 
 The 22,000-game split, real-data profiles/equality, R reproduction, A/S/B, exact fixed holdout
 IDs, real 600-game runner smoke and play strength remain blocked. Hosted GPU/CUDA speed,
-memory, and determinism are not verified. No roadmap gate is claimed.
+memory, and determinism are not verified. No prefetch or thread tuning was made without
+the stage 1 measurements. No roadmap gate is claimed.
 
 ## Checkpoints
 
-No replay-trained checkpoint exists. Generated test inputs/checkpoints are local test
-fixtures and not trained research results. This machine may be reclaimed; committed text
-evidence is retained on `work/p2-scale-prep`, not in ignored `runs/`.
+No checkpoint trained on the pinned replay corpus exists. The generated fixture's
+`runs/blueprint_runner_fixture_final/training/checkpoints/bc_best.pt` is 23,548,503 bytes,
+SHA-256 `67c31faec47317b2e0a6900cd2bf3179057779f5cca419911a553752c02b6859`.
+`02-artifacts/checkpoints.json` also lists the final weights and resumable state with
+their paths, byte sizes and SHA-256 values. They are engineering fixtures, not research
+models, and are not pushed. This machine may be reclaimed; the branch retains text
+evidence and reproducible fixture scripts, not ignored checkpoints.
 
 ## Suggestions
 

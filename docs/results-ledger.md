@@ -506,3 +506,41 @@ also implemented, but the genuine IDs are unavailable. Focused commands:
 (`stage2-ruff.txt`). Four-epoch CPU interruption after epoch two matches numeric metrics,
 model, optimizer, scheduler, scaler, RNG and best/early-stop bookkeeping exactly; elapsed-time
 columns differ and are excluded. Made-up data checks features, not the replay learning curve.
+
+Final implementation/runner validation at code commit
+`ddd83638f8068a85c740eb90029e8201cd98279c` (full commands in
+`02-artifacts/test-commands.txt`): 81 focused tests passed in 15.40 s, plus the last
+added hard-interruption timing test passed in 1.63 s; `ruff check fog tests` clean
+(`focused-tests.txt`, `hard-interruption-test.txt`, `ruff.txt`). The existing
+`cache_dir` warning is caused by the requested disabled pytest cache provider.
+Original `f0dc3d1` versus the changed default trainer on the generated full-model
+fixture: all 24 training losses and all final state tensors exactly identical
+(`stage2-default-equivalence.json`, script `check_default_updates.py`, trained at
+`00a2d79`). This supplements, and does not replace, the blocked run R comparison.
+
+Stage 4 **partial**: fixed-ID splitting and scale runner implemented, hosted-notebook
+instructions in `docs/replay-blueprint-scale-run.md` explicitly not GPU-verified.
+No exact fixed holdout ID file could be recovered, so default scale launch refuses
+before importing. After data recovery, recover those IDs from the verified brief 01
+split and complete stage 1/R/A/S/B before making data/training-length claims.
+
+The genuine 600-game smoke was blocked. A **generated-data engineering smoke**
+actually ran all scripts and killed/restarted the runner on the same command at
+`ddd8363`: `uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 600
+--work-dir runs/blueprint_runner_fixture_final --device cpu --batch-size 256
+--epochs 2 --chronological-holdout-games 100 --parquet
+runs/blueprint_runner_fixture_source/synthetic-public-replays.parquet`.
+600 generated two-turn protocols, 2,400 rows, train 500 games/2,000 rows, holdout
+100 games/400 rows. First attempt 16.890 s, SIGTERM exit143 after epoch one; same
+command 15.349 s, exit0, resumed epoch two with CSV epochs `[0,1,2]`. Per-stage walls:
+import 0.210 s; convert 3.232 s; split 1.067 s; training attempts combined 24.157 s;
+best/untrained CPU reports 1.620/1.656 s. Sources:
+`02-artifacts/runner-smoke/interruption-test.json`, `runner-smoke/results/run-summary.txt`,
+output/metrics/report files beside them, and reproducible fixture scripts in the
+artifacts directory. Fixture timings/metrics are not real-data performance or learning
+results. `--revision` on this offline import labels the exercised importer interface,
+not genuine corpus provenance. Checkpoint paths/sizes/hashes: `02-artifacts/checkpoints.json`.
+
+Stage 5 **not run**: no replay-trained checkpoint available; no new smoke play rows,
+win-rate intervals or switch-play claim. P2.3–P2.5 and G2 remain open. The final report
+records all blocked work without substituting synthetic measurements for it.

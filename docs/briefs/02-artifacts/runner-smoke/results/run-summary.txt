@@ -1,0 +1,21 @@
+commit: ddd83638f8068a85c740eb90029e8201cd98279c
+command: /workspace/fog/.venv/bin/python -m fog.scripts.run_replay_blueprint --games 600 --work-dir runs/blueprint_runner_fixture_final --device cpu --batch-size 256 --epochs 2 --chronological-holdout-games 100 --parquet runs/blueprint_runner_fixture_source/synthetic-public-replays.parquet
+revision: 792a86b5cdbcab9696032e947483b218453a0d4f
+imported games: 600
+converted games/rows: (600, 2400)
+training games/rows: (500, 2000)
+holdout games/rows: (100, 400)
+excluded newer or quarantined games: 0
+import: complete; wall-clock 0.210 s
+  /workspace/fog/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/blueprint_runner_fixture_final/raw --cache runs/blueprint_runner_fixture_final/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 600 --parquet runs/blueprint_runner_fixture_source/synthetic-public-replays.parquet
+convert: complete; wall-clock 3.232 s
+  /workspace/fog/.venv/bin/python -u -m fog.scripts.convert_replay_decisions --raw runs/blueprint_runner_fixture_final/raw --out runs/blueprint_runner_fixture_final/decisions --imputations 1 --workers 4
+split: complete; wall-clock 1.067 s
+  /workspace/fog/.venv/bin/python -u -m fog.scripts.split_replay_manifest --manifest runs/blueprint_runner_fixture_final/decisions/manifest.parquet --out runs/blueprint_runner_fixture_final/split --chronological-holdout-games 100 --train-sizes 20000 100000 --skip-oversized-train-sizes
+train: complete; wall-clock 24.157 s
+  /workspace/fog/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_fixture_final/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_fixture_final/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_fixture_final/training
+  /workspace/fog/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_fixture_final/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_fixture_final/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_fixture_final/training
+score-best: complete; wall-clock 1.620 s
+  /workspace/fog/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_fixture_final/split/holdout_manifest.parquet --out runs/blueprint_runner_fixture_final/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_fixture_final/training/checkpoints/bc_best.pt
+score-untrained: complete; wall-clock 1.656 s
+  /workspace/fog/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_fixture_final/split/holdout_manifest.parquet --out runs/blueprint_runner_fixture_final/results/holdout-untrained.json --batch-size 256 --untrained

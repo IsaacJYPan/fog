@@ -1,0 +1,20 @@
+[
+  {
+    "path": "runs/blueprint_runner_fixture_final/training/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "67c31faec47317b2e0a6900cd2bf3179057779f5cca419911a553752c02b6859",
+    "kind": "synthetic fixture only"
+  },
+  {
+    "path": "runs/blueprint_runner_fixture_final/training/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "7247ef103553bed358d37004d53c982a646cb1990b0f9b1bd67ae5562eb3c08b",
+    "kind": "synthetic fixture only"
+  },
+  {
+    "path": "runs/blueprint_runner_fixture_final/training/checkpoints/bc_state.pt",
+    "bytes": 75660232,
+    "sha256": "b2c3f55b13acfd5420aac754f538242e381d08a269a7fed54874feba1e5d9268",
+    "kind": "synthetic fixture only"
+  }
+]

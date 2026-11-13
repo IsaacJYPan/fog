@@ -1,0 +1,6 @@
+
+$ /workspace/fog/.venv/bin/python -u -m fog.scripts.split_replay_manifest --manifest runs/blueprint_runner_fixture_final/decisions/manifest.parquet --out runs/blueprint_runner_fixture_final/split --chronological-holdout-games 100 --train-sizes 20000 100000 --skip-oversized-train-sizes
+skipped_train_size=20000 available_training_games=500
+skipped_train_size=100000 available_training_games=500
+runs/blueprint_runner_fixture_final/split/train_manifest.parquet
+runs/blueprint_runner_fixture_final/split/holdout_manifest.parquet

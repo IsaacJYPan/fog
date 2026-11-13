@@ -1,0 +1,38 @@
+{
+  "code_commit": "ddd83638f8068a85c740eb90029e8201cd98279c",
+  "fixture": "600 generated two-turn protocol logs; not the pinned replay corpus",
+  "command": [
+    "/workspace/fog/.venv/bin/python",
+    "-u",
+    "-m",
+    "fog.scripts.run_replay_blueprint",
+    "--games",
+    "600",
+    "--work-dir",
+    "runs/blueprint_runner_fixture_final",
+    "--device",
+    "cpu",
+    "--batch-size",
+    "256",
+    "--epochs",
+    "2",
+    "--chronological-holdout-games",
+    "100",
+    "--parquet",
+    "runs/blueprint_runner_fixture_source/synthetic-public-replays.parquet"
+  ],
+  "interrupted_exit_code": 143,
+  "first_attempt_seconds": 16.890273792000016,
+  "metrics_epochs_after_interrupt": [
+    0,
+    1
+  ],
+  "final_checkpoint_after_interrupt": false,
+  "resumed_exit_code": 0,
+  "resumed_seconds": 15.348922649000087,
+  "metrics_epochs_after_resume": [
+    0,
+    1,
+    2
+  ]
+}

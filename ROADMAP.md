@@ -232,6 +232,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12: trained from scratch on 1,000 and 3,000 games on CPU at batch 256 (not ≥ 1,024);
       10,000 and 20,000 not run (over 6 h on 4 cores); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
+      _2026-11-12: trainer resume and policy-loss selection added; real-data profiling and
+      R/A/S/B blocked by dataset access. See "replay trainer profile, resume, and the data-or-steps
+      runs" in the ledger and `docs/briefs/02-report.md`; P2.3 remains open._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
@@ -240,6 +243,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12, 1k and 3k points only: holdout NLL 2.307 (untrained) → 1.841 → 1.635, −0.43 per
       tenfold data (more data next); value ECE 0.032 at 3k; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
+      _2026-11-12: data-versus-steps conclusion remains unmeasured; the runner has a generated-data
+      recovery check, but the original fixed holdout IDs are unavailable. See the ledger section
+      "replay trainer profile, resume, and the data-or-steps runs" and `docs/briefs/02-report.md`._
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
       _2026-11-12, smoke only (400 games, `pool_b`, 3k model): 0.258 vs SimpleHeuristics, 0.623 vs

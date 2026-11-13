@@ -1,0 +1,8 @@
+
+$ /workspace/fog/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/blueprint_runner_fixture_final/raw --cache runs/blueprint_runner_fixture_final/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 600 --parquet runs/blueprint_runner_fixture_source/synthetic-public-replays.parquet
+{
+  "status": "target_reached",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "kept_games": 600,
+  "filter_counts": {}
+}

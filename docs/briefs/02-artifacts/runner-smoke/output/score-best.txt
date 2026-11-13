@@ -1,0 +1,3 @@
+
+$ /workspace/fog/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_fixture_final/split/holdout_manifest.parquet --out runs/blueprint_runner_fixture_final/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_fixture_final/training/checkpoints/bc_best.pt
+rows=400 policy_rows=400 top1=1.0000 lift=8.000 nll=0.8264 brier=0.2458 ece=0.2431 seconds=0.5 -> runs/blueprint_runner_fixture_final/results/holdout-best.json
