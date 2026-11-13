@@ -1,0 +1,16 @@
+[ppo] lr scale 1: 1 tensors at 0.0003
+[ppo] direct rollout workers=4, mode=process, actor_threads=2, persistent CPU actors + one centralized learner
+[ppo] rollout process pids=(8615, 8619, 8620, 8627)
+[ppo] decisions=8050  win_rate=0.030  loss=0.5072  entropy=1.582  kl=0.0020  clip=0.041  belief=13.657  self_belief=13.368
+[ppo] decisions=16503  win_rate=0.055  loss=0.1510  entropy=1.621  kl=0.0077  clip=0.087  belief=3.866  self_belief=3.472
+[ppo] decisions=24515  win_rate=0.075  loss=0.0973  entropy=1.592  kl=0.0051  clip=0.080  belief=1.552  self_belief=1.489
+[ppo] decisions=32792  win_rate=0.100  loss=0.1156  entropy=1.597  kl=0.0055  clip=0.083  belief=1.340  self_belief=1.290
+[ppo] decisions=40961  win_rate=0.130  loss=0.1044  entropy=1.589  kl=0.0063  clip=0.108  belief=1.314  self_belief=1.265
+[ppo] decisions=49269  win_rate=0.210  loss=0.1506  entropy=1.532  kl=0.0107  clip=0.136  belief=1.299  self_belief=1.246
+[ppo] decisions=57625  win_rate=0.235  loss=0.1465  entropy=1.519  kl=0.0120  clip=0.140  belief=1.294  self_belief=1.241
+[ppo] decisions=66058  win_rate=0.325  loss=0.1403  entropy=1.497  kl=0.0106  clip=0.150  belief=1.285  self_belief=1.231
+[ppo] decisions=74289  win_rate=0.455  loss=0.1741  entropy=1.461  kl=0.0116  clip=0.158  belief=1.279  self_belief=1.235
+[ppo] decisions=82342  win_rate=0.505  loss=0.1647  entropy=1.450  kl=0.0104  clip=0.143  belief=1.278  self_belief=1.233
+[ppo] decisions=90373  win_rate=0.660  loss=0.1581  entropy=1.412  kl=0.0100  clip=0.152  belief=1.274  self_belief=1.234
+[ppo] decisions=98769  win_rate=0.650  loss=0.1466  entropy=1.371  kl=0.0130  clip=0.162  belief=1.275  self_belief=1.231
+[ppo] decisions=106889  win_rate=0.820  loss=0.1299  entropy=1.325  kl=0.0145  clip=0.189  belief=1.273  self_belief=1.239

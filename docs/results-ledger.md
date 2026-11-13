@@ -630,3 +630,19 @@ four-game blocks. Both rows completed all 200 games with zero failures, truncati
 Stage 1 training uses the logged CLI in `commands.jsonl`. Intermediate snapshot evaluations
 run concurrently on one CPU thread; only stage 0 is used for the isolated cost breakdown.
 The final controller skips snapshots already scored by the watcher. No second training job runs.
+
+Stage 1 first checkpoint, **smoke**, still training toward the 334,049-decision budget.
+The first whole-update boundary after 100k is 106,889. Both evaluations completed 200 games,
+zero failures, draws or truncations.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 106889 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `9e29e1d0d3f502ceaa5bfa0cc2de06136e96b74c` | `scratch-106889-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_106889.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-106889-maxdamage.json --resume` |
+| 106889 | simpleheuristics (smoke) | 200 | 0.640 [0.571, 0.703] | `9e29e1d0d3f502ceaa5bfa0cc2de06136e96b74c` | `scratch-106889-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_106889.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-106889-simpleheuristics.json --resume` |
+
+First-point reading: MaxDamage 0.160 [0.116, 0.217] → 1.000 [0.981, 1.000],
++84 percentage points with non-overlapping 95% intervals, satisfying the brief’s limited
+learning criterion at this checkpoint. First observed cost = 106889 / (84 / 10) =
+12,724.881 decisions per ten points. SimpleHeuristics 0.135 → 0.640. No held-out-team or
+gate claim follows. `scratch-metrics.csv` and `scratch-tail.txt` are an in-progress copy;
+the final run will extend them. Stage 2 has not started.
