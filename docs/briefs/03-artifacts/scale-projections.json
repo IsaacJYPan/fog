@@ -6,7 +6,9 @@
     "conversion_pause": "docs/briefs/03-artifacts/conversion-pauses.txt",
     "disk": "docs/briefs/03-artifacts/disk-bytes.json",
     "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt",
-    "R_run": "docs/briefs/03-artifacts/R-summary.json"
+    "R_run": "docs/briefs/03-artifacts/R-summary.json",
+    "A_run": "docs/briefs/03-artifacts/A-summary.json",
+    "S_run": "docs/briefs/03-artifacts/S-summary.json"
   },
   "inputs": {
     "measured_imported_games": 22000,
@@ -28,7 +30,13 @@
       "cache": 481396201,
       "environment": 5675620035
     },
-    "R_aggregate_training_rows_per_second": 187.06045301203753
+    "R_aggregate_training_rows_per_second": 187.06045301203753,
+    "observed_training_rows_per_second": {
+      "R": 187.06045301203753,
+      "A": 157.72479858558913,
+      "S": 158.58713344957806,
+      "profile": 194.03996113140155
+    }
   },
   "arithmetic": {
     "scale_ratio": "112000 / 22000",
@@ -42,7 +50,10 @@
     "cpu_20k_training_seconds": "6 * 1023525 / training_rows_per_second",
     "R_based_cpu_training_seconds": "6*training_rows/R.aggregate_training_rows_per_second",
     "CPU_nontraining_seconds": "6*R.mean_validation_seconds + R.wall_outside_epoch_timers_seconds + sum(R.standalone_report_seconds.values())",
-    "CPU_full_pipeline_seconds": "projected import + conversion active + CPU training reference + CPU nontraining reference"
+    "CPU_full_pipeline_seconds": "projected import + conversion active + CPU training reference + CPU nontraining reference",
+    "observed_range_training_hours": "6 * rows / each observed profile or full-run training rate / 3600; report min and max",
+    "observed_range_nontraining_seconds": "for each completed full run: 6*mean_validation_seconds + wall_outside_epoch_timers_seconds + sum(standalone_report_seconds.values()); report min and max",
+    "observed_range_pipeline_hours": "(import_active + conversion_active + observed_training_seconds + observed_nontraining_seconds)/3600; pair low with low and high with high"
   },
   "projections": {
     "scale_training_rows": 5117625.0,
@@ -86,6 +97,31 @@
     "cpu_scale_full_pipeline_reference_hours": [
       46.67206447098667,
       48.31215894365569
+    ],
+    "observed_nontraining_reference_seconds": {
+      "R": 1318.9662599480016,
+      "A": 1498.8357231113357,
+      "S": 1482.4796146560038
+    },
+    "cpu_scale_training_observed_range_hours": [
+      43.95679606544556,
+      54.07757737836988
+    ],
+    "cpu_20k_training_observed_range_hours": [
+      8.79135921308911,
+      10.815515475673974
+    ],
+    "cpu_nontraining_observed_range_seconds": [
+      1318.9662599480016,
+      1498.8357231113357
+    ],
+    "cpu_22k_full_pipeline_observed_range_hours": [
+      9.619127618630221,
+      11.693247620982678
+    ],
+    "cpu_scale_full_pipeline_observed_range_hours": [
+      46.67206447098667,
+      56.84280952367858
     ]
   },
   "limits": [
@@ -96,6 +132,7 @@
     "Training-only references exclude validation and writes; full-pipeline CPU references add observed R validation/outside-epoch/report overhead. Model/corpus-dependent scaling and GPU validation remain unmeasured.",
     "Cache disk grows in whole downloaded shard chunks; linear scaling is approximate.",
     "Disk amounts are decimal bytes/GB. The 25-GB suggestion leaves headroom beyond measured environment plus two data copies for checkpoints, source and logs; hosted storage was not tested.",
-    "Hosted installation, split latency, backup and handback download time are unmeasured."
+    "Hosted installation, split latency, backup and handback download time are unmeasured.",
+    "Observed-range projections include profile and completed R/A/S full-run rates. A outside-epoch wall includes the deliberate restart; the range is a planning reference, not a guaranteed bound. Refresh with B when complete."
   ]
 }
