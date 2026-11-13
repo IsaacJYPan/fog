@@ -14,3 +14,16 @@
 [ppo] decisions=90373  win_rate=0.660  loss=0.1581  entropy=1.412  kl=0.0100  clip=0.152  belief=1.274  self_belief=1.234
 [ppo] decisions=98769  win_rate=0.650  loss=0.1466  entropy=1.371  kl=0.0130  clip=0.162  belief=1.275  self_belief=1.231
 [ppo] decisions=106889  win_rate=0.820  loss=0.1299  entropy=1.325  kl=0.0145  clip=0.189  belief=1.273  self_belief=1.239
+[ppo] decisions=114935  win_rate=0.870  loss=0.1058  entropy=1.267  kl=0.0122  clip=0.185  belief=1.273  self_belief=1.239
+[ppo] decisions=123168  win_rate=0.870  loss=0.1062  entropy=1.272  kl=0.0175  clip=0.156  belief=1.276  self_belief=1.249
+[ppo] decisions=131225  win_rate=0.930  loss=0.1002  entropy=1.236  kl=0.0106  clip=0.112  belief=1.278  self_belief=1.252
+[ppo] decisions=139276  win_rate=0.925  loss=0.0844  entropy=1.155  kl=0.0148  clip=0.152  belief=1.276  self_belief=1.257
+[ppo] decisions=147427  win_rate=0.955  loss=0.0701  entropy=1.031  kl=0.0117  clip=0.105  belief=1.281  self_belief=1.267
+[ppo] decisions=155580  win_rate=0.970  loss=0.0521  entropy=0.972  kl=0.0169  clip=0.137  belief=1.278  self_belief=1.270
+[ppo] decisions=163639  win_rate=0.970  loss=0.0492  entropy=0.891  kl=0.0098  clip=0.078  belief=1.282  self_belief=1.276
+[ppo] decisions=171689  win_rate=0.995  loss=0.0482  entropy=0.912  kl=0.0176  clip=0.103  belief=1.284  self_belief=1.276
+[ppo] decisions=179856  win_rate=1.000  loss=0.0321  entropy=0.974  kl=0.0153  clip=0.077  belief=1.282  self_belief=1.270
+[ppo] decisions=188015  win_rate=0.970  loss=0.0634  entropy=0.959  kl=0.0015  clip=0.066  belief=1.281  self_belief=1.268
+[ppo] decisions=196237  win_rate=0.945  loss=0.0710  entropy=0.846  kl=0.0109  clip=0.080  belief=1.282  self_belief=1.277
+[ppo] decisions=204288  win_rate=0.985  loss=0.0463  entropy=0.765  kl=0.0070  clip=0.042  belief=1.282  self_belief=1.279
+[ppo] decisions=212302  win_rate=0.990  loss=0.0725  entropy=0.779  kl=0.0154  clip=0.121  belief=1.279  self_belief=1.275

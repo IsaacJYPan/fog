@@ -3,7 +3,7 @@
 **Answer (in progress).** The small problem was learned at the first checkpoint: greedy
 MaxDamage wins rose from 16.0% to 100.0% at 106,889 decisions, +84 points with non-overlapping
 95% intervals. That is 12,725 decisions per ten points at the first measured gain.
-SimpleHeuristics rose from 13.5% to 64.0% on the same team. The prescribed scaled stage 1
+By 204,288 decisions MaxDamage remains 100.0%, and SimpleHeuristics is 90.5% on the same team. The prescribed scaled stage 1
 budget is still running; improvement of the human-data blueprint is not yet measured.
 The isolated throughput check averaged 22.27 decisions/s; updates consumed 86.5% of wall time.
 Every result here is smoke. No checkpoint is a candidate and no gate is claimed.
@@ -33,12 +33,13 @@ pinned-Showdown games, win rate [95% Wilson]. Whole-update boundaries explain th
 | ---: | --- | --- |
 | 0 | 0.160 [0.116, 0.217] | 0.135 [0.094, 0.189] |
 | 106,889 | 1.000 [0.981, 1.000] | 0.640 [0.571, 0.703] |
+| 204,288 | 1.000 [0.981, 1.000] | 0.905 [0.856, 0.938] |
 
 No failures, truncations or draws in these evaluations. Intermediate evaluations run on one
 CPU thread alongside training. The first-point gain is +84 points; the brief requires at least
 +30 and non-overlapping intervals. All trainer diagnostics, including behavior-value explained
 variance against GAE returns and unshaped mean episode return, are in `scratch-metrics.csv`.
-The full budget continues; the final reading and any later points remain to be recorded.
+Later updates stop for the existing KL constraint (0.249–0.636 effective epochs in the last five recorded updates), so their higher decisions/s reflects less optimization work. The full budget continues; the final reading and any later points remain to be recorded.
 
 ## Stage 2 — not started
 

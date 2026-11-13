@@ -646,3 +646,18 @@ learning criterion at this checkpoint. First observed cost = 106889 / (84 / 10) 
 12,724.881 decisions per ten points. SimpleHeuristics 0.135 → 0.640. No held-out-team or
 gate claim follows. `scratch-metrics.csv` and `scratch-tail.txt` are an in-progress copy;
 the final run will extend them. Stage 2 has not started.
+
+Stage 1 second checkpoint, **smoke**, 204,288 decisions. Still running toward 334,049.
+Each row has zero failures, draws and truncations.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 204288 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `f7c3318301140da3ec21146b3e223c0ddc691f5a` | `scratch-204288-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_204288.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-204288-maxdamage.json --resume` |
+| 204288 | simpleheuristics (smoke) | 200 | 0.905 [0.856, 0.938] | `f7c3318301140da3ec21146b3e223c0ddc691f5a` | `scratch-204288-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_204288.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-204288-simpleheuristics.json --resume` |
+
+MaxDamage stays at 200/200; SimpleHeuristics rises to 181/200. Later updates stop for
+the existing target-KL constraint (`stopped_for_kl=1`); the five updates ending at 204,288
+process 0.249–0.636 effective epochs, rather than three. Optimization throughput remains
+70–80 processed rows/s; the increased decisions/s reflects less optimization work, not a code
+speed-up. These actual counts are retained in `scratch-metrics.csv`. The first passing point
+took 4,612.136 s of training-loop collection plus updates (sum through 106,889 in that CSV).
