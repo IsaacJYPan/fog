@@ -1,0 +1,66 @@
+BC dataset: train=2000 decision rows; holdout=400 rows  (config_hash=34d61567ab3c)
+[bc] baseline  loss=3.016  belief=4.136  chain=4.136
+[bc] epoch 1/3  train_loss=2.683  eval_loss=1.967  belief=1.596  chain=1.596  value=0.997  query_p=0.205  dropped=0.000%
+[bc] epoch 2/3  train_loss=1.521  eval_loss=1.263  belief=0.502  chain=0.502  value=0.973  query_p=0.609  dropped=0.000%
+[bc] epoch 3/3  train_loss=1.163  eval_loss=1.026  belief=0.327  chain=0.327  value=0.962  query_p=0.723  dropped=0.000%
+[bc] done -> runs/blueprint_default_equivalence/before/checkpoints/bc_final.pt  (best eval epoch=3, loss=1.026)
+BC dataset: train=2000 decision rows; holdout=400 rows  (config_hash=008e79f7af5b, torch_threads=5)
+[bc] baseline  loss=3.016  belief=4.136  chain=4.136
+[bc] epoch 1/3  train_loss=2.683  eval_loss=1.967  belief=1.596  chain=1.596  value=0.997  query_p=0.205  dropped=0.000%
+[bc] epoch 2/3  train_loss=1.521  eval_loss=1.263  belief=0.502  chain=0.502  value=0.973  query_p=0.609  dropped=0.000%
+[bc] epoch 3/3  train_loss=1.163  eval_loss=1.026  belief=0.327  chain=0.327  value=0.962  query_p=0.723  dropped=0.000%
+[bc] done -> runs/blueprint_default_equivalence/after/checkpoints/bc_final.pt  (best eval epoch=3, loss=1.026)
+{
+  "fixture": "600 generated two-turn protocol logs, not the pinned corpus",
+  "base_commit": "f0dc3d16eeecab8fbad545aed93af2b2de20a2c4",
+  "current_commit": "00a2d79ba7ee395ad0e2cba793950cc0a93e6076",
+  "command": "uv run --no-sync python docs/briefs/02-artifacts/check_default_updates.py",
+  "torch_threads": 5,
+  "steps": 24,
+  "first_20_losses_before": [
+    3.0159668922424316,
+    2.941493034362793,
+    2.857855796813965,
+    2.764796257019043,
+    2.672245502471924,
+    2.545590400695801,
+    2.381709575653076,
+    2.1918933391571045,
+    1.975207805633545,
+    1.7799162864685059,
+    1.6290967464447021,
+    1.47955322265625,
+    1.4318737983703613,
+    1.3240361213684082,
+    1.2805304527282715,
+    1.2135013341903687,
+    1.3266273736953735,
+    1.3174080848693848,
+    1.160090684890747,
+    1.1160578727722168
+  ],
+  "first_20_losses_after": [
+    3.0159668922424316,
+    2.941493034362793,
+    2.857855796813965,
+    2.764796257019043,
+    2.672245502471924,
+    2.545590400695801,
+    2.381709575653076,
+    2.1918933391571045,
+    1.975207805633545,
+    1.7799162864685059,
+    1.6290967464447021,
+    1.47955322265625,
+    1.4318737983703613,
+    1.3240361213684082,
+    1.2805304527282715,
+    1.2135013341903687,
+    1.3266273736953735,
+    1.3174080848693848,
+    1.160090684890747,
+    1.1160578727722168
+  ],
+  "all_losses_identical": true,
+  "all_final_state_tensors_identical": true
+}

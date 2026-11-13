@@ -51,6 +51,11 @@ run-to-run variation. There is no measured runtime projection for B and no new p
   setting untouched unless supplied. Trainer+scope tests: 44 passed, 3.70 s
   (`stage2-trainer-tests.txt`); switch/split tests in `stage2-report-split-tests.txt`;
   Ruff in `stage2-ruff.txt`. Implementation wall-clock was not timed.
+  A further full-recipe check on the generated fixture runs the original `f0dc3d1` trainer
+  and the new trainer with all new options absent: all 24 losses (including the first 20)
+  and every final model tensor match exactly (`stage2-default-equivalence.json`, command
+  `uv run --no-sync python docs/briefs/02-artifacts/check_default_updates.py`). This is
+  supplemental default-behaviour evidence, not run R.
 - **Stage 3: not run.** Dataset access blocks every run; no losses or runtimes invented.
 - **Stage 4: in progress.** Fixed-ID splitter and restartable runner; the actual 2,000
   replay IDs cannot be recovered without the pinned import. No substitute IDs are committed.
