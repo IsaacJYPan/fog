@@ -1,6 +1,6 @@
 # Limited learning from play — diagnostic, smoke
 
-**Answer (stage 2 pending).** The small problem was learned at the first checkpoint: greedy
+**Answer (stage 2 in progress).** The small problem was learned at the first checkpoint: greedy
 MaxDamage wins rose from 16.0% to 100.0% at 106,889 decisions, +84 points with non-overlapping
 95% intervals. That is 12,725 decisions per ten points at the first measured gain.
 At the final 334,236 decisions MaxDamage remains 100.0%, and SimpleHeuristics is 92.0% on the same team. Stage 1 finished in 2 h 10 min; improvement of the human-data blueprint is not yet measured.
@@ -42,9 +42,13 @@ CPU thread alongside training. The first-point gain is +84 points; the brief req
 variance against GAE returns and unshaped mean episode return, are in `scratch-metrics.csv`.
 Later updates stop for the existing KL constraint: 1.387 effective epochs overall, so higher decisions/s reflects less optimization work. Full-run throughput 42.81 decisions/s; full-budget cost 39,790 decisions per ten points. No fallback grid was needed.
 
-## Stage 2 — initializer ready, PPO not started
+## Stage 2 — PPO in progress
 
-The replay-host precheck returned HTTP 200. The 1,000-game/52,983-row blueprint was rebuilt through epoch eight of run A’s 18-epoch schedule; its best epoch is eight (holdout action CE 1.742139). The 2,000-game/104,037-row holdout matches the fixed IDs exactly. PPO and its pool-a/pool-b play comparisons are next; no substitute checkpoint was used.
+The replay-host precheck returned HTTP 200. The 1,000-game/52,983-row blueprint was rebuilt through epoch eight of run A’s 18-epoch schedule; its best epoch is eight (holdout action CE 1.742139). The 2,000-game/104,037-row holdout matches the fixed IDs exactly. PPO has started with the prescribed 50%/10%/40% mixture and scaled 556,748-decision budget; no substitute checkpoint was used. Each cell below is 400 greedy games, win rate [95% Wilson].
+
+| Decisions | Pool A SimpleHeuristics | Pool A MaxDamage | Pool B SimpleHeuristics | Pool B MaxDamage |
+| ---: | --- | --- | --- | --- |
+| 0 | 0.255 [0.215, 0.300] | 0.720 [0.674, 0.762] | 0.220 [0.182, 0.263] | 0.565 [0.516, 0.613] |
 
 ## Config changes and fixes
 

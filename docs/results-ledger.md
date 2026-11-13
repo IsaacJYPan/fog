@@ -722,3 +722,19 @@ and one MaxDamage entry within scripted fraction 0.6 implement 50%/10%; latest s
 The inherited 24k snapshot cadence is retained. The first saved boundary after each 200k is
 evaluated, plus the final checkpoint, with 400 games per opponent per pool. A persisted
 ten-hour deadline bounds the PPO job; the scaled decision budget remains 556,748.
+
+Stage 2 untrained-from-play blueprint baselines, **smoke**, 400 greedy pinned-Showdown
+games per row, zero failures, truncations and draws. Pool B is held out from PPO training.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 0 | pool_a | simpleheuristics (smoke) | 400 | 0.255 [0.215, 0.300] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_a.json` |
+| 0 | pool_a | maxdamage (smoke) | 400 | 0.720 [0.674, 0.762] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_a.json` |
+| 0 | pool_b | simpleheuristics (smoke) | 400 | 0.220 [0.182, 0.263] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_b.json` |
+| 0 | pool_b | maxdamage (smoke) | 400 | 0.565 [0.516, 0.613] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_b.json` |
+
+Stage-2 PPO started from the rebuilt `bc_best.pt`, using the generated overrides in
+`blueprint-runtime-overrides.json` and command `uv run --no-sync python -m fog.train
+--config runs/rl_check/blueprint/config.yaml --trainer ppo`. Budget 556,748 decisions,
+with the ten-hour deadline and full-state resume described above. The starting comparison
+for the improvement rule is SimpleHeuristics on pool A: 25.5% [21.5%, 30.0%].

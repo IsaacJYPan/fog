@@ -1,0 +1,12 @@
+{
+  "extends": "/workspace/fog/configs/rl_check_blueprint.yaml",
+  "ppo": {
+    "init_ckpt": "runs/blueprint/g1000e18/checkpoints/bc_best.pt",
+    "total_decisions": 556748
+  },
+  "league": {
+    "past_ckpts": [
+      "runs/blueprint/g1000e18/checkpoints/bc_best.pt"
+    ]
+  }
+}
