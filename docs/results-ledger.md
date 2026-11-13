@@ -709,3 +709,26 @@ NLL 1.825620, top-1 0.333946) versus action-CE selection at epoch 6 (1.810496,
 the option omitted. Sources/formulas/tensor comparison: `R-default-summary.json`,
 `R-default-metrics.csv`, both holdout JSONs and `R-default-tail.txt`. Checkpoint
 sizes/hashes are appended to `checkpoints.json`; no hosted GPU gate is claimed.
+
+Original/current real-input diagnostic **passed** at `5d2d7d5`, command
+`uv run --no-sync python docs/briefs/03-artifacts/check_real_updates.py`.
+Original `f0dc3d1` and current trainers each evaluated the complete fixed holdout
+normally, retained the six-epoch learning-rate schedule and stopped immediately
+before update 21's forward. All 20 training losses are identical (max difference
+0); all 376 parameter/persistent-buffer tensors after 20 completed updates are
+`torch.equal`. The current losses also match the profiler's first 20 exactly.
+Overall wall 426 s, exit 0; old/current trainer calls 222.034/201.122 s including
+their full baseline evaluations. Evidence: `real20-comparison.json`,
+`real20-profile-equality.json`, `real20-output.txt`, `real20-wall.txt`.
+
+Historical three-decimal reproduction remains **failed**. The full six-epoch
+flag-off control and tested original/current updates show no measured regression
+from the new options/trainer edits on this machine. Platform/runtime differences
+remain: AMD versus the historical Intel CPU, with the historical thread count
+unrecorded; specific hardware/thread/kernel contributions are not isolated.
+A/S/B can now continue unchanged. A−R and S−R are controlled comparisons on this
+machine; A/B comparisons with the legacy 3k result must be labeled cross-platform
+references. They cannot automatically establish a clean data effect, especially
+when close to seed noise or the observed R drift. No model/loss/learning-rate/
+batch/thread setting was changed for diagnosis; the historical guard was not
+relabelled as passing. `reproduction-platform.json` collects the source evidence.

@@ -6,7 +6,7 @@ Training measures 194 rows/s in the profile and 187 rows/s across R's training
 epochs; model computation accounts for 96% of the profiled step. The original
 22,000-game split and real 600-game recovery test pass. R differs from the
 historical curve, while the required flag-off repeat has identical metrics and
-final weights, so diagnosis continues before A/S/B and no data-versus-steps
+final weights, and the original/current trainers agree on 20 real updates; no data-versus-steps
 conclusion exists yet. The scale pipeline works on real data; hosted GPU
 throughput and memory remain untested.
 
@@ -15,9 +15,9 @@ throughput and memory remain untested.
 | Run (games × epochs) | Steps | Train wall / rows/s | Last NLL / top-1 | Best report NLL / top-1 (epoch) | Final train NLL | Value MSE min / last |
 | --- | ---: | --- | --- | --- | ---: | --- |
 | R (1,000 × 6) | 1,286 | 2,799.8 s / 187.06 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 |
-| A (1,000 × 18) | — | stopped pending R diagnosis | — | — | — | — |
-| S (1,000 × 6) | — | stopped pending R diagnosis | — | — | — | — |
-| B (3,000 × 18) | — | stopped pending R diagnosis | — | — | — | — |
+| A (1,000 × 18) | — | next, after diagnosis is pushed | — | — | — | — |
+| S (1,000 × 6) | — | not started | — | — | — | — |
+| B (3,000 × 18) | — | projection pending | — | — | — | — |
 
 Last-epoch fields come from `R-metrics.csv`; best fields are the standalone
 holdout report. `R-summary.json` records every source and formula; the trainer
@@ -28,7 +28,12 @@ reproduce the old curve to three decimals: baseline/epochs 1–6 are
 resume/selection omitted matches every non-timing metric and all 376 final
 parameter/buffer tensors exactly (`R-default-summary.json`). Default total-loss
 selection picks epoch 5 (standalone policy NLL 1.825620), whereas R picks epoch
-6 (1.810496). The options preserve this full training trajectory. No data-versus-steps or seed-noise conclusion
+6 (1.810496). The options preserve this full training trajectory. Original and
+current trainers also produce identical first 20 real-input losses and all 376
+parameter/buffer tensors after those updates (`real20-comparison.json`);
+their losses match the profiler exactly (`real20-profile-equality.json`).
+The historical CPU differs and its thread count was not recorded, so hardware
+versus thread/kernel contributions remain unisolated. No data-versus-steps or seed-noise conclusion
 exists yet; R's value MSE barely beats constant zero at its best and rises above
 1.0 afterward. Per-epoch value/policy curves are retained in `R-summary.json`.
 
@@ -53,7 +58,10 @@ exists yet; R's value MSE barely beats constant zero at its best and rises above
   2,737.795 s trainer wall and 107.419/125.688 s reports (2,970.903 s combined),
   matching R's non-timing metrics and all final tensors exactly. The saved
   pre-launch projection was 2,939.569 s (`R-default-projection.json`). A/S/B
-  remain stopped pending the approved original/current 20-real-update diagnostic.
+  can now continue with the failed historical guard explicitly recorded. The
+  original/current real-20 diagnostic passed in 426 s wall (222.034/201.122 s
+  trainer calls, each including full baseline evaluation), with exact losses
+  and all tensors equal (`real20-{comparison.json,output.txt,wall.txt}`).
   Baseline normalized metrics agree
   within 2.49e-8. Current CPU is AMD EPYC 9V74; brief 01 recorded Intel Xeon
   2.10 GHz. This platform difference is observed, not yet an isolated cause
@@ -85,12 +93,16 @@ runner test were already underway and are retained as evidence. No question was
 put to the owner. Commands and original outputs are in `03-artifacts/`; setup
 evidence names retain a `continuation-` prefix. The import source shard was cached
 from the genuine main import before the runner test. The runner still called and
-verified the existing importer.
+verified the existing importer. R's historical reproduction failed; the required
+flag-off repeat and original/current real-20 check ran before the other
+comparisons. A−R and S−R are controlled on this machine; comparisons with the
+legacy 3k run remain cross-platform references, rather than a clean isolated
+data effect. No application code or runtime tuning was introduced for diagnosis.
 
 ## Not verified
 
-R's historical curve reproduction (failed; flag-off options isolated, original/current
-20-real-update diagnostic pending); A/S/B;
+R's historical curve reproduction (failed; full flag-off and original/current
+real-20 equality passed); A/S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints

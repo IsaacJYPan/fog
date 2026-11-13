@@ -10,7 +10,7 @@
   "historical_cpu_description": "4 vCPU Intel Xeon @ 2.10 GHz",
   "historical_torch_version": "2.13.0+cu130",
   "historical_actual_torch_threads": "not recorded",
-  "interpretation": "Resume/selection options preserve all six-epoch non-timing metrics and final model tensors on the current CPU. The historical curve still differs; original/current 20-real-update diagnostic is next. CPU-platform contribution is not isolated.",
+  "interpretation": "Resume/selection preserve the complete six-epoch trajectory on this CPU; original/current trainers also match all 20 real-input losses and all 376 tensors after 20 updates. The historical trajectory still differs. CPU platforms differ and the historical thread count is unrecorded; hardware versus thread/kernel contributions cannot be isolated here.",
   "source_comparison_command": [
     "git",
     "diff",
@@ -184,5 +184,9 @@
   },
   "flag_off_full_repeat_summary": "R-default-summary.json",
   "flag_off_all_non_timing_metrics_identical": true,
-  "flag_off_all_final_tensors_identical": true
+  "flag_off_all_final_tensors_identical": true,
+  "real20_source": "real20-comparison.json",
+  "original_current_first20_losses_identical": true,
+  "original_current_after20_tensors_identical": true,
+  "profile_loss_equality_source": "real20-profile-equality.json"
 }

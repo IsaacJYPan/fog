@@ -1,0 +1,98 @@
+{
+  "status": "passed_20_update_diagnostic",
+  "full_training_run": false,
+  "scope": "20 CPU updates on the real 1000-game training split, not a full reproduction",
+  "baseline_evaluation": "complete fixed holdout evaluated normally in each trainer",
+  "base_commit": "f0dc3d16eeecab8fbad545aed93af2b2de20a2c4",
+  "current_commit": "5d2d7d5dc94b88488f1a57b4d957364cb1e2e7d3",
+  "command": "uv run --no-sync python docs/briefs/03-artifacts/check_real_updates.py",
+  "torch_version": "2.13.0+cu130",
+  "external_python_numpy_seed": 123,
+  "completed_updates_per_trainer": 20,
+  "original_run": {
+    "config": "configs/replay_blueprint_cpu.yaml",
+    "overrides": [
+      "bc.manifest=runs/blueprint/split/train_1000.parquet",
+      "bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet",
+      "bc.streaming=true",
+      "bc.epochs=6",
+      "bc.early_stopping_patience=0",
+      "log.dir=runs/blueprint/original-current-real20/original"
+    ],
+    "new_options_absent": [
+      "bc.resume",
+      "bc.selection_metric",
+      "bc.torch_threads"
+    ],
+    "torch_threads": 5,
+    "wall_seconds_including_full_baseline_evaluation": 222.03432556999906
+  },
+  "current_run": {
+    "config": "configs/replay_blueprint_cpu.yaml",
+    "overrides": [
+      "bc.manifest=runs/blueprint/split/train_1000.parquet",
+      "bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet",
+      "bc.streaming=true",
+      "bc.epochs=6",
+      "bc.early_stopping_patience=0",
+      "log.dir=runs/blueprint/original-current-real20/current"
+    ],
+    "new_options_absent": [
+      "bc.resume",
+      "bc.selection_metric",
+      "bc.torch_threads"
+    ],
+    "torch_threads": 5,
+    "wall_seconds_including_full_baseline_evaluation": 201.12173428700044
+  },
+  "first_20_losses_before": [
+    3.7176108360290527,
+    3.7209677696228027,
+    3.658639907836914,
+    3.6672189235687256,
+    3.629140853881836,
+    3.6460916996002197,
+    3.597897529602051,
+    3.5662946701049805,
+    3.6037933826446533,
+    3.5303897857666016,
+    3.519587278366089,
+    3.5668399333953857,
+    3.4788646697998047,
+    3.465700626373291,
+    3.4775166511535645,
+    3.408133029937744,
+    3.4530394077301025,
+    3.4024391174316406,
+    3.4144206047058105,
+    3.342712879180908
+  ],
+  "first_20_losses_after": [
+    3.7176108360290527,
+    3.7209677696228027,
+    3.658639907836914,
+    3.6672189235687256,
+    3.629140853881836,
+    3.6460916996002197,
+    3.597897529602051,
+    3.5662946701049805,
+    3.6037933826446533,
+    3.5303897857666016,
+    3.519587278366089,
+    3.5668399333953857,
+    3.4788646697998047,
+    3.465700626373291,
+    3.4775166511535645,
+    3.408133029937744,
+    3.4530394077301025,
+    3.4024391174316406,
+    3.4144206047058105,
+    3.342712879180908
+  ],
+  "all_losses_identical": true,
+  "maximum_loss_absolute_difference": 0.0,
+  "state_dict_tensor_count_before": 376,
+  "state_dict_tensor_count_after": 376,
+  "all_parameters_and_persistent_buffers_identical": true,
+  "differing_state_dict_tensor_names": []
+}
