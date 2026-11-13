@@ -16,8 +16,8 @@ throughput and memory remain untested.
 | --- | ---: | --- | --- | --- | ---: | --- |
 | R (1,000 × 6) | 1,286 | 2,799.8 s / 187.06 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 |
 | A (1,000 × 18) | 3,870 | 9,355.4 s / 157.72 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 |
-| S (1,000 × 6) | — | not started | — | — | — | — |
-| B (3,000 × 18) | — | projection pending | — | — | — | — |
+| S (1,000 × 6) | 1,286 | 3,224.9 s / 158.59 | 1.794974 / 0.345247 | 1.794978 / 0.345246 (6) | 1.718056 | 0.999632 / 1.237886 |
+| B (3,000 × 18) | — | next; conservative budget 21,405 s | — | — | — | — |
 
 Last-epoch fields come from `R-metrics.csv`; best fields are the standalone
 holdout report. `R-summary.json` records every source and formula; the trainer
@@ -33,13 +33,15 @@ current trainers also produce identical first 20 real-input losses and all 376
 parameter/buffer tensors after those updates (`real20-comparison.json`);
 their losses match the profiler exactly (`real20-profile-equality.json`).
 The historical CPU differs and its thread count was not recorded, so hardware
-versus thread/kernel contributions remain unisolated. No data-versus-steps or seed-noise conclusion
-exists yet; R's value MSE barely beats constant zero at its best and rises above
+versus thread/kernel contributions remain unisolated. The final reading awaits B;
+R's value MSE barely beats constant zero at its best and rises above
 1.0 afterward. Per-epoch value/policy curves are retained in `R-summary.json`.
 A overfits: its last training/holdout policy NLL are 1.241824/1.948926, a
 0.707102 gap; its selected epoch-8 policy is better than its final policy.
-At the completed schedule, A is 0.138436 NLL worse than R despite higher top-1;
-the S noise estimate remains pending (`A-summary.json`). This is a controlled
+At the completed schedule, A is 0.138436 NLL worse than R despite higher top-1.
+The two-seed NLL difference |S−R| is 0.015516, so effects below about 0.031031
+are not claimed; A's deterioration exceeds that threshold (`S-summary.json`,
+`A-summary.json`). This is a controlled
 same-machine comparison. Legacy 3k comparisons remain cross-platform references.
 
 ## Per stage
@@ -85,7 +87,11 @@ same-machine comparison. Legacy 3k comparisons remain cross-platform references.
   children started with NumPy/Torch absent, then produced identical 20 losses
   and all 376 tensors, also matching the shared-process control. Controller
   wall was 451.193 s, child walls 223.349/226.382 s
-  (`fresh-real20/`). S/B remain unstarted.
+  (`fresh-real20/`). S completed in 3,224.913 s trainer wall plus 131.955/130.175 s
+  reports, 3,487.043 s total versus its 3,477.248 s conservative projection
+  (`S-summary.json`, `S-projection.json`). Its only intended difference from R is
+  seed 20261202. B is budgeted below eight hours: 5.02 h at the stage-1 training
+  rate, or 5.95 h at the slower recent rate (`B-projection.json`).
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
   were deleted. The identical command skipped import/conversion/split, was killed
@@ -122,7 +128,7 @@ data effect. No application code or runtime tuning was introduced for diagnosis.
 ## Not verified
 
 R's historical curve reproduction (failed; full flag-off and original/current
-real-20 and fresh-process startup controls passed); S/B;
+real-20 and fresh-process startup controls passed); B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints

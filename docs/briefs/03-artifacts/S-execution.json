@@ -1,0 +1,34 @@
+{
+  "run": "S",
+  "games": 1000,
+  "epochs": 6,
+  "commit": "aed6f68253302b51e878c4e6e86665594e158fd1",
+  "attempts": [
+    {
+      "started_utc": "2026-11-13 09:48:45 UTC",
+      "exit_code": 0,
+      "seconds": 3224.912673417999,
+      "deliberately_interrupted": false
+    }
+  ],
+  "reports": [
+    {
+      "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint/split/holdout_manifest.parquet --checkpoint runs/blueprint/g1000e6s2/checkpoints/bc_best.pt --out runs/blueprint/g1000e6s2/holdout-best.json",
+      "seconds": 131.9551775309992
+    },
+    {
+      "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint/split/holdout_manifest.parquet --checkpoint runs/blueprint/g1000e6s2/checkpoints/bc_final.pt --out runs/blueprint/g1000e6s2/holdout-final.json",
+      "seconds": 130.1753943440017
+    }
+  ],
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=6 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e6s2 seed=20261202",
+  "completed_epochs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ]
+}

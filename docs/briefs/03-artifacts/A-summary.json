@@ -243,7 +243,10 @@
     "final_policy_nll_A_minus_R": 0.1384358569291162,
     "final_policy_top1_A_minus_R": 0.028043113041097356,
     "best_report_policy_nll_A_minus_R": -0.07441416424535152,
-    "noise_estimate_status": "S not yet run; effect-size reading remains pending",
-    "formula": "A metric minus corresponding R metric, same current CPU/seed/data/batch, different completed schedule length"
+    "noise_estimate_status": "S completed; see S-summary.json controlled_comparison_with_R",
+    "formula": "A metric minus corresponding R metric, same current CPU/seed/data/batch, different completed schedule length",
+    "noise_absolute_NLL_difference": 0.015515575467418996,
+    "twice_noise_NLL_difference": 0.031031150934837992,
+    "absolute_final_A_minus_R_exceeds_twice_noise": true
   }
 }

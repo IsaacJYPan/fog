@@ -664,8 +664,8 @@ per-epoch policy/value curves and timing formulas: `R-summary.json`,
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | R | 1,000 / 6 / 1,286 | 2,799.785 s / 187.060 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 | `247a1e1` |
 | A | 1,000 / 18 / 3,870 | 9,355.371 s / 157.725 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 | `41b6ffd` |
-| S | 1,000 / 6 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
-| B | 3,000 / 18 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
+| S | 1,000 / 6 / 1,286 | 3,224.913 s / 158.587 | 1.794974 / 0.345247 | 1.794978 / 0.345246 (6) | 1.718056 | 0.999632 / 1.237886 | `aed6f68` |
+| B | 3,000 / 18 / unmeasured | budgeted below eight hours; next | — | — | — | — | — |
 
 R best/final reports took 108.494/110.127 s, total trainer+reports 3,018.406 s.
 Mean epoch validation is 154.662 s, derived as
@@ -788,3 +788,31 @@ their output files and supervisor output/result. Tensor snapshots remain
 ignored; only text/JSON are pushed. The tested startup-order gap changes no
 measured updates. Historical reproduction remains failed with specific runtime/
 platform contributions unisolated; this control does not turn it into a pass.
+
+S started at 09:48:45 UTC after the fresh control was reviewed and pushed,
+invocation `uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py S`.
+The only intended difference from R is seed 20261202. Pre-launch projection
+`S-projection.json` retains the stage-1 rate: 6×52,983/194.039961 plus seven
+recent-A validation passes and its two report walls = 3,100.036 s. A conservative
+budget using A's observed 157.724799 rows/s is 3,477.248 s. Runtime settings
+remain unchanged; the different measured rates are planning sensitivity, not
+runtime variants. Exact command/commit/attempts are in `S-execution.json`.
+
+S **completed**, 1,286 updates, selected epoch 6. Trainer wall 3,224.913 s;
+best/final reports 131.955/130.175 s; combined 3,487.043 s versus the conservative
+3,477.248 s projection. Pure training 158.587 rows/s, mean validation 170.227 s.
+Sources/formulas/per-epoch policy/value curves: `S-summary.json`, `S-metrics.csv`,
+`S-tail.txt`, both holdout JSON/output files; checkpoints in `checkpoints.json`.
+S−R last-epoch NLL is −0.015516, absolute seed difference 0.015516, twice that
+0.031031. Per the brief, no smaller difference is called an effect. A−R's
+0.138436 final deterioration is above that rough threshold; A overfits, while
+its epoch-8 selected policy is better than its final policy. Exact controlled
+deltas/noise calculations are in the S/A summaries. Legacy 3k comparisons remain
+cross-platform references.
+
+B budget saved before launch in `B-projection.json`: 18×156,597/194.039961
+training seconds plus 19 holdout passes and two reports; it also budgets the
+slower observed A/S training rate and larger validation/report times. Both the
+stage-1 reference (18,060.446 s, 5.02 h) and conservative recent-rate total
+(21,405.112 s, 5.95 h) are below the eight-hour limit, so B will run serially
+with every prescribed training setting unchanged.
