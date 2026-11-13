@@ -1,0 +1,104 @@
+Using CPython 3.12.14 interpreter at: /opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3
+Creating virtual environment at: .venv
+Resolved 88 packages in 5ms
+   Building fog @ file:///workspace/fog
+Downloading nvidia-cusolver (191.6MiB)
+Downloading tensorboard-data-server (6.3MiB)
+Downloading networkx (2.0MiB)
+Downloading nvidia-cuda-runtime (2.1MiB)
+Downloading scipy (33.7MiB)
+Downloading grpcio (6.6MiB)
+Downloading nvidia-cufile (1.2MiB)
+Downloading tensorboard (5.3MiB)
+Downloading pygments (1.2MiB)
+Downloading pillow (6.6MiB)
+Downloading triton (188.6MiB)
+Downloading nvidia-cusparselt-cu13 (162.3MiB)
+Downloading nvidia-cuda-nvrtc (86.0MiB)
+Downloading nvidia-cusparse (139.2MiB)
+Downloading mypy (14.6MiB)
+Downloading aiohttp (1.7MiB)
+Downloading nvidia-nvjitlink (38.9MiB)
+Downloading ast-serialize (1.2MiB)
+Downloading torch (502.2MiB)
+Downloading sympy (6.0MiB)
+Downloading nvidia-nvshmem-cu13 (57.6MiB)
+Downloading scikit-learn (8.7MiB)
+Downloading cuda-bindings (6.3MiB)
+Downloading numpy (15.9MiB)
+Downloading nvidia-cufft (204.2MiB)
+Downloading nvidia-cublas (403.5MiB)
+Downloading nvidia-cudnn-cu13 (349.2MiB)
+Downloading poke-env (1.3MiB)
+Downloading polars-runtime-32 (54.6MiB)
+Downloading pyarrow (47.8MiB)
+Downloading nvidia-cuda-cupti (10.2MiB)
+Downloading ruff (10.9MiB)
+Downloading nvidia-curand (56.8MiB)
+Downloading nvidia-nccl-cu13 (196.4MiB)
+Downloading hypothesis (1.1MiB)
+ Downloaded nvidia-cufile
+ Downloaded ast-serialize
+ Downloaded networkx
+ Downloaded aiohttp
+ Downloaded nvidia-cuda-runtime
+ Downloaded pygments
+   Building poke-engine==0.0.48
+ Downloaded hypothesis
+ Downloaded grpcio
+ Downloaded mypy
+ Downloaded ruff
+ Downloaded numpy
+ Downloaded scipy
+ Downloaded sympy
+ Downloaded nvidia-cuda-cupti
+ Downloaded tensorboard
+ Downloaded scikit-learn
+ Downloaded poke-env
+ Downloaded tensorboard-data-server
+ Downloaded cuda-bindings
+ Downloaded nvidia-nvjitlink
+ Downloaded pillow
+      Built fog @ file:///workspace/fog
+ Downloaded pyarrow
+ Downloaded nvidia-curand
+error: Failed to build `poke-engine==0.0.48`
+  cause: The build backend returned an error
+  cause: Call to `maturin.build_wheel` failed (exit status: 1)
+
+         [stdout]
+         Rust not found, installing into a temporary directory
+
+         [stderr]
+         Python reports SOABI: cpython-312-x86_64-linux-gnu
+         Computed rustc target triple: x86_64-unknown-linux-gnu
+         Installation directory: /home/agent/.cache/puccinialin
+         Traceback (most recent call last):
+           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1311, in mkdir
+             os.mkdir(self, mode)
+         FileNotFoundError: [Errno 2] No such file or directory: '/home/agent/.cache/puccinialin/rustup-init'
+
+         During handling of the above exception, another exception occurred:
+
+         Traceback (most recent call last):
+           File "<string>", line 11, in <module>
+           File "/tmp/fog-uv-cache/builds-v0/.tmpFnXUsb/lib/python3.12/site-packages/maturin/__init__.py", line 145, in build_wheel
+             return _build_wheel(wheel_directory, config_settings, metadata_directory)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           File "/tmp/fog-uv-cache/builds-v0/.tmpFnXUsb/lib/python3.12/site-packages/maturin/__init__.py", line 118, in _build_wheel
+             env = _get_env()
+                   ^^^^^^^^^^
+           File "/tmp/fog-uv-cache/builds-v0/.tmpFnXUsb/lib/python3.12/site-packages/maturin/__init__.py", line 83, in _get_env
+             extra_env = setup_rust()
+                         ^^^^^^^^^^^^
+           File "/tmp/fog-uv-cache/builds-v0/.tmpFnXUsb/lib/python3.12/site-packages/puccinialin/_setup_rust.py", line 116, in setup_rust
+             rustup_init_dir.mkdir(parents=True, exist_ok=True)
+           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1315, in mkdir
+             self.parent.mkdir(parents=True, exist_ok=True)
+           File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1311, in mkdir
+             os.mkdir(self, mode)
+         OSError: [Errno 30] Read-only file system: '/home/agent/.cache/puccinialin'
+
+hint: `poke-engine` (v0.0.48) was included because `fog` (v0.0.1) depends on `poke-engine`
+
+hint: Build failures usually indicate a problem with the package or the build environment

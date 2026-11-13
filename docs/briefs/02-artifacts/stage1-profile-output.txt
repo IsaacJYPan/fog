@@ -1,0 +1,30 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/workspace/fog/fog/scripts/profile_replay_training.py", line 196, in <module>
+    main()
+  File "/workspace/fog/fog/scripts/profile_replay_training.py", line 171, in main
+    ds = StreamingReplayDataset(args.manifest, shard_buffer=int(bc.get("shard_buffer", 64)))
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/fog/fog/training/dataset.py", line 171, in __init__
+    manifest = pl.read_parquet(manifest_path)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 132, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 132, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/polars/io/parquet/functions.py", line 293, in read_parquet
+    return lf.collect()
+           ^^^^^^^^^^^^
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py", line 97, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py", line 361, in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py", line 2624, in collect
+    return wrap_df(ldf.collect(engine, callback))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: No such file or directory (os error 2): runs/blueprint/split/train_1000.parquet

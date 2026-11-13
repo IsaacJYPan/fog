@@ -466,3 +466,31 @@ Play strength (0.258 against SimpleHeuristics, smoke) comes from an under-traine
 does not yet say whether the roadmap's covariate-shift case applies. Gate G2 stays open.
 Training speed was 112 to 141 rows/s on four cores; 100,000 games (about 5.2 million rows) for
 six epochs is about 70 hours at that rate, so the scale run needs a GPU or a faster trainer.
+
+## 2026-11-12: replay trainer profile, resume, and the data-or-steps runs (ROADMAP P2)
+
+Brief `docs/briefs/02-p2-scale-prep.md`; report `docs/briefs/02-report.md`; branch
+`work/p2-scale-prep`, base `f0dc3d1`. Evidence: `docs/briefs/02-artifacts/`.
+Executor timestamps are 2026-11-13 UTC; section date uses the owner's local date.
+
+Stage 1 **blocked on the real corpus**: pinned import command in `02-report.md`, output
+`stage0-import-output.txt`, failed with proxy tunnel HTTP 403 for `huggingface.co`.
+No local shards/splits were present. Profiling invocation
+`uv run --no-sync python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-before`
+failed on the absent `train_1000.parquet` (`stage1-profile-output.txt`). Before/after step
+components, belief share, top-15 profile and batch-only rows/s are **unmeasured**.
+No batch optimisation or thread-default change was made. PyTorch threads: 5 intra-op,
+5 inter-op; 4-core quota; no GPU (`environment.txt`). The profiler's independent CPU
+update-loop check preserves 20 losses exactly on made-up inputs (4 tests, 3.66 s,
+`stage1-tests.txt`); this does not substitute for the required replay comparison.
+
+| Run | Games / epochs requested | Steps / wall / rows/s | Last / best NLL and top-1 | Final train NLL | Value MSE best / last | Command / commit / status |
+| --- | --- | --- | --- | --- | --- | --- |
+| R | 1000 / 6 | unmeasured | unmeasured | unmeasured | unmeasured | brief stage 3 R command, not run: no corpus |
+| A | 1000 / 18 | unmeasured | unmeasured | unmeasured | unmeasured | brief stage 3 A command, not run: no corpus |
+| S | 1000 / 6 | unmeasured | unmeasured | unmeasured | unmeasured | brief stage 3 S command, not run: no corpus |
+| B | 3000 / 18 | unmeasured | unmeasured | unmeasured | unmeasured | brief stage 3 B command, not run: no corpus |
+
+Data versus training length and seed noise **cannot be determined**. No new value or switch
+claim, runtime projection, or play-strength result exists. Stages 2 and 4 are in progress;
+missing exact fixed holdout IDs and the real runner smoke remain explicit blockers. G2 stays open.
