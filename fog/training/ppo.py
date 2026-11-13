@@ -759,7 +759,9 @@ class _TrainSetup:
             beta=self.beta, clip_deltas=bool(self.leak_cfg.get("clip_delta", True)),
             progress_coef=float(cfg.get("reward", {}).get("progress_coef", 0.0)),
         )
-        self.dash = _Dashboard(cfg.get("log", {}).get("dir", "runs"))
+        self.dash = _Dashboard(
+            cfg.get("log", {}).get("dir", "runs"), resume=bool(self.ppo_cfg.get("resume_ckpt"))
+        )
 
         # Pool truth supplies belief labels and the hidden-information check.
         self.pool_truth = None

@@ -9,13 +9,13 @@ from pathlib import Path
 class TrainingDashboard:
     """CSV plus optional TensorBoard scalar logger with a complete evolving header."""
 
-    def __init__(self, log_dir: str) -> None:
+    def __init__(self, log_dir: str, *, resume: bool = False) -> None:
         self.dir = Path(log_dir)
         self.dir.mkdir(parents=True, exist_ok=True)
         self.csv = self.dir / "metrics.csv"
         self.keys: list[str] = []
         self.rows: list[tuple[int, dict]] = []
-        if self.csv.exists():
+        if resume and self.csv.exists():
             # A resumed trainer must append to its earlier measurements. In particular, the
             # first new metric must not rewrite the file using only this process's rows.
             with self.csv.open(newline="", encoding="utf-8") as stream:

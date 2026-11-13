@@ -30,7 +30,8 @@ league:
   past_frac: 0.0
   scripted_frac: 0.6
   scripted: [SimpleHeuristics, SimpleHeuristics, SimpleHeuristics, SimpleHeuristics, SimpleHeuristics, MaxDamage]
-  snapshot_every_decisions: 200000
+  # Keep the inherited 24k latest-self refresh. At launch, seed league.past_ckpts
+  # with the same rebuilt blueprint passed as ppo.init_ckpt so self play starts at once.
 
 log:
   dir: runs/rl_check/blueprint

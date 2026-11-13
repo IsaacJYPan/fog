@@ -567,3 +567,42 @@ access and is now tracked as `data/replay_splits/p2_holdout_2000_ids.txt`:
   2026-02-20 02:05, as in `docs/briefs/01-artifacts/stage2-split-summary.txt`.
 - Converting only those 2,000 games (`convert_replay_decisions --imputations 1 --workers 4`)
   gave 104,037 accepted rows, the brief 01 holdout row count.
+
+## 2026-11-13: limited learning-from-play check (diagnostic, smoke)
+
+Brief `docs/briefs/04-limited-rl-check.md`; branch `work/rl-check`. All numbers in this
+section are **smoke**, no gate is claimed, and no checkpoint is a candidate. Four CPU cores,
+16 GiB limit, Python 3.12.14, no GPU; pinned Showdown
+`e440c4a18385274f10c405d0b158b6a962ce6d94`. Artifacts: `docs/briefs/04-artifacts/`.
+
+Stage 0, code `c7476c95b14701cb2d57d1df68579ef3ef8b7f6a`:
+`OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 uv run --no-sync python -m fog.train --config
+configs/rl_check_scratch.yaml --trainer ppo --set ppo.total_decisions=20000
+log.dir=runs/rl_check/stage0`. Random weights, first `pool_a` team on both sides,
+MaxDamage only, four process workers with two actor threads each. Whole games/batches gave
+20,336 learner decisions. Collection 118.818 s (171.153 decisions/s); update 790.123 s
+(25.738 unique rows/s); PPO optimization 783.404 s for 61,008 processed rows
+(77.876 rows/s, exactly three epochs). Wall 913.160 s, 22.269 decisions/s end to end.
+`stage0-metrics.csv`, `stage0-summary.json`, `stage0-tail.txt`. One 1.73 s dashboard unit test
+ran during the first update; otherwise idle, timings approximate.
+
+Collection profile, `PYTHONPATH=. uv run --no-sync python
+ docs/briefs/04-artifacts/profile_collection.py` at `b33fe70`: 64 games, 1,563 learner
+ decisions, 16.508 s under cProfile. Node round trip including JSON 14.0%, observation
+ construction 24.0%, model forward 43.7%, other 18.3%. Node CPU separately 2.550 s;
+ it is not an additive wall-time category. Both belief-head forward counters were zero while
+ acting. Single-process profile of the same worker path, not a four-process wall trace.
+ `stage0-profile.json` and `stage0-profile.txt` (top 30 cumulative entries).
+
+Failed setup attempts, before any completed PPO update: the original 20k command at `9bea817`
+was OOM-killed twice (55.602 / 53.663 s; `stage0-oom*-tail.txt`). A 1,024-decision diagnostic
+also exited 137, as did an uncommitted whole-forward checkpointing experiment
+(`checkpointing-whole-forward-oom.txt`). Separate checkpointing of the backbone, shared latent,
+belief and self-belief blocks resolved the peak: the memory-fix smoke completed 1,180 decisions
+in 60.470 s (`memory-fix-smoke-*`). No initial checkpoint existed to resume these failed attempts;
+all restarted from random weights, separately from stage 1. This changes activation storage,
+not the model, losses, batches or optimizer steps. Eight recorded Showdown observations, two
+epochs: parameters, metrics and RNG bit-identical to ordinary updates at four learner threads
+(`check_checkpointing.py`, `checkpointing-equivalence.json`). Focused verification: 31 tests
+passed, lint clean (`focused-tests.txt`, `ruff.txt`). The dashboard fix preserves existing rows
+only for an explicit resume; fresh-run behavior stays unchanged.

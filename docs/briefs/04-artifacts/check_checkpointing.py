@@ -22,6 +22,7 @@ def main():
     batch = _index_nested(batch, torch.arange(8))
     agent.requires_grad_(True)
     torch.set_grad_enabled(True)
+    torch.set_num_threads(4)
     other = deepcopy(agent)
     cfg['ppo'].update(epochs=2, minibatch_size=4, activation_checkpointing=False)
     rng = torch.random.get_rng_state()
