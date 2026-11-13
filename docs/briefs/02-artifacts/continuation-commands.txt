@@ -1,0 +1,26 @@
+Continuation from work/roadmap at 4f9d75c6f2a2562153809263ab7dc2d292e04540.
+Working directory: /workspace/fog-roadmap. No hosted workflows or pull requests.
+
+Setup:
+git clone --branch work/roadmap --single-branch https://github.com/IsaacJYPan/fog.git /workspace/fog-roadmap
+git switch -c work/p2-scale-prep
+git config user.name 'Isaac Pan'
+git config user.email '154495180+IsaacJYPan@users.noreply.github.com'
+git submodule update --init --recursive
+UV_CACHE_DIR=/tmp/fog-uv-cache XDG_CACHE_HOME=/tmp/fog-cache CARGO_HOME=/tmp/fog-cargo RUSTUP_HOME=/tmp/fog-rustup uv sync --locked --extra dev
+npm_config_cache=/tmp/fog-npm-cache npm --prefix server/pokemon-showdown ci --ignore-scripts
+npm_config_cache=/tmp/fog-npm-cache npm --prefix server/pokemon-showdown run build
+
+Access probe: HTTP 200 from
+curl -sS -o /tmp/fog-dataset-access.json -w '%{http_code}\n' -m 30 https://huggingface.co/api/datasets/jakegrigsby/metamon-raw-replays
+
+The following uv commands use UV_CACHE_DIR=/tmp/fog-uv-cache.
+uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_profile_replay_training.py tests/test_bc_resume.py tests/test_bc_metrics.py tests/test_bc_scope.py tests/test_replay_holdout_report.py tests/test_split_replay_manifest.py tests/test_run_replay_blueprint.py
+uv run --no-sync python -m ruff check fog tests
+
+Data recreation (detached jobs; output and exit/wall-time files under runs/blueprint/setup):
+uv run --no-sync python -m fog.scripts.import_metamon_replays --out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600
+uv run --no-sync python -m fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/metamon_gen9ou_r1500_decisions --imputations 1 --workers 4
+uv run --no-sync python -m fog.scripts.split_replay_manifest --manifest data/metamon_gen9ou_r1500_decisions/manifest.parquet --out runs/blueprint/split --chronological-holdout-games 2000 --train-sizes 40 1000 3000 10000 20000
+uv run --no-sync python -m fog.scripts.split_replay_manifest --manifest data/metamon_gen9ou_r1500_decisions/manifest.parquet --out runs/blueprint/split_fixed --holdout-ids data/replay_splits/p2_holdout_2000_ids.txt --train-sizes 20000
+uv run --no-sync python docs/briefs/02-artifacts/verify_split.py

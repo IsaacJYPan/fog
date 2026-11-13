@@ -1,5 +1,15 @@
 # Brief 02: replay scale preparation
 
+Continuation in progress from reviewed `work/roadmap` commit `4f9d75c`, on
+`work/p2-scale-prep`. The pinned dataset metadata endpoint now returns HTTP 200;
+the corpus import is running. The fixed holdout IDs are already tracked by that
+review commit. A fresh locked install and pinned Showdown build succeeded; the
+82 focused tests passed in 20.26 s, and Ruff is clean. This machine has four CPU
+cores of quota, 16 GiB memory and no CUDA device. See `continuation-commands.txt`,
+`continuation-environment.json`, `continuation-tests.txt` and `continuation-ruff.txt`
+in `02-artifacts/`. The prior attempt's report below is retained until these
+measurements finish; its access/holdout blockers describe that earlier attempt.
+
 ## Answer
 
 Training speed and its bottleneck on the pinned replay corpus remain unmeasured because

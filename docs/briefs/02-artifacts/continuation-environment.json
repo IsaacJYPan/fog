@@ -1,0 +1,10 @@
+{
+  "python": "3.12.14",
+  "torch": "2.13.0+cu130",
+  "cuda_available": false,
+  "cpu_count": 5,
+  "torch_threads": 5,
+  "torch_interop_threads": 5,
+  "cpu_quota": "400000 100000",
+  "memory_max": "17179869184"
+}
