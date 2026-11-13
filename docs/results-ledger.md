@@ -671,3 +671,26 @@ a warm-started model is updated, saved, its initializer deleted, and its paramet
 moments restored exactly. Ordinary initialization and PPO update math are unchanged. Updated
 focused verification: **32 passed**, lint clean (`focused-tests.txt`, `ruff.txt`). The running
 scratch job was not restarted or altered by this fix.
+
+Stage 1 completed, **smoke**, uninterrupted: 334,236 decisions versus scaled budget 334,049
+(whole-game overshoot), 41 updates, no restarts. Training command and its starting commit
+`2793b3087b54bccd915831358f813b3f3e070198` are in `scratch-summary.json` / `commands.jsonl`.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 302039 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-302039-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_302039.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-302039-maxdamage.json --resume` |
+| 302039 | simpleheuristics (smoke) | 200 | 0.930 [0.886, 0.958] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-302039-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_302039.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-302039-simpleheuristics.json --resume` |
+| 334236 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-334236-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_final.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-334236-maxdamage.json --resume` |
+| 334236 | simpleheuristics (smoke) | 200 | 0.920 [0.874, 0.950] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-334236-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_final.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-334236-simpleheuristics.json --resume` |
+
+Final reading: **learned** by the stated fixed-team rule, MaxDamage 16% → 100%,
++84 points with non-overlapping intervals. No fallback grid is run. SimpleHeuristics
+13.5% → 92.0% on the same team. First observed cost 12,724.881 decisions per ten points;
+full-budget cost 39790.000. Wall 7807.432 s
+(42.810 decisions/s), collection 1837.584 s,
+update 5966.054 s; 463589 optimization rows,
+1.387 effective epochs overall. Later updates stop for target KL.
+Endpoint entropy / measured policy KL / clip fraction / value loss / value explained variance /
+mean episode return: 0.45304 / 0.01359 / 0.04069 / 0.00677 / -0.05549 / 0.99457.
+All per-update diagnostics and the last 60 log lines are retained. Stage 2 is now eligible;
+no gate or held-out-team claim is made.
