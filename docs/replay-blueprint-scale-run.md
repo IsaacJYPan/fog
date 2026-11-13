@@ -19,7 +19,7 @@ and use a machine with access.
    set -e
    git clone https://github.com/IsaacJYPan/fog /kaggle/working/fog
    cd /kaggle/working/fog
-   git checkout 5d2d7d5dc94b88488f1a57b4d957364cb1e2e7d3
+   git checkout 0e937552905ac93b36938f2d765384651d7b2185
    git submodule update --init --recursive
    ```
 
@@ -95,8 +95,8 @@ and use a machine with access.
      ```
 
    - Upload that archive as a private Kaggle dataset. In the next session enable
-     GPU/Internet, repeat cells 2–3 at the same commit, and attach the saved dataset
-     with **Add Input**.
+     Internet and the same GPU accelerator type/count, repeat cells 2–3 at the
+     same commit, and attach the saved dataset with **Add Input**.
    - Restore it into the writable checkout with this Python cell:
 
      ```python
