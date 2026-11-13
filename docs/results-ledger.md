@@ -694,3 +694,31 @@ Endpoint entropy / measured policy KL / clip fraction / value loss / value expla
 mean episode return: 0.45304 / 0.01359 / 0.04069 / 0.00677 / -0.05549 / 0.99457.
 All per-update diagnostics and the last 60 log lines are retained. Stage 2 is now eligible;
 no gate or held-out-team claim is made.
+
+Stage 2 initializer reconstructed, **smoke / diagnostics**, at code
+`120bd43f90949c64b3efeda7b420615ae8a28d12`. Replay-host precheck returned 200.
+The pinned 22,000-game import, single-imputation conversion, chronological split and fixed-ID
+check succeeded: training 1,000 games/52,983 rows; holdout 2,000 games/104,037 rows, exact
+fixed IDs. The 3,000- and 20,000-game manifests also match the brief-03 counts.
+`blueprint-input-check.json` and import/convert/split tail files retain the measurements.
+
+| Step (smoke) | Seconds | Command |
+| --- | ---: | --- |
+| import | 206.437 | `uv run --no-sync python -m fog.scripts.import_metamon_replays --out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600` |
+| convert | 887.392 | `uv run --no-sync python -m fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/metamon_gen9ou_r1500_decisions --imputations 1 --workers 4` |
+| split | 2.283 | `uv run --no-sync python -m fog.scripts.split_replay_manifest --manifest data/metamon_gen9ou_r1500_decisions/manifest.parquet --out runs/blueprint/split --chronological-holdout-games 2000 --train-sizes 40 1000 3000 10000 20000` |
+| bc | 2835.644 | `uv run --no-sync python -m fog.train --config configs/replay_blueprint_cpu.yaml --trainer bc --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=18 bc.streaming=true bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e18` |
+
+Run A retained its 18-epoch schedule and was intentionally stopped after epoch eight
+(exit 143 after the atomic epoch-eight state was saved, not a failed training attempt).
+`bc_best.pt` is epoch eight, holdout action CE 1.742139; this is a diagnostic, not a strength
+claim. `blueprint-build-metrics.csv`, `blueprint-build-tail.txt`, and `blueprint-build-summary.json`
+are retained. No training restart occurred. The environment was later resumed with these
+completed artifacts and checkpoint intact; stage-2 PPO had not started.
+
+The stage-2 launcher seeds `league.past_ckpts` with that same initializer as well as setting
+`ppo.init_ckpt`, so latest-self play is available immediately. Five SimpleHeuristics entries
+and one MaxDamage entry within scripted fraction 0.6 implement 50%/10%; latest self is 40%.
+The inherited 24k snapshot cadence is retained. The first saved boundary after each 200k is
+evaluated, plus the final checkpoint, with 400 games per opponent per pool. A persisted
+ten-hour deadline bounds the PPO job; the scaled decision budget remains 556,748.

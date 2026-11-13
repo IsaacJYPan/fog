@@ -42,9 +42,9 @@ CPU thread alongside training. The first-point gain is +84 points; the brief req
 variance against GAE returns and unshaped mean episode return, are in `scratch-metrics.csv`.
 Later updates stop for the existing KL constraint: 1.387 effective epochs overall, so higher decisions/s reflects less optimization work. Full-run throughput 42.81 decisions/s; full-budget cost 39,790 decisions per ten points. No fallback grid was needed.
 
-## Stage 2 — not started
+## Stage 2 — initializer ready, PPO not started
 
-The replay-host precheck returned HTTP 200. Run A reconstruction and the blueprint comparison are next. No substitute checkpoint has been used.
+The replay-host precheck returned HTTP 200. The 1,000-game/52,983-row blueprint was rebuilt through epoch eight of run A’s 18-epoch schedule; its best epoch is eight (holdout action CE 1.742139). The 2,000-game/104,037-row holdout matches the fixed IDs exactly. PPO and its pool-a/pool-b play comparisons are next; no substitute checkpoint was used.
 
 ## Config changes and fixes
 

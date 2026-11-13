@@ -1,0 +1,60 @@
+Replay conversion: 21275/22000, 21275 accepted, 0 quarantined
+Replay conversion: 21300/22000, 21300 accepted, 0 quarantined
+Replay conversion: 21325/22000, 21325 accepted, 0 quarantined
+Replay conversion: 21350/22000, 21350 accepted, 0 quarantined
+Replay conversion: 21375/22000, 21375 accepted, 0 quarantined
+Replay conversion: 21400/22000, 21400 accepted, 0 quarantined
+Replay conversion: 21425/22000, 21425 accepted, 0 quarantined
+Replay conversion: 21450/22000, 21450 accepted, 0 quarantined
+Replay conversion: 21475/22000, 21475 accepted, 0 quarantined
+Replay conversion: 21500/22000, 21500 accepted, 0 quarantined
+Replay conversion: 21525/22000, 21525 accepted, 0 quarantined
+Replay conversion: 21550/22000, 21550 accepted, 0 quarantined
+Replay conversion: 21575/22000, 21575 accepted, 0 quarantined
+Replay conversion: 21600/22000, 21600 accepted, 0 quarantined
+Replay conversion: 21625/22000, 21625 accepted, 0 quarantined
+Replay conversion: 21650/22000, 21650 accepted, 0 quarantined
+Replay conversion: 21675/22000, 21675 accepted, 0 quarantined
+Replay conversion: 21700/22000, 21700 accepted, 0 quarantined
+Replay conversion: 21725/22000, 21725 accepted, 0 quarantined
+Replay conversion: 21750/22000, 21750 accepted, 0 quarantined
+Replay conversion: 21775/22000, 21775 accepted, 0 quarantined
+Replay conversion: 21800/22000, 21800 accepted, 0 quarantined
+Replay conversion: 21825/22000, 21825 accepted, 0 quarantined
+Replay conversion: 21850/22000, 21850 accepted, 0 quarantined
+Replay conversion: 21875/22000, 21875 accepted, 0 quarantined
+Replay conversion: 21900/22000, 21900 accepted, 0 quarantined
+Replay conversion: 21925/22000, 21925 accepted, 0 quarantined
+Replay conversion: 21950/22000, 21950 accepted, 0 quarantined
+Replay conversion: 21975/22000, 21975 accepted, 0 quarantined
+Replay conversion: 22000/22000, 22000 accepted, 0 quarantined
+{
+  "status": "complete",
+  "source_replays_considered": 22000,
+  "parsed_replays": 22000,
+  "quarantined_replays": 0,
+  "accepted_decision_versions": 1127562,
+  "all_decision_versions": 1130482,
+  "accepted_fraction": 0.9974170309655528,
+  "imputations_per_replay": 1,
+  "min_rating": 0,
+  "provenance_codes": {
+    "unknown": 0,
+    "inferred": 1,
+    "exact": 2
+  },
+  "public_state_reconstruction": "chronological_prefix_only",
+  "future_opponent_fields_used": false,
+  "private_truth": false,
+  "source_providers": [
+    "metamon_raw_replays"
+  ],
+  "filter_counts": {
+    "accepted": 1127562,
+    "called_or_unaligned_move": 2366,
+    "forced_or_unaligned_switch": 554
+  },
+  "imputation_method": "usage_baseline",
+  "candidate_bank_sha256": null,
+  "imputation_report": {}
+}
