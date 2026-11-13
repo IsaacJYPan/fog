@@ -10,7 +10,7 @@
   "historical_cpu_description": "4 vCPU Intel Xeon @ 2.10 GHz",
   "historical_torch_version": "2.13.0+cu130",
   "historical_actual_torch_threads": "not recorded",
-  "interpretation": "Resume/selection preserve the complete six-epoch trajectory on this CPU; original/current trainers also match all 20 real-input losses and all 376 tensors after 20 updates. The historical trajectory still differs. CPU platforms differ and the historical thread count is unrecorded; hardware versus thread/kernel contributions cannot be isolated here.",
+  "interpretation": "Resume/selection preserve the complete six-epoch trajectory on this CPU. Original/current trainers match all 20 real-input losses and all 376 tensors, both in the shared observer process and in fresh children with NumPy/Torch initially absent. The tested startup-order difference does not change these updates. The historical trajectory remains different: CPU platforms differ and the historical thread count is unrecorded; specific hardware/thread/kernel contributions cannot be isolated here.",
   "source_comparison_command": [
     "git",
     "diff",
@@ -188,5 +188,9 @@
   "real20_source": "real20-comparison.json",
   "original_current_first20_losses_identical": true,
   "original_current_after20_tensors_identical": true,
-  "profile_loss_equality_source": "real20-profile-equality.json"
+  "profile_loss_equality_source": "real20-profile-equality.json",
+  "fresh_process_control_source": "fresh-real20/comparison.json",
+  "fresh_process_numpy_and_torch_initially_absent": true,
+  "fresh_original_current_first20_losses_identical": true,
+  "fresh_original_current_after20_tensors_identical": true
 }

@@ -81,8 +81,11 @@ same-machine comparison. Legacy 3k comparisons remain cross-platform references.
   command resumed at epoch 2 and completed epoch 3, with all earlier CSV rows
   (including timing fields) exactly unchanged (`A-resume-evidence.json`,
   `A-resume-metrics.csv`, `A-resume-tail.txt`). The final prefix check also passed.
-  S/B remain unstarted while a serial fresh-process original/current real-20
-  control closes a residual shared-process startup-order question.
+  The serial fresh-process original/current real-20 control also passed: both
+  children started with NumPy/Torch absent, then produced identical 20 losses
+  and all 376 tensors, also matching the shared-process control. Controller
+  wall was 451.193 s, child walls 223.349/226.382 s
+  (`fresh-real20/`). S/B remain unstarted.
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
   were deleted. The identical command skipped import/conversion/split, was killed
@@ -119,7 +122,7 @@ data effect. No application code or runtime tuning was introduced for diagnosis.
 ## Not verified
 
 R's historical curve reproduction (failed; full flag-off and original/current
-real-20 equality passed; fresh-process startup control pending); S/B;
+real-20 and fresh-process startup controls passed); S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints

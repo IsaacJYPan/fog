@@ -774,3 +774,17 @@ still pending, so the final effect-size reading waits. Legacy 3k comparisons
 remain cross-platform references. A fresh-process original/current real-20
 control runs serially before S, closing the shared-process startup-order gap
 without changing the application or runtime recipe.
+
+Fresh-process startup control **passed**, command
+`uv run --no-sync python docs/briefs/03-artifacts/check_fresh_updates.py`, at
+`0e93755`. The controller/child entry points used only stdlib until each target
+trainer initialized; both children confirmed NumPy/Torch initially absent.
+Original/current children then evaluated the full baseline and completed 20
+updates with the normal six-epoch schedule. All 20 losses and all 376 parameter/
+buffer tensors match exactly; both loss lists also match the earlier shared
+process control. Child walls 223.349/226.382 s; controller 451.193 s, supervisor
+452 s, exit 0. Sources: `fresh-real20/comparison.json`, original/current JSONs,
+their output files and supervisor output/result. Tensor snapshots remain
+ignored; only text/JSON are pushed. The tested startup-order gap changes no
+measured updates. Historical reproduction remains failed with specific runtime/
+platform contributions unisolated; this control does not turn it into a pass.
