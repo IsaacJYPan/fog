@@ -2,10 +2,13 @@
 
 ## Answer
 
-Training measures 194 rows/s (1.27 s/step) on this CPU, and model compute accounts for 96% of the step. The pinned dataset is accessible and the 22,000-game
-import and split reproduce brief 01 exactly, including all fixed holdout IDs. The reviewed
-trainer/runner code passed all 82 focused tests, and the real 600-game runner
-passed its post-completion kill/restart test. The data-versus-steps reading is pending R/A/S/B; the scale pipeline works on real data, but hosted GPU throughput and memory remain untested.
+Training measures 194 rows/s in the profile and 187 rows/s across R's training
+epochs; model computation accounts for 96% of the profiled step. The original
+22,000-game split and real 600-game recovery test pass. R differs from the
+historical curve, while the required flag-off repeat has identical metrics and
+final weights, so diagnosis continues before A/S/B and no data-versus-steps
+conclusion exists yet. The scale pipeline works on real data; hosted GPU
+throughput and memory remain untested.
 
 ## Stage 2 table
 
@@ -22,7 +25,10 @@ command/commit/attempts are in `R-execution.json` (commit `247a1e1`). R does not
 reproduce the old curve to three decimals: baseline/epochs 1–6 are
 2.306/2.045/1.992/1.917/1.850/1.826/1.810, against
 2.306/2.043/1.990/1.909/1.841/1.819/1.804. The required six-epoch repeat with
-resume/selection omitted is next. No data-versus-steps or seed-noise conclusion
+resume/selection omitted matches every non-timing metric and all 376 final
+parameter/buffer tensors exactly (`R-default-summary.json`). Default total-loss
+selection picks epoch 5 (standalone policy NLL 1.825620), whereas R picks epoch
+6 (1.810496). The options preserve this full training trajectory. No data-versus-steps or seed-noise conclusion
 exists yet; R's value MSE barely beats constant zero at its best and rises above
 1.0 afterward. Per-epoch value/policy curves are retained in `R-summary.json`.
 
@@ -43,8 +49,12 @@ exists yet; R's value MSE barely beats constant zero at its best and rises above
   through training/evaluation, or 4,060 s with two standalone reports
   (`R-projection.json`). The evaluation projection uses profile forward/batch/loss
   time per row; it is not a measured evaluation. R's epoch-1 policy NLL is
-  2.045422 versus brief 01's 2.042711, so A/S/B remain stopped pending the
-  required repeat without resume/selection. Baseline normalized metrics agree
+  2.045422 versus brief 01's 2.042711. The required flag-off repeat took
+  2,737.795 s trainer wall and 107.419/125.688 s reports (2,970.903 s combined),
+  matching R's non-timing metrics and all final tensors exactly. The saved
+  pre-launch projection was 2,939.569 s (`R-default-projection.json`). A/S/B
+  remain stopped pending the approved original/current 20-real-update diagnostic.
+  Baseline normalized metrics agree
   within 2.49e-8. Current CPU is AMD EPYC 9V74; brief 01 recorded Intel Xeon
   2.10 GHz. This platform difference is observed, not yet an isolated cause
   (`reproduction-platform.json`).
@@ -60,9 +70,10 @@ exists yet; R's value MSE barely beats constant zero at its best and rises above
   `check_real_runner.py`, measured at `fa35867`. The first completion's initial
   evaluation competed with conversion and was unusually slow; conversion was
   paused from 04:02:31 to 04:15:09 UTC (758 s) to serialize CPU work.
-- Stage 5: notebook page drafted with public cloning, included fixed IDs and CPU
-  time/disk arithmetic (`scale-projections.json`); R-derived validation/report
-  overhead and final code pin remain pending. Not run on a hosted GPU.
+- Stage 5: done: public clone, included fixed IDs, numbered cells, restart/download
+  steps and measured CPU time/disk arithmetic (`scale-projections.json`). The
+  20k full-pipeline reference is 9.62–9.95 h at the observed batch-256 rates;
+  batch-1,024 and GPU throughput/memory remain unmeasured. Not run on a hosted GPU.
 - Stage 6: not started.
 
 ## Deviations and corrections
@@ -78,7 +89,8 @@ verified the existing importer.
 
 ## Not verified
 
-R's historical curve reproduction (failed; diagnosis in progress); A/S/B;
+R's historical curve reproduction (failed; flag-off options isolated, original/current
+20-real-update diagnostic pending); A/S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints
@@ -86,7 +98,7 @@ hosted GPU execution; play strength. No gate is claimed.
 R's best checkpoint is `runs/blueprint/g1000e6/checkpoints/bc_best.pt`, 23,548,503
 bytes, SHA-256 `2126f07ad1d115d9f82d00a72a32485158cca17cda379eb90ed4d2a0746fd398`.
 Paths/sizes/hashes for its final weights and resumable state, plus the engineering
-smoke weights, are in `03-artifacts/checkpoints.json`. The machine may be
+smoke and flag-off repeat weights, are in `03-artifacts/checkpoints.json`. The machine may be
 reclaimed; ignored checkpoints are not retained by pushing this branch.
 
 ## Suggestions

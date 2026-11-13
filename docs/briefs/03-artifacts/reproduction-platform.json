@@ -10,7 +10,7 @@
   "historical_cpu_description": "4 vCPU Intel Xeon @ 2.10 GHz",
   "historical_torch_version": "2.13.0+cu130",
   "historical_actual_torch_threads": "not recorded",
-  "interpretation": "CPU platform differs; its contribution to curve differences is not isolated yet. Required resume/selection-off repeat pending.",
+  "interpretation": "Resume/selection options preserve all six-epoch non-timing metrics and final model tensors on the current CPU. The historical curve still differs; original/current 20-real-update diagnostic is next. CPU-platform contribution is not isolated.",
   "source_comparison_command": [
     "git",
     "diff",
@@ -181,5 +181,8 @@
       }
     },
     "maximum_absolute_normalized_delta_excluding_sum_counts": 2.48577558537022e-08
-  }
+  },
+  "flag_off_full_repeat_summary": "R-default-summary.json",
+  "flag_off_all_non_timing_metrics_identical": true,
+  "flag_off_all_final_tensors_identical": true
 }

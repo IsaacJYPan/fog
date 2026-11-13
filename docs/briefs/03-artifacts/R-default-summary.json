@@ -1,0 +1,73 @@
+{
+  "run": "R-default",
+  "commit": "c5938bcb1573a4a4b6fd53200373e541cefc86ae",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=6 bc.early_stopping_patience=0 log.dir=runs/blueprint/g1000e6-default",
+  "omitted_options": [
+    "bc.resume",
+    "bc.selection_metric"
+  ],
+  "completed_epochs": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "training_wall_seconds": 2737.795230468,
+  "standalone_report_seconds": {
+    "best": 107.41913993800154,
+    "final": 125.68837941200036
+  },
+  "training_plus_reports_wall_seconds": 2970.902749818002,
+  "matches_R_metrics_except_elapsed_time": true,
+  "final_state_comparison": {
+    "reference": "runs/blueprint/g1000e6/checkpoints/bc_final.pt",
+    "candidate": "runs/blueprint/g1000e6-default/checkpoints/bc_final.pt",
+    "comparison": "torch.load CPU then torch.equal for every state_dict tensor, including persistent buffers",
+    "reference_tensor_count": 376,
+    "candidate_tensor_count": 376,
+    "all_parameters_and_persistent_buffers_identical": true,
+    "differing_tensor_names": []
+  },
+  "aggregate_training_rows_per_second": 191.4442380042583,
+  "epoch_training_seconds": [
+    277.34817741999996,
+    277.8511850529994,
+    273.8269599330006,
+    277.7954382659991,
+    276.4600440310005,
+    277.24349140400045
+  ],
+  "epoch_validation_seconds": [
+    150.05689994300064,
+    155.08910872100023,
+    150.25812972200038,
+    153.52472538800066,
+    150.00919099400016,
+    150.8960614459993
+  ],
+  "mean_validation_seconds": 151.63901936900024,
+  "best_epoch_by_default_total_loss": 5,
+  "best_report_policy_nll": 1.8256199354646092,
+  "best_report_policy_top1": 0.3339456246814322,
+  "final_report_policy_nll": 1.810495609767996,
+  "final_report_policy_top1": 0.3404756638231985,
+  "resume_state_absent_with_option_omitted": true,
+  "sources": {
+    "metrics": "R-default-metrics.csv",
+    "execution": "R-default-execution.json",
+    "reports": [
+      "R-default-holdout-best.json",
+      "R-default-holdout-final.json"
+    ],
+    "best_epoch": "R-default-tail.txt"
+  },
+  "formulas": {
+    "epoch_training_seconds": "52983/train_rows_per_second",
+    "epoch_validation_seconds": "seconds_per_epoch - epoch_training_seconds",
+    "aggregate_training_rows_per_second": "6*52983/sum(epoch_training_seconds)"
+  },
+  "interpretation": "Resume/selection options preserve all six-epoch non-timing metrics and final model tensors on the current CPU. The historical curve still differs; original/current 20-real-update diagnostic is next. CPU-platform contribution is not isolated."
+}

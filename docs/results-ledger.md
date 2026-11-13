@@ -646,7 +646,9 @@ time. Command and attempts are in `R-execution.json`; invoked with
 `uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R`.
 A/S/B and stage 6 remain pending. Stage 5 instructions now use public
 cloning and the committed holdout IDs, with CPU time/disk arithmetic in
-`scale-projections.json`; R-derived validation/report overhead is pending. No data-versus-
+`scale-projections.json`; R-derived validation/report overhead is included. Stage
+5 is complete, with a 9.62–9.95 h CPU20k full-pipeline reference at observed batch
+256. Batch 1,024 throughput and hosted GPU execution remain unmeasured. No data-versus-
 steps, seed-noise, value-learning or play-strength conclusion exists yet.
 P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.
 
@@ -685,3 +687,25 @@ count unrecorded. The model/constants/encoding/dataset/loss/recipe source diff
 from `41cc7b9` to `4f9d75c` is empty. Sources and the complete baseline-difference
 table are in `reproduction-platform.json`. These observations do not establish
 the cause of the historical trajectory difference.
+
+Required flag-off repeat **completed** at `c5938bc`, invoked as
+`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R-default`;
+exact trainer/report commands and attempts: `R-default-execution.json`. Only
+`bc.resume`/`bc.selection_metric` are omitted (new log directory); the six-epoch
+recipe, seed, batch, learning rate, streaming and disabled early stopping remain.
+All non-timing CSV fields for epochs 0–6 match R exactly. A direct CPU
+`torch.equal` comparison of every final state-dict tensor passes: 376/376
+parameters/persistent buffers equal, no differing names. This isolates the new
+options from the historical curve drift; it does not isolate the platform's
+contribution. The original/current 20-real-update diagnostic runs next, before
+any A/S/B (`check_real_updates.py` was reviewed; no application code changed).
+
+Flag-off trainer wall 2,737.795 s; best/final report walls 107.419/125.688 s;
+combined 2,970.903 s versus a pre-launch projection of 2,939.569 s
+(`R-default-projection.json`). Aggregate pure training 191.444 rows/s, mean
+validation 151.639 s. Default loss selection picks epoch 5 (standalone policy
+NLL 1.825620, top-1 0.333946) versus action-CE selection at epoch 6 (1.810496,
+0.340476); final weights and report equal R. No resume state is written with
+the option omitted. Sources/formulas/tensor comparison: `R-default-summary.json`,
+`R-default-metrics.csv`, both holdout JSONs and `R-default-tail.txt`. Checkpoint
+sizes/hashes are appended to `checkpoints.json`; no hosted GPU gate is claimed.
