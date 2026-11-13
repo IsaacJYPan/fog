@@ -1,0 +1,6 @@
+[ppo] lr scale 1: 1 tensors at 0.0001
+[ppo] direct rollout workers=4, mode=process, actor_threads=2, persistent CPU actors + one centralized learner
+[ppo] rollout process pids=(720, 721, 728, 732)
+[ppo] decisions=8205  win_rate=0.270  loss=0.7212  entropy=1.371  kl=0.0198  clip=0.190  belief=16.549  self_belief=18.488
+[ppo] decisions=16396  win_rate=0.304  loss=0.5216  entropy=1.354  kl=0.0148  clip=0.171  belief=11.394  self_belief=13.952
+[ppo] decisions=24751  win_rate=0.335  loss=0.3965  entropy=1.344  kl=0.0129  clip=0.156  belief=8.284  self_belief=10.509

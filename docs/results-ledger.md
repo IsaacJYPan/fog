@@ -738,3 +738,12 @@ Stage-2 PPO started from the rebuilt `bc_best.pt`, using the generated overrides
 --config runs/rl_check/blueprint/config.yaml --trainer ppo`. Budget 556,748 decisions,
 with the ten-hour deadline and full-state resume described above. The starting comparison
 for the improvement rule is SimpleHeuristics on pool A: 25.5% [21.5%, 30.0%].
+
+Stage-2 startup measurement, **smoke**, through 24,751 completed learner decisions:
+all three PPO epochs ran in each of the first three updates; value explained variance
+0.11878 → 0.21822 → 0.37202. First snapshot `ppo_24751.pt` is saved with its full-state
+sidecar. The rollout schedule contains both the original blueprint and that PPO snapshot
+as self-play opponents, verifying the initial league seed and inherited 24k refresh.
+`blueprint-startup-check.json` contains scheduled-game counts (including the current batch),
+not a win-rate claim. `blueprint-metrics.csv` and `blueprint-tail.txt` are in-progress copies.
+The first scored PPO point remains the saved boundary after 200k.
