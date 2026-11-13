@@ -1,0 +1,17 @@
+{
+  "run": "R",
+  "recorded_utc": "2026-11-13 04:47:27 UTC",
+  "profile_source": "docs/briefs/03-artifacts/profile-after-timing.json",
+  "training_rows": 52983,
+  "holdout_rows": 104037,
+  "epochs": 6,
+  "training_rows_per_second": 194.03996113140155,
+  "projected_training_seconds": 1638.3120164857344,
+  "evaluation_estimate_source": "profile batch_build + model_forward + other, per measured row; backward excluded; projection not an evaluation measurement",
+  "projected_seconds_per_holdout_pass": 269.0594314878051,
+  "holdout_passes": 7,
+  "standalone_reports": 2,
+  "projected_training_plus_evaluation_seconds": 3521.72803690037,
+  "projected_total_with_reports_seconds": 4059.846899875981,
+  "formula": "epochs*training_rows/training_rows_per_second + (epochs+1+2)*projected_seconds_per_holdout_pass"
+}

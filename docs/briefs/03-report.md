@@ -2,21 +2,29 @@
 
 ## Answer
 
-Training measures 194 rows/s (1.27 s/step) on this CPU, and model compute accounts for 97% of the step. The pinned dataset is accessible and the 22,000-game
+Training measures 194 rows/s (1.27 s/step) on this CPU, and model compute accounts for 96% of the step. The pinned dataset is accessible and the 22,000-game
 import and split reproduce brief 01 exactly, including all fixed holdout IDs. The reviewed
 trainer/runner code passed all 82 focused tests, and the real 600-game runner
 passed its post-completion kill/restart test. The data-versus-steps reading is pending R/A/S/B; the scale pipeline works on real data, but hosted GPU throughput and memory remain untested.
 
 ## Stage 2 table
 
-| Run | Games | Epochs | Status |
-| --- | --- | --- | --- |
-| R | 1,000 | 6 | waiting for verified split and profile |
-| A | 1,000 | 18 | not started |
-| S | 1,000 | 6 | not started |
-| B | 3,000 | 18 | projection pending |
+| Run (games × epochs) | Steps | Train wall / rows/s | Last NLL / top-1 | Best report NLL / top-1 (epoch) | Final train NLL | Value MSE min / last |
+| --- | ---: | --- | --- | --- | ---: | --- |
+| R (1,000 × 6) | 1,286 | 2,799.8 s / 187.06 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 |
+| A (1,000 × 18) | — | stopped pending R diagnosis | — | — | — | — |
+| S (1,000 × 6) | — | stopped pending R diagnosis | — | — | — | — |
+| B (3,000 × 18) | — | stopped pending R diagnosis | — | — | — | — |
 
-No data-versus-steps conclusion or seed-noise estimate exists yet.
+Last-epoch fields come from `R-metrics.csv`; best fields are the standalone
+holdout report. `R-summary.json` records every source and formula; the trainer
+command/commit/attempts are in `R-execution.json` (commit `247a1e1`). R does not
+reproduce the old curve to three decimals: baseline/epochs 1–6 are
+2.306/2.045/1.992/1.917/1.850/1.826/1.810, against
+2.306/2.043/1.990/1.909/1.841/1.819/1.804. The required six-epoch repeat with
+resume/selection omitted is next. No data-versus-steps or seed-noise conclusion
+exists yet; R's value MSE barely beats constant zero at its best and rises above
+1.0 afterward. Per-epoch value/policy curves are retained in `R-summary.json`.
 
 ## Per stage
 
@@ -24,7 +32,22 @@ No data-versus-steps conclusion or seed-noise estimate exists yet.
   16 GiB memory, PyTorch 2.13.0+cu130, no CUDA device. Import: 22,000 games in 194 s,
   with brief 01's rejection counts. Conversion: 22,000 games / 1,127,562 rows in 2,225 s wall, including the 758 s pause. The holdout has 2,000 games / 104,037 rows, uploaded 2026-02-20 04:17:33 through 2026-05-19 04:52:01 UTC. Training sets 1k/3k/20k have 52,983/156,597/1,023,525 rows. Fixed-ID splitting drops zero games and matches chronological holdout/train membership (`verify-split-output.txt`, `split-fixed-output.txt`).
 - Stage 1: done, with no qualifying source changes. Before/repeat: 1.314/1.274 s per step, 188.123/194.040 rows/s; batch construction 0.039762/0.038087 s (3.03%/2.99%); forward 0.608237/0.589191 s; backward+optimizer 0.654632/0.634710 s; remainder 0.011513/0.012080 s. Belief heads: 46.11%/45.76% of forward. Batch-only: 7,182.28/7,100.46 rows/s. Both profiles used 20 warm-ups and 200 measured steps; separate cProfile top-15 files are retained. The first 20 losses match exactly (`profile-comparison.json`). No loader/prefetch criterion qualifies. Thread1/2/4 screens used 5 warm-ups and 30 measured steps: 2.417/1.561/1.235 s, slower or only 6.05% faster than the five-thread baseline, below 10%; alternatives change losses, so preserve five threads. Profile walls 330/321 s; screens 95.067/62.085/49.680 s (`profile-*-timing.json`, `profile-*-cprofile.txt`, `thread-benchmarks.json`).
-- Stages 2–3: not started.
+- Stages 2–3: R completed using the unchanged five-thread recipe: 2,799.785 s
+  trainer wall plus 108.494/110.127 s best/final reports, 3,018.406 s combined.
+  Mean validation time is 154.662 s per pass, calculated for each epoch as
+  `seconds_per_epoch - 52983/train_rows_per_second`; aggregate pure-training
+  throughput is 187.060 rows/s. The saved state records 1,286 actual updates;
+  the brief's step counts are approximate (streaming shard buffers end in partial
+  batches). `R-summary.json` and the two report JSONs retain the measurements.
+  Its projection is 1,638 s training plus seven 269 s holdout passes, 3,522 s
+  through training/evaluation, or 4,060 s with two standalone reports
+  (`R-projection.json`). The evaluation projection uses profile forward/batch/loss
+  time per row; it is not a measured evaluation. R's epoch-1 policy NLL is
+  2.045422 versus brief 01's 2.042711, so A/S/B remain stopped pending the
+  required repeat without resume/selection. Baseline normalized metrics agree
+  within 2.49e-8. Current CPU is AMD EPYC 9V74; brief 01 recorded Intel Xeon
+  2.10 GHz. This platform difference is observed, not yet an isolated cause
+  (`reproduction-platform.json`).
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
   were deleted. The identical command skipped import/conversion/split, was killed
@@ -37,8 +60,9 @@ No data-versus-steps conclusion or seed-noise estimate exists yet.
   `check_real_runner.py`, measured at `fa35867`. The first completion's initial
   evaluation competed with conversion and was unusually slow; conversion was
   paused from 04:02:31 to 04:15:09 UTC (758 s) to serialize CPU work.
-- Stage 5: notebook page updated for public cloning and included fixed IDs;
-  projections await measurement. Not run on a hosted GPU.
+- Stage 5: notebook page drafted with public cloning, included fixed IDs and CPU
+  time/disk arithmetic (`scale-projections.json`); R-derived validation/report
+  overhead and final code pin remain pending. Not run on a hosted GPU.
 - Stage 6: not started.
 
 ## Deviations and corrections
@@ -54,15 +78,16 @@ verified the existing importer.
 
 ## Not verified
 
-R reproduction; A/S/B;
+R's historical curve reproduction (failed; diagnosis in progress); A/S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints
 
-Only engineering smoke checkpoints currently exist, under
-`runs/blueprint_runner_smoke/training/checkpoints/`. Sizes/hashes are retained in
-`03-artifacts/checkpoints.json`. The machine may be reclaimed; ignored checkpoints are
-not retained by pushing this branch.
+R's best checkpoint is `runs/blueprint/g1000e6/checkpoints/bc_best.pt`, 23,548,503
+bytes, SHA-256 `2126f07ad1d115d9f82d00a72a32485158cca17cda379eb90ed4d2a0746fd398`.
+Paths/sizes/hashes for its final weights and resumable state, plus the engineering
+smoke weights, are in `03-artifacts/checkpoints.json`. The machine may be
+reclaimed; ignored checkpoints are not retained by pushing this branch.
 
 ## Suggestions
 

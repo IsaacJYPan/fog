@@ -1,0 +1,11 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=6 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e6
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=e893fd51b4c2, torch_threads=5)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+[bc] epoch 1/6  train_loss=3.139  eval_loss=3.108  belief=8.558  chain=2.646  value=1.005  query_p=0.184  dropped=0.000%
+[bc] epoch 2/6  train_loss=2.935  eval_loss=2.965  belief=7.179  chain=2.333  value=0.994  query_p=0.233  dropped=0.000%
+[bc] epoch 3/6  train_loss=2.753  eval_loss=2.939  belief=6.814  chain=2.216  value=1.141  query_p=0.238  dropped=0.000%
+[bc] epoch 4/6  train_loss=2.556  eval_loss=2.835  belief=6.493  chain=2.118  value=1.109  query_p=0.253  dropped=0.000%
+[bc] epoch 5/6  train_loss=2.415  eval_loss=2.823  belief=6.419  chain=2.098  value=1.143  query_p=0.264  dropped=0.000%
+[bc] epoch 6/6  train_loss=2.325  eval_loss=2.859  belief=6.415  chain=2.091  value=1.247  query_p=0.271  dropped=0.000%
+[bc] done -> runs/blueprint/g1000e6/checkpoints/bc_final.pt  (best eval epoch=6, loss=1.810)

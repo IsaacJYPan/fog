@@ -636,7 +636,52 @@ below the required 10%. Alternatives also change the first 20 losses by up
 to 1.54e-4. The five-thread runtime default remains unchanged. The repeat's
 3% timing difference is observed variation, not a code speedup.
 
-Stages 2–3 and 6 are pending. Stage 5 instructions now use public
-cloning and the committed holdout IDs; projections are pending. No data-versus-
+Stages 2–3: R started 04:47:27 UTC at `247a1e1`, with the unchanged five-thread
+recipe. Projection saved before launch (`R-projection.json`): six passes over
+52,983 training rows at 194.039961 rows/s = 1,638.312 s; seven projected holdout
+passes at 269.059 s = 1,883.416 s; total 3,521.728 s through training/evaluation,
+or 4,059.847 s including two standalone reports. The holdout projection scales
+profile batch/forward/loss time per measured row; it is not an observed evaluation
+time. Command and attempts are in `R-execution.json`; invoked with
+`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R`.
+A/S/B and stage 6 remain pending. Stage 5 instructions now use public
+cloning and the committed holdout IDs, with CPU time/disk arithmetic in
+`scale-projections.json`; R-derived validation/report overhead is pending. No data-versus-
 steps, seed-noise, value-learning or play-strength conclusion exists yet.
 P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.
+
+Stage 2 R **completed; historical reproduction failed**. Trainer command and
+commit are in `R-execution.json` (`247a1e1`); invocation
+`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R`.
+The trainer and both reports exited successfully; the supervisor then exited
+one deliberately because the rounded historical curve differs. Exact sources,
+per-epoch policy/value curves and timing formulas: `R-summary.json`,
+`R-metrics.csv`, `R-tail.txt`, and `R-holdout-{best,final}.json`.
+
+| Run | Games / epochs / actual steps | Trainer wall / pure training rows/s | Last epoch policy NLL / top-1 | Best report policy NLL / top-1 (epoch) | Final training policy NLL | Holdout value MSE min / final | Commit |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| R | 1,000 / 6 / 1,286 | 2,799.785 s / 187.060 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 | `247a1e1` |
+| A | 1,000 / 18 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
+| S | 1,000 / 6 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
+| B | 3,000 / 18 / unmeasured | stopped pending R diagnosis | — | — | — | — | — |
+
+R best/final reports took 108.494/110.127 s, total trainer+reports 3,018.406 s.
+Mean epoch validation is 154.662 s, derived as
+`seconds_per_epoch - 52983/train_rows_per_second`; the 172.372 s outside epoch
+timers includes startup/baseline/writes and was not separated further. The brief's
+step counts were approximate; streaming buffer boundaries add partial batches.
+The required repeat omitting resume/selection runs before any A/S/B. No data or
+training-length effect or seed noise is established. R's value MSE reaches only
+0.993827 before rising above the constant-zero reference of 1.0; all epoch values
+and that reference are in `R-summary.json`. Checkpoint paths/sizes/SHA-256 are in
+`checkpoints.json`; these ignored weights may disappear if the machine is reclaimed.
+
+R reproducibility is under diagnosis: epoch-1 policy NLL is 2.045422 versus
+brief 01's 2.042711, so A/S/B remain stopped until the required repeat without
+resume/selection is completed and investigated. Epoch-0 normalized evaluation
+metrics agree within 2.49e-8. The current CPU is AMD EPYC 9V74, affinity five,
+quota four; brief 01 recorded Intel Xeon 2.10 GHz, with actual PyTorch thread
+count unrecorded. The model/constants/encoding/dataset/loss/recipe source diff
+from `41cc7b9` to `4f9d75c` is empty. Sources and the complete baseline-difference
+table are in `reproduction-platform.json`. These observations do not establish
+the cause of the historical trajectory difference.
