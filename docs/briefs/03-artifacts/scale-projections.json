@@ -1,0 +1,73 @@
+{
+  "sources": {
+    "profile": "docs/briefs/03-artifacts/profile-after-timing.json",
+    "import": "docs/briefs/03-artifacts/continuation-import-wall.txt",
+    "conversion_wall": "docs/briefs/03-artifacts/convert-wall.txt",
+    "conversion_pause": "docs/briefs/03-artifacts/conversion-pauses.txt",
+    "disk": "docs/briefs/03-artifacts/disk-bytes.json",
+    "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt"
+  },
+  "inputs": {
+    "measured_imported_games": 22000,
+    "scale_imported_games": 112000,
+    "scale_eligible_training_games_assumed": 100000,
+    "measured_training_games": 20000,
+    "measured_training_rows": 1023525,
+    "import_seconds": 194,
+    "conversion_wall_seconds": 2225,
+    "conversion_diagnostic_pause_seconds": 758,
+    "epochs": 6,
+    "measured_batch_size": 256,
+    "runner_batch_size": 1024,
+    "training_rows_per_second": 194.03996113140155,
+    "batch_only_rows_per_second": 7100.464694857515,
+    "measured_disk_bytes": {
+      "raw": 209345372,
+      "decisions": 608097221,
+      "cache": 481396201,
+      "environment": 5675620035
+    }
+  },
+  "arithmetic": {
+    "scale_ratio": "112000 / 22000",
+    "scale_training_rows": "1023525 / 20000 * 100000",
+    "scale_import_seconds": "194 * (112000 / 22000)",
+    "scale_conversion_active_seconds": "(2225 - 758) * (112000 / 22000)",
+    "cpu_training_seconds": "6 * scale_training_rows / training_rows_per_second",
+    "cpu_batch_feed_floor_seconds": "6 * scale_training_rows / batch_only_rows_per_second",
+    "scale_disk_bytes": "each measured raw/decisions/cache byte count * (112000 / 22000)",
+    "environment_work_and_archive_bytes": "environment + 2 * scale(raw + decisions + cache)",
+    "cpu_20k_training_seconds": "6 * 1023525 / training_rows_per_second"
+  },
+  "projections": {
+    "scale_training_rows": 5117625.0,
+    "scale_import_seconds": 987.6363636363636,
+    "scale_conversion_active_seconds": 7468.363636363636,
+    "cpu_scale_training_reference_seconds": 158244.465835604,
+    "cpu_scale_training_reference_hours": 43.95679606544556,
+    "cpu_batch_feed_floor_seconds": 4324.470484620328,
+    "cpu_batch_feed_floor_hours": 1.2012418012834243,
+    "scale_disk_bytes": {
+      "raw": 1065758257.4545454,
+      "decisions": 3095767670.5454545,
+      "cache": 2450744296.0
+    },
+    "scale_raw_decisions_cache_bytes": 6612270224.0,
+    "environment_work_and_archive_bytes": 18900160483.0,
+    "suggested_available_disk_bytes": 25000000000,
+    "cpu_22k_import_and_conversion_active_seconds": 1661,
+    "cpu_20k_training_reference_seconds": 31648.893167120797,
+    "cpu_20k_training_reference_hours": 8.79135921308911,
+    "evaluation_and_reports": null
+  },
+  "limits": [
+    "Projections assume similar replay lengths and filtering yield on four CPU cores; hosted CPU and network speeds differ.",
+    "758 seconds of diagnostic pause excluded from conversion wall; the remaining 1467 seconds still include initial CPU contention.",
+    "Training projections use measured batch 256; actual runner batch-1024 throughput is unmeasured.",
+    "GPU throughput and memory are unmeasured; CPU batch-feed floor is not a GPU runtime estimate.",
+    "Training projections exclude validation, reports, checkpoint writes and startup; R-derived evaluation/report overhead is pending.",
+    "Cache disk grows in whole downloaded shard chunks; linear scaling is approximate.",
+    "Disk amounts are decimal bytes/GB. The 25-GB suggestion leaves headroom beyond measured environment plus two data copies for checkpoints, source and logs; hosted storage was not tested.",
+    "Hosted installation, split latency, backup and handback download time are unmeasured."
+  ]
+}
