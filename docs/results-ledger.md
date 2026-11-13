@@ -433,3 +433,36 @@ loader widens the checkpoint with posterior features it was not trained with).
 
 These rows do not decide G2. Checkpoints are git-ignored and were not kept; their SHA-256 values
 are in the report.
+
+## 2026-11-13: review of the brief 01 learning curve
+
+The branch `work/p2-replay-curve` (head `03cf182`) was reviewed and merged into `work/roadmap`.
+Checked: every number in `docs/briefs/01-report.md` against the files in
+`docs/briefs/01-artifacts/`; the new tests (22 passed with `tests/test_bc_metrics.py`) and
+`ruff check fog tests` at `03cf182`; all curve runs used one recipe; no frozen area was touched.
+No new measurement was made in the review. Four readings of the same numbers differ from, or add
+to, the section above:
+
+1. **The curve mixes data size with training length.** Every run had six epochs, so 1,000 games
+   got 1,242 optimizer steps and 3,000 games got 3,672. At 1,000 games the policy was still
+   improving when training ended and was not overfitting (final training action loss 1.731,
+   holdout 1.804; top-1 0.366 and 0.344). The overfit check shows the same thing from the other
+   side: 320 steps at batch 256 could not memorise 2,020 rows, 2,560 steps at batch 32 could.
+   So "−0.43 NLL per tenfold data" is an upper bound on the effect of data, and the P2.4 rule
+   cannot be applied to these two points. A run at 1,000 games with the step count of the
+   3,000-game run separates the two effects.
+2. **The value head has learned little.** Holdout value MSE at 3,000 games is 0.916 at its best
+   epoch, against 1.0 for a constant zero (Brier 0.229 against 0.25), and it rises again from
+   epoch 4 (1.055 at epoch 6, worse than the constant). The low calibration error (0.032) says
+   the predictions are honest, not that they are informative: most sit near 0.5. A game supplies
+   one outcome label however many decisions it has, so 3,000 games is a small value dataset.
+3. **`bc_best.pt` is not the best policy.** It is chosen on the total loss, which the rising
+   value loss turns upward at epoch 4 while the policy loss is still falling.
+4. **The stage 3b pass rule in the brief was badly set** (the brief's fault, not the run's): it
+   fixed 40 epochs at batch 256, too few steps to memorise anything. The batch-32 diagnostic is
+   the valid check, and it passed.
+
+Play strength (0.258 against SimpleHeuristics, smoke) comes from an under-trained policy, so it
+does not yet say whether the roadmap's covariate-shift case applies. Gate G2 stays open.
+Training speed was 112 to 141 rows/s on four cores; 100,000 games (about 5.2 million rows) for
+six epochs is about 70 hours at that rate, so the scale run needs a GPU or a faster trainer.
