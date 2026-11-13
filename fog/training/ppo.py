@@ -300,6 +300,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
     stopped_for_kl = False
     optimizer_steps = 0
+    optimizer_rows = 0
     for _ in range(epochs):
         perm = torch.randperm(n, device=device)
         for start in range(0, n, minibatch_size):
@@ -478,6 +479,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             log("grad_norm", grad_norm)
             optimizer.step()
             optimizer_steps += 1
+            optimizer_rows += len(idx)
 
             with torch.no_grad():
                 log("loss", loss)
@@ -516,6 +518,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
     log("stopped_for_kl", float(stopped_for_kl))
     log("optimizer_steps", optimizer_steps)
+    log("optimizer_rows", optimizer_rows)
+    log("effective_epochs", optimizer_rows / n)
     return {k: sum(v) / len(v) for k, v in metrics.items()}
 
 
@@ -860,7 +864,20 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     step_cfg["ppo"] = step_ppo
 
     n_games = s.buf.n_games
+    collection_seconds = time.monotonic() - s.chunk_t0
+    update_t0 = time.monotonic()
+    # Diagnostics use the behavior values and completed episodes already in the buffer.
+    # They do not require an extra model forward or change the optimization batch.
+    games = [g for g in s.buf._games.values() if g.outcome is not None]
+    behavior_values = np.asarray([v for g in games for v in g.values], dtype=np.float32)
+    episode_return = float(np.mean([g.outcome + g.bonus for g in games]))
     batch = s.buf.to_batch(s.device)
+    returns = batch["returns"].detach().cpu().numpy()
+    return_variance = float(np.var(returns))
+    explained_variance = (
+        1.0 - float(np.var(returns - behavior_values)) / return_variance
+        if return_variance > 0 else float("nan")
+    )
     if s.bc_anchor is not None and step_ppo["kl_anchor_coef"] > 0:
         with torch.no_grad():
             batch["bc_log_probs"] = s.bc_anchor(batch).log_probs
@@ -873,6 +890,7 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         steps=int(s.leak_cfg.get("fresh_probe_steps", 4)),
     )
 
+    optimization_t0 = time.monotonic()
     metrics = ppo_update(
         s.agent,
         s.opt,
@@ -880,8 +898,14 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         step_cfg,
         replay_regularizer=s.replay_regularizer,
     )
+    optimization_seconds = time.monotonic() - optimization_t0
+    metrics["optimization_seconds"] = optimization_seconds
+    metrics["optimization_rows_per_sec"] = (
+        metrics["optimizer_rows"] / max(1e-6, optimization_seconds)
+    )
     metrics.update(probe_metrics)
     metrics.update(_belief_accuracy_vs_turn(s.agent, batch))
+    update_seconds = time.monotonic() - update_t0
     s.buf.clear()
     s.decisions_seen += n
     from fog.training.diagnostics import tera_bonus_at
@@ -910,6 +934,12 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         entropy_coef=step_ppo["entropy_coef"],
         move_entropy=metrics.get("entropy", 0.0),
         rule_prior_strength=float(rule_strength),
+        collection_seconds=collection_seconds,
+        update_seconds=update_seconds,
+        collection_decisions_per_sec=n / max(1e-6, collection_seconds),
+        update_rows_per_sec=n / max(1e-6, update_seconds),
+        value_explained_variance=explained_variance,
+        mean_episode_return=episode_return,
     )
     for name, results in recent_results.items():
         if results:

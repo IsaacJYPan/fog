@@ -1,0 +1,35 @@
+extends: gen9ou_typed_token_selfplay.yaml
+
+experiment: rl_check_scratch
+device: cpu
+
+# Limited learning diagnostic only; no preflight or replay corpus is required.
+preflight:
+  required: false
+replay_policy:
+  coef: 0.0
+
+ppo:
+  init_ckpt: null
+  total_decisions: 600000
+  batch_decisions: 8000
+  minibatch_size: 1024
+  epochs: 3
+  clip: 0.2
+  target_kl: 0.03
+  lr: 3.0e-4
+  entropy_coef: 0.01
+  entropy_coef_final: 0.003
+
+env:
+  team_pool: data/teams/pool_a/core_v1_offensive.txt
+
+league:
+  latest_frac: 0.0
+  past_frac: 0.0
+  scripted_frac: 1.0
+  scripted: [MaxDamage]
+  snapshot_every_decisions: 100000
+
+log:
+  dir: runs/rl_check/scratch
