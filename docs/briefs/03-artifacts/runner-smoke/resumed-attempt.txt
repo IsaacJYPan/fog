@@ -1,0 +1,8 @@
+[import] output complete; skipping
+[convert] output complete; skipping
+[split] output complete; skipping
+Training on all 500 eligible games; fewer than 100000 remain
+/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt
+/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained
+Results: runs/blueprint_runner_smoke/results; retain runs/blueprint_runner_smoke to resume in another session

@@ -1,0 +1,38 @@
+{
+  "command": [
+    "/workspace/fog-roadmap/.venv/bin/python",
+    "-u",
+    "-m",
+    "fog.scripts.run_replay_blueprint",
+    "--games",
+    "600",
+    "--work-dir",
+    "runs/blueprint_runner_smoke",
+    "--device",
+    "cpu",
+    "--batch-size",
+    "256",
+    "--epochs",
+    "2",
+    "--chronological-holdout-games",
+    "100"
+  ],
+  "commit": "9867251980434d450ffcf87d731b0ddc820f28a9",
+  "source": "pinned public corpus; first source shard cached from main import",
+  "timing_context": "main 22000-game converter also running",
+  "interrupted_exit_code": 143,
+  "first_attempt_seconds": 621.6228747119999,
+  "metrics_epochs_after_interrupt": [
+    0,
+    1
+  ],
+  "final_checkpoint_after_interrupt": false,
+  "resumed_exit_code": 0,
+  "resumed_seconds": 155.41494885399993,
+  "metrics_epochs_after_resume": [
+    0,
+    1,
+    2
+  ],
+  "earlier_metrics_unchanged": true
+}

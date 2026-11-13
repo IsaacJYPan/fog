@@ -1,0 +1,167 @@
+{
+  "arguments": {
+    "games": 600,
+    "device": "cpu",
+    "batch_size": 256,
+    "epochs": 2,
+    "workers": 4,
+    "config": "configs/replay_blueprint_cpu.yaml",
+    "holdout_ids": "data/replay_splits/p2_holdout_2000_ids.txt",
+    "chronological_holdout_games": 100,
+    "max_shards": 46,
+    "max_download_mb": 6000,
+    "parquet": [],
+    "resolved_config": {
+      "seed": 20261201,
+      "device": "cpu",
+      "mixed_precision": false,
+      "pins": {
+        "showdown_commit": "e440c4a18385274f10c405d0b158b6a962ce6d94",
+        "ou_banlist_date": "2026-06",
+        "usage_month": "2026-06",
+        "usage_rating_cut": 1695
+      },
+      "env": {
+        "backend": "showdown_direct",
+        "showdown_root": "server/pokemon-showdown",
+        "rollout_workers": 1,
+        "rollout_worker_mode": "process",
+        "actor_threads": 1,
+        "opponent_cache_size": 2,
+        "rollout_worker_timeout": 900,
+        "server_url": "ws://localhost:8000/showdown/websocket",
+        "battle_format": "gen9ou",
+        "num_workers": 8,
+        "no_security": true,
+        "team_pool": null,
+        "concurrent_battles": 1
+      },
+      "encoding": {
+        "history_cap": 60,
+        "history_encoder": "causal_transformer",
+        "species_embed_dim": 64,
+        "entity_hidden": 128,
+        "current_dim": 256,
+        "history_dim": 256,
+        "state_dim": 256,
+        "dyn_dim": 256,
+        "dropout": 0.05
+      },
+      "model": {
+        "history_transformer_layers": 2,
+        "history_heads": 4,
+        "history_gru_hidden": 256,
+        "belief_decoder_layers": 2,
+        "belief_dim": 128,
+        "aux_into_trunk": true,
+        "oracle": "none",
+        "shared_latent_trunk": true,
+        "shared_latent_learned_only": true,
+        "shared_latent_contextual": true,
+        "shared_typed_world_tokens": true,
+        "shared_recent_history_tokens": 8,
+        "shared_entity_dim": 128,
+        "shared_latent_dim": 3072,
+        "shared_contextual_layers": 4,
+        "shared_contextual_heads": 4,
+        "shared_contextual_ff_dim": 512,
+        "shared_contextual_dropout": 0.05,
+        "shared_contextual_head_readers": true,
+        "token_action_policy": true,
+        "action_query_policy": true,
+        "action_query_heads": 4,
+        "simple_rule_prior_strength": 0.0,
+        "history_ff_dim": 512
+      },
+      "loss": {
+        "value_coef": 0.5,
+        "belief_coef": 0.05,
+        "self_belief_coef": 0.0,
+        "belief_chain_coef": 0.05,
+        "self_belief_chain_coef": 0.0,
+        "preview_coef": 0.0,
+        "action_coef": 1.0,
+        "require_exact_chosen_action_features": true,
+        "require_exact_chosen_legality": true
+      },
+      "log": {
+        "dir": "runs/blueprint",
+        "tensorboard": false,
+        "checkpoint_every_decisions": 200000,
+        "halt_on_regression_sigma": 2.0
+      },
+      "experiment": "replay_blueprint_cpu",
+      "bc": {
+        "manifest": "runs/blueprint/split/train_manifest.parquet",
+        "holdout_manifest": "runs/blueprint/split/holdout_manifest.parquet",
+        "holdout_fraction": 0.0,
+        "scope": "full",
+        "epochs": 6,
+        "batch_size": 256,
+        "lr": 0.0003,
+        "lr_final": 3e-05,
+        "eval_batches": 0,
+        "early_stopping_patience": 2,
+        "early_stopping_min_delta": 0.002,
+        "streaming": false
+      },
+      "preflight": {
+        "required": false
+      }
+    },
+    "holdout_contents": null
+  },
+  "commit": "9867251980434d450ffcf87d731b0ddc820f28a9",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -m fog.scripts.run_replay_blueprint --games 600 --work-dir runs/blueprint_runner_smoke --device cpu --batch-size 256 --epochs 2 --chronological-holdout-games 100",
+  "work_root": "/workspace/fog-roadmap/runs/blueprint_runner_smoke",
+  "work_dir": "runs/blueprint_runner_smoke",
+  "steps": {
+    "import": {
+      "seconds": 1.6838619779999817,
+      "status": "complete",
+      "commands": [
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/blueprint_runner_smoke/raw --cache runs/blueprint_runner_smoke/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 600 --max-shards 1 --max-download-mb 6000"
+      ]
+    },
+    "convert": {
+      "seconds": 74.54563317999998,
+      "status": "complete",
+      "commands": [
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.convert_replay_decisions --raw runs/blueprint_runner_smoke/raw --out runs/blueprint_runner_smoke/decisions --imputations 1 --workers 4"
+      ]
+    },
+    "split": {
+      "seconds": 2.2598634239999456,
+      "status": "complete",
+      "commands": [
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.split_replay_manifest --manifest runs/blueprint_runner_smoke/decisions/manifest.parquet --out runs/blueprint_runner_smoke/split --chronological-holdout-games 100 --train-sizes 20000 100000 --skip-oversized-train-sizes"
+      ]
+    },
+    "train": {
+      "seconds": 967.2602324269999,
+      "status": "complete",
+      "commands": [
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training",
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training",
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training",
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training"
+      ]
+    },
+    "score-best": {
+      "seconds": 14.897236014999862,
+      "status": "complete",
+      "commands": [
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt",
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt"
+      ]
+    },
+    "score-untrained": {
+      "seconds": 14.625872153000046,
+      "status": "complete",
+      "commands": [
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained",
+        "/workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained"
+      ]
+    }
+  }
+}

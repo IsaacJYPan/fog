@@ -235,6 +235,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12: trainer resume and policy-loss selection added; real-data profiling and
       R/A/S/B blocked by dataset access. See "replay trainer profile, resume, and the data-or-steps
       runs" in the ledger and `docs/briefs/02-report.md`; P2.3 remains open._
+      _2026-11-12: brief 03 has dataset access and a real replay runner recovery check;
+      profiling and comparison runs are in progress. See "replay trainer profile and the
+      data-or-steps runs" in the ledger and `docs/briefs/03-report.md`; P2.3 remains open._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
@@ -246,6 +249,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12: data-versus-steps conclusion remains unmeasured; the runner has a generated-data
       recovery check, but the original fixed holdout IDs are unavailable. See the ledger section
       "replay trainer profile, resume, and the data-or-steps runs" and `docs/briefs/02-report.md`._
+      _2026-11-12: the reviewed fixed IDs are tracked and brief 03's real-data work is
+      underway. See "replay trainer profile and the data-or-steps runs" in the ledger
+      and `docs/briefs/03-report.md`; P2.4 remains open._
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
       _2026-11-12, smoke only (400 games, `pool_b`, 3k model): 0.258 vs SimpleHeuristics, 0.623 vs

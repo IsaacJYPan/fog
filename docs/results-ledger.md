@@ -567,3 +567,48 @@ access and is now tracked as `data/replay_splits/p2_holdout_2000_ids.txt`:
   2026-02-20 02:05, as in `docs/briefs/01-artifacts/stage2-split-summary.txt`.
 - Converting only those 2,000 games (`convert_replay_decisions --imputations 1 --workers 4`)
   gave 104,037 accepted rows, the brief 01 holdout row count.
+
+## 2026-11-12: replay trainer profile and the data-or-steps runs (ROADMAP P2)
+
+Brief `docs/briefs/03-p2-scale-measure.md`; branch `work/p2-scale-measure`, started
+from reviewed `work/roadmap` at `4f9d75c`. Report: `docs/briefs/03-report.md`;
+evidence: `docs/briefs/03-artifacts/`. Executor timestamps are UTC on 2026-11-13;
+section date uses the owner's local date. Work is in progress.
+
+Setup: metadata endpoint HTTP 200. Pinned import of 22,000 games completed in 194 s
+with exactly brief 01's filter counts: 77,225 below rating, 4,176 invalid metadata,
+495 outside dates, 840 other format (`continuation-import.txt`,
+`continuation-import-wall.txt`; exact command in `continuation-commands.txt`).
+Conversion and split verification are pending. Machine: four CPU cores of quota,
+16 GiB memory, PyTorch 2.13.0+cu130, no CUDA device; intra/inter-op threads 5/5
+(`continuation-environment.json`). Locked install and pinned Showdown build pass.
+All 82 focused tests passed in 20.26 s; Ruff clean (`continuation-tests.txt`,
+`continuation-ruff.txt`; commands in `continuation-commands.txt`).
+
+Stage 4 real-data runner **passed**, at `fa35867` (model/trainer/runner unchanged
+from reviewed `4f9d75c`). Command:
+`uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 600 --work-dir runs/blueprint_runner_smoke --device cpu --batch-size 256 --epochs 2 --chronological-holdout-games 100`.
+The recorded script invokes that environment's Python directly. Its first source
+shard was cached from the genuine pinned import; the existing importer verifies it.
+600 imported/converted games, 29,508 rows; train 500/24,278, holdout 100/5,230.
+After first completion, delete **only** training/results and repeat: import,
+conversion and split skip; SIGTERM after epoch one exits 143 after 147.248 s;
+identical command resumes epoch two and exits 0 after 151.991 s. CSV epochs
+`[0,1]` become `[0,1,2]`; earlier rows are exactly unchanged. All numeric metric
+fields also equal the first completion exactly (timing columns excluded).
+Post-completion step walls: training attempts combined 284.380 s; best report
+7.216 s; untrained report 7.133 s. Sources: `runner-smoke/interruption-test.json`,
+`post-completion-step-seconds.json`, `repeat-comparison.json`, results/output
+folders, and `check_real_runner.py`. Initial import/conversion/split walls were
+1.684/74.546/2.260 s, but competed with the main converter and are not idle CPU
+measurements. The first completion also includes an earlier authorized recovery
+attempt before the owner corrected the brief number; its evidence is retained
+under `runner-first-completion/`. Main conversion was paused 758 s, 04:02:31 to
+04:15:09 UTC (`conversion-pauses.txt`), to serialize CPU work after severe
+contention during the first baseline evaluation. Checkpoint sizes/hashes are in
+`checkpoints.json`; these small-run weights are engineering smoke, not a gate.
+
+Stages 1–3 and 6: pending verified data. Stage 5 instructions now use public
+cloning and the committed holdout IDs; projections are pending. No data-versus-
+steps, seed-noise, value-learning or play-strength conclusion exists yet.
+P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.

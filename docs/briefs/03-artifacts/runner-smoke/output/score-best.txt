@@ -1,0 +1,6 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt
+rows=5230 policy_rows=5224 top1=0.2096 lift=2.131 nll=2.0094 brier=0.2546 ece=0.0846 seconds=6.3 -> runs/blueprint_runner_smoke/results/holdout-best.json
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt
+rows=5230 policy_rows=5224 top1=0.2096 lift=2.131 nll=2.0094 brier=0.2546 ece=0.0846 seconds=5.8 -> runs/blueprint_runner_smoke/results/holdout-best.json

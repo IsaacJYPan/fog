@@ -1,0 +1,27 @@
+[
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "aeb674c60a082dcd07fd65b3a551c4e9129660b8dcb547decc4e57f930d9d36c"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_epoch1.pt",
+    "bytes": 23549643,
+    "sha256": "1b00a93b5e01c86f71091252aed6fc4278efc178c596f58c60a8556d23dc1397"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_epoch2.pt",
+    "bytes": 23549643,
+    "sha256": "df36016efb083c6a8fc0c33e5e865080f278ea1c76b62e427c05baeee4ea2439"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "29173abbf58027dbad939e0faee239b301ac68ff53bdb4632f7fbecc46be1107"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_state.pt",
+    "bytes": 75660168,
+    "sha256": "27859ed4f32738744bf6e7d94919bc03d9c221f140f2ff21c6736efbb00c9eb9"
+  }
+]

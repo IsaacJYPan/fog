@@ -1,0 +1,25 @@
+commit: 9867251980434d450ffcf87d731b0ddc820f28a9
+command: /workspace/fog-roadmap/.venv/bin/python -m fog.scripts.run_replay_blueprint --games 600 --work-dir runs/blueprint_runner_smoke --device cpu --batch-size 256 --epochs 2 --chronological-holdout-games 100
+revision: 792a86b5cdbcab9696032e947483b218453a0d4f
+imported games: 600
+converted games/rows: (600, 29508)
+training games/rows: (500, 24278)
+holdout games/rows: (100, 5230)
+excluded newer or quarantined games: 0
+import: complete; wall-clock 1.684 s
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/blueprint_runner_smoke/raw --cache runs/blueprint_runner_smoke/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 600 --max-shards 1 --max-download-mb 6000
+convert: complete; wall-clock 74.546 s
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.convert_replay_decisions --raw runs/blueprint_runner_smoke/raw --out runs/blueprint_runner_smoke/decisions --imputations 1 --workers 4
+split: complete; wall-clock 2.260 s
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.split_replay_manifest --manifest runs/blueprint_runner_smoke/decisions/manifest.parquet --out runs/blueprint_runner_smoke/split --chronological-holdout-games 100 --train-sizes 20000 100000 --skip-oversized-train-sizes
+train: complete; wall-clock 967.260 s
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+score-best: complete; wall-clock 14.897 s
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-best.json --batch-size 256 --checkpoint runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt
+score-untrained: complete; wall-clock 14.626 s
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained
+  /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained

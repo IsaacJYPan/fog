@@ -1,0 +1,7 @@
+{
+  "excluded_fields": [
+    "seconds_per_epoch",
+    "train_rows_per_second"
+  ],
+  "numeric_metrics_identical_to_first_completion": true
+}

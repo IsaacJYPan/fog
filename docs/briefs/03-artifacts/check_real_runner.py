@@ -18,7 +18,7 @@ command = [sys.executable, "-u", "-m", "fog.scripts.run_replay_blueprint",
 records = {"command": command,
            "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
            "source": "pinned public corpus; first source shard cached from main import",
-           "timing_context": "main 22000-game converter also running"}
+           "timing_context": "main 22000-game converter paused throughout post-completion recovery check"}
 started = time.perf_counter()
 with (work / "first-attempt.txt").open("w") as output:
     child = subprocess.Popen(command, stdout=output, stderr=subprocess.STDOUT)

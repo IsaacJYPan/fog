@@ -1,0 +1,6 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained
+rows=5230 policy_rows=5224 top1=0.1049 lift=1.066 nll=2.2705 brier=0.2534 ece=0.0574 seconds=5.9 -> runs/blueprint_runner_smoke/results/holdout-untrained.json
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.eval.replay_holdout_report --config configs/replay_blueprint_cpu.yaml --manifest runs/blueprint_runner_smoke/split/holdout_manifest.parquet --out runs/blueprint_runner_smoke/results/holdout-untrained.json --batch-size 256 --untrained
+rows=5230 policy_rows=5224 top1=0.1049 lift=1.066 nll=2.2705 brier=0.2534 ece=0.0574 seconds=5.6 -> runs/blueprint_runner_smoke/results/holdout-untrained.json

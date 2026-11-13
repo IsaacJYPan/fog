@@ -1,0 +1,56 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.convert_replay_decisions --raw runs/blueprint_runner_smoke/raw --out runs/blueprint_runner_smoke/decisions --imputations 1 --workers 4
+Replay conversion: 25/600, 25 accepted, 0 quarantined
+Replay conversion: 50/600, 50 accepted, 0 quarantined
+Replay conversion: 75/600, 75 accepted, 0 quarantined
+Replay conversion: 100/600, 100 accepted, 0 quarantined
+Replay conversion: 125/600, 125 accepted, 0 quarantined
+Replay conversion: 150/600, 150 accepted, 0 quarantined
+Replay conversion: 175/600, 175 accepted, 0 quarantined
+Replay conversion: 200/600, 200 accepted, 0 quarantined
+Replay conversion: 225/600, 225 accepted, 0 quarantined
+Replay conversion: 250/600, 250 accepted, 0 quarantined
+Replay conversion: 275/600, 275 accepted, 0 quarantined
+Replay conversion: 300/600, 300 accepted, 0 quarantined
+Replay conversion: 325/600, 325 accepted, 0 quarantined
+Replay conversion: 350/600, 350 accepted, 0 quarantined
+Replay conversion: 375/600, 375 accepted, 0 quarantined
+Replay conversion: 400/600, 400 accepted, 0 quarantined
+Replay conversion: 425/600, 425 accepted, 0 quarantined
+Replay conversion: 450/600, 450 accepted, 0 quarantined
+Replay conversion: 475/600, 475 accepted, 0 quarantined
+Replay conversion: 500/600, 500 accepted, 0 quarantined
+Replay conversion: 525/600, 525 accepted, 0 quarantined
+Replay conversion: 550/600, 550 accepted, 0 quarantined
+Replay conversion: 575/600, 575 accepted, 0 quarantined
+Replay conversion: 600/600, 600 accepted, 0 quarantined
+{
+  "status": "complete",
+  "source_replays_considered": 600,
+  "parsed_replays": 600,
+  "quarantined_replays": 0,
+  "accepted_decision_versions": 29508,
+  "all_decision_versions": 29585,
+  "accepted_fraction": 0.9973973297279026,
+  "imputations_per_replay": 1,
+  "min_rating": 0,
+  "provenance_codes": {
+    "unknown": 0,
+    "inferred": 1,
+    "exact": 2
+  },
+  "public_state_reconstruction": "chronological_prefix_only",
+  "future_opponent_fields_used": false,
+  "private_truth": false,
+  "source_providers": [
+    "metamon_raw_replays"
+  ],
+  "filter_counts": {
+    "accepted": 29508,
+    "called_or_unaligned_move": 64,
+    "forced_or_unaligned_switch": 13
+  },
+  "imputation_method": "usage_baseline",
+  "candidate_bank_sha256": null,
+  "imputation_report": {}
+}

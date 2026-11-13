@@ -1,0 +1,13 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/blueprint_runner_smoke/raw --cache runs/blueprint_runner_smoke/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 600 --max-shards 1 --max-download-mb 6000
+{
+  "status": "target_reached",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "kept_games": 600,
+  "filter_counts": {
+    "below_rating": 1944,
+    "invalid_metadata": 112,
+    "outside_dates": 12,
+    "other_format": 22
+  }
+}
