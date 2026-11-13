@@ -27,3 +27,9 @@ uv run --no-sync python docs/briefs/03-artifacts/verify_split.py
 
 Owner corrected the assignment from brief 02 to brief 03 during setup.
 The earlier setup/evidence commit 9867251980434d450ffcf87d731b0ddc820f28a9 was pushed to work/p2-scale-prep before that correction; work/p2-scale-measure starts from work/roadmap at 4f9d75c.
+
+Main conversion was SIGSTOP-paused 04:02:31 through 04:15:09 UTC to serialize CPU work (conversion-pauses.txt). Its total 2225 s includes that 758 s pause.
+Idle baseline profile, started only after verify_split.py returned zero:
+uv run --no-sync python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-before
+Comparison supervisor (run only after the profile):
+uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py R

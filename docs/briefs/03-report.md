@@ -3,7 +3,7 @@
 ## Answer
 
 Measurements are in progress. The pinned dataset is accessible and the 22,000-game
-import reproduced brief 01's filter counts; conversion is running. The reviewed
+import and split reproduce brief 01 exactly, including all fixed holdout IDs. The reviewed
 trainer/runner code passed all 82 focused tests, and the real 600-game runner
 passed its post-completion kill/restart test. Training throughput, the data-versus-steps reading
 and hosted GPU readiness are not yet established.
@@ -23,8 +23,8 @@ No data-versus-steps conclusion or seed-noise estimate exists yet.
 
 - Setup: locked install and pinned Showdown build complete; four cores of CPU quota,
   16 GiB memory, PyTorch 2.13.0+cu130, no CUDA device. Import: 22,000 games in 194 s,
-  with brief 01's rejection counts. Conversion in progress.
-- Stage 1: waiting for the verified split; no loader/model changes made.
+  with brief 01's rejection counts. Conversion: 22,000 games / 1,127,562 rows in 2,225 s wall, including the 758 s pause. The holdout has 2,000 games / 104,037 rows, uploaded 2026-02-20 04:17:33 through 2026-05-19 04:52:01 UTC. Training sets 1k/3k/20k have 52,983/156,597/1,023,525 rows. Fixed-ID splitting drops zero games and matches chronological holdout/train membership (`verify-split-output.txt`, `split-fixed-output.txt`).
+- Stage 1: the idle CPU baseline profile is running; no loader/model changes made.
 - Stages 2–3: not started.
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
@@ -55,7 +55,7 @@ verified the existing importer.
 
 ## Not verified
 
-Full split counts/dates; idle-machine throughput; R reproduction; A/S/B;
+Idle-machine throughput; R reproduction; A/S/B;
 hosted GPU execution; play strength. No gate is claimed.
 
 ## Checkpoints

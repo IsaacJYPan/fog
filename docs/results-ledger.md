@@ -579,7 +579,7 @@ Setup: metadata endpoint HTTP 200. Pinned import of 22,000 games completed in 19
 with exactly brief 01's filter counts: 77,225 below rating, 4,176 invalid metadata,
 495 outside dates, 840 other format (`continuation-import.txt`,
 `continuation-import-wall.txt`; exact command in `continuation-commands.txt`).
-Conversion and split verification are pending. Machine: four CPU cores of quota,
+Conversion completed with 22,000 accepted games and 1,127,562 rows in 2,225 s wall, including the 758 s pause (`convert-output.txt`, `convert-quality.json`, `convert-wall.txt`). Every nested split matches brief 01: 40/1k/3k/10k/20k games have 2,020/52,983/156,597/514,103/1,023,525 rows. Holdout: 2,000 games, 104,037 rows, exact fixed IDs, uploads 2026-02-20 04:17:33 to 2026-05-19 04:52:01 UTC. Fixed splitting drops zero newer games; holdout/train20k memberships equal the chronological split (`verify-split-output.txt`, `split-fixed-output.txt`; script `verify_split.py`). File bytes by component are measured in `disk-bytes.json`. Machine: four CPU cores of quota,
 16 GiB memory, PyTorch 2.13.0+cu130, no CUDA device; intra/inter-op threads 5/5
 (`continuation-environment.json`). Locked install and pinned Showdown build pass.
 All 82 focused tests passed in 20.26 s; Ruff clean (`continuation-tests.txt`,
@@ -608,7 +608,7 @@ under `runner-first-completion/`. Main conversion was paused 758 s, 04:02:31 to
 contention during the first baseline evaluation. Checkpoint sizes/hashes are in
 `checkpoints.json`; these small-run weights are engineering smoke, not a gate.
 
-Stages 1–3 and 6: pending verified data. Stage 5 instructions now use public
+Stage 1 baseline profile is running on the verified corpus; stages 2–3 and 6 are pending. Stage 5 instructions now use public
 cloning and the committed holdout IDs; projections are pending. No data-versus-
 steps, seed-noise, value-learning or play-strength conclusion exists yet.
 P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.

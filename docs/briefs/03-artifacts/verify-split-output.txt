@@ -1,0 +1,30 @@
+{
+  "train_40": {
+    "games": 40,
+    "rows": 2020
+  },
+  "train_1000": {
+    "games": 1000,
+    "rows": 52983
+  },
+  "train_3000": {
+    "games": 3000,
+    "rows": 156597
+  },
+  "train_10000": {
+    "games": 10000,
+    "rows": 514103
+  },
+  "train_20000": {
+    "games": 20000,
+    "rows": 1023525
+  },
+  "holdout": {
+    "games": 2000,
+    "rows": 104037,
+    "fixed_ids_match": true,
+    "oldest_upload_utc": "2026-02-20T04:17:33+00:00",
+    "newest_upload_utc": "2026-05-19T04:52:01+00:00"
+  }
+}
+fixed and chronological holdout/train_20000 IDs match
