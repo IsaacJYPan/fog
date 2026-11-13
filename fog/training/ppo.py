@@ -668,13 +668,13 @@ class _TrainSetup:
 
         # Single-worker collection uses this model directly. Autograd is independent of mode.
         self.agent = FogAgent.from_tables(cfg).to(self.device).eval()
-        if self.ppo_cfg.get("init_ckpt") and self.ppo_cfg.get("resume_ckpt"):
-            raise ValueError("ppo.init_ckpt and ppo.resume_ckpt are mutually exclusive")
         # ppo.init_ckpt: warm-start the agent's weights from a saved state dict (resume after an
         # interrupted run, or fine-tune from a prior experiment). Optimizer moments are NOT
         # restored — set total_decisions to the REMAINING budget and entropy_coef to the schedule
         # value at the interruption point (the decay runs over this config's own total).
-        if self.ppo_cfg.get("init_ckpt"):
+        # Retain init_ckpt in the configuration digest on a full resume, but do not reload it:
+        # the saved training state below supplies both weights and optimizer moments.
+        if self.ppo_cfg.get("init_ckpt") and not self.ppo_cfg.get("resume_ckpt"):
             initial = torch.load(self.ppo_cfg["init_ckpt"], map_location=self.device)
             if self.ppo_cfg.get("init_compatible", False):
                 manifest = self.agent.load_compatible_state_dict(initial)

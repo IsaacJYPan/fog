@@ -661,3 +661,13 @@ process 0.249–0.636 effective epochs, rather than three. Optimization throughp
 70–80 processed rows/s; the increased decisions/s reflects less optimization work, not a code
 speed-up. These actual counts are retained in `scratch-metrics.csv`. The first passing point
 took 4,612.136 s of training-loop collection plus updates (sum through 106,889 in that CSV).
+
+Stage 2 preparation found a second reproducible resume blocker: a warm-started run could not
+use `ppo.resume_ckpt` while retaining `ppo.init_ckpt`; removing the init key instead fails the
+saved configuration digest. The regression test failed before the fix with the explicit
+mutual-exclusion error (`warm-resume-regression.txt`). Full resume now skips the initializer
+load while retaining its config key, then restores the saved weights and optimizer. Test:
+a warm-started model is updated, saved, its initializer deleted, and its parameters and optimizer
+moments restored exactly. Ordinary initialization and PPO update math are unchanged. Updated
+focused verification: **32 passed**, lint clean (`focused-tests.txt`, `ruff.txt`). The running
+scratch job was not restarted or altered by this fix.

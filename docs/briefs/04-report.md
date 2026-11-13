@@ -62,8 +62,8 @@ inherited 24k latest-self refresh. Exact inherited/new values: `config-changes.j
 16 GiB, including a reduced-total diagnostic. Recomputing the four large encoder/head blocks
 preserves model, losses, minibatches and optimizer steps. On recorded Showdown observations,
 two epochs gave bit-identical parameters, metrics and RNG versus ordinary updates. An explicit
-resume now preserves earlier dashboard CSV rows; fresh-run behavior is unchanged. Focused
-verification: 31 tests passed, lint clean. OOM attempts and the successful memory probe are
+resume now preserves earlier dashboard CSV rows; fresh-run behavior is unchanged. Warm-started runs can also resume with their original init key retained for the config check: the full state supplies weights and optimizer without reloading the initializer. Focused
+verification: 32 tests passed, lint clean. OOM attempts and the successful memory probe are
 retained; no failed attempt supplied starting weights to stage 1.
 
 **Deviations / not verified.** Budgets scaled as authorized; snapshots occur after whole
