@@ -15,7 +15,7 @@ throughput and memory remain untested.
 | Run (games × epochs) | Steps | Train wall / rows/s | Last NLL / top-1 | Best report NLL / top-1 (epoch) | Final train NLL | Value MSE min / last |
 | --- | ---: | --- | --- | --- | ---: | --- |
 | R (1,000 × 6) | 1,286 | 2,799.8 s / 187.06 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 |
-| A (1,000 × 18) | — | next, after diagnosis is pushed | — | — | — | — |
+| A (1,000 × 18) | — | running; resumed epoch 3 completed | — | — | — | — |
 | S (1,000 × 6) | — | not started | — | — | — | — |
 | B (3,000 × 18) | — | projection pending | — | — | — | — |
 
@@ -66,6 +66,14 @@ exists yet; R's value MSE barely beats constant zero at its best and rises above
   within 2.49e-8. Current CPU is AMD EPYC 9V74; brief 01 recorded Intel Xeon
   2.10 GHz. This platform difference is observed, not yet an isolated cause
   (`reproduction-platform.json`).
+  A started at 06:47:15 UTC after the diagnosis was pushed. Its pre-launch
+  projection is 4,914.936 s training plus 19 validation passes and two reports,
+  8,072.140 s total (`A-projection.json`); its required kill/restart is planned
+  after at least two completed epochs. That real interruption/recovery now
+  passed: SIGTERM at completed epoch 2 exited −15 after 1,197.492 s; the identical
+  command resumed at epoch 2 and completed epoch 3, with all earlier CSV rows
+  (including timing fields) exactly unchanged (`A-resume-evidence.json`,
+  `A-resume-metrics.csv`, `A-resume-tail.txt`). A continues; S/B remain unstarted.
 - Stage 4: done on real replays. 600 games / 29,508 rows; train 500 / 24,278,
   holdout 100 / 5,230. After the first completion, only `training/` and `results/`
   were deleted. The identical command skipped import/conversion/split, was killed

@@ -732,3 +732,24 @@ references. They cannot automatically establish a clean data effect, especially
 when close to seed noise or the observed R drift. No model/loss/learning-rate/
 batch/thread setting was changed for diagnosis; the historical guard was not
 relabelled as passing. `reproduction-platform.json` collects the source evidence.
+
+A started at 06:47:15 UTC at `41b6ffd` after diagnosis was pushed (`cdde5e9`), invoked with
+`uv run --no-sync python docs/briefs/03-artifacts/run_comparison.py A`; full
+trainer command/attempts are retained in `A-execution.json`. Pre-launch
+projection (`A-projection.json`): 18×52,983/194.039961 = 4,914.936 s training,
+plus 19×154.662233 s validation and 218.621 s standalone reports = 8,072.140 s.
+The required actual SIGTERM/restart is planned after at least two completed
+epochs, with earlier CSV rows compared exactly; its repeated partial-epoch and
+startup cost is not included in that projection. S/B have not started.
+
+Stage 3 actual A interruption/recovery **passed** while the 18-epoch run
+continues. The supervisor loaded atomic `bc_state.pt` and confirmed completed
+epoch 2, sent SIGTERM (child exit −15, first-attempt wall 1,197.492 s), then
+started the identical command at 07:07:12 UTC. Training printed
+`[bc] resume: completed epoch 2/18` and completed epoch 3. Snapshot CSV epochs
+`[0,1,2,3]` retain exactly the original `[0,1,2]` rows, including timing fields.
+Evidence/command/commit: `A-resume-evidence.json`, `A-execution.json`,
+`A-resume-metrics.csv`, `A-resume-tail.txt`. This is a real replay training
+interruption, not a generated-data test; remaining A epochs and both reports
+are still running/pending. The final supervisor check will compare the same
+prefix again after all 18 epochs complete.

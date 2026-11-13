@@ -1,0 +1,19 @@
+{
+  "run": "A",
+  "recorded_utc": "2026-11-13 06:47:15 UTC",
+  "profile_source": "docs/briefs/03-artifacts/profile-after-timing.json",
+  "evaluation_source": "R-summary.json epoch_validation_seconds",
+  "report_source": "R-summary.json standalone_report_seconds",
+  "training_rows": 52983,
+  "holdout_rows": 104037,
+  "epochs": 18,
+  "training_rows_per_second": 194.03996113140155,
+  "projected_training_seconds": 4914.936049457203,
+  "projected_seconds_per_holdout_pass": 154.66223293949997,
+  "holdout_passes": 19,
+  "projected_reports_seconds": 218.62111969500074,
+  "projected_training_plus_evaluation_seconds": 7853.518475307703,
+  "projected_total_with_reports_seconds": 8072.139595002704,
+  "interruption_plan": "SIGTERM after bc_state.pt records at least epoch2, immediately restart identical command, verify earlier CSV rows unchanged; expect small unprojected repeated partial-epoch/startup cost",
+  "formula": "epochs*training_rows/profile_training_rows_per_second + (epochs+1)*R_mean_validation_seconds + R_best_and_final_report_seconds"
+}

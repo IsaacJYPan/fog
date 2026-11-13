@@ -1,0 +1,37 @@
+{
+  "recorded_utc": "2026-11-13 07:19:08 UTC",
+  "run": "A",
+  "commit": "41b6ffdb955127a3e61b40b930587d8902679663",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e18",
+  "deliberate_SIGTERM_performed": true,
+  "completed_checkpoint_epoch_at_interruption": 2,
+  "interrupted_attempt": {
+    "started_utc": "2026-11-13 06:47:15 UTC",
+    "exit_code": -15,
+    "seconds": 1197.49223351,
+    "deliberately_interrupted": true
+  },
+  "resumed_started_utc": "2026-11-13 07:07:12 UTC",
+  "resume_log_line": "[bc] resume: completed epoch 2/18",
+  "resume_log_line_observed": true,
+  "metric_epochs_before_resume": [
+    0,
+    1,
+    2
+  ],
+  "metric_epochs_after_resume": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "earlier_metrics_exactly_unchanged": true,
+  "resumed_epoch3_completed": true,
+  "comparison": "current_rows[:len(metrics_before_resume)] == metrics_before_resume, including original timing fields",
+  "sources": [
+    "A-execution.json",
+    "A-resume-metrics.csv",
+    "A-resume-tail.txt"
+  ],
+  "status": "passed_actual_interruption_and_continuation; remaining A epochs still training"
+}
