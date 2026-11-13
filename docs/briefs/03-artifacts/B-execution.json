@@ -1,0 +1,13 @@
+{
+  "run": "B",
+  "games": 3000,
+  "epochs": 18,
+  "commit": "620d6c263e77974e84a8413a3a3adef0baf25aa5",
+  "attempts": [
+    {
+      "started_utc": "2026-11-13 10:52:34 UTC"
+    }
+  ],
+  "reports": [],
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_3000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g3000e18"
+}

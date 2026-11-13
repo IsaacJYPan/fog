@@ -647,7 +647,7 @@ time. Command and attempts are in `R-execution.json`; invoked with
 A/S/B and stage 6 remain pending. Stage 5 instructions now use public
 cloning and the committed holdout IDs, with CPU time/disk arithmetic in
 `scale-projections.json`; R-derived validation/report overhead is included. Stage
-5 is complete, with a 9.62–9.95 h CPU20k full-pipeline reference at observed batch
+5 is complete, with a 9.62–11.69 h CPU20k full-pipeline reference at observed/profile batch
 256. Batch 1,024 throughput and hosted GPU execution remain unmeasured. No data-versus-
 steps, seed-noise, value-learning or play-strength conclusion exists yet.
 P2.3–P2.5 and G2 remain open. No hosted GPU run has been made.
@@ -665,7 +665,7 @@ per-epoch policy/value curves and timing formulas: `R-summary.json`,
 | R | 1,000 / 6 / 1,286 | 2,799.785 s / 187.060 | 1.810490 / 0.340484 | 1.810496 / 0.340476 (6) | 1.737690 | 0.993827 / 1.247020 | `247a1e1` |
 | A | 1,000 / 18 / 3,870 | 9,355.371 s / 157.725 | 1.948926 / 0.368527 | 1.736081 / 0.375367 (8) | 1.241824 | 1.015312 / 1.595830 | `41b6ffd` |
 | S | 1,000 / 6 / 1,286 | 3,224.913 s / 158.587 | 1.794974 / 0.345247 | 1.794978 / 0.345246 (6) | 1.718056 | 0.999632 / 1.237886 | `aed6f68` |
-| B | 3,000 / 18 / unmeasured | budgeted below eight hours; next | — | — | — | — | — |
+| B | 3,000 / 18 / unmeasured | running; conservative budget 21,405 s | — | — | — | — | — |
 
 R best/final reports took 108.494/110.127 s, total trainer+reports 3,018.406 s.
 Mean epoch validation is 154.662 s, derived as
@@ -816,3 +816,11 @@ slower observed A/S training rate and larger validation/report times. Both the
 stage-1 reference (18,060.446 s, 5.02 h) and conservative recent-rate total
 (21,405.112 s, 5.95 h) are below the eight-hour limit, so B will run serially
 with every prescribed training setting unchanged.
+
+B launched at 10:52:34 UTC, commit `620d6c2`, with the exact command in
+`B-execution.json`. An intermediate six-epoch snapshot is preserved in
+`B-epoch6-{metrics.csv,tail.txt,progress.json}` while the 18-epoch run continues:
+policy NLL 1.604685, training policy NLL 1.517395, value MSE 1.191609. These
+checkpoints have an unfinished 18-epoch schedule and do not replace the legacy
+six-epoch completed-schedule reference. The supervisor remains live beyond two
+hours; no extra interruption or runtime variant was introduced.

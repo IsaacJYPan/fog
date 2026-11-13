@@ -1,0 +1,10 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_3000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g3000e18
+BC dataset: train=156597 decision rows; holdout=104037 rows  (config_hash=ed89e885e785, torch_threads=5)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+[bc] epoch 1/18  train_loss=3.003  eval_loss=2.844  belief=6.614  chain=2.176  value=0.984  query_p=0.267  dropped=0.000%
+[bc] epoch 2/18  train_loss=2.630  eval_loss=2.632  belief=6.076  chain=2.001  value=0.957  query_p=0.284  dropped=0.000%
+[bc] epoch 3/18  train_loss=2.442  eval_loss=2.572  belief=5.831  chain=1.912  value=1.015  query_p=0.292  dropped=0.000%
+[bc] epoch 4/18  train_loss=2.313  eval_loss=2.506  belief=5.633  chain=1.872  value=0.957  query_p=0.310  dropped=0.000%
+[bc] epoch 5/18  train_loss=2.197  eval_loss=2.479  belief=5.638  chain=1.848  value=0.986  query_p=0.310  dropped=0.000%
+[bc] epoch 6/18  train_loss=2.060  eval_loss=2.571  belief=5.577  chain=1.827  value=1.192  query_p=0.328  dropped=0.000%
