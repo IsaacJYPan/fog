@@ -544,3 +544,26 @@ not genuine corpus provenance. Checkpoint paths/sizes/hashes: `02-artifacts/chec
 Stage 5 **not run**: no replay-trained checkpoint available; no new smoke play rows,
 win-rate intervals or switch-play claim. P2.3–P2.5 and G2 remain open. The final report
 records all blocked work without substituting synthetic measurements for it.
+
+## 2026-11-13: review of brief 02, and the fixed holdout ids
+
+The branch `work/p2-scale-prep` (head `773e2ef`) was reviewed and merged into `work/roadmap`.
+It holds code only: the worker's machine was refused by the dataset host, so the profile, the
+four step-matched runs, the real-data runner test and the play smoke of brief 02 **were not run**
+and are carried into brief 03. Checked in review at `773e2ef`: the seven test files covering the
+change (82 passed in 98 s), `ruff check fog tests` clean, and the trainer diff read line by line
+(new options default to off; `metrics.csv` gains two timing columns and the start-up line prints
+the thread count).
+
+The holdout id list the worker could not produce was made in review on a machine with dataset
+access and is now tracked as `data/replay_splits/p2_holdout_2000_ids.txt`:
+
+- `python -m fog.scripts.import_metamon_replays --out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600`
+  gave 22,000 games with the same rejection counts as brief 01 (77,225 below rating, 4,176 invalid
+  metadata, 495 outside dates, 840 other format). The first attempt failed on a reset connection
+  during a shard download; the retry completed.
+- The 2,000 games with the largest `uploadtime` (ties by id; there was no tie at the boundary)
+  were uploaded 2026-02-20 04:17 to 2026-05-19 04:52 UTC, and the newest remaining game
+  2026-02-20 02:05, as in `docs/briefs/01-artifacts/stage2-split-summary.txt`.
+- Converting only those 2,000 games (`convert_replay_decisions --imputations 1 --workers 4`)
+  gave 104,037 accepted rows, the brief 01 holdout row count.
