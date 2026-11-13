@@ -19,7 +19,7 @@ and use a machine with access.
    set -e
    git clone https://github.com/IsaacJYPan/fog /kaggle/working/fog
    cd /kaggle/working/fog
-   git checkout 2a608ad88843f037d8655dd4a8ff297a928dd117
+   git checkout c5938bcb1573a4a4b6fd53200373e541cefc86ae
    git submodule update --init --recursive
    ```
 
@@ -66,13 +66,16 @@ and use a machine with access.
    | Convert | `(2,225 − 758 paused) s × 112/22`; `608,097,221 bytes × 112/22` | 2.07 h active; 3.10 GB decisions |
    | Download cache | `481,396,201 bytes × 112/22` | about 2.45 GB; grows in whole shard chunks |
    | Split | 2,000 fixed holdout games; about 100,000 eligible training games | not separately timed; manifests are small |
-   | Six training passes | `1,023,525/20,000 × 100,000 = 5,117,625 rows`; `6 × rows / 194.04 rows/s` | 44.0 h CPU reference at batch 256; GPU time unknown |
+   | Six training passes | `1,023,525/20,000 × 100,000 = 5,117,625 rows`; `6 × rows / {194.04 profile, 187.06 full R} rows/s` | 44.0–45.6 h CPU reference at batch 256; GPU time unknown |
    | CPU batch preparation alone | `6 × 5,117,625 / 7,100.46 rows/s` | 1.20 h feed floor; **not a GPU runtime estimate** |
 
    Conversion's active time still includes initial CPU contention. The training
    reference excludes evaluation and file writes; throughput at batch 1,024 is
-   unmeasured. **R-derived evaluation/report overhead: pending run R.** The runner
-   scores its best checkpoint and untrained model on CPU. Raw data, decisions and
+   unmeasured. R averaged `154.66 s` per validation pass. Six validations plus its
+   `172.37 s` outside epoch timers (initial validation/startup/writes combined)
+   give `6 × 154.66 + 172.37 = 1,100.35 s` (18.3 min) CPU overhead. Its two
+   standalone reports took `108.49 + 110.13 = 218.62 s` (3.64 min), used as a
+   proxy for the runner's best/untrained CPU scoring. GPU validation time is unknown. Raw data, decisions and
    cache project to `1.07 + 3.10 + 2.45 = 6.61 GB`; the measured local environment
    is 5.68 GB. Keeping a second full data copy for resume gives
    `5.68 + 2 × 6.61 = 18.90 GB` before checkpoints, source and logs, hence 25 GB
@@ -125,6 +128,7 @@ uv run --no-sync python -m fog.scripts.run_replay_blueprint \
 
 The 22,000-game import retains the fixed holdout and leaves 20,000 training games.
 Import/conversion project to `194 s + 1,467 s = 27.7 min` active; six training passes
-are `6 × 1,023,525 / 194.04 = 8.79 h` at measured batch-256 speed, plus the
-evaluation/report overhead above. Actual batch-1,024 throughput is unmeasured.
+are `6 × 1,023,525 / {194.04, 187.06} = 8.79–9.12 h` at measured batch-256
+speeds. Adding the overhead above gives about **9.6–9.9 h total**. Actual
+batch-1,024 throughput is unmeasured.
 The recipe file keeps batch 256; only the runner command requests 1,024.

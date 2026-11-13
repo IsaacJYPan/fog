@@ -5,7 +5,8 @@
     "conversion_wall": "docs/briefs/03-artifacts/convert-wall.txt",
     "conversion_pause": "docs/briefs/03-artifacts/conversion-pauses.txt",
     "disk": "docs/briefs/03-artifacts/disk-bytes.json",
-    "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt"
+    "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt",
+    "R_run": "docs/briefs/03-artifacts/R-summary.json"
   },
   "inputs": {
     "measured_imported_games": 22000,
@@ -26,7 +27,8 @@
       "decisions": 608097221,
       "cache": 481396201,
       "environment": 5675620035
-    }
+    },
+    "R_aggregate_training_rows_per_second": 187.06045301203753
   },
   "arithmetic": {
     "scale_ratio": "112000 / 22000",
@@ -37,7 +39,10 @@
     "cpu_batch_feed_floor_seconds": "6 * scale_training_rows / batch_only_rows_per_second",
     "scale_disk_bytes": "each measured raw/decisions/cache byte count * (112000 / 22000)",
     "environment_work_and_archive_bytes": "environment + 2 * scale(raw + decisions + cache)",
-    "cpu_20k_training_seconds": "6 * 1023525 / training_rows_per_second"
+    "cpu_20k_training_seconds": "6 * 1023525 / training_rows_per_second",
+    "R_based_cpu_training_seconds": "6*training_rows/R.aggregate_training_rows_per_second",
+    "CPU_nontraining_seconds": "6*R.mean_validation_seconds + R.wall_outside_epoch_timers_seconds + sum(R.standalone_report_seconds.values())",
+    "CPU_full_pipeline_seconds": "projected import + conversion active + CPU training reference + CPU nontraining reference"
   },
   "projections": {
     "scale_training_rows": 5117625.0,
@@ -58,14 +63,37 @@
     "cpu_22k_import_and_conversion_active_seconds": 1661,
     "cpu_20k_training_reference_seconds": 31648.893167120797,
     "cpu_20k_training_reference_hours": 8.79135921308911,
-    "evaluation_and_reports": null
+    "evaluation_and_reports": {
+      "mean_validation_seconds": 154.66223293949997,
+      "six_validation_passes_seconds": 927.9733976369998,
+      "startup_initial_validation_and_writes_seconds": 172.37174261600103,
+      "six_validation_plus_outside_epoch_seconds": 1100.3451402530009,
+      "R_best_report_seconds": 108.49386590100039,
+      "R_final_report_seconds": 110.12725379400035,
+      "standalone_report_proxy_seconds": 218.62111969500074,
+      "nontraining_total_reference_seconds": 1318.9662599480016,
+      "formula": "6*R.mean_validation_seconds + R.wall_outside_epoch_timers_seconds + sum(R.standalone_report_seconds.values())",
+      "limits": "CPU batch256 reference at fixed104037-row holdout. R best+final report time is a proxy for scale best+untrained scoring; GPU validation and batch1024 timings unmeasured."
+    },
+    "cpu_scale_training_R_reference_seconds": 164148.80593721248,
+    "cpu_scale_training_R_reference_hours": 45.59689053811458,
+    "cpu_20k_training_R_reference_seconds": 32829.76118744249,
+    "cpu_20k_training_R_reference_hours": 9.119378107622914,
+    "cpu_22k_full_pipeline_reference_hours": [
+      9.619127618630221,
+      9.947146513164025
+    ],
+    "cpu_scale_full_pipeline_reference_hours": [
+      46.67206447098667,
+      48.31215894365569
+    ]
   },
   "limits": [
     "Projections assume similar replay lengths and filtering yield on four CPU cores; hosted CPU and network speeds differ.",
     "758 seconds of diagnostic pause excluded from conversion wall; the remaining 1467 seconds still include initial CPU contention.",
     "Training projections use measured batch 256; actual runner batch-1024 throughput is unmeasured.",
     "GPU throughput and memory are unmeasured; CPU batch-feed floor is not a GPU runtime estimate.",
-    "Training projections exclude validation, reports, checkpoint writes and startup; R-derived evaluation/report overhead is pending.",
+    "Training-only references exclude validation and writes; full-pipeline CPU references add observed R validation/outside-epoch/report overhead. Model/corpus-dependent scaling and GPU validation remain unmeasured.",
     "Cache disk grows in whole downloaded shard chunks; linear scaling is approximate.",
     "Disk amounts are decimal bytes/GB. The 25-GB suggestion leaves headroom beyond measured environment plus two data copies for checkpoints, source and logs; hosted storage was not tested.",
     "Hosted installation, split latency, backup and handback download time are unmeasured."
