@@ -606,3 +606,15 @@ epochs: parameters, metrics and RNG bit-identical to ordinary updates at four le
 (`check_checkpointing.py`, `checkpointing-equivalence.json`). Focused verification: 31 tests
 passed, lint clean (`focused-tests.txt`, `ruff.txt`). The dashboard fix preserves existing rows
 only for an explicit resume; fresh-run behavior stays unchanged.
+
+Stage 0 thread check (smoke), `a6c73bc`: `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run
+--no-sync python -m fog.train --config configs/rl_check_scratch.yaml --trainer ppo --set
+ppo.total_decisions=1024 log.dir=runs/rl_check/thread1_smoke`, 1,180 decisions, wall
+110.250 s versus 60.470 s for the corresponding four-thread memory-fix smoke. Four learner
+threads retained (`thread-comparison.json`, `thread1-smoke-*`). No further throughput tuning.
+The full-run wall rate above rounds to **22.270** decisions/s; the exact value is
+22.2699198388. Proportional budget factor = 22.2699198388 / 40 = 0.556747996;
+stage 1 budget 334,049, fallback-grid budget 167,024 each, stage 2 budget 556,748 if eligible.
+The normal 100k / 200k evaluation cadence and game counts stay unchanged; report the actual
+whole-update checkpoint counters, and also score the final checkpoint. Stage 1 starts from
+fresh random weights; neither throughput checkpoint is used as its start.
