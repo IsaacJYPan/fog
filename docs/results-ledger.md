@@ -494,3 +494,15 @@ update-loop check preserves 20 losses exactly on made-up inputs (4 tests, 3.66 s
 Data versus training length and seed noise **cannot be determined**. No new value or switch
 claim, runtime projection, or play-strength result exists. Stages 2 and 4 are in progress;
 missing exact fixed holdout IDs and the real runner smoke remain explicit blockers. G2 stays open.
+
+Stage 2 implemented: atomic `bc.resume` epoch state; default-loss or opt-in `action_ce`
+selection and stopping; epoch/throughput columns; optional unchanged-default PyTorch thread
+setting; additive switch-mass and switch-target diagnostics. Fixed-holdout splitter code is
+also implemented, but the genuine IDs are unavailable. Focused commands:
+`uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_bc_resume.py tests/test_bc_metrics.py tests/test_bc_scope.py`
+(44 passed, 3.70 s; `stage2-trainer-tests.txt`) and
+`uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_replay_holdout_report.py tests/test_split_replay_manifest.py`
+(`stage2-report-split-tests.txt`). Ruff: `uv run --no-sync python -m ruff check fog tests`
+(`stage2-ruff.txt`). Four-epoch CPU interruption after epoch two matches numeric metrics,
+model, optimizer, scheduler, scaler, RNG and best/early-stop bookkeeping exactly; elapsed-time
+columns differ and are excluded. Made-up data checks features, not the replay learning curve.

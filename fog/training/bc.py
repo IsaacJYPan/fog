@@ -12,9 +12,13 @@ import csv
 import hashlib
 import json
 import math
+import os
+import random
 import re
+import time
 from pathlib import Path
 
+import numpy as np
 import torch
 
 from fog.config import config_hash
@@ -340,6 +344,77 @@ def _write_metrics(path: Path, rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
+def _atomic_save(state: dict, path: Path) -> None:
+    """Leave the previous completed epoch intact until its replacement is complete."""
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    torch.save(state, temporary)
+    temporary.replace(path)
+
+
+def _resume_settings(cfg: dict, manifest, eval_manifest) -> dict:
+    """The training inputs that must stay fixed across an interrupted run."""
+    settings = {
+        f"bc.{key}": value
+        for key, value in cfg.get("bc", {}).items()
+        if key != "resume"
+    }
+    settings.update(
+        {key: cfg.get(key) for key in ("seed", "device", "model", "encoding", "loss")}
+    )
+    paths = {
+        "manifest": manifest,
+        "holdout_manifest": eval_manifest,
+        **{
+            key: cfg.get("bc", {}).get(key)
+            for key in (
+                "auxiliary_manifest", "auxiliary_holdout_manifest",
+                "guard_train_manifest", "guard_holdout_manifest",
+            )
+        },
+    }
+    for name, path in paths.items():
+        if path is not None:
+            import polars as pl
+
+            source = Path(path)
+            table = pl.read_parquet(source).to_dict(as_series=False)
+            if "shard" in table:
+                # Restoring the whole work directory elsewhere should not invalidate a run.
+                # Preserve row order and paths within that directory when comparing inputs.
+                table["shard"] = [
+                    os.path.relpath(Path(shard).resolve(), source.parent.resolve())
+                    for shard in table["shard"]
+                ]
+            contents = json.dumps(table, sort_keys=True, default=str).encode()
+            settings[f"bc.{name}"] = hashlib.sha256(contents).hexdigest()
+    return settings
+
+
+def _check_resume_settings(saved: dict, current: dict) -> None:
+    changed = sorted(
+        key for key in saved.keys() | current.keys() if saved.get(key) != current.get(key)
+    )
+    if changed:
+        raise ValueError("cannot resume: changed " + ", ".join(changed))
+
+
+def _rng_state() -> dict:
+    return {
+        "python": random.getstate(),
+        "numpy": np.random.get_state(),
+        "torch": torch.random.get_rng_state(),
+        "cuda": torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None,
+    }
+
+
+def _restore_rng_state(state: dict) -> None:
+    random.setstate(state["python"])
+    np.random.set_state(state["numpy"])
+    torch.random.set_rng_state(state["torch"].cpu())
+    if state["cuda"] is not None:
+        torch.cuda.set_rng_state_all([value.cpu() for value in state["cuda"]])
+
+
 def _policy_modules(agent) -> list[torch.nn.Module]:
     if agent.policy_value.action_query_policy:
         modules = [
@@ -609,6 +684,14 @@ def train(cfg: dict) -> dict:
     device = torch.device("cuda" if (cfg.get("device") == "cuda" and torch.cuda.is_available()) else "cpu")
 
     bc_cfg = cfg.get("bc", {})
+    if bc_cfg.get("torch_threads") is not None:
+        threads = int(bc_cfg["torch_threads"])
+        if threads < 1:
+            raise ValueError("bc.torch_threads must be positive")
+        torch.set_num_threads(threads)
+    selection_metric = str(bc_cfg.get("selection_metric", "loss"))
+    if selection_metric not in {"loss", "action_ce"}:
+        raise ValueError("bc.selection_metric must be 'loss' or 'action_ce'")
     loss_cfg = cfg.get("loss", {})
     manifest = bc_cfg.get("manifest", "data/parsed/manifest.parquet")
     batch_size = int(bc_cfg.get("batch_size", 512))
@@ -632,6 +715,16 @@ def train(cfg: dict) -> dict:
         manifest, eval_manifest = _split_replay_manifest(
             manifest, ckpt_dir.parent, holdout_fraction, seed
         )
+
+    resume = bool(bc_cfg.get("resume", False))
+    state_path = ckpt_dir / "bc_state.pt"
+    resume_settings = _resume_settings(cfg, manifest, eval_manifest) if resume else None
+    resumed = None
+    if resume and state_path.exists():
+        resumed = torch.load(state_path, map_location="cpu", weights_only=False)
+        if resumed.get("version") != 1:
+            raise ValueError("cannot resume: unsupported bc_state.pt version")
+        _check_resume_settings(resumed["settings"], resume_settings)
 
     streaming = bool(bc_cfg.get("streaming", False))
     shard_buffer = int(bc_cfg.get("shard_buffer", 64))
@@ -743,10 +836,10 @@ def train(cfg: dict) -> dict:
     )
     print(
         f"BC dataset: train={len(ds)} decision rows{split_note}  "
-        f"(config_hash={config_hash(cfg)})"
+        f"(config_hash={config_hash(cfg)}, torch_threads={torch.get_num_threads()})"
     )
     agent = FogAgent.from_tables(cfg).to(device)
-    if bc_cfg.get("init_ckpt"):
+    if bc_cfg.get("init_ckpt") and resumed is None:
         initial = torch.load(bc_cfg["init_ckpt"], map_location=device)
         if bc_cfg.get("init_compatible", False):
             manifest = agent.load_compatible_state_dict(initial)
@@ -950,45 +1043,62 @@ def train(cfg: dict) -> dict:
 
     metrics_path = ckpt_dir.parent / "metrics.csv"
     history: list[dict] = []
-    baseline = _fixed_eval(
-        agent,
-        eval_ds,
-        batch_size,
-        loss_cfg,
-        device,
-        seed + 90_001,
-        eval_batches,
-        retention_decoder=retention_decoder,
-        retention_coef=retention_coef,
-    )
-    auxiliary_baseline = (
-        _fixed_eval(
+    if resumed is None:
+        baseline = _fixed_eval(
             agent,
-            auxiliary_eval_ds,
+            eval_ds,
             batch_size,
-            auxiliary_loss_cfg,
+            loss_cfg,
             device,
-            seed + 190_001,
-            int(bc_cfg.get("auxiliary_eval_batches", eval_batches)),
+            seed + 90_001,
+            eval_batches,
             retention_decoder=retention_decoder,
             retention_coef=retention_coef,
         )
-        if auxiliary_eval_ds is not None else None
-    )
-    guard_baseline = (
-        _fixed_eval(
-            agent,
-            guard_eval_ds,
-            batch_size,
-            guard_loss_cfg,
-            device,
-            seed + 290_001,
-            int(bc_cfg.get("guard_eval_batches", eval_batches)),
-            retention_decoder=retention_decoder,
-            retention_coef=retention_coef,
+        auxiliary_baseline = (
+            _fixed_eval(
+                agent,
+                auxiliary_eval_ds,
+                batch_size,
+                auxiliary_loss_cfg,
+                device,
+                seed + 190_001,
+                int(bc_cfg.get("auxiliary_eval_batches", eval_batches)),
+                retention_decoder=retention_decoder,
+                retention_coef=retention_coef,
+            )
+            if auxiliary_eval_ds is not None else None
         )
-        if guard_eval_ds is not None else None
-    )
+        guard_baseline = (
+            _fixed_eval(
+                agent,
+                guard_eval_ds,
+                batch_size,
+                guard_loss_cfg,
+                device,
+                seed + 290_001,
+                int(bc_cfg.get("guard_eval_batches", eval_batches)),
+                retention_decoder=retention_decoder,
+                retention_coef=retention_coef,
+            )
+            if guard_eval_ds is not None else None
+        )
+    else:
+        agent.load_state_dict(resumed["model"])
+        opt.load_state_dict(resumed["optimizer"])
+        sched.load_state_dict(resumed["scheduler"])
+        scaler.load_state_dict(resumed["scaler"])
+        initial_digests = resumed["initial_digests"]
+        baseline = resumed["baseline"]
+        auxiliary_baseline = resumed["auxiliary_baseline"]
+        guard_baseline = resumed["guard_baseline"]
+        history = resumed["history"]
+        # An interrupted epoch may have rewritten metrics or the best model before its state
+        # was committed. Restore both to the last complete epoch before replaying that epoch.
+        _write_metrics(metrics_path, history)
+        torch.save(resumed["best_model"], ckpt_dir / "bc_best.pt")
+        _restore_rng_state(resumed["rng"])
+        print(f"[bc] resume: completed epoch {resumed['epoch']}/{epochs}", flush=True)
     if guard_baseline is not None and guard_metric not in guard_baseline:
         raise ValueError(
             f"bc.guard_metric={guard_metric!r} is not an available evaluation metric"
@@ -1041,8 +1151,9 @@ def train(cfg: dict) -> dict:
             {f"guard_eval_{key}": value for key, value in guard_baseline.items()}
         )
         baseline_row["worst_relative_eval_loss"] = 1.0
-    history.append(baseline_row)
-    _write_metrics(metrics_path, history)
+    if resumed is None:
+        history.append(baseline_row)
+        _write_metrics(metrics_path, history)
     print(
         f"[bc] baseline  loss={baseline['loss']:.3f}  "
         f"belief={baseline['belief']:.3f}  chain={baseline['belief_chain']:.3f}",
@@ -1073,14 +1184,30 @@ def train(cfg: dict) -> dict:
         or auxiliary_baseline is not None
         or guard_baseline is not None
     )
-    initial_selection_loss = 1.0 if custom_relative_selection else baseline["loss"]
+    initial_selection_loss = (
+        baseline["action_ce"] if selection_metric == "action_ce"
+        else 1.0 if custom_relative_selection else baseline["loss"]
+    )
     best_eval_loss = initial_selection_loss
     best_meaningful_eval_loss = initial_selection_loss
     best_epoch = 0
-    torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
     epochs_without_improvement = 0
     step = 0
-    for epoch in range(epochs):
+    start_epoch = 0
+    if resumed is None:
+        torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
+    else:
+        best_eval_loss = resumed["best_eval_loss"]
+        best_meaningful_eval_loss = resumed["best_meaningful_eval_loss"]
+        best_epoch = resumed["best_epoch"]
+        epochs_without_improvement = resumed["epochs_without_improvement"]
+        step = resumed["step"]
+        start_epoch = resumed["epoch"]
+        metrics = resumed["metrics"]
+        if resumed["early_stopped"]:
+            start_epoch = epochs
+    for epoch in range(start_epoch, epochs):
+        epoch_started = time.perf_counter()
         agent.train()
         train_weighted: list[tuple[int, dict]] = []
         primary_weighted: list[tuple[int, dict]] = []
@@ -1393,6 +1520,7 @@ def train(cfg: dict) -> dict:
                     )
             if max_primary_batches and batch_index >= max_primary_batches:
                 break
+        train_seconds = time.perf_counter() - epoch_started
         train_metrics = _average_metrics(train_weighted)
         primary_train_metrics = _average_metrics(primary_weighted)
         auxiliary_train_metrics = _average_metrics(auxiliary_weighted)
@@ -1436,13 +1564,20 @@ def train(cfg: dict) -> dict:
             )
             if guard_eval_ds is not None else None
         )
-        row = {"epoch": epoch + 1}
+        # Training throughput excludes evaluation and checkpoint I/O; epoch seconds includes
+        # evaluation but excludes writes of these metrics and the checkpoints themselves.
+        row = {
+            "epoch": epoch + 1,
+            "seconds_per_epoch": time.perf_counter() - epoch_started,
+            "train_rows_per_second": sum(rows for rows, _ in train_weighted)
+            / max(train_seconds, 1e-12),
+        }
         row.update({f"train_{key}": value for key, value in train_metrics.items()})
         row.update({f"primary_train_{key}": value for key, value in primary_train_metrics.items()})
         row.update({f"aux_train_{key}": value for key, value in auxiliary_train_metrics.items()})
         row.update({f"guard_train_{key}": value for key, value in guard_train_metrics.items()})
         row.update({f"eval_{key}": value for key, value in eval_metrics.items()})
-        selection_loss = eval_metrics["loss"]
+        selection_loss = eval_metrics[selection_metric]
         relative_losses = []
         for metric_name in primary_selection_metrics:
             relative = eval_metrics[metric_name] / baseline[metric_name]
@@ -1476,8 +1611,9 @@ def train(cfg: dict) -> dict:
                 / max(1e-12, guard_baseline[guard_metric])
             )
         if custom_relative_selection:
-            selection_loss = max(relative_losses)
-            row["worst_relative_eval_loss"] = selection_loss
+            row["worst_relative_eval_loss"] = max(relative_losses)
+            if selection_metric == "loss":
+                selection_loss = row["worst_relative_eval_loss"]
         history.append(row)
         _write_metrics(metrics_path, history)
         if selection_loss < best_eval_loss:
@@ -1518,7 +1654,39 @@ def train(cfg: dict) -> dict:
             )
         metrics = eval_metrics
         torch.save(agent.state_dict(), ckpt_dir / f"bc_epoch{epoch+1}.pt")
-        if early_stopping_patience and epochs_without_improvement >= early_stopping_patience:
+        early_stopped = bool(
+            early_stopping_patience and epochs_without_improvement >= early_stopping_patience
+        )
+        if resume:
+            _atomic_save(
+                {
+                    "version": 1,
+                    "settings": resume_settings,
+                    "epoch": epoch + 1,
+                    "step": step,
+                    "model": agent.state_dict(),
+                    "optimizer": opt.state_dict(),
+                    "scheduler": sched.state_dict(),
+                    "scaler": scaler.state_dict(),
+                    "best_model": torch.load(
+                        ckpt_dir / "bc_best.pt", map_location="cpu", weights_only=False
+                    ),
+                    "best_eval_loss": best_eval_loss,
+                    "best_meaningful_eval_loss": best_meaningful_eval_loss,
+                    "best_epoch": best_epoch,
+                    "epochs_without_improvement": epochs_without_improvement,
+                    "early_stopped": early_stopped,
+                    "history": history,
+                    "metrics": metrics,
+                    "baseline": baseline,
+                    "auxiliary_baseline": auxiliary_baseline,
+                    "guard_baseline": guard_baseline,
+                    "initial_digests": initial_digests,
+                    "rng": _rng_state(),
+                },
+                state_path,
+            )
+        if early_stopped:
             print(
                 "[bc] early stop: no held-out improvement of at least "
                 f"{early_stopping_min_delta:.6g} for {epochs_without_improvement} epochs",

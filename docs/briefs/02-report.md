@@ -4,9 +4,9 @@
 
 Training throughput on the pinned replay corpus is unmeasured: this environment refuses
 the dataset host, and the previous shards are absent. The brief 01 gain still cannot be
-separated into data and training length because R, A, S and B need that corpus. Trainer and
-runner implementation is in progress; the scale run is not yet ready to launch, and no
-hosted GPU execution has been verified.
+separated into data and training length because R, A, S and B need that corpus. Trainer
+resume and selection are implemented and tested; the scale run still needs the missing fixed
+holdout IDs, real-data performance qualification, and hosted GPU verification.
 
 ## Stage 3 table
 
@@ -40,7 +40,17 @@ run-to-run variation. There is no measured runtime projection for B and no new p
   (`stage1-tests.txt`), including identical first 20 losses and final parameters against
   an independent CPU update loop with dropout. This made-up-data check is not the brief's
   real-data acceptance check or a throughput measurement.
-- **Stage 2: in progress.** Resume, metric selection, epoch timings, switch diagnostics.
+- **Stage 2: done on made-up inputs.** `bc.resume=true` writes atomic epoch state, restores
+  model/optimizer/schedule/scaler/all RNG streams/metric history/best model/patience, and
+  rejects changed manifests or training settings. Its four-epoch interruption test has
+  exactly equal numeric CSV fields and state after resume; the measured timing columns
+  are excluded because real elapsed time differs. Default `bc.selection_metric=loss`
+  preserves selection; `action_ce` selects/stops on policy NLL. New switch diagnostics
+  retain old report fields. Metrics add `seconds_per_epoch` (train+eval, excludes file writes)
+  and `train_rows_per_second` (train only). Optional `bc.torch_threads` leaves the runtime
+  setting untouched unless supplied. Trainer+scope tests: 44 passed, 3.70 s
+  (`stage2-trainer-tests.txt`); switch/split tests in `stage2-report-split-tests.txt`;
+  Ruff in `stage2-ruff.txt`. Implementation wall-clock was not timed.
 - **Stage 3: not run.** Dataset access blocks every run; no losses or runtimes invented.
 - **Stage 4: in progress.** Fixed-ID splitter and restartable runner; the actual 2,000
   replay IDs cannot be recovered without the pinned import. No substitute IDs are committed.

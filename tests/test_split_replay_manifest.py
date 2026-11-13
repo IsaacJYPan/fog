@@ -92,3 +92,61 @@ def test_random_split_still_works(tmp_path):
     assert len(holdout) == 15 and len(training) == 45
     assert set(holdout["id"]).isdisjoint(training["id"])
     assert set(pl.read_parquet(out / "train_10.parquet")["id"]) <= set(training["id"])
+
+
+def test_fixed_ids_are_exact_and_exclude_newer_nonholdout_games(tmp_path, capsys):
+    manifest = _manifest()
+    ordered = manifest.sort(["uploadtime", "id"])
+    # Deliberately noncontiguous holdout: some newer games must be excluded.
+    ids = [ordered["id"][30], ordered["id"][45]]
+    ids_path = tmp_path / "ids.txt"
+    ids_path.write_text("\n".join(ids) + "\n", encoding="utf-8")
+    out = _run(tmp_path, "--holdout-ids", str(ids_path), "--train-sizes", "5", "10")
+    training = pl.read_parquet(out / "train_manifest.parquet")
+    holdout = pl.read_parquet(out / "holdout_manifest.parquet")
+    assert set(holdout["id"]) == set(ids)
+    oldest = holdout["uploadtime"].min()
+    eligible = manifest.filter((~pl.col("id").is_in(ids)) & (pl.col("uploadtime") <= oldest))
+    assert set(training["id"]) == set(eligible["id"])
+    assert training["uploadtime"].max() <= oldest
+    assert set(pl.read_parquet(out / "train_5.parquet")["id"]) <= set(training["id"])
+    assert set(pl.read_parquet(out / "train_5.parquet")["id"]) <= set(
+        pl.read_parquet(out / "train_10.parquet")["id"]
+    )
+    excluded = len(manifest) - len(holdout) - len(training)
+    assert f"dropped_newer_games={excluded}" in capsys.readouterr().out
+
+
+@pytest.mark.parametrize("ids, error", [
+    (["missing-game"], "missing from manifest"),
+    ([], "at least one"),
+    (["game-000", "game-000"], "duplicate"),
+])
+def test_fixed_ids_reject_invalid_lists(ids, error):
+    with pytest.raises(ValueError, match=error):
+        split._fixed_holdout_split(_manifest(), ids)
+
+
+def test_fixed_ids_reject_duplicate_rows_and_missing_timestamps():
+    manifest = _manifest()
+    with pytest.raises(ValueError, match="unique"):
+        split._fixed_holdout_split(pl.concat([manifest, manifest.head(1)]), ["game-000"])
+    with pytest.raises(ValueError, match="uploadtime"):
+        split._fixed_holdout_split(manifest.drop("uploadtime"), ["game-000"])
+    manifest = manifest.with_columns(pl.lit(None, dtype=pl.Int64).alias("uploadtime"))
+    with pytest.raises(ValueError, match="non-null"):
+        split._fixed_holdout_split(manifest, ["game-000"])
+
+
+def test_fixed_ids_and_chronological_mode_are_mutually_exclusive(tmp_path):
+    with pytest.raises(SystemExit) as exc:
+        _run(tmp_path, "--holdout-ids", "ids.txt", "--chronological-holdout-games", "10")
+    assert exc.value.code == 2
+
+
+def test_runner_can_skip_only_unavailable_training_sizes(tmp_path, capsys):
+    out = _run(tmp_path, "--chronological-holdout-games", "10", "--train-sizes", "5", "100",
+               "--skip-oversized-train-sizes")
+    assert (out / "train_5.parquet").exists()
+    assert not (out / "train_100.parquet").exists()
+    assert "skipped_train_size=100 available_training_games=50" in capsys.readouterr().out

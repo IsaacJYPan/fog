@@ -116,6 +116,38 @@ def policy_summary(nll: np.ndarray, correct: np.ndarray, legal: np.ndarray,
     return summary
 
 
+def switch_diagnostics(probability: np.ndarray, target_correct: np.ndarray,
+                       action: np.ndarray) -> dict:
+    """Switch mass and switch-only target accuracy on policy-supervised replay rows.
+
+    ``probability`` sums the policy's probabilities over switch actions for each row;
+    ``target_correct`` compares the most probable switch action with the human action.
+    Missing action families have null means rather than a misleading zero.
+    """
+    probability = np.asarray(probability, dtype=np.float64)
+    target_correct = np.asarray(target_correct, dtype=bool)
+    action = np.asarray(action)
+    if probability.ndim != 1 or probability.shape != target_correct.shape or (
+        probability.shape != action.shape
+    ):
+        raise ValueError("switch diagnostics require one probability, target result and action per row")
+    switched = action >= SWITCH_ACTION_START
+    moved = ~switched
+    return {
+        "human_switch_rows": int(switched.sum()),
+        "human_move_rows": int(moved.sum()),
+        "mean_switch_probability_on_human_switch": (
+            float(probability[switched].mean()) if switched.any() else None
+        ),
+        "mean_switch_probability_on_human_move": (
+            float(probability[moved].mean()) if moved.any() else None
+        ),
+        "switch_target_top1": (
+            float(target_correct[switched].mean()) if switched.any() else None
+        ),
+    }
+
+
 def _commit() -> str | None:
     try:
         return subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True,
@@ -149,7 +181,7 @@ def score(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
     dataset = StreamingReplayDataset(manifest, shard_buffer=64)
     parts: dict[str, list[np.ndarray]] = {
         key: [] for key in ("action", "nll", "correct", "legal", "policy", "value", "outcome",
-                            "turn")
+                            "turn", "switch_probability", "switch_target_correct")
     }
     with torch.no_grad():
         for batch in dataset.batches(batch_size, shuffle=False, seed=0):
@@ -162,6 +194,10 @@ def score(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
             parts["correct"].append((out.log_probs.argmax(-1) == action).numpy())
             parts["legal"].append(batch["legality_mask"].float().sum(-1).numpy())
             parts["policy"].append(policy.numpy())
+            switch_log_probs = out.log_probs[:, SWITCH_ACTION_START:]
+            parts["switch_probability"].append(switch_log_probs.exp().sum(-1).float().numpy())
+            switch_target = switch_log_probs.argmax(-1) + SWITCH_ACTION_START
+            parts["switch_target_correct"].append((switch_target == action).numpy())
             parts["value"].append(out.value.float().reshape(-1).numpy())
             parts["outcome"].append(batch["outcome"].float().reshape(-1).numpy())
             parts["turn"].append(
@@ -183,6 +219,10 @@ def score(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
         "commit": _commit(),
         "policy": policy_summary(data["nll"][policy], data["correct"][policy],
                                  data["legal"][policy], data["action"][policy]),
+        "switch_diagnostics": switch_diagnostics(
+            data["switch_probability"][policy], data["switch_target_correct"][policy],
+            data["action"][policy],
+        ),
         "value": value_calibration(data["value"], data["outcome"]),
         "value_by_phase": {},
         "phase_definition": "(turn - 1) * 3 // last turn of the game; turn read from field, "

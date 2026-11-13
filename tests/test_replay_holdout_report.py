@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from fog.eval.replay_holdout_report import policy_summary, value_calibration
+from fog.eval.replay_holdout_report import policy_summary, switch_diagnostics, value_calibration
 
 
 def test_constant_half_prediction_has_brier_quarter():
@@ -71,3 +71,77 @@ def test_game_phase_uses_each_games_last_turn():
     turn = np.array([1, 3, 4, 6, 7, 9, 9, 1, 2, 3, 1])
     game = np.array([0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0])
     assert game_phase(turn, game).tolist() == [0, 0, 1, 1, 2, 2, 2, 0, 1, 2, 0]
+
+
+def test_switch_diagnostics_separate_when_and_where():
+    # A model can put little total probability on switching while ranking the right
+    # switch target first. Move rows and switch rows have separate denominators.
+    probabilities = np.array([
+        [0.5, 0.2, 0.05, 0.05, 0.05, 0.05, 0.025, 0.025, 0.04, 0.01],
+        [0.2, 0.2, 0.1, 0.1, 0.1, 0.1, 0.05, 0.05, 0.025, 0.075],
+        [0.5, 0.05, 0.05, 0.05, 0.05, 0.05, 0.025, 0.025, 0.15, 0.05],
+    ])
+    action = np.array([8, 8, 0])
+    switch_probability = probabilities[:, 8:].sum(-1)
+    target_correct = probabilities[:, 8:].argmax(-1) + 8 == action
+    result = switch_diagnostics(switch_probability, target_correct, action)
+    assert result["human_switch_rows"] == 2
+    assert result["human_move_rows"] == 1
+    assert result["mean_switch_probability_on_human_switch"] == pytest.approx(0.075)
+    assert result["mean_switch_probability_on_human_move"] == pytest.approx(0.2)
+    assert result["switch_target_top1"] == pytest.approx(0.5)
+
+
+def test_switch_diagnostics_empty_families_and_shape_errors():
+    empty = switch_diagnostics(np.array([]), np.array([], dtype=bool), np.array([]))
+    assert empty["human_switch_rows"] == empty["human_move_rows"] == 0
+    assert empty["switch_target_top1"] is None
+    assert empty["mean_switch_probability_on_human_move"] is None
+    moves = switch_diagnostics(np.array([0.3]), np.array([False]), np.array([0]))
+    assert moves["mean_switch_probability_on_human_switch"] is None
+    assert moves["switch_target_top1"] is None
+    with pytest.raises(ValueError, match="per row"):
+        switch_diagnostics(np.ones(2), np.ones(1), np.ones(2))
+
+
+def test_score_reports_switch_mass_and_targets_on_supervised_rows(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+
+    import polars as pl
+    import torch
+
+    from fog.eval import replay_holdout_report as report
+    from fog.models.agent import FogAgent
+    from fog.training.dataset import StreamingReplayDataset
+
+    probabilities = torch.zeros(4, 14)
+    probabilities[:, 0] = torch.tensor([0.9, 0.8, 0.8, 0.1])
+    probabilities[:, 8] = torch.tensor([0.04, 0.05, 0.15, 0.8])
+    probabilities[:, 9] = torch.tensor([0.06, 0.15, 0.05, 0.1])
+    batch = {
+        "action": torch.tensor([8, 9, 0, 8]),
+        "policy_valid": torch.tensor([True, True, True, False]),
+        "legality_mask": probabilities > 0,
+        "outcome": torch.tensor([1.0, 1.0, -1.0, -1.0]),
+        "field": torch.zeros(4, report._turn_column() + 1),
+    }
+
+    class Agent:
+        def eval(self):
+            return self
+
+        def __call__(self, batch):
+            return SimpleNamespace(log_probs=probabilities.log(), value=torch.zeros(4))
+
+    monkeypatch.setattr(FogAgent, "from_tables", lambda cfg: Agent())
+    monkeypatch.setattr(StreamingReplayDataset, "__init__", lambda self, *args, **kwargs: None)
+    monkeypatch.setattr(StreamingReplayDataset, "batches", lambda *args, **kwargs: iter([batch]))
+    manifest = tmp_path / "manifest.parquet"
+    pl.DataFrame({"id": ["game"], "n_rows": [4]}).write_parquet(manifest)
+    result = report.score({}, manifest, None)
+    assert result["rows"] == 4 and result["policy_rows"] == 3
+    switches = result["switch_diagnostics"]
+    assert switches["human_switch_rows"] == 2 and switches["human_move_rows"] == 1
+    assert switches["mean_switch_probability_on_human_switch"] == pytest.approx(0.15)
+    assert switches["mean_switch_probability_on_human_move"] == pytest.approx(0.2)
+    assert switches["switch_target_top1"] == pytest.approx(0.5)

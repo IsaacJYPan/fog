@@ -103,7 +103,8 @@ _SECTION_KEYS = {
         "max_primary_batches_per_epoch", "reader_lr_scale",
         "primary_selection_metrics",
         "reconstruction_coef", "reconstruction_decoder", "reconstruction_slot_dim", "scope",
-        "shared_lr_scale", "shard_buffer", "streaming",
+        "shared_lr_scale", "shard_buffer", "streaming", "resume", "selection_metric",
+        "torch_threads",
     },
     "eval": {
         "closure_games", "closure_opponent", "games_per", "include_reading_opponent",
