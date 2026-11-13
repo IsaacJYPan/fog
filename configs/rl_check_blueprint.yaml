@@ -10,6 +10,7 @@ replay_policy:
   coef: 0.0
 
 ppo:
+  activation_checkpointing: true  # 1024-row forwards otherwise exceed 16 GB on CPU
   init_ckpt: null
   total_decisions: 1000000
   batch_decisions: 8000

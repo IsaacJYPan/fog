@@ -9,6 +9,39 @@ from fog.training.ppo import _maybe_chunk_update, ppo_update
 from tests.test_ppo_update import TinyPolicyAgent, make_ppo_batch
 
 
+def test_checkpointed_update_preserves_parameters_metrics_and_rng():
+    from copy import deepcopy
+
+    torch.manual_seed(42)
+    ordinary = TinyPolicyAgent()
+    ordinary.backbone = ordinary.pi  # exercise an actual checkpointed block
+    checked = deepcopy(ordinary)
+    batch = make_ppo_batch(n=10)
+    options = {"epochs": 2, "minibatch_size": 4}
+    rng = torch.random.get_rng_state()
+    before = ppo_update(ordinary, torch.optim.Adam(ordinary.parameters()), batch,
+                        {"ppo": options})
+    final_rng = torch.random.get_rng_state()
+    torch.random.set_rng_state(rng)
+    after = ppo_update(checked, torch.optim.Adam(checked.parameters()), batch,
+                       {"ppo": {**options, "activation_checkpointing": True}})
+    assert before == after
+    assert torch.equal(final_rng, torch.random.get_rng_state())
+    for name, value in ordinary.state_dict().items():
+        assert torch.equal(value, checked.state_dict()[name]), name
+
+
+def test_checkpointed_forward_restores_blocks_on_failure():
+    from fog.training.ppo import _checkpointed_forward
+
+    agent = TinyPolicyAgent()
+    agent.backbone = agent.pi
+    original = agent.backbone.forward
+    with pytest.raises(KeyError):
+        _checkpointed_forward(agent, {})
+    assert agent.backbone.forward == original
+
+
 def test_update_counts_rows_including_short_last_minibatch():
     agent = TinyPolicyAgent()
     batch = make_ppo_batch(n=10)

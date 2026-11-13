@@ -35,6 +35,31 @@ def _index_nested(x, idx: torch.Tensor):
     return x
 
 
+def _checkpointed_forward(agent, batch):
+    """Recompute large encoder/head blocks during backward without changing state-dict keys.
+
+    Checkpointing the entire agent retains too many recomputed activations at once. Separate
+    blocks bound that peak while preserving each block's random stream, including chain routes.
+    The temporary wrappers are removed before returning, including on a forward failure.
+    """
+    from functools import partial
+
+    from torch.utils.checkpoint import checkpoint
+
+    originals = []
+    try:
+        for name in ("backbone", "shared_latent", "belief", "self_belief"):
+            module = getattr(agent, name, None)
+            if module is not None:
+                original = module.forward
+                originals.append((module, original))
+                module.forward = partial(checkpoint, original, use_reentrant=False)
+        return agent(batch)
+    finally:
+        for module, original in originals:
+            module.forward = original
+
+
 # -inf logits are clamped to this before any arithmetic: exp(-1e4) == 0 exactly in fp32, and unlike
 # -inf it cannot produce NaN *gradients* (torch.where guards forward values only — the local backward
 # of p*log p at log p = -inf is 0 * -inf = NaN and poisons every parameter).
@@ -310,7 +335,10 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             mb["compute_belief_chain"] = True
             mb_adv = adv[idx]
 
-            out = agent(mb)
+            if ppo_cfg.get("activation_checkpointing", False):
+                out = _checkpointed_forward(agent, mb)
+            else:
+                out = agent(mb)
             behavior_log_probs = _behavior_log_probs(
                 out.log_probs,
                 temperature=rollout_temperature,

@@ -60,6 +60,7 @@ _SECTION_KEYS = {
     },
     "log": {"checkpoint_every_decisions", "dir", "halt_on_regression_sigma", "tensorboard"},
     "ppo": {
+        "activation_checkpointing",
         "target_kl",
         "batch_decisions", "bc_anchor_ckpt", "bc_anchor_rule_prior_strength", "clip",
         "entropy_coef", "entropy_coef_final", "epochs", "games_per_chunk", "gamma",
