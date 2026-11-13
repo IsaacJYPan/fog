@@ -65,24 +65,27 @@ and use a machine with access.
    | Import | `194 s × 112/22`; raw `209,345,372 bytes × 112/22` | 16.5 min; 1.07 GB raw |
    | Convert | `(2,225 − 758 paused) s × 112/22`; `608,097,221 bytes × 112/22` | 2.07 h active; 3.10 GB decisions |
    | Download cache | `481,396,201 bytes × 112/22` | about 2.45 GB; grows in whole shard chunks |
-   | Split | 2,000 fixed holdout games; about 100,000 eligible training games | not separately timed; manifests are small |
-   | Six training passes | `1,023,525/20,000 × 100,000 = 5,117,625 rows`; `6 × rows / {194.04 profile, 157.72–187.06 full runs} rows/s` | 44.0–54.1 h CPU reference at batch 256; GPU time unknown |
+   | Split | `2.155 s × 112/22`; manifests `700,419 bytes × 112/22 + 364,134/20,000 × 100,000` including the extra 100k subset | about 11 s; 5.4 MB manifests |
+   | Six training passes | `1,023,525/20,000 × 100,000 = 5,117,625 rows`; `6 × rows / {194.04 profile, 157.29–187.06 full runs} rows/s` | 44.0–54.2 h CPU reference at batch 256; GPU time unknown; about 0.29 GB checkpoints/results |
    | CPU batch preparation alone | `6 × 5,117,625 / 7,100.46 rows/s` | 1.20 h feed floor; **not a GPU runtime estimate** |
 
    Conversion's active time still includes initial CPU contention. The training
    reference excludes evaluation and file writes; throughput at batch 1,024 is
-   unmeasured. Validation averaged `154.66–172.19 s` per pass in R/A/S. Six
+   unmeasured. Validation averaged `154.66–179.06 s` per pass in R/A/S/B. Six
    validations plus initial validation/startup/writes give
-   `6 × {154.66, 172.19} + {172.37, 209.31} = 1,100–1,242 s` CPU overhead;
-   A's outside-epoch time includes its deliberate restart. Two standalone
-   reports took `218.62–262.13 s`, used as a proxy for the runner's best/untrained
-   CPU scoring. Adding import, conversion and those overheads projects to
-   **46.7–56.8 h total on CPU**. This planning range includes observed runtime
+   `6 × {154.66, 179.06} + {172.37, 209.31} = 1,100–1,284 s` CPU overhead.
+   The startup range uses R/A/S because B's original attempt wall is unknown;
+   A's time includes its deliberate restart. Two standalone reports took
+   `213.02–262.13 s`, used as a proxy for the runner's best/untrained CPU scoring.
+   Adding import, conversion, split and those overheads projects to
+   **46.7–57.0 h total on CPU**. This planning range includes observed runtime
    variation; it is not a guaranteed bound. GPU validation time is unknown. Raw data, decisions and
    cache project to `1.07 + 3.10 + 2.45 = 6.61 GB`; the measured local environment
-   is 5.68 GB. Keeping a second full data copy for resume gives
-   `5.68 + 2 × 6.61 = 18.90 GB` before checkpoints, source and logs, hence 25 GB
-   headroom. Backup creation and handback download time are unmeasured. Inputs and
+   is 5.68 GB. Six-epoch checkpoints and the results copy measured
+   `264,071,026 + 23,548,503 = 287,619,529 bytes`. Keeping a second work copy for
+   resume gives `5.68 + 2 × (6.61 + 0.288 + 0.0054) ≈ 19.5 GB` before source
+   and logs, hence 25 GB headroom. Split time scales interpreter startup too;
+   cache and storage projections are approximate. Backup creation and handback download time are unmeasured. Inputs and
    exact arithmetic:
    [scale-projections.json](briefs/03-artifacts/scale-projections.json).
 
@@ -140,7 +143,7 @@ uv run --no-sync python -m fog.scripts.run_replay_blueprint \
 
 The 22,000-game import retains the fixed holdout and leaves 20,000 training games.
 Import/conversion project to `194 s + 1,467 s = 27.7 min` active; six training passes
-are `6 × 1,023,525 / {194.04, 157.72} = 8.79–10.82 h` at measured batch-256
+are `6 × 1,023,525 / {194.04, 157.29} = 8.79–10.85 h` at measured batch-256
 speeds. Adding the overhead above gives about **9.6–11.7 h total**. Actual
 batch-1,024 throughput is unmeasured.
 The recipe file keeps batch 256; only the runner command requests 1,024.

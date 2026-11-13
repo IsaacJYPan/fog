@@ -1,0 +1,31 @@
+{
+  "command": "uv run --no-sync python -m fog.scripts.split_replay_manifest --manifest data/metamon_gen9ou_r1500_decisions/manifest.parquet --out runs/blueprint/split_timing --holdout-ids data/replay_splits/p2_holdout_2000_ids.txt --train-sizes 20000 100000 --skip-oversized-train-sizes",
+  "started_utc": "2026-11-13T22:23:27.115592+00:00",
+  "commit": "26107f2f5ade1853f87dc630a300804402c2497f",
+  "exit_code": 0,
+  "wall_seconds": 2.154822686999978,
+  "input_games": 22000,
+  "fixed_holdout_games": 2000,
+  "outputs": {
+    "train_manifest.parquet": {
+      "games": 20000,
+      "rows": 1023525,
+      "same_ids_as_verified_fixed_split": true,
+      "bytes": 300902
+    },
+    "holdout_manifest.parquet": {
+      "games": 2000,
+      "rows": 104037,
+      "same_ids_as_verified_fixed_split": true,
+      "bytes": 35383
+    },
+    "train_20000.parquet": {
+      "games": 20000,
+      "rows": 1023525,
+      "same_ids_as_verified_fixed_split": true,
+      "bytes": 364134
+    }
+  },
+  "total_manifest_bytes": 700419,
+  "limits": "Idle CPU sample including interpreter/module startup; 112k extrapolation is a planning estimate, not an actual scale split."
+}

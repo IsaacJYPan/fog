@@ -1,14 +1,17 @@
 {
   "sources": {
+    "R": "docs/briefs/03-artifacts/R-summary.json",
+    "A": "docs/briefs/03-artifacts/A-summary.json",
+    "S": "docs/briefs/03-artifacts/S-summary.json",
+    "B": "docs/briefs/03-artifacts/B-summary.json",
     "profile": "docs/briefs/03-artifacts/profile-after-timing.json",
     "import": "docs/briefs/03-artifacts/continuation-import-wall.txt",
-    "conversion_wall": "docs/briefs/03-artifacts/convert-wall.txt",
+    "conversion": "docs/briefs/03-artifacts/convert-wall.txt",
     "conversion_pause": "docs/briefs/03-artifacts/conversion-pauses.txt",
     "disk": "docs/briefs/03-artifacts/disk-bytes.json",
-    "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt",
-    "R_run": "docs/briefs/03-artifacts/R-summary.json",
-    "A_run": "docs/briefs/03-artifacts/A-summary.json",
-    "S_run": "docs/briefs/03-artifacts/S-summary.json"
+    "split": "docs/briefs/03-artifacts/split-timing.json",
+    "checkpoint_storage": "docs/briefs/03-artifacts/checkpoint-storage.json",
+    "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt"
   },
   "inputs": {
     "measured_imported_games": 22000,
@@ -16,52 +19,88 @@
     "scale_eligible_training_games_assumed": 100000,
     "measured_training_games": 20000,
     "measured_training_rows": 1023525,
-    "import_seconds": 194,
-    "conversion_wall_seconds": 2225,
-    "conversion_diagnostic_pause_seconds": 758,
     "epochs": 6,
     "measured_batch_size": 256,
     "runner_batch_size": 1024,
-    "training_rows_per_second": 194.03996113140155,
+    "import_seconds": 194,
+    "conversion_wall_seconds": 2225,
+    "conversion_diagnostic_pause_seconds": 758,
+    "fixed_split_seconds": 2.154822686999978,
+    "observed_training_rows_per_second": {
+      "R": 187.06045301203753,
+      "A": 157.72479858558913,
+      "S": 158.58713344957806,
+      "B": 157.28838173290174,
+      "profile": 194.03996113140155
+    },
     "batch_only_rows_per_second": 7100.464694857515,
+    "mean_validation_seconds_by_run": {
+      "R": 154.66223293949997,
+      "A": 172.19417904005525,
+      "S": 170.22690416000054,
+      "B": 179.06015897544555
+    },
+    "known_outside_epoch_seconds_by_run": {
+      "R": 172.37174261600103,
+      "A": 209.30552878500384,
+      "S": 198.98761782099973
+    },
+    "two_report_seconds_by_run": {
+      "R": 218.62111969500074,
+      "A": 256.3651200860004,
+      "S": 262.1305718750009,
+      "B": 213.01956158500025
+    },
     "measured_disk_bytes": {
       "raw": 209345372,
       "decisions": 608097221,
       "cache": 481396201,
       "environment": 5675620035
     },
-    "R_aggregate_training_rows_per_second": 187.06045301203753,
-    "observed_training_rows_per_second": {
-      "R": 187.06045301203753,
-      "A": 157.72479858558913,
-      "S": 158.58713344957806,
-      "profile": 194.03996113140155
-    }
+    "fixed_split_manifest_bytes": 700419,
+    "train_20000_manifest_bytes": 364134,
+    "six_epoch_checkpoint_and_results_copy_bytes": 287619529
   },
   "arithmetic": {
-    "scale_ratio": "112000 / 22000",
-    "scale_training_rows": "1023525 / 20000 * 100000",
-    "scale_import_seconds": "194 * (112000 / 22000)",
-    "scale_conversion_active_seconds": "(2225 - 758) * (112000 / 22000)",
-    "cpu_training_seconds": "6 * scale_training_rows / training_rows_per_second",
-    "cpu_batch_feed_floor_seconds": "6 * scale_training_rows / batch_only_rows_per_second",
-    "scale_disk_bytes": "each measured raw/decisions/cache byte count * (112000 / 22000)",
-    "environment_work_and_archive_bytes": "environment + 2 * scale(raw + decisions + cache)",
-    "cpu_20k_training_seconds": "6 * 1023525 / training_rows_per_second",
-    "R_based_cpu_training_seconds": "6*training_rows/R.aggregate_training_rows_per_second",
-    "CPU_nontraining_seconds": "6*R.mean_validation_seconds + R.wall_outside_epoch_timers_seconds + sum(R.standalone_report_seconds.values())",
-    "CPU_full_pipeline_seconds": "projected import + conversion active + CPU training reference + CPU nontraining reference",
-    "observed_range_training_hours": "6 * rows / each observed profile or full-run training rate / 3600; report min and max",
-    "observed_range_nontraining_seconds": "for each completed full run: 6*mean_validation_seconds + wall_outside_epoch_timers_seconds + sum(standalone_report_seconds.values()); report min and max",
-    "observed_range_pipeline_hours": "(import_active + conversion_active + observed_training_seconds + observed_nontraining_seconds)/3600; pair low with low and high with high"
+    "scale_ratio": "112000/22000",
+    "scale_training_rows": "1023525/20000*100000",
+    "import_seconds": "194*scale_ratio",
+    "conversion_active_seconds": "(2225-758)*scale_ratio",
+    "split_seconds": "measured_fixed_split_seconds*scale_ratio (includes scaling interpreter startup)",
+    "scale_training_hours": "6*scale_training_rows/each observed training rate/3600; min,max",
+    "cpu_20k_training_hours": "6*1023525/each observed training rate/3600; min,max",
+    "nontraining_seconds": "low/high = 6*min/max(mean_validation_seconds_by_run) + min/max(known_outside_epoch_seconds_by_run) + min/max(two_report_seconds_by_run)",
+    "full_pipeline_hours": "training_hours + (import_active + conversion_active + split + nontraining_seconds)/3600; pair low with low, high with high",
+    "batch_feed_floor_hours": "6*scale_training_rows/batch_only_rows_per_second/3600",
+    "scale_data_disk_bytes": "each measured raw/decisions/cache byte count*scale_ratio",
+    "scale_manifest_bytes": "fixed_split_manifest_bytes*scale_ratio + train_20000_manifest_bytes/20000*100000 for an additional train_100000 copy",
+    "environment_work_and_archive_bytes": "environment + 2*(scale(raw+decisions+cache) + six_epoch_checkpoint_and_results_copy_bytes + scale_manifest_bytes)"
   },
   "projections": {
     "scale_training_rows": 5117625.0,
     "scale_import_seconds": 987.6363636363636,
     "scale_conversion_active_seconds": 7468.363636363636,
-    "cpu_scale_training_reference_seconds": 158244.465835604,
-    "cpu_scale_training_reference_hours": 43.95679606544556,
-    "cpu_batch_feed_floor_seconds": 4324.470484620328,
+    "scale_split_seconds": 10.970006406545343,
+    "cpu_scale_training_observed_range_hours": [
+      43.95679606544556,
+      54.22762257471822
+    ],
+    "cpu_20k_training_observed_range_hours": [
+      8.79135921308911,
+      10.845524514943644
+    ],
+    "cpu_nontraining_observed_range_seconds": [
+      1313.364701838001,
+      1545.797054512678
+    ],
+    "cpu_22k_full_pipeline_observed_range_hours": [
+      9.618170192123833,
+      11.736900036387999
+    ],
+    "cpu_scale_full_pipeline_observed_range_hours": [
+      46.6735557066246,
+      57.00894675830689
+    ],
     "cpu_batch_feed_floor_hours": 1.2012418012834243,
     "scale_disk_bytes": {
       "raw": 1065758257.4545454,
@@ -69,70 +108,19 @@
       "cache": 2450744296.0
     },
     "scale_raw_decisions_cache_bytes": 6612270224.0,
-    "environment_work_and_archive_bytes": 18900160483.0,
-    "suggested_available_disk_bytes": 25000000000,
-    "cpu_22k_import_and_conversion_active_seconds": 1661,
-    "cpu_20k_training_reference_seconds": 31648.893167120797,
-    "cpu_20k_training_reference_hours": 8.79135921308911,
-    "evaluation_and_reports": {
-      "mean_validation_seconds": 154.66223293949997,
-      "six_validation_passes_seconds": 927.9733976369998,
-      "startup_initial_validation_and_writes_seconds": 172.37174261600103,
-      "six_validation_plus_outside_epoch_seconds": 1100.3451402530009,
-      "R_best_report_seconds": 108.49386590100039,
-      "R_final_report_seconds": 110.12725379400035,
-      "standalone_report_proxy_seconds": 218.62111969500074,
-      "nontraining_total_reference_seconds": 1318.9662599480016,
-      "formula": "6*R.mean_validation_seconds + R.wall_outside_epoch_timers_seconds + sum(R.standalone_report_seconds.values())",
-      "limits": "CPU batch256 reference at fixed104037-row holdout. R best+final report time is a proxy for scale best+untrained scoring; GPU validation and batch1024 timings unmeasured."
-    },
-    "cpu_scale_training_R_reference_seconds": 164148.80593721248,
-    "cpu_scale_training_R_reference_hours": 45.59689053811458,
-    "cpu_20k_training_R_reference_seconds": 32829.76118744249,
-    "cpu_20k_training_R_reference_hours": 9.119378107622914,
-    "cpu_22k_full_pipeline_reference_hours": [
-      9.619127618630221,
-      9.947146513164025
-    ],
-    "cpu_scale_full_pipeline_reference_hours": [
-      46.67206447098667,
-      48.31215894365569
-    ],
-    "observed_nontraining_reference_seconds": {
-      "R": 1318.9662599480016,
-      "A": 1498.8357231113357,
-      "S": 1482.4796146560038
-    },
-    "cpu_scale_training_observed_range_hours": [
-      43.95679606544556,
-      54.07757737836988
-    ],
-    "cpu_20k_training_observed_range_hours": [
-      8.79135921308911,
-      10.815515475673974
-    ],
-    "cpu_nontraining_observed_range_seconds": [
-      1318.9662599480016,
-      1498.8357231113357
-    ],
-    "cpu_22k_full_pipeline_observed_range_hours": [
-      9.619127618630221,
-      11.693247620982678
-    ],
-    "cpu_scale_full_pipeline_observed_range_hours": [
-      46.67206447098667,
-      56.84280952367858
-    ]
+    "scale_manifest_bytes": 5386439.454545455,
+    "six_epoch_checkpoint_and_results_copy_bytes": 287619529,
+    "environment_work_and_archive_bytes": 19486172419.90909,
+    "suggested_available_disk_bytes": 25000000000
   },
   "limits": [
-    "Projections assume similar replay lengths and filtering yield on four CPU cores; hosted CPU and network speeds differ.",
-    "758 seconds of diagnostic pause excluded from conversion wall; the remaining 1467 seconds still include initial CPU contention.",
-    "Training projections use measured batch 256; actual runner batch-1024 throughput is unmeasured.",
-    "GPU throughput and memory are unmeasured; CPU batch-feed floor is not a GPU runtime estimate.",
-    "Training-only references exclude validation and writes; full-pipeline CPU references add observed R validation/outside-epoch/report overhead. Model/corpus-dependent scaling and GPU validation remain unmeasured.",
-    "Cache disk grows in whole downloaded shard chunks; linear scaling is approximate.",
-    "Disk amounts are decimal bytes/GB. The 25-GB suggestion leaves headroom beyond measured environment plus two data copies for checkpoints, source and logs; hosted storage was not tested.",
-    "Hosted installation, split latency, backup and handback download time are unmeasured.",
-    "Observed-range projections include profile and completed R/A/S full-run rates. A outside-epoch wall includes the deliberate restart; the range is a planning reference, not a guaranteed bound. Refresh with B when complete."
+    "Projections assume similar replay lengths/filtering yield on four CPU cores; hosted CPU and network speeds differ. These are planning references, not guaranteed bounds.",
+    "758 seconds of diagnostic pause are excluded from conversion wall; remaining active time includes initial CPU contention.",
+    "Batch256 throughput is measured; actual runner batch1024 throughput, GPU throughput/memory and GPU validation are unmeasured. CPU batch-feed floor is not a GPU runtime estimate.",
+    "B resumed after an environment stop with unknown original attempt wall. Its per-epoch training/validation timers are complete; startup/outside-epoch range uses only R/A/S known totals. A outside-epoch time includes its deliberate restart.",
+    "Two best/final CPU reports are a proxy for runner best/untrained scoring. Component min/max overheads are combined conservatively; no full scale pipeline was timed.",
+    "Split extrapolation scales interpreter startup as well as work. Manifest storage adds a projected train100000 duplicate.",
+    "Cache grows in whole downloaded shard chunks; linear disk scaling is approximate. Disk units are decimal bytes/GB.",
+    "25GB headroom includes the measured local environment plus two data/checkpoint/manifest copies and leaves room for source/logs. Hosted storage/install, archive creation and handback download time were not tested."
   ]
 }

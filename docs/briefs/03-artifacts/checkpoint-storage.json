@@ -1,0 +1,19 @@
+{
+  "source": "runs/blueprint/g1000e6/checkpoints",
+  "epochs": 6,
+  "checkpoint_file_bytes": {
+    "bc_best.pt": 23548503,
+    "bc_epoch1.pt": 23549643,
+    "bc_epoch2.pt": 23549643,
+    "bc_epoch3.pt": 23549643,
+    "bc_epoch4.pt": 23549643,
+    "bc_epoch5.pt": 23549643,
+    "bc_epoch6.pt": 23549643,
+    "bc_final.pt": 23549265,
+    "bc_state.pt": 75675400
+  },
+  "checkpoint_total_bytes": 264071026,
+  "runner_results_best_copy_bytes": 23548503,
+  "checkpoint_and_results_copy_total_bytes": 287619529,
+  "limits": "Measured CPU six-epoch checkpoint storage with this model/optimizer; projected scale reference excludes logs/reports and hosted GPU storage differences."
+}
