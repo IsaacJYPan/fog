@@ -1,0 +1,82 @@
+{
+  "smoke": true,
+  "manifest": "runs/blueprint/split/holdout_manifest.parquet",
+  "checkpoint": null,
+  "rows": 103974,
+  "move_rows": 74868,
+  "label_share_by_move_slot": [
+    0.2468077149115777,
+    0.25261794090933376,
+    0.25022706630336056,
+    0.25034727787572797
+  ],
+  "not_yet_moved_rows": 20309,
+  "not_yet_moved_label_is_slot0": 0.2468363779605101,
+  "switch_only_rows": 2,
+  "largest_own_pp": 0.0,
+  "switch_rows": 29106,
+  "switch_label_counts_by_bench_position": [
+    5852,
+    5774,
+    5762,
+    5857,
+    5861
+  ],
+  "label_share_by_bench_position": [
+    0.20105820105820105,
+    0.1983783412354841,
+    0.19796605510891224,
+    0.20122998694427266,
+    0.20136741565312993
+  ],
+  "lead_order": {
+    "games": 2000,
+    "p1": {
+      "known_leads": 1999,
+      "unknown_leads": 1,
+      "counts_by_team_position": [
+        345,
+        305,
+        350,
+        338,
+        309,
+        352
+      ],
+      "share_by_team_position": [
+        0.17258629314657328,
+        0.15257628814407204,
+        0.17508754377188596,
+        0.16908454227113556,
+        0.15457728864432216,
+        0.176088044022011
+      ],
+      "share_position0": 0.17258629314657328
+    },
+    "p2": {
+      "known_leads": 1998,
+      "unknown_leads": 2,
+      "counts_by_team_position": [
+        346,
+        315,
+        365,
+        320,
+        320,
+        332
+      ],
+      "share_by_team_position": [
+        0.17317317317317318,
+        0.15765765765765766,
+        0.18268268268268267,
+        0.16016016016016016,
+        0.16016016016016016,
+        0.16616616616616617
+      ],
+      "share_position0": 0.17317317317317318
+    },
+    "games_with_both_leads_known": 1997,
+    "share_games_either_lead_position0": 0.314471707561342,
+    "share_games_both_leads_position0": 0.03104656985478217,
+    "source": "converter metadata"
+  },
+  "not_yet_moved_definition": "no move by the acting species in the stored history window"
+}

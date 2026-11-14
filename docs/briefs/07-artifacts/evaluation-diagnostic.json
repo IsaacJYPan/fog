@@ -1,0 +1,8 @@
+{
+  "smoke": true,
+  "purpose": "non-idle evaluation timing to diagnose R0 startup; not a throughput comparison",
+  "rows": 84,
+  "seconds": 8.289938101999951,
+  "loss": 3.594326972961426,
+  "torch_threads": 5
+}

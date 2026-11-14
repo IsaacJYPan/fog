@@ -1,26 +1,54 @@
 {
   "smoke": true,
-  "source": "public preview and first switch in 22000 raw logs",
-  "lead_counts": {
-    "p1": [
-      5380,
-      3677,
-      3220,
-      3398,
-      3158,
-      3158
-    ],
-    "p2": [
-      5497,
-      3714,
-      3279,
-      3255,
-      2993,
-      3251
-    ]
-  },
-  "unknown": {
-    "p2": 11,
-    "p1": 9
+  "command": ".venv/bin/python: lead_order_summary(pl.read_parquet(\"data/metamon_gen9ou_r1500_leaky_decisions/manifest.parquet\"), Path(\"data/metamon_gen9ou_r1500\"))",
+  "commit": "e195b26",
+  "lead_order": {
+    "games": 22000,
+    "p1": {
+      "known_leads": 21995,
+      "unknown_leads": 5,
+      "counts_by_team_position": [
+        5381,
+        3679,
+        3220,
+        3398,
+        3159,
+        3158
+      ],
+      "share_by_team_position": [
+        0.24464651057058423,
+        0.16726528756535577,
+        0.14639690838827008,
+        0.1544896567401682,
+        0.1436235508070016,
+        0.14357808592862015
+      ],
+      "share_position0": 0.24464651057058423
+    },
+    "p2": {
+      "known_leads": 21991,
+      "unknown_leads": 9,
+      "counts_by_team_position": [
+        5499,
+        3714,
+        3279,
+        3255,
+        2993,
+        3251
+      ],
+      "share_by_team_position": [
+        0.25005684143513257,
+        0.1688872720658451,
+        0.14910645263971625,
+        0.14801509708517122,
+        0.13610113228138784,
+        0.14783320449274703
+      ],
+      "share_position0": 0.25005684143513257
+    },
+    "games_with_both_leads_known": 21986,
+    "share_games_either_lead_position0": 0.4340489402346948,
+    "share_games_both_leads_position0": 0.06067497498408078,
+    "source": "raw public logs"
   }
 }

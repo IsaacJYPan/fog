@@ -1,0 +1,27 @@
+import sys
+import torch
+from fog.config import load_config
+from fog.models.agent import FogAgent
+from fog.training.bc import bc_loss
+from fog.training.dataset import StreamingReplayDataset
+
+cfg = load_config('configs/replay_blueprint_cpu.yaml')
+torch.manual_seed(42)
+agent = FogAgent.from_tables(cfg)
+with torch.no_grad():
+    for parameter in agent.parameters():
+        parameter.add_(torch.randn_like(parameter) * 0.01)
+batch = next(StreamingReplayDataset('runs/order_blind/diagnostic-fixture.parquet').batches(32, shuffle=False))
+agent.eval()
+with torch.no_grad():
+    output = agent(batch)
+    saved = {'policy': output.log_probs.clone(), 'value': output.value.clone()}
+agent.train()
+torch.manual_seed(123)
+loss, metrics = bc_loss(agent, batch, cfg['loss'])
+loss.backward()
+saved['loss'] = loss.detach()
+saved.update({name: parameter.grad.clone() for name, parameter in agent.named_parameters()
+              if parameter.grad is not None})
+torch.save(saved, sys.argv[1])
+print(len(saved), 'outputs and gradients; threads', torch.get_num_threads())

@@ -1692,3 +1692,19 @@ duplicate detection continues to use the original log digest. Completed correcte
 can resume per game. The expanded slot diagnostic reports bench and lead positions, value
 Brier/ECE, and intervals that resample games. See `docs/briefs/07-report.md` for limits and
 pending comparisons. Stages 2–5 are not started; search, PPO and belief code are unchanged.
+
+Stage 1 continuation, application commits `ef7c5c4` and `e691661`: a real-corpus comparison
+exposed stale action-to-snapshot identity around Illusion and form changes. Candidate identity
+is now checked before accepting policy labels, and rejected stale slots do not enter own-action
+history. The final corpus is being rebuilt; the initial corrected corpus and partial rebuild
+are explicitly superseded (`row-count-changes.json`, `guarded-partial-attempt.json`).
+81 focused tests pass and Ruff is clean (`tests-identity-history.txt`, `ruff-identity-history.txt`).
+
+The default-wait-policy R0 attempt was interrupted before completing an epoch; command,
+elapsed time and exit are in `R0-default-attempt-execution.json`. Completed fixed-recipe runs
+use `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0`, five torch threads. On recorded inputs and
+perturbed parameters, all 241 output/gradient tensors match bit-for-bit between scheduling
+settings (`runtime-equivalence.json`). No model, loss, batch size, seed or epoch count changed.
+The three historical rollout digests fail already on the unchanged checkout; every corresponding
+before/after digest matches on this runtime. A separate CPU-only build repeat also fails the
+historical sequential reference (`digests-summary.json`). No cause is claimed.

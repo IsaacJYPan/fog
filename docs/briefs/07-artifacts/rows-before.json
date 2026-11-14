@@ -1,0 +1,16 @@
+{
+  "manifest": "runs/order_blind/leaky_split/holdout_manifest.parquet",
+  "checkpoint": null,
+  "rows": 103981,
+  "move_rows": 74874,
+  "label_share_by_move_slot": [
+    0.4814755455832465,
+    0.31671875417367845,
+    0.1544862034885274,
+    0.04731949675454764
+  ],
+  "not_yet_moved_rows": 20311,
+  "not_yet_moved_label_is_slot0": 0.9839988183742799,
+  "switch_only_rows": 2,
+  "largest_own_pp": 0.0
+}

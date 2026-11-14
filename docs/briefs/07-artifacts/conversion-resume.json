@@ -106,5 +106,6 @@
     }
   ],
   "interruption_time_unix": 1794653816.1208704,
-  "status": "interrupted; awaiting identical-command resume"
+  "status": "complete after identical-command resume; retained shards unchanged",
+  "final_replay_checkpoints": 22000
 }

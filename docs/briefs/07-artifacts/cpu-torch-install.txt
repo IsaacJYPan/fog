@@ -1,0 +1,7 @@
+Using CPython 3.12.14 interpreter at: .venv/bin/python
+Resolved 1 package in 2.84s
+Downloading torch (182.9MiB)
+ Downloaded torch
+Prepared 1 package in 8.11s
+Installed 1 package in 374ms
+ + torch==2.13.0+cpu

@@ -1,0 +1,46 @@
+{
+  "smoke": true,
+  "new_model_keys": "none introduced in stage 1; model source unchanged",
+  "runs": [
+    {
+      "name": "sequential",
+      "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+      "historical": "23405989f4665988",
+      "before": "0d026fed7728c0c4",
+      "after": "0d026fed7728c0c4",
+      "same_runtime_equal": true,
+      "historical_reproduced": false,
+      "before_file": "digest-sequential-default.txt",
+      "after_file": "digest-sequential-after.txt"
+    },
+    {
+      "name": "batched",
+      "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --batch 32 --games 64 --threads 2",
+      "historical": "0efd4319547a4b3b",
+      "before": "ef414aee0fe96bad",
+      "after": "ef414aee0fe96bad",
+      "same_runtime_equal": true,
+      "historical_reproduced": false,
+      "before_file": "digest-batched-before.txt",
+      "after_file": "digest-batched-after.txt"
+    },
+    {
+      "name": "maxdamage",
+      "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --batch 32 --games 96 --opponent MaxDamage --pool data/teams/pool_a",
+      "historical": "338cfca82f31b181",
+      "before": "40644081cca71ebe",
+      "after": "40644081cca71ebe",
+      "same_runtime_equal": true,
+      "historical_reproduced": false,
+      "before_file": "digest-maxdamage-before.txt",
+      "after_file": "digest-maxdamage-after.txt"
+    }
+  ],
+  "cpu_build_diagnostic": {
+    "torch": "2.13.0+cpu",
+    "command": "PYTHONPATH=/workspace/fog/runs/order_blind/cpu-torch .venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+    "output": "digest-sequential-cpu-build.txt",
+    "digest": "0d026fed7728c0c4",
+    "historical_reproduced": false
+  }
+}

@@ -1,0 +1,1 @@
+SMOKE, non-idle, warmed evaluation: 84 rows; 0.5463922909998473 seconds; threads 5 ; OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0

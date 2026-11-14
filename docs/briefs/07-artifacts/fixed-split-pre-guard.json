@@ -1,0 +1,11 @@
+{
+  "smoke": true,
+  "holdout_ids_equal": true,
+  "holdout_games": 2000,
+  "training_ids_equal": true,
+  "training_games": 1000,
+  "before_holdout_rows": 104037,
+  "after_holdout_rows": 104035,
+  "before_train_rows": 52983,
+  "after_train_rows": 52983
+}

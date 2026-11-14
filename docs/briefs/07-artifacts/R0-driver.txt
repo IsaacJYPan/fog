@@ -1,0 +1,55 @@
+import json
+import os
+import subprocess
+import time
+from pathlib import Path
+
+root = Path('/workspace/fog')
+baseline = Path('/workspace/fog-order-baseline')
+python = str(root / '.venv/bin/python')
+artifacts = root / 'docs/briefs/07-artifacts'
+records = []
+
+def run(args, output):
+    started = time.monotonic()
+    command = [python, '-m', *args]
+    record = {'command': command, 'cwd': str(baseline), 'commit': subprocess.check_output(
+        ['git', 'rev-parse', 'HEAD'], cwd=baseline, text=True).strip(), 'smoke': True}
+    with open(root / output, 'w') as stream:
+        result = subprocess.run(command, cwd=baseline, stdout=stream, stderr=subprocess.STDOUT,
+                                env=dict(os.environ, PYTHONPATH=str(baseline)))
+    record.update(seconds=time.monotonic()-started, exit_code=result.returncode, output=output)
+    records.append(record)
+    (artifacts / 'R0-execution.json').write_text(json.dumps(records, indent=2)+'\n')
+    if result.returncode:
+        raise SystemExit(result.returncode)
+
+while not (root / 'data/metamon_gen9ou_r1500_leaky_decisions/quality_report.json').exists():
+    time.sleep(5)
+run(['fog.scripts.split_replay_manifest', '--manifest',
+     'data/metamon_gen9ou_r1500_leaky_decisions/manifest.parquet', '--out',
+     'runs/order_blind/leaky_split', '--holdout-ids',
+     'data/replay_splits/p2_holdout_2000_ids.txt', '--train-sizes', '1000'],
+    'runs/order_blind/split-R0-output.txt')
+import polars as pl
+holdout = pl.read_parquet(root / 'runs/order_blind/leaky_split/holdout_manifest.parquet')
+train = pl.read_parquet(root / 'runs/order_blind/leaky_split/train_1000.parquet')
+assert len(holdout) == 2000 and holdout['n_rows'].sum() == 104037
+assert len(train) == 1000 and train['n_rows'].sum() == 52983
+run(['fog.eval.replay_slot_order_check', '--config', 'configs/replay_blueprint_cpu.yaml',
+     '--manifest', 'runs/order_blind/leaky_split/holdout_manifest.parquet', '--out',
+     str(artifacts / 'rows-before.json')], 'runs/order_blind/rows-before-output.txt')
+run(['fog.training.bc', '--config', 'configs/replay_blueprint_cpu.yaml', '--set',
+     'bc.manifest=runs/order_blind/leaky_split/train_1000.parquet',
+     'bc.holdout_manifest=runs/order_blind/leaky_split/holdout_manifest.parquet',
+     'bc.epochs=8', 'bc.early_stopping_patience=0', 'bc.resume=true',
+     'bc.selection_metric=action_ce', 'log.dir=runs/order_blind/R0'],
+    'runs/order_blind/R0-output.txt')
+run(['fog.eval.replay_slot_order_check', '--config', 'configs/replay_blueprint_cpu.yaml',
+     '--manifest', 'runs/order_blind/leaky_split/holdout_manifest.parquet', '--checkpoint',
+     'runs/order_blind/R0/checkpoints/bc_best.pt', '--out', str(artifacts / 'R0-slot-check.json')],
+    'runs/order_blind/R0-slot-check-output.txt')
+run(['fog.eval.replay_holdout_report', '--config', 'configs/replay_blueprint_cpu.yaml',
+     '--manifest', 'runs/order_blind/leaky_split/holdout_manifest.parquet', '--checkpoint',
+     'runs/order_blind/R0/checkpoints/bc_best.pt', '--out', str(artifacts / 'R0-holdout.json')],
+    'runs/order_blind/R0-holdout-output.txt')

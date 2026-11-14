@@ -1,0 +1,29 @@
+SMOKE, non-idle, warmed evaluation: 84 rows; 17.097381109000253 seconds; threads 5
+         7570 function calls (6680 primitive calls) in 17.097 seconds
+
+   Ordered by: cumulative time
+   List reduced from 206 to 20 due to restriction <20>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.001    0.001   17.097   17.097 /workspace/fog/fog/training/bc.py:67(bc_loss)
+    330/1    0.002    0.000   16.949   16.949 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1774(_wrapped_call_impl)
+    330/1    0.003    0.000   16.949   16.949 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1782(_call_impl)
+        1    0.000    0.000   16.948   16.948 /workspace/fog/fog/models/agent.py:529(forward)
+        1    0.000    0.000   10.254   10.254 /workspace/fog/fog/models/belief.py:606(forward)
+        1    0.005    0.005    8.192    8.192 /workspace/fog/fog/models/belief.py:558(_heads_from_context)
+      188    5.155    0.027    5.155    0.027 {built-in method torch._C._nn.linear}
+      176    0.000    0.000    4.393    0.025 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/linear.py:130(forward)
+       90    0.001    0.000    3.052    0.034 /workspace/fog/fog/models/belief.py:488(_value_logits)
+        1    0.000    0.000    3.008    3.008 /workspace/fog/fog/models/agent.py:398(encode_contexts)
+        1    0.000    0.000    3.008    3.008 /workspace/fog/fog/models/three_encoder.py:616(forward)
+        1    0.000    0.000    3.008    3.008 /workspace/fog/fog/models/three_encoder.py:545(encode_contexts)
+       90    1.284    0.014    2.938    0.033 /workspace/fog/fog/models/belief.py:482(_apply_mask)
+        3    0.000    0.000    2.856    0.952 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/transformer.py:405(forward)
+        8    0.001    0.000    2.840    0.355 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/transformer.py:795(forward)
+        8    2.811    0.351    2.811    0.351 {built-in method torch._transformer_encoder_layer_fwd}
+        1    0.042    0.042    2.212    2.212 /workspace/fog/fog/models/shared_latent.py:426(forward)
+        1    0.080    0.080    2.062    2.062 /workspace/fog/fog/models/belief.py:436(_context_hidden)
+        1    0.047    0.047    1.856    1.856 /workspace/fog/fog/models/three_encoder.py:388(encode_sequence)
+        1    0.116    0.116    1.834    1.834 /workspace/fog/fog/models/belief.py:402(_set_context)
+
+

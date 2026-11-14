@@ -8,9 +8,9 @@ not been implemented or measured. No play or strength claim follows from this pr
 
 | Work | State | Evidence |
 | --- | --- | --- |
-| Stage 1 converter and diagnostics | Code and focused tests complete; corpus comparison pending | `07-artifacts/tests-stage1.txt`, `ruff-stage1.txt` |
-| Original baseline | Import complete; original conversion and R0 pipeline running | `R0-execution.json` when each command finishes; baseline commit `d603920` |
-| Corrected corpus | Resumed after interruption; running | `conversion-resume.json` |
+| Stage 1 converter and diagnostics | 81 focused tests pass; final corpus comparison pending | `tests-identity-history.txt`, `ruff-identity-history.txt` |
+| Original baseline | Fixed split verified; R0 training and checkpointing | `R0-execution.json`; baseline commit `d603920` |
+| Corrected corpus | Final rebuild includes snapshot identity guards | `conversion-resume.json`, `guarded-partial-attempt.json` |
 | Stages 2–5 | Not started | No model, loss, search, PPO or belief source changed |
 
 Lead ordering needs the extra team shuffle requested by stage 1: first public send-outs favour
@@ -28,11 +28,25 @@ entire games with both perspectives together. Its existing “not yet moved” t
 the stored history window; it does not establish that a species never moved earlier in a long
 game. The history one-hot caveat still applies when comparing shuffled, already-moved rows.
 
+The corpus comparison exposed an existing Illusion alignment defect: the acting object can
+change after the snapshot, and its current move dictionary can label a different encoded move.
+The converter now rejects mismatches between the protocol label and the encoded candidate,
+and does not copy their stale slot index into history. `row-count-changes.json` retains the
+first corrected-corpus comparison; that corpus is superseded by a rebuild with the guards.
+This adds a filtering difference beyond the order correction.
+
 The original baseline source is isolated in a detached checkout. Corrected conversion has
 per-game atomic recovery records and rejects changed resume settings. The import and both
 conversions use the specified pinned release; fixed holdout verification is pending. CPU only;
 no hosted account is used. Converter timing overlaps other CPU work and is not a throughput
-benchmark.
+benchmark. The initial R0 attempt was interrupted before a completed epoch because CPU
+OpenMP busy waiting made evaluation unexpectedly slow. All completed runs use
+`OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0`, retaining five threads and the prescribed recipe.
+On recorded rows with perturbed weights, all 241 checked output/gradient tensors were
+bit-identical (`runtime-equivalence.json`). The original checkpoint strictly loads, and all
+three rollout digests match before/after on this runtime (`checkpoint-compatibility.json`,
+`digests-summary.json`). The historical references do not reproduce, including a separate
+CPU-only build repeat; their discrepancy remains unisolated.
 
 **Not verified.** R0/R1 training results, the completed fixed split and post-conversion row
 statistics, any stage 2–5 result, seed noise, rare-move transfer, value improvement, and play.
