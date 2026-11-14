@@ -104,6 +104,11 @@ cites the `fog` commit that produced the result.
       on the GPU. Target: ≥ 150 decisions/s on four CPU cores plus one GPU on `showdown_direct`,
       ≥ 400 on the engine backend. If the target is missed, record the new profile and stop; do
       not start a simulator rewrite (see section 7).
+      _2026-11-14: the runner is wired into `_ShowdownRolloutWorker` (`env.rollout_batch`) and the
+      encoder was made cheaper with identical recorded rollouts: 451 learner decisions/s in
+      self-play and 647 against MaxDamage on four CPU cores without a GPU (179 and 324 before).
+      `env.actor_device` puts the acting forward on a GPU and has not been run on one. See the
+      ledger section "faster rollout collection on headless Showdown"._
 - [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already
       plays four-game matched blocks crossing teams and sides) so that:

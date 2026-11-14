@@ -849,3 +849,80 @@ for the value head, not as a head that cannot learn. Brief 05 measures whether 2
 
 Not done by brief 03 and carried forward: any run on a GPU, batch 1,024, and the 20,000 and
 100,000-game points. Next: `docs/briefs/05-p2-gpu-scale.md`.
+
+## 2026-11-14: faster rollout collection on headless Showdown (ROADMAP P0.5)
+
+Asked for by the owner on 2026-11-14 after the accelerator simulator was measured below its
+bar. Branch `work/fast-collect`, code at `21e57fa`. One machine for every row: 4 CPU cores, no
+GPU, PyTorch 2.13 CPU, pinned Showdown `e440c4a`, random weights, teams `data/teams/pool_a`.
+All numbers are smoke-level throughput measurements; nothing here is a strength result.
+
+**What changed**
+
+1. `_ShowdownRolloutWorker` (the trainer's rollout process) can play `env.rollout_batch`
+   battles at once through `fog/env/showdown_batch_runner.py`, one forward per wave. Default 1
+   keeps the old one-battle loop. This is the wiring P0.5 listed as remaining.
+2. `env.actor_device` (default `cpu`): a worker keeps its own copy of the actor on that device,
+   refreshed from the shared CPU actor at the start of every chunk; the two tensors that
+   sampling reads come back to the CPU once per forward. **Not run on a GPU**: the copy and
+   refresh are tested on the CPU only.
+3. Observation encoding does the same work with less Python: name keys cached and built once per
+   Pokémon instead of once per pair, legal moves and switches derived once per observation
+   instead of three times, completed history turns recognised by object identity instead of
+   comparing every event, rule-player matchup scores reused within one feature table, scalar
+   `np.clip` and per-element writes replaced.
+4. `fog.eval.showdown_rollout_probe` gained `--workers N` (the trainer's worker processes),
+   `--device` and `--opponent`.
+
+**Nothing recorded changed.** The probe's digest hashes every recorded learner observation,
+action, log-probability, value and outcome.
+
+| Run | Digest before | Digest after |
+| --- | --- | --- |
+| `--batch 32 --games 64 --threads 2` (self-play, `pool_b`, 8,743 decisions) | `0efd4319547a4b3b` at `fff88ca` | `0efd4319547a4b3b` after every step, last at `21e57fa` |
+| `--games 6` (one-battle loop, 898 decisions) | `23405989f4665988` at `fff88ca` | `23405989f4665988` |
+| `--batch 1 --games 6` (runner with one battle) | | `23405989f4665988`, equal to the loop |
+
+**Collection rate, four worker processes** (`python -m fog.eval.showdown_rollout_probe
+--workers 4 --batch B --games G --opponent O --pool data/teams/pool_a`; old code is `fff88ca`
+with the same probe file, back to back in one session; learner decisions per second, network on
+the CPU):
+
+| Opponent | Old code, one battle at a time (128 games) | New, `--batch 1` (256 games) | New, `--batch 32` (256 games) |
+| --- | ---: | ---: | ---: |
+| frozen copy of the learner (both seats run the network) | 179 | 213 | 451 |
+| MaxDamage | 324 | 357 | 647 |
+
+`--batch 64` gave 656 against MaxDamage and a 768-game chunk 643, so 32 is enough. The trainer
+itself ran end to end with `env.rollout_batch=32`, four workers and `ppo.games_per_chunk=128`
+(11,891 decisions, two updates, MaxDamage only).
+
+**Where a learner decision's time goes now** (one worker, `--batch 32 --games 96 --opponent
+MaxDamage`, 3,151 decisions in 14.85 s, about 4.7 ms each):
+
+| Part | ms per learner decision | What it is |
+| --- | ---: | --- |
+| Network forward on the CPU | 1.3 | goes to the GPU with `env.actor_device` |
+| Showdown in the Node process | about 1.0 | both players' turn; 0.78 ms per step once warm |
+| Applying Showdown's messages (poke-env) | about 0.45 | both views |
+| Building the observation | 0.9 | in the self-play probe: 1.9 before this work, 1.1 after |
+| Sampling, recording, opponent's scripted choice | 0.7 | |
+| Starting battles | 0.2 | 7 ms per game |
+
+The bridge is not where time is lost: driving the same Node worker from Python with random
+legal choices and no observations runs 2,168 player decisions per second on one core (200
+games, second pass); Showdown called directly ran 2,598 on the reviewer's machine on 2026-11-13.
+What remains is ordinary Python spread thinly over poke-env's message parsing and the encoder;
+apart from waiting on Node and the forward, no function's own time is above 3% of a profile.
+
+**Reading.** With the forward on a GPU the CPU side costs about 3.4 ms per learner decision
+against a scripted opponent, so four cores should collect roughly 900 to 1,200 learner
+decisions per second (not measured; a GPU is needed). Collection scales with CPU cores. P0.5's
+target of 150 decisions per second on four cores is met on the CPU alone; its GPU forward is
+written and untested, so the box stays open.
+
+**Not verified:** anything on a GPU; `env.actor_device` together with `leakage.beta > 0`
+(refused); heuristic guidance with `env.rollout_batch > 1` (refused); the trainer's learning
+curves under the batched path (with more than one battle per forward, log-probabilities and
+values differ from the one-battle loop only by floating-point reduction order, as recorded on
+2026-11-11).
