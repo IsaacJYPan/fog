@@ -13,6 +13,7 @@ import os
 from pathlib import Path
 import re
 import shlex
+import shutil
 import signal
 import subprocess
 import sys
@@ -75,7 +76,10 @@ def run(label, args):
     print(metadata["command"], flush=True)
     thread = threading.Thread(target=monitor, daemon=True)
     thread.start()
-    with (OUT / f"{label}.txt").open("w") as output:
+    raw_output = OUT / f"{label}.txt"
+    if raw_output.exists():
+        shutil.copy2(raw_output, OUT / f"{label}-before-attempt{attempt}.txt")
+    with raw_output.open("w") as output:
         child = subprocess.Popen(args, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT,
                                  start_new_session=True)
         try:
@@ -153,7 +157,12 @@ def probes():
 
 def training():
     RUN.mkdir(parents=True, exist_ok=True)
-    args = [PYTHON, "-m", "fog.train", "--config", "configs/collect_gpu_check.yaml",
+    shim = ROOT.parent / "brief06-timing"
+    shim.mkdir(exist_ok=True)
+    shutil.copy2(ROOT / "docs/briefs/06-artifacts/training_timing.py", shim / "sitecustomize.py")
+    args = ["env", f"PYTHONPATH={shim}{os.pathsep}{ROOT}",
+            f"FOG_TIMING_OUTPUT={OUT / 'training-timing.jsonl'}",
+            PYTHON, "-m", "fog.train", "--config", "configs/collect_gpu_check.yaml",
             "--trainer", "ppo", "--set", "log.dir=runs/collect_gpu",
             "league.snapshot_every_decisions=8000"]
     checkpoints = list((RUN / "checkpoints").glob("ppo_*.state.pt"))
@@ -174,6 +183,22 @@ def training():
                 writer = csv.DictWriter(stream, fieldnames=fields)
                 writer.writeheader()
                 writer.writerows(rows)
+        timing = OUT / "training-timing.jsonl"
+        if timing.exists():
+            lines = timing.read_text().splitlines(keepends=True)
+            completed = 0
+            cut = None
+            for index, line in enumerate(lines):
+                event = json.loads(line)
+                if event["kind"] == "update_phase":
+                    completed += event["rows"]
+                    if completed == decisions:
+                        cut = index + 1
+                        break
+            if cut is None:
+                raise RuntimeError("no matching timing prefix for the saved update")
+            timing.with_name("timing-before-resume.jsonl").write_text("".join(lines))
+            timing.write_text("".join(lines[:cut]))
         args.append(f"ppo.resume_ckpt={latest.relative_to(ROOT)}")
     result = run("training", args)
     if (RUN / "metrics.csv").exists():

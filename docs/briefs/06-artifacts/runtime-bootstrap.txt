@@ -28,6 +28,6 @@ git submodule update --init --recursive --depth 1
 npm --prefix server/pokemon-showdown ci --ignore-scripts --no-audit --no-fund
 npm --prefix server/pokemon-showdown run build
 python3 -m fog.scripts.kaggle_setup
-.venv/bin/python -m pip install ruff pytest pytest-asyncio hypothesis
+.venv/bin/python -m pip install ruff==0.15.22 pytest pytest-asyncio hypothesis
 .venv/bin/python -m ruff check fog tests
 printf 'SETUP_COMPLETE\n'
