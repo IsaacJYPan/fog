@@ -69,7 +69,12 @@ The existing dataset now lists exactly one `replay-work.bin`, privacy confirmed.
 `fog-p2-g3-stop3-20261114` was accepted at `106034c`, with an internal 480-second stop
 for export and 600-second platform cap; no other GPU job is active.
 
-Next: collect the opaque-input pilot and complete its deliberate cross-job stop/continue; choose batch size using
+The opaque-input job exported successfully at its deadline, with no completed training
+epoch. Setup was 92.656 s and input restored in 21.109 s. Settled quota use is 0.359879 h;
+a longer private measurement now stops after epoch 1, capped at 30 min within the remaining
+stage-1 allowance. No epoch throughput or peak-memory number exists yet.
+
+Next: obtain one completed epoch, then complete the cross-job continuation within budget; choose batch size using
 the specified 0.031 NLL comparison; finish G20, its value tables and CPU play smoke before G100.
 Choose G100 epochs only from measured GPU rate and remaining budget, reserving two hours.
 

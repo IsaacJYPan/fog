@@ -946,3 +946,20 @@ The worker deadline begins export by 480 s, ahead of the platform cap. Initial e
 **4–7 min** uses the measured 97–126 s setup range; extraction/training speed remains unknown.
 Prior ended attempts used 749.868 quota seconds. Exact source, submission, input verification
 and budget are retained; no new training number is claimed.
+
+### Opaque restore succeeded; first epoch still incomplete (smoke)
+
+`fog-p2-g3-stop3-20261114` completed its **outer job** and exported saved work, but training
+was **interrupted_for_export before epoch 1 completed**. Installation **92.656 s**, input
+restore **21.109 s**, export began at **480.315 s**. The returned training log has the dataset
+line and initial validation only; no completed epoch rate or GPU-memory result exists. Total
+settled quota **1,295.563 s / 0.359878611 h** across the three attempts; this job used
+**545.695 s**. Sources: `G3-stop3-job-runtime.json`, `G3-stop3-train.txt`, status/full log.
+
+Private `fog-p2-g3-stop4-20261114` was accepted at code
+`3b81a6154e1cc597233acba4670e266054decf8a`, version 1, same G3 18-epoch settings, now stopping
+after the first completed epoch. Command: `KaggleApi.kernels_push(acc="NvidiaTeslaT4",
+timeout="1800")`; internal export deadline 1,500 s. Planning range **9–27 min** follows the
+observed incomplete 365-second worker attempt plus setup/restore/export, not a measured
+epoch rate. Its maximum fits the roughly 38 minutes left in stage 1's one-hour allowance.
+No second GPU job is active. Exact source and submission are retained.
