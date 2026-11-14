@@ -1,0 +1,51 @@
+{
+  "label": "smoke live progress and planning projection, not final results",
+  "job": "fog-p2-g100-20261114",
+  "observed_at_utc": "2026-11-14T19:40:38.351637+00:00",
+  "completed_epochs": 1,
+  "target_epochs": 6,
+  "first_epoch_wall_seconds_including_validation_and_save": 3403.646890729,
+  "remaining_epochs": 5,
+  "projection_clock": "observation time after checkpoint, conservatively later than actual save",
+  "training_finish_projection_utc": "2026-11-15T00:24:16.586091+00:00",
+  "reports_export_allowance_seconds": [
+    600,
+    1200
+  ],
+  "reports_export_finish_projection_utc": [
+    "2026-11-15T00:34:16.586091+00:00",
+    "2026-11-15T00:44:16.586091+00:00"
+  ],
+  "communicated_planning_window_utc": [
+    "2026-11-15T00:40:00Z",
+    "2026-11-15T01:00:00Z"
+  ],
+  "uncertainty": "One epoch; throughput/selected checkpoint metrics await the final raw CSV and reports. The public planning window adds extra margin.",
+  "events": [
+    {
+      "stream_name": "stdout",
+      "time": 196.102159525,
+      "data": "Input restored in 104.605 s\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 367.726603093,
+      "data": "BC dataset: train=2090705 decision rows; holdout=104037 rows  (config_hash=33d693b9c73c, torch_threads=2)\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 367.726686715,
+      "data": "[bc] baseline  loss=3.671  belief=13.157  chain=3.994\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 3771.072669412,
+      "data": "[bc] epoch 1/6  train_loss=2.520  eval_loss=2.267  belief=5.027  chain=1.706  value=0.862  query_p=0.326  dropped=0.000%\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 3771.373577444,
+      "data": "Saved epoch 1; peak GPU bytes 2621049856\n"
+    }
+  ]
+}

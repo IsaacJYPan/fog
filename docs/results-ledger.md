@@ -1311,3 +1311,14 @@ observation. No completed epoch or throughput is claimed yet. The conservative 6
 forecast after allocation puts export around **01:30 UTC on 15 November**; refine it
 from actual completed epochs. Queue time remains separate from charged GPU time, using
 the final account-counter delta as a conservative bound rather than counting the wait.
+
+### First final-slot epoch saved (smoke progress, no final selection yet)
+
+G100 fallback has saved epoch 1/6. The log confirms **2,090,705 training rows /
+104,037 holdout rows**, two torch threads, with input restore **104.605 s**. First-epoch
+wall from the baseline log through its completed save is **3,403.646891 s**, including
+validation and checkpoint overhead. Raw events and the one-epoch projection are retained
+in `G100-first-epoch-progress.json`; the broader communicated completion window is
+**00:40–01:00 UTC on 15 November**. This is a projection, not a completed run or measured
+steady-state throughput. The CSV/selected-checkpoint reports remain pending; no NLL is
+inferred from the rounded joint-loss log. The dataset/epochs/configuration are unchanged.
