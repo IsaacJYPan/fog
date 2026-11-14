@@ -34,10 +34,16 @@ def test_restore_prepared_accepts_archive_and_expanded_dataset(tmp_path, expande
         import shutil
 
         shutil.rmtree(source)
+    else:
+        for path in source.rglob("*"):
+            path.chmod(0o555 if path.is_dir() else 0o444)
+        source.chmod(0o555)
     work = tmp_path / "work"
     _job().restore_prepared(tmp_path / "input", work)
     assert {p.relative_to(work).as_posix(): p.read_bytes()
             for p in work.rglob("*") if p.is_file()} == files
+    (work / "run.json").write_text("restored")
+    (work / "decisions/new-manifest.tmp").write_text("rebased")
 
 
 def test_restore_prepared_refuses_missing_input(tmp_path):

@@ -31,12 +31,17 @@ def restore_prepared(input_root: Path, work: Path):
         work.mkdir(exist_ok=True)
         with tarfile.open(archives[0]) as archive:
             archive.extractall(work, filter="data")
-        return
-    roots = [path.parent for path in input_root.rglob("run.json")
-             if (path.parent / "decisions/manifest.parquet").is_file()
-             and (path.parent / "split/holdout_manifest.parquet").is_file()]
-    assert len(roots) == 1, f"expected one expanded prepared dataset, found {len(roots)}"
-    shutil.copytree(roots[0], work, dirs_exist_ok=True)
+    else:
+        roots = [path.parent for path in input_root.rglob("run.json")
+                 if (path.parent / "decisions/manifest.parquet").is_file()
+                 and (path.parent / "split/holdout_manifest.parquet").is_file()]
+        assert len(roots) == 1, f"expected one expanded prepared dataset, found {len(roots)}"
+        shutil.copytree(roots[0], work, dirs_exist_ok=True, copy_function=shutil.copyfile)
+    # Dataset directories are read-only. The restored manifests must be writable for rebasing.
+    for directory, _, files in os.walk(work):
+        Path(directory).chmod(0o755)
+        for name in files:
+            (Path(directory) / name).chmod(0o644)
 
 
 def worker():
