@@ -1557,3 +1557,8 @@ no completed probe is repeated. The launcher supports this with `FOG_PROBE_OPPON
 | MaxDamage | cuda | 32 | 2 | 512 | 16225 | 107.63 | 150.75 | `922886b` | `--opponent MaxDamage --device cuda --batch 32` |
 | self | cuda | 32 | 2 | 512 | 30381 | 282.14 | 107.68 | `922886b` | `--opponent self --device cuda --batch 32` |
 | MaxDamage | cpu | 32 | 1 | 512 | 16838 | 137.27 | 122.66 | `922886b` | `--opponent MaxDamage --device cpu --batch 32` |
+| MaxDamage | cpu | 32 | 2 | 512 | 16838 | 135.79 | 124.00 | `922886b` | `--opponent MaxDamage --device cpu --batch 32` |
+| MaxDamage | cuda | 128 | 1 | 512 | 16225 | 102.18 | 158.79 | `922886b` | `--opponent MaxDamage --device cuda --batch 128` |
+| MaxDamage | cuda | 128 | 2 | 512 | 16225 | 99.40 | 163.22 | `922886b` | `--opponent MaxDamage --device cuda --batch 128` |
+| MaxDamage | cuda | 64 | 1 | 512 | 16225 | 104.23 | 155.66 | `922886b` | `--opponent MaxDamage --device cuda --batch 64` |
+| MaxDamage | cuda | 64 | 2 | 512 | 16225 | 102.56 | 158.19 | `922886b` | `--opponent MaxDamage --device cuda --batch 64` |
