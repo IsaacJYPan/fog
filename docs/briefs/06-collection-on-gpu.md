@@ -51,13 +51,42 @@ any tensor left on the wrong device in `fog/env/showdown_batch_runner.py` or
 
 ## 4. Stage 2: the whole training loop
 
-With a config that extends `configs/gen9ou_typed_token_selfplay.yaml`, turns off the preflight
-requirement, the replay-policy term and the starting checkpoint as brief 04 did
-(`docs/briefs/04-report.md`, "Config changes"), and sets `device: cuda`,
-`env.actor_device: cuda`, `env.rollout_batch` to the best value from stage 1,
-`env.rollout_workers` to the number of cores, `env.actor_threads: 1`,
-`ppo.games_per_chunk` to at least workers × batch, `ppo.batch_decisions: 8000`,
-`ppo.minibatch_size: 1024`, `ppo.epochs: 3`:
+Make `configs/collect_gpu_check.yaml`, extending `configs/gen9ou_typed_token_selfplay.yaml`,
+with exactly these changes and no others:
+
+```yaml
+device: cuda
+preflight: {required: false}        # no preflight reports exist in a fresh clone
+replay_policy: {coef: 0.0}          # no replay corpus is needed
+ppo:
+  init_ckpt: null                   # random weights
+  total_decisions: 100000
+  batch_decisions: 8000
+  minibatch_size: 1024
+  epochs: 3
+  clip: 0.2
+  target_kl: 0.03
+  lr: 3.0e-4
+  entropy_coef: 0.01
+  entropy_coef_final: 0.003
+  games_per_chunk: <at least workers x batch>
+env:
+  team_pool: data/teams/pool_a/core_v1_offensive.txt
+  actor_device: cuda
+  actor_threads: 1
+  rollout_workers: <number of CPU cores>
+  rollout_batch: <best value from stage 1>
+league:
+  latest_frac: 0.0
+  past_frac: 0.0
+  scripted_frac: 1.0
+  scripted: [MaxDamage]
+```
+
+These are the settings of brief 04's fixed-team run, which is still in progress on the branch
+`work/rl-check`; do not merge or copy code from that branch. If a 1,024-row minibatch does not
+fit in GPU memory, halve `ppo.minibatch_size` until it does and report the value used and the
+error. Run it with `python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo`.
 
 1. Train 100,000 decisions against MaxDamage only on the first team of `data/teams/pool_a`
    (brief 04 stage 1's problem, so the learning curve can be compared with its CPU run).
@@ -65,9 +94,9 @@ requirement, the replay-policy term and the starting checkpoint as brief 04 did
    alone, rows per second for the update alone, end to end, the share of wall time in each,
    and peak GPU memory.
 3. Evaluate the final checkpoint with 200 greedy games against MaxDamage on the same team
-   (`fog.eval.showdown_direct_selection`) and put the win rate beside brief 04's value at
-   106,889 decisions. This is a check that the batched GPU path still learns, not a strength
-   claim.
+   (`fog.eval.showdown_direct_selection`). Brief 04's CPU run of the same problem went from
+   0.160 untrained to 1.000 at 106,889 decisions. This is a check that the batched GPU path
+   still learns, not a strength claim.
 
 ## 5. Stage 3: what limits it
 
