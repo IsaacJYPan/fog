@@ -1,5 +1,35 @@
 {
-  "status": "no GPU training yet",
-  "private_dataset_slug": null,
-  "files": []
+  "status": "partial checkpoint set; G3 2/18, G20 and G100 pending",
+  "private_dataset_slug": "fog-p2-gpu-checkpoints-20261114",
+  "files": [
+    {
+      "file": "G3-bc_best.pt",
+      "bytes": 23553751,
+      "sha256": "824e111aa5f6ce8b374b1f0a9717713f6c5af770d3c1daa4d22ae0bf02c447e4",
+      "run": "G3",
+      "training_games": 3000,
+      "completed_epochs": 2,
+      "target_epochs": 18,
+      "selected_epoch": 2,
+      "selection_metric": "eval_action_ce",
+      "completion": "partial calibration",
+      "private_job_slug": "fog-p2-g3-resume-20261114",
+      "source_commit": "e05d5d1829cc32b438f65e781bd2176f20ddc8ad"
+    },
+    {
+      "file": "G3-bc_best_value.pt",
+      "bytes": 23556403,
+      "sha256": "28c21587173b0503d3d9494a3ebb18fc4b9298bd584e1e4c00fd157048421dda",
+      "run": "G3",
+      "training_games": 3000,
+      "completed_epochs": 2,
+      "target_epochs": 18,
+      "selected_epoch": 2,
+      "selection_metric": "eval_value",
+      "completion": "partial calibration",
+      "private_job_slug": "fog-p2-g3-resume-20261114",
+      "source_commit": "e05d5d1829cc32b438f65e781bd2176f20ddc8ad"
+    }
+  ],
+  "download_command": "python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values[\"username\"]+\"/fog-p2-gpu-checkpoints-20261114\", path=\"checkpoints\", unzip=True, quiet=True)'"
 }

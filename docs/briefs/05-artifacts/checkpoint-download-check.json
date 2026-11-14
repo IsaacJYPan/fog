@@ -1,0 +1,10 @@
+{
+  "slug": "fog-p2-gpu-checkpoints-20261114",
+  "is_private": true,
+  "downloaded_files_verified": [
+    "G3-bc_best.pt",
+    "G3-bc_best_value.pt"
+  ],
+  "all_sizes_and_sha256_match": true,
+  "command": "python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values[\"username\"]+\"/fog-p2-gpu-checkpoints-20261114\", path=\"checkpoints\", unzip=True, quiet=True)'"
+}

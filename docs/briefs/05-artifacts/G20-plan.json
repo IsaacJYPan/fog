@@ -1,0 +1,21 @@
+{
+  "run": "G20",
+  "status": "planning projection, smoke, not measured completion",
+  "training_games": 20000,
+  "training_rows": 1023525,
+  "epochs": 18,
+  "batch_size": 1024,
+  "rate_basis": "slowest measured G3 epoch",
+  "training_rows_per_second": 604.1942443236809,
+  "validation_seconds_planning": 160.71649568100003,
+  "initial_validation_seconds": 160.71649568100003,
+  "projected_training_seconds": 30492.594348730887,
+  "projected_validation_seconds": 3053.6134179390006,
+  "setup_restore_reports_export_writes_allowance_seconds": 1000,
+  "projected_total_seconds": 34546.20776666989,
+  "platform_cap_seconds": 39600,
+  "internal_export_deadline_seconds": 38400,
+  "used_quota_hours_before_job": 0.8790152777777778,
+  "max_total_quota_hours_if_cap_used": 11.879015277777778,
+  "limitations": "First two G3 epochs only; larger-corpus throughput remains unmeasured. Full G3 and GPU-256 quality comparison did not fit the fixed calibration budget; G20 retains the brief default batch."
+}

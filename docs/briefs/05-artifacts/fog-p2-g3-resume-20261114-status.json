@@ -1,9 +1,9 @@
 {
   "slug": "fog-p2-g3-resume-20261114",
-  "status": "RUNNING",
+  "status": "COMPLETE",
   "failure_message": "",
   "is_private": true,
   "machine_shape": "NvidiaTeslaT4",
-  "total_quota_hours_used": 0.6756627080555556,
-  "total_quota_seconds_used": 2432.385749
+  "total_quota_hours_used": 0.8790152777777778,
+  "total_quota_seconds_used": 3164.455
 }

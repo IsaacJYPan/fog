@@ -25,5 +25,7 @@
     "run_seconds": "epochs * (training_seconds + last measured validation_seconds) + initial_validation_seconds"
   },
   "limitations": "First-epoch rate on G3, fp32, two CPU threads. Larger corpus/runtime variation unmeasured. Projections are planning, not measured completions.",
-  "value_brier_derived_from_mse": 0.24967651252139886
+  "value_brier_derived_from_mse": 0.24967651252139886,
+  "training_seconds_from_rate": 259.183203864,
+  "epoch_minus_validation_seconds": 259.18616357300016
 }

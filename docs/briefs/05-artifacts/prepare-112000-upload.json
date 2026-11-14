@@ -1,0 +1,14 @@
+{
+  "slug": "fog-p2-gpu-112000-20261114",
+  "private_requested": true,
+  "command": "official KaggleApi.dataset_create_new(public=False, quiet=True)",
+  "files": [
+    {
+      "file": "replay-work.bin",
+      "bytes": 2385762558
+    }
+  ],
+  "status": "Ok",
+  "error": "",
+  "wall_seconds": 47.82499152699984
+}

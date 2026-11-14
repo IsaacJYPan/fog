@@ -998,3 +998,39 @@ Rating floor stays **1500**, no wider dates or lower floor required. Import / co
 wall **789.940 / 4,452.866 / 2.740 s**, with initial raw/cache reuse and local check contention,
 not an idle throughput benchmark. Commands/counts/timers: `prepare-112000*`.
 The **2,385,762,558-byte** opaque archive is uploading to the brief's second private dataset.
+
+### Real continuation verified; G3 calibration closed as partial (smoke)
+
+`fog-p2-g3-resume-20261114` ended **COMPLETE** with training deliberately stopped at epoch 2.
+The raw `[0,1]` metrics CSV is an **exact byte prefix** of `[0,1,2]`; JSON/CSV proof is in
+`G3-resume-check.json` and both before/after files. Both selected checkpoints are epoch 2.
+Aggregate training rate **613.027 rows/s** (epochs **604.194 / 622.123**), epoch-validation
+**154.323 / 149.778 s**. Peak allocation **2,619,988,480 bytes**. Both reports: top-1
+**0.300391**, policy NLL **1.895671**, value MSE **0.979114**, Brier **0.244778**, ECE
+**0.033124**. This is **2 of 18 epochs**, not a completed G3 or a valid full-schedule batch/device
+comparison. Command/config/source: `G3-training-runtime.json`, submitted script at `e05d5d1`.
+
+The continuation used **1,044.105 quota seconds**; complete calibration total
+**3,164.455 s = 0.879015278 h**, including every failed/partial setup. No calibration gate
+or GPU-256 quality conclusion is claimed. G20 retains the brief default batch 1,024, with
+that limitation explicit. Projection using the slower measured epoch and conservative
+validation/overhead allowance is **9.596 h** for G20; planned platform cap **11 h**, internal
+export deadline **10 h 40 min**, all within the unchanged 20-hour total. `G20-plan.json` holds
+the inputs and arithmetic.
+
+Timing clarification for the preceding row: epoch-minus-validation was **259.186 s**;
+the actual training timer from rows/rate was **259.183 s**. The 0.003 s difference is other
+epoch overhead. Projections already used the exact rows/rate value and are unchanged.
+
+Both partial G3 weights were uploaded to the explicitly required private checkpoint dataset
+`fog-p2-gpu-checkpoints-20261114`; the one-command download was executed and both byte sizes
+and SHA-256 values match `checkpoints.json`. It contains partial G3 only; G20/G100 await training.
+See `checkpoint-dataset-create.json` and `checkpoint-download-check.json`; no account identity
+or weights are committed.
+
+The second corpus upload was interrupted by a workspace restart. An owned-dataset check
+confirmed no object had been committed; retry to the **same prescribed destination** succeeded
+in **47.825 s**, reusing uploaded content. This is a retry wall, not a cold-transfer benchmark;
+the earlier interrupted wall is unknown. Its private owned listing confirms exactly one
+**2,385,762,558-byte** `replay-work.bin`. CPU preparation and both private input uploads are now
+complete (`prepare-112000-{recovery-check,upload,private-check}.json`).

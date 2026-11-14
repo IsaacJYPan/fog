@@ -48,25 +48,42 @@
     },
     {
       "slug": "fog-p2-g3-stop4-20261114",
-      "status": "accepted",
+      "status": "COMPLETE outer job; deliberately interrupted after epoch 1",
       "timeout_seconds": 1800,
       "internal_job_seconds_before_export": 1500,
-      "actual_gpu_hours": null,
+      "actual_gpu_hours": 0.22910749999999994,
       "quota_start_seconds": 1295.563,
       "expected_session_minutes": [
         9,
         27
       ],
       "planning_basis": "Prior worker stopped after roughly 365 s without a complete epoch; opaque restore measured 21.109 s and install 92.656 s. Longer first-epoch measurement, bounded within stage 1 budget.",
-      "requested_accelerator": "NvidiaTeslaT4"
+      "requested_accelerator": "NvidiaTeslaT4",
+      "quota_seconds_used": 824.7869999999998
+    },
+    {
+      "slug": "fog-p2-g3-resume-20261114",
+      "status": "COMPLETE outer job; deliberately stopped after epoch 2, both reports returned",
+      "timeout_seconds": 1400,
+      "internal_job_seconds_before_export": 1200,
+      "actual_gpu_hours": 0.29002916666666667,
+      "quota_start_seconds": 2120.35,
+      "expected_session_minutes": [
+        15,
+        20
+      ],
+      "planning_basis": "One resumed 413.509-second epoch, two partial-checkpoint reports, measured hosted setup/restore/export overhead.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "quota_seconds_used": 1044.105
     }
   ],
-  "used_gpu_hours": null,
+  "used_gpu_hours": 0.8790152777777778,
   "quota_before": {
     "gpu_used_hours": 0,
     "gpu_remaining_hours": 45,
     "command": "kaggle quota --format json"
   },
-  "status": "one-epoch measurement accepted; no further GPU job until it ends",
-  "last_observed_total_quota_hours": 0.35987861111111114
+  "status": "calibration ended; G3 partial, real continuation verified; no active GPU job",
+  "last_observed_total_quota_hours": 0.8790152777777778,
+  "calibration_gpu_hours": 0.8790152777777778
 }

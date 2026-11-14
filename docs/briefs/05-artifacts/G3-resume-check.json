@@ -1,0 +1,19 @@
+{
+  "status": "smoke, real cross-job continuation verified",
+  "before_epochs": [
+    "0",
+    "1"
+  ],
+  "after_epochs": [
+    "0",
+    "1",
+    "2"
+  ],
+  "earlier_rows_identical": true,
+  "old_job_slug": "fog-p2-g3-stop4-20261114",
+  "resume_job_slug": "fog-p2-g3-resume-20261114",
+  "target_epochs": 18,
+  "completed_epochs": 2,
+  "full_G3_calibration_complete": false,
+  "raw_csv_prefix_identical": true
+}
