@@ -1,0 +1,79 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________________ test_gpu_job_creates_missing_temporary_root __________________
+
+tmp_path = PosixPath('/workspace/fog/.pytest-tmp/test_gpu_job_creates_missing_t0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdce7334dd0>
+
+    def test_gpu_job_creates_missing_temporary_root(tmp_path, monkeypatch):
+        source = Path(__file__).resolve().parents[1] / "docs/briefs/06-artifacts/gpu_job.py"
+        spec = importlib.util.spec_from_file_location("gpu_job", source)
+        job = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(job)
+        root = tmp_path / "missing-temp/fog"
+        output = tmp_path / "output"
+    
+        def mapped_path(value):
+            return {"/kaggle/temp/fog": root, "/kaggle/working/06-artifacts": output}.get(
+                str(value), Path(value),
+            )
+    
+        class CompletedProcess:
+            def wait(self, timeout=None):
+                return 0
+    
+            def terminate(self):
+                pass
+    
+        calls = []
+    
+        def popen(command, *, cwd=None, stdout=None, **kwargs):
+            calls.append(command)
+            if cwd is not None and not Path(cwd).is_dir():
+                raise FileNotFoundError(cwd)
+            if command[:2] == ["git", "clone"]:
+                root.mkdir()
+            if "fog.eval.showdown_rollout_probe" in command:
+                stdout.write("workers=2 batch=32 device=cuda opponent=self games=512 "
+                             "learner_decisions=1 seconds=1.00 learner_decisions/s=1.00 "
+                             "games/s=512.000 p1_wins=0\n")
+            return CompletedProcess()
+    
+        monkeypatch.setattr(job, "Path", mapped_path)
+        monkeypatch.setattr(job.subprocess, "Popen", popen)
+        monkeypatch.setattr(job.subprocess, "check_output", lambda *args, **kwargs: "GPU, 16 GiB\n")
+        monkeypatch.setenv("FOG_COMMIT", "0" * 40)
+        monkeypatch.setenv("FOG_STAGE", "collection")
+        monkeypatch.delenv("FOG_PLATFORM_TIMEOUT", raising=False)
+>       job.main()
+
+tests/test_collection_gpu_job.py:49: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+docs/briefs/06-artifacts/gpu_job.py:95: in main
+    run(["git", "clone", "https://github.com/IsaacJYPan/fog.git", str(root)],
+docs/briefs/06-artifacts/gpu_job.py:60: in run
+    process = subprocess.Popen(command, cwd=cwd, env=environment, stdout=stream,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+command = ['git', 'clone', 'https://github.com/IsaacJYPan/fog.git', '/workspace/fog/.pytest-tmp/test_gpu_job_creates_missing_t0/missing-temp/fog']
+cwd = PosixPath('/workspace/fog/.pytest-tmp/test_gpu_job_creates_missing_t0/missing-temp')
+stdout = <_io.TextIOWrapper name='/workspace/fog/.pytest-tmp/test_gpu_job_creates_missing_t0/output/clone.txt' mode='w' encoding='UTF-8'>
+kwargs = {'env': {'BROWSER_MANAGEMENT_SOCKET_PATH': '/home/agent/.local/run/browser-management/socket', 'CAAS_DIND_STORAGE_DRIV...22bcaff20654139fe', 'CAAS_IMAGE_VERSION': '20261019221748-969fca457cb9', ...}, 'stderr': -2, 'start_new_session': True}
+
+    def popen(command, *, cwd=None, stdout=None, **kwargs):
+        calls.append(command)
+        if cwd is not None and not Path(cwd).is_dir():
+>           raise FileNotFoundError(cwd)
+E           FileNotFoundError: /workspace/fog/.pytest-tmp/test_gpu_job_creates_missing_t0/missing-temp
+
+tests/test_collection_gpu_job.py:34: FileNotFoundError
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/_pytest/config/__init__.py:1464
+  /workspace/fog/.venv/lib/python3.12/site-packages/_pytest/config/__init__.py:1464: PytestConfigWarning: Unknown config option: cache_dir
+  
+    self._warn_or_fail_if_strict(f"Unknown config option: {key}\n")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_collection_gpu_job.py::test_gpu_job_creates_missing_temporary_root
+1 failed, 1 warning in 0.11s

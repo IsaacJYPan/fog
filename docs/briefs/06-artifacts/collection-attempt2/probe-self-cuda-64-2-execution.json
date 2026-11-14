@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/kaggle/temp/fog/.venv/bin/python",
+    "-m",
+    "fog.eval.showdown_rollout_probe",
+    "--workers",
+    "4",
+    "--batch",
+    "64",
+    "--games",
+    "512",
+    "--opponent",
+    "self",
+    "--pool",
+    "data/teams/pool_a",
+    "--device",
+    "cuda"
+  ],
+  "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+  "status": "complete",
+  "started_at_utc": "2026-11-14T04:29:55.033944+00:00",
+  "seconds": 157.18576101400004,
+  "exit_code": 0,
+  "finished_at_utc": "2026-11-14T04:32:32.219896+00:00"
+}

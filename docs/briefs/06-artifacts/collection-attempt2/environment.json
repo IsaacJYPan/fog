@@ -1,0 +1,13 @@
+{
+  "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+  "cpu_count": 4,
+  "affinity_count": 4,
+  "cpu_quota": "400000 100000",
+  "workers": 4,
+  "gpu": [
+    "Tesla T4, 15360 MiB",
+    "Tesla T4, 15360 MiB"
+  ],
+  "label": "smoke"
+}

@@ -1,0 +1,5 @@
+
+> pokemon-showdown@0.11.10 build
+> node build
+
+config.js does not exist. Creating one with default settings...

@@ -1,0 +1,3 @@
+Submodule 'server/pokemon-showdown' (https://github.com/smogon/pokemon-showdown) registered for path 'server/pokemon-showdown'
+Cloning into '/kaggle/temp/fog/server/pokemon-showdown'...
+Submodule path 'server/pokemon-showdown': checked out 'e440c4a18385274f10c405d0b158b6a962ce6d94'

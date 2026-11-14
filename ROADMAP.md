@@ -109,6 +109,11 @@ cites the `fog` commit that produced the result.
       self-play and 647 against MaxDamage on four CPU cores without a GPU (179 and 324 before).
       `env.actor_device` puts the acting forward on a GPU and has not been run on one. See the
       ledger section "faster rollout collection on headless Showdown"._
+      _2026-11-13: brief 06 GPU measurement prepared on `work/collect-gpu`; waiting for the
+      account's active replay-training GPU job before submission. No new throughput or learning
+      result; see `docs/briefs/06-report.md` and the ledger's GPU smoke section._
+      _2026-11-14: brief 06 end-to-end measurement is prepared after the owner chose to finish G20 first; partial self-play CUDA rows exist, but full PPO speed/learning remain unmeasured. See `docs/briefs/06-report.md`; P0.5 stays open._
+
 - [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already
       plays four-game matched blocks crossing teams and sides) so that:

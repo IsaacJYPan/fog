@@ -1,0 +1,7 @@
+{
+  "label": "smoke",
+  "status": "ERROR",
+  "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+  "observed_terminal_at_utc": "2026-11-14T04:38:30.967967+00:00",
+  "submission_to_observed_terminal_upper_seconds": 1546
+}

@@ -1,0 +1,26 @@
+{
+  "checks": [
+    {
+      "checked_at_utc": "2026-11-14T03:56:50.620427+00:00",
+      "operation": "authenticated kernels_status for the active replay-training job",
+      "status": "KernelWorkerStatus.RUNNING",
+      "collection_job_submitted": false,
+      "gpu_hours_used_by_this_brief": 0
+    },
+    {
+      "checked_at_utc": "2026-11-14T03:59:33.840157+00:00",
+      "operation": "authenticated kernels_status for the active replay-training job",
+      "status": "KernelWorkerStatus.RUNNING",
+      "collection_job_submitted": false,
+      "gpu_hours_used_by_this_brief": 0
+    },
+    {
+      "checked_at_utc": "2026-11-14T04:42:45.819630+00:00",
+      "operation": "authenticated kernels_status for the new replay-training job",
+      "status": "KernelWorkerStatus.RUNNING",
+      "collection_retry_submitted": false,
+      "observed_other_job_last_run_time_utc": "2026-11-14T04:27:10.343000+00:00",
+      "note": "Other GPU job began while collection attempt 2 was already running; no further brief 06 allocation until idle."
+    }
+  ]
+}
