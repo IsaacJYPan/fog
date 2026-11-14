@@ -1,0 +1,12 @@
+[ppo] lr scale 1: 1 tensors at 0.0003
+[ppo] direct rollout workers=4, mode=process, actor_threads=2, persistent CPU actors + one centralized learner
+[ppo] rollout process pids=(5601, 5602, 5606, 5610)
+[ppo] decisions=8050  win_rate=0.030  loss=0.5072  entropy=1.582  kl=0.0020  clip=0.041  belief=13.657  self_belief=13.368
+[ppo] decisions=16503  win_rate=0.055  loss=0.1554  entropy=1.621  kl=0.0077  clip=0.088  belief=3.866  self_belief=3.472
+[ppo] decisions=20336  win_rate=0.085  loss=0.1159  entropy=1.594  kl=0.0024  clip=0.041  belief=1.667  self_belief=1.598
+[ppo] done (direct Showdown backend): 20336 decisions -> runs/rl_check/stage0/checkpoints/ppo_final.pt
+
+real	15m13.160s
+user	47m5.311s
+sys	7m53.787s
+exit_code=0

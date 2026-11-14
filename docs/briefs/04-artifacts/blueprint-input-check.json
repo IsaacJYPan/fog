@@ -1,0 +1,19 @@
+{
+  "holdout_games": 2000,
+  "holdout_rows": 104037,
+  "fixed_ids_match": true,
+  "training": {
+    "1000": {
+      "games": 1000,
+      "rows": 52983
+    },
+    "3000": {
+      "games": 3000,
+      "rows": 156597
+    },
+    "20000": {
+      "games": 20000,
+      "rows": 1023525
+    }
+  }
+}

@@ -72,3 +72,34 @@ def test_league_past_ckpts_missing_file_raises(tmp_path):
         _TrainSetup(
             _cfg(tmp_path / "a", league={"past_ckpts": [str(tmp_path / "nope.pt")]})
         )
+
+
+def test_warm_started_run_resumes_without_reloading_initial_weights(tmp_path):
+    from copy import deepcopy
+
+    from fog.training.training_state import save_training_state
+
+    donor = _TrainSetup(_cfg(tmp_path / "donor"))
+    initial = tmp_path / "initial.pt"
+    torch.save(donor.agent.state_dict(), initial)
+    cfg = _cfg(tmp_path / "warm", ppo={"init_ckpt": str(initial)})
+    warm = _TrainSetup(cfg)
+    parameter = next(warm.agent.parameters())
+    parameter.grad = torch.ones_like(parameter)
+    warm.opt.step()
+    warm.opt.zero_grad()
+    warm.decisions_seen = 40
+    state = save_training_state(warm, warm.ckpt_dir / "ppo_40.pt")
+    initial.unlink()  # full resume must depend only on the saved training state
+    resumed_cfg = deepcopy(cfg)
+    resumed_cfg["ppo"]["resume_ckpt"] = str(state)
+
+    resumed = _TrainSetup(resumed_cfg)
+
+    assert resumed.decisions_seen == 40
+    for name, value in warm.agent.state_dict().items():
+        assert torch.equal(value, resumed.agent.state_dict()[name]), name
+    expected = next(iter(warm.opt.state.values()))
+    actual = next(iter(resumed.opt.state.values()))
+    for key in expected:
+        assert torch.equal(expected[key], actual[key]), key

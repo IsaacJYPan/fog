@@ -1,0 +1,20 @@
+{
+  "four_threads": {
+    "decisions": 1180.0,
+    "collection_seconds": 11.03679,
+    "update_seconds": 46.23788,
+    "optimization_rows_per_sec": 78.35604,
+    "effective_epochs": 3.0
+  },
+  "one_thread": {
+    "decisions": 1180.0,
+    "collection_seconds": 10.15383,
+    "update_seconds": 96.04425,
+    "optimization_rows_per_sec": 37.63735,
+    "effective_epochs": 3.0
+  },
+  "selected_threads": 4,
+  "smoke": true,
+  "one_thread_commit": "a6c73bc",
+  "one_thread_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync python -m fog.train --config configs/rl_check_scratch.yaml --trainer ppo --set ppo.total_decisions=1024 log.dir=runs/rl_check/thread1_smoke"
+}

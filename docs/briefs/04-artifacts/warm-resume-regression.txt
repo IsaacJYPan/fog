@@ -1,0 +1,23 @@
+Before the fix: uv run --no-sync python -m pytest -q tests/test_train_resume.py::test_warm_started_run_resumes_without_reloading_initial_weights
+                "committed action is not observable at decision time (choices resolve "
+                "simultaneously). Use an offline/replay pathway for action-oracle training."
+            )
+        if self.oracle_mode == "set" and self.pool_teams is None:
+            raise ValueError(
+                "model.oracle=set requires env.team_pool — the truth tokens come from the "
+                "sampled pool teams (recording teambuilder / attribute match)."
+            )
+    
+        # Single-worker collection uses this model directly. Autograd is independent of mode.
+        self.agent = FogAgent.from_tables(cfg).to(self.device).eval()
+        if self.ppo_cfg.get("init_ckpt") and self.ppo_cfg.get("resume_ckpt"):
+>           raise ValueError("ppo.init_ckpt and ppo.resume_ckpt are mutually exclusive")
+E           ValueError: ppo.init_ckpt and ppo.resume_ckpt are mutually exclusive
+
+fog/training/ppo.py:672: ValueError
+----------------------------- Captured stdout call -----------------------------
+[ppo] lr scale 1: 1 tensors at 0.0001
+[ppo] lr scale 1: 1 tensors at 0.0001
+=========================== short test summary info ============================
+FAILED tests/test_train_resume.py::test_warm_started_run_resumes_without_reloading_initial_weights
+1 failed in 3.88s

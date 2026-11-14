@@ -1,0 +1,10 @@
+{
+  "smoke": true,
+  "checkpoint_decisions": 216451,
+  "training_pool_rule_passed": true,
+  "simpleheuristics_pool_a_gain_points": 58.5,
+  "first_observed_decisions_per_ten_points": 37000.170940170945,
+  "simpleheuristics_pool_b_gain_points": -1.25,
+  "maxdamage_pool_b_gain_points": -1.75,
+  "held_out_reading": "No clear gain at the first scored point; both intervals overlap baseline."
+}

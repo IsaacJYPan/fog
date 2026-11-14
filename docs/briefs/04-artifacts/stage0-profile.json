@@ -1,0 +1,16 @@
+{
+  "smoke": true,
+  "games": 64,
+  "learner_decisions": 1563,
+  "wins": 2,
+  "profiled_seconds": 16.508372298999802,
+  "learner_decisions_per_sec": 94.67923134340131,
+  "node_cpu_seconds": 2.5500000000000003,
+  "node_roundtrip_seconds": 2.317690315,
+  "observation_seconds": 3.9633834400000003,
+  "forward_seconds": 7.2165137690000005,
+  "belief_calls": {
+    "belief": 0,
+    "self_belief": 0
+  }
+}
