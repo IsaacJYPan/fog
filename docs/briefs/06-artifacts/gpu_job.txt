@@ -133,8 +133,13 @@ def probes():
     machine = hardware()
     workers = machine["affinity_cpus"]
     results = []
+    selected_opponent = os.environ.get("FOG_PROBE_OPPONENT")
+    if selected_opponent not in (None, "MaxDamage"):
+        raise ValueError("FOG_PROBE_OPPONENT must be MaxDamage when set")
     for device, batch in (("cuda", 32), ("cpu", 32), ("cuda", 64), ("cuda", 128)):
         for opponent in ("self", "MaxDamage"):
+            if selected_opponent is not None and opponent != selected_opponent:
+                continue
             for repeat in (1, 2):
                 result = run(f"probe-{opponent}-{device}-b{batch}-r{repeat}", [
                     PYTHON, "-m", "fog.eval.showdown_rollout_probe", "--workers", str(workers),
@@ -152,7 +157,8 @@ def probes():
              for batch in (32, 64, 128)}
     best = max(rates, key=rates.get)
     dump(OUT / "stage1-summary.json", {"workers": workers, "best_batch": best,
-                                      "selection_aggregate_rates": rates, "rows": results})
+                                      "selection_aggregate_rates": rates, "rows": results,
+                                      "same_runtime_matrix_complete": len(results) == 16})
 
 
 def training():
