@@ -1111,3 +1111,15 @@ speed. G100 stays pending while the brief 06 measurement is prepared on its sepa
 Before every later launch, list all owned RUNNING/QUEUED jobs and require none active.
 G20 remains the only currently active job. Its completed epoch 4 has logged holdout value
 MSE 0.861 (rounded; full selected reports remain pending).
+
+### G20 epoch 5 and verified account-wide submission guard (smoke)
+
+G20 has completed five of its 18 epochs; logged holdout value MSE at epoch 5 is 0.871
+(rounded), with the earlier epoch-4 value 0.861. Full-precision selected checkpoint reports
+remain pending. `G20-progress.json` preserves all five completed-epoch log events.
+
+The new launch guard paginates every owned job and reads its status. It checked 20 jobs,
+found only G20 active, and blocked submission (`account-wide-guard-live.json`). A larger
+initial list hit HTTP 429; smaller pages, throttled reads and bounded retry resolved it.
+No job was submitted by either guard check. The owner's requested order remains G20,
+then brief 06 end-to-end timing, then the remaining GPU scale work.
