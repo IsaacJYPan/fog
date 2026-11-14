@@ -28,8 +28,18 @@ def _as_list(value: Any) -> list[Any]:
     return [value]
 
 
+_ID_CACHE: dict[str, str] = {}
+_ID_CACHE_LIMIT = 200_000
+
+
 def _normalize_id(value: Any) -> str:
-    return _NON_ID.sub("", str(value).lower())
+    text = value if value.__class__ is str else str(value)
+    cached = _ID_CACHE.get(text)
+    if cached is None:
+        cached = _NON_ID.sub("", text.lower())
+        if len(_ID_CACHE) < _ID_CACHE_LIMIT:
+            _ID_CACHE[text] = cached
+    return cached
 
 
 def move_key(move: Any) -> str:
@@ -84,17 +94,48 @@ def opponent_team_order(battle: Any) -> list[Any]:
 
 
 def team_order_minus_active(battle: Any) -> list[Any]:
+    # Same result as filtering with `same_pokemon(mon, active)`; the active key is built once.
     active = getattr(battle, "active_pokemon", None)
-    return [mon for mon in team_order(battle) if not same_pokemon(mon, active)]
+    team = team_order(battle)
+    if active is None:
+        return [mon for mon in team if mon is not None]
+    active_key: str | None = None
+    out: list[Any] = []
+    for mon in team:
+        if mon is active:
+            continue
+        if mon is not None:
+            if active_key is None:
+                active_key = pokemon_key(active)
+            key = pokemon_key(mon)
+            if active_key and key and active_key == key:
+                continue
+        out.append(mon)
+    return out
 
 
 def available_switch_by_slot(battle: Any) -> dict[int, Any]:
     """Map project switch slots 0-4 to currently legal switch targets."""
     available = _as_list(getattr(battle, "available_switches", None))
     out: dict[int, Any] = {}
+    if not available:
+        return out
+    # Same matches as `same_pokemon(offered, target)` for every pair; each key is built once.
+    keys: dict[int, str] = {}
     for slot, target in enumerate(team_order_minus_active(battle)[:5]):
         for offered in available:
-            if same_pokemon(offered, target):
+            if offered is target:
+                out[slot] = offered
+                break
+            if offered is None or target is None:
+                continue
+            offered_key = keys.get(id(offered))
+            if offered_key is None:
+                offered_key = keys[id(offered)] = pokemon_key(offered)
+            target_key = keys.get(id(target))
+            if target_key is None:
+                target_key = keys[id(target)] = pokemon_key(target)
+            if offered_key and target_key and offered_key == target_key:
                 out[slot] = offered
                 break
     return out
@@ -107,17 +148,30 @@ def bool_attr(obj: Any, name: str, default: bool = False) -> bool:
     return bool(val)
 
 
+def legal_choices(battle: Any) -> tuple[dict[int, Any], dict[int, Any], list[bool]]:
+    """(legal moves by slot, legal switches by slot, 14-way mask), each computed once."""
+    moves = available_move_by_slot(battle)
+    switches = available_switch_by_slot(battle)
+    return moves, switches, _legality_mask(battle, moves, switches)
+
+
 def action_legality_mask(battle: Any) -> list[bool]:
     """Compute the 14-way legality mask from a live battle/request-like object."""
+    return _legality_mask(
+        battle, available_move_by_slot(battle), available_switch_by_slot(battle)
+    )
+
+
+def _legality_mask(battle: Any, moves: dict[int, Any], switches: dict[int, Any]) -> list[bool]:
     mask = [False] * N_ACTIONS
 
-    for slot in available_move_by_slot(battle):
+    for slot in moves:
         if slot < 4:
             mask[slot] = True
             if bool_attr(battle, "can_tera", False):
                 mask[4 + slot] = True
 
-    for slot in available_switch_by_slot(battle):
+    for slot in switches:
         if slot < 5:
             mask[8 + slot] = True
 

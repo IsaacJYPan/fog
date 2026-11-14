@@ -117,10 +117,17 @@ class Observation:
         hist_ids, hist_state = _history.encode_history_sidecars(
             battle, tables, perspective=perspective, tracker=tracker
         )
-        mask = _entities.legality_mask(battle, perspective=perspective)
+        from fog.constants.schema import N_ACTIONS
         from fog.encoding.action_features import encode_action_features
+        from fog.env.actions import legal_choices
 
-        action_features = encode_action_features(battle)
+        choices = legal_choices(battle)
+        mask = np.asarray(choices[2], dtype=bool)
+        if mask.shape != (N_ACTIONS,):
+            raise ValueError(
+                f"action legality mask must have shape ({N_ACTIONS},); got {mask.shape}"
+            )
+        action_features = encode_action_features(battle, choices=choices)
         from fog.encoding.player_observation import decision_phase_from_battle
 
         return cls(

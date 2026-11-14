@@ -17,12 +17,7 @@ from typing import Any
 import numpy as np
 
 from fog.constants.schema import N_ACTIONS
-from fog.env.actions import (
-    action_legality_mask,
-    available_move_by_slot,
-    available_switch_by_slot,
-    map_order_to_action,
-)
+from fog.env.actions import legal_choices, map_order_to_action
 
 ACTION_FEATURE_NAMES = (
     "legal",
@@ -79,8 +74,62 @@ def _remaining(team: Any, *, opponent: bool = False) -> int:
     return 6 - fainted if opponent else sum(not bool(getattr(mon, "fainted", False)) for mon in mons)
 
 
-def encode_action_features(battle: Any) -> np.ndarray:
-    """Return finite per-action features aligned with the project's fourteen action slots."""
+def _clip(value: float, low: float, high: float) -> float:
+    # Scalar clip for finite inputs; `np.clip` on one Python float is about ten times slower.
+    return low if value < low else high if value > high else value
+
+
+_MATCHUP_MEMO: dict[tuple[int, int], Any] | None = None
+_MATCHUP_ORIGINAL: Any = None
+
+
+def _install_matchup_memo() -> None:
+    """Let one feature table reuse `SimpleHeuristicsPlayer._estimate_matchup` results.
+
+    The rule player's own helpers (`_should_switch_out`, `choose_singles_move`) look the function
+    up on the class at call time and ask for the same pairs again. The wrapper below only
+    remembers results while `encode_action_features` is running, when the battle state cannot
+    change; at any other time it calls straight through.
+    """
+    global _MATCHUP_ORIGINAL
+    if _MATCHUP_ORIGINAL is not None:
+        return
+    from poke_env.player import SimpleHeuristicsPlayer
+
+    original = SimpleHeuristicsPlayer._estimate_matchup
+
+    def _estimate_matchup(mon: Any, opponent: Any) -> Any:
+        memo = _MATCHUP_MEMO
+        if memo is None:
+            return original(mon, opponent)
+        key = (id(mon), id(opponent))
+        if key in memo:
+            return memo[key]
+        memo[key] = score = original(mon, opponent)
+        return score
+
+    _MATCHUP_ORIGINAL = original
+    SimpleHeuristicsPlayer._estimate_matchup = staticmethod(_estimate_matchup)
+
+
+def encode_action_features(battle: Any, *, choices: tuple | None = None) -> np.ndarray:
+    """See `_encode_action_features`; rule-player matchup scores are reused within the call."""
+    global _MATCHUP_MEMO
+    if battle is None or _MATCHUP_MEMO is not None:
+        return _encode_action_features(battle, choices=choices)
+    _install_matchup_memo()
+    _MATCHUP_MEMO = {}
+    try:
+        return _encode_action_features(battle, choices=choices)
+    finally:
+        _MATCHUP_MEMO = None
+
+
+def _encode_action_features(battle: Any, *, choices: tuple | None = None) -> np.ndarray:
+    """Return finite per-action features aligned with the project's fourteen action slots.
+
+    `choices` is an already computed `fog.env.actions.legal_choices(battle)` for this same
+    battle state; passing it avoids deriving the legal moves and switches a second time."""
     features = np.zeros((N_ACTIONS, ACTION_FEATURE_DIM), dtype=np.float32)
     if battle is None:
         features[13, _I["legal"]] = 1.0
@@ -88,7 +137,10 @@ def encode_action_features(battle: Any) -> np.ndarray:
         features[13, _I["simple_rule_pick"]] = 1.0
         return features
 
-    legal = np.asarray(action_legality_mask(battle), dtype=bool)
+    if choices is None:
+        choices = legal_choices(battle)
+    moves, switches, legal_list = choices
+    legal = np.asarray(legal_list, dtype=bool)
     features[:, _I["legal"]] = legal.astype(np.float32)
     features[:4, _I["ordinary_move"]] = 1.0
     features[4:8, _I["tera_move"]] = 1.0
@@ -100,8 +152,6 @@ def encode_action_features(battle: Any) -> np.ndarray:
 
     active = getattr(battle, "active_pokemon", None)
     opponent = getattr(battle, "opponent_active_pokemon", None)
-    moves = available_move_by_slot(battle)
-    switches = available_switch_by_slot(battle)
     can_tera = bool(getattr(battle, "can_tera", False))
     own_remaining = _remaining(getattr(battle, "team", None))
     opp_remaining = _remaining(getattr(battle, "opponent_team", None), opponent=True)
@@ -134,7 +184,7 @@ def encode_action_features(battle: Any) -> np.ndarray:
     switch_branch = bool(switches) and not move_branch
 
     common = {
-        "active_matchup": np.clip(matchup / 4.0, -1.0, 1.0),
+        "active_matchup": _clip(matchup / 4.0, -1.0, 1.0),
         "should_switch_out": should_switch,
         "own_team_remaining": own_remaining / 6.0,
         "opponent_team_remaining": opp_remaining / 6.0,
@@ -205,17 +255,17 @@ def encode_action_features(battle: Any) -> np.ndarray:
             except (AttributeError, KeyError, TypeError, ValueError, ZeroDivisionError):
                 tera_help = False
             for action in (slot, 4 + slot):
-                features[action, _I["move_power"]] = np.clip(base_power / 250.0, 0.0, 2.0)
-                features[action, _I["move_accuracy"]] = np.clip(accuracy, 0.0, 1.0)
-                features[action, _I["expected_hits"]] = np.clip(expected_hits / 5.0, 0.0, 2.0)
+                features[action, _I["move_power"]] = _clip(base_power / 250.0, 0.0, 2.0)
+                features[action, _I["move_accuracy"]] = _clip(accuracy, 0.0, 1.0)
+                features[action, _I["expected_hits"]] = _clip(expected_hits / 5.0, 0.0, 2.0)
                 features[action, _I["physical"]] = float(physical)
                 features[action, _I["special"]] = float(special)
                 features[action, _I["status_move"]] = float(not physical and not special)
                 features[action, _I["same_type_bonus"]] = float(same_type)
-                features[action, _I["type_effectiveness"]] = np.clip(effectiveness / 4.0, 0.0, 2.0)
-                features[action, _I["physical_stat_ratio"]] = np.clip(physical_ratio / 4.0, 0.0, 2.0)
-                features[action, _I["special_stat_ratio"]] = np.clip(special_ratio / 4.0, 0.0, 2.0)
-                features[action, _I["estimated_damage"]] = np.clip(np.log1p(max(0.0, damage)) / 8.0, 0.0, 2.0)
+                features[action, _I["type_effectiveness"]] = _clip(effectiveness / 4.0, 0.0, 2.0)
+                features[action, _I["physical_stat_ratio"]] = _clip(physical_ratio / 4.0, 0.0, 2.0)
+                features[action, _I["special_stat_ratio"]] = _clip(special_ratio / 4.0, 0.0, 2.0)
+                features[action, _I["estimated_damage"]] = _clip(np.log1p(max(0.0, damage)) / 8.0, 0.0, 2.0)
                 features[action, _I["hazard_setup_ready"]] = float(hazard)
                 features[action, _I["hazard_removal_ready"]] = float(removal)
                 features[action, _I["setup_move_ready"]] = float(setup_ready)
@@ -227,7 +277,7 @@ def encode_action_features(battle: Any) -> np.ndarray:
             except (AttributeError, KeyError, TypeError, ValueError, ZeroDivisionError):
                 score = 0.0
             action = 8 + slot
-            features[action, _I["switch_matchup"]] = np.clip(score / 4.0, -1.0, 1.0)
+            features[action, _I["switch_matchup"]] = _clip(score / 4.0, -1.0, 1.0)
             features[action, _I["positive_switch_matchup"]] = float(score > 0)
 
     # Exact, transparent starting rule.  This is not a training label smuggled in from future data:

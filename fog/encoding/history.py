@@ -112,7 +112,7 @@ def _cache_for(tracker: Any) -> dict | None:
     return cache
 
 
-def _cached_record(cache, key, events, tables, inputs, compute) -> np.ndarray:
+def _cached_record(cache, key, events, tables, inputs, compute, seen=None) -> np.ndarray:
     """Return the cached record for ``key`` when every input matches, else compute and store."""
     if cache is None:
         return compute()
@@ -121,13 +121,17 @@ def _cached_record(cache, key, events, tables, inputs, compute) -> np.ndarray:
         hit is not None
         and hit[1] is tables
         and hit[2] == inputs
-        and _events_match(events, hit[0])
+        # A turn's event list only ever grows by appending, so the same list object at the same
+        # length holds the same events; anything else is compared event by event.
+        and ((hit[4] is events and hit[5] == len(events)) or _events_match(events, hit[0]))
     ):
+        if seen is not None and hit[6] is None:
+            cache[key] = (*hit[:6], seen)
         return hit[3]
     record = compute()
     frozen = np.array(record, copy=True)
     frozen.setflags(write=False)
-    cache[key] = ([list(ev) for ev in events], tables, inputs, frozen)
+    cache[key] = ([list(ev) for ev in events], tables, inputs, frozen, events, len(events), seen)
     return frozen
 
 
@@ -202,6 +206,24 @@ def encode_history(
         if cache is None:
             rows.append(compute())
             continue
+        key = ("rec", role, t)
+        if action is not None:
+            # The tracker replaces a turn's snapshot and hit-point seed with new objects whenever
+            # it records that turn again and never edits them in place, so the same objects with
+            # the same action and event count are the inputs this record was computed from.
+            hit = cache.get(key)
+            if hit is not None and hit[1] is tables:
+                seen = hit[6]
+                if (
+                    seen is not None
+                    and seen[0] is events
+                    and seen[1] == len(events)
+                    and seen[2] == action
+                    and seen[3] is snapshot
+                    and seen[4] is hp_seed
+                ):
+                    rows.append(hit[3])
+                    continue
         inputs = (
             action,
             # movesets are read only for retro inference when no action was recorded
@@ -209,7 +231,10 @@ def encode_history(
             _array_fp(snapshot),
             dict(hp_seed) if hp_seed is not None else None,
         )
-        rows.append(_cached_record(cache, ("rec", role, t), events, tables, inputs, compute))
+        rows.append(_cached_record(
+            cache, key, events, tables, inputs, compute,
+            seen=(events, len(events), action, snapshot, hp_seed) if action is not None else None,
+        ))
     records = np.stack(rows).astype(np.float32)
     return records, len(turns)
 
@@ -267,10 +292,23 @@ def encode_history_sidecars(
         if cache is None:
             ids.append(compute())
         else:
-            inputs = (_array_fp(snapshot_ids), species)
-            ids.append(
-                _cached_record(cache, ("ids", role, turn), events, tables, inputs, compute)
-            )
+            key = ("ids", role, turn)
+            hit = cache.get(key)
+            seen = hit[6] if hit is not None and hit[1] is tables else None
+            if (
+                seen is not None
+                and seen[0] is events
+                and seen[1] == len(events)
+                and seen[2] is snapshot_ids
+                and hit[2][1] == species
+            ):
+                ids.append(hit[3])
+            else:
+                inputs = (_array_fp(snapshot_ids), species)
+                ids.append(_cached_record(
+                    cache, key, events, tables, inputs, compute,
+                    seen=(events, len(events), snapshot_ids) if snapshot_ids is not None else None,
+                ))
         state = tracker.snapshot_state.get(turn) if tracker is not None else None
         states.append(
             np.asarray(state, dtype=np.float32)
