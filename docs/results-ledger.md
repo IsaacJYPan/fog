@@ -1077,3 +1077,20 @@ The portable `uv run --no-project --with kaggle==2.2.5 --with six python -c ...`
 was exercised against the existing private checkpoint dataset. Both initial G3 files matched
 inventory bytes and SHA-256 (`checkpoint-portable-download-check.json`). It will be repeated
 after adding G20/G100. No new GPU job was started; G20 continues alone.
+
+### G20 live progress and partial G3 label routing (smoke)
+
+G20 has saved epochs 1 and 2 of 18, with logged (rounded) holdout value MSE 0.894 and
+0.878 and roughly 32-minute epochs including validation. `G20-progress.json` preserves the
+live log events and observation time; these are not final selected-checkpoint metrics. The
+existing private job continues alone with the same configuration/source pin. Do not compare
+rounded aggregate losses with B's full-precision policy NLL.
+
+At `fda1a94`, CPU inference from the partial G3 own-best value checkpoint gave identical
+policy/value tensors after negating outcomes, replacing terminal auxiliary labels and
+injecting optional privileged truth/action fields: one fixed 256-row holdout batch, both
+in evaluation mode and in training mode with matched RNG. No optimizer ran. This checks
+supervision/oracle routing, not every possible feature leak. `G3-label-perturbation.json`
+records the result; repeat on the selected final-run checkpoint. Command: CPU Python,
+`FogAgent.from_tables`, unchanged config with `oracle=none`, paired forward passes and
+`torch.equal` on log-probability and value tensors.

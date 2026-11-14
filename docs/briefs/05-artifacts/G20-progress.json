@@ -1,0 +1,33 @@
+{
+  "job": "fog-p2-g20-20261114",
+  "last_completed_epoch": 2,
+  "target_epochs": 18,
+  "status": "RUNNING",
+  "observed_total_quota_hours": 2.4756298619444443,
+  "observed_at_utc": "2026-11-14T05:37:50.248905+00:00",
+  "log_error_type": "ChunkedEncodingError",
+  "last_epoch_log": "[bc] epoch 2/18  train_loss=2.329  eval_loss=2.288  belief=5.119  chain=1.715  value=0.878  query_p=0.318  dropped=0.000%",
+  "status_note": "smoke live progress only; training and selected reports are not complete",
+  "completed_epoch_log_events": [
+    {
+      "stream_name": "stdout",
+      "time": 2216.116356779,
+      "data": "[bc] epoch 1/18  train_loss=2.730  eval_loss=2.454  belief=5.643  chain=1.880  value=0.894  query_p=0.284  dropped=0.000%\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 2216.40904956,
+      "data": "Saved epoch 1; peak GPU bytes 2621058048\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 4144.551121137,
+      "data": "[bc] epoch 2/18  train_loss=2.329  eval_loss=2.288  belief=5.119  chain=1.715  value=0.878  query_p=0.318  dropped=0.000%\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 4144.877466039,
+      "data": "Saved epoch 2; peak GPU bytes 2621058048\n"
+    }
+  ]
+}
