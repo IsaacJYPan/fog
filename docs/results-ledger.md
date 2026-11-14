@@ -1481,3 +1481,29 @@ probe-self-cuda-b32-r1*}`). A temporary swap attempt returned `Invalid argument`
 The low-memory allocation was released before 08:53 UTC and a high-memory single-T4
 replacement requested. The same 10:16 UTC deadline applies across both allocations;
 retained low-memory CPU rows will not be presented as same-runtime high-memory baselines.
+
+High-memory T4 requests returned `Service Unavailable` twice; no high-memory runtime was
+allocated. A second standard T4 was started, after the first was released. The local guard
+now stops it by 10:21 UTC; conservative per-allocation accounting gives a cumulative cap of
+2.959444 GPU-hours (`runtime-t4-counts/session.json`), including the earlier private jobs.
+
+The narrow fix at `9e977cc` makes only the measurement worker count decisions/wins before
+returning its result. The probe no longer serializes unused observation buffers, which caused
+the end-of-run host-memory spike. It calls the unchanged trainer worker for every game. No
+model, loss, trainer or actor implementation changed. Probe timings now exclude full-buffer
+IPC; the complete training run still includes it. The old CPU rows are retained separately,
+and the complete CPU/GPU matrix is rerun using the same counter-only boundary for both.
+
+The new regression explicitly forbids serializing the buffer. At the old `571a9c0` source
+it fails with that assertion (3.39 s); with the fix, eight focused checks pass in 49.35 s and
+Ruff is clean (`runtime-t4-counts/{regression-before.txt,focused-tests.txt,ruff.txt}`). This
+checks identical counters and delegated worker lifetime without transporting fragments.
+The replacement matrix runs at `922886b`, with CUDA first to catch any remaining defect.
+
+Corrected same-runtime worker-collection matrix, all **smoke**. Timings include worker play
+and counter transfer, excluding full rollout-buffer transfer. Command prefix remains
+`python -m fog.eval.showdown_rollout_probe --workers 2 --games 512 --pool data/teams/pool_a`.
+Evidence is in `06-artifacts/runtime-t4-counts/`; earlier low-memory rows above are not mixed in.
+
+| Opponent | Device | Batch | Repeat | Games | Learner decisions | Probe seconds | Learner decisions/s | Commit | Remaining command flags |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
