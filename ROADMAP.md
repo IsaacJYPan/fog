@@ -213,7 +213,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12: 22,000 games imported (2 shards, 34 s) with a chronological 2,000-game holdout
       newer than all training games; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
-      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+      _2026-11-14: brief 05 prepared 20,000 and 101,928 training games with the fixed 2,000-game holdout; rating floor remains 1500. Private upload/report in `docs/briefs/05-report.md`; no box checked._
 
 - [ ] **P2.2 Convert** with `fog/scripts/convert_replay_decisions.py` (one imputation per game is
       enough at this scale; three triples storage for correlated rows). Time the conversion on
@@ -226,7 +226,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12, at 22,000 games: converted in 28.5 min on 4 cores (12.9 games/s, 1,127,562
       rows, 624 MB, ~580 bytes per decision); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
-      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+      _2026-11-14: brief 05 converted both corpora; 1,023,525 / 5,217,022 training rows, and 104,037 holdout rows with all 2,000 shards byte-identical. See the brief 05 artifacts; task remains open._
 
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
@@ -242,7 +242,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-13: brief 03 completed CPU profiling, R/A/S/B and real replay recovery;
       training is compute-bound and the longer schedules overfit. See "replay trainer profile
       and the data-or-steps runs" in the ledger and `docs/briefs/03-report.md`; P2.3 remains open._
-      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+      _2026-11-14: brief 05 measured 604 rows/s on T4, batch 1,024, one epoch. Full G3 projects above two hours, exceeding the one-hour calibration cap: retain a partial G3/resume smoke, then prioritize G20 at the brief default batch under the unchanged 20-hour budget. Batch/device comparison remains unverified; no model/loss/schedule change or gate claim._
 
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
@@ -259,7 +259,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       the exact historical data effect and hosted GPU performance remain unverified. See
       "replay trainer profile and the data-or-steps runs" in the ledger and
       `docs/briefs/03-report.md`; P2.4 remains open._
-      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+      _2026-11-14: full 3k GPU calibration does not fit its stated cap; the measured learning curve is still pending G20/G100. Preserve partial-run labels and leave the 20k-to-100k rule unverified unless both points finish. See `docs/briefs/05-report.md`._
 
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
@@ -267,7 +267,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       MaxDamage greedy; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
 
-      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+      _2026-11-14: brief 05 CPU play smoke awaits a completed G20; no new play rate or gate is claimed. See `docs/briefs/05-report.md`._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 on the holdout.

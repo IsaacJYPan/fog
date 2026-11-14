@@ -1,0 +1,29 @@
+{
+  "status": "smoke, one completed G3 epoch; full calibration incomplete",
+  "code_commit": "3b81a6154e1cc597233acba4670e266054decf8a",
+  "device": "Tesla T4",
+  "visible_devices": 2,
+  "training_device": "cuda:0",
+  "batch_size": 1024,
+  "completed_epochs": 1,
+  "target_epochs": 18,
+  "train_rows": 156597,
+  "holdout_rows": 104037,
+  "train_rows_per_second": 604.1942443236809,
+  "validation_seconds": 154.32265983899993,
+  "initial_validation_seconds": 160.71649568100003,
+  "peak_gpu_memory_bytes": 2619046912,
+  "peak_gpu_memory_gib": 2.4391775131225586,
+  "epoch_seconds": 413.5088234120001,
+  "policy_nll": 2.0162405690168126,
+  "top1": 0.2121432560218176,
+  "value_mse": 0.9987060500855954,
+  "G3_18_epoch_seconds_projection_excluding_setup_writes": 7603.8220423349985,
+  "G20_18_epoch_seconds_projection_excluding_setup_writes": 33431.118721513885,
+  "formulas": {
+    "training_seconds": "rows / measured training_rows_per_second",
+    "run_seconds": "epochs * (training_seconds + last measured validation_seconds) + initial_validation_seconds"
+  },
+  "limitations": "First-epoch rate on G3, fp32, two CPU threads. Larger corpus/runtime variation unmeasured. Projections are planning, not measured completions.",
+  "value_brier_derived_from_mse": 0.24967651252139886
+}

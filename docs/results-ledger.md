@@ -963,3 +963,38 @@ timeout="1800")`; internal export deadline 1,500 s. Planning range **9–27 min*
 observed incomplete 365-second worker attempt plus setup/restore/export, not a measured
 epoch rate. Its maximum fits the roughly 38 minutes left in stage 1's one-hour allowance.
 No second GPU job is active. Exact source and submission are retained.
+
+### First completed GPU epoch and complete CPU preparation (smoke)
+
+| Run (smoke) | Train / holdout games | Epochs | Batch/device | Holdout NLL / top-1 | Holdout value MSE | Train rows/s | Code | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| G3 partial | 3000 / 2000 | 1 of 18 | 1024 / Tesla T4 | 2.016241 / 0.212143 | 0.998706 | 604.194 | `3b81a61` | `python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cuda bc.manifest=/kaggle/working/replay-work/split/train_3000.parquet bc.holdout_manifest=/kaggle/working/replay-work/split/holdout_manifest.parquet bc.batch_size=1024 bc.epochs=18 bc.resume=true bc.selection_metric=action_ce bc.keep_best_value=true bc.streaming=true bc.early_stopping_patience=0 log.dir=/kaggle/working/replay-work/G3` |
+
+This job deliberately stopped after epoch 1. Training 156,597 rows took 259.186 s; initial and
+epoch validation took 160.716 / 154.323 s. Peak PyTorch allocation **2,619,046,912 bytes**
+(2.439178 GiB), CUDA device 0, two T4s visible. Python 3.13.16 / PyTorch 2.11.0+cu130 /
+CUDA 13.0; two CPU threads. Installation **137.037 s**, wall before export **746.991 s**;
+job quota **824.787 s**, total ended-job quota **2,120.350 s = 0.588986111 h**. Raw files:
+`G3-stop4-*` and `G3-first-epoch-summary.json`. Intervals are n/a for these offline diagnostics.
+
+At the measured rate and validation time, G3 18 epochs project to **7,603.822 s**, excluding
+setup/writes, above stage 1's one-hour cap; G20 projects to **33,431.119 s**. These are
+projections, not completed runs. Per AGENTS.md's impossible-task rule, ROADMAP now states the
+smallest clear next step: retain partial G3 and verify continuation within the unchanged hour,
+then prioritize G20 with default batch 1,024 under the unchanged 20-hour total. No complete
+G3-versus-B or GPU batch-256 comparison, batch-quality conclusion or gate is claimed.
+
+Private `fog-p2-g3-resume-20261114` was accepted, code `e05d5d1`, attaching the preceding
+private job's saved work. Same 18-epoch config, deliberate stop after epoch 2, internal export
+deadline 1,200 s, platform cap 1,400 s. Expected 15–20 min from measured epoch/validation and
+setup; that cap keeps all calibration below one quota-hour. Reports of both partial selected
+checkpoints are requested. Continuation proof remains pending returned metrics.
+
+CPU preparation of 112,000 games is complete: **101,928 / 5,217,022 training games/rows**,
+**2,000 / 104,037 fixed holdout games/rows**, **8,072** newer games excluded, zero quarantines.
+All 20,000 first-set training IDs are contained in the larger set; all **2,000** holdout NPZs
+are byte-identical. Max training upload **1771559041** precedes min holdout **1771561053**.
+Rating floor stays **1500**, no wider dates or lower floor required. Import / conversion / split
+wall **789.940 / 4,452.866 / 2.740 s**, with initial raw/cache reuse and local check contention,
+not an idle throughput benchmark. Commands/counts/timers: `prepare-112000*`.
+The **2,385,762,558-byte** opaque archive is uploading to the brief's second private dataset.

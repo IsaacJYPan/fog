@@ -1,0 +1,21 @@
+{
+  "command": "uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 112000 --work-dir runs/p2_gpu_112000 --device cuda --batch-size 1024 --epochs 18 --prepare-only",
+  "code_commit": "bd6db4161cb3d6d563ae4a98f9415771601d4d8c",
+  "imported_games": 112000,
+  "training_games": 101928,
+  "training_rows": 5217022,
+  "holdout_games": 2000,
+  "holdout_rows": 104037,
+  "dropped_newer_games": 8072,
+  "fixed_holdout_ids_equal": true,
+  "training_uploadtime_max": 1771559041,
+  "holdout_uploadtime_min": 1771561053,
+  "training_min_rating": 1500,
+  "first_20000_subset_of_training": true,
+  "holdout_shards_compared": 2000,
+  "holdout_shard_bytes_equal": 2000,
+  "holdout_shard_arrays_equal": 2000,
+  "holdout_comparison_seconds": 0.5387685610003246,
+  "rating_floor_reduction_required": false,
+  "note": "CPU preparation. Import reused first 22k immutable raw records/cache; both full corpora converted separately. Timings overlap prior preparation and local checks, not idle throughput benchmarks."
+}
