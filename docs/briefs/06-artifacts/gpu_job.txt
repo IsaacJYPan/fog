@@ -74,6 +74,9 @@ def run(label, args):
     }
     dump(OUT / "progress.json", metadata)
     print(metadata["command"], flush=True)
+    memory_output = OUT / f"{label}-gpu.csv"
+    if memory_output.exists():
+        shutil.copy2(memory_output, OUT / f"{label}-before-attempt{attempt}-gpu.csv")
     thread = threading.Thread(target=monitor, daemon=True)
     thread.start()
     raw_output = OUT / f"{label}.txt"
