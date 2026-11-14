@@ -1009,3 +1009,11 @@ repeats and both CUDA batch-32 self-play repeats completed; rates await export.
 Before training, timing capture now distinguishes unique batch rows from
 optimizer row-visits (including partial epochs/KL stopping), retaining the same
 update metrics and parameters in the repeated CPU engineering check.
+
+Job runtime handling now allows an explicit collection platform cap up to
+3,600 seconds via `FOG_PLATFORM_TIMEOUT`, with the same value sent to Kaggle.
+Defaults stay unchanged. Any further allocation must fit the remaining budget
+after prior submission-to-observed-terminal bounds, counting both T4s; a
+longer collection cap reduces the available training cap. This changes only
+the measurement job, not the probe or trainer. Bootstrap regression and Ruff
+pass again.
