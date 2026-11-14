@@ -1,46 +1,34 @@
 # Collection and play-training speed on a GPU (smoke, in progress)
 
-**Answer.** Self-play collection measured **155–156 learner decisions/s on CPU** and
-**206–216 on CUDA**, four Intel Xeon @ 2.00GHz cores and two Tesla T4s. MaxDamage
-collection, PPO update speed, end-to-end decisions/games per second and the 30-hour
-projection remain unmeasured. The owner chose to finish G20 first, then run the missing
-MaxDamage matrix and full 100k-decision PPO loop. No new GPU job has been submitted.
+**Answer.** On the fresh single-T4 runtime, the first CPU self-play repeat collected
+**72.92 learner decisions/s** over 512 games. The second repeat and the rest of the
+same-runtime matrix are running. CUDA collection speed, PPO update rate, end-to-end
+throughput, learning and the 30-hour projection are not yet measured in this allocation.
 
-| Self-play, 512 games/repeat (smoke) | Repeat 1 learner decisions/s | Repeat 2 learner decisions/s |
+| Opponent / device / batch | Repeat 1 learner decisions/s | Repeat 2 |
 | --- | ---: | ---: |
-| CPU, batch 32 | 155.76 | 155.37 |
-| CUDA, batch 32 | 205.81 | 208.95 |
-| CUDA, batch 64 | 209.10 | 213.15 |
-| CUDA, batch 128 | 216.34 | 212.95 |
+| self / CPU / 32 | 72.92 | pending |
 
-These rows are from `06-artifacts/collection-attempt2/`; they are a separate-job result,
-not a completed same-job self/MaxDamage matrix. Attempt 1 failed before clone because
-`/kaggle/temp` was absent; attempt 2 reached its internal deadline after these eight rows.
-Both failed/partial allocations remain in the ledger and artifacts.
+Machine: one Tesla T4, 15,360 MiB; two logical Intel Xeon 2.00 GHz CPUs;
+PyTorch 2.14.1+cu130; pinned Showdown `e440c4a`. Evidence is under
+`06-artifacts/runtime-t4/`, including raw probe output, commands, commit IDs,
+process wall time and two-second GPU-memory samples. Every number is **smoke**.
 
-The planned private `FOG_STAGE=combined` job uses `06-artifacts/gpu_job.py`, the reviewed
-current roadmap trainer, and `configs/collect_gpu_check.yaml`. It measures both repeats of
-CPU batch 32 and CUDA batches 32/64/128 against MaxDamage, selects the aggregate fastest
-GPU batch, then trains the exact 100k-decision recipe and evaluates 200 greedy games on
-the first pool-A team. The config's four-worker/batch-128 values are a template, replaced
-by measured hardware/selection before training. Minibatch stays 1,024; a CUDA OOM may
-only enable the brief's activation-checkpointing option, with the failed attempt retained.
+The runtime CLI login and SSH connection work. Setup reused the supplied CUDA PyTorch;
+the missing Node.js was installed. An unpinned Ruff invocation reported findings;
+the lock's Ruff 0.15.22 is clean. **17 focused tests passed in 117.72 seconds**.
+No application, model, loss or trainer change was needed.
 
-Budget: at most **0.937222 allocated GPU-hours** already used, counting both T4s and
-submission-to-observed-terminal upper bounds. A 3,600-second platform cap plus prior
-allocations totals **2.937222 allocated GPU-hours**, leaving 113 session seconds for
-additional startup/export; the internal deadline is 3,300 seconds including setup. The
-remaining budget is shared by probes, training and evaluation. The initial G20/collection
-overlap is recorded; every new launch requires an empty account-wide active/queued-job check.
+Completed probes are skipped on restart. Evidence is copied to the controlling computer
+every 20 seconds. Training will use the brief's config with measured workers/batch;
+runtime-only overrides place its outputs in `runs/collect_gpu` and save full training
+state every 8,000 decisions, at update boundaries. Weights, optimizer/RNG sidecars and
+metrics are copied off the runtime. Evaluation uses its existing four-game-block resume.
+An interrupted active probe or unfinished update must be repeated.
 
-The timing wrapper preserves the trainer's native phase columns and adds `timing_` fields,
-CUDA-synchronized optimizer/forward timers and the full update phase. End-to-end wall
-includes all training attempts; saved-state continuations retain only their completed timing
-prefix. A regression fails on the prior wrapper and passes after the fix. **15 focused tests
-pass**, timing checks preserve update metrics/model tensors with CUDA calls mocked, Ruff
-and byte compilation pass (`endtoend-*`, `timing-native-before.txt`). No new model, loss,
-trainer or search edits were made; the reviewed brief-04 trainer was merged from the roadmap.
+The earlier attempts remain recorded and count up to **0.937222 GPU-hours**. This
+single-T4 allocation is capped at two hours, including setup/export: cumulative upper
+bound **2.937222 GPU-hours** (`runtime-t4/session.json`). A local deadline guard stops it.
 
-**Not verified:** MaxDamage collection, PPO GPU memory/speed, end-to-end games/second,
-30-hour projections and learning on the batched GPU path. The completed CUDA self-play rows
-exercised spawned actors. The single same-job matrix requirement is not met. P0.5 stays open.
+**Not verified:** the remaining probe rows, GPU PPO memory/speed, learning, weekly
+projections and recovery after an actual runtime loss. P0.5 remains open.
