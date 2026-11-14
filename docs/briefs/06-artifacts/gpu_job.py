@@ -217,6 +217,8 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
                    float(row["update_other_seconds"]) for row in metrics),
                "trainer_wall_seconds": wall, "collection_decisions_per_second": rows / collection,
                "update_unique_rows_per_second": rows / update,
+               "update_optimized_rows_per_second": sum(
+                   int(float(row["update_optimized_rows"])) for row in metrics) / update,
                "end_to_end_decisions_per_second": rows / wall,
                "collection_wall_share": collection / wall, "update_wall_share": update / wall,
                "other_wall_share": (wall - collection - update) / wall,

@@ -74,13 +74,22 @@ def install(path: Path) -> None:
             after.remove()
         seconds = time.perf_counter() - start
         rows = len(batch["actions"])
+        config = args[0] if args else kwargs["cfg"]
+        minibatch = int(config.get("ppo", {}).get("minibatch_size", 2048))
+        batches_per_epoch = (rows + minibatch - 1) // minibatch
+        steps = int(metrics["optimizer_steps"])
+        epochs, partial = divmod(steps, batches_per_epoch)
+        optimized_rows = epochs * rows + min(partial * minibatch, rows)
         interval.update(update_seconds=seconds, update_rows=rows,
+                        update_optimized_rows=optimized_rows,
                         update_forward_seconds=forward_seconds,
                         update_other_seconds=seconds - forward_seconds)
         record({"kind": "update", "seconds": seconds, "rows": rows,
                 "forward_seconds": forward_seconds,
                 "loss_backward_optimizer_seconds": seconds - forward_seconds,
                 "rows_per_second": rows / seconds,
+                "optimized_rows": optimized_rows,
+                "optimized_rows_per_second": optimized_rows / seconds,
                 "optimizer_steps": metrics.get("optimizer_steps"),
                 "peak_learner_allocated_bytes": torch.cuda.max_memory_allocated()})
         return metrics
@@ -96,6 +105,9 @@ def install(path: Path) -> None:
                 interval["collection_rows"] / interval["collection_seconds"]
             )
             metrics["update_rows_per_second"] = interval["update_rows"] / interval["update_seconds"]
+            metrics["update_optimized_rows_per_second"] = (
+                interval["update_optimized_rows"] / interval["update_seconds"]
+            )
             metrics["peak_learner_allocated_bytes"] = torch.cuda.max_memory_allocated()
             interval.clear()
             interval.update(collection_seconds=0.0, collection_rows=0, collection_games=0)

@@ -1002,3 +1002,10 @@ Fix: explicitly create `/kaggle/temp` before cloning. Regression command
 fails without that line and passes with it (one test;
 `job-bootstrap-before.txt`, `job-bootstrap-test.txt`). No actor/trainer/model/loss
 change. Ruff remains clean. The test simulates job bootstrap, not a GPU.
+
+The collection retry was accepted at `5603782` on 2026-11-14 04:12:45 UTC
+(`collection-submission.json`). Live progress confirms both CPU self-play
+repeats and both CUDA batch-32 self-play repeats completed; rates await export.
+Before training, timing capture now distinguishes unique batch rows from
+optimizer row-visits (including partial epochs/KL stopping), retaining the same
+update metrics and parameters in the repeated CPU engineering check.

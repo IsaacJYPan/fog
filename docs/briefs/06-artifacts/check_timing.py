@@ -56,6 +56,7 @@ def main() -> None:
             records = [json.loads(line) for line in events.read_text().splitlines()]
             assert records[0]["rows"] == 1 and records[0]["games"] == 1
             assert [row["rows"] for row in records[1:]] == [64, 64, 64]
+            assert [row["optimized_rows"] for row in records[1:]] == [192, 192, 192]
             assert all(row["forward_seconds"] <= row["seconds"] for row in records[1:])
         assert before_metrics == after_metrics
         assert all(torch.equal(before_state[name], after_state[name]) for name in before_state)
