@@ -900,3 +900,19 @@ will deliberately stop after epoch 2. Initial expected session time 3–6 minute
 estimate from the prior CPU feed ceiling, **not a measured GPU rate**; hard cap is 10 minutes,
 conservatively 1/3 GPU-hour if two devices are billed. Actual use and training results pending.
 Source, accepted response and budget: `docs/briefs/05-artifacts/`.
+
+### First hosted attempt failed before training; corrected retry running (smoke)
+
+`fog-p2-g3-stop-20261114` ended **ERROR**, not a training result. Setup took **126.478 s**,
+Python **3.13.16**, PyTorch **2.11.0+cu130**, CUDA **13.0**, GPU **Tesla T4**; the job
+then failed at **132.475 s** because Kaggle had expanded `replay-work.tar.gz` into ordinary
+files. Quota used **138.869 s = 0.0385747222 h**, including session overhead. See
+`G3-stop-job-runtime.json`, `G3-stop-setup-log.txt`, `gpu-hours.json`. Full kernel metadata
+confirms `is_private=true`; the owned dataset listing also confirms the dataset is private.
+
+Restore fixes `6dcbf51` / `530ae08` support both layouts and make restored manifests writable;
+**3 tests pass**, lint clean, no training/data semantics change.
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="600")` accepted private retry
+`fog-p2-g3-stop2-20261114`, version 1, code `530ae08cac2f27d3e53c0cfa535e44e8f56e7074`,
+same two-epoch interruption plan. Expected **4–7 min** from measured setup plus still-unmeasured
+training/export, capped at **10 min**. Retry is running; no training number claimed.

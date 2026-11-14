@@ -3,14 +3,29 @@
   "jobs": [
     {
       "slug": "fog-p2-g3-stop-20261114",
-      "status": "accepted",
+      "status": "ERROR before training: expanded input archive",
       "timeout_seconds": 600,
-      "actual_gpu_hours": null,
+      "actual_gpu_hours": 0.038574722222222226,
       "expected_session_minutes": [
         3,
         6
       ],
       "planning_basis": "Initial GPU speed unmeasured; roughly 90 s feed floor from brief 03 CPU batch-only measurement plus GPU computation, install and export. Not a measured GPU estimate.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333,
+      "quota_seconds_used": 138.869
+    },
+    {
+      "slug": "fog-p2-g3-stop2-20261114",
+      "status": "RUNNING",
+      "timeout_seconds": 600,
+      "actual_gpu_hours": null,
+      "quota_start_seconds": 138.869,
+      "expected_session_minutes": [
+        4,
+        7
+      ],
+      "planning_basis": "Measured first hosted install 126.478 s, remaining GPU computation unmeasured; two epochs then export.",
       "requested_accelerator": "NvidiaTeslaT4",
       "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333
     }
@@ -21,5 +36,6 @@
     "gpu_remaining_hours": 45,
     "command": "kaggle quota --format json"
   },
-  "status": "pilot accepted; actual GPU use pending session/quota evidence"
+  "status": "retry running; final actual use pending",
+  "last_observed_total_quota_hours": 0.061082617222222226
 }

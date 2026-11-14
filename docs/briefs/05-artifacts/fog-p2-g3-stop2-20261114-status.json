@@ -1,0 +1,9 @@
+{
+  "slug": "fog-p2-g3-stop2-20261114",
+  "status": "RUNNING",
+  "failure_message": "",
+  "is_private": true,
+  "machine_shape": "NvidiaTeslaT4",
+  "total_quota_hours_used": 0.061082617222222226,
+  "total_quota_seconds_used": 219.897422
+}
