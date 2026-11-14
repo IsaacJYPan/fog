@@ -783,3 +783,33 @@ MaxDamage 72.0% → 98.75%. Pool B SimpleHeuristics 22.0% → 20.0% and MaxDamag
 56.5% → 54.5%; both intervals overlap their baselines. Thus the training-pool improvement
 persists without a clear held-out gain at this second point. This is still the brief's
 eight-team learning case, with the final evaluation pending; no gate is claimed.
+
+Stage 2 complete, **smoke**, 556,907 decisions versus scaled budget 556,748
+(whole-game overshoot), 68 updates, zero PPO restarts. The training process exited 0
+within the ten-hour cap. Its command `uv run --no-sync python -m fog.train --config runs/rl_check/blueprint/config.yaml --trainer ppo`, starting code `66cd49c16008537e92f068b729152b2b26eaf7a7`,
+ran for 24,898.840 s (6 h 54 min 59 s including controller polling), 22.367 decisions/s.
+The environment connection reconnected several times; the same learner/controller PIDs and
+uninterrupted counters persisted. No job was relaunched. `blueprint-summary.json`, the complete
+`blueprint-metrics.csv`, last 60 trainer lines and every evaluation JSON are retained.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 556907 | pool_a | simpleheuristics (smoke) | 400 | 0.9125 [0.881, 0.936] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_a.json` |
+| 556907 | pool_a | maxdamage (smoke) | 400 | 0.9725 [0.951, 0.985] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_a.json` |
+| 556907 | pool_b | simpleheuristics (smoke) | 400 | 0.2150 [0.178, 0.258] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_b.json` |
+| 556907 | pool_b | maxdamage (smoke) | 400 | 0.5600 [0.511, 0.608] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_b.json` |
+
+Final reading: **improved on pool A** by the stated rule, SimpleHeuristics 25.5% →
+91.25%, +65.75 points with non-overlapping 95% intervals; MaxDamage 72.0% → 97.25%.
+The SimpleHeuristics endpoint is below the 96.75% intermediate point, so improvement was
+not monotonic. On held-out pool B, SimpleHeuristics 22.0% → 21.5% and MaxDamage
+56.5% → 56.0%, both intervals overlapping baseline. There is **no clear held-out gain**
+at any measured point. This is the brief's eight-team learning case, not evidence of a
+broader game-playing improvement. All comparisons are smoke; no gate or candidate is claimed.
+
+Totals: collection 4,310.608 s, update 20,567.948 s, optimization 20,383.826 s;
+1,535,686 processed optimizer rows, 2.7575 effective epochs overall. Intermediate evaluations
+shared the four-CPU allocation with PPO; their contention is included in measured wall time.
+Final entropy / policy KL / clip fraction / value loss / value explained variance /
+mean episode return: 0.71365 / 0.01315 / 0.07823 / 0.24381 / 0.52057 / 0.42500.
+The no-new-runs cost analysis follows next.

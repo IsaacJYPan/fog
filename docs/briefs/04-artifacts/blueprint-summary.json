@@ -1,0 +1,10 @@
+{
+  "smoke": true,
+  "status": "complete",
+  "requested_decisions": 556748,
+  "checkpoint_decisions": 556907,
+  "last_logged_decisions": 556907,
+  "checkpoint": "runs/rl_check/blueprint/checkpoints/ppo_final.pt",
+  "initializer": "runs/blueprint/g1000e18/checkpoints/bc_best.pt",
+  "ten_hour_cap": false
+}
