@@ -170,6 +170,11 @@ def complete_private_team(
         # to every column. A separate stream leaves all other imputation draws unchanged.
         order = np.random.default_rng(np.random.SeedSequence([seed, slot, 4])).permutation(4)
         columns = np.asarray(SET_MOVE_COLS)
+        # A few species cannot fill four moves (for example Ditto). poke-env's move dictionary
+        # packs installed moves, so keep empty columns trailing after randomising real moves.
+        # Otherwise the returned sheet and the installed request would disagree about slots.
+        present = completed[slot, columns[order]] >= 0
+        order = np.concatenate([order[present], order[~present]])
         completed[slot, columns] = completed[slot, columns[order]]
         provenance[slot, columns] = provenance[slot, columns[order]]
 

@@ -57,6 +57,25 @@ def test_sparse_exact_and_sampled_move_provenance_follow_identity():
             assert source == (EXACT if move == exact_move else INFERRED)
 
 
+def test_unfillable_move_slots_stay_after_the_installed_moves():
+    from poke_env.battle import Pokemon
+
+    from fog.training.replay_policy_data import apply_private_set
+
+    revealed = np.full((6, 15), -1, dtype=np.int64)
+    revealed[0, 0] = TABLES.species_index("ditto")
+    revealed[0, 3] = TABLES.move_index("transform")
+    for seed in range(32):
+        sheet, provenance = complete_private_team(revealed, seed=seed, usage_priors={})
+        assert sheet[0, 3] == TABLES.move_index("transform")
+        assert (sheet[0, 4:7] == -1).all()
+        assert provenance[0, 3] == EXACT
+        assert (provenance[0, 4:7] == 0).all()
+        mon = Pokemon(species="ditto", gen=9)
+        apply_private_set(mon, sheet[0])
+        assert list(mon.moves) == ["transform"]
+
+
 def _replay():
     preview = []
     for role, species in (
