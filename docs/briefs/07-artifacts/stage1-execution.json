@@ -82,5 +82,137 @@
     "seconds": 85.50356702000045,
     "exit_code": 0,
     "output": "runs/order_blind/R0-slot-check-extended-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--set",
+      "bc.manifest=runs/blueprint/split/train_1000.parquet",
+      "bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet",
+      "bc.epochs=8",
+      "bc.early_stopping_patience=0",
+      "bc.resume=true",
+      "bc.selection_metric=action_ce",
+      "log.dir=runs/order_blind/R1",
+      "seed=20261201"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "531f29d704e5c20ad3dcea6de8e10790af06d936",
+    "smoke": true,
+    "seconds": 3133.669389668,
+    "exit_code": 0,
+    "output": "runs/order_blind/R1-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/blueprint/split/holdout_manifest.parquet",
+      "--checkpoint",
+      "runs/order_blind/R1/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/R1-slot-check.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "531f29d704e5c20ad3dcea6de8e10790af06d936",
+    "smoke": true,
+    "seconds": 91.24018856200018,
+    "exit_code": 0,
+    "output": "runs/order_blind/R1-slot-check-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_holdout_report",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/blueprint/split/holdout_manifest.parquet",
+      "--checkpoint",
+      "runs/order_blind/R1/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/R1-holdout.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "531f29d704e5c20ad3dcea6de8e10790af06d936",
+    "smoke": true,
+    "seconds": 93.0518983059992,
+    "exit_code": 0,
+    "output": "runs/order_blind/R1-holdout-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--set",
+      "bc.manifest=runs/blueprint/split/train_1000.parquet",
+      "bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet",
+      "bc.epochs=8",
+      "bc.early_stopping_patience=0",
+      "bc.resume=true",
+      "bc.selection_metric=action_ce",
+      "log.dir=runs/order_blind/R1-seed2",
+      "seed=20261202"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "531f29d704e5c20ad3dcea6de8e10790af06d936",
+    "smoke": true,
+    "seconds": 3143.833758237999,
+    "exit_code": 0,
+    "output": "runs/order_blind/R1-seed2-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/blueprint/split/holdout_manifest.parquet",
+      "--checkpoint",
+      "runs/order_blind/R1-seed2/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/R1-seed2-slot-check.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "531f29d704e5c20ad3dcea6de8e10790af06d936",
+    "smoke": true,
+    "seconds": 90.46661270799996,
+    "exit_code": 0,
+    "output": "runs/order_blind/R1-seed2-slot-check-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_holdout_report",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/blueprint/split/holdout_manifest.parquet",
+      "--checkpoint",
+      "runs/order_blind/R1-seed2/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/R1-seed2-holdout.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "531f29d704e5c20ad3dcea6de8e10790af06d936",
+    "smoke": true,
+    "seconds": 89.5945239699995,
+    "exit_code": 0,
+    "output": "runs/order_blind/R1-seed2-holdout-output.txt"
   }
 ]

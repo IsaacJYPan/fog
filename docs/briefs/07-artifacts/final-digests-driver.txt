@@ -1,0 +1,26 @@
+import json
+import re
+import subprocess
+import time
+from pathlib import Path
+
+root = Path('/workspace/fog')
+artifacts = root / 'docs/briefs/07-artifacts'
+summary = json.loads((artifacts / 'digests-summary.json').read_text())
+revision = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+for record in summary['runs']:
+    output = artifacts / f"digest-{record['name']}-final.txt"
+    started = time.monotonic()
+    command = record['command'].split()
+    with output.open('w') as stream:
+        result = subprocess.run(command, cwd=root, stdout=stream, stderr=subprocess.STDOUT)
+    matches = re.findall(r'digest=([0-9a-f]+)', output.read_text())
+    record['final'] = {
+        'command': command, 'commit': revision, 'exit_code': result.returncode,
+        'seconds': time.monotonic() - started, 'output': output.name,
+        'digest': matches[-1] if matches else None,
+    }
+    record['final']['matches_before'] = record['final']['digest'] == record['before']
+    (artifacts / 'digests-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+    if result.returncode or not record['final']['matches_before']:
+        raise SystemExit(f"final digest failed: {record['name']}")

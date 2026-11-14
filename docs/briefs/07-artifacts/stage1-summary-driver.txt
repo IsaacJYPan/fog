@@ -1,6 +1,7 @@
 import csv
 import hashlib
 import json
+import re
 from pathlib import Path
 
 root = Path('/workspace/fog')
@@ -13,6 +14,10 @@ assert read('stage1-complete.json')['status'] == 'complete'
 summary = {'smoke': True, 'runs': {}, 'fixed_split': read('fixed-split.json'),
            'row_checks': {'before': read('rows-before-extended.json'), 'after': read('rows-after.json')},
            'digests': read('digests-summary.json')}
+summary['tests'] = {
+    path.name: int(re.search(r'(\d+) passed', path.read_text()).group(1))
+    for path in (artifacts / 'tests-final.txt', artifacts / 'tests-shared-imputer.txt')}
+summary['tests']['total'] = sum(summary['tests'].values())
 for name, seed in [('R0', 20261201), ('R1', 20261201), ('R1-seed2', 20261202)]:
     metrics = list(csv.DictReader((artifacts / f'{name}-metrics.csv').open()))
     best = min(metrics, key=lambda row: float(row['eval_action_ce']))
@@ -43,6 +48,17 @@ for group in ('all', 'move', 'not_yet_moved'):
             'exceeds_twice_R1_seed_difference': abs(delta) > noise[group][metric]['twice_difference']}
 summary['R1_seed_noise'] = noise
 summary['shuffled_comparison'] = comparisons
+summary['value_seed_noise'] = {}
+for metric in ('brier', 'ece'):
+    a = summary['runs']['R1']['value'][metric]
+    b = summary['runs']['R1-seed2']['value'][metric]
+    summary['value_seed_noise'][metric] = {
+        'absolute_seed_difference': abs(a-b), 'twice_difference': 2*abs(a-b)}
+summary['stored_minus_shuffled_top1'] = {
+    name: {group: run['policy'][group]['top1_stored']
+                  - run['policy'][group]['top1_shuffled']
+           for group in ('all', 'move', 'not_yet_moved')}
+    for name, run in summary['runs'].items()}
 (artifacts / 'stage1-summary.json').write_text(json.dumps(summary, indent=2)+'\n')
 print('| Run (seed), best epoch | All NLL / top-1 | Move NLL / top-1 | First-history NLL / top-1 | First-history shuffled NLL / top-1 | Value Brier / ECE |')
 print('| --- | --- | --- | --- | --- | --- |')

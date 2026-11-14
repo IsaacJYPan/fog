@@ -8,5 +8,8 @@
   "memory_limit_bytes": 17179869184,
   "showdown_commit": "e440c4a18385274f10c405d0b158b6a962ce6d94",
   "baseline_commit": "d60392080f10894aa216ed7faf561e791922c9f8",
-  "converter_commit": "e195b26f3f2d20653f306cdfcb03a5041892aab0"
+  "converter_commit": "e195b26f3f2d20653f306cdfcb03a5041892aab0",
+  "final_converter_commit": "531f29d",
+  "cpu_model": "AMD EPYC 9V45 96-Core Processor",
+  "native_torch_cpu_capability": "AVX512"
 }

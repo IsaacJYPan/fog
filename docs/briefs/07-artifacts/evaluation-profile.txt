@@ -25,5 +25,3 @@ SMOKE, non-idle, warmed evaluation: 84 rows; 17.097381109000253 seconds; threads
         1    0.080    0.080    2.062    2.062 /workspace/fog/fog/models/belief.py:436(_context_hidden)
         1    0.047    0.047    1.856    1.856 /workspace/fog/fog/models/three_encoder.py:388(encode_sequence)
         1    0.116    0.116    1.834    1.834 /workspace/fog/fog/models/belief.py:402(_set_context)
-
-

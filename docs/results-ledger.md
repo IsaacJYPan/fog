@@ -1727,3 +1727,47 @@ R0 ran on the isolated original source at `d603920`, with the original rows. Eig
 | R0 (smoke, best epoch 7) | 1,000 / 2,000 | 1.7717 / 0.3652 | 2.2135 / 0.2269 | 0.7910 → 0.2543 | 0.3905 / 0.3604 | `d603920` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/order_blind/leaky_split/train_1000.parquet bc.holdout_manifest=runs/order_blind/leaky_split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R0` (cwd `/workspace/fog-order-baseline`) |
 
 Value Brier 95% interval: [0.3761, 0.4044]; ECE: [0.3449, 0.3755]. The unchanged value head fails the constant-0.5 Brier reference of 0.25. No value repair has been attempted. The paired converter retains all 22,000 games with zero quarantines and the same fixed 2,000 holdout / 1,000 training IDs; raw rows are 103,944 / 52,955. R1 and its second seed are pending; no cross-run effect is claimed yet.
+
+### Completed corrected-corpus comparison (smoke)
+
+The paired conversion at `531f29d` and all fixed-recipe runs are complete. R0's
+original rows and checkpoint are preserved. Both R1 seeds completed eight epochs; policy NLL
+selects the checkpoints below. Every result remains smoke. Intervals resample entire games,
+with both perspectives together. The H group is defined by the retained history window,
+not lifetime first use. Complete group metrics and intervals are in the per-run slot checks.
+
+| Run / seed | Best policy epoch | All shuffled NLL / top-1 | H stored → shuffled top-1 | Value Brier / ECE | Producing commit | Command |
+| --- | --- | --- | --- | --- | --- | --- |
+| R1 / 20261201 | 8 | 1.9239 / 0.2641 | 0.3371 → 0.3352 | 0.3920 / 0.3660 | `531f29d` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R1 seed=20261201` (cwd `/workspace/fog`) |
+| R1-seed2 / 20261202 | 7 | 1.9290 / 0.2668 | 0.3297 → 0.3277 | 0.3975 / 0.3712 | `531f29d` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R1-seed2 seed=20261202` (cwd `/workspace/fog`) |
+
+R1 value Brier 95% interval [0.3773, 0.4058]; ECE [0.3507, 0.3807]. R1-seed2 value Brier 95% interval [0.3828, 0.4118]; ECE [0.3558, 0.3865].
+
+All-row nll_shuffled: R1−R0 = -0.289550; R1 absolute two-seed gap 0.005092, twice that gap 0.010184; effect exceeds twice the gap: True. All-row top1_shuffled: R1−R0 = 0.037167; R1 absolute two-seed gap 0.002723, twice that gap 0.005446; effect exceeds twice the gap: True. Only shuffled columns support this comparison; the original stored holdout is leaky.
+The identity guards change the retained rows as well as order. The unchanged value head still
+fails the constant-prediction Brier reference of 0.25; no repair is claimed.
+
+Final conversion: all 22,000 games, no quarantines, 1,126,792 accepted rows; same 1,000 training
+and 2,000 holdout game IDs. The H slot-zero label share is 0.246984 (95% game interval
+[0.240865, 0.253005]), just below the brief's expected 0.25 lower point bound; the interval
+includes one quarter and the seed was not retuned. Source commands, row counts, checkpoints
+and every measured group are in `docs/briefs/07-artifacts/stage1-summary.json`,
+`stage1-execution.json`, `row-intervals.json` and the per-run CSV/JSON.
+
+Final validation: 84 focused tests plus 15 additional tests pass; the latter command is
+`OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 .venv/bin/python -m pytest -q tests/test_metamon_native_comparison.py tests/test_replay_supervision.py`
+(`tests-shared-imputer.txt`). `.venv/bin/ruff check fog tests` is clean. Both an
+untrained original checkpoint and the original trained epoch-1 checkpoint load strictly;
+trained policy/value outputs are finite on recorded rows. Model, encoding, loss, search,
+PPO and belief source are unchanged. Final sequential / batched / MaxDamage digests are
+`0d026fed7728c0c4` / `ef414aee0fe96bad` / `40644081cca71ebe`, matching before-change runs on
+this runtime. The required historical references remain **unreproduced**. Negative repeats
+include unchanged reference commit `21e57fa`, CPU-only Torch and alternate CPU kernels;
+`digests-summary.json` has exact commands, exits and hashes. The discrepancy is unisolated;
+the historical constants were not changed.
+
+This handoff ends after the standalone converter stage. R2, R3, R4 and its second seed,
+order-blind permutation acceptance tests, logistic and auxiliary value targets, mechanical
+features, rare-move groups, trained leads and play were **not run or implemented**. Own replay
+PP remains zero. Full Illusion/Transform reconstruction beyond identity guards and lifetime
+first-move statistics remain unverified. No phase task or strength gate is completed.

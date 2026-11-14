@@ -11,7 +11,22 @@
       "same_runtime_equal": true,
       "historical_reproduced": false,
       "before_file": "digest-sequential-default.txt",
-      "after_file": "digest-sequential-after.txt"
+      "after_file": "digest-sequential-after.txt",
+      "final": {
+        "command": [
+          ".venv/bin/python",
+          "-m",
+          "fog.eval.showdown_rollout_probe",
+          "--games",
+          "6"
+        ],
+        "commit": "d2089c3a833e3f775e2fe1898b04952b38ef1a83",
+        "exit_code": 0,
+        "seconds": 10.871545851001429,
+        "output": "digest-sequential-final.txt",
+        "digest": "0d026fed7728c0c4",
+        "matches_before": true
+      }
     },
     {
       "name": "batched",
@@ -22,7 +37,26 @@
       "same_runtime_equal": true,
       "historical_reproduced": false,
       "before_file": "digest-batched-before.txt",
-      "after_file": "digest-batched-after.txt"
+      "after_file": "digest-batched-after.txt",
+      "final": {
+        "command": [
+          ".venv/bin/python",
+          "-m",
+          "fog.eval.showdown_rollout_probe",
+          "--batch",
+          "32",
+          "--games",
+          "64",
+          "--threads",
+          "2"
+        ],
+        "commit": "d2089c3a833e3f775e2fe1898b04952b38ef1a83",
+        "exit_code": 0,
+        "seconds": 32.36628352700063,
+        "output": "digest-batched-final.txt",
+        "digest": "ef414aee0fe96bad",
+        "matches_before": true
+      }
     },
     {
       "name": "maxdamage",
@@ -33,7 +67,28 @@
       "same_runtime_equal": true,
       "historical_reproduced": false,
       "before_file": "digest-maxdamage-before.txt",
-      "after_file": "digest-maxdamage-after.txt"
+      "after_file": "digest-maxdamage-after.txt",
+      "final": {
+        "command": [
+          ".venv/bin/python",
+          "-m",
+          "fog.eval.showdown_rollout_probe",
+          "--batch",
+          "32",
+          "--games",
+          "96",
+          "--opponent",
+          "MaxDamage",
+          "--pool",
+          "data/teams/pool_a"
+        ],
+        "commit": "d2089c3a833e3f775e2fe1898b04952b38ef1a83",
+        "exit_code": 0,
+        "seconds": 17.485882565000793,
+        "output": "digest-maxdamage-final.txt",
+        "digest": "40644081cca71ebe",
+        "matches_before": true
+      }
     }
   ],
   "cpu_build_diagnostic": {
@@ -51,5 +106,27 @@
     "digest": "0d026fed7728c0c4",
     "recorded_reference": "23405989f4665988",
     "historical_reproduced": false
-  }
+  },
+  "cpu_kernel_diagnostics": [
+    {
+      "commit": "21e57fa",
+      "environment": {
+        "ATEN_CPU_CAPABILITY": "avx2"
+      },
+      "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+      "output": "reference-avx2-digest.txt",
+      "digest": "18e06350fb04d3c7",
+      "historical_reproduced": false
+    },
+    {
+      "commit": "21e57fa",
+      "environment": {
+        "ATEN_CPU_CAPABILITY": "default"
+      },
+      "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+      "output": "reference-default-cpu-digest.txt",
+      "digest": "abf191dddfec40a0",
+      "historical_reproduced": false
+    }
+  ]
 }
