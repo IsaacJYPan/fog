@@ -12,7 +12,7 @@ selects a **40,955-game, six-epoch** fallback, now running; CPU play scores **0.
 | B | 3,000; 18; 256 | 8 | 0.440802 | 1.579018 | 0.344501 | 0.298756 |
 | G3 | 3,000; **2/18**; 1024 | 2 | 0.300391 | 1.895671 | 0.244778 | 0.033124 |
 | G20 | 20,000; 18; 1024 | 12 | 0.544369 | 1.278605 | 0.254356 | 0.153633 |
-| G100, running fallback | 40,955; 6; 1024 | pending | — | — | — | — |
+| G100, running fallback | 40,955; **3/6**; 1024 | pending | — | — | — | — |
 
 | Checkpoint (smoke) | Epoch | Train MSE | Holdout MSE / Brier / ECE | Early / middle / late Brier | Early / middle / late ECE |
 | --- | ---: | ---: | --- | --- | --- |
@@ -44,7 +44,8 @@ the batch-256 comparison. No batch/device attribution is claimed. G20 completed 
 is **11.118819 h**, including another brief's earlier work. G100 conservatively charges
 that whole counter: its largest nested prefix projects to **6.881063 h**, leaving two hours
 inside 20. All prepared games for six epochs project to **15.865326 h** and do not fit.
-The private final-slot job is submitted at `46e9c0d`, cap 7h50m;
+The private final-slot job at `46e9c0d` has saved **3/6 epochs**, cap 7h50m;
+export is projected at **00:40–01:00 UTC on 15 November** (`G100-progress.json`);
 these are projections, not completed G100 results; see [G100-plan.json](05-artifacts/G100-plan.json).
 The initial shared-account overlap and corrected account-wide submission guard remain in
 the ledger. The independent brief-06 timing is finished; G20 was not interrupted for it.

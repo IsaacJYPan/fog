@@ -1322,3 +1322,15 @@ in `G100-first-epoch-progress.json`; the broader communicated completion window 
 **00:40–01:00 UTC on 15 November**. This is a projection, not a completed run or measured
 steady-state throughput. The CSV/selected-checkpoint reports remain pending; no NLL is
 inferred from the rounded joint-loss log. The dataset/epochs/configuration are unchanged.
+
+### Progress refresh and local monitor recovery (smoke, 22:13 UTC)
+
+A fresh direct status query confirms the same private final-slot job is RUNNING with
+**three of six epochs saved** and no failure message. The local watcher and waiting
+collector had stopped; they were restarted, and the remote training continued throughout.
+No GPU job was canceled or duplicated. The latest meter is about **14.76 account quota-hours**
+against the 20-hour conservative budget. Epoch walls are **3,403.646891 / 3,397.826248 /
+3,389.233859 s**, including validation and save, so the **00:40–01:00 UTC on 15 November**
+export projection remains conservative. `G100-progress.json` retains raw epoch events and
+the timing assumptions. Full CSV, selection reports, final checkpoint persistence and CPU
+play still wait for the six-epoch run to finish; no final G100 NLL or strength is claimed.
