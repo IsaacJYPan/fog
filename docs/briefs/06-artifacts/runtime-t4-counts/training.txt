@@ -1,0 +1,20 @@
+[ppo] lr scale 1: 1 tensors at 0.0003
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794648742.141135   11600 cpu_feature_guard.cc:227] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 AVX512F FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1794648745.583023   11600 cudart_stub.cc:31] Could not find cuda drivers on your machine, GPU will not be used.
+[ppo] direct rollout workers=2, mode=process, actor_threads=1, persistent CPU actors + one centralized learner
+[ppo] rollout process pids=(11694, 11695)
+[timing] {"kind": "collection", "seconds": 47.48860464800009, "rows": 6418, "games": 256}
+[timing] {"kind": "collection", "seconds": 42.59965270800012, "rows": 6520, "games": 256}
+[timing] {"kind": "update", "seconds": 240.63095638899995, "rows": 12938, "forward_seconds": 208.59233300600044, "loss_backward_optimizer_seconds": 32.0386233829995, "rows_per_second": 53.76698074991086, "optimized_rows": 38814, "optimized_rows_per_second": 161.30094224973257, "optimizer_steps": 39.0, "peak_learner_allocated_bytes": 10432924160}
+[ppo] decisions=12938  win_rate=0.000  loss=0.3829  entropy=1.608  kl=0.0021  clip=0.032  belief=10.327  self_belief=9.946
+[timing] {"kind": "update_phase", "seconds": 246.3077092630001, "rows": 12938}
+[timing] {"kind": "collection", "seconds": 46.2532540279999, "rows": 6597, "games": 256}
+[timing] {"kind": "collection", "seconds": 40.47124472399992, "rows": 6733, "games": 256}
+[timing] {"kind": "update", "seconds": 252.2389135039998, "rows": 13330, "forward_seconds": 219.70672264399764, "loss_backward_optimizer_seconds": 32.532190860002174, "rows_per_second": 52.846723032640334, "optimized_rows": 39990, "optimized_rows_per_second": 158.540169097921, "optimizer_steps": 42.0, "peak_learner_allocated_bytes": 10432924160}
+[ppo] decisions=26268  win_rate=0.000  loss=0.0965  entropy=1.579  kl=0.0099  clip=0.109  belief=1.804  self_belief=1.701
+[timing] {"kind": "update_phase", "seconds": 258.2806357479999, "rows": 13330}
+[timing] {"kind": "collection", "seconds": 48.50916747300016, "rows": 6842, "games": 256}
+[timing] {"kind": "collection", "seconds": 45.46281468500001, "rows": 6980, "games": 256}

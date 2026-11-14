@@ -1,0 +1,35 @@
+Downloading py-spy (2.8MiB)
+ Downloaded py-spy
+Installed 1 package in 6ms
+Process 11600: /content/fog/.venv/bin/python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo --set log.dir=runs/collect_gpu league.snapshot_every_decisions=8000
+Python v3.13.16 (/usr/bin/python3.13)
+
+Thread 11600 (idle): "MainThread"
+    _PollLikeSelector.select (selectors.py:398)
+    wait (multiprocessing/connection.py:1174)
+    PersistentProcessPool._receive_all (fog/training/direct_parallel.py:216)
+    PersistentProcessPool.map (fog/training/direct_parallel.py:190)
+    install.<locals>.timed_map (sitecustomize.py:38)
+    _train_showdown_direct (fog/training/ppo.py:1820)
+    train (fog/training/ppo.py:569)
+    TrainingSession.run (fog/train.py:66)
+    main (fog/train.py:79)
+    <module> (fog/train.py:83)
+    _run_code (<frozen runpy>:88)
+    _run_module_as_main (<frozen runpy>:203)
+Thread 11691 (idle): "Thread-1"
+    Condition.wait (threading.py:363)
+    Queue.get (queue.py:210)
+    _AsyncWriterThread._run (tensorboard/summary/writer/event_file_writer.py:269)
+    _AsyncWriterThread.run (tensorboard/summary/writer/event_file_writer.py:244)
+    Thread._bootstrap_inner (threading.py:1044)
+    Thread._bootstrap (threading.py:1015)
+Thread 11692 (idle): "Thread-2 (__run_loop)"
+    EpollSelector.select (selectors.py:452)
+    BaseEventLoop._run_once (asyncio/base_events.py:2023)
+    BaseEventLoop.run_forever (asyncio/base_events.py:684)
+    __run_loop (poke_env/concurrency.py:11)
+    Thread.run (threading.py:995)
+    Thread._bootstrap_inner (threading.py:1044)
+    Thread._bootstrap (threading.py:1015)
+Thread 12256 (idle)

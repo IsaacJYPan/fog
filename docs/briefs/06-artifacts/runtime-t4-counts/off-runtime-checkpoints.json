@@ -1,0 +1,25 @@
+{
+  "status": "saved on controlling computer",
+  "files": [
+    {
+      "path": "runs/collect_gpu/checkpoints/ppo_12938.pt",
+      "bytes": 23554891,
+      "zip_crc_check": "passed"
+    },
+    {
+      "path": "runs/collect_gpu/checkpoints/ppo_12938.state.pt",
+      "bytes": 62460822,
+      "zip_crc_check": "passed"
+    },
+    {
+      "path": "runs/collect_gpu/checkpoints/ppo_26268.pt",
+      "bytes": 23554891,
+      "zip_crc_check": "passed"
+    },
+    {
+      "path": "runs/collect_gpu/checkpoints/ppo_26268.state.pt",
+      "bytes": 62460950,
+      "zip_crc_check": "passed"
+    }
+  ]
+}

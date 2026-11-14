@@ -113,10 +113,12 @@ cites the `fog` commit that produced the result.
       account's active replay-training GPU job before submission. No new throughput or learning
       result; see `docs/briefs/06-report.md` and the ledger's GPU smoke section._
       _2026-11-14: brief 06 end-to-end measurement is prepared after the owner chose to finish G20 first; partial self-play CUDA rows exist, but full PPO speed/learning remain unmeasured. See `docs/briefs/06-report.md`; P0.5 stays open._
-      _2026-11-14: a fresh single-T4 runtime is running brief 06's same-runtime matrix through
-      SSH, with evidence and full update checkpoints copied off the runtime. The first CPU
-      self-play repeat is 72.92 learner decisions/s on two logical CPUs; the GPU and learning
-      checks are still pending. See `docs/briefs/06-report.md` and the latest GPU smoke section._
+      _2026-11-14: brief 06 was shortened by the owner to a throughput smoke check. On two
+      logical CPUs and one T4, two complete updates (26,268 decisions) measured 144.98 collection
+      decisions/s, 159.89 processed update rows/s and 37.50 decisions/s end to end. Checkpoints
+      and evidence are off the runtime, which was released at a cumulative upper bound of
+      2.441111 GPU-hours. Learning, greedy evaluation and six remaining probe repeats are
+      unverified, so P0.5 stays open. See `docs/briefs/06-report.md` and the latest ledger section._
 
 - [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already
@@ -429,3 +431,6 @@ Ideas that are deliberately not scheduled. Add to this list instead of starting 
 - A learned value at engine leaves inside the Rust search (needs an engine fork).
 - Team preview and lead selection as a separate small search.
 - Team building.
+- Profile scalar reads from GPU tensors in `BeliefModel._permute_hidden_moves` before a
+  behaviour-preserving GPU optimisation: brief 06's short smoke is forward-bound and one live
+  stack was in this loop. Its exact share is unmeasured; no implementation change is scheduled.

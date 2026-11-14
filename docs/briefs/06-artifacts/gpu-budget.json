@@ -23,11 +23,18 @@
       "session_seconds_upper": 2220,
       "gpu_seconds_upper": 2220,
       "status": "released after host-memory failure; CUDA probe has no throughput result"
+    },
+    {
+      "name": "runtime-t4-counts",
+      "allocated_gpus": 1,
+      "session_seconds_upper": 3194.0,
+      "gpu_seconds_upper": 3194.0,
+      "status": "released; owner requested short timing check at last completed checkpoint"
     }
   ],
-  "completed_gpu_hours_upper": 1.5538888888888889,
-  "remaining_gpu_hours": 0.04055555555555568,
-  "training_cap": "replacement single-T4 runtime, released by 10:21 UTC; no duplicate private job",
+  "completed_gpu_hours_upper": 2.4411111111111112,
+  "remaining_gpu_hours": 0.5588888888888888,
+  "training_cap": "owner shortened to two completed PPO updates; no active runtime or new reservation",
   "superseded_collection_retry_platform_seconds": 2520,
   "superseded_collection_retry_gpu_hours_max": 1.4,
   "next_job": {
@@ -53,7 +60,10 @@
     "allocated_gpus": 1,
     "requested_after_utc": "2026-11-14T08:56:40Z",
     "stop_deadline_utc": "2026-11-14T10:21:00Z",
-    "reserved_gpu_hours_cap": 1.4055555555555554
+    "reserved_gpu_hours_cap": 1.4055555555555554,
+    "status": "released",
+    "observed_released_by_utc": "2026-11-14T09:49:54+00:00",
+    "actual_gpu_hours_upper": 0.8872222222222222
   },
-  "remaining_gpu_hours_before_active_reservation": 1.4461111111111111
+  "remaining_gpu_hours_before_active_reservation": 0.5588888888888888
 }

@@ -1,17 +1,11 @@
 {
-  "label": "probe-MaxDamage-cuda-b128-r2",
-  "status": "complete",
-  "command": "/content/fog/.venv/bin/python -m fog.eval.showdown_rollout_probe --workers 2 --batch 128 --games 512 --opponent MaxDamage --pool data/teams/pool_a --device cuda",
-  "commit": "922886b91a1438d936e47b55c0607e281a41261e",
-  "started_utc": "2026-11-14T09:28:25.834146+00:00",
+  "label": "training",
+  "status": "failed",
+  "command": "env PYTHONPATH=/content/brief06-timing:/content/fog FOG_TIMING_OUTPUT=/content/fog/docs/briefs/06-artifacts/runtime-t4-counts/training-timing.jsonl /content/fog/.venv/bin/python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo --set log.dir=runs/collect_gpu league.snapshot_every_decisions=8000",
+  "commit": "ac7535507e57cb6e302f4b9d6bc0e8d7ff3a3297",
+  "started_utc": "2026-11-14T09:32:12.223634+00:00",
   "attempt": 1,
-  "exit_code": 0,
-  "wall_seconds": 111.74504068099986,
-  "peak_sampled_gpu_mib": 459.0,
-  "games": 512.0,
-  "learner_decisions": 16225.0,
-  "seconds": 99.4,
-  "learner_decisions_per_s": 163.22,
-  "games_per_s": 5.151,
-  "p1_wins": 40.0
+  "exit_code": -15,
+  "wall_seconds": 995.8241648620001,
+  "peak_sampled_gpu_mib": 11561.0
 }

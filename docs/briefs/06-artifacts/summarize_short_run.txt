@@ -1,0 +1,63 @@
+"""Recompute the short smoke timing from the retained completed-checkpoint prefix."""
+import csv
+import json
+from pathlib import Path
+
+root = Path(__file__).resolve().parents[3]
+out = root / 'docs/briefs/06-artifacts/runtime-t4-counts'
+stop = json.loads((out / 'short-run-stop.json').read_text())
+attempt = json.loads((out / 'training.json').read_text())
+rows = list(csv.DictReader((out / 'short-run-metrics.csv').open()))
+events = [json.loads(line) for line in (out / 'short-run-timing.jsonl').read_text().splitlines()]
+collections = [event for event in events if event['kind'] == 'collection']
+updates = [event for event in events if event['kind'] == 'update']
+phases = [event for event in events if event['kind'] == 'update_phase']
+decisions = stop['decisions']
+assert len(rows) == len(updates) == len(phases) == 2
+assert decisions == int(rows[-1]['step']) == sum(event['rows'] for event in collections)
+assert decisions == sum(event['rows'] for event in updates)
+games = sum(event['games'] for event in collections)
+collection = sum(float(row['collection_seconds']) for row in rows)
+update = sum(float(row['update_seconds']) for row in rows)
+optimization = sum(float(row['optimization_seconds']) for row in rows)
+visits = sum(float(row['optimizer_rows']) for row in rows)
+steps = sum(float(row['optimizer_steps']) for row in rows)
+forward = sum(event['forward_seconds'] for event in updates)
+loss_backward = sum(event['loss_backward_optimizer_seconds'] for event in updates)
+wall = stop['wall_to_completed_checkpoint_seconds']
+summary = {
+    'label': 'smoke', 'scope': 'two complete PPO updates; owner shortened the original learning run',
+    'commit': stop['commit'], 'command': stop['training_command'],
+    'completed_updates': len(rows), 'decisions': decisions, 'games': games,
+    'optimizer_steps': steps, 'processed_rows': visits, 'effective_epochs': visits / decisions,
+    'native_collection_seconds': collection, 'native_update_seconds': update,
+    'native_optimization_seconds': optimization,
+    'native_collection_decisions_per_sec': decisions / collection,
+    'native_optimization_processed_rows_per_sec': visits / optimization,
+    'mean_optimizer_step_seconds': optimization / steps,
+    'completed_prefix_wall_seconds': wall,
+    'completed_prefix_end_to_end_decisions_per_sec': decisions / wall,
+    'completed_prefix_end_to_end_games_per_sec': games / wall,
+    'native_collection_wall_share': collection / wall,
+    'native_update_wall_share': update / wall,
+    'startup_checkpoint_other_wall_share': (wall - collection - update) / wall,
+    'forward_seconds': forward, 'loss_backward_optimizer_seconds': loss_backward,
+    'forward_share_of_optimization': forward / optimization,
+    'forward_share_of_update_phase': forward / update,
+    'loss_backward_optimizer_share_of_update': loss_backward / update,
+    'assembly_diagnostics_share_of_update': (update - forward - loss_backward) / update,
+    'all_attempt_wall_seconds_including_discarded_work': attempt['wall_seconds'],
+    'all_attempt_end_to_end_decisions_per_sec': decisions / attempt['wall_seconds'],
+    'discarded_unfinished_work_seconds': attempt['wall_seconds'] - wall,
+    'sampled_peak_all_process_gpu_mib_entire_attempt': attempt['peak_sampled_gpu_mib'],
+    'peak_learner_allocated_bytes_completed_updates': max(event['peak_learner_allocated_bytes'] for event in updates),
+    'week_gpu_hours': 30, 'week_decisions_projection_from_completed_prefix': decisions / wall * 108000,
+    'week_games_projection_from_completed_prefix': games / wall * 108000,
+    'projection_limit': 'startup-inclusive initial fixed-team smoke rate, not measured steady-state learning or self-play throughput',
+    'per_update': [{key: row[key] for key in ('step', 'collection_seconds', 'update_seconds',
+                   'optimization_seconds', 'optimizer_rows', 'optimizer_steps',
+                   'collection_decisions_per_sec', 'optimization_rows_per_sec', 'effective_epochs')}
+                   for row in rows],
+}
+(out / 'short-run-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+print(json.dumps(summary, indent=2))

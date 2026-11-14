@@ -15,13 +15,13 @@ ppo:
   lr: 3.0e-4
   entropy_coef: 0.01
   entropy_coef_final: 0.003
-  games_per_chunk: 512
+  games_per_chunk: 256
 
 env:
   team_pool: data/teams/pool_a/core_v1_offensive.txt
   actor_device: cuda
   actor_threads: 1
-  rollout_workers: 4
+  rollout_workers: 2
   rollout_batch: 128
 
 league:

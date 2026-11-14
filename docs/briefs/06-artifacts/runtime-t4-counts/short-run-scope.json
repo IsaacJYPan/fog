@@ -1,0 +1,21 @@
+{
+  "label": "smoke",
+  "status": "owner-requested short throughput measurement complete",
+  "requested_training_decisions": 100000,
+  "completed_training_decisions": 26268,
+  "complete_ppo_updates": 2,
+  "counter_only_probe_rows_completed": 10,
+  "counter_only_probe_rows_requested": 16,
+  "not_completed_probe_rows": [
+    "probe-self-cpu-b32-r1",
+    "probe-self-cpu-b32-r2",
+    "probe-self-cuda-b64-r1",
+    "probe-self-cuda-b64-r2",
+    "probe-self-cuda-b128-r1",
+    "probe-self-cuda-b128-r2"
+  ],
+  "full_learning_run": "not run; owner requested minimal throughput check instead",
+  "greedy_200_game_evaluation": "not run after owner shortened the work",
+  "actual_runtime_drop_resume_test": "not run",
+  "budget_extension": "not used; original three-hour cap retained"
+}
