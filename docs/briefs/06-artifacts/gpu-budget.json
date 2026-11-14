@@ -1,0 +1,26 @@
+{
+  "label": "smoke",
+  "budget_gpu_hours": 3,
+  "accounting": "count both allocated T4s, including idle GPU and submission-to-observed-terminal startup/export upper bounds",
+  "completed": [
+    {
+      "name": "collection-attempt1",
+      "commit": "c4df5e20d92ef88321ac7745d6a856e476e4119d",
+      "allocated_gpus": 2,
+      "session_seconds_upper": 141,
+      "gpu_seconds_upper": 282
+    },
+    {
+      "name": "collection-attempt2",
+      "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+      "allocated_gpus": 2,
+      "session_seconds_upper": 1546,
+      "gpu_seconds_upper": 3092
+    }
+  ],
+  "completed_gpu_hours_upper": 0.9372222222222222,
+  "remaining_gpu_hours": 2.062777777777778,
+  "collection_retry_platform_seconds": 2520,
+  "collection_retry_gpu_hours_max": 1.4,
+  "training_cap": "recompute from remaining budget after the retry completes"
+}

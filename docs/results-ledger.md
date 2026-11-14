@@ -1045,3 +1045,11 @@ A complete-matrix retry will request a 2,520-second platform cap, with an
 internal 2,220-second deadline. Its worst-case allocation is 1.4 GPU-hours;
 training will use only the budget remaining after its measured completion.
 This preserves all comparisons on one job instead of combining different hosts.
+
+The complete-matrix resubmission was held by the account-wide guard: a new
+replay-training GPU job began at 2026-11-14 04:27:10 UTC while attempt 2 was
+already running. Its status is now RUNNING, so no further brief 06 job was
+submitted. The other job was not active when attempt 2 began. This account
+overlap is recorded explicitly; its time is not charged to brief 06. Evidence:
+`account-status.json`. Budget accounting is `gpu-budget.json`, using both
+allocated T4s and conservative submission-to-terminal bounds.
