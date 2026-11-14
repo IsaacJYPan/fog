@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import signal
 import shutil
 import subprocess
 import sys
@@ -25,7 +26,8 @@ def command(*args, **kwargs):
 
 def restore_prepared(input_root: Path, work: Path):
     """Kaggle datasets expand uploaded archives; kernel outputs may retain them."""
-    archives = list(input_root.rglob("replay-work.tar.gz"))
+    archives = [path for name in ("replay-work.tar.gz", "replay-work.bin")
+                for path in input_root.rglob(name)]
     if archives:
         assert len(archives) == 1, "expected one prepared work archive"
         work.mkdir(exist_ok=True)
@@ -42,6 +44,25 @@ def restore_prepared(input_root: Path, work: Path):
         Path(directory).chmod(0o755)
         for name in files:
             (Path(directory) / name).chmod(0o644)
+
+
+def run_worker(argv, *, seconds, log, env):
+    """Stop before the platform cap so completed epoch state can still be exported."""
+    child = subprocess.Popen(argv, stdout=log, stderr=subprocess.STDOUT,
+                             env=env, cwd=ROOT, start_new_session=True)
+    try:
+        code = child.wait(timeout=seconds)
+    except subprocess.TimeoutExpired:
+        os.killpg(child.pid, signal.SIGTERM)
+        try:
+            child.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            os.killpg(child.pid, signal.SIGKILL)
+            child.wait()
+        return "interrupted_for_export"
+    if code:
+        raise subprocess.CalledProcessError(code, argv)
+    return "returned"
 
 
 def worker():
@@ -84,6 +105,17 @@ def worker():
 
     def stop_after_save(state, path):
         original_save(state, path)
+        # Retain measurements even if the parent later stops an unfinished epoch.
+        snapshot = {"spec": SPEC, "status": "checkpointed", "epoch": state["epoch"],
+                    "device": torch.cuda.get_device_name(0),
+                    "visible_devices": torch.cuda.device_count(),
+                    "peak_gpu_memory_bytes": torch.cuda.max_memory_allocated(),
+                    "training_wall_seconds": time.perf_counter() - started,
+                    "validation_passes": timings}
+        (OUTPUT / "training-runtime.json").write_text(json.dumps(snapshot, indent=2))
+        shutil.copy2(training / "metrics.csv", OUTPUT / "metrics-after.csv")
+        print(f"Saved epoch {state['epoch']}; peak GPU bytes "
+              f"{snapshot['peak_gpu_memory_bytes']}", flush=True)
         if state["epoch"] == SPEC.get("stop_after_epoch"):
             raise InterruptedError("deliberate completed-epoch stop for cross-job continuation")
 
@@ -135,7 +167,9 @@ def main():
         command("npm", "--prefix", ROOT / "server/pokemon-showdown", "run", "build")
         command(sys.executable, "-m", "fog.scripts.kaggle_setup", cwd=ROOT)
         install_seconds = time.perf_counter() - started
+        restore_started = time.perf_counter()
         restore_prepared(Path("/kaggle/input"), WORK)
+        print(f"Input restored in {time.perf_counter() - restore_started:.3f} s", flush=True)
         # A continuation may attach the preceding private job's saved work archive.
         resumes = list(Path("/kaggle/input").rglob("replay-resume.tar.gz"))
         assert len(resumes) <= 1
@@ -144,9 +178,11 @@ def main():
                 archive.extractall(WORK, filter="data")
         env = {**os.environ, "PYTHONPATH": str(ROOT)}
         with (OUTPUT / "train.txt").open("w") as log:
-            command(ROOT / ".venv/bin/python", Path(__file__).resolve(), "--worker",
-                    cwd=ROOT, stdout=log, stderr=subprocess.STDOUT, env=env)
-        status = "returned"
+            status = run_worker([str(ROOT / ".venv/bin/python"), str(Path(__file__).resolve()),
+                                 "--worker"],
+                                seconds=max(1, SPEC.get("job_seconds", 480)
+                                            - (time.perf_counter() - started)),
+                                log=log, env=env)
     finally:
         elapsed = time.perf_counter() - started
         (OUTPUT / "job-runtime.json").write_text(json.dumps({
