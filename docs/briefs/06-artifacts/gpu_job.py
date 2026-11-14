@@ -10,6 +10,7 @@ Account settings belong only in the private submission directory.
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 import os
 from pathlib import Path
 import re
@@ -46,7 +47,8 @@ def main() -> None:
 
     def run(command: list[str], name: str, *, cwd: Path = root) -> str:
         path = output / (name + ".txt")
-        record = {"command": command, "commit": commit, "status": "running"}
+        record = {"command": command, "commit": commit, "status": "running",
+                  "started_at_utc": datetime.now(timezone.utc).isoformat()}
         write_json(output / (name + "-execution.json"), record)
         begin = time.monotonic()
         with path.open("w") as stream:
@@ -63,7 +65,8 @@ def main() -> None:
                     process.wait()
                 code = 124
         record.update(seconds=time.monotonic() - begin, exit_code=code,
-                      status="complete" if code == 0 else "failed")
+                      status="complete" if code == 0 else "failed",
+                      finished_at_utc=datetime.now(timezone.utc).isoformat())
         write_json(output / (name + "-execution.json"), record)
         print(name, record["status"], flush=True)
         if code:
@@ -80,7 +83,7 @@ def main() -> None:
             raise RuntimeError("Unexpected GPU allocation; stop to preserve the budget")
         with (output / "gpu-memory.txt").open("w") as stream:
             monitor = subprocess.Popen([
-                "nvidia-smi", "--query-gpu=timestamp,name,memory.used,utilization.gpu",
+                "nvidia-smi", "--query-gpu=timestamp,index,name,memory.used,utilization.gpu",
                 "--format=csv", "--loop=5",
             ], stdout=stream, stderr=subprocess.STDOUT)
         if not root.exists():
@@ -109,7 +112,7 @@ def main() -> None:
             "workers": workers, "gpu": gpu, "label": "smoke",
         })
         if stage == "training":
-            train(root, output, python, workers, environment, run)
+            train(root, output, python, workers, gpu_count, environment, run)
             status = "complete"
             return
         rows_path = output / "collection.json"
@@ -142,7 +145,7 @@ def main() -> None:
                    "platform_timeout_seconds": platform_limit})
 
 
-def train(root, output, python, workers, environment, run) -> None:
+def train(root, output, python, workers, allocated_gpus, environment, run) -> None:
     import csv
 
     import yaml
@@ -211,8 +214,10 @@ def train(root, output, python, workers, environment, run) -> None:
                "end_to_end_decisions_per_second": rows / wall,
                "collection_wall_share": collection / wall, "update_wall_share": update / wall,
                "other_wall_share": (wall - collection - update) / wall,
-               "week_gpu_hours": 30, "week_decisions_projection": rows / wall * 30 * 3600,
-               "week_games_projection": games / wall * 30 * 3600}
+               "allocated_gpus": allocated_gpus, "week_gpu_hours": 30,
+               "week_session_hours": 30 / allocated_gpus,
+               "week_decisions_projection": rows / wall * 30 * 3600 / allocated_gpus,
+               "week_games_projection": games / wall * 30 * 3600 / allocated_gpus}
     write_json(output / "training-summary.json", summary)
     if collection > update:
         run([python, "-m", "fog.eval.showdown_rollout_probe", "--batch",
