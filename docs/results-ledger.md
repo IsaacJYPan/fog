@@ -1469,3 +1469,6 @@ wall times and sampled GPU memory are in each named probe's JSON, text and CSV u
 | Opponent | Device | Batch | Repeat | Games | Learner decisions | Probe seconds | Learner decisions/s | Commit | Remaining command flags |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | self | cpu | 32 | 1 | 512 | 30009 | 411.52 | 72.92 | `571a9c0` | `--opponent self --device cpu --batch 32` |
+| MaxDamage | cpu | 32 | 1 | 512 | 16838 | 150.89 | 111.59 | `571a9c0` | `--opponent MaxDamage --device cpu --batch 32` |
+| MaxDamage | cpu | 32 | 2 | 512 | 16838 | 151.75 | 110.96 | `571a9c0` | `--opponent MaxDamage --device cpu --batch 32` |
+| self | cpu | 32 | 2 | 512 | 30009 | 410.77 | 73.06 | `571a9c0` | `--opponent self --device cpu --batch 32` |

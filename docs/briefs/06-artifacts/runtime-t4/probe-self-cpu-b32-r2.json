@@ -1,0 +1,17 @@
+{
+  "label": "probe-self-cpu-b32-r2",
+  "status": "complete",
+  "command": "/content/fog/.venv/bin/python -m fog.eval.showdown_rollout_probe --workers 2 --batch 32 --games 512 --opponent self --pool data/teams/pool_a --device cpu",
+  "commit": "571a9c060d775daee30cba254c10fbfa20629aaa",
+  "started_utc": "2026-11-14T08:31:51.762771+00:00",
+  "attempt": 1,
+  "exit_code": 0,
+  "wall_seconds": 428.2845455030001,
+  "peak_sampled_gpu_mib": 3.0,
+  "games": 512.0,
+  "learner_decisions": 30009.0,
+  "seconds": 410.77,
+  "learner_decisions_per_s": 73.06,
+  "games_per_s": 1.246,
+  "p1_wins": 268.0
+}

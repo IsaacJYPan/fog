@@ -1,0 +1,1 @@
+workers=2 batch=32 device=cpu opponent=MaxDamage games=512 learner_decisions=16838 seconds=150.89 learner_decisions/s=111.59 games/s=3.393 p1_wins=49
