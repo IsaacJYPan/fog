@@ -1,0 +1,60 @@
+[showdown-selection] blueprint vs maxdamage: 204/400 A=198 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 208/400 A=202 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 212/400 A=206 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 216/400 A=210 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 220/400 A=214 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 224/400 A=218 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 228/400 A=222 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 232/400 A=226 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 236/400 A=230 B=6 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 240/400 A=233 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 244/400 A=237 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 248/400 A=241 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 252/400 A=245 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 256/400 A=249 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 260/400 A=253 B=7 draws=0 failures=0
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-select-blueprint-vs-maxdamage-260 turn 3
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-select-blueprint-vs-maxdamage-260 turn 3
+[showdown-selection] blueprint vs maxdamage: 264/400 A=257 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 268/400 A=261 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 272/400 A=265 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 276/400 A=269 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 280/400 A=273 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 284/400 A=277 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 288/400 A=281 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 292/400 A=285 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 296/400 A=289 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 300/400 A=293 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 304/400 A=297 B=7 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 308/400 A=300 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 312/400 A=304 B=8 draws=0 failures=0
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-select-blueprint-vs-maxdamage-312 turn 3
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-select-blueprint-vs-maxdamage-312 turn 3
+[showdown-selection] blueprint vs maxdamage: 316/400 A=308 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 320/400 A=312 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 324/400 A=316 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 328/400 A=320 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 332/400 A=324 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 336/400 A=328 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 340/400 A=332 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 344/400 A=336 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 348/400 A=340 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 352/400 A=344 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 356/400 A=348 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 360/400 A=352 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 364/400 A=356 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 368/400 A=360 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 372/400 A=364 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 376/400 A=368 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 380/400 A=372 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 384/400 A=376 B=8 draws=0 failures=0
+Unmanaged move message format received - cleaned up message ['', 'move', 'p2a: Kingambit', 'Kowtow Cleave', 'p1a: Dragapult', '[miss]'] in battle battle-select-blueprint-vs-maxdamage-386 turn 3
+Unmanaged move message format received - cleaned up message ['', 'move', 'p2a: Kingambit', 'Kowtow Cleave', 'p1a: Dragapult', '[miss]'] in battle battle-select-blueprint-vs-maxdamage-386 turn 3
+[showdown-selection] blueprint vs maxdamage: 388/400 A=380 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 392/400 A=384 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 396/400 A=388 B=8 draws=0 failures=0
+[showdown-selection] blueprint vs maxdamage: 400/400 A=392 B=8 draws=0 failures=0
+[showdown-selection] RESULT blueprint vs maxdamage: 0.980 [0.961, 0.990] (392-8, draws=0)
+[showdown-selection] report -> docs/briefs/04-artifacts/blueprint-216451-pool_a.json
+| 2026-11-14 | blueprint | simpleheuristics | showdown_direct | 400 | 0.840 [0.801, 0.873] (336-64-0) | n/a | n/a | `6103abf` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_a.json` |
+| 2026-11-14 | blueprint | maxdamage | showdown_direct | 400 | 0.980 [0.961, 0.990] (392-8-0) | n/a | n/a | `6103abf` | `python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_a.json` |

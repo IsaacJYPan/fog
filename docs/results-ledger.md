@@ -747,3 +747,22 @@ as self-play opponents, verifying the initial league seed and inherited 24k refr
 `blueprint-startup-check.json` contains scheduled-game counts (including the current batch),
 not a win-rate claim. `blueprint-metrics.csv` and `blueprint-tail.txt` are in-progress copies.
 The first scored PPO point remains the saved boundary after 200k.
+
+Stage 2 first scored PPO point, **smoke**, 216,451 decisions. The 192k league snapshot
+landed at 199,807, below 200k; the next inherited 24k boundary supplies this point.
+This preserves latest-self refresh timing. Each row completed 400 games, with zero failures,
+truncations and draws. Training continues toward 556,748.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 216451 | pool_a | simpleheuristics (smoke) | 400 | 0.8400 [0.801, 0.873] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_a.json` |
+| 216451 | pool_a | maxdamage (smoke) | 400 | 0.9800 [0.961, 0.990] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_a.json` |
+| 216451 | pool_b | simpleheuristics (smoke) | 400 | 0.2075 [0.171, 0.250] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_b.json` |
+| 216451 | pool_b | maxdamage (smoke) | 400 | 0.5475 [0.499, 0.596] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_b.json` |
+
+First-point reading: **improved on pool A** by the brief’s rule. SimpleHeuristics
+25.5% → 84.0%, +58.5 points, non-overlapping intervals; first observed cost
+37000.171 PPO decisions per ten points. MaxDamage 72.0% → 98.0%.
+On held-out pool B, SimpleHeuristics 22.0% → 20.75%, MaxDamage 56.5% → 54.75%;
+intervals overlap their baselines, so no clear transfer is observed at this point. This is
+the brief’s eight-team learning case, pending the remaining curve. No gate is claimed.
