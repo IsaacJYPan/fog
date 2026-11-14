@@ -1,6 +1,8 @@
 """Private GPU measurement job; inject FOG_COMMIT before submitting.
 
-Use FOG_STAGE=collection (1,800-second platform timeout) or training (3,000).
+Use FOG_STAGE=collection (1,800-second platform timeout), training (3,000),
+or combined (3,600). Combined measures the missing MaxDamage matrix, selects
+its best GPU batch, then runs the full training loop and evaluation.
 Internal deadlines reserve 300 seconds for export. Both include setup.
 Completed probe rows and training checkpoints survive a rerun of the script
 with the same output directory. Budget any new GPU session separately.
@@ -39,10 +41,10 @@ def main() -> None:
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("FOG_COMMIT must identify the pushed commit")
     stage = os.environ.get("FOG_STAGE", "collection")
-    if stage not in {"collection", "training"}:
-        raise ValueError("FOG_STAGE must be collection or training")
-    default = 1800 if stage == "collection" else 3000
-    maximum = 3600 if stage == "collection" else 3000
+    if stage not in {"collection", "training", "combined"}:
+        raise ValueError("FOG_STAGE must be collection, training or combined")
+    default = {"collection": 1800, "training": 3000, "combined": 3600}[stage]
+    maximum = 3000 if stage == "training" else 3600
     platform_limit = int(os.environ.get("FOG_PLATFORM_TIMEOUT", default))
     if not 600 <= platform_limit <= maximum:
         raise ValueError("FOG_PLATFORM_TIMEOUT must be between 600 and this stage's maximum")
@@ -51,6 +53,17 @@ def main() -> None:
     monitor = None
     gpu_count = 2  # Conservative until nvidia-smi reports the allocation.
     status = "failed"
+    # Attached prior private outputs allow another bounded job to restore saved PPO state.
+    resume_roots = [path.parent for path in Path("/kaggle/input").rglob("collect_gpu_check.txt")
+                    if (path.parent / "training/checkpoints").is_dir()]
+    if len(resume_roots) > 1:
+        raise ValueError("attach at most one preceding training job")
+    if resume_roots:
+        shutil.copytree(resume_roots[0], output, dirs_exist_ok=True)
+        for directory, _, files in os.walk(output):
+            Path(directory).chmod(0o755)
+            for name in files:
+                (Path(directory) / name).chmod(0o644)
 
     def run(command: list[str], name: str, *, cwd: Path = root) -> str:
         path = output / (name + ".txt")
@@ -77,6 +90,10 @@ def main() -> None:
         write_json(output / (name + "-execution.json"), record)
         print(name, record["status"], flush=True)
         if code:
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
             print(path.read_text()[-6000:], flush=True)
             raise RuntimeError(f"{name} exited {code}; stop before further measurements")
         return path.read_text()
@@ -124,7 +141,8 @@ def main() -> None:
             return
         rows_path = output / "collection.json"
         saved = json.loads(rows_path.read_text()) if rows_path.exists() else {"rows": []}
-        for opponent in ("self", "MaxDamage"):
+        opponents = ("MaxDamage",) if stage == "combined" else ("self", "MaxDamage")
+        for opponent in opponents:
             for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
                 for repeat in (1, 2):
                     name = f"probe-{opponent}-{device}-{batch}-{repeat}"
@@ -140,6 +158,32 @@ def main() -> None:
                     saved["rows"].append({"name": name, "label": "smoke", "commit": commit,
                                           "command": command, "repeat": repeat, **values})
                     write_json(rows_path, saved)
+        if stage == "combined":
+            import yaml
+
+            config = root / "configs/collect_gpu_check.yaml"
+            previous = output / "collect_gpu_check.txt"
+            if previous.exists():
+                recipe = yaml.safe_load(previous.read_text())
+            else:
+                recipe = yaml.safe_load(config.read_text())
+                speeds = {}
+                for batch in (32, 64, 128):
+                    measured = [row for row in saved["rows"] if row["opponent"] == "MaxDamage"
+                                and row["device"] == "cuda" and int(row["batch"]) == batch]
+                    assert len(measured) == 2
+                    speeds[batch] = sum(int(row["learner_decisions"]) for row in measured) / sum(
+                        float(row["seconds"]) for row in measured)
+                best = max(speeds, key=speeds.get)
+                recipe["env"].update(rollout_workers=workers, rollout_batch=best)
+                recipe["ppo"]["games_per_chunk"] = workers * best
+                write_json(output / "batch-selection.json", {
+                    "label": "smoke", "basis": "aggregate learner decisions / aggregate seconds, two MaxDamage repeats",
+                    "rows_per_second": speeds, "selected_batch": best, "workers": workers,
+                    "self_play_matrix": "separate earlier job; not a same-job self/MaxDamage matrix",
+                })
+            config.write_text(yaml.safe_dump(recipe, sort_keys=False))
+            train(root, output, python, workers, gpu_count, environment, run)
         status = "complete"
     finally:
         if monitor is not None:
@@ -159,8 +203,13 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
 
     config = root / "configs/collect_gpu_check.yaml"
     recipe = yaml.safe_load(config.read_text())
+    previous = output / "collect_gpu_check.txt"
+    if previous.exists():
+        recipe = yaml.safe_load(previous.read_text())
+        config.write_text(yaml.safe_dump(recipe, sort_keys=False))
     if recipe["env"]["rollout_workers"] != workers:
         raise ValueError("Training hardware differs from the recorded collection hardware")
+    shutil.copy2(config, output / "collect_gpu_check.txt")
     # Preserve the inherited log.dir setting while saving checkpoints in Kaggle outputs.
     log = root / "runs/gen9ou_typed_token_policy_v1"
     log.parent.mkdir(parents=True, exist_ok=True)
@@ -177,31 +226,41 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
     states = sorted((output / "training/checkpoints").glob("ppo_[0-9]*.state.pt"),
                     key=lambda path: int(path.stem.split("_")[1].split(".")[0]))
     if states:
+        trim_measurements(output, int(states[-1].stem.split("_")[1].split(".")[0]))
         command += ["--set", "ppo.resume_ckpt=" + str(states[-1])]
-    oom_attempts = []
+    oom_path = output / "oom-attempts.json"
+    oom_attempts = json.loads(oom_path.read_text())["attempts"] if oom_path.exists() else []
+    attempts_path = output / "trainer-attempts.json"
+    attempts = json.loads(attempts_path.read_text())["attempts"] if attempts_path.exists() else []
     while True:
         try:
             run(command, "trainer")
+            attempts.append(json.loads((output / "trainer-execution.json").read_text()))
+            write_json(attempts_path, {"attempts": attempts})
             break
         except RuntimeError:
+            attempts.append(json.loads((output / "trainer-execution.json").read_text()))
+            write_json(attempts_path, {"attempts": attempts})
             text = (output / "trainer.txt").read_text()
             if "out of memory" not in text.lower() or "cuda" not in text.lower():
                 raise
-            minibatch = int(recipe["ppo"]["minibatch_size"])
             # An update-boundary checkpoint requires its original exact-resume config.
-            if minibatch <= 1 or list((output / "training/checkpoints").glob("*.state.pt")):
+            if recipe["ppo"].get("activation_checkpointing", False) or list(
+                (output / "training/checkpoints").glob("*.state.pt")
+            ):
                 raise
-            shutil.copy2(output / "trainer.txt", output / f"trainer-oom-{minibatch}.txt")
+            shutil.copy2(output / "trainer.txt", output / "trainer-oom-1024.txt")
             execution = json.loads((output / "trainer-execution.json").read_text())
-            execution.update(minibatch_size=minibatch, error="CUDA out of memory")
+            execution.update(minibatch_size=1024, error="CUDA out of memory")
             oom_attempts.append(execution)
             write_json(output / "oom-attempts.json", {"attempts": oom_attempts})
             timing = output / "training-timing.jsonl"
             if timing.exists():
-                shutil.copy2(timing, output / f"trainer-oom-{minibatch}-timing.jsonl")
+                shutil.copy2(timing, output / "trainer-oom-1024-timing.jsonl")
                 timing.write_text("")
-            recipe["ppo"]["minibatch_size"] = minibatch // 2
+            recipe["ppo"]["activation_checkpointing"] = True
             config.write_text(yaml.safe_dump(recipe, sort_keys=False))
+            shutil.copy2(config, output / "collect_gpu_check.txt")
     environment.pop("FOG_TIMING_OUTPUT")
     environment.pop("PYTHONPATH")
     lines = (output / "trainer.txt").read_text().splitlines()
@@ -210,30 +269,46 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
     shutil.copy2(config, output / "collect_gpu_check.txt")
     with (output / "trainer-metrics.csv").open() as stream:
         metrics = list(csv.DictReader(stream))
-    collection = sum(float(row["collection_seconds"]) for row in metrics)
-    optimizer = sum(float(row["update_seconds"]) for row in metrics)
+    native_collection = sum(float(row["collection_seconds"]) for row in metrics)
+    native_update = sum(float(row["update_seconds"]) for row in metrics)
+    native_optimizer = sum(float(row["optimization_seconds"]) for row in metrics)
     events = [json.loads(line) for line in (output / "training-timing.jsonl").read_text().splitlines()]
     phases = [row for row in events if row["kind"] == "update_phase"]
+    collections = [row for row in events if row["kind"] == "collection"]
+    optimizers = [row for row in events if row["kind"] == "update"]
+    collection = sum(row["seconds"] for row in collections)
+    optimizer = sum(row["seconds"] for row in optimizers)
     update = sum(row["seconds"] for row in phases)
     if len(phases) != len(metrics):
         raise ValueError("Update-phase timers and trainer metrics disagree")
-    rows = sum(int(float(row["collection_rows"])) for row in metrics)
-    games = sum(int(float(row["collection_games"])) for row in metrics)
-    wall = json.loads((output / "trainer-execution.json").read_text())["seconds"]
+    rows = sum(row["rows"] for row in collections)
+    games = sum(row["games"] for row in collections)
+    assert rows >= 100000, "partial training, do not claim completed 100k run"
+    assert rows == int(float(metrics[-1]["decisions"]))
+    wall = sum(attempt["seconds"] for attempt in attempts)
     summary = {"label": "smoke", "decisions": rows, "games": games,
                "collection_seconds": collection, "update_seconds": update,
                "optimizer_update_seconds": optimizer,
+               "native_collection_seconds": native_collection,
+               "native_update_seconds": native_update,
+               "native_optimization_seconds": native_optimizer,
                "update_assembly_diagnostics_logging_seconds": update - optimizer,
-               "update_forward_seconds": sum(float(row["update_forward_seconds"]) for row in metrics),
+               "update_forward_seconds": sum(row["forward_seconds"] for row in optimizers),
                "update_loss_backward_optimizer_seconds": sum(
-                   float(row["update_other_seconds"]) for row in metrics),
+                   row["loss_backward_optimizer_seconds"] for row in optimizers),
                "trainer_wall_seconds": wall, "collection_decisions_per_second": rows / collection,
+               "trainer_attempts": len(attempts),
+               "latest_trainer_attempt_seconds": attempts[-1]["seconds"],
+               "timing_scope": "committed update prefix for phase sums; all trainer attempts, including OOM or repeated unfinished work, in end-to-end wall",
+               "failed_oom_attempt_seconds": sum(attempt["seconds"] for attempt in oom_attempts),
                "update_unique_rows_per_second": rows / update,
                "update_optimized_rows_per_second": sum(
-                   int(float(row["update_optimized_rows"])) for row in metrics) / update,
+                   row["optimized_rows"] for row in optimizers) / update,
                "optimizer_optimized_rows_per_second": sum(
-                   int(float(row["update_optimized_rows"])) for row in metrics) / optimizer,
+                   row["optimized_rows"] for row in optimizers) / optimizer,
                "end_to_end_decisions_per_second": rows / wall,
+               "end_to_end_games_per_second": games / wall,
+               "effective_epochs": sum(row["optimized_rows"] for row in optimizers) / rows,
                "collection_wall_share": collection / wall, "update_wall_share": update / wall,
                "other_wall_share": (wall - collection - update) / wall,
                "allocated_gpus": allocated_gpus, "week_gpu_hours": 30,
@@ -251,6 +326,37 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
         run([python, "-m", "fog.eval.showdown_rollout_probe", "--batch",
              str(recipe["env"]["rollout_batch"]), "--games", "128", "--opponent",
              "MaxDamage", "--pool", "data/teams/pool_a", "--device", "cuda"], "collection-split")
+
+
+def trim_measurements(output: Path, decisions: int) -> None:
+    """Drop work after the last saved PPO state before a continuation repeats it."""
+    import csv
+
+    timing = output / "training-timing.jsonl"
+    lines = timing.read_text().splitlines(keepends=True)
+    completed = 0
+    cut = None
+    for index, line in enumerate(lines):
+        event = json.loads(line)
+        if event["kind"] == "update_phase":
+            completed += event["rows"]
+            if completed == decisions:
+                cut = index + 1
+                break
+    if cut is None:
+        raise ValueError("Saved model state has no matching completed timing prefix; timing is partial")
+    shutil.copy2(timing, output / "timing-before-resume.jsonl")
+    timing.write_text("".join(lines[:cut]))
+    metrics = output / "training/metrics.csv"
+    with metrics.open(newline="") as stream:
+        reader = csv.DictReader(stream)
+        fields = reader.fieldnames
+        rows = [row for row in reader if int(float(row["decisions"])) <= decisions]
+    shutil.copy2(metrics, output / "metrics-before-resume.csv")
+    with metrics.open("w", newline="") as stream:
+        writer = csv.DictWriter(stream, fieldnames=fields)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 if __name__ == "__main__":

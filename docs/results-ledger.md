@@ -1391,3 +1391,34 @@ collected on a machine where the forum pages open.
 
 `pool_b` is not a held-out split of one distribution: it has other species. The result says
 play on `pool_a` neither helped nor hurt there.
+
+### 2026-11-14: owner prioritizes end-to-end timing after G20 (smoke preparation)
+
+The owner asked for end-to-end games/second and chose to finish G20 first, then measure
+brief 06 before G100. No new brief-06 job has been submitted. Merge `92ebd08` brings in
+`work/roadmap` at `76eb4ee`, including the reviewed brief-04 timing, checkpointing and
+resume code; both ledger histories were retained. The planned private combined job will
+measure the eight missing MaxDamage rows, choose the aggregate fastest GPU batch, then
+run the specified 100k-decision PPO recipe and 200-game evaluation. The earlier self-play
+matrix remains a separate-job smoke result. This is a documented deviation from a single
+same-job matrix, preserving the remaining budget for the newly requested full-loop speed.
+The proposed cap is 3,600 session seconds, internal deadline 3,300, two T4s conservatively
+counted: prior upper bound 0.937222 + cap 2.0 = 2.937222 allocated GPU-hours, leaving 113
+session seconds for additional startup/export before three hours. No further allocation
+may exceed the measured remaining allowance. An account-wide active/queued-job guard is
+required immediately before submission. The initial G20/collection overlap remains recorded.
+
+`configs/collect_gpu_check.yaml` changes only the brief's named settings; its 4-worker,
+batch-128 values are a template, replaced by observed hardware and the new MaxDamage
+selection before training (`endtoend-config-diff.json`). Minibatch remains 1,024; only the
+brief-authorized activation-checkpointing option can be enabled after CUDA OOM, with the
+failed attempt retained. No model, loss or trainer edits were made here.
+
+The measurement wrapper now namespaces extra CSV fields with `timing_`, preserving the
+new trainer's native `collection_seconds`, `update_seconds` and optimization columns.
+A regression fails on the prior wrapper and passes with the fix (`timing-native-before.txt`).
+A continuation keeps only the timing/CSV prefix represented by its saved model state, and
+sums all trainer-attempt walls so retries cannot inflate end-to-end speed. CPU checks:
+15 focused tests pass; timing hooks preserve update metrics and model tensors with CUDA
+calls mocked; Ruff and byte compilation pass (`endtoend-*` artifacts). GPU PPO speed,
+end-to-end decisions/games per second and batched-path learning remain unmeasured.

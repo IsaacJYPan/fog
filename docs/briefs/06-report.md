@@ -1,46 +1,46 @@
-# Collection and play-training speed on a GPU (smoke)
+# Collection and play-training speed on a GPU (smoke, in progress)
 
-**Answer.** Collection on this GPU host, PPO update speed, end-to-end speed,
-and decisions/games per 30-hour week are not measured yet. After the existing
-GPU job finished, the initial private collection job at `c4df5e2` failed
-before cloning: `/kaggle/temp` did not exist. The next allocation completed
-all self-play rows, then hit its time limit before MaxDamage. A longer
-same-job matrix is being prepared within the remaining GPU budget.
+**Answer.** Self-play collection measured **155–156 learner decisions/s on CPU** and
+**206–216 on CUDA**, four Intel Xeon @ 2.00GHz cores and two Tesla T4s. MaxDamage
+collection, PPO update speed, end-to-end decisions/games per second and the 30-hour
+projection remain unmeasured. The owner chose to finish G20 first, then run the missing
+MaxDamage matrix and full 100k-decision PPO loop. No new GPU job has been submitted.
 
-| Stage | Status | Evidence |
-| --- | --- | --- |
-| 1: CPU/GPU collection, twice per setting | Self-play done; MaxDamage not run | `06-artifacts/collection-attempt2/` |
-| 2: fixed-team PPO and greedy evaluation | Depends on stage 1's chosen batch and CPU count | Not run |
-| 3: bottleneck and 30-hour projection | Depends on measured collection/update rates | Not run |
+| Self-play, 512 games/repeat (smoke) | Repeat 1 learner decisions/s | Repeat 2 learner decisions/s |
+| --- | ---: | ---: |
+| CPU, batch 32 | 155.76 | 155.37 |
+| CUDA, batch 32 | 205.81 | 208.95 |
+| CUDA, batch 64 | 209.10 | 213.15 |
+| CUDA, batch 128 | 216.34 | 212.95 |
 
-The private collection entry point is `06-artifacts/gpu_job.py`. It clones a
-pushed commit supplied through `FOG_COMMIT`, builds pinned Showdown, preserves
-the installed CUDA PyTorch, records CPU hardware/quota and GPU memory, and
-runs the exact collection matrix. It stops on the first failed probe and
-preserves completed rows. Use T4: the installed client documents P100 as
-retired. The two completed allocations cost at most 0.937223 GPU-hours,
-including startup/export, on two T4s. A complete matrix will use a
-2,520-second platform cap; training gets only the measured remaining budget.
-Both allocated GPUs count toward the budget and weekly projection.
+These rows are from `06-artifacts/collection-attempt2/`; they are a separate-job result,
+not a completed same-job self/MaxDamage matrix. Attempt 1 failed before clone because
+`/kaggle/temp` was absent; attempt 2 reached its internal deadline after these eight rows.
+Both failed/partial allocations remain in the ledger and artifacts.
 
-Partial self-play smoke, four Intel Xeon @ 2.00GHz cores: CPU B32
-155.76 / 155.37 learner decisions/s; CUDA B32 205.81 / 208.95;
-B64 209.10 / 213.15; B128 216.34 / 212.95. These are not combined with
-future hosts to form the final comparison table.
+The planned private `FOG_STAGE=combined` job uses `06-artifacts/gpu_job.py`, the reviewed
+current roadmap trainer, and `configs/collect_gpu_check.yaml`. It measures both repeats of
+CPU batch 32 and CUDA batches 32/64/128 against MaxDamage, selects the aggregate fastest
+GPU batch, then trains the exact 100k-decision recipe and evaluates 200 greedy games on
+the first pool-A team. The config's four-worker/batch-128 values are a template, replaced
+by measured hardware/selection before training. Minibatch stays 1,024; a CUDA OOM may
+only enable the brief's activation-checkpointing option, with the failed attempt retained.
 
-`06-artifacts/training_timing.py` supplies optional process-local timing hooks
-through a temporary `sitecustomize.py`: collection/update wall times go into
-the trainer's existing metrics CSV and a separate JSONL file. CUDA updates
-are synchronized at their boundaries; update rows/s counts unique batch rows.
-The CPU engineering check (`check_timing.py`, `timing-equivalence.json`)
-preserves every update metric and final parameter exactly with CUDA timing
-calls mocked. This is not GPU validation. Local pinned Showdown builds;
-18 focused rollout/process-pool tests pass and Ruff is clean (artifact outputs).
+Budget: at most **0.937222 allocated GPU-hours** already used, counting both T4s and
+submission-to-observed-terminal upper bounds. A 3,600-second platform cap plus prior
+allocations totals **2.937222 allocated GPU-hours**, leaving 113 session seconds for
+additional startup/export; the internal deadline is 3,300 seconds including setup. The
+remaining budget is shared by probes, training and evaluation. The initial G20/collection
+overlap is recorded; every new launch requires an empty account-wide active/queued-job check.
 
-**Fixes.** The job creates its temporary parent before cloning. The regression
-fails without the fix and passes with it (`job-bootstrap-{before,test}.txt`).
-No model, loss, trainer or search code changed.
+The timing wrapper preserves the trainer's native phase columns and adds `timing_` fields,
+CUDA-synchronized optimizer/forward timers and the full update phase. End-to-end wall
+includes all training attempts; saved-state continuations retain only their completed timing
+prefix. A regression fails on the prior wrapper and passes after the fix. **15 focused tests
+pass**, timing checks preserve update metrics/model tensors with CUDA calls mocked, Ruff
+and byte compilation pass (`endtoend-*`, `timing-native-before.txt`). No new model, loss,
+trainer or search edits were made; the reviewed brief-04 trainer was merged from the roadmap.
 
-**Not verified.** GPU startup in spawned actors, CUDA tensor placement,
-collection rates, PPO GPU memory/speed, and learning on the batched GPU path.
-P0.5 remains unchecked. This report records preparation, not a completed run.
+**Not verified:** MaxDamage collection, PPO GPU memory/speed, end-to-end games/second,
+30-hour projections and learning on the batched GPU path. The completed CUDA self-play rows
+exercised spawned actors. The single same-job matrix requirement is not met. P0.5 stays open.

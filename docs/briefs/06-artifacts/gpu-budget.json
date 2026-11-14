@@ -20,7 +20,24 @@
   ],
   "completed_gpu_hours_upper": 0.9372222222222222,
   "remaining_gpu_hours": 2.062777777777778,
-  "collection_retry_platform_seconds": 2520,
-  "collection_retry_gpu_hours_max": 1.4,
-  "training_cap": "recompute from remaining budget after the retry completes"
+  "training_cap": "single combined session shares its 3300-second internal deadline across missing probes, PPO and evaluation",
+  "superseded_collection_retry_platform_seconds": 2520,
+  "superseded_collection_retry_gpu_hours_max": 1.4,
+  "next_job": {
+    "status": "prepared, not submitted; waits for G20 completion and empty account-wide active-job check",
+    "stage": "combined MaxDamage matrix, full 100k PPO, evaluation",
+    "planned_slug": "fog-collect-endtoend-20261114",
+    "platform_seconds": 3600,
+    "internal_seconds": 3300,
+    "allocated_gpus_planning": 2,
+    "max_gpu_hours_for_platform_cap": 2.0,
+    "prior_plus_cap_gpu_hours_upper": 2.937222222222222,
+    "additional_startup_export_headroom_seconds": 113,
+    "self_matrix": "retained from earlier job; not a single same-job self/MaxDamage matrix",
+    "expected_session_seconds_range": [
+      1800,
+      3300
+    ],
+    "estimate_basis": "Earlier self-play probe wall times and brief-05 supervised GPU throughput bound the rough planning range; PPO GPU speed and MaxDamage collection remain unmeasured."
+  }
 }

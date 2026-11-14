@@ -4,7 +4,8 @@ Copy to a temporary directory as sitecustomize.py and add that directory to
 PYTHONPATH for `python -m fog.train` only. Set FOG_TIMING_OUTPUT to a JSONL
 path. Spawned actors inherit FOG_TIMING_PARENT and do not install these hooks.
 Times include explicit CUDA synchronization at learner update boundaries.
-Update rows/s counts unique collected rows, including the configured epochs.
+Extra CSV keys use timing_ prefixes and preserve the trainer's native phase metrics.
+Optimizer row-visits include partial epochs and KL stopping.
 """
 from __future__ import annotations
 
@@ -22,7 +23,7 @@ def install(path: Path) -> None:
     from fog.training.dashboard import TrainingDashboard
     from fog.training.direct_parallel import PersistentProcessPool
 
-    interval = {"collection_seconds": 0.0, "collection_rows": 0, "collection_games": 0}
+    interval = {"timing_collection_seconds": 0.0, "timing_collection_rows": 0, "timing_collection_games": 0}
 
     def record(row: dict) -> None:
         with path.open("a") as stream:
@@ -38,9 +39,9 @@ def install(path: Path) -> None:
         seconds = time.perf_counter() - start
         games = [game for buffer, _ in results for game in buffer._games.values()]
         rows = sum(len(game.actions) for game in games)
-        interval["collection_seconds"] += seconds
-        interval["collection_rows"] += rows
-        interval["collection_games"] += len(games)
+        interval["timing_collection_seconds"] += seconds
+        interval["timing_collection_rows"] += rows
+        interval["timing_collection_games"] += len(games)
         record({"kind": "collection", "seconds": seconds, "rows": rows, "games": len(games)})
         return results
 
@@ -80,10 +81,11 @@ def install(path: Path) -> None:
         steps = int(metrics["optimizer_steps"])
         epochs, partial = divmod(steps, batches_per_epoch)
         optimized_rows = epochs * rows + min(partial * minibatch, rows)
-        interval.update(update_seconds=seconds, update_rows=rows,
-                        update_optimized_rows=optimized_rows,
-                        update_forward_seconds=forward_seconds,
-                        update_other_seconds=seconds - forward_seconds)
+        optimized_rows = int(metrics.get("optimizer_rows", optimized_rows))
+        interval.update(timing_optimizer_seconds=seconds, timing_update_rows=rows,
+                        timing_optimized_rows=optimized_rows,
+                        timing_forward_seconds=forward_seconds,
+                        timing_loss_backward_optimizer_seconds=seconds - forward_seconds)
         record({"kind": "update", "seconds": seconds, "rows": rows,
                 "forward_seconds": forward_seconds,
                 "loss_backward_optimizer_seconds": seconds - forward_seconds,
@@ -114,18 +116,18 @@ def install(path: Path) -> None:
 
     @functools.wraps(original_log)
     def timed_log(self, step, metrics):
-        if "update_seconds" in interval:
+        if "timing_optimizer_seconds" in interval:
             metrics.update(interval)
-            metrics["collection_rows_per_second"] = (
-                interval["collection_rows"] / interval["collection_seconds"]
+            metrics["timing_collection_rows_per_second"] = (
+                interval["timing_collection_rows"] / interval["timing_collection_seconds"]
             )
-            metrics["update_rows_per_second"] = interval["update_rows"] / interval["update_seconds"]
-            metrics["update_optimized_rows_per_second"] = (
-                interval["update_optimized_rows"] / interval["update_seconds"]
+            metrics["timing_update_unique_rows_per_second"] = interval["timing_update_rows"] / interval["timing_optimizer_seconds"]
+            metrics["timing_optimizer_rows_per_second"] = (
+                interval["timing_optimized_rows"] / interval["timing_optimizer_seconds"]
             )
-            metrics["peak_learner_allocated_bytes"] = torch.cuda.max_memory_allocated()
+            metrics["timing_peak_learner_allocated_bytes"] = torch.cuda.max_memory_allocated()
             interval.clear()
-            interval.update(collection_seconds=0.0, collection_rows=0, collection_games=0)
+            interval.update(timing_collection_seconds=0.0, timing_collection_rows=0, timing_collection_games=0)
         return original_log(self, step, metrics)
 
     TrainingDashboard.log = timed_log
