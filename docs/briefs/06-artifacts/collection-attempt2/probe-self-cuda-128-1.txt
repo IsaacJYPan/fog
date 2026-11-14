@@ -1,0 +1,1 @@
+workers=4 batch=128 device=cuda opponent=self games=512 learner_decisions=29648 seconds=137.04 learner_decisions/s=216.34 games/s=3.736 p1_wins=247

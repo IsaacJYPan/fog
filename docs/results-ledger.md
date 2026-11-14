@@ -1017,3 +1017,31 @@ after prior submission-to-observed-terminal bounds, counting both T4s; a
 longer collection cap reduces the available training cap. This changes only
 the measurement job, not the probe or trainer. Bootstrap regression and Ruff
 pass again.
+
+Collection attempt 2 stopped at its internal deadline, not a CUDA error. All
+eight self-play rows completed, then `probe-MaxDamage-cpu-32-1` exited 124
+after 9.191 s without a result. Evidence is in `06-artifacts/collection-attempt2/`.
+Hardware: four quota/affinity cores, Intel Xeon @ 2.00GHz, two Tesla T4 15,360 MiB;
+Python 3.13.16, PyTorch 2.11.0+cu130, CUDA 13.0, Node v22.23.4. No GPU code fix.
+The following completed measurements are partial-stage smoke results, not the
+final same-job CPU/GPU matrix:
+
+| Opponent | Device | Batch | Repeat | Games | Learner decisions | Timed s | Learner decisions/s | Commit | Command |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| self (smoke) | cpu | 32 | 1 | 512 | 29982 | 192.49 | 155.76 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 32 --games 512 --opponent self --pool data/teams/pool_a --device cpu` |
+| self (smoke) | cpu | 32 | 2 | 512 | 29982 | 192.97 | 155.37 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 32 --games 512 --opponent self --pool data/teams/pool_a --device cpu` |
+| self (smoke) | cuda | 32 | 1 | 512 | 29648 | 144.05 | 205.81 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 32 --games 512 --opponent self --pool data/teams/pool_a --device cuda` |
+| self (smoke) | cuda | 32 | 2 | 512 | 29648 | 141.89 | 208.95 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 32 --games 512 --opponent self --pool data/teams/pool_a --device cuda` |
+| self (smoke) | cuda | 64 | 1 | 512 | 29648 | 141.79 | 209.10 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 64 --games 512 --opponent self --pool data/teams/pool_a --device cuda` |
+| self (smoke) | cuda | 64 | 2 | 512 | 29648 | 139.09 | 213.15 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 64 --games 512 --opponent self --pool data/teams/pool_a --device cuda` |
+| self (smoke) | cuda | 128 | 1 | 512 | 29648 | 137.04 | 216.34 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 128 --games 512 --opponent self --pool data/teams/pool_a --device cuda` |
+| self (smoke) | cuda | 128 | 2 | 512 | 29648 | 139.23 | 212.95 | `5603782` | `python -m fog.eval.showdown_rollout_probe --workers 4 --batch 128 --games 512 --opponent self --pool data/teams/pool_a --device cuda` |
+
+Attempt 2's script duration is 1,500.788 s, or 0.833771 allocated GPU-hours.
+The stronger budget bound includes startup/export: submission to observed
+terminal is at most 1,546 s. Together with attempt 1's 141 s, the two
+allocations cost at most 2 × (1,546 + 141) / 3,600 = 0.937222 GPU-hours.
+A complete-matrix retry will request a 2,520-second platform cap, with an
+internal 2,220-second deadline. Its worst-case allocation is 1.4 GPU-hours;
+training will use only the budget remaining after its measured completion.
+This preserves all comparisons on one job instead of combining different hosts.
