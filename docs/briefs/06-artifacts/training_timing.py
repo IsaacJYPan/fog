@@ -95,6 +95,21 @@ def install(path: Path) -> None:
         return metrics
 
     ppo.ppo_update = timed_update
+    original_phase = ppo._maybe_chunk_update
+
+    @functools.wraps(original_phase)
+    def timed_phase(setup, *args, **kwargs):
+        rows = setup.buf.n_decisions
+        if rows < min(setup.batch_decisions, setup.total - setup.decisions_seen):
+            return original_phase(setup, *args, **kwargs)
+        torch.cuda.synchronize()
+        start = time.perf_counter()
+        result = original_phase(setup, *args, **kwargs)
+        torch.cuda.synchronize()
+        record({"kind": "update_phase", "seconds": time.perf_counter() - start, "rows": rows})
+        return result
+
+    ppo._maybe_chunk_update = timed_phase
     original_log = TrainingDashboard.log
 
     @functools.wraps(original_log)

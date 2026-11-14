@@ -1053,3 +1053,11 @@ submitted. The other job was not active when attempt 2 began. This account
 overlap is recorded explicitly; its time is not charged to brief 06. Evidence:
 `account-status.json`. Budget accounting is `gpu-budget.json`, using both
 allocated T4s and conservative submission-to-terminal bounds.
+
+Training timing will report the complete `_maybe_chunk_update` phase
+(batch assembly, optimizer work, diagnostics, logging and checkpoint work),
+with `ppo_update` and its forward/remainder as explicit subcomponents.
+This avoids assigning update overhead to collection. JSONL phase events
+complement the trainer's unchanged CSV logging path. The CPU engineering
+check still preserves all update metrics/tensors and wrapper return values
+(`timing-equivalence.json`); CUDA timing remains unverified until stage 2.

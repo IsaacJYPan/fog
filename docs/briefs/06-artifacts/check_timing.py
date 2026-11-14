@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 import runpy
 import tempfile
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import torch
@@ -42,27 +43,36 @@ def main() -> None:
     buffer.end_game(gid, 1.0)
     expected_results = [(buffer, 1)]
     original_update = ppo.ppo_update
+    original_phase = ppo._maybe_chunk_update
     try:
         with tempfile.TemporaryDirectory() as temporary, patch.object(
             torch.cuda, "synchronize", return_value=None,
         ), patch.object(torch.cuda, "max_memory_allocated", return_value=0), patch.object(
             PersistentProcessPool, "map", return_value=expected_results,
+        ), patch.object(
+            ppo, "_maybe_chunk_update", return_value="updated",
         ):
             events = Path(temporary) / "events.jsonl"
             module.install(events)
             # Exercise only the collection wrapper; no fake timing is a GPU result.
             assert PersistentProcessPool.map(object(), []) is expected_results
             after_metrics, after_state = updates()
+            setup = SimpleNamespace(buf=SimpleNamespace(n_decisions=64),
+                                    batch_decisions=64, total=1000, decisions_seen=0)
+            assert ppo._maybe_chunk_update(setup, None, {}) == "updated"
             records = [json.loads(line) for line in events.read_text().splitlines()]
+            update_records = [row for row in records if row["kind"] == "update"]
             assert records[0]["rows"] == 1 and records[0]["games"] == 1
-            assert [row["rows"] for row in records[1:]] == [64, 64, 64]
-            assert [row["optimized_rows"] for row in records[1:]] == [192, 192, 192]
-            assert all(row["forward_seconds"] <= row["seconds"] for row in records[1:])
+            assert [row["rows"] for row in update_records] == [64, 64, 64]
+            assert [row["optimized_rows"] for row in update_records] == [192, 192, 192]
+            assert all(row["forward_seconds"] <= row["seconds"] for row in update_records)
+            assert len([row for row in records if row["kind"] == "update_phase"]) == 1
         assert before_metrics == after_metrics
         assert all(torch.equal(before_state[name], after_state[name]) for name in before_state)
         result = {"label": "CPU engineering smoke; CUDA timing calls mocked",
                   "update_metrics_identical": True, "final_state_tensors_identical": True,
                   "collection_result_identity_preserved": True,
+                  "complete_update_phase_return_preserved": True,
                   "row_counts_and_forward_time_partition_valid": True,
                   "gpu_performance_verified": False}
         destination = Path(__file__).with_name("timing-equivalence.json")
@@ -70,6 +80,7 @@ def main() -> None:
         print(json.dumps(result))
     finally:
         ppo.ppo_update = original_update
+        ppo._maybe_chunk_update = original_phase
 
 
 if __name__ == "__main__":

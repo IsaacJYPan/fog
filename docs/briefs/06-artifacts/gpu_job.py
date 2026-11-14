@@ -196,6 +196,10 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
             execution.update(minibatch_size=minibatch, error="CUDA out of memory")
             oom_attempts.append(execution)
             write_json(output / "oom-attempts.json", {"attempts": oom_attempts})
+            timing = output / "training-timing.jsonl"
+            if timing.exists():
+                shutil.copy2(timing, output / f"trainer-oom-{minibatch}-timing.jsonl")
+                timing.write_text("")
             recipe["ppo"]["minibatch_size"] = minibatch // 2
             config.write_text(yaml.safe_dump(recipe, sort_keys=False))
     environment.pop("FOG_TIMING_OUTPUT")
@@ -207,12 +211,19 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
     with (output / "trainer-metrics.csv").open() as stream:
         metrics = list(csv.DictReader(stream))
     collection = sum(float(row["collection_seconds"]) for row in metrics)
-    update = sum(float(row["update_seconds"]) for row in metrics)
+    optimizer = sum(float(row["update_seconds"]) for row in metrics)
+    events = [json.loads(line) for line in (output / "training-timing.jsonl").read_text().splitlines()]
+    phases = [row for row in events if row["kind"] == "update_phase"]
+    update = sum(row["seconds"] for row in phases)
+    if len(phases) != len(metrics):
+        raise ValueError("Update-phase timers and trainer metrics disagree")
     rows = sum(int(float(row["collection_rows"])) for row in metrics)
     games = sum(int(float(row["collection_games"])) for row in metrics)
     wall = json.loads((output / "trainer-execution.json").read_text())["seconds"]
     summary = {"label": "smoke", "decisions": rows, "games": games,
                "collection_seconds": collection, "update_seconds": update,
+               "optimizer_update_seconds": optimizer,
+               "update_assembly_diagnostics_logging_seconds": update - optimizer,
                "update_forward_seconds": sum(float(row["update_forward_seconds"]) for row in metrics),
                "update_loss_backward_optimizer_seconds": sum(
                    float(row["update_other_seconds"]) for row in metrics),
@@ -220,6 +231,8 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
                "update_unique_rows_per_second": rows / update,
                "update_optimized_rows_per_second": sum(
                    int(float(row["update_optimized_rows"])) for row in metrics) / update,
+               "optimizer_optimized_rows_per_second": sum(
+                   int(float(row["update_optimized_rows"])) for row in metrics) / optimizer,
                "end_to_end_decisions_per_second": rows / wall,
                "collection_wall_share": collection / wall, "update_wall_share": update / wall,
                "other_wall_share": (wall - collection - update) / wall,

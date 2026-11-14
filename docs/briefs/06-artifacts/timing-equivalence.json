@@ -3,6 +3,7 @@
   "update_metrics_identical": true,
   "final_state_tensors_identical": true,
   "collection_result_identity_preserved": true,
+  "complete_update_phase_return_preserved": true,
   "row_counts_and_forward_time_partition_valid": true,
   "gpu_performance_verified": false
 }
