@@ -165,6 +165,14 @@ def complete_private_team(
             completed[slot, column] = move
             provenance[slot, column] = INFERRED
 
+        # First-use order is an answer-bearing property of the complete replay, not part of
+        # the player's sheet. Give every final move (including sampled padding) equal access
+        # to every column. A separate stream leaves all other imputation draws unchanged.
+        order = np.random.default_rng(np.random.SeedSequence([seed, slot, 4])).permutation(4)
+        columns = np.asarray(SET_MOVE_COLS)
+        completed[slot, columns] = completed[slot, columns[order]]
+        provenance[slot, columns] = provenance[slot, columns[order]]
+
         rng = np.random.default_rng(np.random.SeedSequence([seed, slot, 7]))
         nature, ev_units = _sample_spread(species_id, rng, spread_priors)
         if completed[slot, SET_NATURE_COL] < 0:
@@ -214,11 +222,51 @@ def stable_replay_seed(replay_id: str, role: str, imputation: int, seed: int) ->
     return int.from_bytes(hashlib.sha256(payload).digest()[:8], "little")
 
 
+def permute_replay_preview(replay: dict, *, replay_id: str, seed: int) -> dict:
+    """Shuffle only public preview order, before reconstructing either perspective.
+
+    Moving the protocol's preview entries together makes private sheets, both public views,
+    switch labels, provenance and history use the same installed order. The order is stable
+    across imputations and independent of every action and future reveal.
+    """
+    lines = replay["log"].splitlines()
+    for role in ("p1", "p2"):
+        positions = [i for i, line in enumerate(lines) if line.startswith(f"|poke|{role}|")]
+        rng = np.random.default_rng(stable_replay_seed(replay_id, role, 0, seed))
+        entries = [lines[i] for i in positions]
+        for position, old in zip(positions, rng.permutation(len(entries))):
+            lines[position] = entries[int(old)]
+    return {**replay, "log": "\n".join(lines)}
+
+
+def replay_lead_positions(replay: dict) -> dict[str, int | None]:
+    """Locate the first public send-out in each side's preview; ambiguous leads stay missing."""
+    from fog.training.replay_supervision import _preview_species_id
+
+    preview: dict[str, list[str]] = {"p1": [], "p2": []}
+    leads: dict[str, str] = {}
+    for line in replay["log"].splitlines():
+        parts = line.split("|")
+        if len(parts) >= 4 and parts[1] == "poke" and parts[2] in preview:
+            preview[parts[2]].append(_preview_species_id(parts[3]))
+        elif len(parts) >= 4 and parts[1] == "switch" and parts[2][:2] in preview:
+            leads.setdefault(parts[2][:2], _preview_species_id(parts[3]))
+        elif len(parts) >= 2 and parts[1] == "turn":
+            break
+    result = {}
+    for role, species in preview.items():
+        lead = leads.get(role)
+        result[role] = species.index(lead) if species.count(lead) == 1 else None
+    return result
+
+
 __all__ = [
     "EXACT",
     "INFERRED",
     "UNKNOWN",
     "apply_private_set",
     "complete_private_team",
+    "permute_replay_preview",
+    "replay_lead_positions",
     "stable_replay_seed",
 ]

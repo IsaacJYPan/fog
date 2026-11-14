@@ -526,6 +526,14 @@ def parse_replay_policy_versions(
     """
     if imputations < 1:
         raise ValueError("imputations must be positive")
+    from fog.training.replay_policy_data import permute_replay_preview, replay_lead_positions
+    from fog.training.replay_candidates import replay_digest
+
+    source_log_hash = replay_digest(replay_json)
+    # Public preview position also carries a first-slot lead bias. Reorder it before either
+    # chronological pass so all identities and action indices are derived from that order.
+    replay_json = permute_replay_preview(replay_json, replay_id=replay_id, seed=seed)
+    lead_positions = replay_lead_positions(replay_json)
     baseline = parse_replay(replay_json)
     revealed: dict[str, np.ndarray] = {}
     for role in ("p1", "p2"):
@@ -538,7 +546,6 @@ def parse_replay_policy_versions(
     from collections import Counter
 
     from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
-    from fog.training.replay_candidates import replay_digest
 
     accepted: list[dict] = []
     filters: Counter[str] = Counter()
@@ -552,7 +559,7 @@ def parse_replay_policy_versions(
                 seed=stable_replay_seed(replay_id, role, imputation, seed),
                 candidate_bank=candidate_bank,
                 replay_id=replay_id,
-                log_hash=replay_digest(replay_json),
+                log_hash=source_log_hash,
                 timestamp=int(replay_json.get("uploadtime") or 0),
                 rating=int(replay_json.get("rating") or 0),
                 diagnostics=imputation_report,
@@ -576,6 +583,7 @@ def parse_replay_policy_versions(
             accepted.append(row)
             filters["accepted"] += 1
     return {"rows": accepted, "p1_win": baseline["p1_win"], "filter_counts": dict(filters),
+            "lead_positions": lead_positions,
             "imputation_report": imputation_report}
 
 

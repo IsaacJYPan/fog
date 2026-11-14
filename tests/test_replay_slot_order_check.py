@@ -1,9 +1,17 @@
+import numpy as np
 import torch
 
 from fog.encoding.dims import DIMS
 from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS, L
 from fog.encoding.events import H_MY_MOVE, H_START_MY_SPECIES
-from fog.eval.replay_slot_order_check import not_yet_moved, shuffle_move_slots
+from fog.eval.replay_slot_order_check import (
+    _policy_statistic,
+    _value_statistic,
+    game_resampled_intervals,
+    lead_order_summary,
+    not_yet_moved,
+    shuffle_move_slots,
+)
 
 
 def _batch(rows: int = 64) -> dict:
@@ -22,6 +30,9 @@ def _batch(rows: int = 64) -> dict:
         ),
         "legality_mask": legality,
         "legal_provenance": legality.to(torch.uint8),
+        "action_feature_provenance": torch.randint(0, 3, (rows, 14), generator=generator),
+        "own_set_provenance": torch.randint(0, 3, (rows, 6, 15), generator=generator),
+        "action_features": torch.rand(rows, 14, 3, generator=generator),
         "action": action,
     }
 
@@ -42,6 +53,18 @@ def test_shuffle_moves_label_legality_and_pp_together() -> None:
     old_pp = batch["entities"][rows, mine][:, L.move_pp : L.move_pp + 4]
     new_pp = shuffled["entities"][rows, mine][:, L.move_pp : L.move_pp + 4]
     assert torch.equal(old_pp[rows, old_slot][move], new_pp[rows, new_slot][move])
+    old_flags = batch["entities"][rows, mine][:, L.epistemic + 2 : L.epistemic + 6]
+    new_flags = shuffled["entities"][rows, mine][:, L.epistemic + 2 : L.epistemic + 6]
+    assert torch.equal(old_flags[rows, old_slot][move], new_flags[rows, new_slot][move])
+    for key in ("action_feature_provenance", "action_features", "legal_provenance"):
+        assert torch.equal(
+            batch[key][rows, batch["action"]][move],
+            shuffled[key][rows, shuffled["action"]][move],
+        )
+    assert torch.equal(
+        batch["own_set_provenance"][rows, mine, 3 + old_slot][move],
+        shuffled["own_set_provenance"][rows, mine, 3 + new_slot][move],
+    )
     assert torch.equal(
         batch["legality_mask"][rows, batch["action"]][move],
         shuffled["legality_mask"][rows, shuffled["action"]][move],
@@ -74,3 +97,48 @@ def test_not_yet_moved_reads_only_real_history_rows() -> None:
         "entity_ids": entity_ids,
     }
     assert not_yet_moved(batch, n_moves).tolist() == [False, True, True]
+
+
+def test_intervals_resample_whole_games_and_keep_row_weighting():
+    # Each game's rows are perfectly correlated. Resampling rows would falsely narrow this CI.
+    totals = np.array([[100, 0, 0, 0, 0], [100, 100, 100, 100, 100]], dtype=float)
+    intervals = game_resampled_intervals(totals, _policy_statistic, samples=1000, seed=4)
+    assert intervals["top1_stored"] == [0.0, 1.0]
+    assert intervals == game_resampled_intervals(
+        totals, _policy_statistic, samples=1000, seed=4,
+    )
+    unequal = totals.copy()
+    unequal[1] *= 2
+    assert _policy_statistic(unequal.sum(0))["top1_stored"] == 2 / 3
+
+
+def test_value_totals_match_calibration_and_do_not_average_bin_ece():
+    from fog.eval.replay_holdout_report import value_calibration
+
+    # Errors in the same reliability bin cancel after combining games, before taking abs.
+    values = np.array([-0.1, -0.1, 0.6, 0.9])
+    outcome = np.array([-1, 1, 1, -1])
+    p, target = (values + 1) / 2, (outcome + 1) / 2
+    total = np.zeros(32)
+    total[0], total[1] = len(p), ((p - target) ** 2).sum()
+    bins = np.minimum((p * 10).astype(int), 9)
+    np.add.at(total, 2 + bins, 1)
+    np.add.at(total, 12 + bins, p)
+    np.add.at(total, 22 + bins, target)
+    expected = value_calibration(values, outcome)
+    actual = _value_statistic(total)
+    np.testing.assert_allclose([actual["brier"], actual["ece"]],
+                               [expected["brier"], expected["ece"]])
+
+
+def test_lead_summary_counts_games_and_explicitly_reports_missing_leads():
+    import polars as pl
+
+    manifest = pl.DataFrame({"lead_p1": [0, 2, None], "lead_p2": [0, 0, 1]})
+    summary = lead_order_summary(manifest)
+    assert summary["p1"]["share_position0"] == 0.5
+    assert summary["p1"]["unknown_leads"] == 1
+    assert summary["p2"]["share_position0"] == 2 / 3
+    assert summary["games_with_both_leads_known"] == 2
+    assert summary["share_games_both_leads_position0"] == 0.5
+    assert summary["share_games_either_lead_position0"] == 1

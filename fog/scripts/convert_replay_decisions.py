@@ -28,8 +28,8 @@ def initialize_worker(bank_path: Path | None) -> None:
     _BANK = ReplayCandidateBank(bank_path) if bank_path else None
 
 
-def convert_one(path: Path, *, shard_dir: Path, min_rating: int, imputations: int,
-                seed: int) -> dict:
+def _convert_one(path: Path, *, shard_dir: Path, min_rating: int, imputations: int,
+                 seed: int) -> dict:
     output = {"filters": {}, "imputation_report": {}, "source_rows": 0}
     try:
         replay = json.loads(path.read_text(encoding="utf-8"))
@@ -64,12 +64,56 @@ def convert_one(path: Path, *, shard_dir: Path, min_rating: int, imputations: in
             "private_truth": False,
             "imputation_method": "replay_candidates_v1" if _BANK else "usage_baseline",
             "candidate_bank_sha256": _BANK.sha256 if _BANK else "",
+            "lead_p1": result["lead_positions"]["p1"],
+            "lead_p2": result["lead_positions"]["p2"],
         }
     except Exception as error:  # noqa: BLE001 - quarantine preserves the corpus
         output["quarantine"] = {"id": path.stem,
                                 "reason": f"{type(error).__name__}: {error}",
                                 "trace": traceback.format_exc()[-1200:]}
     return output
+
+
+def convert_one(path: Path, *, shard_dir: Path, min_rating: int, imputations: int,
+                seed: int, progress_dir: Path | None = None) -> dict:
+    """Checkpoint each completed replay so a long conversion can resume after interruption."""
+    progress = progress_dir / f"{path.stem}.json" if progress_dir else None
+    if progress is not None and progress.exists():
+        result = json.loads(progress.read_text(encoding="utf-8"))
+        if "manifest" in result and not Path(result["manifest"]["shard"]).exists():
+            raise FileNotFoundError(f"completed conversion shard is missing: {path}")
+        return result
+    result = _convert_one(path, shard_dir=shard_dir, min_rating=min_rating,
+                          imputations=imputations, seed=seed)
+    if progress is not None:
+        temporary = progress.with_suffix(".tmp")
+        temporary.write_text(json.dumps(result), encoding="utf-8")
+        temporary.replace(progress)
+    return result
+
+
+def _resume_settings(args) -> Path | None:
+    """A job's settings and per-replay progress are sufficient recovery state."""
+    if not args.resume:
+        return None
+    settings = {
+        "version": 1,
+        "raw": str(args.raw.resolve()), "limit": args.limit, "min_rating": args.min_rating,
+        "imputations": args.imputations, "seed": args.seed,
+        "candidate_bank": str(args.candidate_bank.resolve()) if args.candidate_bank else None,
+    }
+    path = args.out / "conversion.json"
+    if path.exists():
+        if json.loads(path.read_text(encoding="utf-8")) != settings:
+            raise ValueError("cannot resume conversion with changed settings")
+    else:
+        if args.out.exists() and any(args.out.iterdir()):
+            raise ValueError("cannot resume a conversion created without --resume")
+        args.out.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
+    progress = args.out / "progress"
+    progress.mkdir(exist_ok=True)
+    return progress
 
 
 def main() -> None:
@@ -83,6 +127,8 @@ def main() -> None:
     parser.add_argument("--imputations", type=int, default=3)
     parser.add_argument("--seed", type=int, default=20260804)
     parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--resume", action="store_true",
+                        help="checkpoint completed games and continue an interrupted conversion")
     parser.add_argument("--candidate-bank", type=Path,
                         help="training-only replay donor bank; omit for the usage baseline")
     args = parser.parse_args()
@@ -90,9 +136,15 @@ def main() -> None:
         parser.error("workers and imputations must be positive")
     initialize_worker(args.candidate_bank)
     bank = _BANK
+    progress_dir = _resume_settings(args)
 
     if (args.out / "manifest.parquet").exists():
-        raise FileExistsError(f"refusing to overwrite existing conversion: {args.out}")
+        if not args.resume:
+            raise FileExistsError(f"refusing to overwrite existing conversion: {args.out}")
+        quality = args.out / "quality_report.json"
+        if quality.exists():
+            print(quality.read_text(encoding="utf-8"), flush=True)
+            return
     shard_dir = args.out / "shards"
     shard_dir.mkdir(parents=True, exist_ok=True)
 
@@ -103,7 +155,7 @@ def main() -> None:
     imputation_report: Counter = Counter()
     paths = replay_files(args.raw, args.limit)
     worker = partial(convert_one, shard_dir=shard_dir, min_rating=args.min_rating,
-                     imputations=args.imputations, seed=args.seed)
+                     imputations=args.imputations, seed=args.seed, progress_dir=progress_dir)
     context = (ProcessPoolExecutor(max_workers=args.workers, initializer=initialize_worker,
                                    initargs=(args.candidate_bank,))
                if args.workers > 1 else nullcontext())
@@ -141,6 +193,8 @@ def main() -> None:
         "public_state_reconstruction": "chronological_prefix_only",
         "future_opponent_fields_used": False,
         "private_truth": False,
+        "move_order": "seeded_permutation_after_completion",
+        "team_order": "seeded_public_preview_permutation",
         "source_providers": sorted({row["source_provider"] for row in manifest}),
         "filter_counts": dict(sorted(filter_counts.items())),
         "imputation_method": "replay_candidates_v1" if bank else "usage_baseline",
