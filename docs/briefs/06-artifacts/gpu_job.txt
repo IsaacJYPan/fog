@@ -22,7 +22,7 @@ import time
 from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[3]
-OUT = ROOT / "docs/briefs/06-artifacts"
+OUT = ROOT / "docs/briefs/06-artifacts/runtime-t4"
 RUN = ROOT / "runs/collect_gpu"
 PYTHON = sys.executable
 
@@ -192,4 +192,5 @@ if __name__ == "__main__":
     parser.add_argument("stage", choices=["probes", "training", "evaluate", "split"])
     selected = parser.parse_args().stage
     os.chdir(ROOT)
+    OUT.mkdir(parents=True, exist_ok=True)
     {"probes": probes, "training": training, "evaluate": evaluate, "split": split}[selected]()
