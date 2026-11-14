@@ -3,7 +3,7 @@
 **Answer.** The two completed GPU epochs run at **604–622 rows/s** (**613 aggregate**) on **Tesla T4**,
 with **150–154 s** validation and **2.44 GiB** peak allocation. Full G3 projects to over two hours,
 so it cannot complete inside stage 1's one-hour limit. The partial G3 cross-job continuation
-is verified; G20 is next at the brief's default batch 1,024. The 20k/100k curve, P2.4 branch,
+is verified; G20 is running at the brief's default batch 1,024. The 20k/100k curve, P2.4 branch,
 100k value reading and new play rates are unmeasured. **No gate is claimed.**
 
 | Run (smoke) | Epochs completed / target | Batch | Policy epoch | Top-1 | NLL | Value Brier | Value ECE |
@@ -55,7 +55,8 @@ Both partial G3 weights are now in the one private checkpoint dataset; the one-c
 download in `05-artifacts/checkpoints.json` was tested and both hashes/sizes match. G20/G100
 weights are still pending. Both holdout reports and detailed before/after metrics are retained.
 
-Next: G20 projects to 9.6 h including overhead allowance (`G20-plan.json`), with an 11-hour
-platform cap and export deadline. Select G100 epochs/subset from actual G20 rate and remaining
+G20 is running privately at `7a23497`, 20,000 games / 18 epochs / batch 1,024, with no other
+GPU job active. It projects to 9.6 h including overhead allowance (`G20-plan.json`), with an
+11-hour platform cap and 10 h 40 min internal export deadline. Its result remains pending. Select G100 epochs/subset from actual G20 rate and remaining
 allowance, reserving two hours. Full G3 calibration/batch comparison, G20/G100 results, the
 strict 100k value reading, new play results and gates remain unverified. P2.1–P2.5 remain unchecked.

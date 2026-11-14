@@ -1034,3 +1034,18 @@ in **47.825 s**, reusing uploaded content. This is a retry wall, not a cold-tran
 the earlier interrupted wall is unknown. Its private owned listing confirms exactly one
 **2,385,762,558-byte** `replay-work.bin`. CPU preparation and both private input uploads are now
 complete (`prepare-112000-{recovery-check,upload,private-check}.json`).
+
+### G20 submitted (smoke; no completed result yet)
+
+Private `fog-p2-g20-20261114`, version 1, was accepted at code
+`7a234972abf8d4c6dde8629353588aa2558f1fd0`: **20,000 games / 1,023,525 rows**, **18 epochs**,
+batch **1,024**, CUDA, both checkpoint-selection options active, no early stopping. Command:
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="39600")`; internal export deadline
+**38,400 s**. Expected **9.596 GPU-hours** from the conservative measured inputs in
+`G20-plan.json`; cap **11 h**. All prior jobs ended before submission, at total quota
+**0.879015278 h**. Exact source/submission and verified private status are retained.
+
+`docs/replay-blueprint-scale-run.md` now gives actual hosted measurements, CPU preparation
+counts/times, private input slugs, the exact job source, concrete continuation steps and the
+tested checkpoint download. G20 and G100 are still pending; no curve, play or gate result is
+claimed by a running job.

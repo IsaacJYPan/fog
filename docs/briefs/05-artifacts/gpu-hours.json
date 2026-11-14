@@ -75,15 +75,26 @@
       "planning_basis": "One resumed 413.509-second epoch, two partial-checkpoint reports, measured hosted setup/restore/export overhead.",
       "requested_accelerator": "NvidiaTeslaT4",
       "quota_seconds_used": 1044.105
+    },
+    {
+      "slug": "fog-p2-g20-20261114",
+      "status": "RUNNING",
+      "timeout_seconds": 39600,
+      "internal_job_seconds_before_export": 38400,
+      "actual_gpu_hours": null,
+      "quota_start_seconds": 3164.455,
+      "expected_gpu_hours": 9.596168824074969,
+      "planning_basis": "Slowest measured G3 epoch, conservative measured validation time, and 1,000 s setup/report/export/write allowance; see G20-plan.json.",
+      "requested_accelerator": "NvidiaTeslaT4"
     }
   ],
-  "used_gpu_hours": 0.8790152777777778,
+  "used_gpu_hours": null,
   "quota_before": {
     "gpu_used_hours": 0,
     "gpu_remaining_hours": 45,
     "command": "kaggle quota --format json"
   },
-  "status": "calibration ended; G3 partial, real continuation verified; no active GPU job",
+  "status": "G20 running; G100 budget selection waits for actual G20 completion",
   "last_observed_total_quota_hours": 0.8790152777777778,
   "calibration_gpu_hours": 0.8790152777777778
 }
