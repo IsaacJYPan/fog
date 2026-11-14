@@ -3,7 +3,8 @@
 **Answer (in progress).** CPU preparation and the two default-off options are implemented;
 71 affected tests pass and lint is clean. The 22,000-game set is verified: 20,000 training games / 1,023,525 rows and the fixed
 2,000-game holdout / 104,037 rows. The 112,000-game conversion is running. The first hosted setup reached a Tesla T4 but failed before training because the dataset
-archive was expanded by Kaggle. The tested retry is running. GPU throughput, the new learning
+archive was expanded by Kaggle. The corrected retry was capped without returning training output. An opaque archive and
+graceful export deadline are tested; the next attempt is pending. GPU throughput, the new learning
 curve, P2.4's decision branch, the G100 value reading and new play rates are unmeasured. No gate
 is claimed. This checkpoint records work in progress, not completion of brief 05.
 
@@ -36,8 +37,7 @@ Validation: `05-artifacts/tests.txt`, `lint.txt`, `validation-attempts.json`. Th
 hangs during the dependency's asynchronous shutdown; the same real pipeline passes outside
 it. Earlier failed attempts are recorded separately. No full suite was run.
 
-GPU budget: **20 GPU-hours maximum**; first setup used 0.038575 quota-hours, retry running
-with a 600-second cap; final actual use pending; `05-artifacts/gpu-hours.json`.
+GPU budget: **20 GPU-hours maximum**; first setup used 0.038575 quota-hours, two attempts ended, **0.208297 quota-hours total**; `05-artifacts/gpu-hours.json`.
 Official client authentication and job-list access succeeded. Prepared data and every job will
 be private; account identity stays outside Git. `gpu_job.py` is the job template; the exact submitted pilot source and accepted response
 are retained. No completed GPU execution is claimed. No new checkpoint exists (`checkpoints.json`).
@@ -57,7 +57,15 @@ Hosted setup: Python 3.13.16, PyTorch 2.11.0+cu130, CUDA 13.0, Tesla T4; install
 failure is retained. Three tests cover expanded read-only inputs and intact archives; fix
 commits `6dcbf51` and `530ae08` change only the job restore path, not training semantics.
 
-Next: collect the retry and complete its deliberate cross-job stop/continue; choose batch size using
+The corrected retry ended `CANCEL_ACKNOWLEDGED`; the final billed total is 749.868 s,
+including 610.999 s for that attempt. No returned training log/checkpoint exists. The last
+visible event was setup at 98.617 s; the subsequent stage is unverified. Five local tests
+now cover opaque/expanded inputs, writable restoration and deadline preservation of saved
+output. The existing private dataset was versioned with the identical archive under a binary
+filename, retaining the old version. A new destination was rejected by automatic approval
+review; updating the existing destination was permitted.
+
+Next: run the opaque-input pilot and complete its deliberate cross-job stop/continue; choose batch size using
 the specified 0.031 NLL comparison; finish G20, its value tables and CPU play smoke before G100.
 Choose G100 epochs only from measured GPU rate and remaining budget, reserving two hours.
 

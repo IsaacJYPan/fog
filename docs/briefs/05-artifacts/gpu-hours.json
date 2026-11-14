@@ -17,9 +17,9 @@
     },
     {
       "slug": "fog-p2-g3-stop2-20261114",
-      "status": "RUNNING",
+      "status": "CANCEL_ACKNOWLEDGED; no training output returned",
       "timeout_seconds": 600,
-      "actual_gpu_hours": null,
+      "actual_gpu_hours": 0.16972194444444444,
       "quota_start_seconds": 138.869,
       "expected_session_minutes": [
         4,
@@ -27,15 +27,16 @@
       ],
       "planning_basis": "Measured first hosted install 126.478 s, remaining GPU computation unmeasured; two epochs then export.",
       "requested_accelerator": "NvidiaTeslaT4",
-      "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333
+      "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333,
+      "quota_seconds_used": 610.999
     }
   ],
-  "used_gpu_hours": null,
+  "used_gpu_hours": 0.20829666666666669,
   "quota_before": {
     "gpu_used_hours": 0,
     "gpu_remaining_hours": 45,
     "command": "kaggle quota --format json"
   },
-  "status": "retry running; final actual use pending",
-  "last_observed_total_quota_hours": 0.061082617222222226
+  "status": "two ended attempts; no active GPU job",
+  "last_observed_total_quota_hours": 0.20829666666666669
 }

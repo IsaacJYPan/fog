@@ -916,3 +916,21 @@ Restore fixes `6dcbf51` / `530ae08` support both layouts and make restored manif
 `fog-p2-g3-stop2-20261114`, version 1, code `530ae08cac2f27d3e53c0cfa535e44e8f56e7074`,
 same two-epoch interruption plan. Expected **4–7 min** from measured setup plus still-unmeasured
 training/export, capped at **10 min**. Retry is running; no training number claimed.
+
+### Corrected pilot capped without output; safer input and export handling (smoke)
+
+`fog-p2-g3-stop2-20261114`, code `530ae08`, ended **CANCEL_ACKNOWLEDGED** at its requested
+600-second cap; no training log/checkpoint was returned (output fetch HTTP 404). The last live
+event is the successful runtime probe at **98.617 s**; the stage reached afterward is unknown.
+Final quota total **749.868 s / 0.208296667 h**, hence this attempt used **610.999 s** including
+platform overhead. It is a failed/partial attempt, never an 18-epoch result.
+
+`29ffeb4` adds opaque-archive input and an internal worker deadline reserving export time;
+**5 local tests pass**, including preserving a saved marker after the worker is stopped.
+Selected policy/value weights are now exported separately from the resume archive (`3f0f59a`).
+No model, loss, schedule or filter changed. A redundant new dataset destination was rejected
+by automatic approval review as outside the approved sensitive-data destination scope.
+The safer update of existing private `fog-p2-gpu-22000-20261114` was permitted: same archive
+bytes, filename `replay-work.bin`, old versions retained, **102.839 s** upload/version wall.
+This avoids archive expansion; its effect on hosted training remains unmeasured.
+See `prepare-22000-version2.json`, input tests and the exact scripts/status/log artifacts.
