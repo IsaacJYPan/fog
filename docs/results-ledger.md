@@ -1507,3 +1507,4 @@ Evidence is in `06-artifacts/runtime-t4-counts/`; earlier low-memory rows above 
 
 | Opponent | Device | Batch | Repeat | Games | Learner decisions | Probe seconds | Learner decisions/s | Commit | Remaining command flags |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| self | cuda | 32 | 1 | 512 | 30381 | 286.10 | 106.19 | `922886b` | `--opponent self --device cuda --batch 32` |
