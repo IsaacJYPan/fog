@@ -1,0 +1,10 @@
+Collecting ruff==0.15.22
+  Downloading ruff-0.15.22-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (26 kB)
+Downloading ruff-0.15.22-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (11.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.4/11.4 MB 31.3 MB/s  0:00:00
+Installing collected packages: ruff
+  Attempting uninstall: ruff
+    Found existing installation: ruff 0.17.5
+    Uninstalling ruff-0.17.5:
+      Successfully uninstalled ruff-0.17.5
+Successfully installed ruff-0.15.22

@@ -1,0 +1,1 @@
+workers=2 batch=32 device=cpu opponent=self games=512 learner_decisions=30009 seconds=410.77 learner_decisions/s=73.06 games/s=1.246 p1_wins=268

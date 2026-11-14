@@ -19,12 +19,12 @@
     }
   ],
   "completed_gpu_hours_upper": 0.9372222222222222,
-  "remaining_gpu_hours": 2.062777777777778,
-  "training_cap": "single combined session shares its 3300-second internal deadline across missing probes, PPO and evaluation",
+  "remaining_gpu_hours": 0.06277777777777782,
+  "training_cap": "owner-selected separate single-T4 runtime, released by 10:16 UTC; no duplicate private job",
   "superseded_collection_retry_platform_seconds": 2520,
   "superseded_collection_retry_gpu_hours_max": 1.4,
   "next_job": {
-    "status": "prepared, not submitted; waits for G20 completion and empty account-wide active-job check",
+    "status": "superseded, never submitted; a separate single-T4 runtime is already reserved for this brief",
     "stage": "combined MaxDamage matrix, full 100k PPO, evaluation",
     "planned_slug": "fog-collect-endtoend-20261114",
     "platform_seconds": 3600,
@@ -40,5 +40,13 @@
     ],
     "estimate_basis": "Earlier self-play probe wall times and brief-05 supervised GPU throughput bound the rough planning range; PPO GPU speed and MaxDamage collection remain unmeasured.",
     "optional_after_primary": "Complete the self-play matrix in the same job only if its earlier measured execution costs, scaled conservatively for core count plus 20% and 60 seconds, fit the remaining internal deadline."
-  }
+  },
+  "active_runtime": {
+    "source": "runtime-t4/session.json",
+    "allocated_gpus": 1,
+    "start_upper_utc": "2026-11-14T08:16:00Z",
+    "stop_deadline_utc": "2026-11-14T10:16:00Z",
+    "reserved_gpu_hours_cap": 2.0
+  },
+  "remaining_gpu_hours_before_active_reservation": 2.062777777777778
 }

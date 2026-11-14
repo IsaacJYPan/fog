@@ -1,0 +1,33 @@
+#!/bin/bash
+set -euo pipefail
+cd /content
+if [ ! -d fog ]; then
+  git clone --single-branch --branch work/collect-gpu https://github.com/IsaacJYPan/fog.git
+fi
+if [ ! -x /content/node/bin/node ]; then
+  python3 - <<'PY'
+import hashlib
+from pathlib import Path
+import tarfile
+import urllib.request
+base = 'https://nodejs.org/dist/latest-v22.x/'
+sums = urllib.request.urlopen(base + 'SHASUMS256.txt').read().decode()
+checksum, name = next(line.split() for line in sums.splitlines() if line.endswith('-linux-x64.tar.xz'))
+archive = Path('/content/node.tar.xz')
+urllib.request.urlretrieve(base + name, archive)
+assert hashlib.sha256(archive.read_bytes()).hexdigest() == checksum
+with tarfile.open(archive) as package:
+    package.extractall('/content', filter='data')
+Path('/content', name.removesuffix('.tar.xz')).rename('/content/node')
+PY
+fi
+export PATH=/content/node/bin:$PATH
+cd fog
+git checkout --detach 81590955a4cb02e153b77120a5e6e2c69ef0ccc3
+git submodule update --init --recursive --depth 1
+npm --prefix server/pokemon-showdown ci --ignore-scripts --no-audit --no-fund
+npm --prefix server/pokemon-showdown run build
+python3 -m fog.scripts.kaggle_setup
+.venv/bin/python -m pip install ruff==0.15.22 pytest pytest-asyncio hypothesis
+.venv/bin/python -m ruff check fog tests
+printf 'SETUP_COMPLETE\n'

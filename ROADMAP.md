@@ -113,6 +113,10 @@ cites the `fog` commit that produced the result.
       account's active replay-training GPU job before submission. No new throughput or learning
       result; see `docs/briefs/06-report.md` and the ledger's GPU smoke section._
       _2026-11-14: brief 06 end-to-end measurement is prepared after the owner chose to finish G20 first; partial self-play CUDA rows exist, but full PPO speed/learning remain unmeasured. See `docs/briefs/06-report.md`; P0.5 stays open._
+      _2026-11-14: a fresh single-T4 runtime is running brief 06's same-runtime matrix through
+      SSH, with evidence and full update checkpoints copied off the runtime. The first CPU
+      self-play repeat is 72.92 learner decisions/s on two logical CPUs; the GPU and learning
+      checks are still pending. See `docs/briefs/06-report.md` and the latest GPU smoke section._
 
 - [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already

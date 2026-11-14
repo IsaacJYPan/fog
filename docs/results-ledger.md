@@ -1446,3 +1446,56 @@ extras when they cannot fit, native metric preservation and saved-state timing p
 Together with the trainer measurement/resume cases, **17 focused tests pass**; Ruff and
 byte compilation pass (`combined-order-tests.txt`, `endtoend-focused-tests.txt`). No GPU
 allocation or application/trainer change was made while preparing this ordering.
+
+## 2026-11-14: collection and play-training speed on a GPU (smoke)
+
+The owner requested a fresh T4 runtime through the runtime CLI and SSH, replacing the
+previous private-job plan. Earlier attempts and their 0.937222 GPU-hour allocation upper
+bound above are retained. The existing measurement branch was merged before this run;
+application, model, losses and trainer code are unchanged from `work/roadmap`.
+
+Runtime: one Tesla T4 (15,360 MiB), two logical Intel Xeon 2.00 GHz CPUs, Python 3.13.16,
+PyTorch 2.14.1+cu130, CUDA 13.0, pinned Showdown `e440c4a`. The established runtime installer
+reuses the supplied CUDA PyTorch and pins the direct-Showdown dependencies. A missing Node.js
+binary was installed; the first unpinned lint invocation used Ruff 0.17.5 and reported 77
+findings. Ruff pinned to the lock's 0.15.22 is clean; no source was changed to silence them.
+Setup logs, environment versions and checks are in `06-artifacts/runtime-t4/`.
+
+At `571a9c0`, `python -m pytest -q tests/test_showdown_rollout_probe.py
+tests/test_showdown_batch_runner.py tests/test_training_state.py tests/test_dashboard_resume.py
+tests/test_collection_gpu_job.py`: **17 passed in 117.72 s**. The full suite was not run.
+The same-runtime 16-row collection matrix started at this commit, through
+`python docs/briefs/06-artifacts/gpu_job.txt probes`; each command and its raw output are
+saved separately. No incomplete probe is a throughput result.
+
+Evidence is downloaded to the controlling computer every 20 seconds. Completed checkpoint
+weights and their optimizer/RNG state sidecars are downloaded as pairs. Training uses the
+brief's recipe, with runtime overrides `log.dir=runs/collect_gpu` and
+`league.snapshot_every_decisions=8000` for the owner's requested frequent recovery points.
+These affect persistence, not the model, losses or update rule. Evaluation uses its existing
+four-game-block resume option. A local guard releases the single T4 by 10:16 UTC, from a
+conservative 08:16 UTC allocation start: prior plus this two-hour cap is 2.937222 GPU-hours.
+
+Same-runtime collection, all **smoke**. Command prefix for every row:
+`python -m fog.eval.showdown_rollout_probe --workers 2 --games 512
+--pool data/teams/pool_a`; the remaining flags are in the last column. Full commands,
+wall times and sampled GPU memory are in each named probe's JSON, text and CSV under
+`06-artifacts/runtime-t4/`. Probe seconds exclude process startup; command wall includes it.
+
+| Opponent | Device | Batch | Repeat | Games | Learner decisions | Probe seconds | Learner decisions/s | Commit | Remaining command flags |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| self | cpu | 32 | 1 | 512 | 30009 | 411.52 | 72.92 | `571a9c0` | `--opponent self --device cpu --batch 32` |
+| MaxDamage | cpu | 32 | 1 | 512 | 16838 | 150.89 | 111.59 | `571a9c0` | `--opponent MaxDamage --device cpu --batch 32` |
+| MaxDamage | cpu | 32 | 2 | 512 | 16838 | 151.75 | 110.96 | `571a9c0` | `--opponent MaxDamage --device cpu --batch 32` |
+| self | cpu | 32 | 2 | 512 | 30009 | 410.77 | 73.06 | `571a9c0` | `--opponent self --device cpu --batch 32` |
+
+At 08:50 UTC, integrating the concurrently updated branch revealed the owner-selected
+separate single-T4 allocation already active since 08:16. The prepared combined private
+Kaggle job was never submitted and is now superseded. Its tested script remains available,
+but its planned two-GPU-hour reservation must not be added to the active runtime's
+reservation. Prior allocations plus the current two-hour single-T4 cap already reserve
+2.937222 of the three GPU-hours. No duplicate brief-06 allocation will be launched.
+The active runtime's report/evidence are retained as published by that worker; G20 continues
+unchanged on its separate account allocation. The earlier 14:50 estimate assumed waiting
+for G20's Kaggle slot; this independent runtime can produce an earlier end-to-end result,
+subject to its 10:16 budget stop and measured PPO speed.

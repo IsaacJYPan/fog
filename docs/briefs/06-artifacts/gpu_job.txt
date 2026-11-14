@@ -1,0 +1,238 @@
+"""Run one brief-06 stage; completed probes are skipped on restart.
+
+Use the repository's Python: python docs/briefs/06-artifacts/gpu_job.txt probes
+The controlling computer copies this evidence directory and completed checkpoint pairs
+off the runtime while this process runs. No credentials are needed by this script.
+"""
+from __future__ import annotations
+
+import argparse
+import importlib.metadata
+import json
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import signal
+import subprocess
+import sys
+import threading
+import time
+from datetime import datetime, timezone
+
+ROOT = Path(__file__).resolve().parents[3]
+OUT = ROOT / "docs/briefs/06-artifacts/runtime-t4"
+RUN = ROOT / "runs/collect_gpu"
+PYTHON = sys.executable
+
+
+def dump(path, value):
+    path = Path(path)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(value, indent=2) + "\n")
+    temporary.replace(path)
+
+
+def capture(args):
+    return subprocess.check_output(args, cwd=ROOT, text=True).strip()
+
+
+def run(label, args):
+    """Record raw output, command wall time and sampled device memory for every attempt."""
+    destination = OUT / f"{label}.json"
+    if destination.exists() and json.loads(destination.read_text()).get("exit_code") == 0:
+        print(f"skip completed: {label}", flush=True)
+        return json.loads(destination.read_text())
+    attempt = 1
+    while (OUT / f"{label}-attempt{attempt}.json").exists():
+        attempt += 1
+    start = time.monotonic()
+    stop = threading.Event()
+    samples = []
+
+    def monitor():
+        with (OUT / f"{label}-gpu.csv").open("w") as stream:
+            stream.write("seconds,memory_used_mib,utilization_percent\n")
+            while not stop.is_set():
+                try:
+                    raw = capture(["nvidia-smi", "--query-gpu=memory.used,utilization.gpu",
+                                   "--format=csv,noheader,nounits"])
+                    memory, utilization = map(float, raw.splitlines()[0].split(","))
+                    seconds = time.monotonic() - start
+                    samples.append(memory)
+                    stream.write(f"{seconds:.3f},{memory},{utilization}\n")
+                    stream.flush()
+                except (OSError, ValueError, subprocess.CalledProcessError):
+                    pass
+                stop.wait(2)
+
+    metadata = {
+        "label": label, "status": "running", "command": shlex.join(args),
+        "commit": capture(["git", "rev-parse", "HEAD"]),
+        "started_utc": datetime.now(timezone.utc).isoformat(), "attempt": attempt,
+    }
+    dump(OUT / "progress.json", metadata)
+    print(metadata["command"], flush=True)
+    thread = threading.Thread(target=monitor, daemon=True)
+    thread.start()
+    raw_output = OUT / f"{label}.txt"
+    if raw_output.exists():
+        shutil.copy2(raw_output, OUT / f"{label}-before-attempt{attempt}.txt")
+    with raw_output.open("w") as output:
+        child = subprocess.Popen(args, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT,
+                                 start_new_session=True)
+        try:
+            # A separate controller enforces the cumulative three-hour runtime budget.
+            code = child.wait(timeout=5400)
+        except subprocess.TimeoutExpired:
+            os.killpg(child.pid, signal.SIGTERM)
+            code = child.wait(timeout=30)
+        finally:
+            stop.set()
+            thread.join(timeout=5)
+    metadata.update(exit_code=code, status="complete" if code == 0 else "failed",
+                    wall_seconds=time.monotonic() - start,
+                    peak_sampled_gpu_mib=max(samples, default=0))
+    raw = (OUT / f"{label}.txt").read_text()
+    if label.startswith("probe-"):
+        match = re.search(r"games=(\d+) learner_decisions=(\d+) seconds=([\d.]+) "
+                          r"learner_decisions/s=([\d.]+) games/s=([\d.]+) p1_wins=(\d+)", raw)
+        if match:
+            metadata.update(zip(("games", "learner_decisions", "seconds",
+                                 "learner_decisions_per_s", "games_per_s", "p1_wins"),
+                                map(float, match.groups())))
+    dump(OUT / f"{label}-attempt{attempt}.json", metadata)
+    dump(destination, metadata)
+    dump(OUT / "progress.json", metadata)
+    print(json.dumps(metadata), flush=True)
+    if code:
+        raise RuntimeError(f"{label} failed with exit {code}; inspect its text output")
+    return metadata
+
+
+def hardware():
+    import torch
+
+    record = {
+        "logical_cpus": os.cpu_count(), "affinity_cpus": len(os.sched_getaffinity(0)),
+        "cpu": capture(["lscpu"]), "gpu": capture(["nvidia-smi"]),
+        "python": sys.version, "torch": torch.__version__, "cuda": torch.version.cuda,
+        "gpu_name": torch.cuda.get_device_name(0),
+        "gpu_capability": torch.cuda.get_device_capability(0),
+        "torch_arch_list": torch.cuda.get_arch_list(),
+        "showdown_commit": capture(["git", "-C", "server/pokemon-showdown", "rev-parse", "HEAD"]),
+        "packages": sorted(f"{p.metadata['Name']}=={p.version}"
+                           for p in importlib.metadata.distributions()),
+    }
+    dump(OUT / "hardware.json", record)
+    return record
+
+
+def probes():
+    machine = hardware()
+    workers = machine["affinity_cpus"]
+    results = []
+    for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
+        for opponent in ("self", "MaxDamage"):
+            for repeat in (1, 2):
+                result = run(f"probe-{opponent}-{device}-b{batch}-r{repeat}", [
+                    PYTHON, "-m", "fog.eval.showdown_rollout_probe", "--workers", str(workers),
+                    "--batch", str(batch), "--games", "512", "--opponent", opponent,
+                    "--pool", "data/teams/pool_a", "--device", device,
+                ])
+                results.append({**result, "device": device, "batch": batch,
+                                "opponent": opponent, "repeat": repeat})
+    rates = {batch: (sum(r["learner_decisions"] for r in results
+                        if r["device"] == "cuda" and r["batch"] == batch
+                        and r["opponent"] == "MaxDamage") /
+                     sum(r["seconds"] for r in results
+                         if r["device"] == "cuda" and r["batch"] == batch
+                         and r["opponent"] == "MaxDamage"))
+             for batch in (32, 64, 128)}
+    best = max(rates, key=rates.get)
+    dump(OUT / "stage1-summary.json", {"workers": workers, "best_batch": best,
+                                      "selection_aggregate_rates": rates, "rows": results})
+
+
+def training():
+    RUN.mkdir(parents=True, exist_ok=True)
+    shim = ROOT.parent / "brief06-timing"
+    shim.mkdir(exist_ok=True)
+    shutil.copy2(ROOT / "docs/briefs/06-artifacts/training_timing.py", shim / "sitecustomize.py")
+    args = ["env", f"PYTHONPATH={shim}{os.pathsep}{ROOT}",
+            f"FOG_TIMING_OUTPUT={OUT / 'training-timing.jsonl'}",
+            PYTHON, "-m", "fog.train", "--config", "configs/collect_gpu_check.yaml",
+            "--trainer", "ppo", "--set", "log.dir=runs/collect_gpu",
+            "league.snapshot_every_decisions=8000"]
+    checkpoints = list((RUN / "checkpoints").glob("ppo_*.state.pt"))
+    if checkpoints:
+        import csv
+        import torch
+
+        latest = max(checkpoints, key=lambda p: p.stat().st_mtime)
+        state = torch.load(latest, map_location="cpu", weights_only=False)
+        decisions = state["progress"]["decisions_seen"]
+        metrics = RUN / "metrics.csv"
+        if metrics.exists():
+            with metrics.open() as stream:
+                reader = csv.DictReader(stream)
+                fields = reader.fieldnames
+                rows = [row for row in reader if int(row["step"]) <= decisions]
+            with metrics.open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(rows)
+        timing = OUT / "training-timing.jsonl"
+        if timing.exists():
+            lines = timing.read_text().splitlines(keepends=True)
+            completed = 0
+            cut = None
+            for index, line in enumerate(lines):
+                event = json.loads(line)
+                if event["kind"] == "update_phase":
+                    completed += event["rows"]
+                    if completed == decisions:
+                        cut = index + 1
+                        break
+            if cut is None:
+                raise RuntimeError("no matching timing prefix for the saved update")
+            timing.with_name("timing-before-resume.jsonl").write_text("".join(lines))
+            timing.write_text("".join(lines[:cut]))
+        args.append(f"ppo.resume_ckpt={latest.relative_to(ROOT)}")
+    result = run("training", args)
+    if (RUN / "metrics.csv").exists():
+        (OUT / "metrics.csv").write_bytes((RUN / "metrics.csv").read_bytes())
+    lines = (OUT / "training.txt").read_text().splitlines()
+    (OUT / "training-tail.txt").write_text("\n".join(lines[-60:]) + "\n")
+    import torch
+    state = torch.load(RUN / "checkpoints/ppo_final.state.pt", map_location="cpu",
+                       weights_only=False)
+    dump(OUT / "final-progress.json", {"decisions": state["progress"]["decisions_seen"],
+                                      "wall_seconds": result["wall_seconds"]})
+
+
+def evaluate():
+    run("evaluation", [PYTHON, "-m", "fog.eval.showdown_direct_selection", "--pool",
+        "data/teams/pool_a/core_v1_offensive.txt", "--device", "cuda", "--config",
+        "configs/collect_gpu_check.yaml", "--checkpoint",
+        "trained=runs/collect_gpu/checkpoints/ppo_final.pt", "--checkpoint-config",
+        "trained=configs/collect_gpu_check.yaml", "--opponent", "maxdamage",
+        "--games", "200", "--temperature", "0", "--resume", "--out",
+        "docs/briefs/06-artifacts/evaluation-results.json"])
+
+
+def split():
+    summary = json.loads((OUT / "stage1-summary.json").read_text())
+    run("collection-split", [PYTHON, "-m", "fog.eval.showdown_rollout_probe",
+        "--batch", str(summary["best_batch"]), "--games", "128", "--opponent",
+        "MaxDamage", "--pool", "data/teams/pool_a", "--device", "cuda"])
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("stage", choices=["probes", "training", "evaluate", "split"])
+    selected = parser.parse_args().stage
+    os.chdir(ROOT)
+    OUT.mkdir(parents=True, exist_ok=True)
+    {"probes": probes, "training": training, "evaluate": evaluate, "split": split}[selected]()
