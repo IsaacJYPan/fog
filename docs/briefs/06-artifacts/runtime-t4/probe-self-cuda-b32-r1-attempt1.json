@@ -1,0 +1,11 @@
+{
+  "label": "probe-self-cuda-b32-r1",
+  "status": "failed",
+  "command": "/content/fog/.venv/bin/python -m fog.eval.showdown_rollout_probe --workers 2 --batch 32 --games 512 --opponent self --pool data/teams/pool_a --device cuda",
+  "commit": "571a9c060d775daee30cba254c10fbfa20629aaa",
+  "started_utc": "2026-11-14T08:44:26.043118+00:00",
+  "attempt": 1,
+  "exit_code": 1,
+  "wall_seconds": 339.14485411500027,
+  "peak_sampled_gpu_mib": 415.0
+}

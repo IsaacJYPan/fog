@@ -22,7 +22,7 @@ import time
 from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[3]
-OUT = ROOT / "docs/briefs/06-artifacts/runtime-t4"
+OUT = ROOT / "docs/briefs/06-artifacts" / os.environ.get("FOG_MEASUREMENT_DIR", "runtime-t4")
 RUN = ROOT / "runs/collect_gpu"
 PYTHON = sys.executable
 
@@ -133,7 +133,7 @@ def probes():
     machine = hardware()
     workers = machine["affinity_cpus"]
     results = []
-    for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
+    for device, batch in (("cuda", 32), ("cpu", 32), ("cuda", 64), ("cuda", 128)):
         for opponent in ("self", "MaxDamage"):
             for repeat in (1, 2):
                 result = run(f"probe-{opponent}-{device}-b{batch}-r{repeat}", [

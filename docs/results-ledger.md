@@ -1499,3 +1499,19 @@ The active runtime's report/evidence are retained as published by that worker; G
 unchanged on its separate account allocation. The earlier 14:50 estimate assumed waiting
 for G20's Kaggle slot; this independent runtime can produce an earlier end-to-end result,
 subject to its 10:16 budget stop and measured PPO speed.
+
+The first CUDA self-play probe (`--opponent self --device cuda --batch 32`) at `571a9c0`
+failed after 339.145 command seconds with a pipe EOF, not a measured throughput result.
+The kernel recorded a host OOM kill of a rollout worker; cgroup `oom_kill=1` and the
+sampled GPU peak was 415 MiB (`runtime-t4/{kernel-memory.txt,memory-events.txt,
+probe-self-cuda-b32-r1*}`). A temporary swap attempt returned `Invalid argument`.
+The low-memory allocation was released before 08:53 UTC and a high-memory single-T4
+replacement requested. The same 10:16 UTC deadline applies across both allocations;
+retained low-memory CPU rows will not be presented as same-runtime high-memory baselines.
+
+The replacement's reservation is now reflected in `gpu-budget.json`: prior private jobs
+0.937222 GPU-hours, first single-T4 allocation at most 0.616667, replacement at most
+1.405556, cumulative upper bound 2.959444. Its new stop deadline is 10:21 UTC, accounting
+for the gap without an allocation. The duplicate private-job plan stays unsubmitted.
+The probe-only memory fix returns counters instead of unused buffers; full PPO still pays
+for real rollout-buffer transfer. Those two timing scopes must remain separate in the report.
