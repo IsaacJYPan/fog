@@ -1550,6 +1550,10 @@ will restart later. The remaining MaxDamage sweep runs first, then the full 100k
 PPO run and greedy evaluation, then the remaining self-play matrix if time remains. This
 protects the learning and end-to-end measurements within the hard cumulative GPU budget;
 no completed probe is repeated. The launcher supports this with `FOG_PROBE_OPPONENT=MaxDamage`.
+
+| Opponent | Device | Batch | Repeat | Games | Learner decisions | Probe seconds | Learner decisions/s | Commit | Remaining command flags |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | MaxDamage | cuda | 32 | 1 | 512 | 16225 | 107.60 | 150.79 | `922886b` | `--opponent MaxDamage --device cuda --batch 32` |
 | MaxDamage | cuda | 32 | 2 | 512 | 16225 | 107.63 | 150.75 | `922886b` | `--opponent MaxDamage --device cuda --batch 32` |
 | self | cuda | 32 | 2 | 512 | 30381 | 282.14 | 107.68 | `922886b` | `--opponent self --device cuda --batch 32` |
+| MaxDamage | cpu | 32 | 1 | 512 | 16838 | 137.27 | 122.66 | `922886b` | `--opponent MaxDamage --device cpu --batch 32` |

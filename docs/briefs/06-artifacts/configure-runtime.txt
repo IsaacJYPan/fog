@@ -1,0 +1,15 @@
+import json
+import os
+from pathlib import Path
+import yaml
+
+root = Path('/content/fog')
+name = os.environ.get('FOG_MEASUREMENT_DIR', 'runtime-t4')
+summary = json.loads((root / 'docs/briefs/06-artifacts' / name / 'stage1-summary.json').read_text())
+config = root / 'configs/collect_gpu_check.yaml'
+recipe = yaml.safe_load(config.read_text())
+recipe['env']['rollout_workers'] = summary['workers']
+recipe['env']['rollout_batch'] = summary['best_batch']
+recipe['ppo']['games_per_chunk'] = summary['workers'] * summary['best_batch']
+config.write_text(yaml.safe_dump(recipe, sort_keys=False))
+print(config.read_text())

@@ -1,34 +1,36 @@
 # Collection and play-training speed on a GPU (smoke, in progress)
 
-**Answer.** On the fresh single-T4 runtime, the first CPU self-play repeat collected
-**72.92 learner decisions/s** over 512 games. The second repeat and the rest of the
-same-runtime matrix are running. CUDA collection speed, PPO update rate, end-to-end
-throughput, learning and the 30-hour projection are not yet measured in this allocation.
+**Answer.** On two logical CPU threads and one T4, the corrected worker-only probe
+collects **106.19/107.68 learner decisions/s in self-play** and **150.79/150.75 against
+MaxDamage**, batch 32, 512 games per repeat. The remaining sweep, full PPO update rate,
+end-to-end throughput, learning and the 30-hour projection are still pending.
 
-| Opponent / device / batch | Repeat 1 learner decisions/s | Repeat 2 |
+| CUDA batch 32, smoke | Repeat 1 learner decisions/s | Repeat 2 |
 | --- | ---: | ---: |
-| self / CPU / 32 | 72.92 | pending |
+| self | 106.19 | 107.68 |
+| MaxDamage | 150.79 | 150.75 |
 
-Machine: one Tesla T4, 15,360 MiB; two logical Intel Xeon 2.00 GHz CPUs;
-PyTorch 2.14.1+cu130; pinned Showdown `e440c4a`. Evidence is under
-`06-artifacts/runtime-t4/`, including raw probe output, commands, commit IDs,
-process wall time and two-second GPU-memory samples. Every number is **smoke**.
+The initial standard T4's four CPU rows and failed CUDA row are retained under
+`06-artifacts/runtime-t4/`. Its first CUDA probe was killed by **host RAM exhaustion**
+while returning observation buffers; sampled device use was 415 MiB. High-memory T4
+requests were unavailable. The replacement standard T4 uses the same actor code, with
+only probe counters transferred to the parent. Those timings exclude full-buffer IPC;
+PPO still transfers real buffers. Fresh CPU baselines are being measured with the same
+counter-only boundary, so the earlier CPU rows are not the corrected GPU comparison.
 
-The runtime CLI login and SSH connection work. Setup reused the supplied CUDA PyTorch;
-the missing Node.js was installed. An unpinned Ruff invocation reported findings;
-the lock's Ruff 0.15.22 is clean. **17 focused tests passed in 117.72 seconds**.
-No application, model, loss or trainer change was needed.
+The memory regression fails before the fix and passes after it; eight focused checks
+pass and pinned Ruff is clean (`runtime-t4-counts/`). No model, loss, trainer or actor
+implementation changed. Environment: PyTorch 2.14.1+cu130, Showdown `e440c4a`.
 
-Completed probes are skipped on restart. Evidence is copied to the controlling computer
-every 20 seconds. Training will use the brief's config with measured workers/batch;
-runtime-only overrides place its outputs in `runs/collect_gpu` and save full training
-state every 8,000 decisions, at update boundaries. Weights, optimizer/RNG sidecars and
-metrics are copied off the runtime. Evaluation uses its existing four-game-block resume.
-An interrupted active probe or unfinished update must be repeated.
+Completed probes are skipped on restart and copied off the runtime every 20 seconds.
+PPO saves model/optimizer/RNG state at update boundaries with an 8,000-decision snapshot
+interval; weights, state sidecars and metrics are copied locally. Evaluation resumes at
+four-game blocks. An active probe or unfinished update must be repeated after a drop.
 
-The earlier attempts remain recorded and count up to **0.937222 GPU-hours**. This
-single-T4 allocation is capped at two hours, including setup/export: cumulative upper
-bound **2.937222 GPU-hours** (`runtime-t4/session.json`). A local deadline guard stops it.
+Run order now protects the full-loop result: finish MaxDamage's matrix, train/evaluate,
+then complete the remaining self-play rows. One newly started CPU self-play row was
+preempted after 24.188 seconds and will restart. It is not a throughput result.
 
-**Not verified:** the remaining probe rows, GPU PPO memory/speed, learning, weekly
-projections and recovery after an actual runtime loss. P0.5 remains open.
+All earlier allocations count toward the **3 GPU-hour** budget. The local 10:21 UTC
+stop guard caps the conservative cumulative allocation at **2.959444 GPU-hours**
+(`runtime-t4-counts/session.json`). Only one T4 is active. P0.5 stays open.

@@ -1,0 +1,21 @@
+import json
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path('/content/fog')
+out = root / 'docs/briefs/06-artifacts/runtime-t4-counts'
+events = [json.loads(line) for line in (out / 'training-timing.jsonl').read_text().splitlines()]
+collection = sum(event['seconds'] for event in events if event['kind'] == 'collection')
+update = sum(event['seconds'] for event in events if event['kind'] == 'update_phase')
+(out / 'bottleneck-selection.json').write_text(json.dumps({
+    'label': 'smoke', 'collection_seconds': collection, 'update_phase_seconds': update,
+    'larger_phase': 'collection' if collection > update else 'update',
+    'source': 'training-timing.jsonl',
+}, indent=2) + '\n')
+job = str(root / 'docs/briefs/06-artifacts/gpu_job.txt')
+if collection > update:
+    subprocess.run([sys.executable, job, 'split'], cwd=root, check=True)
+os.environ.pop('FOG_PROBE_OPPONENT', None)
+subprocess.run([sys.executable, job, 'probes'], cwd=root, check=True)

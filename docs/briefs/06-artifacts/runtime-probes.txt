@@ -1,0 +1,21 @@
+#!/bin/bash
+set -euo pipefail
+export PATH=/content/node/bin:$PATH
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export FOG_MEASUREMENT_DIR=runtime-t4-counts
+cd /content/fog
+mkdir -p docs/briefs/06-artifacts/runtime-t4-counts
+cp fog/eval/showdown_rollout_probe.py /content/probe-fixed.py
+git show 571a9c0:fog/eval/showdown_rollout_probe.py > fog/eval/showdown_rollout_probe.py
+set +e
+.venv/bin/python -m pytest -q tests/test_rollout_probe_memory.py > docs/briefs/06-artifacts/runtime-t4-counts/regression-before.txt 2>&1
+regression_exit=$?
+set -e
+cp /content/probe-fixed.py fog/eval/showdown_rollout_probe.py
+if [ "$regression_exit" -eq 0 ]; then
+  echo 'Regression unexpectedly passed before the fix'
+  exit 1
+fi
+.venv/bin/python -m ruff check fog tests > docs/briefs/06-artifacts/runtime-t4-counts/ruff.txt 2>&1
+.venv/bin/python -m pytest -q tests/test_rollout_probe_memory.py tests/test_showdown_rollout_probe.py tests/test_collection_gpu_job.py > docs/briefs/06-artifacts/runtime-t4-counts/focused-tests.txt 2>&1
+.venv/bin/python docs/briefs/06-artifacts/gpu_job.txt probes

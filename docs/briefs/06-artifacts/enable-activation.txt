@@ -1,0 +1,26 @@
+import json
+from pathlib import Path
+import shutil
+import yaml
+
+root = Path('/content/fog')
+out = root / 'docs/briefs/06-artifacts/runtime-t4-counts'
+log = (out / 'training.txt').read_text()
+if 'CUDA out of memory' not in log:
+    raise SystemExit('Failure was not a CUDA OOM; no automatic setting change made.')
+if list((root / 'runs/collect_gpu/checkpoints').glob('*.state.pt')):
+    raise SystemExit('A saved state exists; retain its configuration for exact resume.')
+config = root / 'configs/collect_gpu_check.yaml'
+shutil.copy2(config, out / 'config-before-activation.txt')
+recipe = yaml.safe_load(config.read_text())
+recipe['ppo']['activation_checkpointing'] = True
+config.write_text(yaml.safe_dump(recipe, sort_keys=False))
+for name in ('training-timing.jsonl',):
+    path = out / name
+    if path.exists():
+        shutil.copy2(path, path.with_name('oom-before-activation-' + name))
+        path.write_text('')
+(out / 'activation-retry.json').write_text(json.dumps({
+    'label': 'smoke', 'reason': 'observed CUDA out of memory with 1024-row minibatches',
+    'setting': 'ppo.activation_checkpointing=true', 'resumed_state': False,
+}, indent=2) + '\n')

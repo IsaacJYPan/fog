@@ -1,0 +1,13 @@
+#!/bin/bash
+set -euo pipefail
+export PATH=/content/node/bin:$PATH
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export FOG_MEASUREMENT_DIR=runtime-t4-counts
+unset FOG_PROBE_OPPONENT
+cd /content/fog
+if ! .venv/bin/python docs/briefs/06-artifacts/gpu_job.txt training; then
+  .venv/bin/python /content/enable_activation.py
+  .venv/bin/python docs/briefs/06-artifacts/gpu_job.txt training
+fi
+.venv/bin/python docs/briefs/06-artifacts/gpu_job.txt evaluate
+.venv/bin/python /content/after_training.py

@@ -1,0 +1,17 @@
+{
+  "label": "probe-MaxDamage-cpu-b32-r1",
+  "status": "complete",
+  "command": "/content/fog/.venv/bin/python -m fog.eval.showdown_rollout_probe --workers 2 --batch 32 --games 512 --opponent MaxDamage --pool data/teams/pool_a --device cpu",
+  "commit": "922886b91a1438d936e47b55c0607e281a41261e",
+  "started_utc": "2026-11-14T09:17:49.716365+00:00",
+  "attempt": 1,
+  "exit_code": 0,
+  "wall_seconds": 147.14048648300013,
+  "peak_sampled_gpu_mib": 3.0,
+  "games": 512.0,
+  "learner_decisions": 16838.0,
+  "seconds": 137.27,
+  "learner_decisions_per_s": 122.66,
+  "games_per_s": 3.73,
+  "p1_wins": 49.0
+}

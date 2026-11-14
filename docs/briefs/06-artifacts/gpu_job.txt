@@ -232,7 +232,7 @@ def split():
     summary = json.loads((OUT / "stage1-summary.json").read_text())
     run("collection-split", [PYTHON, "-m", "fog.eval.showdown_rollout_probe",
         "--batch", str(summary["best_batch"]), "--games", "128", "--opponent",
-        "MaxDamage", "--pool", "data/teams/pool_a", "--device", "cuda"])
+        "MaxDamage", "--device", "cuda"])
 
 
 if __name__ == "__main__":
