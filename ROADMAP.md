@@ -213,6 +213,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12: 22,000 games imported (2 shards, 34 s) with a chronological 2,000-game holdout
       newer than all training games; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
+      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+
 - [ ] **P2.2 Convert** with `fog/scripts/convert_replay_decisions.py` (one imputation per game is
       enough at this scale; three triples storage for correlated rows). Time the conversion on
       1,000 games first and record games/s and stored bytes per decision. If 100,000 games would
@@ -224,6 +226,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12, at 22,000 games: converted in 28.5 min on 4 cores (12.9 games/s, 1,127,562
       rows, 624 MB, ~580 bytes per decision); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
+      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
@@ -238,6 +242,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-13: brief 03 completed CPU profiling, R/A/S/B and real replay recovery;
       training is compute-bound and the longer schedules overfit. See "replay trainer profile
       and the data-or-steps runs" in the ledger and `docs/briefs/03-report.md`; P2.3 remains open._
+      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
@@ -253,11 +259,15 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       the exact historical data effect and hosted GPU performance remain unverified. See
       "replay trainer profile and the data-or-steps runs" in the ledger and
       `docs/briefs/03-report.md`; P2.4 remains open._
+      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
+
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
       _2026-11-12, smoke only (400 games, `pool_b`, 3k model): 0.258 vs SimpleHeuristics, 0.623 vs
       MaxDamage greedy; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
+
+      _2026-11-14: brief 05 GPU-scale work started; CPU data preparation is running, new GPU measurements pending. See `docs/briefs/05-report.md`; task remains open._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 on the holdout.

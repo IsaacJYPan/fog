@@ -1,0 +1,45 @@
+{
+  "code_commit": "bd6db4161cb3d6d563ae4a98f9415771601d4d8c",
+  "test_files": [
+    "tests/test_bc_resume.py",
+    "tests/test_run_replay_blueprint.py",
+    "tests/test_bc_metrics.py",
+    "tests/test_bc_scope.py",
+    "tests/test_replay_holdout_report.py"
+  ],
+  "attempts": [
+    {
+      "environment": "command sandbox",
+      "passed": 68,
+      "failed": 3,
+      "seconds": 68.93,
+      "reading": "Two new mocked metrics omitted belief_chain_dropped_rate; fixture corrected. Existing real runner test timed out in poke-env shutdown."
+    },
+    {
+      "environment": "command sandbox",
+      "passed": 70,
+      "failed": 1,
+      "seconds": 71.41,
+      "reading": "Existing real runner test timed out in converter shutdown after complete output."
+    },
+    {
+      "environment": "command sandbox, isolated, bounded threads",
+      "passed": 0,
+      "failed": 1,
+      "seconds": 62.61,
+      "reading": "Same timeout; traceback localises wait to poke_env.concurrency.__clear_loop and shutdown_asyncgens."
+    },
+    {
+      "environment": "outside command sandbox",
+      "passed": 71,
+      "failed": 0,
+      "seconds": 37.5,
+      "reading": "Real offline runner interrupted and resumed successfully. Same locked dependencies, no application workaround."
+    }
+  ],
+  "lint": {
+    "command": "uv run --no-sync python -m ruff check fog tests",
+    "result": "All checks passed!"
+  },
+  "command": "uv run --no-sync python -m pytest -q -p no:cacheprovider --tb=short <test_files>"
+}

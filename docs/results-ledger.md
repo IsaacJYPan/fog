@@ -849,3 +849,26 @@ for the value head, not as a head that cannot learn. Brief 05 measures whether 2
 
 Not done by brief 03 and carried forward: any run on a GPU, batch 1,024, and the 20,000 and
 100,000-game points. Next: `docs/briefs/05-p2-gpu-scale.md`.
+
+## 2026-11-14: replay blueprint on a GPU at 3,000 to 100,000 games (smoke)
+
+Brief 05 is in progress on `work/p2-gpu-scale`; no gate is claimed. Implementation commit
+`bd6db4161cb3d6d563ae4a98f9415771601d4d8c` adds CPU-only preparation and independent,
+resumable best-value checkpoint selection, both default off. No model, loss, schedule or filter
+changed. Affected validation: `uv run --no-sync python -m pytest -q -p no:cacheprovider --tb=short
+tests/test_bc_resume.py tests/test_run_replay_blueprint.py tests/test_bc_metrics.py
+tests/test_bc_scope.py tests/test_replay_holdout_report.py`: **71 passed**, 37.50 s, outside the
+command sandbox; `uv run --no-sync python -m ruff check fog tests`: clean. Earlier sandbox
+attempts timed out in the dependency's asynchronous exit and are retained as failures in
+`docs/briefs/05-artifacts/validation-attempts.json`.
+
+| Run (smoke) | Command | Code commit | Games / interval | Status |
+| --- | --- | --- | --- | --- |
+| CPU preparation, first set | `uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 22000 --work-dir runs/p2_gpu_22000 --device cuda --batch-size 1024 --epochs 18 --prepare-only` | `bd6db41` | pending / n/a | import finished, conversion running; no training |
+| CPU preparation, second set | `uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 112000 --work-dir runs/p2_gpu_112000 --device cuda --batch-size 1024 --epochs 18 --prepare-only` | `bd6db41` | pending / n/a | import running; no training |
+
+Both preparations began with these implementation bytes before the code commit was made.
+Kaggle client authentication and job-list access succeeded. `kaggle quota --format json`
+reported 0.00 GPU-hours used and 45.00 available; this brief remains capped at 20. No GPU job
+submitted and no GPU checkpoint or new play result exists at this checkpoint. Historical B
+reference files, budget, test results and job template: `docs/briefs/05-artifacts/`.

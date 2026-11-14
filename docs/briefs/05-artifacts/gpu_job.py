@@ -146,6 +146,11 @@ def main():
         if log.exists():
             with log.open() as stream:
                 (OUTPUT / "tail.txt").write_text("".join(deque(stream, maxlen=60)))
+        # Kaggle exports every file in its working directory. Retain the resume archive
+        # and text results, rather than exporting a second data copy and the installed venv.
+        if Path("/kaggle/working/replay-resume.tar.gz").is_file():
+            shutil.rmtree(WORK)
+            shutil.rmtree(ROOT)
 
 
 if __name__ == "__main__":

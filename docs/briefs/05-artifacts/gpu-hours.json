@@ -1,0 +1,11 @@
+{
+  "budget_gpu_hours": 20,
+  "jobs": [],
+  "used_gpu_hours": 0,
+  "quota_before": {
+    "gpu_used_hours": 0,
+    "gpu_remaining_hours": 45,
+    "command": "kaggle quota --format json"
+  },
+  "status": "no GPU job submitted"
+}
