@@ -1542,3 +1542,14 @@ Evidence is in `06-artifacts/runtime-t4-counts/`; earlier low-memory rows above 
 | Opponent | Device | Batch | Repeat | Games | Learner decisions | Probe seconds | Learner decisions/s | Commit | Remaining command flags |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | self | cuda | 32 | 1 | 512 | 30381 | 286.10 | 106.19 | `922886b` | `--opponent self --device cuda --batch 32` |
+
+Run-order correction: after both CUDA batch-32 self-play rows and both batch-32 MaxDamage
+rows completed, the newly started CPU self-play row was deliberately preempted (24.188
+command seconds, exit -15; `planned-interruption.txt`). It is not a throughput result and
+will restart later. The remaining MaxDamage sweep runs first, then the full 100k-decision
+PPO run and greedy evaluation, then the remaining self-play matrix if time remains. This
+protects the learning and end-to-end measurements within the hard cumulative GPU budget;
+no completed probe is repeated. The launcher supports this with `FOG_PROBE_OPPONENT=MaxDamage`.
+| MaxDamage | cuda | 32 | 1 | 512 | 16225 | 107.60 | 150.79 | `922886b` | `--opponent MaxDamage --device cuda --batch 32` |
+| MaxDamage | cuda | 32 | 2 | 512 | 16225 | 107.63 | 150.75 | `922886b` | `--opponent MaxDamage --device cuda --batch 32` |
+| self | cuda | 32 | 2 | 512 | 30381 | 282.14 | 107.68 | `922886b` | `--opponent self --device cuda --batch 32` |

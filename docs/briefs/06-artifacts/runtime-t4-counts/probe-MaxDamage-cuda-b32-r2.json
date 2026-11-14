@@ -1,0 +1,17 @@
+{
+  "label": "probe-MaxDamage-cuda-b32-r2",
+  "status": "complete",
+  "command": "/content/fog/.venv/bin/python -m fog.eval.showdown_rollout_probe --workers 2 --batch 32 --games 512 --opponent MaxDamage --pool data/teams/pool_a --device cuda",
+  "commit": "922886b91a1438d936e47b55c0607e281a41261e",
+  "started_utc": "2026-11-14T09:15:01.149927+00:00",
+  "attempt": 1,
+  "exit_code": 0,
+  "wall_seconds": 119.26663830500001,
+  "peak_sampled_gpu_mib": 367.0,
+  "games": 512.0,
+  "learner_decisions": 16225.0,
+  "seconds": 107.63,
+  "learner_decisions_per_s": 150.75,
+  "games_per_s": 4.757,
+  "p1_wins": 40.0
+}
