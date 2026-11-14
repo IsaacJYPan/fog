@@ -1431,6 +1431,22 @@ print(ppo.__file__); runpy.run_path("docs/briefs/06-artifacts/check_timing.py",
 run_name="__main__")'`. All update metrics and tensors remain identical;
 `endtoend-timing-equivalence.txt` records the current source path and CPU-only result.
 
+The combined job now protects the end-to-end benchmark and evaluation before attempting
+any additional self-play comparison. After those finish, it compares the remaining internal
+deadline with the prior eight self-play execution times, scaled conservatively for fewer
+cores, plus 20% and 60 seconds. Only if the whole repeat fits does it run those eight rows
+on the same host, completing the requested one-job matrix. Otherwise the prior self-play
+cohort stays separate and the report retains that limitation. The cap and three-hour
+budget are unchanged. `same-job-self-plan.json` and `collection-completeness.json` will
+record the actual branch, rather than assuming completion. The original child environment
+is restored after timing instrumentation so subsequent probes use the same settings.
+
+Five measurement-job cases verify bootstrap, benchmark-before-extra-probes order, skipping
+extras when they cannot fit, native metric preservation and saved-state timing prefixes.
+Together with the trainer measurement/resume cases, **17 focused tests pass**; Ruff and
+byte compilation pass (`combined-order-tests.txt`, `endtoend-focused-tests.txt`). No GPU
+allocation or application/trainer change was made while preparing this ordering.
+
 ## 2026-11-14: collection and play-training speed on a GPU (smoke)
 
 The owner requested a fresh T4 runtime through the runtime CLI and SSH, replacing the
@@ -1473,6 +1489,17 @@ wall times and sampled GPU memory are in each named probe's JSON, text and CSV u
 | MaxDamage | cpu | 32 | 2 | 512 | 16838 | 151.75 | 110.96 | `571a9c0` | `--opponent MaxDamage --device cpu --batch 32` |
 | self | cpu | 32 | 2 | 512 | 30009 | 410.77 | 73.06 | `571a9c0` | `--opponent self --device cpu --batch 32` |
 
+At 08:50 UTC, integrating the concurrently updated branch revealed the owner-selected
+separate single-T4 allocation already active since 08:16. The prepared combined private
+Kaggle job was never submitted and is now superseded. Its tested script remains available,
+but its planned two-GPU-hour reservation must not be added to the active runtime's
+reservation. Prior allocations plus the current two-hour single-T4 cap already reserve
+2.937222 of the three GPU-hours. No duplicate brief-06 allocation will be launched.
+The active runtime's report/evidence are retained as published by that worker; G20 continues
+unchanged on its separate account allocation. The earlier 14:50 estimate assumed waiting
+for G20's Kaggle slot; this independent runtime can produce an earlier end-to-end result,
+subject to its 10:16 budget stop and measured PPO speed.
+
 The first CUDA self-play probe (`--opponent self --device cuda --batch 32`) at `571a9c0`
 failed after 339.145 command seconds with a pipe EOF, not a measured throughput result.
 The kernel recorded a host OOM kill of a rollout worker; cgroup `oom_kill=1` and the
@@ -1481,6 +1508,13 @@ probe-self-cuda-b32-r1*}`). A temporary swap attempt returned `Invalid argument`
 The low-memory allocation was released before 08:53 UTC and a high-memory single-T4
 replacement requested. The same 10:16 UTC deadline applies across both allocations;
 retained low-memory CPU rows will not be presented as same-runtime high-memory baselines.
+
+The replacement's reservation is now reflected in `gpu-budget.json`: prior private jobs
+0.937222 GPU-hours, first single-T4 allocation at most 0.616667, replacement at most
+1.405556, cumulative upper bound 2.959444. Its new stop deadline is 10:21 UTC, accounting
+for the gap without an allocation. The duplicate private-job plan stays unsubmitted.
+The probe-only memory fix returns counters instead of unused buffers; full PPO still pays
+for real rollout-buffer transfer. Those two timing scopes must remain separate in the report.
 
 High-memory T4 requests returned `Service Unavailable` twice; no high-memory runtime was
 allocated. A second standard T4 was started, after the first was released. The local guard
