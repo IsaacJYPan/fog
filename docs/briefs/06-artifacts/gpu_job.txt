@@ -14,7 +14,6 @@ from pathlib import Path
 import re
 import shlex
 import signal
-import statistics
 import subprocess
 import sys
 import threading
@@ -140,13 +139,16 @@ def probes():
                 ])
                 results.append({**result, "device": device, "batch": batch,
                                 "opponent": opponent, "repeat": repeat})
-    rates = {batch: statistics.mean(r["learner_decisions_per_s"] for r in results
-                                   if r["device"] == "cuda" and r["batch"] == batch
-                                   and r["opponent"] == "MaxDamage")
+    rates = {batch: (sum(r["learner_decisions"] for r in results
+                        if r["device"] == "cuda" and r["batch"] == batch
+                        and r["opponent"] == "MaxDamage") /
+                     sum(r["seconds"] for r in results
+                         if r["device"] == "cuda" and r["batch"] == batch
+                         and r["opponent"] == "MaxDamage"))
              for batch in (32, 64, 128)}
     best = max(rates, key=rates.get)
     dump(OUT / "stage1-summary.json", {"workers": workers, "best_batch": best,
-                                      "selection_mean_rates": rates, "rows": results})
+                                      "selection_aggregate_rates": rates, "rows": results})
 
 
 def training():
@@ -156,7 +158,22 @@ def training():
             "league.snapshot_every_decisions=8000"]
     checkpoints = list((RUN / "checkpoints").glob("ppo_*.state.pt"))
     if checkpoints:
+        import csv
+        import torch
+
         latest = max(checkpoints, key=lambda p: p.stat().st_mtime)
+        state = torch.load(latest, map_location="cpu", weights_only=False)
+        decisions = state["progress"]["decisions_seen"]
+        metrics = RUN / "metrics.csv"
+        if metrics.exists():
+            with metrics.open() as stream:
+                reader = csv.DictReader(stream)
+                fields = reader.fieldnames
+                rows = [row for row in reader if int(row["step"]) <= decisions]
+            with metrics.open("w", newline="") as stream:
+                writer = csv.DictWriter(stream, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(rows)
         args.append(f"ppo.resume_ckpt={latest.relative_to(ROOT)}")
     result = run("training", args)
     if (RUN / "metrics.csv").exists():
