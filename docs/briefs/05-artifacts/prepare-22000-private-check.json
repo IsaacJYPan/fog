@@ -2,5 +2,10 @@
   "slug": "fog-p2-gpu-22000-20261114",
   "error_type": "HTTPError",
   "http_status": 403,
-  "service_message": "{\"error\":{\"code\":403,\"message\":\"Permission \\u0027datasets.get\\u0027 was denied\",\"status\":\"PERMISSION_DENIED\"}}"
+  "service_message": "{\"error\":{\"code\":403,\"message\":\"Permission \\u0027datasets.get\\u0027 was denied\",\"status\":\"PERMISSION_DENIED\"}}",
+  "list_verification": {
+    "matching_owned_datasets": 1,
+    "is_private": true,
+    "command": "KaggleApi.dataset_list(mine=True, search=slug)"
+  }
 }

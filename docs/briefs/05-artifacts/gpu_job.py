@@ -23,6 +23,22 @@ def command(*args, **kwargs):
     subprocess.run([str(arg) for arg in args], check=True, **kwargs)
 
 
+def restore_prepared(input_root: Path, work: Path):
+    """Kaggle datasets expand uploaded archives; kernel outputs may retain them."""
+    archives = list(input_root.rglob("replay-work.tar.gz"))
+    if archives:
+        assert len(archives) == 1, "expected one prepared work archive"
+        work.mkdir(exist_ok=True)
+        with tarfile.open(archives[0]) as archive:
+            archive.extractall(work, filter="data")
+        return
+    roots = [path.parent for path in input_root.rglob("run.json")
+             if (path.parent / "decisions/manifest.parquet").is_file()
+             and (path.parent / "split/holdout_manifest.parquet").is_file()]
+    assert len(roots) == 1, f"expected one expanded prepared dataset, found {len(roots)}"
+    shutil.copytree(roots[0], work, dirs_exist_ok=True)
+
+
 def worker():
     import polars as pl
     import torch
@@ -114,12 +130,7 @@ def main():
         command("npm", "--prefix", ROOT / "server/pokemon-showdown", "run", "build")
         command(sys.executable, "-m", "fog.scripts.kaggle_setup", cwd=ROOT)
         install_seconds = time.perf_counter() - started
-        # Each private input dataset contains exactly one CPU-prepared work archive.
-        archives = list(Path("/kaggle/input").rglob("replay-work.tar.gz"))
-        assert len(archives) == 1, archives
-        WORK.mkdir(exist_ok=True)
-        with tarfile.open(archives[0]) as archive:
-            archive.extractall(WORK, filter="data")
+        restore_prepared(Path("/kaggle/input"), WORK)
         # A continuation may attach the preceding private job's saved work archive.
         resumes = list(Path("/kaggle/input").rglob("replay-resume.tar.gz"))
         assert len(resumes) <= 1
