@@ -886,3 +886,17 @@ Commands and complete counts/timers: `docs/briefs/05-artifacts/prepare-22000.jso
 `prepare-22000-quality.json`, `prepare-22000-skip.txt`, plus import/split text outputs. Private upload is next.
 The 112,000-game import also reached its target and conversion is running; usable training
 count is not yet known. No GPU time or play result is claimed.
+
+### Private G3 pilot submission (smoke, result pending)
+
+The 468,727,506-byte CPU work archive uploaded privately as `fog-p2-gpu-22000-20261114` in
+186.132 s. The official dataset metadata/status reads return HTTP 403,
+`Permission 'datasets.get' was denied`; creation was accepted, and privacy was requested
+explicitly. At code `f67c9587b75ffa838a5cffec0ca0c60b555c5c9f`,
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="600")` accepted private script
+`fog-p2-g3-stop-20261114`, version 1, no invalid dataset sources. Its G3 config is 3,000 games,
+18 epochs, batch 1,024, CUDA, separate best-value checkpoint enabled; a completed-epoch hook
+will deliberately stop after epoch 2. Initial expected session time 3–6 minutes is a planning
+estimate from the prior CPU feed ceiling, **not a measured GPU rate**; hard cap is 10 minutes,
+conservatively 1/3 GPU-hour if two devices are billed. Actual use and training results pending.
+Source, accepted response and budget: `docs/briefs/05-artifacts/`.
