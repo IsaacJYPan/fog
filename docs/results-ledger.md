@@ -1334,3 +1334,14 @@ against the 20-hour conservative budget. Epoch walls are **3,403.646891 / 3,397.
 export projection remains conservative. `G100-progress.json` retains raw epoch events and
 the timing assumptions. Full CSV, selection reports, final checkpoint persistence and CPU
 play still wait for the six-epoch run to finish; no final G100 NLL or strength is claimed.
+
+### Owner ends the foreground wait; final slot continues in the background
+
+The owner asked to report progress without waiting for G100. G20 and the short brief-06
+throughput result are complete. The existing final GPU job continues unchanged at three
+of six saved epochs; no cancel or duplicate submission was made. The local read-only
+watcher and completion collector now have independent process sessions and file-backed
+logs, verified alive after detachment. On completion the collector downloads raw metrics
+and both reports, versions the same private checkpoint dataset and tests all six hashes,
+then runs the specified CPU diagnostics and 400-game/opponent smoke. These final G100
+results remain pending; this entry makes no completed-run or gate claim.
