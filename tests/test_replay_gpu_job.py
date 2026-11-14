@@ -67,3 +67,17 @@ def test_worker_deadline_preserves_completed_output_and_stops_process(tmp_path):
         )
     assert status == "interrupted_for_export"
     assert (tmp_path / "checkpoint").read_text() == "saved"
+
+
+def test_worker_retains_and_forwards_epoch_output(tmp_path, capsys):
+    import os
+    import sys
+
+    job = _job()
+    job.ROOT = tmp_path
+    with (tmp_path / "log.txt").open("w") as log:
+        status = job.run_worker([sys.executable, "-c", "print('epoch saved', flush=True)"],
+                                seconds=5, log=log, env=dict(os.environ))
+    assert status == "returned"
+    assert (tmp_path / "log.txt").read_text() == "epoch saved\n"
+    assert "epoch saved" in capsys.readouterr().out

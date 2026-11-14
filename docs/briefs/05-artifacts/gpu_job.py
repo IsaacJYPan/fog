@@ -11,6 +11,7 @@ import tarfile
 import time
 from collections import deque
 from pathlib import Path
+from threading import Thread
 
 # Replace only this literal in each submitted copy and retain that copy as a text artifact.
 SPEC = {"commit": "SET_TO_PUSHED_CODE_COMMIT", "run": "G3", "games": 3000,
@@ -48,8 +49,17 @@ def restore_prepared(input_root: Path, work: Path):
 
 def run_worker(argv, *, seconds, log, env):
     """Stop before the platform cap so completed epoch state can still be exported."""
-    child = subprocess.Popen(argv, stdout=log, stderr=subprocess.STDOUT,
-                             env=env, cwd=ROOT, start_new_session=True)
+    child = subprocess.Popen(argv, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                             env=env, cwd=ROOT, start_new_session=True, text=True, bufsize=1)
+
+    def forward_output():
+        for line in child.stdout:
+            log.write(line)
+            log.flush()
+            print(line, end="", flush=True)
+
+    reader = Thread(target=forward_output, daemon=True)
+    reader.start()
     try:
         code = child.wait(timeout=seconds)
     except subprocess.TimeoutExpired:
@@ -60,6 +70,8 @@ def run_worker(argv, *, seconds, log, env):
             os.killpg(child.pid, signal.SIGKILL)
             child.wait()
         return "interrupted_for_export"
+    finally:
+        reader.join(timeout=10)
     if code:
         raise subprocess.CalledProcessError(code, argv)
     return "returned"
@@ -145,7 +157,7 @@ def worker():
         (OUTPUT / "training-runtime.json").write_text(json.dumps(runtime, indent=2))
         if metrics.exists():
             shutil.copy2(metrics, OUTPUT / "metrics-after.csv")
-    if status == "complete":
+    if status in {"complete", "deliberately_interrupted"}:
         for name in ("bc_best", "bc_best_value"):
             command(sys.executable, "-m", "fog.eval.replay_holdout_report", "--config",
                     ROOT / "configs/replay_blueprint_cpu.yaml", "--manifest", holdout,
