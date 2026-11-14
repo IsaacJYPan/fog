@@ -1,0 +1,33 @@
+{
+  "label": "smoke",
+  "command": [
+    "/workspace/fog/.venv/bin/python",
+    "-m",
+    "fog.eval.showdown_direct_selection",
+    "--pool",
+    "data/teams/pool_b",
+    "--device",
+    "cpu",
+    "--config",
+    "configs/replay_blueprint_cpu.yaml",
+    "--checkpoint",
+    "blueprint=runs/p2_gpu_checkpoints/G20-bc_best.pt",
+    "--checkpoint-config",
+    "blueprint=configs/replay_blueprint_cpu.yaml",
+    "--opponent",
+    "simpleheuristics",
+    "--opponent",
+    "maxdamage",
+    "--games",
+    "400",
+    "--temperature",
+    "0",
+    "--action-stats",
+    "--resume",
+    "--out",
+    "/workspace/fog/runs/p2_gpu_play/G20-play.json"
+  ],
+  "source_commit": "325a46f9552cf0d7979287220d2b401d3b545119",
+  "wall_seconds": 349.939293069001,
+  "exit_code": 0
+}

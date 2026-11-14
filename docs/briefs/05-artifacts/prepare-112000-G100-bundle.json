@@ -1,0 +1,25 @@
+{
+  "label": "smoke CPU archive preparation",
+  "status": "ready for version update; not yet uploaded",
+  "slug": "fog-p2-gpu-112000-20261114",
+  "file": "replay-work.bin",
+  "bytes": 2386510456,
+  "sha256": "5457cc642d2ecc63152a36ec4d2d78cf150c8efeaa1c37209807be1429fbfe9f",
+  "wall_seconds": 81.3278754560015,
+  "included_top_level": [
+    "raw",
+    "decisions",
+    "split",
+    "run.json",
+    "output"
+  ],
+  "cpu_only_cache_included": false,
+  "added_cpu_manifest": "split/train_40955.parquet",
+  "selected_training_games": 40955,
+  "selected_training_rows": 2090705,
+  "prepared_training_games": 101928,
+  "fixed_holdout_games": 2000,
+  "gpu_time_used": 0,
+  "compression_level": 1,
+  "old_private_version_retained": true
+}

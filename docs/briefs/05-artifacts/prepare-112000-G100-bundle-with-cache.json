@@ -1,0 +1,17 @@
+{
+  "label": "smoke CPU archive preparation, overlaps G20 CPU play",
+  "slug": "fog-p2-gpu-112000-20261114",
+  "file": "replay-work.bin",
+  "bytes": 4075781022,
+  "sha256": "45b9ec6b715099d54ee6c4b6242dbfacdadb3736889cb722f47fc5f143088126",
+  "wall_seconds": 187.82351642800495,
+  "added_cpu_manifest": "split/train_41071.parquet",
+  "selected_training_games": 41071,
+  "selected_training_rows": 2096584,
+  "prepared_training_games": 101928,
+  "fixed_holdout_games": 2000,
+  "gpu_time_used": 0,
+  "compression_level": 1,
+  "destination": "version update of the existing private input dataset; old version retained",
+  "status": "discarded before upload: included CPU-only cache; rebuilding the original input layout"
+}

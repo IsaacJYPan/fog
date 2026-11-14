@@ -1,0 +1,28 @@
+{
+  "status": "smoke checkpoint label perturbation",
+  "run": "G20",
+  "checkpoint": "G20-bc_best_value.pt",
+  "device": "cpu",
+  "rows": 256,
+  "oracle": "none",
+  "optimizer_steps": 0,
+  "results": [
+    {
+      "mode": "evaluation",
+      "policy_identical": true,
+      "value_identical": true
+    },
+    {
+      "mode": "training, matched RNG",
+      "policy_identical": true,
+      "value_identical": true
+    }
+  ],
+  "changed": [
+    "outcome signs",
+    "terminal belief targets",
+    "terminal self-belief targets",
+    "optional privileged opponent truth and committed action"
+  ],
+  "limitations": "One batch checks label/oracle routing; the sampled chronological-prefix check separately checks observation construction. This does not prove isolation for every input/replay."
+}

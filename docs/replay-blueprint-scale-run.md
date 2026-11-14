@@ -1,11 +1,14 @@
 # Replay blueprint scale run
 
-**Hosted GPU measured; scale training is in progress.** Two G3 epochs on Tesla T4 ran at
-604–622 training rows/s (613 aggregate), with 150–154 s validation passes and 2.44 GiB peak
-PyTorch allocation. Installation took 89–137 s. These are **smoke** measurements at batch
-1,024, FP32, CUDA device 0; two T4s were visible. Full G3 does not fit the one-hour calibration
-allowance, so its batch/device quality comparison is unverified. Current results and budget:
-[brief 05 report](briefs/05-report.md).
+**Hosted GPU measured; G20 is complete.** Full G20 (20k games / 18 epochs, batch 1,024)
+runs at **583.24 training rows/s** (580–586 by epoch), with **161–166 s** validation and
+**2.44 GiB** peak PyTorch allocation on Tesla T4. Its own hosted session is at most
+**9.840590 quota-hours**, including setup, both CPU holdout reports and export. Two T4s
+were visible; CUDA device 0 was used. G3's two-epoch calibration/resume smoke ran at
+604–622 rows/s, but its full schedule and batch comparison did not fit the one-hour cap.
+G100's measured-budget fallback is planned at **40,955 games / six epochs**, **6.881063 h**;
+full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
+[brief 05 report](briefs/05-report.md) and `briefs/05-artifacts/G100-plan.json`.
 
 1. **Use the CPU-prepared private inputs.** Both exist under the configured owner's account:
 
@@ -15,7 +18,10 @@ allowance, so its batch/device quality comparison is unverified. Current results
    | `fog-p2-gpu-112000-20261114` | 101,928 / 5,217,022 | 2,000 / 104,037 |
 
    Each contains `replay-work.bin`, a gzip tar archive whose opaque filename prevents archive
-   expansion into thousands of mounted files. Sizes: 468,727,506 / 2,385,762,558 bytes. All
+   expansion into thousands of mounted files. Current private-input sizes: 468,727,506 / 2,385,762,558 bytes. The next large-input
+   version is being uploaded from a 2,386,510,456-byte CPU archive containing the new
+   40,955-game nested manifest and omitting CPU-only caches. Wait for its ready/private
+   receipt before starting that run. All
    holdout shards are byte-identical, and G20 is contained in the larger training set. Rating
    floor stays 1500; 8,072 newer non-holdout games were excluded from the larger import.
    Counts and archive hashes: `briefs/05-artifacts/prepare-*`.
@@ -68,10 +74,10 @@ allowance, so its batch/device quality comparison is unverified. Current results
    ```
 
    `uv tool install kaggle --with six` installs the client including its missing dependency.
-   Keep account metadata under ignored `runs/`. The measured rate projects G20 to **9.6 h**
-   including allowance; this is not a completed timing. Cap: 11 h; internal export deadline:
-   10 h 40 min. Select G100 epochs/subset only after G20's actual rate and remaining 20-hour
-   budget are known, with two hours spare.
+   Keep account metadata under ignored `runs/`. G20 completed all 18 epochs in an own-session upper bound of **9.840590 h**
+   (11 h platform cap, 10 h 40 min internal export deadline). The final-slot plan uses its
+   slowest measured rate and a two-hour forecast reserve inside 20 Kaggle quota-hours.
+   One account-wide active/queued-job check is required immediately before every submission.
 
 4. **Continue from the last completed epoch.** `bc_state.pt` retains optimizer, schedule,
    RNG, earlier CSV rows and both best models. Jobs export the full work directory as
@@ -83,8 +89,8 @@ allowance, so its batch/device quality comparison is unverified. Current results
    exactly as the prefix of `[0,1,2]`.
 
 5. **Download and verify the selected weights.** The single private dataset is
-   `fog-p2-gpu-checkpoints-20261114`; its initial version contains partial G3 only. Later
-   versions add G20/G100. This command was tested on both G3 files:
+   `fog-p2-gpu-checkpoints-20261114`; version 2 contains partial G3 and full G20 selections (four files), retaining the earlier
+   version. G100 will be added there. This command was tested on all four current files:
 
    ```bash
    uv run --no-project --with kaggle==2.2.5 --with six python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values["username"]+"/fog-p2-gpu-checkpoints-20261114", path="checkpoints", unzip=True, quiet=True)'
@@ -97,5 +103,5 @@ allowance, so its batch/device quality comparison is unverified. Current results
 
 The unchanged `replay_holdout_report` scorer runs on CPU, including inside the hosted job:
 its implementation does not use the config's device override. Its two report passes still
-consume hosted session quota (about 208 s each in the resumed G3 job). The measured validation
+consume hosted session quota (about 208 s each in resumed G3; 443.788 s total for G20). The measured validation
 passes during training use CUDA. Include both kinds of overhead when selecting the next run.

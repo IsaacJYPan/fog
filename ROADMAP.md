@@ -242,7 +242,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-13: brief 03 completed CPU profiling, R/A/S/B and real replay recovery;
       training is compute-bound and the longer schedules overfit. See "replay trainer profile
       and the data-or-steps runs" in the ledger and `docs/briefs/03-report.md`; P2.3 remains open._
-      _2026-11-14: brief 05 measured 604 rows/s on T4, batch 1,024, one epoch. Full G3 projects above two hours, exceeding the one-hour calibration cap: retain a partial G3/resume smoke, then prioritize G20 at the brief default batch under the unchanged 20-hour budget. Batch/device comparison remains unverified; no model/loss/schedule change or gate claim._
+      _2026-11-14: brief 05 completed G20 (20k games, 18 epochs, batch 1,024) at 583 rows/s on T4. Policy/value best epochs are 12/4; own-best value Brier 0.215320. Partial G3/resume proof retained because the full calibration exceeds its one-hour cap. A 40,955-game/six-epoch fallback is planned within 20 quota-hours; no box or gate claimed._
 
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
@@ -259,7 +259,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       the exact historical data effect and hosted GPU performance remain unverified. See
       "replay trainer profile and the data-or-steps runs" in the ledger and
       `docs/briefs/03-report.md`; P2.4 remains open._
-      _2026-11-14: full 3k GPU calibration does not fit its stated cap; the measured learning curve is still pending G20/G100. Preserve partial-run labels and leave the 20k-to-100k rule unverified unless both points finish. See `docs/briefs/05-report.md`._
+      _2026-11-14: G20 policy NLL is 1.278605 versus B 1.579018; full 3k GPU calibration did not fit its cap. The planned larger fallback remains below 100k, so the exact 20k-to-100k rule stays unverified. See `docs/briefs/05-report.md`._
 
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
@@ -267,7 +267,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       MaxDamage greedy; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
 
-      _2026-11-14: brief 05 CPU play smoke awaits a completed G20; no new play rate or gate is claimed. See `docs/briefs/05-report.md`._
+      _2026-11-14: brief 05 G20 CPU play smoke (400 games/opponent, pool_b, greedy) is 0.520 [0.471, 0.569] vs SimpleHeuristics and 0.8675 [0.831, 0.897] vs MaxDamage, no failures/truncations. G100 remains pending; no gate claimed. See `docs/briefs/05-report.md`._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 on the holdout.

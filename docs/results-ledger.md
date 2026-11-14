@@ -1167,3 +1167,93 @@ checks are in `brief06-endtoend-recomputed.json`. Cumulative brief-06 allocation
 bound is 2.441111 GPU-hours, separate from the brief-05 Kaggle budget. No duplicate
 allocation was submitted. G20 remains running unchanged, with epoch 10 of 18 saved.
 G100 can follow G20 curve/value reports and CPU play without a further brief-06 GPU job.
+
+### Completed G20, separate policy/value selections, and conservative final-slot plan (smoke)
+
+Private `fog-p2-g20-20261114` completed and exported by 14:17:26 UTC, at training
+source `7a234972abf8d4c6dde8629353588aa2558f1fd0`. Actual execution is the retained
+`fog-p2-g20-20261114.py` worker calling unchanged `bc.train`; submission command was
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="39600")`. The complete resolved
+training command/overrides are in `G20-training-runtime.json`: CUDA, original 20k manifest,
+fixed 2k holdout, batch 1024, 18 epochs, resume, policy-CE selection and the independently
+saved value checkpoint, streaming on, early stopping off. CSV contains exactly epochs 0–18;
+training status is complete. No loss, schedule, model or filter changed.
+
+| Run (smoke) | Train games / rows | Epochs / batch | Policy / value epochs | Train rows/s | Holdout top-1 / policy NLL | Policy-checkpoint value Brier / ECE | Own-best value MSE / Brier / ECE | Commit |
+| --- | --- | --- | --- | ---: | --- | --- | --- | --- |
+| G20, complete | 20,000 / 1,023,525 | 18 / 1024 | 12 / 4 | 583.241649 | 0.544368683 / 1.278605058 | 0.254355678 / 0.153632606 | 0.861281370 / 0.215320343 / 0.016158573 | `7a23497` |
+
+Per-epoch train rates are 579.961717–585.537242 rows/s; validation is 161.165194–166.059520 s,
+with peak learner allocation 2,621,320,192 bytes (2.441295 GiB). Training including validation
+is 34,692.389136 s; hosted setup is 92.034458 s. The selected policy has 103,981 legal-policy
+holdout rows; value reports cover all 104,037. Own-best early/middle/late Brier is
+0.244753784 / 0.222778563 / 0.179070357: late is 0.065683427 below early. That value
+checkpoint is eight epochs before the policy checkpoint. Its train MSE is 0.832760363,
+versus 0.543420724 at the later policy selection; the latter's holdout MSE has worsened to
+1.017422711. The policy NLL improves by 0.300412805 from historical B. These are diagnostic
+smoke results. They do not establish the brief's strict **100k** reading or any strength gate.
+Both full holdout reports, phase metrics, extreme shares/win rates and all ten reliability
+bins are in `G20-holdout-*.json`, `curve-value-tables.json` and `reliability.csv`.
+
+G20's own session upper bound is 35,426.124028 s = 9.840590 h, from conservative 04:27:00
+start to observed terminal. Its global quota delta includes the earlier other brief and
+is not attributed wholly to G20. Calibration plus the own-session bound is at most
+10.719605 replay quota-hours; the account's observed counter is 11.118819. `gpu-hours.json`
+records both scopes, using Kaggle quota units, one CUDA device used, two T4s visible.
+
+Both G20 selected weights have been added to the **same private checkpoint dataset**,
+version 2, retaining version 1. The literal portable owner command was run in a fresh ignored
+folder: all four G3/G20 file sizes and SHA-256 values match the public inventory
+(`checkpoint-version-G20.json`, `checkpoint-portable-download-G20.json`). No weights or
+account identity are committed. CPU label/oracle perturbation on 256 holdout rows leaves
+policy/value tensors identical in evaluation and matched-RNG training modes
+(`G20-label-perturbation.json`); the earlier sampled prefix/sign checks remain bounded smoke.
+
+`G100-plan.json` uses the slowest G20 train rate, longest validation, measured own-session
+setup/export overhead scaled to the full archive, and a two-hour forecast reserve. All
+101,928 prepared games for six epochs project to 57,054.752635 s (15.848542 h), which does
+not fit. The largest seeded nested prefix that fits is **41,071 games / 2,096,584 rows**,
+six epochs, projecting 24,772.228739 s (6.881175 h). It contains every original G20 game
+and no holdout game. The new manifest was made on CPU; rating floor and dates are unchanged.
+The projected conservative account total is 17.999994 quota-hours. Planned hard platform
+cap 28,200 s, internal deadline 27,000 s, keeps even the cap total below 20; the forecast's
+two-hour reserve supplies the overrun allowance. No G100 GPU job has been submitted yet.
+Its exact 20k-to-100k P2.4 branch and strict 100k value test will remain unverified because
+this is the brief-authorized fallback. G20 CPU play is running before G100 training.
+
+### G20 CPU play complete and input-layout correction before G100 (smoke)
+
+Command, from the unchanged application at `325a46f` (the dirty flag covers new docs/results):
+`OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 PYTHONPATH=. .venv/bin/python -m
+fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config
+configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/p2_gpu_checkpoints/G20-bc_best.pt
+--checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics
+--opponent maxdamage --games 400 --temperature 0 --action-stats --resume
+--out runs/p2_gpu_play/G20-play.json`. Model source is `7a23497`, policy epoch 12.
+Pinned Showdown `e440c4a`; the original matched teams/sides/seeds recipe is unchanged.
+Raw command, 349.939293-second total wall and exit 0 are in `G20-play-command.json`.
+
+| Candidate (smoke) | Opponent | Games | W-L-D | Win rate [95% Wilson] | Failures / truncations | Seconds/decision / fallbacks | Commit |
+| --- | --- | ---: | --- | --- | --- | --- | --- |
+| G20 policy epoch 12 | simpleheuristics | 400 | 208-192-0 | 0.5200 [0.471083, 0.568537] | 0 / 0 | not emitted / not emitted | `325a46f` |
+| G20 policy epoch 12 | maxdamage | 400 | 347-53-0 | 0.8675 [0.830754, 0.897255] | 0 / 0 | not emitted / not emitted | `325a46f` |
+
+The result file is `G20-play.json`, separate from historical B and the later model's output.
+These 400-game rows are smoke, not T1/G2 evidence. B's reference rates were 0.360
+[0.314, 0.408] and 0.7725 [0.729, 0.811]. G20's action statistics are retained; per-decision
+wall and fallback counters were not emitted, so no zero is invented.
+
+An intermediate CPU repack included the conversion cache. Its 4,075,781,022-byte
+archive was never uploaded or attached to a job; it is explicitly discarded in
+`prepare-112000-G100-bundle-with-cache.json`. Rebuild only the original top-level layout
+(`raw`, `decisions`, `split`, `run.json`, `output`), omitting that CPU-only cache.
+No GPU time was used. The initial 41,071-game forecast remains a superseded preliminary
+plan in `G100-plan-before-archive-check.json`.
+
+The final planner allows 2 MiB for the new manifest in the original full-corpus archive,
+rounds setup/report/export allowance up to a whole minute (1,980 s), and verifies that the
+actual upload fits that byte bound. The largest fitting nested prefix is now **40,955 games /
+2,090,705 rows**, six epochs, projected **24,771.827035 s = 6.881063 h**. The exact 100k
+rules stay unverified; no filters or training settings changed. The two-hour forecast reserve
+and 28,200/27,000-second platform/internal caps stay unchanged. G20 curve/value reports,
+private persistence and CPU play are all complete before the final GPU slot is submitted.

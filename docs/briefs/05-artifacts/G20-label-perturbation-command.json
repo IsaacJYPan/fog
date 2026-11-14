@@ -1,0 +1,11 @@
+{
+  "label": "smoke",
+  "command": [
+    "/workspace/fog/.venv/bin/python",
+    "runs/p2_gpu_checks/check_checkpoint_labels.py",
+    "G20"
+  ],
+  "source_commit": "325a46f9552cf0d7979287220d2b401d3b545119",
+  "wall_seconds": 8.671946495000157,
+  "exit_code": 0
+}

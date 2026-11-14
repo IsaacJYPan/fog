@@ -1,0 +1,17 @@
+{
+  "label": "smoke checkpoint persistence",
+  "slug": "fog-p2-gpu-checkpoints-20261114",
+  "is_private": true,
+  "version_before": 1,
+  "version_after": 2,
+  "old_versions_deleted": false,
+  "files": {
+    "G20-bc_best.pt": 23553751,
+    "G20-bc_best_value.pt": 23556403,
+    "G3-bc_best.pt": 23553751,
+    "G3-bc_best_value.pt": 23556403,
+    "checkpoints.json": 2424
+  },
+  "upload_and_ready_seconds": 41.692990504998306,
+  "command": "KaggleApi.dataset_create_version(quiet=True, convert_to_csv=False, delete_old_versions=False)"
+}
