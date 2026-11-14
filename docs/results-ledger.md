@@ -1123,3 +1123,13 @@ found only G20 active, and blocked submission (`account-wide-guard-live.json`). 
 initial list hit HTTP 429; smaller pages, throttled reads and bounded retry resolved it.
 No job was submitted by either guard check. The owner's requested order remains G20,
 then brief 06 end-to-end timing, then the remaining GPU scale work.
+
+### Projected handoff to brief 06 (planning only)
+
+At 07:19 UTC, the five completed G20 epochs took 1,909.859–1,928.435 seconds each,
+median 1,923.599. Thirteen remain. Their median projects the training endpoint to
+14:08:52 UTC, then allow 10–15 minutes for both holdout reports and checkpoint export.
+The unmeasured brief-06 PPO session is planned at 30–60 minutes afterward: earliest
+realistic result about 14:50 UTC, planning window 15:00–15:30. These are projections,
+not completion measurements or promises; a GPU-path failure would change them.
+`G20-to-brief06-eta.json` records the inputs and the owner's preservation choice.

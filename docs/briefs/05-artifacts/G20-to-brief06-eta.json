@@ -1,0 +1,29 @@
+{
+  "status": "planning projection, not measured completion",
+  "observed_at_utc": "2026-11-14T07:20:52.369994+00:00",
+  "completed_epochs": 5,
+  "epoch_seconds": [
+    1923.598651023,
+    1928.4347643580004,
+    1924.5554613759996,
+    1915.9200193859997,
+    1909.858736489
+  ],
+  "median_epoch_seconds": 1923.598651023,
+  "g20_training_finish_projection_utc": "2026-11-14T14:08:52.010802+00:00",
+  "g20_reports_export_allowance_seconds": [
+    600,
+    900
+  ],
+  "brief06_session_planning_seconds": [
+    1800,
+    3600
+  ],
+  "earliest_realistic_brief06_result_utc": "2026-11-14T14:50:00+00:00",
+  "brief06_planning_window_utc": [
+    "2026-11-14T15:00:00+00:00",
+    "2026-11-14T15:30:00+00:00"
+  ],
+  "owner_priority": "Finish G20, then measure brief 06, preserving current G20 output",
+  "uncertainty": "PPO GPU speed is not yet measured; a failed or partial benchmark would require a revised estimate."
+}
