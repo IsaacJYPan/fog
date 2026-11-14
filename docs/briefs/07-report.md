@@ -8,7 +8,7 @@ not been implemented or measured. No play or strength claim follows from this pr
 
 | Work | State | Evidence |
 | --- | --- | --- |
-| Stage 1 converter and diagnostics | 81 focused tests pass; final corpus comparison pending | `tests-identity-history.txt`, `ruff-identity-history.txt` |
+| Stage 1 converter and diagnostics | 84 focused tests pass; final corpus comparison pending | `tests-final.txt`, `ruff-final.txt` |
 | Original baseline | Fixed split verified; R0 training and checkpointing | `R0-execution.json`; baseline commit `d603920` |
 | Corrected corpus | Final rebuild includes snapshot identity guards | `conversion-resume.json`, `guarded-partial-attempt.json` |
 | Stages 2–5 | Not started | No model, loss, search, PPO or belief source changed |
@@ -19,8 +19,11 @@ and live `FogPlayer` observations call the same encoder: own entities follow `ba
 insertion order, opponents follow public preview order, and switches follow own order minus the
 active. Replay registration inserts own preview entries before play; live insertion comes from
 the private request. These are the same indexing convention, but the raw logs and live team
-sheets need not put the same species at the same position. The correction shuffles only replay
-preview messages before both chronological passes; it uses no opponent hidden facts.
+sheets need not put the same species at the same position. The public-fact pass and imputation
+use original preview slots, keeping draws paired with R0. Completed sheets and provenance then
+move with the shuffled preview before decision reconstruction; no opponent hidden facts enter
+inputs. Species unable to fill four moves keep empty columns trailing, matching installed
+request order (`test_unfillable_move_slots_stay_after_the_installed_moves`).
 
 The slot check now moves IDs, PP, known flags, candidate features and provenance together. It
 reports switch-label positions, per-side lead positions, and policy/value intervals resampling

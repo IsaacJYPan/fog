@@ -1,0 +1,57 @@
+import csv
+import hashlib
+import json
+from pathlib import Path
+
+root = Path('/workspace/fog')
+artifacts = root / 'docs/briefs/07-artifacts'
+
+def read(name):
+    return json.loads((artifacts / name).read_text())
+
+assert read('stage1-complete.json')['status'] == 'complete'
+summary = {'smoke': True, 'runs': {}, 'fixed_split': read('fixed-split.json'),
+           'row_checks': {'before': read('rows-before-extended.json'), 'after': read('rows-after.json')},
+           'digests': read('digests-summary.json')}
+for name, seed in [('R0', 20261201), ('R1', 20261201), ('R1-seed2', 20261202)]:
+    metrics = list(csv.DictReader((artifacts / f'{name}-metrics.csv').open()))
+    best = min(metrics, key=lambda row: float(row['eval_action_ce']))
+    check = read('R0-slot-check-extended.json' if name == 'R0' else f'{name}-slot-check.json')
+    checkpoint = root / f'runs/order_blind/{name}/checkpoints/bc_best.pt'
+    summary['runs'][name] = {
+        'seed': seed, 'best_policy_epoch': int(best['epoch']),
+        'completed_epochs': max(int(row['epoch']) for row in metrics),
+        'policy': check['policy'], 'value': check['value'],
+        'checkpoint': {'path': str(checkpoint), 'bytes': checkpoint.stat().st_size,
+                       'sha256': hashlib.sha256(checkpoint.read_bytes()).hexdigest()},
+        'metric_source': f'{name}-metrics.csv',
+        'slot_source': 'R0-slot-check-extended.json' if name == 'R0' else f'{name}-slot-check.json',
+        'epoch_train_rows_per_second': [float(row['train_rows_per_second'])
+                                        for row in metrics if int(row['epoch']) > 0],
+    }
+    assert summary['runs'][name]['completed_epochs'] == 8
+noise, comparisons = {}, {}
+for group in ('all', 'move', 'not_yet_moved'):
+    noise[group], comparisons[group] = {}, {}
+    for metric in ('nll_stored', 'top1_stored', 'nll_shuffled', 'top1_shuffled'):
+        a = summary['runs']['R1']['policy'][group][metric]
+        b = summary['runs']['R1-seed2']['policy'][group][metric]
+        noise[group][metric] = {'absolute_seed_difference': abs(a-b), 'twice_difference': 2*abs(a-b)}
+    for metric in ('nll_shuffled', 'top1_shuffled'):
+        delta = summary['runs']['R1']['policy'][group][metric] - summary['runs']['R0']['policy'][group][metric]
+        comparisons[group][metric] = {'R1_minus_R0': delta,
+            'exceeds_twice_R1_seed_difference': abs(delta) > noise[group][metric]['twice_difference']}
+summary['R1_seed_noise'] = noise
+summary['shuffled_comparison'] = comparisons
+(artifacts / 'stage1-summary.json').write_text(json.dumps(summary, indent=2)+'\n')
+print('| Run (seed), best epoch | All NLL / top-1 | Move NLL / top-1 | First-history NLL / top-1 | First-history shuffled NLL / top-1 | Value Brier / ECE |')
+print('| --- | --- | --- | --- | --- | --- |')
+for name, run in summary['runs'].items():
+    cells = []
+    for group in ('all', 'move', 'not_yet_moved'):
+        p = run['policy'][group]
+        cells.append(f"{p['nll_stored']:.4f} / {p['top1_stored']:.4f}")
+    p = run['policy']['not_yet_moved']
+    cells.append(f"{p['nll_shuffled']:.4f} / {p['top1_shuffled']:.4f}")
+    cells.append(f"{run['value']['brier']:.4f} / {run['value']['ece']:.4f}")
+    print(f"| {name} ({run['seed']}), {run['best_policy_epoch']} | " + ' | '.join(cells) + ' |')

@@ -24,13 +24,13 @@ def run(args, output):
     if result.returncode:
         raise SystemExit(result.returncode)
 
-while not (root / 'data/metamon_gen9ou_r1500_order_guarded_v3_decisions/quality_report.json').exists():
+while not (root / 'data/metamon_gen9ou_r1500_order_paired_decisions/quality_report.json').exists():
     time.sleep(5)
 run(['fog.scripts.split_replay_manifest', '--manifest',
-     'data/metamon_gen9ou_r1500_order_guarded_v3_decisions/manifest.parquet', '--out',
+     'data/metamon_gen9ou_r1500_order_paired_decisions/manifest.parquet', '--out',
      'runs/blueprint/split', '--holdout-ids',
      'data/replay_splits/p2_holdout_2000_ids.txt', '--train-sizes', '1000'],
-    'runs/order_blind/split-R1-guarded-output.txt')
+    'runs/order_blind/split-R1-paired-output.txt')
 import polars as pl
 os.chdir(root)
 before = pl.read_parquet('runs/order_blind/leaky_split/holdout_manifest.parquet')

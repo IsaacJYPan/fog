@@ -1708,3 +1708,12 @@ settings (`runtime-equivalence.json`). No model, loss, batch size, seed or epoch
 The three historical rollout digests fail already on the unchanged checkout; every corresponding
 before/after digest matches on this runtime. A separate CPU-only build repeat also fails the
 historical sequential reference (`digests-summary.json`). No cause is claimed.
+
+Further converter checks before any R1 training: empty move columns now remain trailing for
+species unable to fill four slots (`7890d3a`), and private-set completion runs in original
+preview slots before sheets/provenance are shuffled (`531f29d`). This keeps imputation draws
+paired with R0 instead of changing sampled attributes alongside order. 84 focused tests pass,
+including installed Ditto move order, original-slot imputation pairing and full-converter
+opponent-information isolation (`tests-final.txt`, `ruff-final.txt`). Earlier corrected-corpus
+files marked `pre-guard` or `pre-empty-packing`, and the partial-attempt JSONs, are superseded;
+no R1 model was trained on them. The paired corpus is being rebuilt.
