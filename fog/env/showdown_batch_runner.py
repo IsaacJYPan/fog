@@ -297,6 +297,14 @@ class BatchedShowdownRunner:
                     out = agent(batch)
                 else:
                     out = agent(batch, need_belief=False)
+            if device.type != "cpu" and out.belief is None and out.belief_chain is None:
+                # Sampling and recording read one row at a time. Bring the two tensors they read
+                # to the CPU in one transfer, and sample with the per-battle CPU generators.
+                from fog.models.agent import AgentOutput
+
+                out = AgentOutput(
+                    log_probs=out.log_probs.float().cpu(), value=out.value.float().cpu()
+                )
             self.stats["forwards"] += 1
             self.stats["forward_rows"] += len(items)
             for row, (battle, seat) in enumerate(items):
