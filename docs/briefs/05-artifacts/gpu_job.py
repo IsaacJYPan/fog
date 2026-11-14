@@ -158,6 +158,10 @@ def main():
             with tarfile.open("/kaggle/working/replay-resume.tar.gz", "w:gz") as archive:
                 for path in WORK.iterdir():
                     archive.add(path, arcname=path.name)
+            for name in ("bc_best.pt", "bc_best_value.pt"):
+                checkpoint = WORK / SPEC["run"] / "checkpoints" / name
+                if checkpoint.is_file():
+                    shutil.copy2(checkpoint, OUTPUT / f"{SPEC['run']}-{name}")
         log = OUTPUT / "train.txt"
         if log.exists():
             with log.open() as stream:
