@@ -161,6 +161,7 @@ def test_policy_rejects_a_move_dictionary_that_changed_since_the_snapshot():
     state.record_action(["", "move", "p1a: Chomp", "Earthquake", "p2a: Pult"])
     assert not state._pending_policy_valid
     assert state._pending_filter_reason == "called_or_unaligned_move"
+    assert 1 not in state.tracker.my_actions
 
 
 def test_policy_rejects_a_switch_identity_that_changed_since_the_snapshot():
@@ -178,3 +179,4 @@ def test_policy_rejects_a_switch_identity_that_changed_since_the_snapshot():
     state.record_action(["", "switch", "p1a: Bird", "Corviknight", "100/100"])
     assert not state._pending_policy_valid
     assert state._pending_filter_reason == "forced_or_unaligned_switch"
+    assert 1 not in state.tracker.my_actions

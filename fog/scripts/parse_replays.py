@@ -302,7 +302,9 @@ class _PerspectiveState:
             self._pending_filter_reason = (
                 "accepted" if self._pending_policy_valid else "forced_or_unaligned_switch"
             )
-        if self._pending_action is not None:  # history retro-fidelity: my action per turn
+        if self._pending_action is not None and (self.private_set is None or aligned):
+            # Let public identity history handle a replaced actor; do not preserve a slot
+            # number that was just found to name a different encoded move or switch target.
             self.tracker.my_actions[int(getattr(battle, "turn", 0) or 0)] = self._pending_action
 
     def record_tera(self, parts: list[str]) -> None:
