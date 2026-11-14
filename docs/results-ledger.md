@@ -1150,3 +1150,20 @@ this independent run may produce its full-loop result earlier, but PPO timing is
 pending. G100 still waits for completed G20 curve/value reports and its CPU play smoke.
 G20's quota delta contains the earlier shared-account collection work, so its own session
 wall upper bound, not that contaminated delta, must drive G100's overhead projection.
+
+### Independent end-to-end speed result, G20 preserved (smoke)
+
+`work/collect-gpu` at `bc5bd85` published the short timing result from its independent
+single T4, released by 09:49:54 UTC. Two completed PPO updates at training commit
+`ac75355` retain 26,268 learner decisions / 1,024 games in 700.389269 seconds, including
+startup and checkpoint writes: **37.504858 decisions/s / 1.462044 games/s**. The whole
+995.824165-second attempt includes an unfinished third update and yields **26.378151
+retained decisions/s / 1.028294 games/s**. Native update time is 71.897% of completed-prefix
+wall time. The worker reports a separate owner instruction to shorten the learning run;
+100k decisions, the 200-game evaluation and the full self-play matrix remain unverified.
+No learning/strength gate is claimed. Exact published training command, native timers and
+source pin are copied in `brief06-short-run-summary.json`; independent division/count
+checks are in `brief06-endtoend-recomputed.json`. Cumulative brief-06 allocation upper
+bound is 2.441111 GPU-hours, separate from the brief-05 Kaggle budget. No duplicate
+allocation was submitted. G20 remains running unchanged, with epoch 10 of 18 saved.
+G100 can follow G20 curve/value reports and CPU play without a further brief-06 GPU job.

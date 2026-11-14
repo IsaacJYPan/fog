@@ -1,6 +1,6 @@
 {
   "label": "smoke",
-  "status": "running",
+  "status": "released; short end-to-end timing published",
   "allocated_gpus": 1,
   "previous_attempts_gpu_hours_upper": 0.9372222222222222,
   "first_runtime_start_conservative_utc": "2026-11-14T08:16:00Z",
@@ -15,5 +15,13 @@
   "source_commit": "922886b",
   "relation_to_g20": "independent owner-selected single-T4 runtime; G20 remains unchanged on Kaggle",
   "duplicate_private_job": "prepared but never submitted; retired",
-  "earlier_eta": "14:50 estimate applied to waiting for G20 on the shared Kaggle account; this separate runtime can finish earlier if all stages fit"
+  "earlier_eta": "14:50 estimate applied to waiting for G20 on the shared Kaggle account; this separate runtime can finish earlier if all stages fit",
+  "reported_source_commit": "bc5bd85",
+  "observed_released_by_utc": "2026-11-14T09:49:54+00:00",
+  "actual_all_attempts_gpu_hours_upper": 2.4411111111111112,
+  "completed_prefix_games_per_second": 1.4620441024812119,
+  "completed_prefix_decisions_per_second": 37.50485789450828,
+  "whole_attempt_retained_games_per_second": 1.0282939861595992,
+  "whole_attempt_retained_decisions_per_second": 26.378150809023783,
+  "limitations": "Two completed PPO updates, 26,268 decisions and 1,024 games; the original 100k run, greedy evaluation and complete self-play matrix were not completed. Published worker reports a separate owner request for this shorter timing scope. G20 was not interrupted."
 }
