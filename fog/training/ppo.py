@@ -1244,7 +1244,13 @@ def _copy_module_to_shared_cpu(target, source) -> None:
 
 
 class _ShowdownRolloutWorker:
-    """Long-lived CPU actor plus one long-lived authoritative Showdown subprocess."""
+    """Long-lived actor plus one long-lived authoritative Showdown subprocess.
+
+    `env.rollout_batch` above 1 plays that many battles at once through
+    `fog.env.showdown_batch_runner`, with one forward per wave instead of one per decision.
+    `env.actor_device` other than ``cpu`` keeps a copy of the actor on that device; it is
+    refreshed from the shared CPU actor at the start of every chunk.
+    """
 
     _SCRIPTED = frozenset({"Random", "MaxDamage", "SimpleHeuristics"})
 
@@ -1296,7 +1302,20 @@ class _ShowdownRolloutWorker:
         torch.set_grad_enabled(False)
         torch.manual_seed(int(cfg.get("seed", 0)) + self.worker_id)
 
-        self.actor = shared_actor
+        env_cfg = cfg.get("env", {})
+        self.rollout_batch = int(env_cfg.get("rollout_batch", 1))
+        if self.rollout_batch < 1:
+            raise ValueError("env.rollout_batch must be >= 1")
+        self.actor_device = torch.device(str(env_cfg.get("actor_device", "cpu")))
+        self.shared_actor = shared_actor
+        if self.actor_device.type == "cpu":
+            self.actor = shared_actor
+        else:
+            if shared_phi is not None:
+                raise ValueError("env.actor_device other than cpu does not support leakage.beta > 0")
+            from fog.models.agent import FogAgent
+
+            self.actor = FogAgent.from_tables(cfg).to(self.actor_device)
         self.actor.eval()
         self.adapter = bind_fog_player(
             FogPlayer(
@@ -1311,6 +1330,8 @@ class _ShowdownRolloutWorker:
         from fog.training.heuristic_guidance import attach_guidance
 
         self.teacher = attach_guidance(self.adapter, cfg)
+        if self.teacher is not None and self.rollout_batch > 1:
+            raise ValueError("env.rollout_batch > 1 does not support heuristic guidance")
         self.adapter.phi_hat = shared_phi
 
         def local_truth(battle):
@@ -1354,6 +1375,7 @@ class _ShowdownRolloutWorker:
 
         frozen = FogAgent.from_tables(self.cfg).cpu()
         frozen.load_compatible_state_dict(torch.load(spec, map_location="cpu"))
+        frozen.to(self.actor_device)
         frozen.eval()
         controller = bind_fog_player(FogPlayer(frozen))
         self.opponents[spec] = controller
@@ -1361,7 +1383,7 @@ class _ShowdownRolloutWorker:
             self.opponents.popitem(last=False)
         return controller
 
-    def run(self, payload):
+    def run(self, payload, *, batched: bool | None = None):
         import numpy as np
         import torch
 
@@ -1369,6 +1391,8 @@ class _ShowdownRolloutWorker:
         from fog.training.rollout import RolloutBuffer
 
         assigned, opponent_spec, tera_bonus = payload
+        if self.actor is not self.shared_actor:
+            self.actor.load_state_dict(self.shared_actor.state_dict())
         self.adapter.tera_logit_bonus = float(tera_bonus)
         gamma, lam, beta, clip_deltas, progress_coef = self.rollout_settings
         local_buf = RolloutBuffer(
@@ -1380,6 +1404,9 @@ class _ShowdownRolloutWorker:
         )
         self.adapter.attach_buffer(local_buf)
         controller = self._opponent_controller(str(opponent_spec))
+        if self.rollout_batch > 1 if batched is None else batched:
+            wins, self.batch_stats = self._play_batched(assigned, controller)
+            return local_buf, wins
         wins = 0
         for game in assigned:
             p1_paste = self.pool_teams[game.p1_index]
@@ -1408,6 +1435,43 @@ class _ShowdownRolloutWorker:
                 )
             wins += int(result.p1_won is True)
         return local_buf, wins
+
+    def _play_batched(self, assigned, controller) -> tuple[int, dict]:
+        """Play the assigned games `rollout_batch` at a time; returns (learner wins, runner stats).
+
+        Each battle keeps the seeds the one-at-a-time loop gives it, so with a batch of one the
+        recorded rollout is identical; with more, only floating-point reduction order in the
+        forward can differ.
+        """
+        from fog.env.showdown_batch_runner import BatchedShowdownRunner, BattleSpec
+
+        specs = []
+        for game in assigned:
+            p1_paste = self.pool_teams[game.p1_index]
+            p2_paste = self.pool_teams[game.p2_index]
+            specs.append(
+                BattleSpec(
+                    options={
+                        "formatid": self.fmt,
+                        "seed": f"sodium,{game.seed:064x}",
+                        "strictChoices": True,
+                        "p1": {"name": "FOG", "team": self.packed[p1_paste]},
+                        "p2": {"name": "Opponent", "team": self.packed[p2_paste]},
+                    },
+                    battle_tag=game.battle_tag,
+                    seed=game.seed,
+                    context=(p1_paste, p2_paste),
+                )
+            )
+
+        def enter(spec) -> None:
+            self.current_private_state, self.current_opponent = spec.context
+
+        runner = BatchedShowdownRunner(
+            self.client, self.adapter, controller, batch_size=self.rollout_batch, enter=enter
+        )
+        results = runner.play(specs)
+        return sum(int(result.p1_won is True) for result in results), runner.stats
 
     def close(self) -> None:
         self.client.close()
@@ -1473,6 +1537,21 @@ def _train_showdown_direct(cfg: dict) -> dict:
     )
     if actor_threads < 1:
         raise ValueError("env.actor_threads must be >= 1")
+    rollout_batch = int(s.env_cfg.get("rollout_batch", 1))
+    actor_device = str(s.env_cfg.get("actor_device", "cpu"))
+    if (rollout_batch > 1 or actor_device != "cpu") and not (
+        worker_count > 1 and worker_mode == "process"
+    ):
+        raise ValueError(
+            "env.rollout_batch > 1 and env.actor_device need env.rollout_workers >= 2 "
+            "with env.rollout_worker_mode: process"
+        )
+    if rollout_batch > 1 and worker_count * rollout_batch > s.games_per_chunk:
+        print(
+            f"[ppo] note: ppo.games_per_chunk={s.games_per_chunk} gives each of {worker_count} "
+            f"workers fewer than env.rollout_batch={rollout_batch} games at a time",
+            flush=True,
+        )
     if worker_count > 1:
         if worker_count > s.games_per_chunk:
             raise ValueError(

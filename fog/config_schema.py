@@ -21,10 +21,10 @@ class ConfigSchema:
 _SECTION_KEYS = {
     "pins": {"showdown_commit", "ou_banlist_date", "usage_month", "usage_rating_cut"},
     "env": {
-        "actor_threads", "backend", "balanced_team_sampling", "battle_format",
+        "actor_device", "actor_threads", "backend", "balanced_team_sampling", "battle_format",
         "belief_supervision", "concurrent_battles", "engine_batch", "games_per_chunk",
         "min_team_pool_size", "no_security", "node_binary", "num_workers",
-        "opponent_cache_size", "rollout_worker_mode", "rollout_worker_timeout",
+        "opponent_cache_size", "rollout_batch", "rollout_worker_mode", "rollout_worker_timeout",
         "independent_opponent_rng",
         "rollout_workers", "server_url", "showdown_root", "team_pool",
     },

@@ -116,9 +116,19 @@ class BatchedShowdownRunner:
 
     # ------------------------------------------------------------------------------ random state
     @contextmanager
-    def _battle(self, live: _Live) -> Iterator[None]:
+    def _battle(self, live: _Live, *, random_state: bool = True) -> Iterator[None]:
+        """Work on one battle: its providers see it, and it draws from its own random states.
+
+        `random_state=False` skips swapping the global torch and numpy generators; it is for
+        phases that draw no random numbers (decision preparation).
+        """
         import torch
 
+        if not random_state:
+            if self.enter is not None:
+                self.enter(live.spec)
+            yield
+            return
         torch.set_rng_state(live.torch_state)
         np.random.set_state(live.np_state)
         if self.enter is not None:
@@ -252,7 +262,7 @@ class BatchedShowdownRunner:
         groups: dict[int, list[tuple[_Live, int]]] = {}
         for battle in live:
             battle.pending = [None, None]
-            with self._battle(battle):
+            with self._battle(battle, random_state=False):
                 for seat, role in enumerate(_ROLES):
                     if not battle.owed[seat]:
                         continue

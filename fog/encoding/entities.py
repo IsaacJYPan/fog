@@ -43,7 +43,7 @@ from fog.constants.schema import (
 )
 from fog.encoding.dims import DIMS, N_ENTITIES
 from fog.encoding.events import submitted_species_id
-from fog.env.actions import action_legality_mask, team_order
+from fog.env.actions import _normalize_id, action_legality_mask, team_order
 
 _NON_ID = re.compile(r"[^a-z0-9]")
 
@@ -91,7 +91,59 @@ _PARADOX_STAT = {s: i for i, s in enumerate(PARADOX_BOOST_STATS)}
 
 
 def _to_id(name: object) -> str:
-    return _NON_ID.sub("", str(name).lower())
+    return _normalize_id(name)
+
+
+_STAT_KEYS = ("hp", "atk", "def", "spa", "spd", "spe")
+_TYPE_SLOT: dict[Any, int | None] = {}
+_STATUS_MEMBER: dict[Any, Status] = {}
+_EFFECT_SLOTS: dict[Any, tuple[int | None, tuple[int, ...]]] = {}
+_WEIGHT_BUCKET: Any = None
+
+
+def _type_slot(type_: Any) -> int | None:
+    try:
+        return _TYPE_SLOT[type_]
+    except KeyError:
+        slot = _TYPE_SLOT[type_] = TYPE_INDEX.get(_to_id(getattr(type_, "name", type_)))
+        return slot
+    except TypeError:  # unhashable test double
+        return TYPE_INDEX.get(_to_id(getattr(type_, "name", type_)))
+
+
+def _status_member(status: Any) -> Status:
+    try:
+        return _STATUS_MEMBER[status]
+    except KeyError:
+        cache = True
+    except TypeError:
+        cache = False
+    try:
+        member = Status[_to_id(getattr(status, "name", status)).upper()]
+    except KeyError:
+        member = Status.NONE
+    if cache:
+        _STATUS_MEMBER[status] = member
+    return member
+
+
+def _effect_slots(effect: Any) -> tuple[int | None, tuple[int, ...]]:
+    """(volatile column or None, paradox-boost columns) for one volatile effect."""
+    try:
+        return _EFFECT_SLOTS[effect]
+    except KeyError:
+        cache = True
+    except TypeError:
+        cache = False
+    name = _to_id(getattr(effect, "name", effect))
+    paradox = tuple(
+        pi for stat, pi in _PARADOX_STAT.items()
+        if ("protosynthesis" in name or "quarkdrive" in name) and name.endswith(stat)
+    )
+    slots = (_VOLATILE_IDX.get(name), paradox)
+    if cache:
+        _EFFECT_SLOTS[effect] = slots
+    return slots
 
 
 def _own_nature_evs(mon: Any, species_id: str, tables) -> tuple[int, list[int]]:
@@ -196,56 +248,51 @@ L = _Layout()
 
 def _fill_mon_record(row: np.ndarray, mon: Any, tables) -> None:
     """Publicly-visible condition/rulebook blocks shared by mine and revealed-opponent mons."""
+    global _WEIGHT_BUCKET
     stats = getattr(mon, "base_stats", None) or {}
-    for i, key in enumerate(("hp", "atk", "def", "spa", "spd", "spe")):
-        row[L.base_stats + i] = float(stats.get(key, 0)) / 255.0
+    row[L.base_stats : L.base_stats + 6] = [float(stats.get(key, 0)) / 255.0 for key in _STAT_KEYS]
     for t in getattr(mon, "types", None) or []:
-        idx = TYPE_INDEX.get(_to_id(getattr(t, "name", t)))
+        idx = _type_slot(t)
         if idx is not None:
             row[L.typing + idx] = 1.0
     weight = getattr(mon, "weight", None)
     if weight:
-        from fog.constants.build import weight_bucket
+        if _WEIGHT_BUCKET is None:
+            from fog.constants.build import weight_bucket
 
-        row[L.weight + min(weight_bucket(float(weight)), DIMS.weight_bucket - 1)] = 1.0
+            _WEIGHT_BUCKET = weight_bucket
+        row[L.weight + min(_WEIGHT_BUCKET(float(weight)), DIMS.weight_bucket - 1)] = 1.0
     hp = getattr(mon, "current_hp_fraction", None)
     row[L.hp] = float(hp) if hp is not None else 1.0
     row[L.fainted] = 1.0 if getattr(mon, "fainted", False) else 0.0
 
     status = getattr(mon, "status", None)
-    status_name = _to_id(getattr(status, "name", status)).upper() if status else "NONE"
-    try:
-        member = Status[status_name]
-    except KeyError:
-        member = Status.NONE
+    member = _status_member(status) if status else Status.NONE
     row[L.status + member.value] = 1.0
-    counter = float(getattr(mon, "status_counter", 0) or 0)
     if member is Status.SLP:
-        row[L.counters + 0] = counter / 8.0
+        row[L.counters + 0] = float(getattr(mon, "status_counter", 0) or 0) / 8.0
     elif member is Status.TOX:
-        row[L.counters + 1] = counter / 8.0
+        row[L.counters + 1] = float(getattr(mon, "status_counter", 0) or 0) / 8.0
 
     boosts = getattr(mon, "boosts", None) or {}
-    for i, key in enumerate(_BOOST_ORDER):
-        row[L.boosts + i] = float(boosts.get(key, 0)) / 6.0
+    row[L.boosts : L.boosts + 7] = [float(boosts.get(key, 0)) / 6.0 for key in _BOOST_ORDER]
 
     for effect in getattr(mon, "effects", None) or {}:
-        name = _to_id(getattr(effect, "name", effect))
-        if name in _VOLATILE_IDX:
-            row[L.volatiles + _VOLATILE_IDX[name]] = 1.0
         # The simulator/poke-env effect value may be an exact internal remaining duration that the
         # player cannot know (partial trapping is the important example).  Countdown features are
         # populated only by BattleTracker from public start/end events below.
-        for stat, pi in _PARADOX_STAT.items():
-            if ("protosynthesis" in name or "quarkdrive" in name) and name.endswith(stat):
-                row[L.paradox + pi] = 1.0
+        volatile, paradox = _effect_slots(effect)
+        if volatile is not None:
+            row[L.volatiles + volatile] = 1.0
+        for pi in paradox:
+            row[L.paradox + pi] = 1.0
 
     if is_terastallized(mon):
         row[L.tera_used] = 1.0
-    tera = getattr(mon, "tera_type", None)
-    if tera is not None and is_terastallized(mon):
-        idx = TYPE_INDEX.get(_to_id(getattr(tera, "name", tera)), N_TERA_TYPES - 1)
-        row[L.tera_type + idx] = 1.0
+        tera = getattr(mon, "tera_type", None)
+        if tera is not None:
+            idx = _type_slot(tera)
+            row[L.tera_type + (idx if idx is not None else N_TERA_TYPES - 1)] = 1.0
 
 
 def encode_entities(

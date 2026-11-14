@@ -47,46 +47,10 @@ def build_worker(cfg: dict, pool: list[str], *, threads: int = 1):
 
 
 def run_batched(worker, payload, batch_size: int):
-    """`_ShowdownRolloutWorker.run` played through the batched runner instead of one by one."""
-    from fog.env.showdown_batch_runner import BatchedShowdownRunner, BattleSpec
-    from fog.training.rollout import RolloutBuffer
-
-    assigned, opponent_spec, tera_bonus = payload
-    if worker.teacher is not None:
-        raise NotImplementedError("per-game heuristic teacher state is not batched")
-    worker.adapter.tera_logit_bonus = float(tera_bonus)
-    gamma, lam, beta, clip_deltas, progress_coef = worker.rollout_settings
-    local_buf = RolloutBuffer(
-        gamma=gamma, lam=lam, beta=beta, clip_deltas=clip_deltas, progress_coef=progress_coef
-    )
-    worker.adapter.attach_buffer(local_buf)
-    controller = worker._opponent_controller(str(opponent_spec))
-    specs = []
-    for game in assigned:
-        p1_paste = worker.pool_teams[game.p1_index]
-        p2_paste = worker.pool_teams[game.p2_index]
-        specs.append(BattleSpec(
-            options={
-                "formatid": worker.fmt,
-                "seed": f"sodium,{game.seed:064x}",
-                "strictChoices": True,
-                "p1": {"name": "FOG", "team": worker.packed[p1_paste]},
-                "p2": {"name": "Opponent", "team": worker.packed[p2_paste]},
-            },
-            battle_tag=game.battle_tag,
-            seed=game.seed,
-            context=(p1_paste, p2_paste),
-        ))
-
-    def enter(spec) -> None:
-        worker.current_private_state, worker.current_opponent = spec.context
-
-    runner = BatchedShowdownRunner(
-        worker.client, worker.adapter, controller, batch_size=batch_size, enter=enter
-    )
-    results = runner.play(specs)
-    wins = sum(int(result.p1_won is True) for result in results)
-    return local_buf, wins, runner.stats
+    """`_ShowdownRolloutWorker.run` with `env.rollout_batch` set to `batch_size`."""
+    worker.rollout_batch = int(batch_size)
+    local_buf, wins = worker.run(payload, batched=True)
+    return local_buf, wins, worker.batch_stats
 
 
 def _feed(h, value) -> None:
@@ -130,6 +94,7 @@ def run_probe(
     seed: int,
     threads: int = 1,
     batch: int | None = None,
+    opponent_name: str = "self",
 ) -> dict:
     import torch
 
@@ -148,28 +113,34 @@ def run_probe(
     with tempfile.TemporaryDirectory() as tmp:
         ckpt = Path(tmp) / "opponent.pt"
         torch.save(agent.state_dict(), ckpt)
-        opponent = worker._opponent_controller(str(ckpt))
+        spec = str(ckpt) if opponent_name == "self" else opponent_name
         opponent_calls = [0]
-        inner_act = opponent.act
+        if opponent_name == "self":
+            opponent = worker._opponent_controller(spec)
+            inner_act = opponent.act
 
-        def counted_act(battle):
-            opponent_calls[0] += 1
-            return inner_act(battle)
+            def counted_act(battle):
+                opponent_calls[0] += 1
+                return inner_act(battle)
 
-        opponent.act = counted_act
+            opponent.act = counted_act
         stats = None
         try:
             start = time.perf_counter()
             if batch is None:
-                buf, wins = worker.run((assigned, str(ckpt), 0.0))
+                buf, wins = worker.run((assigned, spec, 0.0))
             else:
-                buf, wins, stats = run_batched(worker, (assigned, str(ckpt), 0.0), batch)
+                buf, wins, stats = run_batched(worker, (assigned, spec, 0.0), batch)
             elapsed = time.perf_counter() - start
         finally:
             worker.close()
     learner = sum(len(g.actions) for g in buf._games.values())
     # The batched runner does not call `act` for batched decisions; count its p2 move choices.
-    opponent = opponent_calls[0] if stats is None else stats["move_choices"][1]
+    # Against a scripted opponent only the learner's decisions run the network and are counted.
+    if opponent_name != "self":
+        opponent = 0
+    else:
+        opponent = opponent_calls[0] if stats is None else stats["move_choices"][1]
     decisions = learner + opponent
     return {
         "buffer": buf,
@@ -185,6 +156,84 @@ def run_probe(
     }
 
 
+def run_pool_probe(
+    config: str,
+    pool_dir: str,
+    games: int,
+    seed: int,
+    *,
+    workers: int,
+    threads: int = 1,
+    batch: int = 1,
+    device: str = "cpu",
+    opponent: str = "self",
+) -> dict:
+    """Collection rate of the trainer's own worker processes (`PersistentProcessPool`).
+
+    One untimed game per worker first (it loads the opponent and warms the simulator), then
+    `games` games split across the workers as the trainer splits a chunk. `opponent` is ``self``
+    (a frozen copy of the learner, so both seats run the network) or a scripted controller name.
+    """
+    import torch
+
+    from fog.config import load_config
+    from fog.env.teams import load_pool
+    from fog.models.agent import FogAgent
+    from fog.training.direct_parallel import PersistentProcessPool, WorkerGame, partition_games
+    from fog.training.ppo import _ShowdownRolloutWorker
+
+    cfg = load_config(config)
+    cfg.setdefault("env", {})["rollout_batch"] = int(batch)
+    cfg["env"]["actor_device"] = str(device)
+    pool = load_pool(pool_dir)
+    torch.manual_seed(int(cfg.get("seed", 0)))
+    shared_actor = FogAgent.from_tables(cfg).cpu().eval()
+    shared_actor.share_memory()
+    ppo = cfg.get("ppo", {})
+    leak = cfg.get("leakage", {})
+    settings = (
+        float(ppo.get("gamma", 1.0)),
+        float(ppo.get("lam", 0.95)),
+        0.0,
+        bool(leak.get("clip_delta", True)),
+        float(cfg.get("reward", {}).get("progress_coef", 0.0)),
+    )
+    supervision = str(cfg.get("env", {}).get("belief_supervision", "full_truth"))
+    rng = random.Random(seed)
+
+    def schedule(count: int, first: int) -> list:
+        return [
+            WorkerGame(-1, first + n, rng.getrandbits(62), rng.randrange(len(pool)),
+                       rng.randrange(len(pool)))
+            for n in range(count)
+        ]
+
+    with tempfile.TemporaryDirectory() as tmp:
+        spec = opponent
+        if opponent == "self":
+            spec = str(Path(tmp) / "opponent.pt")
+            torch.save(shared_actor.state_dict(), spec)
+        with PersistentProcessPool(
+            workers, _ShowdownRolloutWorker, cfg, shared_actor, None, pool, settings,
+            supervision, {}, threads, 2,
+        ) as process_pool:
+            warm = partition_games(schedule(workers, 0), workers)
+            process_pool.map([(assigned, spec, 0.0) for assigned in warm])
+            timed = partition_games(schedule(games, workers), workers)
+            start = time.perf_counter()
+            results = process_pool.map([(assigned, spec, 0.0) for assigned in timed])
+            elapsed = time.perf_counter() - start
+    learner = sum(len(g.actions) for buf, _ in results for g in buf._games.values())
+    return {
+        "games": float(games),
+        "learner_decisions": float(learner),
+        "seconds": elapsed,
+        "learner_decisions_per_s": learner / elapsed,
+        "games_per_s": games / elapsed,
+        "p1_wins": float(sum(wins for _, wins in results)),
+    }
+
+
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--config", default="configs/gen9ou_typed_token_selfplay.yaml")
@@ -196,8 +245,34 @@ def main(argv: list[str] | None = None) -> None:
         "--batch", type=int, default=None,
         help="play N concurrent battles with one batched forward per wave",
     )
+    parser.add_argument(
+        "--workers", type=int, default=0,
+        help="measure the trainer's worker processes instead of one in-process worker",
+    )
+    parser.add_argument("--device", default="cpu", help="env.actor_device for --workers")
+    parser.add_argument(
+        "--opponent", default="self",
+        help="self (a frozen copy of the learner), MaxDamage, SimpleHeuristics or Random",
+    )
     args = parser.parse_args(argv)
-    out = run_probe(args.config, args.pool, args.games, args.seed, args.threads, args.batch)
+    if args.workers:
+        out = run_pool_probe(
+            args.config, args.pool, args.games, args.seed, workers=args.workers,
+            threads=args.threads, batch=args.batch or 1, device=args.device,
+            opponent=args.opponent,
+        )
+        print(
+            f"workers={args.workers} batch={args.batch or 1} device={args.device} "
+            f"opponent={args.opponent} games={int(out['games'])} "
+            f"learner_decisions={int(out['learner_decisions'])} seconds={out['seconds']:.2f} "
+            f"learner_decisions/s={out['learner_decisions_per_s']:.2f} "
+            f"games/s={out['games_per_s']:.3f} p1_wins={int(out['p1_wins'])}",
+            flush=True,
+        )
+        return
+    out = run_probe(
+        args.config, args.pool, args.games, args.seed, args.threads, args.batch, args.opponent
+    )
     print(
         f"games={int(out['games'])} decisions={int(out['decisions'])} "
         f"seconds={out['seconds']:.2f} decisions/s={out['decisions_per_s']:.2f} "
