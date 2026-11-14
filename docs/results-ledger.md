@@ -810,3 +810,42 @@ replay reference 28% (29,107/103,981 = 27.99%). The numerator is action family
 forced replacements while retained replay decisions omit forced/single-choice
 rows, so these raw rates are not a like-for-like voluntary-switch comparison.
 Formulas and counts are in `play-summary.json`. P2.3–P2.5 and G2 remain open.
+
+## 2026-11-14: review of brief 03
+
+The branch `work/p2-scale-measure` (head `c5a1cb4`) was reviewed and merged into `work/roadmap`.
+It changes no application code: 22 commits of measurements, the report, the ledger section
+above and the rewritten `docs/replay-blueprint-scale-run.md`. Checked in review:
+
+- The stage 2 table against `docs/briefs/03-artifacts/{R,A,S,B}-metrics.csv`: step counts, last
+  and best holdout NLL, top-1 and final training NLL agree to the printed digits (run A's best
+  is 1.736087 in the CSV and 1.736081 in the standalone report; both are quoted correctly).
+- The play smoke against `play-summary.json`: 144/400 against SimpleHeuristics, 309/400 against
+  MaxDamage, no failures or truncations.
+- No effect smaller than twice the two-seed difference (0.031) is claimed.
+- `ruff check fog tests` is clean; every commit is authored as the owner with no attribution.
+- Not re-run in review: the trainings themselves and the kill-and-continue tests (their before
+  and after files are in the artifacts).
+
+What the review takes from it, all smoke:
+
+| Finding | Evidence |
+| --- | --- |
+| The policy is limited by data, not by updates | 1,000 and 3,000 games both reach their best holdout NLL at epoch 8 of 18 (1.736 and 1.579) and then get worse while training NLL keeps falling (to 1.24 and 1.06) |
+| More games still buy play strength | The 3,000-game model at its best epoch wins 0.360 against SimpleHeuristics and 0.7725 against MaxDamage on `pool_b`, against 0.258 and 0.623 for brief 01's 3,000-game model after six epochs |
+| Training is bound by model computation on CPU | 157 to 194 rows/s on four cores, 96% of a step in the model, 46% of the forward pass in the belief heads; batch building alone would allow 7,100 rows/s |
+| The value head memorises games | At the best policy epoch of run B, holdout value Brier is 0.3445 (a constant 0.5 scores 0.25) and ECE 0.299. It predicts below 0.1 or above 0.9 on 56% of rows; those rows were won 40% and 59% of the time. Late-game rows are no better than early ones (Brier 0.327 against 0.343). The lowest value MSE of any epoch is 0.957, against 1.0 for a constant |
+
+The last row matters for gate G2, which asks for value ECE below 0.05, and for search in P4,
+which needs a value that says something. Run B has 3,000 outcome labels against 156,597 policy
+labels: every row of a game carries the same outcome, and the inputs identify the game. The
+checkpoint is chosen by policy loss, long after the value head has started to memorise. In
+brief 01 the six-epoch model had ECE 0.032 with value MSE 0.92 to 1.05: calibrated because it
+predicted close to 0.5 everywhere. In play the same head does learn: brief 04's fixed-team run
+shows value explained variance of 0.26 to 0.38 between 80,000 and 250,000 decisions (interim, branch
+`work/rl-check`). So this reads as too few independent outcomes and no separate stopping point
+for the value head, not as a head that cannot learn. Brief 05 measures whether 20,000 and
+100,000 games change it.
+
+Not done by brief 03 and carried forward: any run on a GPU, batch 1,024, and the 20,000 and
+100,000-game points. Next: `docs/briefs/05-p2-gpu-scale.md`.
