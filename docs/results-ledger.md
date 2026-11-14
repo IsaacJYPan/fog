@@ -813,3 +813,47 @@ shared the four-CPU allocation with PPO; their contention is included in measure
 Final entropy / policy KL / clip fraction / value loss / value explained variance /
 mean episode return: 0.71365 / 0.01315 / 0.07823 / 0.24381 / 0.52057 / 0.42500.
 The no-new-runs cost analysis follows next.
+
+Stage 3 completed, **smoke / arithmetic only, no new experiments**. Command
+`UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python docs/briefs/04-artifacts/summarize_costs.py`,
+code `4790766638d0baa37e62d46102a0bfcc4aed01e0`; output `cost-breakdown.json`.
+
+| Learned comparison (smoke) | First observed gain | Decisions per ten points at first measured gain | Full-budget cost per ten points |
+| --- | --- | ---: | ---: |
+| Stage 1, same-team MaxDamage | +84 points at 106,889 | 12,724.881 | 39,790.000 |
+| Stage 2, pool A SimpleHeuristics | +58.5 points at 216,451 | 37,000.171 | 84,700.684 |
+
+Cost is learner PPO decisions / (gain in percentage points / 10). First measured points
+bound when improvement was observed, not when it first occurred. Stage-2 full-budget gain
+is +65.75 points at 556,907; the intermediate +71.25-point gain cost 58,199.158 per ten
+points. These costs exclude blueprint reconstruction (~66 minutes from the recorded build
+steps) and evaluation. No held-out cost per gain is claimed because no clear gain was measured.
+
+Stage-0 hour split projects the measured single-worker collection profile shares onto its
+118.81777 s of four-worker collection wall time. It is approximate, not a four-process trace.
+Node CPU (2.55 s) overlaps the Node round-trip/JSON and other wall categories, so is not added.
+The hypothetical rates use N/(wall - component); they are Amdahl arithmetic, not benchmarks.
+
+| Component (smoke projection) | Minutes per training hour | End-to-end decisions/s if this part alone were free |
+| --- | ---: | ---: |
+| node_roundtrip_and_json | 1.096067 | 22.684312 |
+| observation_building | 1.874337 | 22.988042 |
+| acting_forward | 3.412785 | 23.613023 |
+| other_collection | 1.423840 | 22.811246 |
+| update | 51.915719 | 165.283130 |
+| outside_training_loop | 0.277252 | 22.373304 |
+
+Measured end-to-end rates: stage 0 22.269920, stage 1 42.809979, stage 2 22.366785
+learner decisions/s. Stage-1 collection/update minutes per hour: 14.121809/45.849035;
+stage 2: 10.387491/49.563631. If all collection alone were free, stage 1 projects
+55.987359 decisions/s and stage 2 27.049773; if the update alone were free,
+181.514038 and 128.589466. The update dominates in all three runs.
+Optimization throughput is 77.875567 / 79.051466 / 75.338457 processed rows/s, with
+3 / 1.387011 / 2.757527 effective epochs. The stage-1 rate increase is principally fewer
+KL-limited optimizer rows, not a new implementation speedup. Intermediate evaluations shared
+CPU with training; use stage 0 for the approximately isolated collection breakdown.
+
+Final report `docs/briefs/04-report.md` contains all evaluation points, the stated rule readings,
+config changes, fixes and limitations. Focused tests remain 32 passed; final full lint over
+`fog tests docs/briefs/04-artifacts` is clean. No model, loss, search or PPO algorithm was
+changed. No gate, candidate checkpoint, broader held-out improvement or GPU result is claimed.

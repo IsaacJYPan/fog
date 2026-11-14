@@ -1,0 +1,145 @@
+{
+  "smoke": true,
+  "stage0": {
+    "decisions": 20336.0,
+    "wall_seconds": 913.16,
+    "end_to_end_decisions_per_second": 22.269919838801524,
+    "optimization_seconds": 783.40361,
+    "optimizer_rows": 61008.0,
+    "effective_epochs": 3.0,
+    "optimization_rows_per_second": 77.87556659331707,
+    "parts": {
+      "collection": {
+        "seconds": 118.81777,
+        "minutes_per_training_hour": 7.807028560164702,
+        "hypothetical_decisions_per_second_if_free": 25.601056109027468
+      },
+      "update": {
+        "seconds": 790.12264,
+        "minutes_per_training_hour": 51.91571947960927,
+        "hypothetical_decisions_per_second_if_free": 165.2831302622229
+      },
+      "outside_training_loop": {
+        "seconds": 4.219589999999926,
+        "minutes_per_training_hour": 0.27725196022602344,
+        "hypothetical_decisions_per_second_if_free": 22.37330387808371
+      }
+    }
+  },
+  "stage1": {
+    "decisions": 334236,
+    "wall_seconds": 7807.4319496154785,
+    "end_to_end_decisions_per_second": 42.80997928089035,
+    "optimization_seconds": 5864.39472,
+    "optimizer_rows": 463589.0,
+    "effective_epochs": 1.3870109742816452,
+    "optimization_rows_per_second": 79.05146603092228,
+    "parts": {
+      "collection": {
+        "seconds": 1837.58434,
+        "minutes_per_training_hour": 14.121808696063004,
+        "hypothetical_decisions_per_second_if_free": 55.98735878310441
+      },
+      "update": {
+        "seconds": 5966.05371,
+        "minutes_per_training_hour": 45.84903524104747,
+        "hypothetical_decisions_per_second_if_free": 181.51403813145748
+      },
+      "outside_training_loop": {
+        "seconds": 3.7938996154780398,
+        "minutes_per_training_hour": 0.02915606288952586,
+        "hypothetical_decisions_per_second_if_free": 42.83079223542409
+      }
+    },
+    "first_observed_decisions_per_ten_points": 12724.880952380952,
+    "full_budget_decisions_per_ten_points": 39790.0
+  },
+  "stage0_collection_projection": {
+    "method": "Apply single-worker cProfile wall shares to four-worker collection wall time; approximate projection, not a four-worker trace. Node CPU time overlaps and is not added. Free-part rates are Amdahl arithmetic, not measured speedups.",
+    "profile_shares": {
+      "node_roundtrip_and_json": 0.1403948416610657,
+      "observation_building": 0.24008323584028518,
+      "acting_forward": 0.43714265939090974,
+      "other_collection": 0.18237926310773944
+    },
+    "parts": {
+      "node_roundtrip_and_json": {
+        "projected_seconds": 16.681402005670922,
+        "minutes_per_training_hour": 1.0960665385477413,
+        "hypothetical_decisions_per_second_if_free": 22.684311756574296
+      },
+      "observation_building": {
+        "projected_seconds": 28.52615469692676,
+        "minutes_per_training_hour": 1.8743366790218643,
+        "hypothetical_decisions_per_second_if_free": 22.988042010797066
+      },
+      "acting_forward": {
+        "projected_seconds": 51.940315960697454,
+        "minutes_per_training_hour": 3.412785226731183,
+        "hypothetical_decisions_per_second_if_free": 23.61302275932647
+      },
+      "other_collection": {
+        "projected_seconds": 21.66989733670487,
+        "minutes_per_training_hour": 1.4238401158639147,
+        "hypothetical_decisions_per_second_if_free": 22.811245956906216
+      },
+      "update": {
+        "projected_seconds": 790.12264,
+        "minutes_per_training_hour": 51.91571947960927,
+        "hypothetical_decisions_per_second_if_free": 165.2831302622229
+      },
+      "outside_training_loop": {
+        "projected_seconds": 4.219589999999926,
+        "minutes_per_training_hour": 0.27725196022602344,
+        "hypothetical_decisions_per_second_if_free": 22.37330387808371
+      }
+    }
+  },
+  "stage2": {
+    "decisions": 556907,
+    "wall_seconds": 24898.839698553085,
+    "end_to_end_decisions_per_second": 22.366785229448375,
+    "optimization_seconds": 20383.82592,
+    "optimizer_rows": 1535686.0,
+    "effective_epochs": 2.757526840208509,
+    "optimization_rows_per_second": 75.33845736453385,
+    "parts": {
+      "collection": {
+        "seconds": 4310.60784,
+        "minutes_per_training_hour": 10.38749088436558,
+        "hypothetical_decisions_per_second_if_free": 27.049773085231745
+      },
+      "update": {
+        "seconds": 20567.94839,
+        "minutes_per_training_hour": 49.56363101015163,
+        "hypothetical_decisions_per_second_if_free": 128.5894658450937
+      },
+      "outside_training_loop": {
+        "seconds": 20.283468553083367,
+        "minutes_per_training_hour": 0.04887810548279181,
+        "hypothetical_decisions_per_second_if_free": 22.385020852956465
+      }
+    },
+    "checkpoint_decisions": 556907,
+    "attempts": 1,
+    "wall_note": "Trainer-process wall time observed by controller, including polling overhead and CPU contention from intermediate evaluations; baseline/final evaluation excluded.",
+    "passing_training_pool_points": [
+      {
+        "decisions": 216451,
+        "gain_percentage_points": 58.5,
+        "decisions_per_ten_points": 37000.170940170945
+      },
+      {
+        "decisions": 414669,
+        "gain_percentage_points": 71.25,
+        "decisions_per_ten_points": 58199.15789473684
+      },
+      {
+        "decisions": 556907,
+        "gain_percentage_points": 65.75,
+        "decisions_per_ten_points": 84700.6844106464
+      }
+    ],
+    "cost_note": "PPO decisions only; excludes blueprint reconstruction. First observed checkpoint does not identify the first actual crossing. No held-out gain is implied."
+  }
+}
