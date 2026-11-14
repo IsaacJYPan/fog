@@ -2,7 +2,8 @@
 
 Use FOG_STAGE=collection (1,800-second platform timeout), training (3,000),
 or combined (3,600). Combined measures the missing MaxDamage matrix, selects
-its best GPU batch, then runs the full training loop and evaluation.
+its best GPU batch, then runs the full training loop and evaluation. It completes
+the self-play matrix afterward only when the remaining deadline fits its measured cost.
 Internal deadlines reserve 300 seconds for export. Both include setup.
 Completed probe rows and training checkpoints survive a rerun of the script
 with the same output directory. Budget any new GPU session separately.
@@ -142,22 +143,25 @@ def main() -> None:
         rows_path = output / "collection.json"
         saved = json.loads(rows_path.read_text()) if rows_path.exists() else {"rows": []}
         opponents = ("MaxDamage",) if stage == "combined" else ("self", "MaxDamage")
-        for opponent in opponents:
-            for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
-                for repeat in (1, 2):
-                    name = f"probe-{opponent}-{device}-{batch}-{repeat}"
-                    if any(row["name"] == name for row in saved["rows"]):
-                        continue
-                    command = [python, "-m", "fog.eval.showdown_rollout_probe", "--workers",
-                               str(workers), "--batch", str(batch), "--games", "512",
-                               "--opponent", opponent, "--pool", "data/teams/pool_a",
-                               "--device", device]
-                    text = run(command, name)
-                    line = next(line for line in text.splitlines() if line.startswith("workers="))
-                    values = dict(field.split("=", 1) for field in line.split())
-                    saved["rows"].append({"name": name, "label": "smoke", "commit": commit,
-                                          "command": command, "repeat": repeat, **values})
-                    write_json(rows_path, saved)
+        def matrix(opponents):
+            for opponent in opponents:
+                for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
+                    for repeat in (1, 2):
+                        name = f"probe-{opponent}-{device}-{batch}-{repeat}"
+                        if any(row["name"] == name for row in saved["rows"]):
+                            continue
+                        command = [python, "-m", "fog.eval.showdown_rollout_probe", "--workers",
+                                   str(workers), "--batch", str(batch), "--games", "512",
+                                   "--opponent", opponent, "--pool", "data/teams/pool_a",
+                                   "--device", device]
+                        text = run(command, name)
+                        line = next(line for line in text.splitlines() if line.startswith("workers="))
+                        values = dict(field.split("=", 1) for field in line.split())
+                        saved["rows"].append({"name": name, "label": "smoke", "commit": commit,
+                                              "command": command, "repeat": repeat, **values})
+                        write_json(rows_path, saved)
+
+        matrix(opponents)
         if stage == "combined":
             import yaml
 
@@ -180,10 +184,38 @@ def main() -> None:
                 write_json(output / "batch-selection.json", {
                     "label": "smoke", "basis": "aggregate learner decisions / aggregate seconds, two MaxDamage repeats",
                     "rows_per_second": speeds, "selected_batch": best, "workers": workers,
-                    "self_play_matrix": "separate earlier job; not a same-job self/MaxDamage matrix",
+                    "self_play_matrix": "primary selection uses MaxDamage; see collection-completeness.json for the final same-job status",
                 })
             config.write_text(yaml.safe_dump(recipe, sort_keys=False))
             train(root, output, python, workers, gpu_count, environment, run)
+            summary = output / "training-summary.json"
+            if summary.exists():
+                print("[end-to-end] " + json.dumps(json.loads(summary.read_text())), flush=True)
+            reference = root / "docs/briefs/06-artifacts/collection-attempt2"
+            measurements = [reference / f"probe-self-{device}-{batch}-{repeat}-execution.json"
+                            for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128))
+                            for repeat in (1, 2)]
+            reference_seconds = (sum(json.loads(path.read_text())["seconds"] for path in measurements)
+                                 if all(path.exists() for path in measurements) else None)
+            needed = reference_seconds * max(1.0, 4 / workers) * 1.2 + 60 if reference_seconds else None
+            remaining = deadline - time.monotonic()
+            finish_self = needed is not None and needed <= remaining
+            write_json(output / "same-job-self-plan.json", {
+                "label": "smoke planning, not measured completion", "reference_seconds": reference_seconds,
+                "planning_seconds_with_margin": needed, "remaining_internal_seconds": remaining,
+                "run_after_training_and_evaluation": finish_self,
+            })
+            if finish_self:
+                matrix(("self",))
+        requested = {f"probe-{opponent}-{device}-{batch}-{repeat}"
+                     for opponent in ("self", "MaxDamage")
+                     for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128))
+                     for repeat in (1, 2)}
+        write_json(output / "collection-completeness.json", {
+            "label": "smoke", "requested_rows": len(requested), "completed_rows": len(saved["rows"]),
+            "all_requested_rows_complete": requested.issubset({row["name"] for row in saved["rows"]}),
+            "same_job_complete": not resume_roots and requested.issubset({row["name"] for row in saved["rows"]}),
+        })
         status = "complete"
     finally:
         if monitor is not None:
@@ -219,6 +251,7 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
     shim = root.parent / "timing"
     shim.mkdir(exist_ok=True)
     shutil.copy2(root / "docs/briefs/06-artifacts/training_timing.py", shim / "sitecustomize.py")
+    previous_environment = {key: environment.get(key) for key in ("PYTHONPATH", "FOG_TIMING_OUTPUT")}
     environment.update(PYTHONPATH=str(shim) + os.pathsep + str(root),
                        FOG_TIMING_OUTPUT=str(output / "training-timing.jsonl"))
     command = [python, "-m", "fog.train", "--config", "configs/collect_gpu_check.yaml",
@@ -261,8 +294,11 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
             recipe["ppo"]["activation_checkpointing"] = True
             config.write_text(yaml.safe_dump(recipe, sort_keys=False))
             shutil.copy2(config, output / "collect_gpu_check.txt")
-    environment.pop("FOG_TIMING_OUTPUT")
-    environment.pop("PYTHONPATH")
+    for key, value in previous_environment.items():
+        if value is None:
+            environment.pop(key, None)
+        else:
+            environment[key] = value
     lines = (output / "trainer.txt").read_text().splitlines()
     (output / "trainer-tail.txt").write_text("\n".join(lines[-60:]) + "\n")
     shutil.copy2(output / "training/metrics.csv", output / "trainer-metrics.csv")

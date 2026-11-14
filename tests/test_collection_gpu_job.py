@@ -5,10 +5,16 @@ import importlib.util
 import json
 from pathlib import Path
 
+import pytest
 import torch
 
 
-def test_gpu_job_creates_missing_temporary_root(tmp_path, monkeypatch):
+@pytest.mark.parametrize("stage,reference_seconds,expected_probes", [
+    ("collection", 0.1, 16), ("combined", 0.1, 16), ("combined", 10000, 8),
+])
+def test_gpu_job_creates_missing_temporary_root(
+    tmp_path, monkeypatch, stage, reference_seconds, expected_probes,
+):
     source = Path(__file__).resolve().parents[1] / "docs/briefs/06-artifacts/gpu_job.py"
     spec = importlib.util.spec_from_file_location("gpu_job", source)
     job = importlib.util.module_from_spec(spec)
@@ -36,8 +42,22 @@ def test_gpu_job_creates_missing_temporary_root(tmp_path, monkeypatch):
             raise FileNotFoundError(cwd)
         if command[:2] == ["git", "clone"]:
             root.mkdir()
+            (root / "configs").mkdir()
+            config = source.parents[3] / "configs/collect_gpu_check.yaml"
+            (root / "configs/collect_gpu_check.yaml").write_text(config.read_text())
+            reference = root / "docs/briefs/06-artifacts/collection-attempt2"
+            reference.mkdir(parents=True)
+            for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
+                for repeat in (1, 2):
+                    (reference / f"probe-self-{device}-{batch}-{repeat}-execution.json").write_text(
+                        json.dumps({"seconds": reference_seconds}),
+                    )
         if "fog.eval.showdown_rollout_probe" in command:
-            stdout.write("workers=2 batch=32 device=cuda opponent=self games=512 "
+            workers = command[command.index("--workers") + 1]
+            batch = command[command.index("--batch") + 1]
+            device = command[command.index("--device") + 1]
+            opponent = command[command.index("--opponent") + 1]
+            stdout.write(f"workers={workers} batch={batch} device={device} opponent={opponent} games=512 "
                          "learner_decisions=1 seconds=1.00 learner_decisions/s=1.00 "
                          "games/s=512.000 p1_wins=0\n")
         return CompletedProcess()
@@ -46,11 +66,23 @@ def test_gpu_job_creates_missing_temporary_root(tmp_path, monkeypatch):
     monkeypatch.setattr(job.subprocess, "Popen", popen)
     monkeypatch.setattr(job.subprocess, "check_output", lambda *args, **kwargs: "GPU, 16 GiB\n")
     monkeypatch.setenv("FOG_COMMIT", "0" * 40)
-    monkeypatch.setenv("FOG_STAGE", "collection")
+    monkeypatch.setattr(job, "train", lambda *_args: calls.append(["benchmark_and_evaluation"]))
+    monkeypatch.setenv("FOG_STAGE", stage)
     monkeypatch.delenv("FOG_PLATFORM_TIMEOUT", raising=False)
     job.main()
     assert root.is_dir()
-    assert len([command for command in calls if "fog.eval.showdown_rollout_probe" in command]) == 16
+    probes = [command for command in calls if "fog.eval.showdown_rollout_probe" in command]
+    assert len(probes) == expected_probes
+    if stage == "combined":
+        split = calls.index(["benchmark_and_evaluation"])
+        before = [command for command in calls[:split] if "fog.eval.showdown_rollout_probe" in command]
+        after = [command for command in calls[split + 1:] if "fog.eval.showdown_rollout_probe" in command]
+        assert len(before) == 8
+        assert all(command[command.index("--opponent") + 1] == "MaxDamage" for command in before)
+        assert all(command[command.index("--opponent") + 1] == "self" for command in after)
+        assert len(after) == expected_probes - 8
+    completeness = json.loads((output / "collection-completeness.json").read_text())
+    assert completeness["same_job_complete"] == (expected_probes == 16)
     assert json.loads((output / "budget.json").read_text())["status"] == "complete"
 
 

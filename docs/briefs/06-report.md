@@ -36,7 +36,7 @@ overlap is recorded; every new launch requires an empty account-wide active/queu
 The timing wrapper preserves the trainer's native phase columns and adds `timing_` fields,
 CUDA-synchronized optimizer/forward timers and the full update phase. End-to-end wall
 includes all training attempts; saved-state continuations retain only their completed timing
-prefix. A regression fails on the prior wrapper and passes after the fix. **15 focused tests
+prefix. A regression fails on the prior wrapper and passes after the fix. **17 focused tests
 pass**, timing checks preserve update metrics/model tensors with CUDA calls mocked, Ruff
 and byte compilation pass (`endtoend-*`, `timing-native-before.txt`). No new model, loss,
 trainer or search edits were made; the reviewed brief-04 trainer was merged from the roadmap.

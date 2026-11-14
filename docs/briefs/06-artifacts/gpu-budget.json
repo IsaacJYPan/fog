@@ -38,6 +38,7 @@
       1800,
       3300
     ],
-    "estimate_basis": "Earlier self-play probe wall times and brief-05 supervised GPU throughput bound the rough planning range; PPO GPU speed and MaxDamage collection remain unmeasured."
+    "estimate_basis": "Earlier self-play probe wall times and brief-05 supervised GPU throughput bound the rough planning range; PPO GPU speed and MaxDamage collection remain unmeasured.",
+    "optional_after_primary": "Complete the self-play matrix in the same job only if its earlier measured execution costs, scaled conservatively for core count plus 20% and 60 seconds, fit the remaining internal deadline."
   }
 }

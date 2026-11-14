@@ -1430,3 +1430,19 @@ trainer. Command: `PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
 print(ppo.__file__); runpy.run_path("docs/briefs/06-artifacts/check_timing.py",
 run_name="__main__")'`. All update metrics and tensors remain identical;
 `endtoend-timing-equivalence.txt` records the current source path and CPU-only result.
+
+The combined job now protects the end-to-end benchmark and evaluation before attempting
+any additional self-play comparison. After those finish, it compares the remaining internal
+deadline with the prior eight self-play execution times, scaled conservatively for fewer
+cores, plus 20% and 60 seconds. Only if the whole repeat fits does it run those eight rows
+on the same host, completing the requested one-job matrix. Otherwise the prior self-play
+cohort stays separate and the report retains that limitation. The cap and three-hour
+budget are unchanged. `same-job-self-plan.json` and `collection-completeness.json` will
+record the actual branch, rather than assuming completion. The original child environment
+is restored after timing instrumentation so subsequent probes use the same settings.
+
+Five measurement-job cases verify bootstrap, benchmark-before-extra-probes order, skipping
+extras when they cannot fit, native metric preservation and saved-state timing prefixes.
+Together with the trainer measurement/resume cases, **17 focused tests pass**; Ruff and
+byte compilation pass (`combined-order-tests.txt`, `endtoend-focused-tests.txt`). No GPU
+allocation or application/trainer change was made while preparing this ordering.
