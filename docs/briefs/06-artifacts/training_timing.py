@@ -50,13 +50,36 @@ def install(path: Path) -> None:
     @functools.wraps(original_update)
     def timed_update(agent, optimizer, batch, *args, **kwargs):
         torch.cuda.synchronize()
+        forward_seconds = 0.0
+        forward_start = 0.0
+
+        def before_forward(_module, _args):
+            nonlocal forward_start
+            torch.cuda.synchronize()
+            forward_start = time.perf_counter()
+
+        def after_forward(_module, _args, _output):
+            nonlocal forward_seconds
+            torch.cuda.synchronize()
+            forward_seconds += time.perf_counter() - forward_start
+
+        before = agent.register_forward_pre_hook(before_forward)
+        after = agent.register_forward_hook(after_forward)
         start = time.perf_counter()
-        metrics = original_update(agent, optimizer, batch, *args, **kwargs)
-        torch.cuda.synchronize()
+        try:
+            metrics = original_update(agent, optimizer, batch, *args, **kwargs)
+            torch.cuda.synchronize()
+        finally:
+            before.remove()
+            after.remove()
         seconds = time.perf_counter() - start
         rows = len(batch["actions"])
-        interval.update(update_seconds=seconds, update_rows=rows)
+        interval.update(update_seconds=seconds, update_rows=rows,
+                        update_forward_seconds=forward_seconds,
+                        update_other_seconds=seconds - forward_seconds)
         record({"kind": "update", "seconds": seconds, "rows": rows,
+                "forward_seconds": forward_seconds,
+                "loss_backward_optimizer_seconds": seconds - forward_seconds,
                 "rows_per_second": rows / seconds,
                 "optimizer_steps": metrics.get("optimizer_steps"),
                 "peak_learner_allocated_bytes": torch.cuda.max_memory_allocated()})

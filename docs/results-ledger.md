@@ -959,3 +959,19 @@ installation succeeds with writable UV/XDG/Rust caches. Command
 `UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python -m ruff check fog tests docs/briefs/06-artifacts/*.py`
 is clean. Full suite not run. The optional measurement-only timing shim is
 syntax/lint checked, not training-verified; it does not change trainer source.
+
+Preparation follow-up: the installed Kaggle client documents P100 as retired
+and substituted with T4. The job script therefore supports one or two allocated
+GPUs and now uses collection/training platform caps of 1,800/3,600 seconds
+(internal deadlines 300 seconds shorter). At two allocated GPUs these caps
+reserve at most three GPU-hours; the earlier proposed single-P100 caps were
+never submitted. Stage 2's entry point preserves the inherited recipe, records
+unique update rows/s and forward versus remaining update time, retains PPO
+checkpoints and halves the initial minibatch after a documented CUDA OOM.
+No stage 2 config is chosen before the collection measurements exist.
+
+`UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python docs/briefs/06-artifacts/check_timing.py`:
+CPU engineering smoke, CUDA synchronization/memory calls mocked. Every update
+metric and final state tensor is identical with/without timing hooks; collection
+result identity, row counts and forward time partition also pass
+(`06-artifacts/timing-equivalence.json`). No GPU measurement is implied.

@@ -15,15 +15,18 @@ The private collection entry point is `06-artifacts/gpu_job.py`. It clones a
 pushed commit supplied through `FOG_COMMIT`, builds pinned Showdown, preserves
 the installed CUDA PyTorch, records CPU hardware/quota and GPU memory, and
 runs the exact collection matrix. It stops on the first failed probe and
-preserves completed rows. Request one P100 and a 3,600-second platform limit;
-the internal 3,300-second deadline reserves export time. The remaining
-GPU-hour budget is reserved for the training/evaluation stage.
+preserves completed rows. Use T4: the installed client documents P100 as
+retired. Collection/training platform limits are 1,800/3,600 seconds, with
+300 seconds reserved inside each for export. Even a two-T4 allocation is
+bounded to three GPU-hours in total; both allocated GPUs count toward it.
 
 `06-artifacts/training_timing.py` supplies optional process-local timing hooks
 through a temporary `sitecustomize.py`: collection/update wall times go into
 the trainer's existing metrics CSV and a separate JSONL file. CUDA updates
 are synchronized at their boundaries; update rows/s counts unique batch rows.
-It has not been exercised in training yet. Local pinned Showdown builds;
+The CPU engineering check (`check_timing.py`, `timing-equivalence.json`)
+preserves every update metric and final parameter exactly with CUDA timing
+calls mocked. This is not GPU validation. Local pinned Showdown builds;
 18 focused rollout/process-pool tests pass and Ruff is clean (artifact outputs).
 
 **Fixes.** None. No model, loss, trainer or search code changed.
