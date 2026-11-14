@@ -3,7 +3,7 @@
 **Answer.** The worker probe collected **122.66/124.00 learner decisions/s on CPU** and
 **158.79/163.22 on CUDA**, the selected batch 128, against MaxDamage. Two completed PPO
 updates measured **144.98 collection decisions/s**, **159.89 processed update rows/s**
-(6.08 s per optimizer step on average), and **37.50 decisions/s end to end**. At this initial
+(6.08 s per optimizer step on average), and **37.50 decisions/s / 1.46 games/s end to end**. At this initial
 fixed-team rate, 30 GPU-hours project to **4.05 million decisions / 157,901 games**. The
 update takes **71.9%** of completed-prefix wall time. These are smoke timings, not a learning result.
 
@@ -22,7 +22,7 @@ epochs**, in **700.389 s** through its saved checkpoint. Collection/update/other
 caught `_permute_hidden_moves` reading GPU scalars, but its exact share is unmeasured.
 Sampled whole-attempt GPU peak: **11,561 MiB**; 1,024-row minibatches fit without activation
 checkpointing. Including the unfinished third update discarded at the owner's stop request,
-the entire attempt cost 995.824 s, or 26.38 retained decisions/s. Prefix and spent-time rates
+the entire attempt cost 995.824 s, or **26.38 retained decisions/s / 1.03 games/s**. Prefix and spent-time rates
 are kept separate in `short-run-summary.json`.
 
 **Scope and recovery.** The owner chose a minimal timing check instead of extending the

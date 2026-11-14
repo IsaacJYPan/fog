@@ -1,0 +1,17 @@
+{
+  "label": "smoke, independent arithmetic check of published evidence",
+  "training_source_commit": "ac7535507e57cb6e302f4b9d6bc0e8d7ff3a3297",
+  "sources": [
+    "short-run-summary.json",
+    "short-run-timing.jsonl"
+  ],
+  "completed_decisions": 26268,
+  "completed_games": 1024,
+  "completed_prefix_wall_seconds": 700.3892688751221,
+  "completed_prefix_decisions_per_second": 37.50485789450828,
+  "completed_prefix_games_per_second": 1.4620441024812119,
+  "whole_attempt_wall_seconds": 995.8241648620001,
+  "whole_attempt_retained_decisions_per_second": 26.378150809023783,
+  "whole_attempt_retained_games_per_second": 1.0282939861595992,
+  "limitations": "Two completed PPO updates only. The whole-attempt denominator includes a discarded unfinished third update; neither scope verifies the original 100k learning/evaluation run."
+}
