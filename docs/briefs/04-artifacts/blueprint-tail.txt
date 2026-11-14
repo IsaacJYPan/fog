@@ -1,45 +1,3 @@
-[ppo] decisions=33228  win_rate=0.365  loss=0.3379  entropy=1.333  kl=0.0114  clip=0.143  belief=6.908  self_belief=8.559
-[ppo] decisions=41382  win_rate=0.393  loss=0.3076  entropy=1.305  kl=0.0116  clip=0.164  belief=6.160  self_belief=7.668
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Knock Off', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g1269 turn 27
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Knock Off', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g1269 turn 27
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g1339 turn 24
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g1339 turn 24
-[ppo] decisions=49861  win_rate=0.398  loss=0.3094  entropy=1.268  kl=0.0152  clip=0.164  belief=5.729  self_belief=6.998
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Thunderbolt', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g1558 turn 3
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Thunderbolt', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g1558 turn 3
-[ppo] decisions=57878  win_rate=0.425  loss=0.2924  entropy=1.254  kl=0.0129  clip=0.147  belief=5.165  self_belief=6.429
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Zamazenta', 'Crunch', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g1792 turn 11
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Zamazenta', 'Crunch', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g1792 turn 11
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g1849 turn 14
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g1849 turn 14
-[ppo] decisions=66310  win_rate=0.458  loss=0.2828  entropy=1.200  kl=0.0153  clip=0.169  belief=4.793  self_belief=5.857
-[ppo] decisions=74424  win_rate=0.467  loss=0.2707  entropy=1.174  kl=0.0131  clip=0.149  belief=4.390  self_belief=5.388
-[ppo] decisions=82829  win_rate=0.484  loss=0.2438  entropy=1.174  kl=0.0125  clip=0.153  belief=4.046  self_belief=5.064
-[ppo] decisions=91169  win_rate=0.483  loss=0.2459  entropy=1.179  kl=0.0183  clip=0.158  belief=3.722  self_belief=4.757
-[ppo] decisions=99430  win_rate=0.498  loss=0.2260  entropy=1.163  kl=0.0130  clip=0.149  belief=3.530  self_belief=4.371
-[ppo] decisions=107996  win_rate=0.508  loss=0.2185  entropy=1.180  kl=0.0140  clip=0.134  belief=3.216  self_belief=4.032
-[ppo] decisions=116605  win_rate=0.529  loss=0.2110  entropy=1.115  kl=0.0156  clip=0.150  belief=3.131  self_belief=3.900
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Zamazenta', 'Close Combat', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g3506 turn 3
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Zamazenta', 'Close Combat', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g3506 turn 3
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Slowking', 'Sludge Bomb', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g3572 turn 15
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Slowking', 'Sludge Bomb', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g3572 turn 15
-[ppo] decisions=124664  win_rate=0.538  loss=0.2058  entropy=1.114  kl=0.0128  clip=0.139  belief=2.965  self_belief=3.525
-[ppo] decisions=133118  win_rate=0.539  loss=0.2070  entropy=1.022  kl=0.0145  clip=0.155  belief=2.813  self_belief=3.392
-[ppo] decisions=141586  win_rate=0.540  loss=0.1867  entropy=1.068  kl=0.0176  clip=0.169  belief=2.761  self_belief=3.161
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g4214 turn 13
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g4214 turn 13
-[ppo] decisions=150017  win_rate=0.559  loss=0.1905  entropy=1.032  kl=0.0117  clip=0.149  belief=2.543  self_belief=3.133
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Zamazenta', 'Crunch', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g4715 turn 17
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Zamazenta', 'Crunch', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g4715 turn 17
-[ppo] decisions=158422  win_rate=0.577  loss=0.1956  entropy=0.962  kl=0.0142  clip=0.162  belief=2.719  self_belief=2.978
-[ppo] decisions=166789  win_rate=0.568  loss=0.1923  entropy=0.926  kl=0.0140  clip=0.158  belief=2.527  self_belief=2.911
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g5083 turn 19
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g5083 turn 19
-[ppo] decisions=175206  win_rate=0.567  loss=0.1905  entropy=0.915  kl=0.0172  clip=0.159  belief=2.443  self_belief=2.882
-[ppo] decisions=183505  win_rate=0.570  loss=0.1773  entropy=0.855  kl=0.0160  clip=0.145  belief=2.529  self_belief=2.797
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g5720 turn 3
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g5720 turn 3
-Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g5782 turn 3
 Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g5782 turn 3
 [ppo] decisions=191706  win_rate=0.566  loss=0.1868  entropy=0.851  kl=0.0213  clip=0.176  belief=2.356  self_belief=2.600
 Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g5874 turn 3
@@ -58,3 +16,45 @@ Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: G
 Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g7050 turn 17
 Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g7115 turn 33
 Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g7115 turn 33
+[ppo] decisions=232795  win_rate=0.558  loss=0.1705  entropy=0.801  kl=0.0169  clip=0.157  belief=2.289  self_belief=2.505
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g7257 turn 26
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g7257 turn 26
+[ppo] decisions=241031  win_rate=0.558  loss=0.1573  entropy=0.808  kl=0.0156  clip=0.143  belief=2.313  self_belief=2.438
+[ppo] decisions=249048  win_rate=0.551  loss=0.1932  entropy=0.792  kl=0.0225  clip=0.163  belief=2.194  self_belief=2.560
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g7780 turn 11
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g7780 turn 11
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Dragapult', 'Draco Meteor', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g7780 turn 15
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Dragapult', 'Draco Meteor', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g7780 turn 15
+[ppo] decisions=257683  win_rate=0.550  loss=0.1650  entropy=0.801  kl=0.0199  clip=0.171  belief=2.216  self_belief=2.470
+[ppo] decisions=266211  win_rate=0.557  loss=0.1731  entropy=0.820  kl=0.0182  clip=0.150  belief=2.209  self_belief=2.385
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Slowking', 'Ice Beam', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g8402 turn 12
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Slowking', 'Ice Beam', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g8402 turn 12
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Headlong Rush', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g8402 turn 16
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Headlong Rush', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g8402 turn 16
+[ppo] decisions=274462  win_rate=0.558  loss=0.1781  entropy=0.797  kl=0.0170  clip=0.159  belief=2.176  self_belief=2.607
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g8788 turn 24
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Shadow Ball', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w3-g8788 turn 24
+[ppo] decisions=282682  win_rate=0.552  loss=0.1514  entropy=0.766  kl=0.0177  clip=0.132  belief=2.195  self_belief=2.628
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Dragapult', 'Flamethrower', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g9097 turn 26
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Dragapult', 'Flamethrower', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g9097 turn 26
+[ppo] decisions=290973  win_rate=0.552  loss=0.1624  entropy=0.812  kl=0.0174  clip=0.166  belief=2.257  self_belief=2.638
+[ppo] decisions=299266  win_rate=0.554  loss=0.1660  entropy=0.786  kl=0.0166  clip=0.130  belief=2.249  self_belief=2.515
+[ppo] decisions=307705  win_rate=0.552  loss=0.1824  entropy=0.737  kl=0.0187  clip=0.143  belief=2.279  self_belief=2.519
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Make It Rain', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g9801 turn 28
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Make It Rain', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g9801 turn 28
+[ppo] decisions=316044  win_rate=0.555  loss=0.1607  entropy=0.770  kl=0.0183  clip=0.144  belief=2.146  self_belief=2.384
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g10115 turn 3
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Great Tusk', 'Earthquake', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w2-g10115 turn 3
+[ppo] decisions=324324  win_rate=0.556  loss=0.1693  entropy=0.757  kl=0.0196  clip=0.151  belief=2.240  self_belief=2.541
+[ppo] decisions=332430  win_rate=0.550  loss=0.1710  entropy=0.766  kl=0.0196  clip=0.150  belief=2.163  self_belief=2.339
+[ppo] decisions=340800  win_rate=0.554  loss=0.1518  entropy=0.734  kl=0.0173  clip=0.136  belief=2.181  self_belief=2.433
+[ppo] decisions=349088  win_rate=0.552  loss=0.1692  entropy=0.759  kl=0.0142  clip=0.147  belief=2.170  self_belief=2.454
+[ppo] decisions=357251  win_rate=0.547  loss=0.1723  entropy=0.760  kl=0.0180  clip=0.135  belief=2.240  self_belief=2.390
+[ppo] decisions=365318  win_rate=0.548  loss=0.1475  entropy=0.771  kl=0.0158  clip=0.139  belief=2.075  self_belief=2.219
+[ppo] decisions=373694  win_rate=0.548  loss=0.1615  entropy=0.764  kl=0.0183  clip=0.143  belief=2.055  self_belief=2.168
+[ppo] decisions=382022  win_rate=0.548  loss=0.1602  entropy=0.748  kl=0.0190  clip=0.153  belief=2.022  self_belief=2.320
+[ppo] decisions=390236  win_rate=0.549  loss=0.1677  entropy=0.740  kl=0.0168  clip=0.135  belief=2.105  self_belief=2.194
+[ppo] decisions=398384  win_rate=0.546  loss=0.1642  entropy=0.746  kl=0.0138  clip=0.125  belief=1.958  self_belief=2.107
+[ppo] decisions=406391  win_rate=0.547  loss=0.1385  entropy=0.725  kl=0.0189  clip=0.149  belief=2.165  self_belief=2.283
+[ppo] decisions=414669  win_rate=0.548  loss=0.1604  entropy=0.737  kl=0.0136  clip=0.146  belief=2.156  self_belief=2.343
+[ppo] decisions=422924  win_rate=0.547  loss=0.1720  entropy=0.687  kl=0.0115  clip=0.125  belief=2.152  self_belief=2.294

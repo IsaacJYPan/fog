@@ -50,8 +50,9 @@ The replay-host precheck returned HTTP 200. The 1,000-game/52,983-row blueprint 
 | ---: | --- | --- | --- | --- |
 | 0 | 0.255 [0.215, 0.300] | 0.720 [0.674, 0.762] | 0.220 [0.182, 0.263] | 0.565 [0.516, 0.613] |
 | 216,451 | 0.840 [0.801, 0.873] | 0.980 [0.961, 0.990] | 0.2075 [0.171, 0.250] | 0.5475 [0.499, 0.596] |
+| 414,669 | 0.9675 [0.945, 0.981] | 0.9875 [0.971, 0.995] | 0.200 [0.164, 0.242] | 0.545 [0.496, 0.593] |
 
-The first point meets the training-pool rule (+58.5 points, non-overlapping intervals): 37,000 PPO decisions per ten points at the first measured gain. Both held-out rates remain within their baseline intervals. The remaining budget continues. The 24k league cadence makes the first scored point 216,451 rather than exactly 200k.
+The first point meets the training-pool rule (+58.5 points, non-overlapping intervals): 37,000 PPO decisions per ten points at the first measured gain. Both held-out rates remain within their baseline intervals. At 414,669, pool A has gained 71.25 points against SimpleHeuristics; both held-out intervals still overlap baseline. The remaining budget continues. The 24k league cadence makes the first scored point 216,451 rather than exactly 200k.
 
 ## Config changes and fixes
 

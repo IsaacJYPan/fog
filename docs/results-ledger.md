@@ -766,3 +766,20 @@ First-point reading: **improved on pool A** by the brief’s rule. SimpleHeurist
 On held-out pool B, SimpleHeuristics 22.0% → 20.75%, MaxDamage 56.5% → 54.75%;
 intervals overlap their baselines, so no clear transfer is observed at this point. This is
 the brief’s eight-team learning case, pending the remaining curve. No gate is claimed.
+
+Stage 2 second scored point, **smoke**, 414,669 decisions, the first saved inherited
+24k snapshot after 400k. All four comparisons completed with zero failures, truncations or
+draws. The PPO run continues unchanged toward 556,748; no restart has occurred.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 414669 | pool_a | simpleheuristics (smoke) | 400 | 0.9675 [0.945, 0.981] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_a.json` |
+| 414669 | pool_a | maxdamage (smoke) | 400 | 0.9875 [0.971, 0.995] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_a.json` |
+| 414669 | pool_b | simpleheuristics (smoke) | 400 | 0.2000 [0.164, 0.242] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_b.json` |
+| 414669 | pool_b | maxdamage (smoke) | 400 | 0.5450 [0.496, 0.593] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_b.json` |
+
+Pool A SimpleHeuristics 25.5% → 96.75%, +71.25 points with non-overlapping intervals;
+MaxDamage 72.0% → 98.75%. Pool B SimpleHeuristics 22.0% → 20.0% and MaxDamage
+56.5% → 54.5%; both intervals overlap their baselines. Thus the training-pool improvement
+persists without a clear held-out gain at this second point. This is still the brief's
+eight-team learning case, with the final evaluation pending; no gate is claimed.
