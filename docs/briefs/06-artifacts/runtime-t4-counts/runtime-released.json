@@ -1,0 +1,17 @@
+{
+  "label": "smoke",
+  "observed_by_utc": "2026-11-14T09:49:54+00:00",
+  "commands": [
+    "colab stop -s fog-brief06",
+    "colab sessions"
+  ],
+  "output": [
+    "Session terminated.",
+    "No active sessions found on server."
+  ],
+  "replacement_allocation_seconds_upper": 3194.0,
+  "replacement_allocation_gpu_hours_upper": 0.8872222222222222,
+  "prior_allocations_gpu_hours_upper": 1.5538888888888889,
+  "total_allocated_gpu_hours_upper": 2.4411111111111112,
+  "authorized_gpu_hours": 3
+}

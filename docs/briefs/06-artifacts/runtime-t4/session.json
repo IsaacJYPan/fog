@@ -1,0 +1,17 @@
+{
+  "label": "smoke",
+  "status": "released after host OOM",
+  "allocated_gpus": 1,
+  "allocation_start_upper_bound_utc": "2026-11-14T08:16:00Z",
+  "allocation_start_note": "Conservative start for elapsed-allocation accounting; creation completed before 08:17:10 UTC.",
+  "local_stop_deadline_utc": "2026-11-14T10:16:00Z",
+  "prior_allocated_gpu_hours_upper": 0.9372222222222222,
+  "this_allocation_gpu_hours_cap": 2.0,
+  "total_gpu_hours_upper_if_deadline_reached": 2.937222222222222,
+  "backup": "Evidence copied to the controlling computer every 20 seconds; completed weights and training-state sidecars copied after each snapshot. Evaluation resumes at completed four-game blocks.",
+  "training_runtime_overrides": [
+    "log.dir=runs/collect_gpu",
+    "league.snapshot_every_decisions=8000"
+  ],
+  "observed_released_before_utc": "2026-11-14T08:53:00Z"
+}

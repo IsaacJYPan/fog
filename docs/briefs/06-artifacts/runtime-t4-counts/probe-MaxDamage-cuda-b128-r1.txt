@@ -1,0 +1,7 @@
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g235 turn 8
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Kingambit', 'Kowtow Cleave', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w1-g235 turn 8
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Trick', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g250 turn 29
+Unmanaged move message format received - cleaned up message ['', 'move', 'p1a: Gholdengo', 'Trick', 'p2a: Dragapult', '[miss]'] in battle battle-direct-w0-g250 turn 29
+Unmanaged move message format received - cleaned up message ['', 'move', 'p2a: Great Tusk', 'Headlong Rush', 'p1a: Dragapult', '[miss]'] in battle battle-direct-w1-g277 turn 24
+Unmanaged move message format received - cleaned up message ['', 'move', 'p2a: Great Tusk', 'Headlong Rush', 'p1a: Dragapult', '[miss]'] in battle battle-direct-w1-g277 turn 24
+workers=2 batch=128 device=cuda opponent=MaxDamage games=512 learner_decisions=16225 seconds=102.18 learner_decisions/s=158.79 games/s=5.011 p1_wins=40

@@ -1,0 +1,26 @@
+Excerpt of one live stack captured during the second PPO update.
+Command: uv tool run --from py-spy py-spy dump --pid 11600
+This is a location sample, not a percentage profile.
+
+Process 11600: /content/fog/.venv/bin/python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo --set log.dir=runs/collect_gpu league.snapshot_every_decisions=8000
+Python v3.13.16 (/usr/bin/python3.13)
+
+Thread 11600 (active+gil): "MainThread"
+    BeliefModel._permute_hidden_moves (fog/models/belief.py:366)
+    BeliefModel.forward (fog/models/belief.py:640)
+    Module._call_impl (torch/nn/modules/module.py:1794)
+    Module._wrapped_call_impl (torch/nn/modules/module.py:1783)
+    FogAgent.forward (fog/models/agent.py:651)
+    Module._call_impl.<locals>.inner (torch/nn/modules/module.py:1837)
+    Module._call_impl (torch/nn/modules/module.py:1889)
+    Module._wrapped_call_impl (torch/nn/modules/module.py:1783)
+    ppo_update (fog/training/ppo.py:341)
+    _deterministic_policy_update.<locals>.wrapped (fog/training/ppo.py:142)
+    install.<locals>.timed_update (sitecustomize.py:71)
+    _maybe_chunk_update (fog/training/ppo.py:924)
+    install.<locals>.timed_phase (sitecustomize.py:109)
+    _train_showdown_direct (fog/training/ppo.py:1932)
+    train (fog/training/ppo.py:569)
+    TrainingSession.run (fog/train.py:66)
+    main (fog/train.py:79)
+    <module> (fog/train.py:83)

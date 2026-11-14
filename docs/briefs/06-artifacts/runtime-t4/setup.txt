@@ -1,0 +1,1812 @@
+HEAD is now at 8159095 Merge remote-tracking branch 'origin/work/collect-gpu' into work/collect-gpu
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated npmlog@6.0.2: This package is no longer supported.
+npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs
+npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.
+npm warn deprecated gauge@4.0.4: This package is no longer supported.
+
+added 355 packages in 6s
+npm notice
+npm notice New major version of npm available! 10.9.9 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+
+> pokemon-showdown@0.11.10 build
+> node build
+
+config.js does not exist. Creating one with default settings...
+pip 26.2.2 from /usr/local/lib/python3.13/dist-packages/pip (python 3.13)
+Collecting poke-env==0.15.0
+  Downloading poke_env-0.15.0-py3-none-any.whl.metadata (7.3 kB)
+Collecting numpy==2.5.1
+  Downloading numpy-2.5.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+Collecting polars==1.43.0
+  Downloading polars-1.43.0-py3-none-any.whl.metadata (11 kB)
+Collecting pyarrow==25.0.0
+  Downloading pyarrow-25.0.0-cp313-cp313-manylinux_2_28_x86_64.whl.metadata (3.0 kB)
+Requirement already satisfied: pyyaml==6.0.3 in /usr/local/lib/python3.13/dist-packages (6.0.3)
+Collecting tensorboard==2.20.0
+  Downloading tensorboard-2.20.0-py3-none-any.whl.metadata (1.8 kB)
+Collecting aiohttp==3.14.2
+  Downloading aiohttp-3.14.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)
+Collecting scikit-learn==1.9.0
+  Downloading scikit_learn-1.9.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (11 kB)
+Collecting tqdm==4.69.0
+  Downloading tqdm-4.69.0-py3-none-any.whl.metadata (57 kB)
+Requirement already satisfied: gymnasium>=1.0.0 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (1.4.0)
+Requirement already satisfied: orjson>=3.10.15 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (3.13.0)
+Collecting pettingzoo>=1.24.3 (from poke-env==0.15.0)
+  Downloading pettingzoo-1.27.0-py3-none-any.whl.metadata (8.6 kB)
+Requirement already satisfied: requests>=2.32.3 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (2.32.4)
+Requirement already satisfied: tabulate>=0.9.0 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (0.9.0)
+Collecting websockets==16.0 (from poke-env==0.15.0)
+  Downloading websockets-16.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.8 kB)
+Collecting polars-runtime-32==1.43.0 (from polars==1.43.0)
+  Downloading polars_runtime_32-1.43.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)
+Requirement already satisfied: absl-py>=0.4 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (2.0.0)
+Requirement already satisfied: grpcio>=1.48.2 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (1.85.1)
+Requirement already satisfied: markdown>=2.6.8 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (3.11.2)
+Requirement already satisfied: packaging in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (26.3)
+Requirement already satisfied: pillow in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (11.3.0)
+Requirement already satisfied: protobuf!=4.24.0,>=3.19.6 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (6.33.6)
+Requirement already satisfied: setuptools>=41.0.0 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (80.10.2)
+Requirement already satisfied: tensorboard-data-server<0.8.0,>=0.7.0 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (0.7.2)
+Requirement already satisfied: werkzeug>=1.0.1 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (3.1.9)
+Requirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (2.7.1)
+Requirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (1.4.0)
+Requirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (26.1.0)
+Requirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (1.8.0)
+Collecting multidict<7.0,>=4.5 (from aiohttp==3.14.2)
+  Downloading multidict-6.9.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (5.3 kB)
+Requirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (0.5.4)
+Requirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (1.25.1)
+Requirement already satisfied: scipy>=1.10.0 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (1.16.3)
+Requirement already satisfied: joblib>=1.4.0 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (1.6.0)
+Requirement already satisfied: narwhals>=2.0.1 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (2.28.0)
+Requirement already satisfied: threadpoolctl>=3.5.0 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (3.7.0)
+Requirement already satisfied: idna>=2.0 in /usr/local/lib/python3.13/dist-packages (from yarl<2.0,>=1.17.0->aiohttp==3.14.2) (3.20)
+Requirement already satisfied: typing-extensions~=4.12 in /usr/local/lib/python3.13/dist-packages (from grpcio>=1.48.2->tensorboard==2.20.0) (4.16.0)
+Requirement already satisfied: cloudpickle>=1.2.0 in /usr/local/lib/python3.13/dist-packages (from gymnasium>=1.0.0->poke-env==0.15.0) (3.1.2)
+Requirement already satisfied: farama-notifications>=0.0.1 in /usr/local/lib/python3.13/dist-packages (from gymnasium>=1.0.0->poke-env==0.15.0) (0.0.6)
+Requirement already satisfied: charset_normalizer<4,>=2 in /usr/local/lib/python3.13/dist-packages (from requests>=2.32.3->poke-env==0.15.0) (3.4.9)
+Requirement already satisfied: urllib3<3,>=1.21.1 in /usr/local/lib/python3.13/dist-packages (from requests>=2.32.3->poke-env==0.15.0) (2.5.0)
+Requirement already satisfied: certifi>=2017.4.17 in /usr/local/lib/python3.13/dist-packages (from requests>=2.32.3->poke-env==0.15.0) (2026.10.23)
+Requirement already satisfied: markupsafe>=2.1.1 in /usr/local/lib/python3.13/dist-packages (from werkzeug>=1.0.1->tensorboard==2.20.0) (3.0.4)
+WARNING: The candidate selected for download or install is a yanked version: 'polars' candidate (version 1.43.0 at https://files.pythonhosted.org/packages/76/28/a8eac2c1d1b2d2a4ba2eb745921616d863185d94b1afd91cbb07af9ef21a/polars-1.43.0-py3-none-any.whl (from https://pypi.org/simple/polars/) (requires-python:>=3.10))
+Reason for being yanked: <none given>
+WARNING: The candidate selected for download or install is a yanked version: 'polars-runtime-32' candidate (version 1.43.0 at https://files.pythonhosted.org/packages/ab/7d/24ae73389aac03296925973c4e2cbe2e4982e859b9fad69eb1a72b9026fa/polars_runtime_32-1.43.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from https://pypi.org/simple/polars-runtime-32/) (requires-python:>=3.10))
+Reason for being yanked: <none given>
+Downloading poke_env-0.15.0-py3-none-any.whl (1.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 27.7 MB/s  0:00:00
+Downloading numpy-2.5.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 120.3 MB/s  0:00:00
+Downloading polars-1.43.0-py3-none-any.whl (846 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.5/846.5 kB 46.7 MB/s  0:00:00
+Downloading pyarrow-25.0.0-cp313-cp313-manylinux_2_28_x86_64.whl (50.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.1/50.1 MB 53.9 MB/s  0:00:00
+Downloading tensorboard-2.20.0-py3-none-any.whl (5.5 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 98.8 MB/s  0:00:00
+Downloading aiohttp-3.14.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 76.2 MB/s  0:00:00
+Downloading scikit_learn-1.9.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.1 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.1/9.1 MB 105.4 MB/s  0:00:00
+Downloading tqdm-4.69.0-py3-none-any.whl (676 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 676.7/676.7 kB 34.6 MB/s  0:00:00
+Downloading polars_runtime_32-1.43.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (57.3 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.3/57.3 MB 55.0 MB/s  0:00:01
+Downloading websockets-16.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)
+Downloading multidict-6.9.1-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (336 kB)
+Downloading pettingzoo-1.27.0-py3-none-any.whl (668 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 668.5/668.5 kB 39.1 MB/s  0:00:00
+Installing collected packages: websockets, tqdm, pyarrow, polars-runtime-32, numpy, multidict, tensorboard, polars, scikit-learn, pettingzoo, aiohttp, poke-env
+  Attempting uninstall: websockets
+    Found existing installation: websockets 15.0.1
+    Not uninstalling websockets at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'websockets'. No files were found to uninstall.
+  Attempting uninstall: tqdm
+    Found existing installation: tqdm 4.67.3
+    Not uninstalling tqdm at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'tqdm'. No files were found to uninstall.
+  Attempting uninstall: pyarrow
+    Found existing installation: pyarrow 23.0.1
+    Not uninstalling pyarrow at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'pyarrow'. No files were found to uninstall.
+  Attempting uninstall: polars-runtime-32
+    Found existing installation: polars-runtime-32 1.35.2
+    Not uninstalling polars-runtime-32 at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'polars-runtime-32'. No files were found to uninstall.
+  Attempting uninstall: numpy
+    Found existing installation: numpy 2.4.6
+    Not uninstalling numpy at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'numpy'. No files were found to uninstall.
+  Attempting uninstall: multidict
+    Found existing installation: multidict 7.2.1
+    Not uninstalling multidict at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'multidict'. No files were found to uninstall.
+  Attempting uninstall: tensorboard
+    Found existing installation: tensorboard 2.21.0
+    Not uninstalling tensorboard at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'tensorboard'. No files were found to uninstall.
+  Attempting uninstall: polars
+    Found existing installation: polars 1.35.2
+    Not uninstalling polars at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'polars'. No files were found to uninstall.
+  Attempting uninstall: scikit-learn
+    Found existing installation: scikit-learn 1.6.1
+    Not uninstalling scikit-learn at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'scikit-learn'. No files were found to uninstall.
+  Attempting uninstall: aiohttp
+    Found existing installation: aiohttp 3.14.5
+    Not uninstalling aiohttp at /usr/local/lib/python3.13/dist-packages, outside environment /content/fog/.venv
+    Can't uninstall 'aiohttp'. No files were found to uninstall.
+
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.
+numba 0.64.0 requires numpy<2.5,>=1.22, but you have numpy 2.5.1 which is incompatible.
+cudf-cu13 26.6.0 requires pyarrow<24,>=19.0.0, but you have pyarrow 25.0.0 which is incompatible.
+cudf-polars-cu13 26.6.0 requires polars<1.40,>=1.35, but you have polars 1.43.0 which is incompatible.
+google-adk 2.7.1 requires aiohttp!=3.14.2, but you have aiohttp 3.14.2 which is incompatible.
+google-adk 2.7.1 requires websockets<16,>=15.0.1, but you have websockets 16.0 which is incompatible.
+Successfully installed aiohttp-3.14.2 multidict-6.9.1 numpy-2.5.1 pettingzoo-1.27.0 poke-env-0.15.0 polars-1.43.0 polars-runtime-32-1.43.0 pyarrow-25.0.0 scikit-learn-1.9.0 tensorboard-2.20.0 tqdm-4.69.0 websockets-16.0
+Obtaining file:///content/fog
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Checking if build backend supports build_editable: started
+  Checking if build backend supports build_editable: finished with status 'done'
+  Getting requirements to build editable: started
+  Getting requirements to build editable: finished with status 'done'
+  Preparing editable metadata (pyproject.toml): started
+  Preparing editable metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: fog
+  Building editable for fog (pyproject.toml): started
+  Building editable for fog (pyproject.toml): finished with status 'done'
+  Created wheel for fog: filename=fog-0.0.1-0.editable-py3-none-any.whl size=5509 sha256=723eacfb71790ec696a7581a00bd33f8b543032d2dbf75dae55826780aae5814
+  Stored in directory: /tmp/pip-ephem-wheel-cache-7s7hbm5s/wheels/de/52/18/45825b59ac0205dc07b37f30da2dc40ece50304cf6c3c30586
+Successfully built fog
+Installing collected packages: fog
+Successfully installed fog-0.0.1
+
+added 24 packages in 1s
+{"python": "3.13.16", "torch": "2.14.1+cu130", "cuda": "13.0", "gpu": "Tesla T4", "node": "v22.23.5"}
+Training interpreter: /content/fog/.venv/bin/python
+Collecting ruff
+  Downloading ruff-0.17.5-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+Requirement already satisfied: pytest in /usr/local/lib/python3.13/dist-packages (8.4.2)
+Collecting pytest-asyncio
+  Downloading pytest_asyncio-1.5.0-py3-none-any.whl.metadata (4.4 kB)
+Collecting hypothesis
+  Downloading hypothesis-6.170.15-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (5.6 kB)
+Requirement already satisfied: iniconfig>=1 in /usr/local/lib/python3.13/dist-packages (from pytest) (2.3.1)
+Requirement already satisfied: packaging>=20 in /usr/local/lib/python3.13/dist-packages (from pytest) (26.3)
+Requirement already satisfied: pluggy<2,>=1.5 in /usr/local/lib/python3.13/dist-packages (from pytest) (1.7.0)
+Requirement already satisfied: pygments>=2.7.2 in /usr/local/lib/python3.13/dist-packages (from pytest) (2.21.0)
+Requirement already satisfied: sortedcontainers<3.0.0,>=2.1.0 in /usr/local/lib/python3.13/dist-packages (from hypothesis) (2.4.0)
+Downloading ruff-0.17.5-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.6 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.6/10.6 MB 47.3 MB/s  0:00:00
+Downloading pytest_asyncio-1.5.0-py3-none-any.whl (17 kB)
+Downloading hypothesis-6.170.15-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 47.0 MB/s  0:00:00
+Installing collected packages: ruff, hypothesis, pytest-asyncio
+
+Successfully installed hypothesis-6.170.15 pytest-asyncio-1.5.0 ruff-0.17.5
+FURB136 [*] Replace `high if value > high else value` with `min(value, high)`
+  --> fog/encoding/action_features.py:79:36
+   |
+77 | def _clip(value: float, low: float, high: float) -> float:
+78 |     # Scalar clip for finite inputs; `np.clip` on one Python float is about ten times slower.
+79 |     return low if value < low else high if value > high else value
+   |                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Replace with `min(value, high)`
+   |
+78 |     # Scalar clip for finite inputs; `np.clip` on one Python float is about ten times slower.
+   -     return low if value < low else high if value > high else value
+79 +     return low if value < low else min(value, high)
+80 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/encoding/entities.py:16:1
+   |
+14 |     * paradox_boost is best-effort from effect names containing PROTOSYNTHESIS/QUARKDRIVE + stat.
+15 |   """
+16 | / from __future__ import annotations
+17 | |
+18 | | import functools
+19 | | import re
+20 | | from typing import Any
+21 | |
+22 | | import numpy as np
+23 | |
+24 | | from fog.encoding.pokemon_state import is_terastallized
+25 | |
+26 | | from fog.constants.schema import (
+27 | |     EV_STATS,
+28 | |     N_ACTIONS,
+29 | |     N_EV_UNITS,
+30 | |     N_NATURES,
+31 | |     N_TERA_TYPES,
+32 | |     NATURE_INDEX,
+33 | |     NATURES,
+34 | |     PARADOX_BOOST_STATS,
+35 | |     SET_EV_COLS,
+36 | |     SET_N_ATTRS,
+37 | |     SET_NATURE_COL,
+38 | |     SET_TERA_COL,
+39 | |     TYPE_INDEX,
+40 | |     VOLATILE_COUNTERS,
+41 | |     VOLATILES,
+42 | |     Status,
+43 | | )
+44 | | from fog.encoding.dims import DIMS, N_ENTITIES
+45 | | from fog.encoding.events import submitted_species_id
+46 | | from fog.env.actions import _normalize_id, action_legality_mask, team_order
+   | |___________________________________________________________________________^
+47 |
+48 |   _NON_ID = re.compile(r"[^a-z0-9]")
+   |
+help: Organize imports
+   |
+23 |
+   - from fog.encoding.pokemon_state import is_terastallized
+   -
+24 | from fog.constants.schema import (
+--------------------------------------------------------------------------------
+43 | from fog.encoding.events import submitted_species_id
+44 + from fog.encoding.pokemon_state import is_terastallized
+45 | from fog.env.actions import _normalize_id, action_legality_mask, team_order
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/encoding/reveals.py:14:1
+   |
+12 |   The extraction code uses numpy and duck typing so it can run without poke-env.
+13 |   """
+14 | / from __future__ import annotations
+15 | |
+16 | | from fog.encoding.pokemon_state import is_terastallized
+17 | |
+18 | | import re
+19 | | from dataclasses import dataclass, field
+20 | |
+21 | | import numpy as np
+22 | |
+23 | | from fog.constants.schema import (
+24 | |     NO_ITEM,
+25 | |     RARE_SPECIES,
+26 | |     SET_EV_COLS,
+27 | |     SET_MOVE_COLS,
+28 | |     SET_N_ATTRS,
+29 | |     SET_NATURE_COL,
+30 | |     SET_TERA_COL,
+31 | | )
+   | |_^
+32 |
+33 |   N_SLOTS = 6
+   |
+help: Organize imports
+   |
+15 |
+   - from fog.encoding.pokemon_state import is_terastallized
+   -
+16 | import re
+--------------------------------------------------------------------------------
+29 | )
+30 + from fog.encoding.pokemon_state import is_terastallized
+31 |
+   |
+
+PLC0414 Import alias does not rename original package
+  --> fog/env/player.py:17:38
+   |
+15 | from fog.env.actions import active_entity_indices, map_action_to_order
+16 | from fog.env.mirror_recording import MirrorRecorder
+17 | from fog.env.mirror_recording import _own_truth_tokens as _own_truth_tokens
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+18 | from fog.env.mirror_recording import _species_id as _species_id
+19 | from fog.env.mirror_recording import _t1 as _t1
+   |
+help: Remove import alias
+   |
+16 | from fog.env.mirror_recording import MirrorRecorder
+   - from fog.env.mirror_recording import _own_truth_tokens as _own_truth_tokens
+17 + from fog.env.mirror_recording import _own_truth_tokens
+18 | from fog.env.mirror_recording import _species_id as _species_id
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+PLC0414 Import alias does not rename original package
+  --> fog/env/player.py:18:38
+   |
+16 | from fog.env.mirror_recording import MirrorRecorder
+17 | from fog.env.mirror_recording import _own_truth_tokens as _own_truth_tokens
+18 | from fog.env.mirror_recording import _species_id as _species_id
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+19 | from fog.env.mirror_recording import _t1 as _t1
+20 | from fog.env.mirror_recording import _zero_mirror as _zero_mirror
+   |
+help: Remove import alias
+   |
+17 | from fog.env.mirror_recording import _own_truth_tokens as _own_truth_tokens
+   - from fog.env.mirror_recording import _species_id as _species_id
+18 + from fog.env.mirror_recording import _species_id
+19 | from fog.env.mirror_recording import _t1 as _t1
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+PLC0414 Import alias does not rename original package
+  --> fog/env/player.py:19:38
+   |
+17 | from fog.env.mirror_recording import _own_truth_tokens as _own_truth_tokens
+18 | from fog.env.mirror_recording import _species_id as _species_id
+19 | from fog.env.mirror_recording import _t1 as _t1
+   |                                      ^^^^^^^^^^
+20 | from fog.env.mirror_recording import _zero_mirror as _zero_mirror
+21 | from fog.training.progress_reward import battle_progress_score as _progress_score
+   |
+help: Remove import alias
+   |
+18 | from fog.env.mirror_recording import _species_id as _species_id
+   - from fog.env.mirror_recording import _t1 as _t1
+19 + from fog.env.mirror_recording import _t1
+20 | from fog.env.mirror_recording import _zero_mirror as _zero_mirror
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+PLC0414 Import alias does not rename original package
+  --> fog/env/player.py:20:38
+   |
+18 | from fog.env.mirror_recording import _species_id as _species_id
+19 | from fog.env.mirror_recording import _t1 as _t1
+20 | from fog.env.mirror_recording import _zero_mirror as _zero_mirror
+   |                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 | from fog.training.progress_reward import battle_progress_score as _progress_score
+   |
+help: Remove import alias
+   |
+19 | from fog.env.mirror_recording import _t1 as _t1
+   - from fog.env.mirror_recording import _zero_mirror as _zero_mirror
+20 + from fog.env.mirror_recording import _zero_mirror
+21 | from fog.training.progress_reward import battle_progress_score as _progress_score
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> fog/env/showdown_batch_runner.py:209:17
+    |
+207 |                   try:
+208 |                       battle.local.close()
+209 | /                 except Exception:  # noqa: BLE001 - keep the original error
+210 | |                     pass
+    | |________________________^
+211 |               raise
+212 |           finally:
+    |
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> fog/eval/critic_readout.py:45:16
+   |
+43 |     best = score(development)
+44 |     state, best_epoch, stale = copy.deepcopy(model.state_dict()), 0, 0
+45 |     history = [dict(epoch=0, fit_mse=score(fit), development_mse=best)]
+   |                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+46 |     for epoch in range(1, max_epochs+1):
+47 |         order = ids[torch.randperm(len(ids), generator=generator)]
+   |
+help: Rewrite as a literal
+   |
+44 |     state, best_epoch, stale = copy.deepcopy(model.state_dict()), 0, 0
+   -     history = [dict(epoch=0, fit_mse=score(fit), development_mse=best)]
+45 +     history = [{"epoch": 0, "fit_mse": score(fit), "development_mse": best}]
+46 |     for epoch in range(1, max_epochs+1):
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> fog/eval/critic_readout.py:57:24
+   |
+55 |             optimizer.step()
+56 |         value = score(development)
+57 |         history.append(dict(epoch=epoch, fit_mse=score(fit), development_mse=value))
+   |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+58 |         if value < best-min_delta:
+59 |             best, state, best_epoch, stale = value, copy.deepcopy(model.state_dict()), epoch, 0
+   |
+help: Rewrite as a literal
+   |
+56 |         value = score(development)
+   -         history.append(dict(epoch=epoch, fit_mse=score(fit), development_mse=value))
+57 +         history.append({"epoch": epoch, "fit_mse": score(fit), "development_mse": value})
+58 |         if value < best-min_delta:
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> fog/eval/critic_readout.py:65:12
+   |
+63 |             break
+64 |     model.load_state_dict(state)
+65 |     return dict(model=model, history=history, best_epoch=best_epoch, best_development_mse=best)
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Rewrite as a literal
+   |
+64 |     model.load_state_dict(state)
+   -     return dict(model=model, history=history, best_epoch=best_epoch, best_development_mse=best)
+65 +     return {"model": model, "history": history, "best_epoch": best_epoch, "best_development_mse": best}
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+   --> fog/eval/engine_mcts_smoke.py:125:11
+    |
+123 |     pool = load_pool(pool_path)
+124 |     rng = random.Random(seed)
+125 |     cfg = dict(k=k, budget_ms=budget_ms, iterations=iterations, threads=1)
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+126 |     tera = EngineMCTSPolicy(seed=seed, **cfg)
+127 |     no_tera = _no_tera_policy(seed=seed + 1, **cfg)
+    |
+help: Rewrite as a literal
+    |
+124 |     rng = random.Random(seed)
+    -     cfg = dict(k=k, budget_ms=budget_ms, iterations=iterations, threads=1)
+125 +     cfg = {"k": k, "budget_ms": budget_ms, "iterations": iterations, "threads": 1}
+126 |     tera = EngineMCTSPolicy(seed=seed, **cfg)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> fog/eval/learning_signal.py:61:12
+   |
+59 |     draws = data[rng.integers(len(data), size=(samples, len(data)))].mean(-1)
+60 |     lo, hi = np.quantile(draws, [.025, .975])
+61 |     return dict(games=len(data), mean=float(data.mean()), low=float(lo), high=float(hi))
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+help: Rewrite as a literal
+   |
+60 |     lo, hi = np.quantile(draws, [.025, .975])
+   -     return dict(games=len(data), mean=float(data.mean()), low=float(lo), high=float(hi))
+61 +     return {"games": len(data), "mean": float(data.mean()), "low": float(lo), "high": float(hi)}
+62 |
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> fog/eval/learning_signal.py:86:12
+   |
+84 |       target_variance = float(np.var(targets))
+85 |       residual_variance = float(np.mean(squared_residuals) - np.mean(residual_means) ** 2)
+86 |       return dict(value_mse=game_mean_interval(errors), baseline_mse=game_mean_interval(constant_errors),
+   |  ____________^
+87 | |                 mse_difference=game_mean_interval(np.array(errors) - constant_errors),
+88 | |                 baseline=baseline, mean_outcome=float(np.mean(targets)),
+89 | |                 explained_variance=(1 - residual_variance / target_variance
+90 | |                                     if target_variance > 0 else None))
+   | |______________________________________________________________________^
+help: Rewrite as a literal
+   |
+85 |     residual_variance = float(np.mean(squared_residuals) - np.mean(residual_means) ** 2)
+   -     return dict(value_mse=game_mean_interval(errors), baseline_mse=game_mean_interval(constant_errors),
+   -                 mse_difference=game_mean_interval(np.array(errors) - constant_errors),
+   -                 baseline=baseline, mean_outcome=float(np.mean(targets)),
+   -                 explained_variance=(1 - residual_variance / target_variance
+   -                                     if target_variance > 0 else None))
+86 +     return {"value_mse": game_mean_interval(errors), "baseline_mse": game_mean_interval(constant_errors),
+87 +                 "mse_difference": game_mean_interval(np.array(errors) - constant_errors),
+88 +                 "baseline": baseline, "mean_outcome": float(np.mean(targets)),
+89 +                 "explained_variance": (1 - residual_variance / target_variance
+90 +                                     if target_variance > 0 else None)}
+91 |
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+   --> fog/eval/learning_signal.py:120:25
+    |
+118 |           combined = math.sqrt(max(0, float(gram.sum())))
+119 |           policy = names.index('policy')
+120 |           report[group] = dict(
+    |  _________________________^
+121 | |             names=names, gram=gram.tolist(), norms=dict(zip(names, norm.tolist(), strict=True)),
+122 | |             combined_norm=combined,
+123 | |             cosine_with_policy={name: float(gram[policy, i] / (norm[policy] * norm[i]))
+124 | |                                 if norm[policy] * norm[i] > 0 else None
+125 | |                                 for i, name in enumerate(names)},
+126 | |             combined_policy_cosine=(float(gram[policy].sum() / (norm[policy] * combined))
+127 | |                                     if norm[policy] * combined > 0 else None),
+128 | |         )
+    | |_________^
+129 |       return report
+    |
+help: Rewrite as a literal
+    |
+119 |         policy = names.index('policy')
+    -         report[group] = dict(
+    -             names=names, gram=gram.tolist(), norms=dict(zip(names, norm.tolist(), strict=True)),
+    -             combined_norm=combined,
+    -             cosine_with_policy={name: float(gram[policy, i] / (norm[policy] * norm[i]))
+120 +         report[group] = {
+121 +             "names": names, "gram": gram.tolist(), "norms": dict(zip(names, norm.tolist(), strict=True)),
+122 +             "combined_norm": combined,
+123 +             "cosine_with_policy": {name: float(gram[policy, i] / (norm[policy] * norm[i]))
+124 |                                 if norm[policy] * norm[i] > 0 else None
+125 |                                 for i, name in enumerate(names)},
+    -             combined_policy_cosine=(float(gram[policy].sum() / (norm[policy] * combined))
+126 +             "combined_policy_cosine": (float(gram[policy].sum() / (norm[policy] * combined))
+127 |                                     if norm[policy] * combined > 0 else None),
+    -         )
+128 +         }
+129 |     return report
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+S102 Use of `exec` detected
+  --> fog/eval/metamon_imputation_baseline.py:76:9
+   |
+74 |         constants = ast.parse(constants_path.read_text(encoding="utf-8"))
+75 |         assignments = [node for node in constants.body if isinstance(node, ast.Assign)]
+76 |         exec(compile(ast.Module(body=assignments, type_ignores=[]), str(constants_path), "exec"),
+   |         ^^^^
+77 |              namespace)
+78 |         nodes = _definitions(builder_path, {"weighted_random_choice", "TeamBuilder"})
+   |
+
+S102 Use of `exec` detected
+  --> fog/eval/metamon_imputation_baseline.py:82:9
+   |
+80 |         builder.body = [node for node in builder.body if isinstance(node, ast.FunctionDef)
+81 |                         and node.name in {"check_valid_moves", "get_valid_moves", "generate_moveset"}]
+82 |         exec(compile(ast.Module(body=nodes, type_ignores=[]), str(builder_path), "exec"), namespace)
+   |         ^^^^
+83 |         pokemon = _definitions(team_path, {"PokemonSet"})[0]
+84 |         pokemon.decorator_list = []
+   |
+
+S102 Use of `exec` detected
+  --> fog/eval/metamon_imputation_baseline.py:88:9
+   |
+86 |                         or (isinstance(node, ast.FunctionDef) and node.name == "fill_from_PokemonSet")]
+87 |         namespace["pokemon_name"] = lambda value: str(value).lower().replace("-", "")
+88 |         exec(compile(ast.Module(body=[pokemon], type_ignores=[]), str(team_path), "exec"), namespace)
+   |         ^^^^
+89 |         self.PokemonSet = namespace["PokemonSet"]
+90 |         self.builder = namespace["TeamBuilder"]()
+   |
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+   --> fog/eval/metamon_native_comparison.py:108:17
+    |
+106 |                     counts[name + "_revealed"] += 1
+107 |                     counts[name + "_wrong"] += source[col] != target[col]
+108 |         moves = set(int(v) for v in source[3:7] if v >= 0)
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+109 |         actual = set(int(v) for v in target[3:7] if v >= 0)
+110 |         counts["moves_revealed"] += len(moves)
+    |
+help: Rewrite as a set comprehension
+    |
+107 |                     counts[name + "_wrong"] += source[col] != target[col]
+    -         moves = set(int(v) for v in source[3:7] if v >= 0)
+108 +         moves = {int(v) for v in source[3:7] if v >= 0}
+109 |         actual = set(int(v) for v in target[3:7] if v >= 0)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+   --> fog/eval/metamon_native_comparison.py:109:18
+    |
+107 |                     counts[name + "_wrong"] += source[col] != target[col]
+108 |         moves = set(int(v) for v in source[3:7] if v >= 0)
+109 |         actual = set(int(v) for v in target[3:7] if v >= 0)
+    |                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+110 |         counts["moves_revealed"] += len(moves)
+111 |         counts["moves_wrong"] += len(moves - actual)
+    |
+help: Rewrite as a set comprehension
+    |
+108 |         moves = set(int(v) for v in source[3:7] if v >= 0)
+    -         actual = set(int(v) for v in target[3:7] if v >= 0)
+109 +         actual = {int(v) for v in target[3:7] if v >= 0}
+110 |         counts["moves_revealed"] += len(moves)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/eval/metamon_native_worker.py:27:5
+   |
+26 |   def run(input_path: Path, out: Path, *, draws: int, seed: int, source: Path) -> None:
+27 | /     from metamon.backend.replay_parser import backward, forward
+28 | |     from metamon.backend.replay_parser.parse_replays import ReplayParser
+29 | |     from metamon.backend.team_prediction.predictor import ReplayPredictor
+30 | |     from metamon.backend.team_prediction.team import PokemonSet, TeamSet
+31 | |     from metamon.backend.showdown_dex import Dex
+32 | |     from metamon.backend.team_prediction.usage_stats.stat_reader import (
+33 | |         EARLIEST_USAGE_STATS_DATE, LATEST_USAGE_STATS_DATE,
+34 | |     )
+   | |_____^
+35 |
+36 |       if out.exists():
+   |
+help: Organize imports
+   |
+28 |     from metamon.backend.replay_parser.parse_replays import ReplayParser
+29 +     from metamon.backend.showdown_dex import Dex
+30 |     from metamon.backend.team_prediction.predictor import ReplayPredictor
+31 |     from metamon.backend.team_prediction.team import PokemonSet, TeamSet
+   -     from metamon.backend.showdown_dex import Dex
+32 |     from metamon.backend.team_prediction.usage_stats.stat_reader import (
+   -         EARLIEST_USAGE_STATS_DATE, LATEST_USAGE_STATS_DATE,
+33 +         EARLIEST_USAGE_STATS_DATE,
+34 +         LATEST_USAGE_STATS_DATE,
+35 |     )
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+  --> fog/eval/metamon_native_worker.py:77:20
+   |
+75 |                     for role, team in (("p1", replay[-1].pokemon_1), ("p2", replay[-1].pokemon_2))
+76 |                 }
+77 |             except Exception as error:
+   |                    ^^^^^^^^^
+78 |                 result["forward_ok"] = False
+79 |                 result["errors"].append({"stage": "forward", "type": type(error).__name__,
+   |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> fog/eval/metamon_native_worker.py:126:28
+    |
+124 |                             raise ValueError("native prediction contradicts FOG evidence")
+125 |                         fog_prediction[role] = export(completed)
+126 |                     except Exception as error:
+    |                            ^^^^^^^^^
+127 |                         result["errors"].append({"stage": "fog_evidence_prediction", "draw": draw,
+128 |                                                  "role": role, "type": type(error).__name__,
+    |
+
+BLE001 Do not catch blind exception: `Exception`
+   --> fog/eval/metamon_native_worker.py:142:28
+    |
+140 |                         result["samples"].append({"draw": draw, "sides": predictor.calls,
+141 |                                                    "sequence_lengths": lengths})
+142 |                     except Exception as error:
+    |                            ^^^^^^^^^
+143 |                         result["errors"].append({"stage": "backward_or_sequence", "draw": draw,
+144 |                                                  "type": type(error).__name__,
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/eval/replay_imputation.py:7:1
+   |
+ 5 |   The optional BC pilot measures held-out action NLL, not a claim of improved battle win rate.
+ 6 |   """
+ 7 | / from __future__ import annotations
+ 8 | |
+ 9 | | import argparse
+10 | | import hashlib
+11 | | import json
+12 | | import os
+13 | | import random
+14 | | from collections import Counter
+15 | | from pathlib import Path
+16 | |
+17 | | import numpy as np
+18 | |
+19 | | from fog.constants.tables import TABLES
+20 | | from fog.training.replay_candidates import ReplayCandidateBank, revealed_teams, replay_digest
+21 | | from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
+   | |_____________________________________________________________________________________^
+help: Organize imports
+   |
+19 | from fog.constants.tables import TABLES
+   - from fog.training.replay_candidates import ReplayCandidateBank, revealed_teams, replay_digest
+20 + from fog.training.replay_candidates import ReplayCandidateBank, replay_digest, revealed_teams
+21 | from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
+   |
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+   --> fog/eval/replay_imputation.py:116:24
+    |
+114 |         observed = revealed[slot]
+115 |         hidden = (observed < 0) & (target >= 0)
+116 |         target_moves = set(int(m) for m in target[3:7] if m >= 0)
+    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+117 |         hidden_moves = target_moves - set(int(m) for m in observed[3:7] if m >= 0)
+118 |         any_exact = False
+    |
+help: Rewrite as a set comprehension
+    |
+115 |         hidden = (observed < 0) & (target >= 0)
+    -         target_moves = set(int(m) for m in target[3:7] if m >= 0)
+116 +         target_moves = {int(m) for m in target[3:7] if m >= 0}
+117 |         hidden_moves = target_moves - set(int(m) for m in observed[3:7] if m >= 0)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+   --> fog/eval/replay_imputation.py:117:39
+    |
+115 |         hidden = (observed < 0) & (target >= 0)
+116 |         target_moves = set(int(m) for m in target[3:7] if m >= 0)
+117 |         hidden_moves = target_moves - set(int(m) for m in observed[3:7] if m >= 0)
+    |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+118 |         any_exact = False
+119 |         for sample in samples:
+    |
+help: Rewrite as a set comprehension
+    |
+116 |         target_moves = set(int(m) for m in target[3:7] if m >= 0)
+    -         hidden_moves = target_moves - set(int(m) for m in observed[3:7] if m >= 0)
+117 +         hidden_moves = target_moves - {int(m) for m in observed[3:7] if m >= 0}
+118 |         any_exact = False
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+   --> fog/eval/replay_imputation.py:121:21
+    |
+119 |         for sample in samples:
+120 |             row = sample[slot]
+121 |             moves = set(int(m) for m in row[3:7] if m >= 0)
+    |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+122 |             for name, cols in {"item": [1], "ability": [2], "nature": [7],
+123 |                                "ev": list(range(8, 14)), "tera": [14]}.items():
+    |
+help: Rewrite as a set comprehension
+    |
+120 |             row = sample[slot]
+    -             moves = set(int(m) for m in row[3:7] if m >= 0)
+121 +             moves = {int(m) for m in row[3:7] if m >= 0}
+122 |             for name, cols in {"item": [1], "ability": [2], "nature": [7],
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+PLW1510 `subprocess.run` without explicit `check` argument
+   --> fog/eval/showdown_direct_selection.py:421:17
+    |
+419 |         out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
+420 |                              text=True, check=True, cwd=Path(__file__).resolve().parent)
+421 |         dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+    |                 ^^^^^^^^^^^^^^
+422 |                                capture_output=True, text=True,
+423 |                                cwd=Path(__file__).resolve().parent).stdout.strip()
+    |
+help: Add explicit `check=False`
+    |
+421 |         dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=no"],
+    -                                capture_output=True, text=True,
+422 +                                check=False, capture_output=True, text=True,
+423 |                                cwd=Path(__file__).resolve().parent).stdout.strip()
+    |
+note: This suggestion may be incorrect or produce invalid syntax. It requires manual review and cannot be applied automatically
+
+PLR0124 Name compared with itself, consider replacing `point != point`
+   --> fog/eval/showdown_direct_selection.py:439:25
+    |
+437 |                  if "fallbacks" in totals and decisions else "n/a")
+438 |     point = row.get("a_win_rate_decisive")
+439 |     if point is None or point != point:
+    |                         ^^^^^
+440 |         rate = "n/a"
+441 |     else:
+    |
+
+ISC004 Unparenthesized implicit string concatenation in collection
+   --> fog/eval/tera_damage_check.py:214:9
+    |
+212 |   def markdown(report: dict[str, Any]) -> str:
+213 |       lines = [
+214 | /         "| Case | Attacker (Tera) | Move | Defender (Tera) | Showdown rolls | Engine max |"
+215 | |         " Engine in-turn | Agrees |",
+    | |____________________________________^
+216 |           "| --- | --- | --- | --- | ---: | ---: | ---: | --- |",
+217 |       ]
+    |
+help: Did you forget a comma?
+help: Wrap implicitly concatenated strings in parentheses
+    |
+213 |     lines = [
+    -         "| Case | Attacker (Tera) | Move | Defender (Tera) | Showdown rolls | Engine max |"
+    -         " Engine in-turn | Agrees |",
+214 +         ("| Case | Attacker (Tera) | Move | Defender (Tera) | Showdown rolls | Engine max |"
+215 +         " Engine in-turn | Agrees |"),
+216 |         "| --- | --- | --- | --- | ---: | ---: | ---: | --- |",
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> fog/scripts/check_policy_contract.py:57:12
+   |
+55 |           and r['chosen_log_prob_abs_error_quantiles'][-1] <= tolerance
+56 |           and r['categorical_kl_max'] <= 1e-6 for r in modes)
+57 |       return dict(passed=passed, weights_unchanged=unchanged, device=device,
+   |  ____________^
+58 | |                 log_probability_tolerance=tolerance, modes=modes)
+   | |_________________________________________________________________^
+help: Rewrite as a literal
+   |
+56 |         and r['categorical_kl_max'] <= 1e-6 for r in modes)
+   -     return dict(passed=passed, weights_unchanged=unchanged, device=device,
+   -                 log_probability_tolerance=tolerance, modes=modes)
+57 +     return {"passed": passed, "weights_unchanged": unchanged, "device": device,
+58 +                 "log_probability_tolerance": tolerance, "modes": modes}
+59 |
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+SIM102 Use a single `if` statement instead of nested `if` statements
+   --> fog/scripts/fuzz_recon_showdown.py:172:13
+    |
+170 |               true_vols -= _IGNORED_VOLATILES
+171 |               vols = {_id(v) for v in (es.volatile_statuses or ())} - _IGNORED_VOLATILES
+172 | /             if "substitute" in true_vols or int(es.substitute_health or 0) > 0:
+173 | |                 if ("substitute" in true_vols) != (int(es.substitute_health or 0) > 0):
+    | |_______________________________________________________________________________________^
+174 |                       out.append(f"{label}.substitute")
+175 |               true_vols.discard("substitute")
+    |
+help: Combine `if` statements using `and`
+
+SIM117 Use a single `with` statement with multiple contexts instead of nested `with` statements
+  --> fog/scripts/import_metamon_replays.py:69:13
+   |
+67 |                   raise ValueError("selected shard exceeds remaining download budget")
+68 |               temporary = path.with_suffix(".partial")
+69 | /             with _request(f"https://huggingface.co/datasets/{REPOSITORY}/resolve/{pinned}/{name}") as source:
+70 | |                 with temporary.open("wb") as destination:
+   | |_________________________________________________________^
+71 |                       while chunk := source.read(1024**2):
+72 |                           used += len(chunk)
+   |
+help: Combine `with` statements
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/scripts/kaggle_experiment.py:2:1
+   |
+ 1 |   """Freeze, submit, collect and evaluate private Kaggle training experiments."""
+ 2 | / from __future__ import annotations
+ 3 | |
+ 4 | | import argparse
+ 5 | | from datetime import UTC, datetime
+ 6 | | import hashlib
+ 7 | | import json
+ 8 | | from pathlib import Path
+ 9 | | import re
+10 | | import shutil
+11 | | import subprocess
+12 | | import sys
+13 | | import tempfile
+14 | | import uuid
+15 | | import zipfile
+16 | |
+17 | | from fog.scripts.kaggle_results import ROOT, client, digest, import_archive, remote, write_json
+   | |_______________________________________________________________________________________________^
+18 |
+19 |   HOME = ROOT / "runs/experiments"
+   |
+help: Organize imports
+   |
+4  | import argparse
+   - from datetime import UTC, datetime
+5  | import hashlib
+6  | import json
+   - from pathlib import Path
+7  | import re
+--------------------------------------------------------------------------------
+13 | import zipfile
+14 + from datetime import UTC, datetime
+15 + from pathlib import Path
+16 |
+   |
+
+UP022 Prefer `capture_output` over sending `stdout` and `stderr` to `PIPE`
+  --> fog/scripts/kaggle_experiment.py:40:14
+   |
+39 |   def cli(*args: str) -> str:
+40 |       result = subprocess.run([str(client()), *args], cwd=ROOT, text=True,
+   |  ______________^
+41 | |                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+   | |___________________________________________________________________________^
+42 |       if result.returncode:
+43 |           raise RuntimeError(f"Kaggle {' '.join(args[:2])} failed: {result.stderr[-1500:]}")
+   |
+help: Replace with `capture_output` keyword argument
+   |
+40 |     result = subprocess.run([str(client()), *args], cwd=ROOT, text=True,
+   -                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+41 +                             capture_output=True)
+42 |     if result.returncode:
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> fog/scripts/kaggle_experiment.py:40:14
+   |
+39 | def cli(*args: str) -> str:
+40 |     result = subprocess.run([str(client()), *args], cwd=ROOT, text=True,
+   |              ^^^^^^^^^^^^^^
+41 |                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+42 |     if result.returncode:
+   |
+help: Add explicit `check=False`
+   |
+39 | def cli(*args: str) -> str:
+   -     result = subprocess.run([str(client()), *args], cwd=ROOT, text=True,
+40 +     result = subprocess.run([str(client()), *args], check=False, cwd=ROOT, text=True,
+41 |                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+   |
+note: This suggestion may be incorrect or produce invalid syntax. It requires manual review and cannot be applied automatically
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/scripts/kaggle_experiment.py:48:5
+   |
+47 |   def prepare(job_path: Path, label: str, trial: bool = False, parent: Path | None = None) -> Path:
+48 | /     import yaml
+49 | |     from fog.scripts.kaggle_bundle import bundle_for_kaggle
+   | |___________________________________________________________^
+50 |       if not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,22}", label):
+51 |           raise ValueError("Label must have 2–23 lowercase letters, digits or hyphens")
+   |
+help: Organize imports
+   |
+48 |     import yaml
+49 +
+50 |     from fog.scripts.kaggle_bundle import bundle_for_kaggle
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> fog/scripts/kaggle_experiment.py:209:5
+    |
+208 |   def evaluate(folder: Path, pool: Path, games: int) -> None:
+209 | /     import yaml
+210 | |     from fog.scripts.automated_training import _evaluation_command, summarize_evaluation
+    | |________________________________________________________________________________________^
+211 |       if games < 4 or games % 4:
+212 |           raise ValueError("Evaluation games must be a positive multiple of four")
+    |
+help: Organize imports
+    |
+209 |     import yaml
+210 +
+211 |     from fog.scripts.automated_training import _evaluation_command, summarize_evaluation
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/scripts/kaggle_results.py:2:1
+   |
+ 1 |   """Fetch a pinned Kaggle run and prepare a local, inspectable training handoff."""
+ 2 | / from __future__ import annotations
+ 3 | |
+ 4 | | import argparse
+ 5 | | import csv
+ 6 | | import hashlib
+ 7 | | import json
+ 8 | | import os
+ 9 | | from pathlib import Path
+10 | | import re
+11 | | import shutil
+12 | | import stat
+13 | | import subprocess
+14 | | import sys
+15 | | import tempfile
+16 | | import zipfile
+17 | | from urllib.parse import urlsplit
+   | |_________________________________^
+18 |
+19 |   ROOT = Path(__file__).resolve().parents[2]
+   |
+help: Organize imports
+   |
+8  | import os
+   - from pathlib import Path
+9  | import re
+--------------------------------------------------------------------------------
+15 | import zipfile
+16 + from pathlib import Path
+17 | from urllib.parse import urlsplit
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> fog/scripts/kaggle_results.py:137:5
+    |
+135 |       # Kaggle serves latest outputs; version_label returns 404 for these private
+136 |       # runs. Fail closed unless the signed file URL identifies the requested run.
+137 | /     from kaggle.api.kaggle_api_extended import KaggleApi
+138 | |     from kagglesdk.kernels.types.kernels_api_service import (
+139 | |         ApiGetKernelSessionStatusRequest, ApiListKernelSessionOutputRequest,
+140 | |     )
+141 | |     import requests
+    | |___________________^
+142 |       api = KaggleApi()
+143 |       api.authenticate()
+    |
+help: Organize imports
+    |
+136 |     # runs. Fail closed unless the signed file URL identifies the requested run.
+137 +     import requests
+138 |     from kaggle.api.kaggle_api_extended import KaggleApi
+139 |     from kagglesdk.kernels.types.kernels_api_service import (
+    -         ApiGetKernelSessionStatusRequest, ApiListKernelSessionOutputRequest,
+140 +         ApiGetKernelSessionStatusRequest,
+141 +         ApiListKernelSessionOutputRequest,
+142 |     )
+    -     import requests
+143 |     api = KaggleApi()
+    |
+
+PLW1510 `subprocess.run` without explicit `check` argument
+  --> fog/scripts/kaggle_setup.py:63:14
+   |
+61 |                   "node": subprocess.check_output(["node", "--version"], text=True).strip()}))
+62 | '''
+63 |     result = subprocess.run([str(python), "-c", probe], cwd=root, capture_output=True, text=True)
+   |              ^^^^^^^^^^^^^^
+64 |     print(result.stdout, end="")
+65 |     if result.returncode:
+   |
+help: Add explicit `check=False`
+   |
+62 | '''
+   -     result = subprocess.run([str(python), "-c", probe], cwd=root, capture_output=True, text=True)
+63 +     result = subprocess.run([str(python), "-c", probe], check=False, cwd=root, capture_output=True, text=True)
+64 |     print(result.stdout, end="")
+   |
+note: This suggestion may be incorrect or produce invalid syntax. It requires manual review and cannot be applied automatically
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/scripts/kaggle_worker.py:2:1
+   |
+ 1 |   """Thin Kaggle entry point; all experiment inputs arrive in a frozen private dataset."""
+ 2 | / from pathlib import Path
+ 3 | | import hashlib
+ 4 | | import json
+ 5 | | import os
+ 6 | | import shutil
+ 7 | | import signal
+ 8 | | import subprocess
+ 9 | | import sys
+10 | | import time
+11 | | import zipfile
+   | |______________^
+help: Organize imports
+   |
+1  | """Thin Kaggle entry point; all experiment inputs arrive in a frozen private dataset."""
+   - from pathlib import Path
+2  | import hashlib
+--------------------------------------------------------------------------------
+10 | import zipfile
+11 + from pathlib import Path
+12 |
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+   --> fog/scripts/parse_replays.py:538:5
+    |
+536 |           return {"rows": [], "p1_win": baseline["p1_win"], "filter_counts": {"missing_side": 1}}
+537 |
+538 | /     from collections import Counter
+539 | |
+540 | |     from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
+541 | |     from fog.training.replay_candidates import replay_digest
+    | |____________________________________________________________^
+542 |
+543 |       accepted: list[dict] = []
+    |
+help: Organize imports
+    |
+539 |
+540 +     from fog.training.replay_candidates import replay_digest
+541 |     from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
+    -     from fog.training.replay_candidates import replay_digest
+542 |
+    |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/search/direct_two_sided.py:8:1
+   |
+ 6 |   """
+ 7 |
+ 8 | / from __future__ import annotations
+ 9 | |
+10 | | import random
+11 | |
+12 | | from dataclasses import dataclass
+13 | | from typing import Any
+14 | |
+15 | | import numpy as np
+16 | |
+17 | | from fog.constants.schema import N_ACTIONS
+18 | | from fog.env.actions import action_legality_mask, map_action_to_order
+19 | | from fog.env.showdown_local_runner import LocalOrderFactory
+20 | | from fog.search.two_sided import TwoSidedSolution, two_sided_regret_solve
+   | |_________________________________________________________________________^
+help: Organize imports
+   |
+10 | import random
+   -
+11 | from dataclasses import dataclass
+   |
+
+S110 `try`-`except`-`pass` detected, consider logging the exception
+   --> fog/search/engine_mcts.py:280:13
+    |
+278 |               try:
+279 |                   self.failed_states.append(state.to_string())
+280 | /             except Exception:  # noqa: BLE001 - diagnostics only
+281 | |                 pass
+    | |____________________^
+282 |
+283 |       def _decide(self, mask: np.ndarray, choice_map: dict[str, int], tera_used: bool,
+    |
+
+PERF102 When using only the values of a dict use the `values()` method
+  --> fog/search/public_observation.py:60:31
+   |
+58 |         self.evidence = np.ones((len(self.keys), *self.shape), dtype=np.float64)
+59 |         if evidence.ndim == 3:
+60 |             for key, group in index.items():
+   |                               ^^^^^^^^^^^
+61 |                 selected = evidence[self.leaf_group == group]
+62 |                 if not np.all(selected == selected[0]):
+   |
+help: Replace `.items()` with `.values()`
+   |
+59 |         if evidence.ndim == 3:
+   -             for key, group in index.items():
+60 +             for group in index.values():
+61 |                 selected = evidence[self.leaf_group == group]
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> fog/training/bc.py:8:1
+   |
+ 6 |       python -m fog.training.bc --config configs/bc_ou.yaml
+ 7 |   """
+ 8 | / from __future__ import annotations
+ 9 | |
+10 | | import argparse
+11 | | import csv
+12 | | import hashlib
+13 | | import json
+14 | | import math
+15 | | import os
+16 | | import random
+17 | | import re
+18 | | import time
+19 | | from pathlib import Path
+20 | |
+21 | | import numpy as np
+22 | | import torch
+23 | |
+24 | | from fog.config import config_hash
+25 | | from fog.training import losses
+26 | | from fog.training.optimization import (
+27 | |     cosine_schedule,
+28 | |     equal_norm_pcgrad_pair as _equal_norm_pcgrad_pair,
+29 | |     pcgrad_many as _pcgrad_many,
+30 | |     pcgrad_pair as _pcgrad_pair,
+31 | |     trainable_parameters,
+32 | | )
+   | |_^
+help: Organize imports
+   |
+27 |     cosine_schedule,
+28 +     trainable_parameters,
+29 + )
+30 + from fog.training.optimization import (
+31 |     equal_norm_pcgrad_pair as _equal_norm_pcgrad_pair,
+32 + )
+33 + from fog.training.optimization import (
+34 |     pcgrad_many as _pcgrad_many,
+35 + )
+36 + from fog.training.optimization import (
+37 |     pcgrad_pair as _pcgrad_pair,
+   -     trainable_parameters,
+38 | )
+   |
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+  --> fog/training/replay_candidates.py:56:20
+   |
+54 | def canonical_row(row: np.ndarray) -> np.ndarray:
+55 |     row = np.asarray(row, dtype=np.int64).copy()
+56 |     moves = sorted(set(int(m) for m in row[3:7] if m >= 0))
+   |                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+57 |     row[3:7] = moves + [-1] * (4 - len(moves))
+58 |     return row
+   |
+help: Rewrite as a set comprehension
+   |
+55 |     row = np.asarray(row, dtype=np.int64).copy()
+   -     moves = sorted(set(int(m) for m in row[3:7] if m >= 0))
+56 +     moves = sorted({int(m) for m in row[3:7] if m >= 0})
+57 |     row[3:7] = moves + [-1] * (4 - len(moves))
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C401 Unnecessary generator (rewrite as a set comprehension)
+   --> fog/training/replay_candidates.py:198:27
+    |
+196 |             indices = indices[eligible]
+197 |             cand = self.tokens[indices]
+198 |             known_moves = set(int(m) for m in row[3:7] if m >= 0)
+    |                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+199 |             compatible = np.ones(len(cand), dtype=bool)
+200 |             for col in (1, 2, *range(7, SET_N_ATTRS)):
+    |
+help: Rewrite as a set comprehension
+    |
+197 |             cand = self.tokens[indices]
+    -             known_moves = set(int(m) for m in row[3:7] if m >= 0)
+198 +             known_moves = {int(m) for m in row[3:7] if m >= 0}
+199 |             compatible = np.ones(len(cand), dtype=bool)
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_critic_readout.py:19:11
+   |
+17 |     torch.nn.init.zeros_(head.bias)
+18 |     x = torch.tensor([[-1.], [1.], [-1.], [1.]])
+19 |     fit = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4))
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+20 |     dev = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4, 8))
+21 |     result = fit_readout(head, fit, dev, seed=1, lr=.1, max_epochs=20, patience=5, min_delta=0.)
+   |
+help: Rewrite as a literal
+   |
+18 |     x = torch.tensor([[-1.], [1.], [-1.], [1.]])
+   -     fit = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4))
+19 +     fit = {'features': x, 'outcome': x[:, 0], 'game_id': torch.arange(4)}
+20 |     dev = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4, 8))
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_critic_readout.py:20:11
+   |
+18 |     x = torch.tensor([[-1.], [1.], [-1.], [1.]])
+19 |     fit = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4))
+20 |     dev = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4, 8))
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+21 |     result = fit_readout(head, fit, dev, seed=1, lr=.1, max_epochs=20, patience=5, min_delta=0.)
+22 |     assert result['best_development_mse'] < .1
+   |
+help: Rewrite as a literal
+   |
+19 |     fit = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4))
+   -     dev = dict(features=x, outcome=x[:, 0], game_id=torch.arange(4, 8))
+20 +     dev = {'features': x, 'outcome': x[:, 0], 'game_id': torch.arange(4, 8)}
+21 |     result = fit_readout(head, fit, dev, seed=1, lr=.1, max_epochs=20, patience=5, min_delta=0.)
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_critic_readout.py:30:11
+   |
+28 |     head = torch.nn.Linear(1, 1, bias=False)
+29 |     torch.nn.init.zeros_(head.weight)
+30 |     fit = dict(features=torch.ones(4, 1), outcome=torch.ones(4), game_id=torch.arange(4))
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+31 |     dev = dict(features=torch.ones(4, 1), outcome=-torch.ones(4), game_id=torch.arange(4, 8))
+32 |     result = fit_readout(head, fit, dev, seed=1, lr=.1, max_epochs=5, patience=2)
+   |
+help: Rewrite as a literal
+   |
+29 |     torch.nn.init.zeros_(head.weight)
+   -     fit = dict(features=torch.ones(4, 1), outcome=torch.ones(4), game_id=torch.arange(4))
+30 +     fit = {'features': torch.ones(4, 1), 'outcome': torch.ones(4), 'game_id': torch.arange(4)}
+31 |     dev = dict(features=torch.ones(4, 1), outcome=-torch.ones(4), game_id=torch.arange(4, 8))
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_critic_readout.py:31:11
+   |
+29 |     torch.nn.init.zeros_(head.weight)
+30 |     fit = dict(features=torch.ones(4, 1), outcome=torch.ones(4), game_id=torch.arange(4))
+31 |     dev = dict(features=torch.ones(4, 1), outcome=-torch.ones(4), game_id=torch.arange(4, 8))
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+32 |     result = fit_readout(head, fit, dev, seed=1, lr=.1, max_epochs=5, patience=2)
+33 |     assert result['best_epoch'] == 0
+   |
+help: Rewrite as a literal
+   |
+30 |     fit = dict(features=torch.ones(4, 1), outcome=torch.ones(4), game_id=torch.arange(4))
+   -     dev = dict(features=torch.ones(4, 1), outcome=-torch.ones(4), game_id=torch.arange(4, 8))
+31 +     dev = {'features': torch.ones(4, 1), 'outcome': -torch.ones(4), 'game_id': torch.arange(4, 8)}
+32 |     result = fit_readout(head, fit, dev, seed=1, lr=.1, max_epochs=5, patience=2)
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_critic_readout.py:39:11
+   |
+37 | def test_readout_refuses_shared_gradients_and_overlapping_development_games():
+38 |     head = torch.nn.Linear(1, 1)
+39 |     fit = dict(features=torch.ones(2, 1), outcome=torch.ones(2), game_id=torch.arange(2))
+   |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+40 |     with pytest.raises(ValueError, match='identities overlap'):
+41 |         fit_readout(head, fit, fit, seed=1)
+   |
+help: Rewrite as a literal
+   |
+38 |     head = torch.nn.Linear(1, 1)
+   -     fit = dict(features=torch.ones(2, 1), outcome=torch.ones(2), game_id=torch.arange(2))
+39 +     fit = {'features': torch.ones(2, 1), 'outcome': torch.ones(2), 'game_id': torch.arange(2)}
+40 |     with pytest.raises(ValueError, match='identities overlap'):
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_heuristic_guidance.py:1:1
+   |
+ 1 | / from types import SimpleNamespace
+ 2 | | import random
+ 3 | |
+ 4 | | import pytest
+ 5 | | import torch
+ 6 | |
+ 7 | | from fog.training.heuristic_guidance import (
+ 8 | |     attach_guidance,
+ 9 | |     guidance_loss,
+10 | |     guidance_weight,
+11 | |     validate_guidance,
+12 | | )
+13 | | from fog.training.ppo import ppo_update
+14 | | from tests.test_ppo_update import TinyPolicyAgent, make_ppo_batch
+   | |_________________________________________________________________^
+help: Organize imports
+  |
+1 + import random
+2 | from types import SimpleNamespace
+  - import random
+3 |
+  |
+
+PLR0402 [*] Use `from fog.encoding import events` in lieu of alias
+  --> tests/test_history_cache.py:93:12
+   |
+92 | def test_cache_hits_skip_reparsing(pool, monkeypatch):
+93 |     import fog.encoding.events as events
+   |            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+94 |     from fog.env.engine_battle import EngineBattle
+95 |     from fog.env.engine_scripted import EngineRandomPolicy
+   |
+help: Replace with `from fog.encoding import events`
+   |
+92 | def test_cache_hits_skip_reparsing(pool, monkeypatch):
+   -     import fog.encoding.events as events
+93 +     from fog.encoding import events
+94 |     from fog.env.engine_battle import EngineBattle
+   |
+
+RUF059 Unpacked variable `hist` is never used
+   --> tests/test_history_cache.py:117:5
+    |
+115 |     monkeypatch.setattr(events, "parse_turn_events", count_rec)
+116 |     monkeypatch.setattr(events, "parse_turn_event_ids", count_ids)
+117 |     hist, n, _, _ = _encode(view, tracker, role, True)
+    |     ^^^^
+118 |     assert n > 0 and calls == {"rec": 0, "ids": 0}
+119 |     _encode(view, tracker, role, False)
+    |
+help: Prefix it with an underscore or any other dummy variable pattern
+    |
+116 |     monkeypatch.setattr(events, "parse_turn_event_ids", count_ids)
+    -     hist, n, _, _ = _encode(view, tracker, role, True)
+117 +     _hist, n, _, _ = _encode(view, tracker, role, True)
+118 |     assert n > 0 and calls == {"rec": 0, "ids": 0}
+    |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_kaggle_results.py:1:1
+   |
+ 1 | / import json
+ 2 | | from pathlib import Path
+ 3 | | import zipfile
+ 4 | | from contextlib import nullcontext
+ 5 | | import sys
+ 6 | | from types import ModuleType, SimpleNamespace
+ 7 | |
+ 8 | | import pytest
+ 9 | |
+10 | | from fog.scripts.kaggle_results import import_archive, remote
+   | |_____________________________________________________________^
+help: Organize imports
+  |
+1 | import json
+  - from pathlib import Path
+2 + import sys
+3 | import zipfile
+4 | from contextlib import nullcontext
+  - import sys
+5 + from pathlib import Path
+6 | from types import ModuleType, SimpleNamespace
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_metamon_native_comparison.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import json
+ 4 | |
+ 5 | | import numpy as np
+ 6 | | import pytest
+ 7 | |
+ 8 | | from fog.constants.tables import TABLES
+ 9 | | from fog.eval.metamon_native_comparison import (
+10 | |     METHODS, evidence_counts, export_partial, import_priors, import_team,
+11 | |     paired_comparisons, prepare, score,
+12 | | )
+13 | | from fog.training.replay_policy_data import complete_private_team
+   | |_________________________________________________________________^
+help: Organize imports
+   |
+9  | from fog.eval.metamon_native_comparison import (
+   -     METHODS, evidence_counts, export_partial, import_priors, import_team,
+   -     paired_comparisons, prepare, score,
+10 +     METHODS,
+11 +     evidence_counts,
+12 +     export_partial,
+13 +     import_priors,
+14 +     import_team,
+15 +     paired_comparisons,
+16 +     prepare,
+17 +     score,
+18 | )
+   |
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_policy_contract_gate.py:20:13
+   |
+18 |       model = Policy(torch.tensor([0., 1., float('-inf')]))
+19 |       old = model.logits.detach().log_softmax(-1).expand(40, -1)
+20 |       batch = dict(actions=torch.zeros(40, dtype=torch.long), behavior_log_probs=old.clone(),
+   |  _____________^
+21 | |                  old_log_probs=old[:, 0].clone())
+   | |_________________________________________________^
+22 |       assert check(model, batch, device='cpu', temperature=1., bonus=0.)['passed']
+23 |       with torch.no_grad():
+   |
+help: Rewrite as a literal
+   |
+19 |     old = model.logits.detach().log_softmax(-1).expand(40, -1)
+   -     batch = dict(actions=torch.zeros(40, dtype=torch.long), behavior_log_probs=old.clone(),
+   -                  old_log_probs=old[:, 0].clone())
+20 +     batch = {'actions': torch.zeros(40, dtype=torch.long), 'behavior_log_probs': old.clone(),
+21 +                  'old_log_probs': old[:, 0].clone()}
+22 |     assert check(model, batch, device='cpu', temperature=1., bonus=0.)['passed']
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+PLR0402 [*] Use `from fog.training import ppo` in lieu of alias
+  --> tests/test_ppo_measurements.py:59:12
+   |
+57 |     import time
+58 |
+59 |     import fog.training.ppo as ppo
+   |            ^^^^^^^^^^^^^^^^^^^^^^^
+60 |
+61 |     returns = torch.tensor([1., 1., 1., 1.] if constant else [-1., 0., 1., 0.])
+   |
+help: Replace with `from fog.training import ppo`
+   |
+58 |
+   -     import fog.training.ppo as ppo
+59 +     from fog.training import ppo
+60 |
+   |
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_ppo_measurements.py:80:60
+   |
+78 |       monkeypatch.setattr(ppo, "_fit_and_measure_probes", lambda *a, **k: {})
+79 |       monkeypatch.setattr(ppo, "_belief_accuracy_vs_turn", lambda *a, **k: {})
+80 |       monkeypatch.setattr(ppo, "ppo_update", lambda *a, **k: dict(
+   |  ____________________________________________________________^
+81 | |         loss=0., entropy=1., approx_kl=0., clip_frac=0., optimizer_rows=12.))
+   | |____________________________________________________________________________^
+82 |       assert _maybe_chunk_update(setup, SimpleNamespace(phi_hat=None), {}) == "updated"
+83 |       metrics = setup.metrics
+   |
+help: Rewrite as a literal
+   |
+79 |     monkeypatch.setattr(ppo, "_belief_accuracy_vs_turn", lambda *a, **k: {})
+   -     monkeypatch.setattr(ppo, "ppo_update", lambda *a, **k: dict(
+   -         loss=0., entropy=1., approx_kl=0., clip_frac=0., optimizer_rows=12.))
+80 +     monkeypatch.setattr(ppo, "ppo_update", lambda *a, **k: {
+81 +         "loss": 0., "entropy": 1., "approx_kl": 0., "clip_frac": 0., "optimizer_rows": 12.})
+82 |     assert _maybe_chunk_update(setup, SimpleNamespace(phi_hat=None), {}) == "updated"
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+I001 [*] Import block is un-sorted or un-formatted
+  --> tests/test_replay_candidates.py:1:1
+   |
+ 1 | / from __future__ import annotations
+ 2 | |
+ 3 | | import json
+ 4 | | from pathlib import Path
+ 5 | |
+ 6 | | import numpy as np
+ 7 | | import pytest
+ 8 | |
+ 9 | | from fog.constants.tables import TABLES
+10 | | from fog.eval.replay_imputation import align_truth, score_samples
+11 | | from fog.training.replay_candidates import (
+12 | |     ReplayCandidateBank, build_bank, canonical_row, revealed_teams, vocabulary_digest,
+13 | | )
+14 | | from fog.training.replay_policy_data import EXACT, INFERRED, complete_private_team
+   | |__________________________________________________________________________________^
+help: Organize imports
+   |
+11 | from fog.training.replay_candidates import (
+   -     ReplayCandidateBank, build_bank, canonical_row, revealed_teams, vocabulary_digest,
+12 +     ReplayCandidateBank,
+13 +     build_bank,
+14 +     canonical_row,
+15 +     revealed_teams,
+16 +     vocabulary_digest,
+17 | )
+   |
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_run_replay_blueprint.py:19:14
+   |
+18 |   def _args(tmp_path, **changes):
+19 |       values = dict(games=6, work_dir=tmp_path / "run", device="cpu", batch_size=256,
+   |  ______________^
+20 | |                   epochs=2, workers=1, config=Path("configs/replay_blueprint_cpu.yaml"),
+21 | |                   holdout_ids=tmp_path / "absent.txt", chronological_holdout_games=2,
+22 | |                   max_shards=46, max_download_mb=6000, parquet=[])
+   | |__________________________________________________________________^
+23 |       values.update(changes)
+24 |       return argparse.Namespace(**values)
+   |
+help: Rewrite as a literal
+   |
+18 | def _args(tmp_path, **changes):
+   -     values = dict(games=6, work_dir=tmp_path / "run", device="cpu", batch_size=256,
+   -                   epochs=2, workers=1, config=Path("configs/replay_blueprint_cpu.yaml"),
+   -                   holdout_ids=tmp_path / "absent.txt", chronological_holdout_games=2,
+   -                   max_shards=46, max_download_mb=6000, parquet=[])
+19 +     values = {"games": 6, "work_dir": tmp_path / "run", "device": "cpu", "batch_size": 256,
+20 +                   "epochs": 2, "workers": 1, "config": Path("configs/replay_blueprint_cpu.yaml"),
+21 +                   "holdout_ids": tmp_path / "absent.txt", "chronological_holdout_games": 2,
+22 +                   "max_shards": 46, "max_download_mb": 6000, "parquet": []}
+23 |     values.update(changes)
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+PLW1510 `subprocess.run` without explicit `check` argument
+   --> tests/test_run_replay_blueprint.py:330:21
+    |
+328 |         assert first["epoch"] == 1
+329 |         assert not (work / "training/checkpoints/bc_final.pt").exists()
+330 |         completed = subprocess.run(command, stdout=output, stderr=subprocess.STDOUT,
+    |                     ^^^^^^^^^^^^^^
+331 |                                    env=env, timeout=60)
+332 |     assert completed.returncode == 0, (tmp_path / "attempts.txt").read_text()
+    |
+help: Add explicit `check=False`
+    |
+329 |         assert not (work / "training/checkpoints/bc_final.pt").exists()
+    -         completed = subprocess.run(command, stdout=output, stderr=subprocess.STDOUT,
+330 +         completed = subprocess.run(command, check=False, stdout=output, stderr=subprocess.STDOUT,
+331 |                                    env=env, timeout=60)
+    |
+note: This suggestion may be incorrect or produce invalid syntax. It requires manual review and cannot be applied automatically
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_sequential_stats.py:54:33
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+   |                                 ^^^^^^^^^^^^^^^^^^^^
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+56 | def test_invalid_params(kw):
+   |
+help: Rewrite as a literal
+   |
+53 |
+   - @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+54 + @pytest.mark.parametrize("kw", [{"p0": 0.6, "p1": 0.5}, dict(p0=0.0), dict(p1=1.0),
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_sequential_stats.py:54:55
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+   |                                                       ^^^^^^^^^^^^
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+56 | def test_invalid_params(kw):
+   |
+help: Rewrite as a literal
+   |
+53 |
+   - @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+54 + @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), {"p0": 0.0}, dict(p1=1.0),
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_sequential_stats.py:54:69
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+   |                                                                     ^^^^^^^^^^^^
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+56 | def test_invalid_params(kw):
+   |
+help: Rewrite as a literal
+   |
+53 |
+   - @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+54 + @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), {"p1": 1.0},
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_sequential_stats.py:55:33
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+   |                                 ^^^^^^^^^^^^^^^
+56 | def test_invalid_params(kw):
+57 |     with pytest.raises(ValueError):
+   |
+help: Rewrite as a literal
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+   -                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+55 +                                 {"alpha": 0.5}, dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+56 | def test_invalid_params(kw):
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_sequential_stats.py:55:50
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+   |                                                  ^^^^^^^^^^^^^^
+56 | def test_invalid_params(kw):
+57 |     with pytest.raises(ValueError):
+   |
+help: Rewrite as a literal
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+   -                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+55 +                                 dict(alpha=0.5), {"beta": 0.0}, dict(min_blocks=10, max_blocks=5)])
+56 | def test_invalid_params(kw):
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_sequential_stats.py:55:66
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+55 |                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+   |                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+56 | def test_invalid_params(kw):
+57 |     with pytest.raises(ValueError):
+   |
+help: Rewrite as a literal
+   |
+54 | @pytest.mark.parametrize("kw", [dict(p0=0.6, p1=0.5), dict(p0=0.0), dict(p1=1.0),
+   -                                 dict(alpha=0.5), dict(beta=0.0), dict(min_blocks=10, max_blocks=5)])
+55 +                                 dict(alpha=0.5), dict(beta=0.0), {"min_blocks": 10, "max_blocks": 5}])
+56 | def test_invalid_params(kw):
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+RUF012 Mutable default value for class attribute
+   --> tests/test_showdown_engine_mcts.py:133:27
+    |
+131 |     class View:
+132 |         force_switch = True
+133 |         available_moves = []
+    |                           ^^
+134 |
+135 |     forced = apply_request_overlay(state, View(), "p1")
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> tests/test_showdown_engine_mcts.py:144:27
+    |
+142 |     class View2:
+143 |         force_switch = False
+144 |         available_moves = [Move()]
+    |                           ^^^^^^^^
+145 |
+146 |     limited = apply_request_overlay(state, View2(), "p1")
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+RUF012 Mutable default value for class attribute
+   --> tests/test_showdown_engine_mcts.py:153:30
+    |
+151 |     class View3(View2):
+152 |         trapped = True
+153 |         available_switches = []
+    |                              ^^
+154 |
+155 |     trapped = apply_request_overlay(state, View3(), "p1")
+    |
+help: Consider initializing in `__init__` or annotating with `typing.ClassVar`
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_state_recon_fixes.py:87:12
+   |
+85 |   def _own_mon(**kw):
+86 |       """A poke-env-shaped own mon (Great Tusk) for direct `_engine_mon_from_self` calls."""
+87 |       base = dict(
+   |  ____________^
+88 | |         species="greattusk", level=100, current_hp_fraction=1.0, fainted=False,
+89 | |         stats={"hp": 404, "atk": 268, "def": 299, "spa": 127, "spd": 143, "spe": 339},
+90 | |         ability="protosynthesis", item="heavydutyboots", status=None, status_counter=0,
+91 | |         is_terastallized=False, tera_type=None, types=["ground", "fighting"],
+92 | |         moves={"headlongrush": SimpleNamespace(current_pp=0, max_pp=8, disabled=False),
+93 | |                "rapidspin": SimpleNamespace(current_pp=None, max_pp=64, disabled=False),
+94 | |                "knockoff": SimpleNamespace(current_pp=5, max_pp=32, disabled=False)},
+95 | |         _last_request={"teraType": "Water"},
+96 | |     )
+   | |_____^
+97 |       base.update(kw)
+98 |       return SimpleNamespace(**base)
+   |
+help: Rewrite as a literal
+   |
+86 |     """A poke-env-shaped own mon (Great Tusk) for direct `_engine_mon_from_self` calls."""
+   -     base = dict(
+   -         species="greattusk", level=100, current_hp_fraction=1.0, fainted=False,
+   -         stats={"hp": 404, "atk": 268, "def": 299, "spa": 127, "spd": 143, "spe": 339},
+   -         ability="protosynthesis", item="heavydutyboots", status=None, status_counter=0,
+   -         is_terastallized=False, tera_type=None, types=["ground", "fighting"],
+   -         moves={"headlongrush": SimpleNamespace(current_pp=0, max_pp=8, disabled=False),
+87 +     base = {
+88 +         "species": "greattusk", "level": 100, "current_hp_fraction": 1.0, "fainted": False,
+89 +         "stats": {"hp": 404, "atk": 268, "def": 299, "spa": 127, "spd": 143, "spe": 339},
+90 +         "ability": "protosynthesis", "item": "heavydutyboots", "status": None, "status_counter": 0,
+91 +         "is_terastallized": False, "tera_type": None, "types": ["ground", "fighting"],
+92 +         "moves": {"headlongrush": SimpleNamespace(current_pp=0, max_pp=8, disabled=False),
+93 |                "rapidspin": SimpleNamespace(current_pp=None, max_pp=64, disabled=False),
+94 |                "knockoff": SimpleNamespace(current_pp=5, max_pp=32, disabled=False)},
+   -         _last_request={"teraType": "Water"},
+   -     )
+95 +         "_last_request": {"teraType": "Water"},
+96 +     }
+97 |     base.update(kw)
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+C408 Unnecessary `dict()` call (rewrite as a literal)
+  --> tests/test_value_finetune.py:46:14
+   |
+44 |       from fog.models.heads import PolicyValueHead
+45 |       torch.manual_seed(42)
+46 |       kwargs = dict(state_dim=8, dyn_dim=6, action_feature_dim=3, action_context_dim=5,
+   |  ______________^
+47 | |                   structured_dim=2)
+   | |___________________________________^
+48 |       blind = PolicyValueHead(**kwargs).eval()
+49 |       aware = PolicyValueHead(**kwargs, posterior_dim=N_POSTERIOR_FEATURES).eval()
+   |
+help: Rewrite as a literal
+   |
+45 |     torch.manual_seed(42)
+   -     kwargs = dict(state_dim=8, dyn_dim=6, action_feature_dim=3, action_context_dim=5,
+   -                   structured_dim=2)
+46 +     kwargs = {"state_dim": 8, "dyn_dim": 6, "action_feature_dim": 3, "action_context_dim": 5,
+47 +                   "structured_dim": 2}
+48 |     blind = PolicyValueHead(**kwargs).eval()
+   |
+note: This is an unsafe fix and may change runtime behavior
+
+Found 77 errors.
+[*] 20 fixable with `--fix` (39 unsafe fixes available with `--fix --unsafe-fixes`).

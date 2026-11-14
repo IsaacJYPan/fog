@@ -1,0 +1,13 @@
+{
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "fog.scripts.kaggle_setup"
+  ],
+  "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+  "status": "complete",
+  "started_at_utc": "2026-11-14T04:13:31.598758+00:00",
+  "seconds": 86.05316863300004,
+  "exit_code": 0,
+  "finished_at_utc": "2026-11-14T04:14:57.652127+00:00"
+}

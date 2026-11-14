@@ -1,0 +1,49 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___________ test_timing_hooks_preserve_native_trainer_phase_metrics ____________
+
+tmp_path = PosixPath('/workspace/fog-collect-gpu/.pytest-tmp/test_timing_hooks_preserve_nat0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f83d168eae0>
+
+    def test_timing_hooks_preserve_native_trainer_phase_metrics(tmp_path, monkeypatch):
+        from types import SimpleNamespace
+    
+        from fog.training import ppo
+        from fog.training.dashboard import TrainingDashboard
+        from fog.training.direct_parallel import PersistentProcessPool
+    
+        source = Path(__file__).resolve().parents[1] / "docs/briefs/06-artifacts/training_timing.py"
+        spec = importlib.util.spec_from_file_location("training_timing", source)
+        timing = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(timing)
+        result = [(SimpleNamespace(_games={0: SimpleNamespace(actions=[0, 1])}), 1)]
+        monkeypatch.setattr(PersistentProcessPool, "map", lambda *_a, **_kw: result)
+        monkeypatch.setattr(ppo, "ppo_update", lambda *_a, **_kw: {
+            "optimizer_steps": 1, "optimizer_rows": 4,
+        })
+        monkeypatch.setattr(ppo, "_maybe_chunk_update", lambda *_a, **_kw: None)
+        monkeypatch.setattr(TrainingDashboard, "log", lambda _self, _step, metrics: dict(metrics))
+        monkeypatch.setattr(torch.cuda, "synchronize", lambda: None)
+        monkeypatch.setattr(torch.cuda, "max_memory_allocated", lambda: 0)
+        monkeypatch.delenv("FOG_TIMING_OUTPUT", raising=False)
+        timing.install(tmp_path / "events.jsonl")
+        PersistentProcessPool.map(None, [])
+        agent = torch.nn.Linear(1, 1)
+        ppo.ppo_update(agent, None, {"actions": torch.zeros(4)}, {
+            "ppo": {"minibatch_size": 4},
+        })
+        native = {"collection_seconds": 101.0, "update_seconds": 202.0,
+                  "optimization_seconds": 303.0, "collection_decisions_per_sec": 4.0,
+                  "optimization_rows_per_sec": 5.0}
+        logged = TrainingDashboard.log(None, 4, dict(native))
+>       assert all(logged[key] == value for key, value in native.items())
+E       assert False
+E        +  where False = all(<generator object test_timing_hooks_preserve_native_trainer_phase_metrics.<locals>.<genexpr> at 0x7f8489211b60>)
+
+tests/test_collection_gpu_job.py:88: AssertionError
+----------------------------- Captured stdout call -----------------------------
+[timing] {"kind": "collection", "seconds": 8.709976100362837e-07, "rows": 2, "games": 1}
+[timing] {"kind": "update", "seconds": 4.176999937044457e-06, "rows": 4, "forward_seconds": 0.0, "loss_backward_optimizer_seconds": 4.176999937044457e-06, "rows_per_second": 957625.1042106317, "optimized_rows": 4, "optimized_rows_per_second": 957625.1042106317, "optimizer_steps": 1, "peak_learner_allocated_bytes": 0}
+=========================== short test summary info ============================
+FAILED tests/test_collection_gpu_job.py::test_timing_hooks_preserve_native_trainer_phase_metrics
+1 failed in 1.48s

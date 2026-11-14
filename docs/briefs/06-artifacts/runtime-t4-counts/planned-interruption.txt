@@ -1,0 +1,1 @@
+Preempted the newly started CPU self-play repeat to finish the MaxDamage sweep and training/evaluation before the remaining self-play matrix. No interrupted result is a throughput measurement; this repeat will restart later.

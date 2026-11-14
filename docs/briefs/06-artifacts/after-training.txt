@@ -1,0 +1,48 @@
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
+import subprocess
+import sys
+
+root = Path('/content/fog')
+out = root / 'docs/briefs/06-artifacts/runtime-t4-counts'
+events = [json.loads(line) for line in (out / 'training-timing.jsonl').read_text().splitlines()]
+collection = sum(event['seconds'] for event in events if event['kind'] == 'collection')
+update = sum(event['seconds'] for event in events if event['kind'] == 'update_phase')
+(out / 'bottleneck-selection.json').write_text(json.dumps({
+    'label': 'smoke', 'collection_seconds': collection, 'update_phase_seconds': update,
+    'larger_phase': 'collection' if collection > update else 'update',
+    'source': 'training-timing.jsonl',
+}, indent=2) + '\n')
+job = str(root / 'docs/briefs/06-artifacts/gpu_job.txt')
+if collection > update:
+    subprocess.run([sys.executable, job, 'split'], cwd=root, check=True)
+os.environ.pop('FOG_PROBE_OPPONENT', None)
+session = json.loads((out / 'session.json').read_text())
+deadline = datetime.fromisoformat(session['local_stop_deadline_utc'].replace('Z', '+00:00'))
+available = (deadline - datetime.now(timezone.utc)).total_seconds()
+missing = []
+estimated = 0.0
+for device, batch in (('cpu', 32), ('cuda', 32), ('cuda', 64), ('cuda', 128)):
+    for repeat in (1, 2):
+        name = f'probe-self-{device}-b{batch}-r{repeat}'
+        path = out / (name + '.json')
+        if path.exists() and json.loads(path.read_text()).get('exit_code') == 0:
+            continue
+        missing.append(name)
+        reference_dir = out if device == 'cuda' else out.parent / 'runtime-t4'
+        reference = [json.loads(p.read_text()) for p in reference_dir.glob(
+            f'probe-self-{device}-b32-r[12].json')]
+        successful = [r['wall_seconds'] for r in reference if r.get('exit_code') == 0]
+        estimated += max(successful)
+if missing and estimated * 1.1 + 30 > available:
+    (out / 'deferred-probes.json').write_text(json.dumps({
+        'label': 'smoke', 'reason': 'remaining complete sweep does not fit the authorized GPU budget',
+        'missing': missing, 'estimated_seconds': estimated,
+        'estimate_note': 'conservative proxy from completed self-play batch-32 command walls; not new measurements',
+        'available_seconds': available, 'deadline_utc': deadline.isoformat(),
+    }, indent=2) + '\n')
+    print('Deferred the incomplete self-play sweep to preserve the authorized GPU budget.', flush=True)
+else:
+    subprocess.run([sys.executable, job, 'probes'], cwd=root, check=True)

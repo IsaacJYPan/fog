@@ -1,0 +1,8 @@
+Cloning into 'fog'...
+HEAD is now at 8159095 Merge remote-tracking branch 'origin/work/collect-gpu' into work/collect-gpu
+Submodule 'server/pokemon-showdown' (https://github.com/smogon/pokemon-showdown) registered for path 'server/pokemon-showdown'
+Cloning into '/content/fog/server/pokemon-showdown'...
+From https://github.com/smogon/pokemon-showdown
+ * branch            e440c4a18385274f10c405d0b158b6a962ce6d94 -> FETCH_HEAD
+Submodule path 'server/pokemon-showdown': checked out 'e440c4a18385274f10c405d0b158b6a962ce6d94'
+/content/runtime_bootstrap.sh: line 8: npm: command not found

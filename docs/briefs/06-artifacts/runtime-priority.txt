@@ -1,0 +1,7 @@
+#!/bin/bash
+set -euo pipefail
+export PATH=/content/node/bin:$PATH
+export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export FOG_MEASUREMENT_DIR=runtime-t4-counts FOG_PROBE_OPPONENT=MaxDamage
+cd /content/fog
+.venv/bin/python docs/briefs/06-artifacts/gpu_job.txt probes

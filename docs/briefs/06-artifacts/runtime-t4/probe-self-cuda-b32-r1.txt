@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/content/fog/fog/eval/showdown_rollout_probe.py", line 300, in <module>
+    main()
+    ~~~~^^
+  File "/content/fog/fog/eval/showdown_rollout_probe.py", line 267, in main
+    out = run_pool_probe(
+        args.config, args.pool, args.games, args.seed, workers=args.workers,
+        threads=args.threads, batch=args.batch or 1, device=args.device,
+        opponent=args.opponent,
+    )
+  File "/content/fog/fog/eval/showdown_rollout_probe.py", line 232, in run_pool_probe
+    results = process_pool.map([(assigned, spec, 0.0) for assigned in timed])
+  File "/content/fog/fog/training/direct_parallel.py", line 190, in map
+    return self._receive_all(expected="ok", timeout=self.timeout)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/content/fog/fog/training/direct_parallel.py", line 222, in _receive_all
+    message = connection.recv()
+  File "/usr/lib/python3.13/multiprocessing/connection.py", line 255, in recv
+    buf = self._recv_bytes()
+  File "/usr/lib/python3.13/multiprocessing/connection.py", line 442, in _recv_bytes
+    return self._recv(size)
+           ~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/multiprocessing/connection.py", line 406, in _recv
+    raise OSError("got end of file during message")
+OSError: got end of file during message

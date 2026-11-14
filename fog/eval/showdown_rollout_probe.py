@@ -164,6 +164,31 @@ def run_probe(
     }
 
 
+class _CountingRolloutWorker:
+    """Run the trainer's actor but transfer only the probe's counters over its pipe.
+
+    Full rollout buffers are not consumed by this probe. Serializing 512 games' fragments
+    transiently doubles host memory and can OOM a small GPU runtime at the end of a run.
+    The trainer still transfers real buffers; its end-to-end timing measures that cost.
+    """
+
+    def __init__(self, worker_id, *args):
+        from fog.training.ppo import _ShowdownRolloutWorker
+
+        self.worker = _ShowdownRolloutWorker(worker_id, *args)
+
+    def run(self, payload):
+        buffer, wins = self.worker.run(payload)
+        return {
+            "learner_decisions": sum(len(game.actions) for game in buffer._games.values()),
+            "games": len(buffer._games),
+            "p1_wins": wins,
+        }
+
+    def close(self):
+        self.worker.close()
+
+
 def run_pool_probe(
     config: str,
     pool_dir: str,
@@ -178,6 +203,8 @@ def run_pool_probe(
 ) -> dict:
     """Collection rate of the trainer's own worker processes (`PersistentProcessPool`).
 
+    Only counts cross the worker pipe, not unused observation buffers. Thus this measures
+    worker collection rather than full-buffer IPC; the trainer measures the latter separately.
     One untimed game per worker first (it loads the opponent and warms the simulator), then
     `games` games split across the workers as the trainer splits a chunk. `opponent` is ``self``
     (a frozen copy of the learner, so both seats run the network) or a scripted controller name.
@@ -188,7 +215,6 @@ def run_pool_probe(
     from fog.env.teams import load_pool
     from fog.models.agent import FogAgent
     from fog.training.direct_parallel import PersistentProcessPool, WorkerGame, partition_games
-    from fog.training.ppo import _ShowdownRolloutWorker
 
     cfg = load_config(config)
     cfg.setdefault("env", {})["rollout_batch"] = int(batch)
@@ -222,7 +248,7 @@ def run_pool_probe(
             spec = str(Path(tmp) / "opponent.pt")
             torch.save(shared_actor.state_dict(), spec)
         with PersistentProcessPool(
-            workers, _ShowdownRolloutWorker, cfg, shared_actor, None, pool, settings,
+            workers, _CountingRolloutWorker, cfg, shared_actor, None, pool, settings,
             supervision, {}, threads, 2,
         ) as process_pool:
             warm = partition_games(schedule(workers, 0), workers)
@@ -231,14 +257,15 @@ def run_pool_probe(
             start = time.perf_counter()
             results = process_pool.map([(assigned, spec, 0.0) for assigned in timed])
             elapsed = time.perf_counter() - start
-    learner = sum(len(g.actions) for buf, _ in results for g in buf._games.values())
+    learner = sum(result["learner_decisions"] for result in results)
+    assert sum(result["games"] for result in results) == games
     return {
         "games": float(games),
         "learner_decisions": float(learner),
         "seconds": elapsed,
         "learner_decisions_per_s": learner / elapsed,
         "games_per_s": games / elapsed,
-        "p1_wins": float(sum(wins for _, wins in results)),
+        "p1_wins": float(sum(result["p1_wins"] for result in results)),
     }
 
 

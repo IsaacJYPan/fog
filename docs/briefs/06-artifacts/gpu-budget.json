@@ -1,0 +1,69 @@
+{
+  "label": "smoke",
+  "budget_gpu_hours": 3,
+  "accounting": "count both allocated T4s, including idle GPU and submission-to-observed-terminal startup/export upper bounds",
+  "completed": [
+    {
+      "name": "collection-attempt1",
+      "commit": "c4df5e20d92ef88321ac7745d6a856e476e4119d",
+      "allocated_gpus": 2,
+      "session_seconds_upper": 141,
+      "gpu_seconds_upper": 282
+    },
+    {
+      "name": "collection-attempt2",
+      "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+      "allocated_gpus": 2,
+      "session_seconds_upper": 1546,
+      "gpu_seconds_upper": 3092
+    },
+    {
+      "name": "runtime-t4",
+      "allocated_gpus": 1,
+      "session_seconds_upper": 2220,
+      "gpu_seconds_upper": 2220,
+      "status": "released after host-memory failure; CUDA probe has no throughput result"
+    },
+    {
+      "name": "runtime-t4-counts",
+      "allocated_gpus": 1,
+      "session_seconds_upper": 3194.0,
+      "gpu_seconds_upper": 3194.0,
+      "status": "released; owner requested short timing check at last completed checkpoint"
+    }
+  ],
+  "completed_gpu_hours_upper": 2.4411111111111112,
+  "remaining_gpu_hours": 0.5588888888888888,
+  "training_cap": "owner shortened to two completed PPO updates; no active runtime or new reservation",
+  "superseded_collection_retry_platform_seconds": 2520,
+  "superseded_collection_retry_gpu_hours_max": 1.4,
+  "next_job": {
+    "status": "superseded, never submitted; a separate single-T4 runtime is already reserved for this brief",
+    "stage": "combined MaxDamage matrix, full 100k PPO, evaluation",
+    "planned_slug": "fog-collect-endtoend-20261114",
+    "platform_seconds": 3600,
+    "internal_seconds": 3300,
+    "allocated_gpus_planning": 2,
+    "max_gpu_hours_for_platform_cap": 2.0,
+    "prior_plus_cap_gpu_hours_upper": 2.937222222222222,
+    "additional_startup_export_headroom_seconds": 113,
+    "self_matrix": "retained from earlier job; not a single same-job self/MaxDamage matrix",
+    "expected_session_seconds_range": [
+      1800,
+      3300
+    ],
+    "estimate_basis": "Earlier self-play probe wall times and brief-05 supervised GPU throughput bound the rough planning range; PPO GPU speed and MaxDamage collection remain unmeasured.",
+    "optional_after_primary": "Complete the self-play matrix in the same job only if its earlier measured execution costs, scaled conservatively for core count plus 20% and 60 seconds, fit the remaining internal deadline."
+  },
+  "active_runtime": {
+    "source": "runtime-t4-counts/session.json",
+    "allocated_gpus": 1,
+    "requested_after_utc": "2026-11-14T08:56:40Z",
+    "stop_deadline_utc": "2026-11-14T10:21:00Z",
+    "reserved_gpu_hours_cap": 1.4055555555555554,
+    "status": "released",
+    "observed_released_by_utc": "2026-11-14T09:49:54+00:00",
+    "actual_gpu_hours_upper": 0.8872222222222222
+  },
+  "remaining_gpu_hours_before_active_reservation": 0.5588888888888888
+}

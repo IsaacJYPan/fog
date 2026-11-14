@@ -1,0 +1,14 @@
+{
+  "rollout_workers": {
+    "before_template": 4,
+    "measured_selection": 2
+  },
+  "rollout_batch": {
+    "before_template": 128,
+    "measured_selection": 128
+  },
+  "games_per_chunk": {
+    "before_template": 512,
+    "measured_selection": 256
+  }
+}

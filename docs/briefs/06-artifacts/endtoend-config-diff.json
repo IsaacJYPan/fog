@@ -1,0 +1,96 @@
+{
+  "label": "smoke preparation only",
+  "status": "template; workers and batch are selected from the new MaxDamage matrix before training",
+  "only_brief_settings_changed": true,
+  "changed": {
+    "env.actor_device": {
+      "base": null,
+      "measurement": "cuda"
+    },
+    "env.actor_threads": {
+      "base": 2,
+      "measurement": 1
+    },
+    "env.rollout_batch": {
+      "base": null,
+      "measurement": 128
+    },
+    "env.team_pool": {
+      "base": "data/teams/gen9ou_public_v1/train.json",
+      "measurement": "data/teams/pool_a/core_v1_offensive.txt"
+    },
+    "league.latest_frac": {
+      "base": 0.5,
+      "measurement": 0.0
+    },
+    "league.past_frac": {
+      "base": 0.4,
+      "measurement": 0.0
+    },
+    "league.scripted": {
+      "base": [
+        "SimpleHeuristics",
+        "MaxDamage"
+      ],
+      "measurement": [
+        "MaxDamage"
+      ]
+    },
+    "league.scripted_frac": {
+      "base": 0.1,
+      "measurement": 1.0
+    },
+    "ppo.batch_decisions": {
+      "base": 24000,
+      "measurement": 8000
+    },
+    "ppo.clip": {
+      "base": 0.05,
+      "measurement": 0.2
+    },
+    "ppo.entropy_coef": {
+      "base": 0.003,
+      "measurement": 0.01
+    },
+    "ppo.entropy_coef_final": {
+      "base": 0.001,
+      "measurement": 0.003
+    },
+    "ppo.epochs": {
+      "base": 1,
+      "measurement": 3
+    },
+    "ppo.games_per_chunk": {
+      "base": 16,
+      "measurement": 512
+    },
+    "ppo.init_ckpt": {
+      "base": "runs/gen9ou_typed_token_policy_v1_continuation/checkpoints/bc_best.pt",
+      "measurement": null
+    },
+    "ppo.lr": {
+      "base": 1e-05,
+      "measurement": 0.0003
+    },
+    "ppo.minibatch_size": {
+      "base": 1536,
+      "measurement": 1024
+    },
+    "ppo.target_kl": {
+      "base": 0.01,
+      "measurement": 0.03
+    },
+    "ppo.total_decisions": {
+      "base": 240000,
+      "measurement": 100000
+    },
+    "preflight.required": {
+      "base": true,
+      "measurement": false
+    },
+    "replay_policy.coef": {
+      "base": 0.001,
+      "measurement": 0.0
+    }
+  }
+}

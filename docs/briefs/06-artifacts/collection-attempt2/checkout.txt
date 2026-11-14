@@ -1,0 +1,1 @@
+HEAD is now at 5603782 Create the hosted temporary root before cloning and record the failed attempt

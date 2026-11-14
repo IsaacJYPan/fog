@@ -1,0 +1,68 @@
+import csv
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import signal
+import time
+import zipfile
+
+root = Path('/content/fog')
+out = root / 'docs/briefs/06-artifacts/runtime-t4-counts'
+checkpoint_dir = root / 'runs/collect_gpu/checkpoints'
+states = [p for p in checkpoint_dir.glob('ppo_[0-9]*.state.pt')
+          if time.time() - p.stat().st_mtime > 5 and zipfile.is_zipfile(p)]
+latest = max(states, key=lambda p: int(p.name.split('_')[1].split('.')[0]))
+decisions = int(latest.name.split('_')[1].split('.')[0])
+weights = latest.with_name(latest.name.replace('.state.pt', '.pt'))
+assert zipfile.is_zipfile(weights)
+progress = json.loads((out / 'progress.json').read_text())
+assert progress['label'] == 'training'
+started = datetime.fromisoformat(progress['started_utc']).timestamp()
+candidates = []
+for process in Path('/proc').iterdir():
+    if not process.name.isdigit():
+        continue
+    try:
+        args = (process / 'cmdline').read_bytes().decode().split('\0')
+    except (OSError, UnicodeDecodeError):
+        continue
+    if 'fog.train' in args and '--config' in args and 'configs/collect_gpu_check.yaml' in args:
+        candidates.append(int(process.name))
+assert len(candidates) == 1, candidates
+record = {
+    'label': 'smoke', 'reason': 'owner requested a minimal update-throughput check instead of the full learning run',
+    'decisions': decisions, 'checkpoint': str(latest.relative_to(root)),
+    'weights': str(weights.relative_to(root)), 'commit': progress['commit'],
+    'training_command': progress['command'], 'training_started_utc': progress['started_utc'],
+    'completed_state_modified_utc': datetime.fromtimestamp(latest.stat().st_mtime, timezone.utc).isoformat(),
+    'wall_to_completed_checkpoint_seconds': latest.stat().st_mtime - started,
+    'stop_requested_utc': datetime.now(timezone.utc).isoformat(),
+    'learning_check': 'not run',
+}
+(out / 'short-run-stop.json').write_text(json.dumps(record, indent=2) + '\n')
+os.killpg(candidates[0], signal.SIGTERM)
+time.sleep(1)
+with (root / 'runs/collect_gpu/metrics.csv').open() as stream:
+    reader = csv.DictReader(stream)
+    fields = reader.fieldnames
+    rows = [row for row in reader if int(row['step']) <= decisions]
+with (out / 'short-run-metrics.csv').open('w', newline='') as stream:
+    writer = csv.DictWriter(stream, fieldnames=fields)
+    writer.writeheader()
+    writer.writerows(rows)
+lines = (out / 'training-timing.jsonl').read_text().splitlines(keepends=True)
+completed = 0
+prefix = []
+for line in lines:
+    event = json.loads(line)
+    prefix.append(line)
+    if event['kind'] == 'update_phase':
+        completed += event['rows']
+        if completed == decisions:
+            break
+assert completed == decisions
+(out / 'short-run-timing.jsonl').write_text(''.join(prefix))
+tail = (out / 'training.txt').read_text().splitlines()[-60:]
+(out / 'training-tail.txt').write_text('\n'.join(tail) + '\n')
+print(json.dumps(record), flush=True)

@@ -1,0 +1,15 @@
+{
+  "command": [
+    "git",
+    "submodule",
+    "update",
+    "--init",
+    "--recursive"
+  ],
+  "commit": "5603782d8239f7d0eb1743db27e0e266464d69b2",
+  "status": "complete",
+  "started_at_utc": "2026-11-14T04:12:55.776505+00:00",
+  "seconds": 25.386613405999924,
+  "exit_code": 0,
+  "finished_at_utc": "2026-11-14T04:13:21.163477+00:00"
+}
