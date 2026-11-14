@@ -1049,3 +1049,31 @@ batch **1,024**, CUDA, both checkpoint-selection options active, no early stoppi
 counts/times, private input slugs, the exact job source, concrete continuation steps and the
 tested checkpoint download. G20 and G100 are still pending; no curve, play or gate result is
 claimed by a running job.
+
+### Available value tables and input checks while G20 trains (smoke)
+
+At `8b88e149161433632aadb37dd3301e5715cc58de`, read-only CPU checks used the
+existing `parse_replay_policy_versions(..., imputations=1, seed=20260804)` reconstruction,
+with a separate protocol-player/winner reader. A seeded sample of 64 nested G20 training
+and 64 fixed holdout games contained 6,283 accepted serialized rows: no per-side outcome-sign
+mismatch. Holding each legitimate imputed own sheet fixed, deleting the second half of each
+log left all earlier observation fields and opponent reveal tokens identical across 3,150
+rows. This is sampled smoke, not a full-corpus isolation proof. The independent full prepared
+manifest/protocol check covered 101,928 training plus 2,000 holdout games with zero winner or
+player-order discrepancies (24.984 s). Commands: CPU Python calling the existing parser and
+NumPy shard reader, and a separate raw-log/Polars manifest comparison; no optimizer, filters
+or data changed. Results and method are in `value-input-checks.json` and
+`outcome-manifest-check.json` under `docs/briefs/05-artifacts/`.
+
+The named `fog/eval/leakage_metrics.py` contains readability/reveal statistics, not a
+privileged-input check. The chronological-prefix comparison above checks the intended input
+isolation directly; trained-checkpoint label perturbation remains pending G100. The value
+learning criterion and G2 remain unverified. Existing B and partial G3 reports now feed
+`curve-value-tables.json` and the complete ten-bin `reliability.csv`; unavailable historical
+best-value details stay null. The unchanged holdout-report scorer runs on CPU even when its
+config says CUDA; training validation uses CUDA, and both report passes consume session quota.
+
+The portable `uv run --no-project --with kaggle==2.2.5 --with six python -c ...` owner download
+was exercised against the existing private checkpoint dataset. Both initial G3 files matched
+inventory bytes and SHA-256 (`checkpoint-portable-download-check.json`). It will be repeated
+after adding G20/G100. No new GPU job was started; G20 continues alone.

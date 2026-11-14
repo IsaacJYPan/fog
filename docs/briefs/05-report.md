@@ -24,6 +24,8 @@ B's ten-bin reliability table and extremes are retained in `05-artifacts/B-refer
 56.2588% of rows lie below 0.1 or above 0.9. Its historical best-value weights/report are absent;
 only that epoch's MSE is available. G3's best of two epochs cannot be compared with B's best of 18 to attribute a
 batch/device effect. No complete GPU batch-256 repeat or batch-quality decision is claimed.
+All available overall/phase MSE, Brier, ECE, training MSE and extreme-bin shares/win rates
+are collected in `05-artifacts/curve-value-tables.json`; `reliability.csv` contains every bin.
 
 Both CPU datasets are prepared: train **20,000 / 1,023,525 rows** and **101,928 / 5,217,022
 rows**, plus the fixed **2,000 / 104,037** holdout. Every holdout shard is byte-identical, and
@@ -60,3 +62,10 @@ GPU job active. It projects to 9.6 h including overhead allowance (`G20-plan.jso
 11-hour platform cap and 10 h 40 min internal export deadline. Its result remains pending. Select G100 epochs/subset from actual G20 rate and remaining
 allowance, reserving two hours. Full G3 calibration/batch comparison, G20/G100 results, the
 strict 100k value reading, new play results and gates remain unverified. P2.1–P2.5 remain unchecked.
+
+Input diagnostics (smoke): 128 sampled games / 6,283 serialized rows show no per-side outcome
+sign mismatch; 3,150 earlier observations are identical after deleting future turns with
+legitimate own sheets fixed. All 103,928 prepared train/holdout manifest outcomes agree with
+protocol winners. The named leakage module supplies readability statistics rather than an
+input checker; these direct checks and their limits are retained in `value-input-checks.json`
+and `outcome-manifest-check.json`. A trained G100 label-perturbation check is pending.

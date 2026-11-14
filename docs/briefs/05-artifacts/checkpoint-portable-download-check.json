@@ -1,0 +1,17 @@
+{
+  "status": "smoke portable download passed",
+  "command": "uv run --no-project --with kaggle==2.2.5 --with six python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values[\"username\"]+\"/fog-p2-gpu-checkpoints-20261114\", path=\"runs/p2_gpu_checkpoint_portable_download\", unzip=True, quiet=True)'",
+  "files": [
+    {
+      "file": "G3-bc_best.pt",
+      "bytes": 23553751,
+      "sha256": "824e111aa5f6ce8b374b1f0a9717713f6c5af770d3c1daa4d22ae0bf02c447e4"
+    },
+    {
+      "file": "G3-bc_best_value.pt",
+      "bytes": 23556403,
+      "sha256": "28c21587173b0503d3d9494a3ebb18fc4b9298bd584e1e4c00fd157048421dda"
+    }
+  ],
+  "scope": "initial two partial G3 weights; repeat after adding G20/G100"
+}

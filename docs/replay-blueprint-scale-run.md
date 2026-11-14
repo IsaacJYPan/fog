@@ -87,10 +87,15 @@ allowance, so its batch/device quality comparison is unverified. Current results
    versions add G20/G100. This command was tested on both G3 files:
 
    ```bash
-   python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values["username"]+"/fog-p2-gpu-checkpoints-20261114", path="checkpoints", unzip=True, quiet=True)'
+   uv run --no-project --with kaggle==2.2.5 --with six python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values["username"]+"/fog-p2-gpu-checkpoints-20261114", path="checkpoints", unzip=True, quiet=True)'
    ```
 
    File sizes, SHA-256, selected epochs and partial/full status are in
    [checkpoints.json](briefs/05-artifacts/checkpoints.json). Check the inventory before
    evaluation. Earlier archive-layout and capped attempts are failed/partial evidence.
    The internal deadline reserves export time; platform cancellation can return no output.
+
+The unchanged `replay_holdout_report` scorer runs on CPU, including inside the hosted job:
+its implementation does not use the config's device override. Its two report passes still
+consume hosted session quota (about 208 s each in the resumed G3 job). The measured validation
+passes during training use CUDA. Include both kinds of overhead when selecting the next run.

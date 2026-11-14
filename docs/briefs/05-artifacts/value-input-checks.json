@@ -1,0 +1,800 @@
+{
+  "status": "smoke sampled replay checks",
+  "seed": 20261114,
+  "commit": "8b88e149161433632aadb37dd3301e5715cc58de",
+  "training_sample": "64 games from G20, which is nested in the larger prepared corpus",
+  "holdout_sample": "64 of the fixed 2000 games",
+  "games": 128,
+  "counts": {
+    "nested_train_p1_rows": 1546,
+    "p1_outcome_1": 1626,
+    "nested_train_p2_rows": 1559,
+    "p2_outcome_-1": 1595,
+    "prefix_rows_compared": 3150,
+    "p1_outcome_-1": 1518,
+    "p2_outcome_1": 1544,
+    "holdout_p1_rows": 1598,
+    "holdout_p2_rows": 1580
+  },
+  "issues": [],
+  "records": [
+    {
+      "id": "gen9ou-2516010826",
+      "source": "nested_train",
+      "accepted_rows": 39,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2200500489",
+      "source": "nested_train",
+      "accepted_rows": 64,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2410246393",
+      "source": "nested_train",
+      "accepted_rows": 47,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2085996831",
+      "source": "nested_train",
+      "accepted_rows": 34,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2307779719",
+      "source": "nested_train",
+      "accepted_rows": 27,
+      "prefix_rows_compared": 14
+    },
+    {
+      "id": "gen9ou-2473630293",
+      "source": "nested_train",
+      "accepted_rows": 44,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2435583680",
+      "source": "nested_train",
+      "accepted_rows": 43,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2533460112",
+      "source": "nested_train",
+      "accepted_rows": 55,
+      "prefix_rows_compared": 28
+    },
+    {
+      "id": "gen9ou-2277622438",
+      "source": "nested_train",
+      "accepted_rows": 33,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2297932178",
+      "source": "nested_train",
+      "accepted_rows": 48,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2333621555",
+      "source": "nested_train",
+      "accepted_rows": 63,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2437941314",
+      "source": "nested_train",
+      "accepted_rows": 44,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2475013615",
+      "source": "nested_train",
+      "accepted_rows": 40,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2271047540",
+      "source": "nested_train",
+      "accepted_rows": 92,
+      "prefix_rows_compared": 46
+    },
+    {
+      "id": "gen9ou-2149834176",
+      "source": "nested_train",
+      "accepted_rows": 45,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2165886226",
+      "source": "nested_train",
+      "accepted_rows": 22,
+      "prefix_rows_compared": 12
+    },
+    {
+      "id": "gen9ou-2186628733",
+      "source": "nested_train",
+      "accepted_rows": 81,
+      "prefix_rows_compared": 41
+    },
+    {
+      "id": "gen9ou-2304323111",
+      "source": "nested_train",
+      "accepted_rows": 95,
+      "prefix_rows_compared": 48
+    },
+    {
+      "id": "gen9ou-2368412973",
+      "source": "nested_train",
+      "accepted_rows": 42,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2104400245",
+      "source": "nested_train",
+      "accepted_rows": 52,
+      "prefix_rows_compared": 26
+    },
+    {
+      "id": "gen9ou-2476865572",
+      "source": "nested_train",
+      "accepted_rows": 21,
+      "prefix_rows_compared": 10
+    },
+    {
+      "id": "gen9ou-2235610081",
+      "source": "nested_train",
+      "accepted_rows": 40,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2416209477",
+      "source": "nested_train",
+      "accepted_rows": 40,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2170808046",
+      "source": "nested_train",
+      "accepted_rows": 64,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2300685115",
+      "source": "nested_train",
+      "accepted_rows": 79,
+      "prefix_rows_compared": 40
+    },
+    {
+      "id": "gen9ou-2533642208",
+      "source": "nested_train",
+      "accepted_rows": 34,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2403680420",
+      "source": "nested_train",
+      "accepted_rows": 47,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2225335605",
+      "source": "nested_train",
+      "accepted_rows": 34,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2415625226",
+      "source": "nested_train",
+      "accepted_rows": 64,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2322161219",
+      "source": "nested_train",
+      "accepted_rows": 33,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2500829720",
+      "source": "nested_train",
+      "accepted_rows": 50,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2481945858",
+      "source": "nested_train",
+      "accepted_rows": 28,
+      "prefix_rows_compared": 14
+    },
+    {
+      "id": "gen9ou-2130809060",
+      "source": "nested_train",
+      "accepted_rows": 41,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2148537189",
+      "source": "nested_train",
+      "accepted_rows": 32,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2195630825",
+      "source": "nested_train",
+      "accepted_rows": 88,
+      "prefix_rows_compared": 44
+    },
+    {
+      "id": "gen9ou-2244521121",
+      "source": "nested_train",
+      "accepted_rows": 28,
+      "prefix_rows_compared": 14
+    },
+    {
+      "id": "gen9ou-2478284630",
+      "source": "nested_train",
+      "accepted_rows": 47,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2503411718",
+      "source": "nested_train",
+      "accepted_rows": 67,
+      "prefix_rows_compared": 34
+    },
+    {
+      "id": "gen9ou-2474299353",
+      "source": "nested_train",
+      "accepted_rows": 87,
+      "prefix_rows_compared": 44
+    },
+    {
+      "id": "gen9ou-2449810871",
+      "source": "nested_train",
+      "accepted_rows": 36,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2189556901",
+      "source": "nested_train",
+      "accepted_rows": 22,
+      "prefix_rows_compared": 12
+    },
+    {
+      "id": "gen9ou-2312778158",
+      "source": "nested_train",
+      "accepted_rows": 52,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2419880633",
+      "source": "nested_train",
+      "accepted_rows": 75,
+      "prefix_rows_compared": 38
+    },
+    {
+      "id": "gen9ou-2054041091",
+      "source": "nested_train",
+      "accepted_rows": 110,
+      "prefix_rows_compared": 56
+    },
+    {
+      "id": "gen9ou-2519208567",
+      "source": "nested_train",
+      "accepted_rows": 18,
+      "prefix_rows_compared": 9
+    },
+    {
+      "id": "gen9ou-2515017234",
+      "source": "nested_train",
+      "accepted_rows": 43,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2199709964",
+      "source": "nested_train",
+      "accepted_rows": 65,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2391513415",
+      "source": "nested_train",
+      "accepted_rows": 55,
+      "prefix_rows_compared": 28
+    },
+    {
+      "id": "gen9ou-2412035352",
+      "source": "nested_train",
+      "accepted_rows": 43,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2474828090",
+      "source": "nested_train",
+      "accepted_rows": 20,
+      "prefix_rows_compared": 10
+    },
+    {
+      "id": "gen9ou-2511532611",
+      "source": "nested_train",
+      "accepted_rows": 36,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2333878636",
+      "source": "nested_train",
+      "accepted_rows": 36,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2202572940",
+      "source": "nested_train",
+      "accepted_rows": 45,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2389734111",
+      "source": "nested_train",
+      "accepted_rows": 56,
+      "prefix_rows_compared": 28
+    },
+    {
+      "id": "gen9ou-2457589252",
+      "source": "nested_train",
+      "accepted_rows": 29,
+      "prefix_rows_compared": 14
+    },
+    {
+      "id": "gen9ou-2417459268",
+      "source": "nested_train",
+      "accepted_rows": 44,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2183488593",
+      "source": "nested_train",
+      "accepted_rows": 36,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2440035672",
+      "source": "nested_train",
+      "accepted_rows": 49,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2323689149",
+      "source": "nested_train",
+      "accepted_rows": 43,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2511278362",
+      "source": "nested_train",
+      "accepted_rows": 54,
+      "prefix_rows_compared": 28
+    },
+    {
+      "id": "gen9ou-2506822787",
+      "source": "nested_train",
+      "accepted_rows": 44,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2414340909",
+      "source": "nested_train",
+      "accepted_rows": 46,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2290309595",
+      "source": "nested_train",
+      "accepted_rows": 64,
+      "prefix_rows_compared": 33
+    },
+    {
+      "id": "gen9ou-2479506801",
+      "source": "nested_train",
+      "accepted_rows": 50,
+      "prefix_rows_compared": 25
+    },
+    {
+      "id": "gen9ou-2600649958",
+      "source": "holdout",
+      "accepted_rows": 61,
+      "prefix_rows_compared": 31
+    },
+    {
+      "id": "gen9ou-2575244468",
+      "source": "holdout",
+      "accepted_rows": 105,
+      "prefix_rows_compared": 52
+    },
+    {
+      "id": "gen9ou-2569960154",
+      "source": "holdout",
+      "accepted_rows": 50,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2607080724",
+      "source": "holdout",
+      "accepted_rows": 34,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2565201695",
+      "source": "holdout",
+      "accepted_rows": 42,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2600558589",
+      "source": "holdout",
+      "accepted_rows": 76,
+      "prefix_rows_compared": 38
+    },
+    {
+      "id": "gen9ou-2607601857",
+      "source": "holdout",
+      "accepted_rows": 59,
+      "prefix_rows_compared": 30
+    },
+    {
+      "id": "gen9ou-2550749674",
+      "source": "holdout",
+      "accepted_rows": 14,
+      "prefix_rows_compared": 6
+    },
+    {
+      "id": "gen9ou-2577698815",
+      "source": "holdout",
+      "accepted_rows": 68,
+      "prefix_rows_compared": 35
+    },
+    {
+      "id": "gen9ou-2578140919",
+      "source": "holdout",
+      "accepted_rows": 51,
+      "prefix_rows_compared": 25
+    },
+    {
+      "id": "gen9ou-2577812716",
+      "source": "holdout",
+      "accepted_rows": 50,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2578477470",
+      "source": "holdout",
+      "accepted_rows": 62,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2568793138",
+      "source": "holdout",
+      "accepted_rows": 43,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2581527799",
+      "source": "holdout",
+      "accepted_rows": 96,
+      "prefix_rows_compared": 48
+    },
+    {
+      "id": "gen9ou-2543890579",
+      "source": "holdout",
+      "accepted_rows": 26,
+      "prefix_rows_compared": 12
+    },
+    {
+      "id": "gen9ou-2572028929",
+      "source": "holdout",
+      "accepted_rows": 76,
+      "prefix_rows_compared": 38
+    },
+    {
+      "id": "gen9ou-2568843409",
+      "source": "holdout",
+      "accepted_rows": 70,
+      "prefix_rows_compared": 36
+    },
+    {
+      "id": "gen9ou-2547439510",
+      "source": "holdout",
+      "accepted_rows": 38,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2576907167",
+      "source": "holdout",
+      "accepted_rows": 79,
+      "prefix_rows_compared": 39
+    },
+    {
+      "id": "gen9ou-2544084816",
+      "source": "holdout",
+      "accepted_rows": 13,
+      "prefix_rows_compared": 5
+    },
+    {
+      "id": "gen9ou-2561786796",
+      "source": "holdout",
+      "accepted_rows": 14,
+      "prefix_rows_compared": 8
+    },
+    {
+      "id": "gen9ou-2567075354",
+      "source": "holdout",
+      "accepted_rows": 55,
+      "prefix_rows_compared": 28
+    },
+    {
+      "id": "gen9ou-2610727988",
+      "source": "holdout",
+      "accepted_rows": 70,
+      "prefix_rows_compared": 35
+    },
+    {
+      "id": "gen9ou-2549535813",
+      "source": "holdout",
+      "accepted_rows": 80,
+      "prefix_rows_compared": 40
+    },
+    {
+      "id": "gen9ou-2605570135",
+      "source": "holdout",
+      "accepted_rows": 53,
+      "prefix_rows_compared": 26
+    },
+    {
+      "id": "gen9ou-2548806289",
+      "source": "holdout",
+      "accepted_rows": 71,
+      "prefix_rows_compared": 36
+    },
+    {
+      "id": "gen9ou-2574841026",
+      "source": "holdout",
+      "accepted_rows": 42,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2588592485",
+      "source": "holdout",
+      "accepted_rows": 28,
+      "prefix_rows_compared": 14
+    },
+    {
+      "id": "gen9ou-2554897503",
+      "source": "holdout",
+      "accepted_rows": 29,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2579185365",
+      "source": "holdout",
+      "accepted_rows": 73,
+      "prefix_rows_compared": 36
+    },
+    {
+      "id": "gen9ou-2612399063",
+      "source": "holdout",
+      "accepted_rows": 18,
+      "prefix_rows_compared": 8
+    },
+    {
+      "id": "gen9ou-2562814724",
+      "source": "holdout",
+      "accepted_rows": 42,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2596610171",
+      "source": "holdout",
+      "accepted_rows": 40,
+      "prefix_rows_compared": 19
+    },
+    {
+      "id": "gen9ou-2580164893",
+      "source": "holdout",
+      "accepted_rows": 22,
+      "prefix_rows_compared": 10
+    },
+    {
+      "id": "gen9ou-2596526206",
+      "source": "holdout",
+      "accepted_rows": 50,
+      "prefix_rows_compared": 26
+    },
+    {
+      "id": "gen9ou-2543566092",
+      "source": "holdout",
+      "accepted_rows": 36,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2543989294",
+      "source": "holdout",
+      "accepted_rows": 49,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2557686124",
+      "source": "holdout",
+      "accepted_rows": 48,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2582573601",
+      "source": "holdout",
+      "accepted_rows": 34,
+      "prefix_rows_compared": 16
+    },
+    {
+      "id": "gen9ou-2546884492",
+      "source": "holdout",
+      "accepted_rows": 45,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2587861450",
+      "source": "holdout",
+      "accepted_rows": 50,
+      "prefix_rows_compared": 25
+    },
+    {
+      "id": "gen9ou-2558623775",
+      "source": "holdout",
+      "accepted_rows": 47,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2573789224",
+      "source": "holdout",
+      "accepted_rows": 24,
+      "prefix_rows_compared": 12
+    },
+    {
+      "id": "gen9ou-2565241283",
+      "source": "holdout",
+      "accepted_rows": 53,
+      "prefix_rows_compared": 26
+    },
+    {
+      "id": "gen9ou-2606440319",
+      "source": "holdout",
+      "accepted_rows": 57,
+      "prefix_rows_compared": 28
+    },
+    {
+      "id": "gen9ou-2552240514",
+      "source": "holdout",
+      "accepted_rows": 51,
+      "prefix_rows_compared": 26
+    },
+    {
+      "id": "gen9ou-2557629547",
+      "source": "holdout",
+      "accepted_rows": 71,
+      "prefix_rows_compared": 38
+    },
+    {
+      "id": "gen9ou-2582085422",
+      "source": "holdout",
+      "accepted_rows": 77,
+      "prefix_rows_compared": 38
+    },
+    {
+      "id": "gen9ou-2569722302",
+      "source": "holdout",
+      "accepted_rows": 63,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2556132522",
+      "source": "holdout",
+      "accepted_rows": 66,
+      "prefix_rows_compared": 34
+    },
+    {
+      "id": "gen9ou-2545505524",
+      "source": "holdout",
+      "accepted_rows": 59,
+      "prefix_rows_compared": 29
+    },
+    {
+      "id": "gen9ou-2563981924",
+      "source": "holdout",
+      "accepted_rows": 45,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2568909188",
+      "source": "holdout",
+      "accepted_rows": 64,
+      "prefix_rows_compared": 32
+    },
+    {
+      "id": "gen9ou-2544122501",
+      "source": "holdout",
+      "accepted_rows": 34,
+      "prefix_rows_compared": 17
+    },
+    {
+      "id": "gen9ou-2576834579",
+      "source": "holdout",
+      "accepted_rows": 31,
+      "prefix_rows_compared": 15
+    },
+    {
+      "id": "gen9ou-2564797211",
+      "source": "holdout",
+      "accepted_rows": 37,
+      "prefix_rows_compared": 18
+    },
+    {
+      "id": "gen9ou-2552502723",
+      "source": "holdout",
+      "accepted_rows": 60,
+      "prefix_rows_compared": 30
+    },
+    {
+      "id": "gen9ou-2550680666",
+      "source": "holdout",
+      "accepted_rows": 49,
+      "prefix_rows_compared": 24
+    },
+    {
+      "id": "gen9ou-2601299939",
+      "source": "holdout",
+      "accepted_rows": 12,
+      "prefix_rows_compared": 6
+    },
+    {
+      "id": "gen9ou-2546080955",
+      "source": "holdout",
+      "accepted_rows": 46,
+      "prefix_rows_compared": 22
+    },
+    {
+      "id": "gen9ou-2582783667",
+      "source": "holdout",
+      "accepted_rows": 26,
+      "prefix_rows_compared": 14
+    },
+    {
+      "id": "gen9ou-2546548470",
+      "source": "holdout",
+      "accepted_rows": 62,
+      "prefix_rows_compared": 31
+    },
+    {
+      "id": "gen9ou-2603048419",
+      "source": "holdout",
+      "accepted_rows": 39,
+      "prefix_rows_compared": 20
+    },
+    {
+      "id": "gen9ou-2603332591",
+      "source": "holdout",
+      "accepted_rows": 43,
+      "prefix_rows_compared": 22
+    }
+  ],
+  "checks": [
+    "protocol winner versus reconstructed role and serialized outcome",
+    "future deletion with fixed legitimate own sheets: every earlier observation field"
+  ],
+  "limitations": [
+    "sampled smoke, not every replay",
+    "fog/eval/leakage_metrics.py supplies readability statistics, not a privileged-input checker",
+    "trained-checkpoint label-perturbation check is recorded separately"
+  ],
+  "seconds": 34.27178505499978
+}

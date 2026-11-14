@@ -31,5 +31,5 @@
       "source_commit": "e05d5d1829cc32b438f65e781bd2176f20ddc8ad"
     }
   ],
-  "download_command": "python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values[\"username\"]+\"/fog-p2-gpu-checkpoints-20261114\", path=\"checkpoints\", unzip=True, quiet=True)'"
+  "download_command": "uv run --no-project --with kaggle==2.2.5 --with six python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values[\"username\"]+\"/fog-p2-gpu-checkpoints-20261114\", path=\"checkpoints\", unzip=True, quiet=True)'"
 }
