@@ -241,16 +241,16 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
                "week_decisions_projection": rows / wall * 30 * 3600 / allocated_gpus,
                "week_games_projection": games / wall * 30 * 3600 / allocated_gpus}
     write_json(output / "training-summary.json", summary)
-    if collection > update:
-        run([python, "-m", "fog.eval.showdown_rollout_probe", "--batch",
-             str(recipe["env"]["rollout_batch"]), "--games", "128", "--opponent",
-             "MaxDamage", "--pool", "data/teams/pool_a", "--device", "cuda"], "collection-split")
     run([python, "-m", "fog.eval.showdown_direct_selection", "--pool",
          "data/teams/pool_a/core_v1_offensive.txt", "--device", "cuda", "--config",
          "configs/collect_gpu_check.yaml", "--checkpoint", "final=" + str(log / "checkpoints/ppo_final.pt"),
          "--checkpoint-config", "final=configs/collect_gpu_check.yaml", "--opponent",
          "maxdamage", "--games", "200", "--temperature", "0", "--out",
          str(output / "evaluation.json")], "evaluation")
+    if collection > update:
+        run([python, "-m", "fog.eval.showdown_rollout_probe", "--batch",
+             str(recipe["env"]["rollout_batch"]), "--games", "128", "--opponent",
+             "MaxDamage", "--pool", "data/teams/pool_a", "--device", "cuda"], "collection-split")
 
 
 if __name__ == "__main__":
