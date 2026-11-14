@@ -9,13 +9,14 @@ import numpy as np
 from fog.constants.tables import TABLES
 from fog.encoding.entities import L
 from fog.encoding.events import H_MY_MOVE, _OFF_MYACT
-from fog.scripts.parse_replays import _PerspectiveState, parse_replay_policy_versions
+from fog.scripts.parse_replays import _PerspectiveState, parse_replay, parse_replay_policy_versions
 from fog.training.replay_policy_data import (
     EXACT,
     INFERRED,
     complete_private_team,
     permute_replay_preview,
     replay_lead_positions,
+    stable_replay_seed,
 )
 
 
@@ -223,3 +224,23 @@ def test_shuffled_policy_conversion_keeps_future_opponent_facts_out_of_inputs():
     slot = list(targets[1][:, 0]).index(species)
     assert targets[1][slot, 1] == TABLES.item_index("choicespecs")
     assert targets[0][slot, 1] == -1
+
+
+def test_preview_shuffle_keeps_imputation_draws_paired_by_original_species_slot():
+    replay = _replay()
+    public = parse_replay(replay)
+    result = parse_replay_policy_versions(replay, replay_id="paired", seed=9, imputations=1)
+    for role in ("p1", "p2"):
+        revealed = next(r["self_belief"] for r in public["rows"] if r["role"] == role)
+        expected, provenance = complete_private_team(
+            revealed, seed=stable_replay_seed("paired", role, 0, 9),
+        )
+        row = next(r for r in result["rows"] if r["role"] == role and r["turn"] == 1)
+        ids = row["obs"].entity_ids[:6]
+        # Entity ids place last_move before the native nature/EV block; sets do not.
+        observed = ids[:, [0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14]]
+        columns = list(range(14))
+        for slot, species in enumerate(ids[:, 0]):
+            original = list(expected[:, 0]).index(species)
+            np.testing.assert_array_equal(observed[slot], expected[original, columns])
+            np.testing.assert_array_equal(row["own_set_provenance"][slot], provenance[original])

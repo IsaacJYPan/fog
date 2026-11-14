@@ -97,7 +97,7 @@ def _resume_settings(args) -> Path | None:
     if not args.resume:
         return None
     settings = {
-        "version": 4,
+        "version": 5,
         "raw": str(args.raw.resolve()), "limit": args.limit, "min_rating": args.min_rating,
         "imputations": args.imputations, "seed": args.seed,
         "candidate_bank": str(args.candidate_bank.resolve()) if args.candidate_bank else None,

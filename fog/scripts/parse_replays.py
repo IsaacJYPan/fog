@@ -544,14 +544,16 @@ def parse_replay_policy_versions(
     """
     if imputations < 1:
         raise ValueError("imputations must be positive")
-    from fog.training.replay_policy_data import permute_replay_preview, replay_lead_positions
+    from fog.training.replay_policy_data import (
+        permute_replay_preview,
+        replay_lead_positions,
+        replay_preview_permutation,
+    )
     from fog.training.replay_candidates import replay_digest
 
     source_log_hash = replay_digest(replay_json)
-    # Public preview position also carries a first-slot lead bias. Reorder it before either
-    # chronological pass so all identities and action indices are derived from that order.
-    replay_json = permute_replay_preview(replay_json, replay_id=replay_id, seed=seed)
-    lead_positions = replay_lead_positions(replay_json)
+    # Complete sets in original preview slots to keep imputation draws paired with the legacy
+    # corpus. Shuffle the resulting sheets and provenance together with the public preview.
     baseline = parse_replay(replay_json)
     revealed: dict[str, np.ndarray] = {}
     for role in ("p1", "p2"):
@@ -565,6 +567,12 @@ def parse_replay_policy_versions(
 
     from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
 
+    orders = {}
+    for role in ("p1", "p2"):
+        order = replay_preview_permutation(replay_json, replay_id=replay_id, role=role, seed=seed)
+        orders[role] = np.concatenate([order, np.arange(len(order), 6)])
+    replay_json = permute_replay_preview(replay_json, replay_id=replay_id, seed=seed)
+    lead_positions = replay_lead_positions(replay_json)
     accepted: list[dict] = []
     filters: Counter[str] = Counter()
     imputation_report: dict = {}
@@ -582,6 +590,8 @@ def parse_replay_policy_versions(
                 rating=int(replay_json.get("rating") or 0),
                 diagnostics=imputation_report,
             )
+            private_sets[role] = private_sets[role][orders[role]]
+            provenance[role] = provenance[role][orders[role]]
         version = parse_replay(
             replay_json,
             private_sets=private_sets,

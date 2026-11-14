@@ -227,6 +227,14 @@ def stable_replay_seed(replay_id: str, role: str, imputation: int, seed: int) ->
     return int.from_bytes(hashlib.sha256(payload).digest()[:8], "little")
 
 
+def replay_preview_permutation(replay: dict, *, replay_id: str, role: str, seed: int) -> np.ndarray:
+    """New preview slot k receives original slot order[k]."""
+    count = sum(line.startswith(f"|poke|{role}|") for line in replay["log"].splitlines())
+    if count > 6:
+        raise ValueError("replay preview has more than six Pokemon on one side")
+    return np.random.default_rng(stable_replay_seed(replay_id, role, 0, seed)).permutation(count)
+
+
 def permute_replay_preview(replay: dict, *, replay_id: str, seed: int) -> dict:
     """Shuffle only public preview order, before reconstructing either perspective.
 
@@ -237,9 +245,9 @@ def permute_replay_preview(replay: dict, *, replay_id: str, seed: int) -> dict:
     lines = replay["log"].splitlines()
     for role in ("p1", "p2"):
         positions = [i for i, line in enumerate(lines) if line.startswith(f"|poke|{role}|")]
-        rng = np.random.default_rng(stable_replay_seed(replay_id, role, 0, seed))
+        order = replay_preview_permutation(replay, replay_id=replay_id, role=role, seed=seed)
         entries = [lines[i] for i in positions]
-        for position, old in zip(positions, rng.permutation(len(entries))):
+        for position, old in zip(positions, order):
             lines[position] = entries[int(old)]
     return {**replay, "log": "\n".join(lines)}
 
@@ -273,5 +281,6 @@ __all__ = [
     "complete_private_team",
     "permute_replay_preview",
     "replay_lead_positions",
+    "replay_preview_permutation",
     "stable_replay_seed",
 ]
