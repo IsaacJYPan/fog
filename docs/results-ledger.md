@@ -872,3 +872,17 @@ Kaggle client authentication and job-list access succeeded. `kaggle quota --form
 reported 0.00 GPU-hours used and 45.00 available; this brief remains capped at 20. No GPU job
 submitted and no GPU checkpoint or new play result exists at this checkpoint. Historical B
 reference files, budget, test results and job template: `docs/briefs/05-artifacts/`.
+
+### Stage 0 first set completed (smoke; no training)
+
+The first preparation command above completed under the same `bd6db41` application bytes:
+22,000/22,000 games accepted, zero quarantines; train **20,000 / 1,023,525 rows**, holdout
+**2,000 / 104,037 rows**, exact fixed holdout IDs. Nested 1,000 / 3,000 subsets match
+**52,983 / 156,597 rows**, splitter seed 20260804. Newest training upload 1771553139 is before
+oldest holdout upload 1771561053. Import / conversion / split wall: **92.066 / 1,000.359 /
+3.294 s**. These are CPU preparation walls with concurrent setup/tests and the larger import,
+not an idle throughput benchmark. Repeating the identical prepare command skips all stages.
+Commands and complete counts/timers: `docs/briefs/05-artifacts/prepare-22000.json`, `prepare-22000-run.json`,
+`prepare-22000-quality.json`, `prepare-22000-skip.txt`, plus import/split text outputs. Private upload is next.
+The 112,000-game import also reached its target and conversion is running; usable training
+count is not yet known. No GPU time or play result is claimed.

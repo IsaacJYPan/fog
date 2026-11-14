@@ -1,0 +1,26 @@
+
+$ /workspace/fog/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/p2_gpu_22000/raw --cache runs/p2_gpu_22000/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 1 --max-download-mb 6000
+{
+  "status": "selected_shards_exhausted",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "kept_games": 12287,
+  "filter_counts": {
+    "below_rating": 42945,
+    "invalid_metadata": 2340,
+    "outside_dates": 264,
+    "other_format": 465
+  }
+}
+
+$ /workspace/fog/.venv/bin/python -u -m fog.scripts.import_metamon_replays --out runs/p2_gpu_22000/raw --cache runs/p2_gpu_22000/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 2 --max-download-mb 6000
+{
+  "status": "target_reached",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "kept_games": 22000,
+  "filter_counts": {
+    "below_rating": 77225,
+    "invalid_metadata": 4176,
+    "outside_dates": 495,
+    "other_format": 840
+  }
+}

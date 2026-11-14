@@ -1,0 +1,32 @@
+{
+  "command": "uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 22000 --work-dir runs/p2_gpu_22000 --device cuda --batch-size 1024 --epochs 18 --prepare-only",
+  "code_commit": "bd6db4161cb3d6d563ae4a98f9415771601d4d8c",
+  "imported_games": 22000,
+  "training_games": 20000,
+  "training_rows": 1023525,
+  "holdout_games": 2000,
+  "holdout_rows": 104037,
+  "fixed_holdout_ids_equal": true,
+  "holdout_uploadtime_min": 1771561053,
+  "holdout_uploadtime_max": 1779166321,
+  "training_uploadtime_max": 1771553139,
+  "nested_seed": 20260804,
+  "nested_subsets": {
+    "1000": {
+      "games": 1000,
+      "rows": 52983
+    },
+    "3000": {
+      "games": 3000,
+      "rows": 156597
+    },
+    "20000": {
+      "games": 20000,
+      "rows": 1023525
+    }
+  },
+  "python": "3.12.14",
+  "convert_workers": 4,
+  "available_cpus": 5,
+  "note": "CPU preparation only. Setup/tests and the larger import overlapped this conversion; not an idle throughput benchmark."
+}

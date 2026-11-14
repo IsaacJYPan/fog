@@ -1,0 +1,5 @@
+[import] output complete; skipping
+[convert] output complete; skipping
+[split] output complete; skipping
+Training on all 20000 eligible games; fewer than 100000 remain
+Prepared: runs/p2_gpu_22000/split; training games/rows: (20000, 1023525); holdout games/rows: (2000, 104037)

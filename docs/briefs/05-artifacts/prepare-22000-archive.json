@@ -1,0 +1,13 @@
+{
+  "file": "replay-work.tar.gz",
+  "bytes": 468727506,
+  "archive_seconds": 18.95270176300005,
+  "contents": [
+    "raw",
+    "decisions",
+    "split",
+    "output",
+    "run.json"
+  ],
+  "excluded": "download cache; not needed to skip completed preparation or train"
+}
