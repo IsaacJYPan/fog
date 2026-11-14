@@ -40,9 +40,15 @@ def build_worker(cfg: dict, pool: list[str], *, threads: int = 1):
         float(cfg.get("reward", {}).get("progress_coef", 0.0)),
     )
     supervision = str(cfg.get("env", {}).get("belief_supervision", "full_truth"))
-    worker = _ShowdownRolloutWorker(
-        0, cfg, agent, phi, pool, settings, supervision, {}, threads, 2
-    )
+    # The worker is written for its own process and switches gradients off globally; this probe
+    # builds it in the caller's process, so put the caller's setting back.
+    grad_enabled = torch.is_grad_enabled()
+    try:
+        worker = _ShowdownRolloutWorker(
+            0, cfg, agent, phi, pool, settings, supervision, {}, threads, 2
+        )
+    finally:
+        torch.set_grad_enabled(grad_enabled)
     return worker, agent
 
 

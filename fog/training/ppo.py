@@ -1243,6 +1243,11 @@ def _copy_module_to_shared_cpu(target, source) -> None:
             target_value.copy_(source_state[key].detach().to(device="cpu"))
 
 
+def _needs_private_actor(device) -> bool:
+    """Whether a rollout worker acts on its own copy of the actor instead of the shared CPU one."""
+    return device.type != "cpu"
+
+
 class _ShowdownRolloutWorker:
     """Long-lived actor plus one long-lived authoritative Showdown subprocess.
 
@@ -1308,7 +1313,7 @@ class _ShowdownRolloutWorker:
             raise ValueError("env.rollout_batch must be >= 1")
         self.actor_device = torch.device(str(env_cfg.get("actor_device", "cpu")))
         self.shared_actor = shared_actor
-        if self.actor_device.type == "cpu":
+        if not _needs_private_actor(self.actor_device):
             self.actor = shared_actor
         else:
             if shared_phi is not None:

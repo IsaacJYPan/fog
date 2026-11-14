@@ -64,3 +64,39 @@ def test_conditional_action_context_is_optional_and_behavior_preserving_at_init(
     )
     without_context, _ = head(private, legal, public, action_features=features)
     assert torch.equal(with_context, without_context)
+
+
+def test_matchup_reuse_is_confined_to_one_feature_table():
+    """Remembered rule-player matchup scores never outlive `encode_action_features`."""
+    from poke_env.player import SimpleHeuristicsPlayer
+
+    from fog.encoding import action_features
+
+    class Boom:
+        @property
+        def active_pokemon(self):
+            raise RuntimeError("boom")
+
+    try:
+        action_features.encode_action_features(Boom())
+    except RuntimeError:
+        pass
+    assert action_features._MATCHUP_MEMO is None
+
+    calls = []
+    original = action_features._MATCHUP_ORIGINAL
+    assert original is not None
+    try:
+        action_features._MATCHUP_ORIGINAL = None
+        SimpleHeuristicsPlayer._estimate_matchup = staticmethod(
+            lambda mon, opponent: calls.append((mon, opponent)) or 1.5
+        )
+        action_features._install_matchup_memo()
+        # Outside a feature table every call goes straight through.
+        assert SimpleHeuristicsPlayer._estimate_matchup("a", "b") == 1.5
+        assert SimpleHeuristicsPlayer._estimate_matchup("a", "b") == 1.5
+        assert len(calls) == 2
+    finally:
+        SimpleHeuristicsPlayer._estimate_matchup = staticmethod(original)
+        action_features._MATCHUP_ORIGINAL = None
+        action_features._install_matchup_memo()

@@ -229,3 +229,69 @@ def test_local_runner_normalizes_scripted_controller_switch_to_request_slot():
         {"active": [{}]},
         random.Random(0),
     ) == "/choose switch 3"
+
+
+def test_switch_slot_helpers_match_pairwise_same_pokemon_reference():
+    """The single-key-per-Pokemon versions agree with comparing every pair by `same_pokemon`."""
+    import random
+    from types import SimpleNamespace
+
+    from fog.env.actions import (
+        action_legality_mask,
+        available_move_by_slot,
+        available_switch_by_slot,
+        legal_choices,
+        same_pokemon,
+        team_order,
+        team_order_minus_active,
+    )
+
+    def reference_minus_active(battle):
+        active = getattr(battle, "active_pokemon", None)
+        return [mon for mon in team_order(battle) if not same_pokemon(mon, active)]
+
+    def reference_switches(battle):
+        out = {}
+        for slot, target in enumerate(reference_minus_active(battle)[:5]):
+            for offered in battle.available_switches:
+                if same_pokemon(offered, target):
+                    out[slot] = offered
+                    break
+        return out
+
+    rng = random.Random(0)
+    names = ["a", "b", "c", "d", "e", "f", "A!", "b ", ""]
+    for _ in range(300):
+        team = [
+            None if rng.random() < 0.05 else SimpleNamespace(species=rng.choice(names))
+            for _ in range(rng.randint(0, 6))
+        ]
+        active = rng.choice(team) if team and rng.random() < 0.8 else None
+        if rng.random() < 0.2 and active is not None:
+            active = SimpleNamespace(species=active.species)  # rebuilt object, same key
+        offered = [
+            mon if rng.random() < 0.7 or mon is None else SimpleNamespace(species=mon.species)
+            for mon in rng.sample(team, k=rng.randint(0, len(team)))
+        ]
+        moves = [SimpleNamespace(id=f"move{i}") for i in range(rng.randint(0, 4))]
+        battle = SimpleNamespace(
+            team={str(i): mon for i, mon in enumerate(team)},
+            active_pokemon=(
+                None if active is None else SimpleNamespace(species=active.species, moves=moves)
+            ),
+            available_switches=offered,
+            available_moves=rng.sample(moves, k=rng.randint(0, len(moves))),
+            can_tera=rng.random() < 0.5,
+        )
+        expected_order = reference_minus_active(battle)
+        got_order = team_order_minus_active(battle)
+        assert len(got_order) == len(expected_order)
+        assert all(x is y for x, y in zip(got_order, expected_order, strict=True))
+        expected_switches = reference_switches(battle)
+        got_switches = available_switch_by_slot(battle)
+        assert got_switches.keys() == expected_switches.keys()
+        assert all(got_switches[k] is expected_switches[k] for k in got_switches)
+        moves_by_slot, switches_by_slot, mask = legal_choices(battle)
+        assert moves_by_slot == available_move_by_slot(battle)
+        assert switches_by_slot.keys() == got_switches.keys()
+        assert mask == action_legality_mask(battle)
