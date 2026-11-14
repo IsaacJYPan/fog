@@ -38,5 +38,82 @@
     "seconds": 32.91730969599985,
     "exit_code": 0,
     "output": "runs/order_blind/rows-before-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--set",
+      "bc.manifest=runs/order_blind/leaky_split/train_1000.parquet",
+      "bc.holdout_manifest=runs/order_blind/leaky_split/holdout_manifest.parquet",
+      "bc.epochs=8",
+      "bc.early_stopping_patience=0",
+      "bc.resume=true",
+      "bc.selection_metric=action_ce",
+      "log.dir=runs/order_blind/R0"
+    ],
+    "cwd": "/workspace/fog-order-baseline",
+    "commit": "d60392080f10894aa216ed7faf561e791922c9f8",
+    "smoke": true,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "seconds": 4611.805111853,
+    "exit_code": 0,
+    "output": "runs/order_blind/R0-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/order_blind/leaky_split/holdout_manifest.parquet",
+      "--checkpoint",
+      "runs/order_blind/R0/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/R0-slot-check.json"
+    ],
+    "cwd": "/workspace/fog-order-baseline",
+    "commit": "d60392080f10894aa216ed7faf561e791922c9f8",
+    "smoke": true,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "seconds": 103.23123767299967,
+    "exit_code": 0,
+    "output": "runs/order_blind/R0-slot-check-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_holdout_report",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/order_blind/leaky_split/holdout_manifest.parquet",
+      "--checkpoint",
+      "runs/order_blind/R0/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/R0-holdout.json"
+    ],
+    "cwd": "/workspace/fog-order-baseline",
+    "commit": "d60392080f10894aa216ed7faf561e791922c9f8",
+    "smoke": true,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "seconds": 88.24883817699993,
+    "exit_code": 0,
+    "output": "runs/order_blind/R0-holdout-output.txt"
   }
 ]

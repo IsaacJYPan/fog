@@ -42,5 +42,14 @@
     "output": "digest-sequential-cpu-build.txt",
     "digest": "0d026fed7728c0c4",
     "historical_reproduced": false
+  },
+  "historical_source_repeat": {
+    "commit": "21e57fa",
+    "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+    "cwd": "/workspace/fog-order-reference",
+    "output": "reference-source-digest-sequential.txt",
+    "digest": "0d026fed7728c0c4",
+    "recorded_reference": "23405989f4665988",
+    "historical_reproduced": false
   }
 }

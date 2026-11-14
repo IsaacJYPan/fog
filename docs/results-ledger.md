@@ -1717,3 +1717,13 @@ including installed Ditto move order, original-slot imputation pairing and full-
 opponent-information isolation (`tests-final.txt`, `ruff-final.txt`). Earlier corrected-corpus
 files marked `pre-guard` or `pre-empty-packing`, and the partial-attempt JSONs, are superseded;
 no R1 model was trained on them. The paired corpus is being rebuilt.
+
+### Completed original baseline (smoke)
+
+R0 ran on the isolated original source at `d603920`, with the original rows. Eight epochs completed; the lowest holdout policy NLL selected epoch 7. All policy groups and game-resampled 95% intervals are in `07-artifacts/R0-slot-check-extended.json`; the original diagnostic output is retained separately. The retained-history group means no earlier move by the acting species in the stored history window, not necessarily its first move ever.
+
+| Run | Training / holdout games | All stored NLL / top-1 | All shuffled NLL / top-1 | Retained-history top-1 stored → shuffled | Value Brier / ECE | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| R0 (smoke, best epoch 7) | 1,000 / 2,000 | 1.7717 / 0.3652 | 2.2135 / 0.2269 | 0.7910 → 0.2543 | 0.3905 / 0.3604 | `d603920` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/order_blind/leaky_split/train_1000.parquet bc.holdout_manifest=runs/order_blind/leaky_split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R0` (cwd `/workspace/fog-order-baseline`) |
+
+Value Brier 95% interval: [0.3761, 0.4044]; ECE: [0.3449, 0.3755]. The unchanged value head fails the constant-0.5 Brier reference of 0.25. No value repair has been attempted. The paired converter retains all 22,000 games with zero quarantines and the same fixed 2,000 holdout / 1,000 training IDs; raw rows are 103,944 / 52,955. R1 and its second seed are pending; no cross-run effect is claimed yet.

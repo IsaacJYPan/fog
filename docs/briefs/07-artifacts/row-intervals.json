@@ -1,0 +1,25 @@
+{
+  "smoke": true,
+  "method": "percentile bootstrap of games, both perspectives together",
+  "samples": 2000,
+  "seed": 0,
+  "definition": "no move by the acting species in retained history",
+  "before": {
+    "games": 2000,
+    "rows": 20311,
+    "slot0_share": 0.9839988183742799,
+    "interval95": [
+      0.981291915586949,
+      0.9865076669095318
+    ]
+  },
+  "after": {
+    "games": 2000,
+    "rows": 20309,
+    "slot0_share": 0.24698409572110888,
+    "interval95": [
+      0.2408648475767018,
+      0.25300508838590885
+    ]
+  }
+}
