@@ -1,0 +1,9 @@
+{
+  "label": "smoke",
+  "status": "failed",
+  "commit": "c4df5e20d92ef88321ac7745d6a856e476e4119d",
+  "allocated_gpus": 2,
+  "job_seconds": 0.048260717000005116,
+  "gpu_hours": 2.6811509444447285e-05,
+  "platform_timeout_seconds": 1800
+}

@@ -983,3 +983,22 @@ requested accelerator `NvidiaTeslaT4`, no datasets, internet enabled, code
 frozen to the pushed commit. The private entry point injects `FOG_COMMIT`
 and `FOG_STAGE=collection` into the committed `gpu_job.py`. Measurements and
 actual allocation/runtime are pending; the three-GPU-hour limit is unchanged.
+
+| Measurement | Result (smoke) | Games / interval | Commit / command | Evidence |
+| --- | --- | --- | --- | --- |
+| Collection attempt 1 | Failed before clone: `/kaggle/temp` absent; two T4s allocated | 0 / not applicable | `c4df5e2`, private script `gpu_job.py`, `FOG_STAGE=collection` | `collection-attempt1-tail.txt`, `collection-attempt1-budget.json` |
+
+Attempt 1's script timer was 0.048261 s; this excludes container startup/export
+and is not the budget charge. Submission-to-observed-terminal is at most
+141 seconds, or 0.078333 allocated GPU-hours on two GPUs
+(`collection-attempt1-runtime-upper.json`). Reserve 600 session seconds for it
+and lower the remaining training platform cap to 3,000 seconds. Together with
+the collection retry cap 1,800 seconds, this bounds all three allocations to
+three GPU-hours even with two allocated T4s each. No probes or PPO ran.
+The initial submission evidence was renamed `collection-attempt1-submission.json`.
+
+Fix: explicitly create `/kaggle/temp` before cloning. Regression command
+`uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_collection_gpu_job.py`
+fails without that line and passes with it (one test;
+`job-bootstrap-before.txt`, `job-bootstrap-test.txt`). No actor/trainer/model/loss
+change. Ruff remains clean. The test simulates job bootstrap, not a GPU.

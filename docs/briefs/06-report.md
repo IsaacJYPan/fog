@@ -2,12 +2,13 @@
 
 **Answer.** Collection on this GPU host, PPO update speed, end-to-end speed,
 and decisions/games per 30-hour week are not measured yet. After the existing
-GPU job finished, Kaggle accepted the private collection job at `c4df5e2`.
-It is running with a 30-minute platform cap; training follows its measurements.
+GPU job finished, the initial private collection job at `c4df5e2` failed
+before cloning: `/kaggle/temp` did not exist. The startup fix is tested;
+collection is being retried, and training follows its measurements.
 
 | Stage | Status | Evidence |
 | --- | --- | --- |
-| 1: CPU/GPU collection, twice per setting | Submitted | `06-artifacts/collection-submission.json` |
+| 1: CPU/GPU collection, twice per setting | Initial startup failed; retry prepared | `06-artifacts/collection-attempt1-*.json` |
 | 2: fixed-team PPO and greedy evaluation | Depends on stage 1's chosen batch and CPU count | Not run |
 | 3: bottleneck and 30-hour projection | Depends on measured collection/update rates | Not run |
 
@@ -16,9 +17,11 @@ pushed commit supplied through `FOG_COMMIT`, builds pinned Showdown, preserves
 the installed CUDA PyTorch, records CPU hardware/quota and GPU memory, and
 runs the exact collection matrix. It stops on the first failed probe and
 preserves completed rows. Use T4: the installed client documents P100 as
-retired. Collection/training platform limits are 1,800/3,600 seconds, with
+retired. Retry collection/training platform limits are 1,800/3,000 seconds, with
 300 seconds reserved inside each for export. Even a two-T4 allocation is
-bounded to three GPU-hours in total; both allocated GPUs count toward it.
+bounded to three GPU-hours including a 600-second reserve for the first
+failure; its submission-to-observed-terminal upper bound is 141 seconds.
+Both allocated GPUs count toward the budget and weekly projection.
 
 `06-artifacts/training_timing.py` supplies optional process-local timing hooks
 through a temporary `sitecustomize.py`: collection/update wall times go into
@@ -29,7 +32,9 @@ preserves every update metric and final parameter exactly with CUDA timing
 calls mocked. This is not GPU validation. Local pinned Showdown builds;
 18 focused rollout/process-pool tests pass and Ruff is clean (artifact outputs).
 
-**Fixes.** None. No model, loss, trainer or search code changed.
+**Fixes.** The job creates its temporary parent before cloning. The regression
+fails without the fix and passes with it (`job-bootstrap-{before,test}.txt`).
+No model, loss, trainer or search code changed.
 
 **Not verified.** GPU startup in spawned actors, CUDA tensor placement,
 collection rates, PPO GPU memory/speed, and learning on the batched GPU path.

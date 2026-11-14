@@ -1,10 +1,12 @@
 """Private GPU measurement job; inject FOG_COMMIT before submitting.
 
-Use FOG_STAGE=collection (1,800-second platform timeout) or training (3,600).
+Use FOG_STAGE=collection (1,800-second platform timeout) or training (3,000).
 Internal deadlines reserve 300 seconds for export. Both include setup.
 Completed probe rows and training checkpoints survive a rerun of the script
 with the same output directory. Budget any new GPU session separately.
-These caps total at most three GPU-hours even if Kaggle allocates two T4s.
+These caps leave 600 session seconds for the failed initial submission within
+three GPU-hours even if Kaggle allocates two T4s. FOG_PLATFORM_TIMEOUT may
+lower a cap further; the submission must request that same platform timeout.
 Account settings belong only in the private submission directory.
 """
 from __future__ import annotations
@@ -32,13 +34,17 @@ def main() -> None:
     output = Path("/kaggle/working/06-artifacts")
     output.mkdir(parents=True, exist_ok=True)
     root = Path("/kaggle/temp/fog")
+    root.parent.mkdir(parents=True, exist_ok=True)
     commit = os.environ["FOG_COMMIT"]
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("FOG_COMMIT must identify the pushed commit")
     stage = os.environ.get("FOG_STAGE", "collection")
     if stage not in {"collection", "training"}:
         raise ValueError("FOG_STAGE must be collection or training")
-    platform_limit = 1800 if stage == "collection" else 3600
+    maximum = 1800 if stage == "collection" else 3000
+    platform_limit = int(os.environ.get("FOG_PLATFORM_TIMEOUT", maximum))
+    if not 600 <= platform_limit <= maximum:
+        raise ValueError("FOG_PLATFORM_TIMEOUT must be between 600 and this stage's maximum")
     deadline = started + platform_limit - 300
     environment = dict(os.environ, OMP_NUM_THREADS="1", MKL_NUM_THREADS="1")
     monitor = None

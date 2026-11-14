@@ -1,0 +1,10 @@
+{
+  "label": "smoke",
+  "commit": "c4df5e20d92ef88321ac7745d6a856e476e4119d",
+  "status": "ERROR",
+  "observed_terminal_at_utc": "2026-11-14T04:11:26.174783+00:00",
+  "submission_to_observed_terminal_upper_seconds": 141,
+  "allocated_gpus": 2,
+  "conservative_gpu_hour_upper_bound": 0.07833333333333334,
+  "reserved_failed_attempt_seconds": 600
+}
