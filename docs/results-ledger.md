@@ -975,3 +975,11 @@ CPU engineering smoke, CUDA synchronization/memory calls mocked. Every update
 metric and final state tensor is identical with/without timing hooks; collection
 result identity, row counts and forward time partition also pass
 (`06-artifacts/timing-equivalence.json`). No GPU measurement is implied.
+
+Stage 1 submitted after the account-wide recent-job check found no active GPU
+job. Kaggle accepted the private T4 script at `c4df5e2` on 2026-11-14
+04:09:05 UTC (`06-artifacts/collection-submission.json`). Platform cap 1,800 s;
+requested accelerator `NvidiaTeslaT4`, no datasets, internet enabled, code
+frozen to the pushed commit. The private entry point injects `FOG_COMMIT`
+and `FOG_STAGE=collection` into the committed `gpu_job.py`. Measurements and
+actual allocation/runtime are pending; the three-GPU-hour limit is unchanged.

@@ -1,13 +1,13 @@
 # Collection and play-training speed on a GPU (smoke)
 
 **Answer.** Collection on this GPU host, PPO update speed, end-to-end speed,
-and decisions/games per 30-hour week are not measured yet. The configured
-Kaggle account has an active replay-training GPU job; brief 06 must wait for
-it to finish before allocating a GPU. No GPU time has been used by this brief.
+and decisions/games per 30-hour week are not measured yet. After the existing
+GPU job finished, Kaggle accepted the private collection job at `c4df5e2`.
+It is running with a 30-minute platform cap; training follows its measurements.
 
 | Stage | Status | Evidence |
 | --- | --- | --- |
-| 1: CPU/GPU collection, twice per setting | Waiting for the active GPU job | `06-artifacts/account-status.json` |
+| 1: CPU/GPU collection, twice per setting | Submitted | `06-artifacts/collection-submission.json` |
 | 2: fixed-team PPO and greedy evaluation | Depends on stage 1's chosen batch and CPU count | Not run |
 | 3: bottleneck and 30-hour projection | Depends on measured collection/update rates | Not run |
 
