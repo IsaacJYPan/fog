@@ -325,7 +325,7 @@ def train(root, output, python, workers, allocated_gpus, environment, run) -> No
     if collection > update:
         run([python, "-m", "fog.eval.showdown_rollout_probe", "--batch",
              str(recipe["env"]["rollout_batch"]), "--games", "128", "--opponent",
-             "MaxDamage", "--pool", "data/teams/pool_a", "--device", "cuda"], "collection-split")
+             "MaxDamage", "--device", "cuda"], "collection-split")
 
 
 def trim_measurements(output: Path, decisions: int) -> None:
