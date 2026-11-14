@@ -921,6 +921,11 @@ decisions per second (not measured; a GPU is needed). Collection scales with CPU
 target of 150 decisions per second on four cores is met on the CPU alone; its GPU forward is
 written and untested, so the box stays open.
 
+**Tests.** `python -m pytest -q tests` at `ab75672`: 1,017 passed, 3 skipped, 3 expected
+failures, 1 failed. The failure, `test_active_typed_league_uses_portable_checkpoint_artifacts`,
+needs checkpoint files that are not in a fresh clone and fails the same way at `fff88ca`.
+`ruff check fog tests` is clean. Next: `docs/briefs/06-collection-on-gpu.md`.
+
 **Not verified:** anything on a GPU; `env.actor_device` together with `leakage.beta > 0`
 (refused); heuristic guidance with `env.rollout_batch > 1` (refused); the trainer's learning
 curves under the batched path (with more than one battle per forward, log-probabilities and
