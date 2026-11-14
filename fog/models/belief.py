@@ -356,16 +356,20 @@ class BeliefModel(nn.Module):
         out = truth.clone()
         if mode != "random":
             return out
-        for row in range(len(out)):
-            for slot in range(N_SLOTS):
-                flats = list(_SLOT_MOVE_FLATS[slot])
-                hidden = [p for p in flats if not bool(revealed[row, p])]
-                valid = [p for p in hidden if 0 <= int(out[row, p]) < self.sizes["move"]]
-                if len(valid) <= 1:
-                    continue
-                perm = torch.randperm(len(valid), generator=generator, device=out.device)
-                vals = out[row, valid].clone()
-                out[row, valid] = vals[perm]
+        # One vectorised pass over every row and team slot. A per-row Python loop here read
+        # single elements, each of which waits for the device when the model is on a GPU.
+        positions = torch.as_tensor(_SLOT_MOVE_FLATS, device=out.device)  # [slots, 4]
+        values = out[:, positions]                                        # [B, slots, 4]
+        movable = ~revealed[:, positions] & (values >= 0) & (values < self.sizes["move"])
+        column = torch.arange(positions.shape[1], device=out.device)
+        noise = torch.rand(values.shape, generator=generator, device=out.device)
+        # Movable columns first: `source` lists them in uniformly random order and `target` in
+        # ascending order. Fixed columns follow in ascending order in both, so they map to
+        # themselves. Random keys are below 1, fixed keys start at 2.
+        source = torch.where(movable, noise, 2.0 + column).argsort(dim=-1)
+        target = torch.where(movable, column, column + positions.shape[1]).argsort(dim=-1)
+        shuffled = values.scatter(-1, target, values.gather(-1, source))
+        out[:, positions] = shuffled
         return out
 
     # ------------------------------------------------------------------------------- set encoding

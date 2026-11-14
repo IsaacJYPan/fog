@@ -1673,3 +1673,48 @@ P0.5 stays open: the GPU path runs, learning under it was not shown. The estimat
 nor refuted, since this machine had two cores. Next for speed: profile the update's forward
 on a GPU by function, then remove the per-row Python from the belief training path with a test
 that the route and permutation distributions are unchanged.
+
+## 2026-11-14: per-row Python removed from the belief training path (ROADMAP P0.5)
+
+Asked for by the owner after brief 06 showed 37.5 decisions per second end to end on a T4.
+Branch `work/fast-update`. Machine for every row: 4 CPU cores, no GPU, PyTorch CPU, pinned
+Showdown `e440c4a`. Smoke timings; nothing here is a strength result, and **nothing here ran on
+a GPU**.
+
+**Where one PPO update spends its time on the CPU** (`python -m cProfile -m fog.train --config
+configs/collect_gpu_check.yaml --trainer ppo --set device=cpu env.actor_device=cpu
+env.rollout_workers=3 env.rollout_batch=32 ppo.games_per_chunk=96 ppo.total_decisions=2400
+ppo.batch_decisions=2400 ppo.minibatch_size=512 ppo.epochs=1`; one update of 4,837 decisions,
+10 optimizer steps; code at `d603920` before and at this section's commit after):
+
+| Part of the update | Before, s | After, s |
+| --- | ---: | ---: |
+| Whole update | 47.5 | 43.6 |
+| Forward passes | 22.3 | 20.3 |
+| of which the two belief models (four passes per forward) | 15.4 | 12.1 |
+| of which `BeliefModel._permute_hidden_moves` | 2.84 | 0.02 |
+| of which the shared trunk | 3.6 | 4.2 |
+| Backward | 24.5 | 22.4 |
+
+**What changed.** `_permute_hidden_moves` looped over every row and team slot in Python and
+read single tensor elements; on a GPU each read waits for the device. It is now one vectorised
+pass. On 1,024 rows on the CPU the function takes 1.4 ms instead of 230 ms.
+
+**How it was checked.** The random stream differs, so results are equal in distribution, not
+bit for bit. `tests/test_belief_move_permutation.py` keeps the old loop as the specification:
+only hidden, in-range moves move; every slot keeps its multiset; over 6,000 draws all twelve
+arrangements of a two-slot case appear with equal frequency under both versions. The belief,
+trainer and candidate tests pass (59 and 52), `ruff check fog tests` is clean, and the rollout
+digest is unchanged (`--games 6`: `23405989f4665988`; acting does not call this function).
+
+**Reading.** On the CPU this is 8% of an update. On the T4 it should be far more: the loop is
+about 6,000 iterations of roughly fourteen small tensor operations per call, two calls per
+forward, and brief 06's forward took 5.3 s per 1,024 rows. An estimate of 3 to 5 s of that
+5.3 s is **not measured**; `docs/briefs/08-update-speed-gpu.md` measures it. The same function
+runs in replay training whenever `loss.belief_chain_coef` is above zero, so brief 05's GPU job
+was slowed by it as well (size not measured).
+
+What the profile also shows: the two belief models are 59% of the forward on the CPU after the
+fix and the trunk that serves policy and value is 20%. The PPO update does not use mixed
+precision (`fog/training/bc.py` does; `fog/training/ppo.py` has no autocast). Both are levers
+only if a GPU profile shows the same split.
