@@ -6,7 +6,7 @@ runs at **583.24 training rows/s** (580–586 by epoch), with **161–166 s** va
 **9.840590 quota-hours**, including setup, both CPU holdout reports and export. Two T4s
 were visible; CUDA device 0 was used. G3's two-epoch calibration/resume smoke ran at
 604–622 rows/s, but its full schedule and batch comparison did not fit the one-hour cap.
-G100's measured-budget fallback is planned at **40,955 games / six epochs**, **6.881063 h**;
+G100's measured-budget fallback was submitted at **40,955 games / six epochs**, **6.881063 h**;
 full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
 [brief 05 report](briefs/05-report.md) and `briefs/05-artifacts/G100-plan.json`.
 
@@ -18,10 +18,10 @@ full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
    | `fog-p2-gpu-112000-20261114` | 101,928 / 5,217,022 | 2,000 / 104,037 |
 
    Each contains `replay-work.bin`, a gzip tar archive whose opaque filename prevents archive
-   expansion into thousands of mounted files. Current private-input sizes: 468,727,506 / 2,385,762,558 bytes. The next large-input
-   version is being uploaded from a 2,386,510,456-byte CPU archive containing the new
-   40,955-game nested manifest and omitting CPU-only caches. Wait for its ready/private
-   receipt before starting that run. All
+   expansion into thousands of mounted files. Current private-input sizes: 468,727,506 / 2,386,510,456 bytes. Large-input version 2
+   is ready and private, contains the new 40,955-game nested manifest, and omits CPU-only
+   caches. Version 1 (2,385,762,558 bytes) is retained. See its ready/private receipt
+   `briefs/05-artifacts/prepare-112000-G100-version.json`. All
    holdout shards are byte-identical, and G20 is contained in the larger training set. Rating
    floor stays 1500; 8,072 newer non-holdout games were excluded from the larger import.
    Counts and archive hashes: `briefs/05-artifacts/prepare-*`.
@@ -78,6 +78,16 @@ full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
    (11 h platform cap, 10 h 40 min internal export deadline). The final-slot plan uses its
    slowest measured rate and a two-hour forecast reserve inside 20 Kaggle quota-hours.
    One account-wide active/queued-job check is required immediately before every submission.
+
+   The final-slot source is [fog-p2-g100-20261114.py](briefs/05-artifacts/fog-p2-g100-20261114.py),
+   frozen at `46e9c0da2c1b6caa01ab3da0b5bba2e103029662`: 40,955 nested games, six epochs,
+   batch 1,024. It uses large-input version 2 and projects to 6.881063 quota-hours. For that
+   reproduction, copy this source, use `fog-p2-gpu-112000-20261114` as the private dataset,
+   choose a fresh job slug, and set platform timeout **28200** (7h50m); its internal export
+   deadline is **27000** (7h30m). The account-wide check found all 20 owned jobs terminal
+   immediately before its submission. The forecast leaves two hours; even the hard cap
+   keeps the conservative account total below 20 quota-hours. Original full-corpus six-epoch
+   training did not fit; this fallback cannot establish an exact 100k result.
 
 4. **Continue from the last completed epoch.** `bc_state.pt` retains optimizer, schedule,
    RNG, earlier CSV rows and both best models. Jobs export the full work directory as

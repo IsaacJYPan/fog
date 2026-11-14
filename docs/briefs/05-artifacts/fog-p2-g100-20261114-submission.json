@@ -1,0 +1,24 @@
+{
+  "slug": "fog-p2-g100-20261114",
+  "private_requested": true,
+  "spec": {
+    "commit": "46e9c0da2c1b6caa01ab3da0b5bba2e103029662",
+    "run": "G100",
+    "games": 40955,
+    "epochs": 6,
+    "batch_size": 1024,
+    "stop_after_epoch": null,
+    "job_seconds": 27000
+  },
+  "quota_seconds_before_submission": 40027.748,
+  "dataset_slug": "fog-p2-gpu-112000-20261114",
+  "timeout_seconds": 28200,
+  "command": "official KaggleApi.kernels_push(acc=NvidiaTeslaT4)",
+  "submission_started_utc": "2026-11-14T14:42:59.655880+00:00",
+  "version": 1,
+  "kernel_id": 145012268,
+  "error": "",
+  "invalid_dataset_sources": [],
+  "invalid_kernel_sources": [],
+  "submission_wall_seconds": 2.455918482002744
+}

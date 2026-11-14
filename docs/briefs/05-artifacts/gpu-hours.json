@@ -93,6 +93,22 @@
       "account_quota_delta_includes_other_brief": true,
       "quota_delta_seconds_including_other_brief": 36863.293,
       "actual_gpu_hours_note": "Shared quota delta is not attributable to G20; use its own measured session upper bound."
+    },
+    {
+      "slug": "fog-p2-g100-20261114",
+      "status": "QUEUED",
+      "timeout_seconds": 28200,
+      "internal_job_seconds_before_export": 27000,
+      "actual_gpu_hours": null,
+      "quota_start_seconds": 40027.748,
+      "submission_started_utc": "2026-11-14T14:42:59.655880+00:00",
+      "expected_gpu_hours": 6.881063065200146,
+      "expected_training_games": 40955,
+      "expected_training_rows": 2090705,
+      "expected_epochs": 6,
+      "planning_basis": "Actual slowest G20 rate and max validation, rounded measured archive-scaled overhead, largest seeded nested prefix, two-hour forecast reserve; see G100-plan.json.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "source_commit": "46e9c0da2c1b6caa01ab3da0b5bba2e103029662"
     }
   ],
   "used_gpu_hours": null,
@@ -101,7 +117,7 @@
     "gpu_remaining_hours": 45,
     "command": "kaggle quota --format json"
   },
-  "status": "G20 complete; G100 planned from actual measured rate, CPU play and private input update in progress",
+  "status": "G20 complete and durable; final bounded nested fallback submitted",
   "last_observed_total_quota_hours": 11.118818888888889,
   "calibration_gpu_hours": 0.8790152777777778,
   "used_account_quota_hours_for_conservative_budget": 11.118818888888889,

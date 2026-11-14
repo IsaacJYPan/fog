@@ -1,5 +1,5 @@
 {
-  "status": "smoke planning projection, not a completed run",
+  "status": "smoke forecast; final fallback submitted, not completed",
   "run": "G100",
   "training_games": 40955,
   "training_rows": 2090705,
@@ -40,5 +40,11 @@
   "platform_cap_seconds": 28200,
   "internal_export_deadline_seconds": 27000,
   "max_account_quota_hours_if_cap_used": 18.95215222222222,
-  "cap_basis": "The forecast preserves two hours; the hard cap permits roughly 57 minutes of overrun while remaining below 20 account quota-hours."
+  "cap_basis": "The forecast preserves two hours; the hard cap permits roughly 57 minutes of overrun while remaining below 20 account quota-hours.",
+  "source_commit": "46e9c0da2c1b6caa01ab3da0b5bba2e103029662",
+  "private_job_slug": "fog-p2-g100-20261114",
+  "submission_started_utc": "2026-11-14T14:42:59.655880+00:00",
+  "input_dataset_version": 2,
+  "input_archive_bytes": 2386510456,
+  "input_archive_sha256": "5457cc642d2ecc63152a36ec4d2d78cf150c8efeaa1c37209807be1429fbfe9f"
 }

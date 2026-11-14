@@ -1257,3 +1257,30 @@ actual upload fits that byte bound. The largest fitting nested prefix is now **4
 rules stay unverified; no filters or training settings changed. The two-hour forecast reserve
 and 28,200/27,000-second platform/internal caps stay unchanged. G20 curve/value reports,
 private persistence and CPU play are all complete before the final GPU slot is submitted.
+
+The corrected CPU archive is **2,386,510,456 bytes**, SHA-256
+`5457cc642d2ecc63152a36ec4d2d78cf150c8efeaa1c37209807be1429fbfe9f`, below the
+2 MiB added-manifest planning allowance. Its CPU packaging wall is 81.327875 s; it includes
+the original layout and excludes the conversion cache. The same private large-input
+dataset now has ready **version 2**, with version 1 retained; upload/processing/readiness
+took 704.252935 s and used no GPU. Evidence: `prepare-112000-G100-{bundle,version}.json`.
+The account quota remained 40,027.748 seconds before final submission.
+
+### Final bounded fallback submitted (smoke forecast; no G100 result yet)
+
+Private `fog-p2-g100-20261114` version 1, kernel 145012268, was accepted from source
+`46e9c0da2c1b6caa01ab3da0b5bba2e103029662` at 14:42:59 UTC: **40,955 games /
+2,090,705 rows**, **six epochs**, batch **1,024**, same model/loss/optimizer/schedule recipe,
+CUDA, both independent checkpoint selections, streaming, no early stop. Command:
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="28200")`. Its internal export deadline
+is 27,000 s. Expected **6.881063 quota-hours** from the completed G20 measurements; the
+forecast conservative account total is 17.999882 h, reserving two hours. Hard-cap account
+total is at most 18.952152 h. Inputs are ready private large-corpus version 2, including
+the CPU nested manifest; no GPU import, conversion or splitting is run.
+
+Immediately before submission, the paginated owned list plus each job's status checked
+**20 jobs**, found no RUNNING/QUEUED job, and allowed launch; fresh quota was unchanged at
+40,027.748 s. `fog-p2-g100-20261114-account-guard.json` records that check. GetKernel confirms
+private `NvidiaTeslaT4`, initially QUEUED. Exact submitted source, receipt, status and plan
+are retained. The new run remains unmeasured until its CSV and reports return. G20's
+curve/value/CPU play and four-file private-download round trip were completed first.
