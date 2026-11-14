@@ -931,3 +931,31 @@ needs checkpoint files that are not in a fresh clone and fails the same way at `
 curves under the batched path (with more than one battle per forward, log-probabilities and
 values differ from the one-battle loop only by floating-point reduction order, as recorded on
 2026-11-11).
+
+## 2026-11-13: collection and play-training speed on a GPU (smoke)
+
+Brief `docs/briefs/06-collection-on-gpu.md`, branch `work/collect-gpu`, base
+`b5983c6`. Preparation only; report `docs/briefs/06-report.md`. Kaggle token
+authentication succeeds using an isolated client installation. The first
+list/status sweep returned HTTP 429; a smaller list and targeted status checks
+succeeded. An existing replay-training GPU job is running, so this brief has
+not submitted a job, in accordance with its one-job-at-a-time rule.
+
+| Measurement | Status | Games / interval | GPU hours | Command and commit | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| Stage 1 collection matrix (smoke) | Pending: shared account's GPU job running | Not measured | 0 | `KaggleApi.authenticate(); KaggleApi.kernels_status(...)`, base `b5983c6`; account identifier omitted | `06-artifacts/account-status.json` |
+| Stage 2 PPO/update/evaluation (smoke) | Not run; depends on stage 1 | Not measured | 0 | Brief stage 2 commands, not run | No metrics/checkpoint/evaluation exists |
+| Stage 3 bottleneck/week projection (smoke) | Not measured | Not applicable | 0 | No extrapolation without measured rates | `06-report.md` |
+
+`06-artifacts/gpu_job.py` prepares the collection matrix with an internal
+3,300-second deadline and a requested 3,600-second platform cap on one GPU.
+No model, losses, trainer or search changes; no defect claimed. P0.5 stays open.
+
+Preparation checks at base `b5983c6`: pinned Showdown builds after redirecting
+the local npm cache to a writable temporary directory. Locked development
+installation succeeds with writable UV/XDG/Rust caches. Command
+`UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python -m pytest -q -p no:cacheprovider tests/test_showdown_batch_runner.py tests/test_showdown_rollout_probe.py tests/test_direct_parallel.py`:
+18 passed (`06-artifacts/focused-tests.txt`).
+`UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python -m ruff check fog tests docs/briefs/06-artifacts/*.py`
+is clean. Full suite not run. The optional measurement-only timing shim is
+syntax/lint checked, not training-verified; it does not change trainer source.

@@ -1,0 +1,18 @@
+{
+  "checks": [
+    {
+      "checked_at_utc": "2026-11-14T03:56:50.620427+00:00",
+      "operation": "authenticated kernels_status for the active replay-training job",
+      "status": "KernelWorkerStatus.RUNNING",
+      "collection_job_submitted": false,
+      "gpu_hours_used_by_this_brief": 0
+    },
+    {
+      "checked_at_utc": "2026-11-14T03:59:33.840157+00:00",
+      "operation": "authenticated kernels_status for the active replay-training job",
+      "status": "KernelWorkerStatus.RUNNING",
+      "collection_job_submitted": false,
+      "gpu_hours_used_by_this_brief": 0
+    }
+  ]
+}
