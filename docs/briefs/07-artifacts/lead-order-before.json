@@ -1,0 +1,26 @@
+{
+  "smoke": true,
+  "source": "public preview and first switch in 22000 raw logs",
+  "lead_counts": {
+    "p1": [
+      5380,
+      3677,
+      3220,
+      3398,
+      3158,
+      3158
+    ],
+    "p2": [
+      5497,
+      3714,
+      3279,
+      3255,
+      2993,
+      3251
+    ]
+  },
+  "unknown": {
+    "p2": 11,
+    "p1": 9
+  }
+}

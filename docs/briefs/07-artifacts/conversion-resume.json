@@ -1,0 +1,110 @@
+{
+  "smoke": true,
+  "signal": "SIGTERM",
+  "processes_signalled": 5,
+  "completed_replay_checkpoints": 769,
+  "retained_shards": [
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-10954.npz",
+      "sha256": "d8e38ff35db3270cf52bb7238a9cc0921e2e6ce6506617f573f5c6ecc8fdd19e",
+      "mtime_ns": 1794653741487859997
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-13131.npz",
+      "sha256": "1febee54c40ea877b88fc20ea15a17189ef580db19f0b846b6fe80a3fd346b8e",
+      "mtime_ns": 1794653741615860594
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-14607.npz",
+      "sha256": "a30689cf5b153195f1b1f304fdc6b4c8c775bcb36faeb78e4b4605f8f2822897",
+      "mtime_ns": 1794653740603855876
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-19143.npz",
+      "sha256": "9e9e700af05b01f0a4115bed8b330b426cbcc22a3f6d5efc18c088c0368ac2cb",
+      "mtime_ns": 1794653741155858450
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2048962435.npz",
+      "sha256": "38f02eb79b73a7ded138311bf45ab3fdb0423e96e63739d6f611a2c8c272b647",
+      "mtime_ns": 1794653740887857200
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2048981670.npz",
+      "sha256": "d48feef79d49594257d0c1d057932ab82db2af85a494a3b540168cd022c46053",
+      "mtime_ns": 1794653741091858151
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2049136773.npz",
+      "sha256": "283de16c894a7da951799b679a17c2e522611b7b93466756f92e9907c4c7144c",
+      "mtime_ns": 1794653741435859755
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2049630826.npz",
+      "sha256": "b534b6720f248e63f95e8782bb5c0db6aca64964e80797de7597774984f8751e",
+      "mtime_ns": 1794653742003862403
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2049635461.npz",
+      "sha256": "439f5ba0894fb3c6673d412f2b9359e79782bd5c20ffe6cc1172799e68bff128",
+      "mtime_ns": 1794653741611860576
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2049679303.npz",
+      "sha256": "a9432c3b5ffbcc53160d07d454e0c0cda1af34387818d678b3c28e2eb9d972b5",
+      "mtime_ns": 1794653741815861527
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2049830845.npz",
+      "sha256": "2f1bd9d0e0d0ead71ee508b3348315e37b0011d44a98726c5dd57dfb837d5933",
+      "mtime_ns": 1794653741827861582
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2050002079.npz",
+      "sha256": "6e34d35c5a6860d54de9efc339d6801575efff8f2c8143ea01579fc06b273783",
+      "mtime_ns": 1794653742099862851
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2050290537.npz",
+      "sha256": "f83378eef03136fd600d7d07af3fb579da2da10ceb44a4a0940941eb8241a679",
+      "mtime_ns": 1794653742103862869
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2050521866.npz",
+      "sha256": "1ffbb3e182c664757e4c3e5f3a5f2e57d5a9a753c3c1b7ed3243fad8a342e925",
+      "mtime_ns": 1794653742115862925
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2050597121.npz",
+      "sha256": "577587cdea486a8447fc81e00618d7c65cd8ee3809bd61d0c20e9afefc849ea6",
+      "mtime_ns": 1794653742121567906
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2050721708.npz",
+      "sha256": "cd5c12b9b78fa72d087515d1d7f6cf4cf0dd2b023dbd93d42c05d204ee65f226",
+      "mtime_ns": 1794653742261135812
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2050835373.npz",
+      "sha256": "c81cc088e038390811ad968903051e11360f2faa9202638d3b0499a1f0b3e6a2",
+      "mtime_ns": 1794653742343863988
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2051088601.npz",
+      "sha256": "bfd00cdea0c24d8107e1c2807dd0b56ea7dccd3fd629128dc1f885429973b7bd",
+      "mtime_ns": 1794653742887866702
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2051259490.npz",
+      "sha256": "e0dfd2d65e320fa1d0392034aa7948044002fa8121a362e035d7021f1161c532",
+      "mtime_ns": 1794653742247863541
+    },
+    {
+      "path": "data/metamon_gen9ou_r1500_order_blind_decisions/shards/gen9ou-2051384728.npz",
+      "sha256": "d363b8b1ac852c4f54ba1d5c81e78877e76aa1b9b0a1dad3eff3bf62f1458b1b",
+      "mtime_ns": 1794653743335868972
+    }
+  ],
+  "interruption_time_unix": 1794653816.1208704,
+  "status": "interrupted; awaiting identical-command resume"
+}

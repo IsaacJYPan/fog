@@ -1,0 +1,12 @@
+{
+  "smoke": true,
+  "python": "3.12.14",
+  "torch": "2.13.0+cu130",
+  "torch_threads": 5,
+  "cuda_available": false,
+  "cpu_quota": "400000 100000",
+  "memory_limit_bytes": 17179869184,
+  "showdown_commit": "e440c4a18385274f10c405d0b158b6a962ce6d94",
+  "baseline_commit": "d60392080f10894aa216ed7faf561e791922c9f8",
+  "converter_commit": "e195b26f3f2d20653f306cdfcb03a5041892aab0"
+}

@@ -1673,3 +1673,22 @@ P0.5 stays open: the GPU path runs, learning under it was not shown. The estimat
 nor refuted, since this machine had two cores. Next for speed: profile the update's forward
 on a GPU by function, then remove the per-row Python from the belief training path with a test
 that the route and permutation distributions are unchanged.
+
+## 2026-11-14: move-order leak removed and order-blind encoder (smoke)
+
+Brief 07, branch `work/order-blind`; stage 1 preparation at `e195b26` from `d603920`.
+All results in this section are smoke. No strength gate or roadmap task is complete.
+
+| Run / check | Status and evidence | Command and producing commit |
+| --- | --- | --- |
+| Import | 22,000 games; pinned release; `07-artifacts/import-output.txt` | `python -m fog.scripts.import_metamon_replays --out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600`, `d603920` |
+| Converter tests | 79 pass; Ruff clean; `07-artifacts/tests-stage1.txt`, `ruff-stage1.txt` | `.venv/bin/python -m pytest -q tests/test_replay_conversion_resume.py tests/test_replay_order.py tests/test_replay_slot_order_check.py tests/test_replay_parser.py tests/test_replay_candidates.py tests/test_split_replay_manifest.py tests/test_engine_mcts.py tests/test_replay_holdout_report.py tests/test_run_replay_blueprint.py`; `.venv/bin/ruff check fog tests`, `e195b26` |
+| R0 / R1 | Pending: preserved original source and corrected corpus conversion; no training metrics claimed | Fixed recipe in brief 07; completed commands recorded in `07-artifacts/R0-execution.json` |
+
+The correction permutes finalized moves and their provenance in independent per-slot seed
+streams. Measured lead-position bias also calls for shuffling public preview order before
+reconstructing either side; no hidden opponent information is introduced. Candidate-bank
+duplicate detection continues to use the original log digest. Completed corrected conversions
+can resume per game. The expanded slot diagnostic reports bench and lead positions, value
+Brier/ECE, and intervals that resample games. See `docs/briefs/07-report.md` for limits and
+pending comparisons. Stages 2–5 are not started; search, PPO and belief code are unchanged.

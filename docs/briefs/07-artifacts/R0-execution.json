@@ -1,0 +1,23 @@
+[
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.scripts.split_replay_manifest",
+      "--manifest",
+      "data/metamon_gen9ou_r1500_leaky_decisions/manifest.parquet",
+      "--out",
+      "runs/order_blind/leaky_split",
+      "--holdout-ids",
+      "data/replay_splits/p2_holdout_2000_ids.txt",
+      "--train-sizes",
+      "1000"
+    ],
+    "cwd": "/workspace/fog-order-baseline",
+    "commit": "d60392080f10894aa216ed7faf561e791922c9f8",
+    "smoke": true,
+    "seconds": 4.962724041999991,
+    "exit_code": 0,
+    "output": "runs/order_blind/split-R0-output.txt"
+  }
+]
