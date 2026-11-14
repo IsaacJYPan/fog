@@ -133,7 +133,7 @@ def probes():
     machine = hardware()
     workers = machine["affinity_cpus"]
     results = []
-    for device, batch in (("cpu", 32), ("cuda", 32), ("cuda", 64), ("cuda", 128)):
+    for device, batch in (("cuda", 32), ("cpu", 32), ("cuda", 64), ("cuda", 128)):
         for opponent in ("self", "MaxDamage"):
             for repeat in (1, 2):
                 result = run(f"probe-{opponent}-{device}-b{batch}-r{repeat}", [

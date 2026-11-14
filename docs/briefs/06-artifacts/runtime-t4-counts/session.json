@@ -1,0 +1,14 @@
+{
+  "label": "smoke",
+  "status": "running",
+  "allocated_gpus": 1,
+  "previous_attempts_gpu_hours_upper": 0.9372222222222222,
+  "first_runtime_start_conservative_utc": "2026-11-14T08:16:00Z",
+  "first_runtime_released_before_utc": "2026-11-14T08:53:00Z",
+  "first_runtime_gpu_hours_upper": 0.6166666666666667,
+  "replacement_requested_after_utc": "2026-11-14T08:56:40Z",
+  "local_stop_deadline_utc": "2026-11-14T10:21:00Z",
+  "replacement_gpu_hours_upper_at_deadline": 1.4055555555555554,
+  "all_attempts_gpu_hours_upper_at_deadline": 2.9594444444444443,
+  "note": "High-memory requests returned service unavailable; only one standard T4 is allocated at once. The gap without an allocation permits a later deadline within the same three GPU-hour budget."
+}
