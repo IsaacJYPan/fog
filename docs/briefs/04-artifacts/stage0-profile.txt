@@ -1,0 +1,38 @@
+         21004790 function calls (20299472 primitive calls) in 16.483 seconds
+
+   Ordered by: cumulative time
+   List reduced from 1038 to 30 due to restriction <30>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+       64    0.033    0.001   16.457    0.257 /workspace/fog/fog/env/showdown_local_runner.py:118(play_local_battle)
+     3606    0.029    0.000   13.204    0.004 /workspace/fog/fog/env/showdown_local_runner.py:80(_choice)
+     1563    0.020    0.000   12.758    0.008 /workspace/fog/fog/env/player.py:224(act)
+250730/1819    0.157    0.000    7.315    0.004 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1774(_wrapped_call_impl)
+250730/1819    0.309    0.000    7.312    0.004 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/module.py:1782(_call_impl)
+     1563    0.034    0.000    7.217    0.005 /workspace/fog/fog/models/agent.py:529(forward)
+     1563    0.011    0.000    4.049    0.003 /workspace/fog/fog/env/player.py:251(prepare_decision)
+     1627    0.033    0.000    3.963    0.002 /workspace/fog/fog/encoding/observation.py:54(from_battle)
+     1563    0.005    0.000    3.153    0.002 /workspace/fog/fog/models/agent.py:398(encode_contexts)
+     1563    0.002    0.000    3.138    0.002 /workspace/fog/fog/models/three_encoder.py:616(forward)
+     1563    0.022    0.000    3.136    0.002 /workspace/fog/fog/models/three_encoder.py:545(encode_contexts)
+     1563    0.055    0.000    2.738    0.002 /workspace/fog/fog/models/shared_latent.py:426(forward)
+     1803    0.004    0.000    2.716    0.002 /workspace/fog/fog/env/showdown_local.py:145(step)
+     3126    0.039    0.000    2.608    0.001 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/transformer.py:405(forward)
+     9378    0.155    0.000    2.429    0.000 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/transformer.py:795(forward)
+     1931    0.016    0.000    2.318    0.001 /workspace/fog/fog/env/showdown_direct.py:171(_request)
+     1931    2.101    0.001    2.108    0.001 {method 'readline' of '_io.TextIOWrapper' objects}
+     1803    0.006    0.000    1.974    0.001 /workspace/fog/fog/env/showdown_direct.py:326(step_session)
+     1627    0.153    0.000    1.801    0.001 /workspace/fog/fog/encoding/action_features.py:82(encode_action_features)
+     9378    1.765    0.000    1.765    0.000 {built-in method torch._transformer_encoder_layer_fwd}
+    30145    0.054    0.000    1.504    0.000 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/container.py:248(forward)
+     1563    0.060    0.000    1.363    0.001 /workspace/fog/fog/models/three_encoder.py:388(encode_sequence)
+     1563    0.043    0.000    1.197    0.001 /workspace/fog/fog/env/player.py:281(complete_decision)
+    80865    1.000    0.000    1.000    0.000 {built-in method torch._C._nn.linear}
+     1627    0.231    0.000    0.944    0.001 /workspace/fog/fog/encoding/entities.py:251(encode_entities)
+    66798    0.035    0.000    0.913    0.000 /workspace/fog/.venv/lib/python3.12/site-packages/torch/nn/modules/linear.py:130(forward)
+     1627    0.044    0.000    0.888    0.001 /workspace/fog/fog/models/three_encoder.py:218(forward)
+     1867    0.009    0.000    0.860    0.000 /workspace/fog/fog/env/showdown_local.py:96(_apply)
+     3734    0.031    0.000    0.851    0.000 /workspace/fog/fog/env/showdown_local.py:106(_apply_view_update)
+     4817    0.105    0.000    0.755    0.000 /workspace/fog/fog/models/three_encoder.py:74(forward)
+
+

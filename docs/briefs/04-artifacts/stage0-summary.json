@@ -1,0 +1,27 @@
+{
+  "smoke": true,
+  "commit": "c7476c95b14701cb2d57d1df68579ef3ef8b7f6a",
+  "command": "uv run --no-sync python -m fog.train --config configs/rl_check_scratch.yaml --trainer ppo --set ppo.total_decisions=20000 log.dir=runs/rl_check/stage0",
+  "environment": {
+    "OMP_NUM_THREADS": "4",
+    "MKL_NUM_THREADS": "4",
+    "rollout_workers": 4,
+    "actor_threads": 2
+  },
+  "decisions": 20336.0,
+  "collection_seconds": 118.81777,
+  "update_seconds": 790.12264,
+  "optimization_seconds": 783.40361,
+  "optimizer_rows": 61008.0,
+  "collection_decisions_per_second": 171.15285028493633,
+  "update_unique_rows_per_second": 25.737776606426564,
+  "optimization_rows_per_second": 77.87556659331707,
+  "end_to_end_decisions_per_second": 22.269919838801524,
+  "effective_epochs": 3.0,
+  "scale": 0.5567479959700381,
+  "stage1_budget": 334049,
+  "grid_budget": 167024,
+  "stage2_budget": 556748,
+  "training_loop_decisions_per_second": 22.37330387808371,
+  "wall_seconds": 913.16
+}

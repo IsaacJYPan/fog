@@ -1,0 +1,193 @@
+{
+  "scratch": {
+    "device": {
+      "inherited": "cuda",
+      "diagnostic": "cpu"
+    },
+    "env.team_pool": {
+      "inherited": "data/teams/gen9ou_public_v1/train.json",
+      "diagnostic": "data/teams/pool_a/core_v1_offensive.txt"
+    },
+    "log.dir": {
+      "inherited": "runs/gen9ou_typed_token_policy_v1",
+      "diagnostic": "runs/rl_check/scratch"
+    },
+    "experiment": {
+      "inherited": "gen9ou_typed_token_selfplay",
+      "diagnostic": "rl_check_scratch"
+    },
+    "preflight.required": {
+      "inherited": true,
+      "diagnostic": false
+    },
+    "ppo.total_decisions": {
+      "inherited": 240000,
+      "diagnostic": 600000
+    },
+    "ppo.batch_decisions": {
+      "inherited": 24000,
+      "diagnostic": 8000
+    },
+    "ppo.minibatch_size": {
+      "inherited": 1536,
+      "diagnostic": 1024
+    },
+    "ppo.epochs": {
+      "inherited": 1,
+      "diagnostic": 3
+    },
+    "ppo.clip": {
+      "inherited": 0.05,
+      "diagnostic": 0.2
+    },
+    "ppo.target_kl": {
+      "inherited": 0.01,
+      "diagnostic": 0.03
+    },
+    "ppo.lr": {
+      "inherited": 1e-05,
+      "diagnostic": 0.0003
+    },
+    "ppo.entropy_coef": {
+      "inherited": 0.003,
+      "diagnostic": 0.01
+    },
+    "ppo.entropy_coef_final": {
+      "inherited": 0.001,
+      "diagnostic": 0.003
+    },
+    "ppo.init_ckpt": {
+      "inherited": "runs/gen9ou_typed_token_policy_v1_continuation/checkpoints/bc_best.pt",
+      "diagnostic": null
+    },
+    "ppo.activation_checkpointing": {
+      "inherited": null,
+      "diagnostic": true
+    },
+    "league.snapshot_every_decisions": {
+      "inherited": 24000,
+      "diagnostic": 100000
+    },
+    "league.latest_frac": {
+      "inherited": 0.5,
+      "diagnostic": 0.0
+    },
+    "league.past_frac": {
+      "inherited": 0.4,
+      "diagnostic": 0.0
+    },
+    "league.scripted_frac": {
+      "inherited": 0.1,
+      "diagnostic": 1.0
+    },
+    "league.scripted": {
+      "inherited": [
+        "SimpleHeuristics",
+        "MaxDamage"
+      ],
+      "diagnostic": [
+        "MaxDamage"
+      ]
+    },
+    "replay_policy.coef": {
+      "inherited": 0.001,
+      "diagnostic": 0.0
+    }
+  },
+  "blueprint": {
+    "device": {
+      "inherited": "cuda",
+      "diagnostic": "cpu"
+    },
+    "env.team_pool": {
+      "inherited": "data/teams/gen9ou_public_v1/train.json",
+      "diagnostic": "data/teams/pool_a"
+    },
+    "log.dir": {
+      "inherited": "runs/gen9ou_typed_token_policy_v1",
+      "diagnostic": "runs/rl_check/blueprint"
+    },
+    "experiment": {
+      "inherited": "gen9ou_typed_token_selfplay",
+      "diagnostic": "rl_check_blueprint"
+    },
+    "preflight.required": {
+      "inherited": true,
+      "diagnostic": false
+    },
+    "ppo.total_decisions": {
+      "inherited": 240000,
+      "diagnostic": 1000000
+    },
+    "ppo.batch_decisions": {
+      "inherited": 24000,
+      "diagnostic": 8000
+    },
+    "ppo.minibatch_size": {
+      "inherited": 1536,
+      "diagnostic": 1024
+    },
+    "ppo.epochs": {
+      "inherited": 1,
+      "diagnostic": 3
+    },
+    "ppo.clip": {
+      "inherited": 0.05,
+      "diagnostic": 0.2
+    },
+    "ppo.target_kl": {
+      "inherited": 0.01,
+      "diagnostic": 0.03
+    },
+    "ppo.lr": {
+      "inherited": 1e-05,
+      "diagnostic": 0.0001
+    },
+    "ppo.entropy_coef": {
+      "inherited": 0.003,
+      "diagnostic": 0.01
+    },
+    "ppo.entropy_coef_final": {
+      "inherited": 0.001,
+      "diagnostic": 0.003
+    },
+    "ppo.init_ckpt": {
+      "inherited": "runs/gen9ou_typed_token_policy_v1_continuation/checkpoints/bc_best.pt",
+      "diagnostic": null
+    },
+    "ppo.activation_checkpointing": {
+      "inherited": null,
+      "diagnostic": true
+    },
+    "league.latest_frac": {
+      "inherited": 0.5,
+      "diagnostic": 0.4
+    },
+    "league.past_frac": {
+      "inherited": 0.4,
+      "diagnostic": 0.0
+    },
+    "league.scripted_frac": {
+      "inherited": 0.1,
+      "diagnostic": 0.6
+    },
+    "league.scripted": {
+      "inherited": [
+        "SimpleHeuristics",
+        "MaxDamage"
+      ],
+      "diagnostic": [
+        "SimpleHeuristics",
+        "SimpleHeuristics",
+        "SimpleHeuristics",
+        "SimpleHeuristics",
+        "SimpleHeuristics",
+        "MaxDamage"
+      ]
+    },
+    "replay_policy.coef": {
+      "inherited": 0.001,
+      "diagnostic": 0.0
+    }
+  }
+}

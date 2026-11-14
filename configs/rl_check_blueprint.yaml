@@ -1,0 +1,37 @@
+extends: gen9ou_typed_token_selfplay.yaml
+
+experiment: rl_check_blueprint
+device: cpu
+
+# Limited learning diagnostic only; no preflight or replay corpus is required.
+preflight:
+  required: false
+replay_policy:
+  coef: 0.0
+
+ppo:
+  activation_checkpointing: true  # 1024-row forwards otherwise exceed 16 GB on CPU
+  init_ckpt: null
+  total_decisions: 1000000
+  batch_decisions: 8000
+  minibatch_size: 1024
+  epochs: 3
+  clip: 0.2
+  target_kl: 0.03
+  lr: 1.0e-4
+  entropy_coef: 0.01
+  entropy_coef_final: 0.003
+
+env:
+  team_pool: data/teams/pool_a
+
+league:
+  latest_frac: 0.4
+  past_frac: 0.0
+  scripted_frac: 0.6
+  scripted: [SimpleHeuristics, SimpleHeuristics, SimpleHeuristics, SimpleHeuristics, SimpleHeuristics, MaxDamage]
+  # Keep the inherited 24k latest-self refresh. At launch, seed league.past_ckpts
+  # with the same rebuilt blueprint passed as ppo.init_ckpt so self play starts at once.
+
+log:
+  dir: runs/rl_check/blueprint

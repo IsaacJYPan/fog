@@ -568,6 +568,296 @@ access and is now tracked as `data/replay_splits/p2_holdout_2000_ids.txt`:
 - Converting only those 2,000 games (`convert_replay_decisions --imputations 1 --workers 4`)
   gave 104,037 accepted rows, the brief 01 holdout row count.
 
+## 2026-11-13: limited learning-from-play check (diagnostic, smoke)
+
+Brief `docs/briefs/04-limited-rl-check.md`; branch `work/rl-check`. All numbers in this
+section are **smoke**, no gate is claimed, and no checkpoint is a candidate. Four CPU cores,
+16 GiB limit, Python 3.12.14, no GPU; pinned Showdown
+`e440c4a18385274f10c405d0b158b6a962ce6d94`. Artifacts: `docs/briefs/04-artifacts/`.
+
+Stage 0, code `c7476c95b14701cb2d57d1df68579ef3ef8b7f6a`:
+`OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 uv run --no-sync python -m fog.train --config
+configs/rl_check_scratch.yaml --trainer ppo --set ppo.total_decisions=20000
+log.dir=runs/rl_check/stage0`. Random weights, first `pool_a` team on both sides,
+MaxDamage only, four process workers with two actor threads each. Whole games/batches gave
+20,336 learner decisions. Collection 118.818 s (171.153 decisions/s); update 790.123 s
+(25.738 unique rows/s); PPO optimization 783.404 s for 61,008 processed rows
+(77.876 rows/s, exactly three epochs). Wall 913.160 s, 22.269 decisions/s end to end.
+`stage0-metrics.csv`, `stage0-summary.json`, `stage0-tail.txt`. One 1.73 s dashboard unit test
+ran during the first update; otherwise idle, timings approximate.
+
+Collection profile, `PYTHONPATH=. uv run --no-sync python
+ docs/briefs/04-artifacts/profile_collection.py` at `b33fe70`: 64 games, 1,563 learner
+ decisions, 16.508 s under cProfile. Node round trip including JSON 14.0%, observation
+ construction 24.0%, model forward 43.7%, other 18.3%. Node CPU separately 2.550 s;
+ it is not an additive wall-time category. Both belief-head forward counters were zero while
+ acting. Single-process profile of the same worker path, not a four-process wall trace.
+ `stage0-profile.json` and `stage0-profile.txt` (top 30 cumulative entries).
+
+Failed setup attempts, before any completed PPO update: the original 20k command at `9bea817`
+was OOM-killed twice (55.602 / 53.663 s; `stage0-oom*-tail.txt`). A 1,024-decision diagnostic
+also exited 137, as did an uncommitted whole-forward checkpointing experiment
+(`checkpointing-whole-forward-oom.txt`). Separate checkpointing of the backbone, shared latent,
+belief and self-belief blocks resolved the peak: the memory-fix smoke completed 1,180 decisions
+in 60.470 s (`memory-fix-smoke-*`). No initial checkpoint existed to resume these failed attempts;
+all restarted from random weights, separately from stage 1. This changes activation storage,
+not the model, losses, batches or optimizer steps. Eight recorded Showdown observations, two
+epochs: parameters, metrics and RNG bit-identical to ordinary updates at four learner threads
+(`check_checkpointing.py`, `checkpointing-equivalence.json`). Focused verification: 31 tests
+passed, lint clean (`focused-tests.txt`, `ruff.txt`). The dashboard fix preserves existing rows
+only for an explicit resume; fresh-run behavior stays unchanged.
+
+Stage 0 thread check (smoke), `a6c73bc`: `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run
+--no-sync python -m fog.train --config configs/rl_check_scratch.yaml --trainer ppo --set
+ppo.total_decisions=1024 log.dir=runs/rl_check/thread1_smoke`, 1,180 decisions, wall
+110.250 s versus 60.470 s for the corresponding four-thread memory-fix smoke. Four learner
+threads retained (`thread-comparison.json`, `thread1-smoke-*`). No further throughput tuning.
+The full-run wall rate above rounds to **22.270** decisions/s; the exact value is
+22.2699198388. Proportional budget factor = 22.2699198388 / 40 = 0.556747996;
+stage 1 budget 334,049, fallback-grid budget 167,024 each, stage 2 budget 556,748 if eligible.
+The normal 100k / 200k evaluation cadence and game counts stay unchanged; report the actual
+whole-update checkpoint counters, and also score the final checkpoint. Stage 1 starts from
+fresh random weights; neither throughput checkpoint is used as its start.
+
+Stage 1 untrained baselines (smoke), greedy, first `pool_a` team on both sides, matched
+four-game blocks. Both rows completed all 200 games with zero failures, truncations or draws.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 0 | maxdamage (smoke) | 200 | 0.160 [0.116, 0.217] | `2793b3087b54bccd915831358f813b3f3e070198` | `scratch-0-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/untrained.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-0-maxdamage.json --resume` |
+| 0 | simpleheuristics (smoke) | 200 | 0.135 [0.094, 0.189] | `2793b3087b54bccd915831358f813b3f3e070198` | `scratch-0-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/untrained.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-0-simpleheuristics.json --resume` |
+
+Stage 1 training uses the logged CLI in `commands.jsonl`. Intermediate snapshot evaluations
+run concurrently on one CPU thread; only stage 0 is used for the isolated cost breakdown.
+The final controller skips snapshots already scored by the watcher. No second training job runs.
+
+Stage 1 first checkpoint, **smoke**, still training toward the 334,049-decision budget.
+The first whole-update boundary after 100k is 106,889. Both evaluations completed 200 games,
+zero failures, draws or truncations.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 106889 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `9e29e1d0d3f502ceaa5bfa0cc2de06136e96b74c` | `scratch-106889-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_106889.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-106889-maxdamage.json --resume` |
+| 106889 | simpleheuristics (smoke) | 200 | 0.640 [0.571, 0.703] | `9e29e1d0d3f502ceaa5bfa0cc2de06136e96b74c` | `scratch-106889-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_106889.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-106889-simpleheuristics.json --resume` |
+
+First-point reading: MaxDamage 0.160 [0.116, 0.217] → 1.000 [0.981, 1.000],
++84 percentage points with non-overlapping 95% intervals, satisfying the brief’s limited
+learning criterion at this checkpoint. First observed cost = 106889 / (84 / 10) =
+12,724.881 decisions per ten points. SimpleHeuristics 0.135 → 0.640. No held-out-team or
+gate claim follows. `scratch-metrics.csv` and `scratch-tail.txt` are an in-progress copy;
+the final run will extend them. Stage 2 has not started.
+
+Stage 1 second checkpoint, **smoke**, 204,288 decisions. Still running toward 334,049.
+Each row has zero failures, draws and truncations.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 204288 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `f7c3318301140da3ec21146b3e223c0ddc691f5a` | `scratch-204288-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_204288.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-204288-maxdamage.json --resume` |
+| 204288 | simpleheuristics (smoke) | 200 | 0.905 [0.856, 0.938] | `f7c3318301140da3ec21146b3e223c0ddc691f5a` | `scratch-204288-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_204288.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-204288-simpleheuristics.json --resume` |
+
+MaxDamage stays at 200/200; SimpleHeuristics rises to 181/200. Later updates stop for
+the existing target-KL constraint (`stopped_for_kl=1`); the five updates ending at 204,288
+process 0.249–0.636 effective epochs, rather than three. Optimization throughput remains
+70–80 processed rows/s; the increased decisions/s reflects less optimization work, not a code
+speed-up. These actual counts are retained in `scratch-metrics.csv`. The first passing point
+took 4,612.136 s of training-loop collection plus updates (sum through 106,889 in that CSV).
+
+Stage 2 preparation found a second reproducible resume blocker: a warm-started run could not
+use `ppo.resume_ckpt` while retaining `ppo.init_ckpt`; removing the init key instead fails the
+saved configuration digest. The regression test failed before the fix with the explicit
+mutual-exclusion error (`warm-resume-regression.txt`). Full resume now skips the initializer
+load while retaining its config key, then restores the saved weights and optimizer. Test:
+a warm-started model is updated, saved, its initializer deleted, and its parameters and optimizer
+moments restored exactly. Ordinary initialization and PPO update math are unchanged. Updated
+focused verification: **32 passed**, lint clean (`focused-tests.txt`, `ruff.txt`). The running
+scratch job was not restarted or altered by this fix.
+
+Stage 1 completed, **smoke**, uninterrupted: 334,236 decisions versus scaled budget 334,049
+(whole-game overshoot), 41 updates, no restarts. Training command and its starting commit
+`2793b3087b54bccd915831358f813b3f3e070198` are in `scratch-summary.json` / `commands.jsonl`.
+
+| Decisions | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | ---: | --- | --- | --- | --- |
+| 302039 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-302039-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_302039.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-302039-maxdamage.json --resume` |
+| 302039 | simpleheuristics (smoke) | 200 | 0.930 [0.886, 0.958] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-302039-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_302039.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-302039-simpleheuristics.json --resume` |
+| 334236 | maxdamage (smoke) | 200 | 1.000 [0.981, 1.000] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-334236-maxdamage.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_final.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent maxdamage --out docs/briefs/04-artifacts/scratch-334236-maxdamage.json --resume` |
+| 334236 | simpleheuristics (smoke) | 200 | 0.920 [0.874, 0.950] | `ad94f0d54e54e01c5a66b743e6a8c1646bad44cc` | `scratch-334236-simpleheuristics.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a/core_v1_offensive.txt --config configs/rl_check_scratch.yaml --checkpoint scratch=runs/rl_check/scratch/checkpoints/ppo_final.pt --checkpoint-config scratch=configs/rl_check_scratch.yaml --device cpu --temperature 0 --games 200 --seed 0 --opponent simpleheuristics --out docs/briefs/04-artifacts/scratch-334236-simpleheuristics.json --resume` |
+
+Final reading: **learned** by the stated fixed-team rule, MaxDamage 16% → 100%,
++84 points with non-overlapping intervals. No fallback grid is run. SimpleHeuristics
+13.5% → 92.0% on the same team. First observed cost 12,724.881 decisions per ten points;
+full-budget cost 39790.000. Wall 7807.432 s
+(42.810 decisions/s), collection 1837.584 s,
+update 5966.054 s; 463589 optimization rows,
+1.387 effective epochs overall. Later updates stop for target KL.
+Endpoint entropy / measured policy KL / clip fraction / value loss / value explained variance /
+mean episode return: 0.45304 / 0.01359 / 0.04069 / 0.00677 / -0.05549 / 0.99457.
+All per-update diagnostics and the last 60 log lines are retained. Stage 2 is now eligible;
+no gate or held-out-team claim is made.
+
+Stage 2 initializer reconstructed, **smoke / diagnostics**, at code
+`120bd43f90949c64b3efeda7b420615ae8a28d12`. Replay-host precheck returned 200.
+The pinned 22,000-game import, single-imputation conversion, chronological split and fixed-ID
+check succeeded: training 1,000 games/52,983 rows; holdout 2,000 games/104,037 rows, exact
+fixed IDs. The 3,000- and 20,000-game manifests also match the brief-03 counts.
+`blueprint-input-check.json` and import/convert/split tail files retain the measurements.
+
+| Step (smoke) | Seconds | Command |
+| --- | ---: | --- |
+| import | 206.437 | `uv run --no-sync python -m fog.scripts.import_metamon_replays --out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600` |
+| convert | 887.392 | `uv run --no-sync python -m fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/metamon_gen9ou_r1500_decisions --imputations 1 --workers 4` |
+| split | 2.283 | `uv run --no-sync python -m fog.scripts.split_replay_manifest --manifest data/metamon_gen9ou_r1500_decisions/manifest.parquet --out runs/blueprint/split --chronological-holdout-games 2000 --train-sizes 40 1000 3000 10000 20000` |
+| bc | 2835.644 | `uv run --no-sync python -m fog.train --config configs/replay_blueprint_cpu.yaml --trainer bc --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=18 bc.streaming=true bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e18` |
+
+Run A retained its 18-epoch schedule and was intentionally stopped after epoch eight
+(exit 143 after the atomic epoch-eight state was saved, not a failed training attempt).
+`bc_best.pt` is epoch eight, holdout action CE 1.742139; this is a diagnostic, not a strength
+claim. `blueprint-build-metrics.csv`, `blueprint-build-tail.txt`, and `blueprint-build-summary.json`
+are retained. No training restart occurred. The environment was later resumed with these
+completed artifacts and checkpoint intact; stage-2 PPO had not started.
+
+The stage-2 launcher seeds `league.past_ckpts` with that same initializer as well as setting
+`ppo.init_ckpt`, so latest-self play is available immediately. Five SimpleHeuristics entries
+and one MaxDamage entry within scripted fraction 0.6 implement 50%/10%; latest self is 40%.
+The inherited 24k snapshot cadence is retained. The first saved boundary after each 200k is
+evaluated, plus the final checkpoint, with 400 games per opponent per pool. A persisted
+ten-hour deadline bounds the PPO job; the scaled decision budget remains 556,748.
+
+Stage 2 untrained-from-play blueprint baselines, **smoke**, 400 greedy pinned-Showdown
+games per row, zero failures, truncations and draws. Pool B is held out from PPO training.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 0 | pool_a | simpleheuristics (smoke) | 400 | 0.255 [0.215, 0.300] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_a.json` |
+| 0 | pool_a | maxdamage (smoke) | 400 | 0.720 [0.674, 0.762] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_a.json` |
+| 0 | pool_b | simpleheuristics (smoke) | 400 | 0.220 [0.182, 0.263] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_b.json` |
+| 0 | pool_b | maxdamage (smoke) | 400 | 0.565 [0.516, 0.613] | `66cd49c16008537e92f068b729152b2b26eaf7a7` | `blueprint-0-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/blueprint/g1000e18/checkpoints/bc_best.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-0-pool_b.json` |
+
+Stage-2 PPO started from the rebuilt `bc_best.pt`, using the generated overrides in
+`blueprint-runtime-overrides.json` and command `uv run --no-sync python -m fog.train
+--config runs/rl_check/blueprint/config.yaml --trainer ppo`. Budget 556,748 decisions,
+with the ten-hour deadline and full-state resume described above. The starting comparison
+for the improvement rule is SimpleHeuristics on pool A: 25.5% [21.5%, 30.0%].
+
+Stage-2 startup measurement, **smoke**, through 24,751 completed learner decisions:
+all three PPO epochs ran in each of the first three updates; value explained variance
+0.11878 → 0.21822 → 0.37202. First snapshot `ppo_24751.pt` is saved with its full-state
+sidecar. The rollout schedule contains both the original blueprint and that PPO snapshot
+as self-play opponents, verifying the initial league seed and inherited 24k refresh.
+`blueprint-startup-check.json` contains scheduled-game counts (including the current batch),
+not a win-rate claim. `blueprint-metrics.csv` and `blueprint-tail.txt` are in-progress copies.
+The first scored PPO point remains the saved boundary after 200k.
+
+Stage 2 first scored PPO point, **smoke**, 216,451 decisions. The 192k league snapshot
+landed at 199,807, below 200k; the next inherited 24k boundary supplies this point.
+This preserves latest-self refresh timing. Each row completed 400 games, with zero failures,
+truncations and draws. Training continues toward 556,748.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 216451 | pool_a | simpleheuristics (smoke) | 400 | 0.8400 [0.801, 0.873] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_a.json` |
+| 216451 | pool_a | maxdamage (smoke) | 400 | 0.9800 [0.961, 0.990] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_a.json` |
+| 216451 | pool_b | simpleheuristics (smoke) | 400 | 0.2075 [0.171, 0.250] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_b.json` |
+| 216451 | pool_b | maxdamage (smoke) | 400 | 0.5475 [0.499, 0.596] | `6103abf2e4ff2100ec72ebf857d24ef6f0701695` | `blueprint-216451-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_216451.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-216451-pool_b.json` |
+
+First-point reading: **improved on pool A** by the brief’s rule. SimpleHeuristics
+25.5% → 84.0%, +58.5 points, non-overlapping intervals; first observed cost
+37000.171 PPO decisions per ten points. MaxDamage 72.0% → 98.0%.
+On held-out pool B, SimpleHeuristics 22.0% → 20.75%, MaxDamage 56.5% → 54.75%;
+intervals overlap their baselines, so no clear transfer is observed at this point. This is
+the brief’s eight-team learning case, pending the remaining curve. No gate is claimed.
+
+Stage 2 second scored point, **smoke**, 414,669 decisions, the first saved inherited
+24k snapshot after 400k. All four comparisons completed with zero failures, truncations or
+draws. The PPO run continues unchanged toward 556,748; no restart has occurred.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 414669 | pool_a | simpleheuristics (smoke) | 400 | 0.9675 [0.945, 0.981] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_a.json` |
+| 414669 | pool_a | maxdamage (smoke) | 400 | 0.9875 [0.971, 0.995] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_a.json` |
+| 414669 | pool_b | simpleheuristics (smoke) | 400 | 0.2000 [0.164, 0.242] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_b.json` |
+| 414669 | pool_b | maxdamage (smoke) | 400 | 0.5450 [0.496, 0.593] | `2ca541e85678907ae8de8fffede6cbd127d62ba9` | `blueprint-414669-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_414669.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-414669-pool_b.json` |
+
+Pool A SimpleHeuristics 25.5% → 96.75%, +71.25 points with non-overlapping intervals;
+MaxDamage 72.0% → 98.75%. Pool B SimpleHeuristics 22.0% → 20.0% and MaxDamage
+56.5% → 54.5%; both intervals overlap their baselines. Thus the training-pool improvement
+persists without a clear held-out gain at this second point. This is still the brief's
+eight-team learning case, with the final evaluation pending; no gate is claimed.
+
+Stage 2 complete, **smoke**, 556,907 decisions versus scaled budget 556,748
+(whole-game overshoot), 68 updates, zero PPO restarts. The training process exited 0
+within the ten-hour cap. Its command `uv run --no-sync python -m fog.train --config runs/rl_check/blueprint/config.yaml --trainer ppo`, starting code `66cd49c16008537e92f068b729152b2b26eaf7a7`,
+ran for 24,898.840 s (6 h 54 min 59 s including controller polling), 22.367 decisions/s.
+The environment connection reconnected several times; the same learner/controller PIDs and
+uninterrupted counters persisted. No job was relaunched. `blueprint-summary.json`, the complete
+`blueprint-metrics.csv`, last 60 trainer lines and every evaluation JSON are retained.
+
+| Decisions | Pool | Opponent | Games | Win rate [95% Wilson] | Commit | JSON | Command |
+| ---: | --- | --- | ---: | --- | --- | --- | --- |
+| 556907 | pool_a | simpleheuristics (smoke) | 400 | 0.9125 [0.881, 0.936] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_a.json` |
+| 556907 | pool_a | maxdamage (smoke) | 400 | 0.9725 [0.951, 0.985] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_a.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_a --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_a.json` |
+| 556907 | pool_b | simpleheuristics (smoke) | 400 | 0.2150 [0.178, 0.258] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_b.json` |
+| 556907 | pool_b | maxdamage (smoke) | 400 | 0.5600 [0.511, 0.608] | `74da7385d50fd36880f8ea0eb262c68ac6cf33d5` | `blueprint-556907-pool_b.json` | `uv run --no-sync python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --config configs/rl_check_blueprint.yaml --checkpoint blueprint=runs/rl_check/blueprint/checkpoints/ppo_final.pt --checkpoint-config blueprint=configs/rl_check_blueprint.yaml --device cpu --temperature 0 --games 400 --seed 0 --opponent simpleheuristics --opponent maxdamage --resume --out docs/briefs/04-artifacts/blueprint-556907-pool_b.json` |
+
+Final reading: **improved on pool A** by the stated rule, SimpleHeuristics 25.5% →
+91.25%, +65.75 points with non-overlapping 95% intervals; MaxDamage 72.0% → 97.25%.
+The SimpleHeuristics endpoint is below the 96.75% intermediate point, so improvement was
+not monotonic. On held-out pool B, SimpleHeuristics 22.0% → 21.5% and MaxDamage
+56.5% → 56.0%, both intervals overlapping baseline. There is **no clear held-out gain**
+at any measured point. This is the brief's eight-team learning case, not evidence of a
+broader game-playing improvement. All comparisons are smoke; no gate or candidate is claimed.
+
+Totals: collection 4,310.608 s, update 20,567.948 s, optimization 20,383.826 s;
+1,535,686 processed optimizer rows, 2.7575 effective epochs overall. Intermediate evaluations
+shared the four-CPU allocation with PPO; their contention is included in measured wall time.
+Final entropy / policy KL / clip fraction / value loss / value explained variance /
+mean episode return: 0.71365 / 0.01315 / 0.07823 / 0.24381 / 0.52057 / 0.42500.
+The no-new-runs cost analysis follows next.
+
+Stage 3 completed, **smoke / arithmetic only, no new experiments**. Command
+`UV_CACHE_DIR=/tmp/fog-uv-cache uv run --no-sync python docs/briefs/04-artifacts/summarize_costs.py`,
+code `4790766638d0baa37e62d46102a0bfcc4aed01e0`; output `cost-breakdown.json`.
+
+| Learned comparison (smoke) | First observed gain | Decisions per ten points at first measured gain | Full-budget cost per ten points |
+| --- | --- | ---: | ---: |
+| Stage 1, same-team MaxDamage | +84 points at 106,889 | 12,724.881 | 39,790.000 |
+| Stage 2, pool A SimpleHeuristics | +58.5 points at 216,451 | 37,000.171 | 84,700.684 |
+
+Cost is learner PPO decisions / (gain in percentage points / 10). First measured points
+bound when improvement was observed, not when it first occurred. Stage-2 full-budget gain
+is +65.75 points at 556,907; the intermediate +71.25-point gain cost 58,199.158 per ten
+points. These costs exclude blueprint reconstruction (~66 minutes from the recorded build
+steps) and evaluation. No held-out cost per gain is claimed because no clear gain was measured.
+
+Stage-0 hour split projects the measured single-worker collection profile shares onto its
+118.81777 s of four-worker collection wall time. It is approximate, not a four-process trace.
+Node CPU (2.55 s) overlaps the Node round-trip/JSON and other wall categories, so is not added.
+The hypothetical rates use N/(wall - component); they are Amdahl arithmetic, not benchmarks.
+
+| Component (smoke projection) | Minutes per training hour | End-to-end decisions/s if this part alone were free |
+| --- | ---: | ---: |
+| node_roundtrip_and_json | 1.096067 | 22.684312 |
+| observation_building | 1.874337 | 22.988042 |
+| acting_forward | 3.412785 | 23.613023 |
+| other_collection | 1.423840 | 22.811246 |
+| update | 51.915719 | 165.283130 |
+| outside_training_loop | 0.277252 | 22.373304 |
+
+Measured end-to-end rates: stage 0 22.269920, stage 1 42.809979, stage 2 22.366785
+learner decisions/s. Stage-1 collection/update minutes per hour: 14.121809/45.849035;
+stage 2: 10.387491/49.563631. If all collection alone were free, stage 1 projects
+55.987359 decisions/s and stage 2 27.049773; if the update alone were free,
+181.514038 and 128.589466. The update dominates in all three runs.
+Optimization throughput is 77.875567 / 79.051466 / 75.338457 processed rows/s, with
+3 / 1.387011 / 2.757527 effective epochs. The stage-1 rate increase is principally fewer
+KL-limited optimizer rows, not a new implementation speedup. Intermediate evaluations shared
+CPU with training; use stage 0 for the approximately isolated collection breakdown.
+
+Final report `docs/briefs/04-report.md` contains all evaluation points, the stated rule readings,
+config changes, fixes and limitations. Focused tests remain 32 passed; final full lint over
+`fog tests docs/briefs/04-artifacts` is clean. No model, loss, search or PPO algorithm was
+changed. No gate, candidate checkpoint, broader held-out improvement or GPU result is claimed.
+
 ## 2026-11-12: replay trainer profile and the data-or-steps runs (ROADMAP P2)
 
 Brief `docs/briefs/03-p2-scale-measure.md`; branch `work/p2-scale-measure`, base
@@ -1061,3 +1351,43 @@ This avoids assigning update overhead to collection. JSONL phase events
 complement the trainer's unchanged CSV logging path. The CPU engineering
 check still preserves all update metrics/tensors and wrapper return values
 (`timing-equivalence.json`); CUDA timing remains unverified until stage 2.
+
+## 2026-11-14: review of brief 04
+
+The branch `work/rl-check` (head `830a7ea`) was reviewed and merged into `work/roadmap`.
+Checked in review:
+
+- Every win rate in the report's two tables against the evaluation files in
+  `docs/briefs/04-artifacts/` for the first, the peak and the last point of each run (for
+  example 32/200 and 200/200 against MaxDamage; 102/400, 387/400 and 365/400 against
+  SimpleHeuristics on `pool_a`; 86/400 on `pool_b` at the end). All 400- and 200-game files
+  show no failures or truncations.
+- The trainer changes, read line by line: `ppo.activation_checkpointing` (default off), timing
+  and diagnostic columns in the metrics, CSV history kept on resume, and a warm-started run
+  resuming from its saved state. No change to the model, the losses or the update rule.
+- After the merge with the collection work of the same day: the three new test files and the
+  trainer, probe and batch-runner tests pass (38), `ruff check fog tests` is clean, and the
+  rollout digest is unchanged (`0efd4319547a4b3b`). Commits are authored as the owner.
+- Not re-run in review: the two training runs and their evaluations.
+
+What the review takes from it, all smoke, one training seed, budgets scaled to 0.557 of the
+brief's because the CPU trainer ran at 22 decisions per second:
+
+| Question | Answer | Evidence |
+| --- | --- | --- |
+| Can this model and loop learn from play? | Yes | From random weights on one team: 0.160 to 1.000 against MaxDamage by 106,889 decisions, and 0.920 against SimpleHeuristics, which it never trained against |
+| Does play improve the human-data policy? | On the teams it trains on | 1,000-game blueprint on the eight `pool_a` teams: 0.255 to 0.9125 against SimpleHeuristics at 556,907 decisions (peak 0.9675) |
+| Does that carry to other teams? | No | `pool_b`, never trained on: 0.220 before, 0.215 after; every interval overlaps the start |
+| Does the value head learn from play? | Yes | Explained variance of the behaviour value reaches 0.5 to 0.6 in the second run (`blueprint-metrics.csv`), against a head that memorised games on replays (review of brief 03) |
+| What limits the speed? | The update on a CPU | 82.6 to 86.5% of wall time; 78 processed rows per second |
+| What does a gain cost? | 12,725 and 37,000 decisions per ten points at the first measured point | |
+
+Reading. Nothing here points at the architecture: policy and value both learn from play, and
+fast. What the second run shows is that eight teams of the same six species teach those eight
+teams. A self-play run of any size on a narrow pool will do the same, so the pool of teams,
+not the number of games, is what decides whether self-play is worth scaling. The wide pool the
+roadmap plans is the public team bank (P0.7), which is still an owner action: it has to be
+collected on a machine where the forum pages open.
+
+`pool_b` is not a held-out split of one distribution: it has other species. The result says
+play on `pool_a` neither helped nor hurt there.

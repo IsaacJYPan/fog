@@ -83,10 +83,12 @@ league:
   scripted: [MaxDamage]
 ```
 
-These are the settings of brief 04's fixed-team run, which is still in progress on the branch
-`work/rl-check`; do not merge or copy code from that branch. If a 1,024-row minibatch does not
-fit in GPU memory, halve `ppo.minibatch_size` until it does and report the value used and the
-error. Run it with `python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo`.
+These are the settings of brief 04's fixed-team run (`configs/rl_check_scratch.yaml`), with the
+GPU and collection keys added. If a 1,024-row minibatch does not fit in GPU memory, set
+`ppo.activation_checkpointing: true` (brief 04 needed it on a 16 GiB CPU machine) and say so.
+Run it with `python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo`. The
+trainer's `metrics.csv` has `collection_decisions_per_sec`, `optimization_rows_per_sec`,
+`collection_seconds`, `update_seconds` and `effective_epochs` for every update.
 
 1. Train 100,000 decisions against MaxDamage only on the first team of `data/teams/pool_a`
    (brief 04 stage 1's problem, so the learning curve can be compared with its CPU run).

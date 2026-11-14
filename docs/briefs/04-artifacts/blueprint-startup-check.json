@@ -1,0 +1,12 @@
+{
+  "smoke": true,
+  "status": "in_progress",
+  "completed_decisions": 24751,
+  "scheduled_games_by_opponent": {
+    "SimpleHeuristics": 528,
+    "runs/blueprint/g1000e18/checkpoints/bc_best.pt": 272,
+    "MaxDamage": 112,
+    "runs/rl_check/blueprint/checkpoints/ppo_24751.pt": 80
+  },
+  "note": "Scheduled games include the current unfinished batch; these are not evaluation rates."
+}

@@ -1,0 +1,27 @@
+[ppo] lr scale 1: 1 tensors at 0.0003
+[ppo] direct rollout workers=4, mode=process, actor_threads=2, persistent CPU actors + one centralized learner
+[ppo] rollout process pids=(4817, 4824, 4841, 4857)
+forward_begin 1024 True 981280
+memory backbone 1351584
+memory shared_latent 1361196
+memory belief 1724252
+memory belief 1824944
+memory policy_value 1824944
+memory backbone 1824944
+memory shared_latent 1824944
+memory self_belief 2179088
+memory self_belief 2244912
+forward_end 1024 2244912
+forward_begin 1024 True 2369780
+memory backbone 2986124
+memory shared_latent 3952084
+memory belief 4911600
+memory belief 5813020
+memory policy_value 5949340
+memory backbone 6633960
+memory shared_latent 7607860
+
+real	0m24.489s
+user	0m21.561s
+sys	0m9.970s
+exit_code=137

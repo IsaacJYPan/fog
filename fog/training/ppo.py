@@ -35,6 +35,31 @@ def _index_nested(x, idx: torch.Tensor):
     return x
 
 
+def _checkpointed_forward(agent, batch):
+    """Recompute large encoder/head blocks during backward without changing state-dict keys.
+
+    Checkpointing the entire agent retains too many recomputed activations at once. Separate
+    blocks bound that peak while preserving each block's random stream, including chain routes.
+    The temporary wrappers are removed before returning, including on a forward failure.
+    """
+    from functools import partial
+
+    from torch.utils.checkpoint import checkpoint
+
+    originals = []
+    try:
+        for name in ("backbone", "shared_latent", "belief", "self_belief"):
+            module = getattr(agent, name, None)
+            if module is not None:
+                original = module.forward
+                originals.append((module, original))
+                module.forward = partial(checkpoint, original, use_reentrant=False)
+        return agent(batch)
+    finally:
+        for module, original in originals:
+            module.forward = original
+
+
 # -inf logits are clamped to this before any arithmetic: exp(-1e4) == 0 exactly in fp32, and unlike
 # -inf it cannot produce NaN *gradients* (torch.where guards forward values only — the local backward
 # of p*log p at log p = -inf is 0 * -inf = NaN and poisons every parameter).
@@ -300,6 +325,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
     stopped_for_kl = False
     optimizer_steps = 0
+    optimizer_rows = 0
     for _ in range(epochs):
         perm = torch.randperm(n, device=device)
         for start in range(0, n, minibatch_size):
@@ -309,7 +335,10 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             mb["compute_belief_chain"] = True
             mb_adv = adv[idx]
 
-            out = agent(mb)
+            if ppo_cfg.get("activation_checkpointing", False):
+                out = _checkpointed_forward(agent, mb)
+            else:
+                out = agent(mb)
             behavior_log_probs = _behavior_log_probs(
                 out.log_probs,
                 temperature=rollout_temperature,
@@ -478,6 +507,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             log("grad_norm", grad_norm)
             optimizer.step()
             optimizer_steps += 1
+            optimizer_rows += len(idx)
 
             with torch.no_grad():
                 log("loss", loss)
@@ -516,6 +546,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
     log("stopped_for_kl", float(stopped_for_kl))
     log("optimizer_steps", optimizer_steps)
+    log("optimizer_rows", optimizer_rows)
+    log("effective_epochs", optimizer_rows / n)
     return {k: sum(v) / len(v) for k, v in metrics.items()}
 
 
@@ -636,13 +668,13 @@ class _TrainSetup:
 
         # Single-worker collection uses this model directly. Autograd is independent of mode.
         self.agent = FogAgent.from_tables(cfg).to(self.device).eval()
-        if self.ppo_cfg.get("init_ckpt") and self.ppo_cfg.get("resume_ckpt"):
-            raise ValueError("ppo.init_ckpt and ppo.resume_ckpt are mutually exclusive")
         # ppo.init_ckpt: warm-start the agent's weights from a saved state dict (resume after an
         # interrupted run, or fine-tune from a prior experiment). Optimizer moments are NOT
         # restored — set total_decisions to the REMAINING budget and entropy_coef to the schedule
         # value at the interruption point (the decay runs over this config's own total).
-        if self.ppo_cfg.get("init_ckpt"):
+        # Retain init_ckpt in the configuration digest on a full resume, but do not reload it:
+        # the saved training state below supplies both weights and optimizer moments.
+        if self.ppo_cfg.get("init_ckpt") and not self.ppo_cfg.get("resume_ckpt"):
             initial = torch.load(self.ppo_cfg["init_ckpt"], map_location=self.device)
             if self.ppo_cfg.get("init_compatible", False):
                 manifest = self.agent.load_compatible_state_dict(initial)
@@ -727,7 +759,9 @@ class _TrainSetup:
             beta=self.beta, clip_deltas=bool(self.leak_cfg.get("clip_delta", True)),
             progress_coef=float(cfg.get("reward", {}).get("progress_coef", 0.0)),
         )
-        self.dash = _Dashboard(cfg.get("log", {}).get("dir", "runs"))
+        self.dash = _Dashboard(
+            cfg.get("log", {}).get("dir", "runs"), resume=bool(self.ppo_cfg.get("resume_ckpt"))
+        )
 
         # Pool truth supplies belief labels and the hidden-information check.
         self.pool_truth = None
@@ -860,7 +894,20 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     step_cfg["ppo"] = step_ppo
 
     n_games = s.buf.n_games
+    collection_seconds = time.monotonic() - s.chunk_t0
+    update_t0 = time.monotonic()
+    # Diagnostics use the behavior values and completed episodes already in the buffer.
+    # They do not require an extra model forward or change the optimization batch.
+    games = [g for g in s.buf._games.values() if g.outcome is not None]
+    behavior_values = np.asarray([v for g in games for v in g.values], dtype=np.float32)
+    episode_return = float(np.mean([g.outcome + g.bonus for g in games]))
     batch = s.buf.to_batch(s.device)
+    returns = batch["returns"].detach().cpu().numpy()
+    return_variance = float(np.var(returns))
+    explained_variance = (
+        1.0 - float(np.var(returns - behavior_values)) / return_variance
+        if return_variance > 0 else float("nan")
+    )
     if s.bc_anchor is not None and step_ppo["kl_anchor_coef"] > 0:
         with torch.no_grad():
             batch["bc_log_probs"] = s.bc_anchor(batch).log_probs
@@ -873,6 +920,7 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         steps=int(s.leak_cfg.get("fresh_probe_steps", 4)),
     )
 
+    optimization_t0 = time.monotonic()
     metrics = ppo_update(
         s.agent,
         s.opt,
@@ -880,8 +928,14 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         step_cfg,
         replay_regularizer=s.replay_regularizer,
     )
+    optimization_seconds = time.monotonic() - optimization_t0
+    metrics["optimization_seconds"] = optimization_seconds
+    metrics["optimization_rows_per_sec"] = (
+        metrics["optimizer_rows"] / max(1e-6, optimization_seconds)
+    )
     metrics.update(probe_metrics)
     metrics.update(_belief_accuracy_vs_turn(s.agent, batch))
+    update_seconds = time.monotonic() - update_t0
     s.buf.clear()
     s.decisions_seen += n
     from fog.training.diagnostics import tera_bonus_at
@@ -910,6 +964,12 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         entropy_coef=step_ppo["entropy_coef"],
         move_entropy=metrics.get("entropy", 0.0),
         rule_prior_strength=float(rule_strength),
+        collection_seconds=collection_seconds,
+        update_seconds=update_seconds,
+        collection_decisions_per_sec=n / max(1e-6, collection_seconds),
+        update_rows_per_sec=n / max(1e-6, update_seconds),
+        value_explained_variance=explained_variance,
+        mean_episode_return=episode_return,
     )
     for name, results in recent_results.items():
         if results:

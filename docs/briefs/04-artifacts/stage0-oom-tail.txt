@@ -1,0 +1,7 @@
+[ppo] lr scale 1: 1 tensors at 0.0003
+[ppo] direct rollout workers=4, mode=process, actor_threads=2, persistent CPU actors + one centralized learner
+[ppo] rollout process pids=(2897, 2898, 2902, 2910)
+
+real	0m55.602s
+user	0m12.958s
+sys	0m6.969s

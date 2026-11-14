@@ -1,0 +1,7 @@
+{
+  "rows": 8,
+  "epochs": 2,
+  "parameters_bit_identical": true,
+  "metrics_identical": true,
+  "rng_identical": true
+}

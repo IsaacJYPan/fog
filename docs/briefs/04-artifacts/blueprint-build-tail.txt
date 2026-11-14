@@ -1,0 +1,10 @@
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=861f513b56aa, torch_threads=4)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+[bc] epoch 1/18  train_loss=3.141  eval_loss=3.125  belief=8.707  chain=2.677  value=1.005  query_p=0.186  dropped=0.000%
+[bc] epoch 2/18  train_loss=2.940  eval_loss=2.973  belief=7.150  chain=2.321  value=1.011  query_p=0.237  dropped=0.000%
+[bc] epoch 3/18  train_loss=2.760  eval_loss=2.932  belief=6.884  chain=2.236  value=1.105  query_p=0.246  dropped=0.000%
+[bc] epoch 4/18  train_loss=2.554  eval_loss=2.838  belief=6.561  chain=2.121  value=1.132  query_p=0.256  dropped=0.000%
+[bc] epoch 5/18  train_loss=2.382  eval_loss=2.815  belief=6.458  chain=2.100  value=1.163  query_p=0.264  dropped=0.000%
+[bc] epoch 6/18  train_loss=2.227  eval_loss=2.860  belief=6.700  chain=2.120  value=1.286  query_p=0.278  dropped=0.000%
+[bc] epoch 7/18  train_loss=2.089  eval_loss=2.877  belief=6.631  chain=2.097  value=1.376  query_p=0.299  dropped=0.000%
+[bc] epoch 8/18  train_loss=1.966  eval_loss=2.876  belief=6.793  chain=2.103  value=1.378  query_p=0.299  dropped=0.000%

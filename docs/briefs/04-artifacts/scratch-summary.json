@@ -1,0 +1,36 @@
+{
+  "smoke": true,
+  "status": "complete",
+  "requested_decisions": 334049,
+  "decisions": 334236,
+  "updates": 41,
+  "training_command": {
+    "command": "uv run --no-sync python -m fog.train --config configs/rl_check_scratch.yaml --trainer ppo --set ppo.total_decisions=334049 ppo.lr=3.0e-4 ppo.epochs=3 log.dir=runs/rl_check/scratch",
+    "commit": "2793b3087b54bccd915831358f813b3f3e070198",
+    "start_unix": 1794573759.9022589,
+    "seconds": 7807.4319496154785,
+    "exit_code": 0,
+    "log": "runs/rl_check/scratch/output.txt"
+  },
+  "restarts": 0,
+  "wall_seconds": 7807.4319496154785,
+  "collection_seconds": 1837.58434,
+  "update_seconds": 5966.05371,
+  "optimization_seconds": 5864.39472,
+  "optimizer_rows": 463589.0,
+  "first_passing_checkpoint": 106889,
+  "first_gain_percentage_points": 84.0,
+  "first_decisions_per_ten_points": 12724.880952380952,
+  "final_decisions_per_ten_points": 39790.0,
+  "final_diagnostics": {
+    "entropy": 0.45304,
+    "policy_kl": 0.01359,
+    "approx_kl": 0.00669,
+    "clip_frac": 0.04069,
+    "value_loss": 0.00677,
+    "value_explained_variance": -0.05549,
+    "mean_episode_return": 0.99457
+  },
+  "end_to_end_decisions_per_second": 42.80997928089035,
+  "effective_epochs": 1.3870109742816452
+}
