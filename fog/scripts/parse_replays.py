@@ -256,8 +256,17 @@ class _PerspectiveState:
                 for part in parts[4:]
             )
             self._pending_action = (4 + slot) if tera else slot
+            # Illusion/Transform can replace a Pokemon object after the snapshot. Its current
+            # move dictionary is then not the installed order represented by that snapshot.
+            # Never let an index label a different move in the encoded observation.
+            aligned = True
+            if self.private_set is not None:
+                mine = int(self._pending_obs.active_idx[0])
+                encoded = int(self._pending_obs.entity_ids[mine, 3 + slot])
+                aligned = encoded == TABLES.move_index(move_id, default=-1)
             self._pending_policy_valid = bool(
                 found
+                and aligned
                 and not called
                 and self._pending_filter_reason == "awaiting_action"
                 and self._pending_mask is not None
@@ -277,8 +286,15 @@ class _PerspectiveState:
                     found = True
                     break
             self._pending_action = 8 + slot
+            aligned = True
+            if self.private_set is not None and found:
+                active_slot = int(self._pending_obs.active_idx[0])
+                bench_slots = [i for i in range(6) if i != active_slot]
+                encoded = int(self._pending_obs.entity_ids[bench_slots[slot], 0])
+                aligned = encoded == TABLES.species_index(target_species)
             self._pending_policy_valid = bool(
                 found
+                and aligned
                 and self._pending_filter_reason == "awaiting_action"
                 and self._pending_mask is not None
                 and self._pending_mask[self._pending_action]

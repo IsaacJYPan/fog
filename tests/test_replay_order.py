@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 from collections import Counter
+from types import SimpleNamespace
 
 import numpy as np
 
 from fog.constants.tables import TABLES
 from fog.encoding.entities import L
 from fog.encoding.events import H_MY_MOVE, _OFF_MYACT
-from fog.scripts.parse_replays import parse_replay_policy_versions
+from fog.scripts.parse_replays import _PerspectiveState, parse_replay_policy_versions
 from fog.training.replay_policy_data import (
     EXACT,
     INFERRED,
@@ -145,3 +146,35 @@ def test_converted_actions_provenance_and_history_read_the_installed_order():
                     mid = obs.history_ids[-1, H_MY_MOVE]
                     assert TABLES.moves["ids"][mid] == expected[role][turn - 1]
             previous[role] = row
+
+
+def test_policy_rejects_a_move_dictionary_that_changed_since_the_snapshot():
+    state = _PerspectiveState("p1", "Alice", private_set=_revealed())
+    state.battle = SimpleNamespace(
+        active_pokemon=SimpleNamespace(moves={"earthquake": object()}), turn=1,
+    )
+    ids = np.zeros((12, 17), dtype=np.int64)
+    ids[0, 3] = TABLES.move_index("protect")
+    state._pending_obs = SimpleNamespace(entity_ids=ids, active_idx=np.array([0, 6]))
+    state._pending_mask = np.ones(14, dtype=bool)
+    state._pending_filter_reason = "awaiting_action"
+    state.record_action(["", "move", "p1a: Chomp", "Earthquake", "p2a: Pult"])
+    assert not state._pending_policy_valid
+    assert state._pending_filter_reason == "called_or_unaligned_move"
+
+
+def test_policy_rejects_a_switch_identity_that_changed_since_the_snapshot():
+    state = _PerspectiveState("p1", "Alice", private_set=_revealed())
+    active = SimpleNamespace(species="garchomp")
+    target = SimpleNamespace(species="corviknight")
+    state.battle = SimpleNamespace(
+        active_pokemon=active, team={"p1: Chomp": active, "p1: Bird": target}, turn=1,
+    )
+    ids = np.zeros((12, 17), dtype=np.int64)
+    ids[1, 0] = TABLES.species_index("zoroarkhisui")
+    state._pending_obs = SimpleNamespace(entity_ids=ids, active_idx=np.array([0, 6]))
+    state._pending_mask = np.ones(14, dtype=bool)
+    state._pending_filter_reason = "awaiting_action"
+    state.record_action(["", "switch", "p1a: Bird", "Corviknight", "100/100"])
+    assert not state._pending_policy_valid
+    assert state._pending_filter_reason == "forced_or_unaligned_switch"
