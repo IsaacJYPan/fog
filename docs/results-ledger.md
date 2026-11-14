@@ -934,3 +934,15 @@ The safer update of existing private `fog-p2-gpu-22000-20261114` was permitted: 
 bytes, filename `replay-work.bin`, old versions retained, **102.839 s** upload/version wall.
 This avoids archive expansion; its effect on hosted training remains unmeasured.
 See `prepare-22000-version2.json`, input tests and the exact scripts/status/log artifacts.
+
+### Opaque-input pilot accepted (smoke; measurements pending)
+
+The owned listing confirms versioned `fog-p2-gpu-22000-20261114` remains private and now
+contains exactly one `replay-work.bin`; its bytes are identical to the original archive.
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="600")` accepted private
+`fog-p2-g3-stop3-20261114`, version 1, code `106034c87187d351e01873ee6e99213370ab9e3c`.
+G3 remains 3,000 games / 18 epochs / batch 1,024 / CUDA, with the deliberate epoch-2 stop.
+The worker deadline begins export by 480 s, ahead of the platform cap. Initial estimate
+**4–7 min** uses the measured 97–126 s setup range; extraction/training speed remains unknown.
+Prior ended attempts used 749.868 quota seconds. Exact source, submission, input verification
+and budget are retained; no new training number is claimed.

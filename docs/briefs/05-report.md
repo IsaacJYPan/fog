@@ -4,7 +4,7 @@
 71 affected tests pass and lint is clean. The 22,000-game set is verified: 20,000 training games / 1,023,525 rows and the fixed
 2,000-game holdout / 104,037 rows. The 112,000-game conversion is running. The first hosted setup reached a Tesla T4 but failed before training because the dataset
 archive was expanded by Kaggle. The corrected retry was capped without returning training output. An opaque archive and
-graceful export deadline are tested; the next attempt is pending. GPU throughput, the new learning
+graceful export deadline are tested; a private opaque-input pilot has been accepted. GPU throughput, the new learning
 curve, P2.4's decision branch, the G100 value reading and new play rates are unmeasured. No gate
 is claimed. This checkpoint records work in progress, not completion of brief 05.
 
@@ -65,7 +65,11 @@ output. The existing private dataset was versioned with the identical archive un
 filename, retaining the old version. A new destination was rejected by automatic approval
 review; updating the existing destination was permitted.
 
-Next: run the opaque-input pilot and complete its deliberate cross-job stop/continue; choose batch size using
+The existing dataset now lists exactly one `replay-work.bin`, privacy confirmed. Pilot
+`fog-p2-g3-stop3-20261114` was accepted at `106034c`, with an internal 480-second stop
+for export and 600-second platform cap; no other GPU job is active.
+
+Next: collect the opaque-input pilot and complete its deliberate cross-job stop/continue; choose batch size using
 the specified 0.031 NLL comparison; finish G20, its value tables and CPU play smoke before G100.
 Choose G100 epochs only from measured GPU rate and remaining budget, reserving two hours.
 
