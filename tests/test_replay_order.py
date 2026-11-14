@@ -180,3 +180,27 @@ def test_policy_rejects_a_switch_identity_that_changed_since_the_snapshot():
     assert not state._pending_policy_valid
     assert state._pending_filter_reason == "forced_or_unaligned_switch"
     assert 1 not in state.tracker.my_actions
+
+
+def test_shuffled_policy_conversion_keeps_future_opponent_facts_out_of_inputs():
+    replay = _replay()
+    revealed = {**replay, "log": replay["log"].replace(
+        "|turn|3\n", "|-item|p2a: Pult|Choice Specs\n|turn|3\n",
+    )}
+    observations = []
+    targets = []
+    for source in (replay, revealed):
+        result = parse_replay_policy_versions(source, replay_id="isolation", seed=7, imputations=1)
+        row = next(r for r in result["rows"] if r["role"] == "p1" and r["turn"] == 1)
+        observations.append(row["obs"])
+        targets.append(row["belief"])
+    before, after = observations
+    for name in ("entities", "entity_ids", "field", "history", "history_ids", "history_state",
+                 "active_idx", "legality_mask", "action_features"):
+        np.testing.assert_array_equal(getattr(before, name), getattr(after, name))
+    np.testing.assert_array_equal(before.opp_revealed["tokens"], after.opp_revealed["tokens"])
+    # The later public fact is allowed in the training target, but never in turn-one inputs.
+    species = TABLES.species_index("dragapult")
+    slot = list(targets[1][:, 0]).index(species)
+    assert targets[1][slot, 1] == TABLES.item_index("choicespecs")
+    assert targets[0][slot, 1] == -1

@@ -1,0 +1,13 @@
+{
+  "smoke": true,
+  "checkpoint": "runs/order_blind/R0/checkpoints/bc_epoch1.pt",
+  "original_source_commit": "d603920",
+  "trained_epochs": 1,
+  "model_source_changed": false,
+  "strict_load": true,
+  "missing_keys": [],
+  "unexpected_keys": [],
+  "state_tensors": 376,
+  "finite_policy_and_value_on_recorded_rows": 32,
+  "command": "OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 .venv/bin/python: load_state_dict(torch.load(\"runs/order_blind/R0/checkpoints/bc_epoch1.pt\"),strict=True) in FogAgent.from_tables(load_config(\"configs/replay_blueprint_cpu.yaml\")); evaluate 32 recorded rows."
+}
