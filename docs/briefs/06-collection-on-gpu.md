@@ -49,11 +49,6 @@ CPU. The expected weak points are a CUDA start-up problem in the spawned worker 
 any tensor left on the wrong device in `fog/env/showdown_batch_runner.py` or
 `FogPlayer.complete_decision`.
 
-Check once that `--device cuda --batch 32` and `--device cpu --batch 32` play the same games:
-same number of learner decisions is not expected (sampled actions differ once
-log-probabilities differ in the last bits), so compare instead the first battle's first ten
-recorded log-probability rows from each device and report the largest absolute difference.
-
 ## 4. Stage 2: the whole training loop
 
 With a config that extends `configs/gen9ou_typed_token_selfplay.yaml`, turns off the preflight
@@ -78,9 +73,9 @@ requirement, the replay-policy term and the starting checkpoint as brief 04 did
 
 From the numbers above, no new runs: state what a week of 30 GPU-hours trains at this speed, in
 decisions and in games; which of collection and update takes more of the hour; and for the
-larger one, its split (for collection: `--batch` stats from a one-worker
-`python -m fog.eval.showdown_rollout_probe --batch B --games 128 --opponent MaxDamage`, which
-prints seconds for prepare, forward, choose and step).
+larger one, its split (for collection: run one worker in the GPU job with
+`python -m fog.eval.showdown_rollout_probe --batch B --games 128 --opponent MaxDamage --device cuda`,
+which prints seconds for prepare, forward, choose and step).
 
 ## 6. What to hand back
 

@@ -101,6 +101,7 @@ def run_probe(
     threads: int = 1,
     batch: int | None = None,
     opponent_name: str = "self",
+    device: str = "cpu",
 ) -> dict:
     import torch
 
@@ -109,6 +110,7 @@ def run_probe(
     from fog.training.direct_parallel import WorkerGame
 
     cfg = load_config(config)
+    cfg.setdefault("env", {})["actor_device"] = str(device)
     pool = load_pool(pool_dir)
     worker, agent = build_worker(cfg, pool, threads=threads)
     rng = random.Random(seed)
@@ -255,7 +257,7 @@ def main(argv: list[str] | None = None) -> None:
         "--workers", type=int, default=0,
         help="measure the trainer's worker processes instead of one in-process worker",
     )
-    parser.add_argument("--device", default="cpu", help="env.actor_device for --workers")
+    parser.add_argument("--device", default="cpu", help="env.actor_device: cpu or cuda")
     parser.add_argument(
         "--opponent", default="self",
         help="self (a frozen copy of the learner), MaxDamage, SimpleHeuristics or Random",
@@ -277,7 +279,8 @@ def main(argv: list[str] | None = None) -> None:
         )
         return
     out = run_probe(
-        args.config, args.pool, args.games, args.seed, args.threads, args.batch, args.opponent
+        args.config, args.pool, args.games, args.seed, args.threads, args.batch, args.opponent,
+        args.device,
     )
     print(
         f"games={int(out['games'])} decisions={int(out['decisions'])} "
