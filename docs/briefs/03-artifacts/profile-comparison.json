@@ -1,0 +1,11 @@
+{
+  "first_20_losses_identical": true,
+  "max_abs_loss_difference": 0.0,
+  "batch_build_share_before": 0.030256852946614784,
+  "batch_build_share_after": 0.029893918575768806,
+  "source_code_changed": false,
+  "loader_optimization_qualifies": false,
+  "prefetch_qualifies": false,
+  "thread_default_change_qualifies": false,
+  "decision": "No source-code changes: batch building <15% step and >3000 rows/s; 4-thread gain <10%. Retain five runtime threads."
+}

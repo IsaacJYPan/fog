@@ -1,0 +1,97 @@
+[
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "aeb674c60a082dcd07fd65b3a551c4e9129660b8dcb547decc4e57f930d9d36c"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_epoch1.pt",
+    "bytes": 23549643,
+    "sha256": "1b00a93b5e01c86f71091252aed6fc4278efc178c596f58c60a8556d23dc1397"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_epoch2.pt",
+    "bytes": 23549643,
+    "sha256": "df36016efb083c6a8fc0c33e5e865080f278ea1c76b62e427c05baeee4ea2439"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "29173abbf58027dbad939e0faee239b301ac68ff53bdb4632f7fbecc46be1107"
+  },
+  {
+    "path": "runs/blueprint_runner_smoke/training/checkpoints/bc_state.pt",
+    "bytes": 75660168,
+    "sha256": "27859ed4f32738744bf6e7d94919bc03d9c221f140f2ff21c6736efbb00c9eb9"
+  },
+  {
+    "path": "runs/blueprint/g1000e6/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "2126f07ad1d115d9f82d00a72a32485158cca17cda379eb90ed4d2a0746fd398"
+  },
+  {
+    "path": "runs/blueprint/g1000e6/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "5e6f16ffc5df0729b3766e3301630a3455b39a934ad7a61ee5216488e2ad51d2"
+  },
+  {
+    "path": "runs/blueprint/g1000e6/checkpoints/bc_state.pt",
+    "bytes": 75675400,
+    "sha256": "db5f46cf2b529aa1dfe89a79048c1ddd9e38081679a9640c5a709970d1e39e85"
+  },
+  {
+    "path": "runs/blueprint/g1000e6-default/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "d084233b62f9381c35c279eaff177d3070966db6fb51f420e0634715af39ec27"
+  },
+  {
+    "path": "runs/blueprint/g1000e6-default/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "5e6f16ffc5df0729b3766e3301630a3455b39a934ad7a61ee5216488e2ad51d2"
+  },
+  {
+    "path": "runs/blueprint/g1000e18/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "02dfddcf7f52bcf45b225bf87778c16b33fbb8056fd55ba0b5c3588d47405a1b"
+  },
+  {
+    "path": "runs/blueprint/g1000e18/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "a0e1418f94461c21283b7b2fbf967372c78b5fe5f6ed026cdd3ac16816db9616"
+  },
+  {
+    "path": "runs/blueprint/g1000e18/checkpoints/bc_state.pt",
+    "bytes": 75726280,
+    "sha256": "8618be1713a858502241f6635814034cfd97cbfbefe0c6ee932fd5d341107064"
+  },
+  {
+    "path": "runs/blueprint/g1000e6s2/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "1cef278b695516bc5e6d6487bfb701674a76a425952f6e6c8f2044f096802908"
+  },
+  {
+    "path": "runs/blueprint/g1000e6s2/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "b84ca29eda8ed93d257e6be43fc1dd97ec54ac84c8a4e94e5007a00e29a3632b"
+  },
+  {
+    "path": "runs/blueprint/g1000e6s2/checkpoints/bc_state.pt",
+    "bytes": 75675464,
+    "sha256": "c3ccc92b919d6019f5c87fdeb1c127a5b8f8c781700c32752cfb4900c7367472"
+  },
+  {
+    "path": "runs/blueprint/g3000e18/checkpoints/bc_best.pt",
+    "bytes": 23548503,
+    "sha256": "bed0804dc21d83b27acba45d3359c5a8ec88cb3233210c21a65d719df5a02c8a"
+  },
+  {
+    "path": "runs/blueprint/g3000e18/checkpoints/bc_final.pt",
+    "bytes": 23549265,
+    "sha256": "834ea7732963ad79e42d317d8805de4697d5074495fe475ec29dc3369fbac3a4"
+  },
+  {
+    "path": "runs/blueprint/g3000e18/checkpoints/bc_state.pt",
+    "bytes": 75726344,
+    "sha256": "967bf85599a78167d198db08dff17415008ef682af1030a32545407115a1a8d0"
+  }
+]

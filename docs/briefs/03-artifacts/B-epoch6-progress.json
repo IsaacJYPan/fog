@@ -1,0 +1,17 @@
+{
+  "status": "intermediate_snapshot_not_a_completed_schedule",
+  "recorded_utc": "2026-11-13 13:02:16 UTC",
+  "run": "B",
+  "completed_epoch": 6,
+  "requested_epochs": 18,
+  "commit": "620d6c263e77974e84a8413a3a3adef0baf25aa5",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_3000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g3000e18",
+  "last_snapshot_policy_nll": 1.6046851180453798,
+  "last_snapshot_training_policy_nll": 1.5173951277473445,
+  "last_snapshot_value_mse": 1.1916088816155366,
+  "snapshot_sources": [
+    "B-epoch6-metrics.csv",
+    "B-epoch6-tail.txt"
+  ],
+  "note": "B remains running; these are not its final metrics or a replacement for the legacy six-epoch completed schedule."
+}

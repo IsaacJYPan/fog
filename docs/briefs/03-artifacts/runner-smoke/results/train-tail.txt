@@ -1,0 +1,24 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+BC dataset: train=24278 decision rows; holdout=5230 rows  (config_hash=5d1573f9e77d, torch_threads=5)
+[bc] baseline  loss=3.630  belief=13.072  chain=3.985
+[bc] epoch 1/2  train_loss=3.262  eval_loss=3.095  belief=8.359  chain=2.595  value=0.999  query_p=0.174  dropped=0.000%
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+BC dataset: train=24278 decision rows; holdout=5230 rows  (config_hash=5d1573f9e77d, torch_threads=5)
+[bc] resume: completed epoch 1/2
+[bc] baseline  loss=3.630  belief=13.072  chain=3.985
+[bc] epoch 2/2  train_loss=3.026  eval_loss=3.054  belief=8.159  chain=2.553  value=1.018  query_p=0.174  dropped=0.000%
+[bc] done -> runs/blueprint_runner_smoke/training/checkpoints/bc_final.pt  (best eval epoch=2, loss=2.009)
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+BC dataset: train=24278 decision rows; holdout=5230 rows  (config_hash=5d1573f9e77d, torch_threads=5)
+[bc] baseline  loss=3.630  belief=13.072  chain=3.985
+[bc] epoch 1/2  train_loss=3.262  eval_loss=3.095  belief=8.359  chain=2.595  value=0.999  query_p=0.174  dropped=0.000%
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cpu bc.manifest=runs/blueprint_runner_smoke/split/train_manifest.parquet bc.holdout_manifest=runs/blueprint_runner_smoke/split/holdout_manifest.parquet bc.batch_size=256 bc.epochs=2 bc.resume=true bc.selection_metric=action_ce bc.streaming=true bc.early_stopping_patience=0 log.dir=runs/blueprint_runner_smoke/training
+BC dataset: train=24278 decision rows; holdout=5230 rows  (config_hash=5d1573f9e77d, torch_threads=5)
+[bc] resume: completed epoch 1/2
+[bc] baseline  loss=3.630  belief=13.072  chain=3.985
+[bc] epoch 2/2  train_loss=3.026  eval_loss=3.054  belief=8.159  chain=2.553  value=1.018  query_p=0.174  dropped=0.000%
+[bc] done -> runs/blueprint_runner_smoke/training/checkpoints/bc_final.pt  (best eval epoch=2, loss=2.009)

@@ -1,0 +1,5 @@
+dropped_newer_games=0
+skipped_train_size=100000 available_training_games=20000
+runs/blueprint/split_timing/train_manifest.parquet
+runs/blueprint/split_timing/holdout_manifest.parquet
+runs/blueprint/split_timing/train_20000.parquet

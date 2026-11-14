@@ -1,108 +1,149 @@
 # Replay blueprint scale run
 
-**Not run on a hosted GPU.** CPU engineering tests pass; real-data timing and the
-brief 01 holdout recovery are blocked in the development environment. Do not treat
-the generated-data smoke as a learning curve or a GPU speed estimate.
+**Not run on a hosted GPU.** GPU speed and memory use are unmeasured. Three likely
+setup failures: **Rust** — a full `uv sync` builds `poke-engine`; cell 3 avoids that
+unused engine. **CUDA** — enable the GPU, restart the notebook if needed, and keep
+its supplied CUDA PyTorch using cell 3. **Downloads** — enable Internet; the run
+needs `huggingface.co` and `us.aws.cdn.hf.co`. If access is refused, retain the error
+and use a machine with access.
 
-Use a private GPU notebook with **GPU accelerator and Internet enabled**, enough
-disk for raw replays, compressed decision shards and checkpoints, and a way to
-retain its working directory between sessions. Keep this private repository and
-outputs private. On Kaggle use `/kaggle/working`, not read-only `/kaggle/input`, for
-the active run. Repository access must use the owner's configured authentication;
-if cloning is unavailable, attach a private checkout archive at the same commit.
+1. Create a Kaggle Python notebook. Turn **GPU accelerator** and **Internet** on.
+   Use writable `/kaggle/working`, and plan how to save the run before the session
+   limit. Allow **25 GB free disk** for environment, working data and a resume
+   archive; the arithmetic below is a projection, not a hosted storage test.
 
-Paste these cells (the setup follows `notebooks/kaggle_training.ipynb` and
-`docs/kaggle-setup.md`; it preserves the notebook's CUDA PyTorch):
+2. Paste this cell in a fresh session. The repository is public; no login is needed.
 
-```python
-!git clone https://github.com/IsaacJYPan/fog /kaggle/working/fog
-%cd /kaggle/working/fog
-!git checkout ddd83638f8068a85c740eb90029e8201cd98279c
-!git submodule update --init --recursive
-!python -m pip install uv
-!npm --prefix server/pokemon-showdown ci --ignore-scripts
-!npm --prefix server/pokemon-showdown run build
-!python -m fog.scripts.kaggle_setup
-!.venv/bin/python -c "import torch; assert torch.cuda.is_available(); print(torch.__version__, torch.cuda.get_device_name(0))"
-```
+   ```bash
+   %%bash
+   set -e
+   git clone https://github.com/IsaacJYPan/fog /kaggle/working/fog
+   cd /kaggle/working/fog
+   git checkout 0e937552905ac93b36938f2d765384651d7b2185
+   git submodule update --init --recursive
+   ```
 
-**Required before the scale command:** restore
-`data/replay_splits/p2_holdout_2000_ids.txt`. It is deliberately absent from this
-commit: the dataset host refused access, so the exact IDs could not be recovered.
-On a machine allowed to reach the dataset, reproduce brief 02 section 4's pinned
-22,000-game import, conversion and chronological split. Verify all its row counts
-and the holdout dates before exporting the IDs; do not create a fresh scale holdout.
-Then run from that checkout, and copy the resulting text file into this notebook:
+3. Install and check the runtime. This reuses the repository's Kaggle installer,
+   preserving preinstalled CUDA PyTorch and omitting the unused Rust engine.
+   Hosted installation time is unmeasured.
 
-```sh
-uv run --no-sync python - <<'PY'
-from pathlib import Path
-import polars as pl
-m = pl.read_parquet('runs/blueprint/split/holdout_manifest.parquet')
-assert len(m) == 2000 and m['n_rows'].sum() == 104037
-assert m['id'].n_unique() == 2000
-p = Path('data/replay_splits/p2_holdout_2000_ids.txt')
-p.parent.mkdir(parents=True, exist_ok=True)
-p.write_text('\n'.join(sorted(m['id'].to_list())) + '\n')
-PY
-```
+   ```bash
+   %%bash
+   set -e
+   cd /kaggle/working/fog
+   python -m pip install uv
+   if ! command -v node >/dev/null || ! command -v npm >/dev/null; then
+     apt-get update
+     apt-get install -y nodejs npm
+   fi
+   npm --prefix server/pokemon-showdown ci --ignore-scripts
+   npm --prefix server/pokemon-showdown run build
+   python -m fog.scripts.kaggle_setup
+   .venv/bin/python -c 'import torch; assert torch.cuda.is_available(); print(torch.__version__, torch.cuda.get_device_name(0))'
+   test -f data/replay_splits/p2_holdout_2000_ids.txt
+   df -h /kaggle/working
+   ```
 
-Launch, or rerun after interruption, with this **same command**:
+4. Start the run with this cell. Keep this command unchanged for every restart.
+   The fixed 2,000 holdout IDs are included. The runner imports the pinned public
+   corpus, converts it, excludes newer games outside that holdout, and trains on
+   all eligible games. If fewer than 100,000 remain, it prints the actual count.
 
-```sh
-uv run --no-sync python -m fog.scripts.run_replay_blueprint \
-  --games 112000 --work-dir runs/blueprint_scale --device cuda --batch-size 1024 --epochs 6
-```
+   ```bash
+   %%bash
+   set -e
+   cd /kaggle/working/fog
+   uv run --no-sync python -m fog.scripts.run_replay_blueprint \
+     --games 112000 --work-dir runs/blueprint_scale --device cuda --batch-size 1024 --epochs 6
+   ```
 
-The runner imports the pinned revision (rating ≥1500, from 2024-02-01), converts,
-splits using exactly the fixed IDs, reports excluded newer games, and trains on all
-eligible games. It also saves nested 20k/100k subsets when enough games exist. Fewer
-than 100k eligible games is reported, not hidden. Completed steps are skipped;
-training restores optimizer, schedule, scaler, RNG, metrics and best model from the
-last complete epoch. An incomplete epoch is repeated. Keep epochs, batch size,
-recipe and holdout unchanged; incompatible reruns fail. Scoring currently runs on
-CPU, including when training uses CUDA.
+   CPU measurements on four cores give these **projections**, assuming similar
+   game lengths and acceptance rates; hosted CPU/network speeds can differ:
 
-When a session ends, save **all of `runs/blueprint_scale/`**, including `run.json`,
-`raw/`, `decisions/`, `split/`, `training/checkpoints/bc_state.pt` and `output/`, to
-private persistent storage. Download/archive this folder before the notebook's
-temporary storage disappears. Restore it writable in the next session, recreate
-the environment at the same commit, restore the same holdout file, and rerun the
-same command. Runner-owned shard paths are rebased if the restored work directory
-moves. Retain external local-source files too if using `--parquet` for a smoke.
-Hard termination can lose the unfinished attempt's timing, which the summary says.
+   | Step | Arithmetic for 112,000 imported games | Projected time / disk |
+   | --- | --- | --- |
+   | Import | `194 s × 112/22`; raw `209,345,372 bytes × 112/22` | 16.5 min; 1.07 GB raw |
+   | Convert | `(2,225 − 758 paused) s × 112/22`; `608,097,221 bytes × 112/22` | 2.07 h active; 3.10 GB decisions |
+   | Download cache | `481,396,201 bytes × 112/22` | about 2.45 GB; grows in whole shard chunks |
+   | Split | `2.155 s × 112/22`; manifests `700,419 bytes × 112/22 + 364,134/20,000 × 100,000` including the extra 100k subset | about 11 s; 5.4 MB manifests |
+   | Six training passes | `1,023,525/20,000 × 100,000 = 5,117,625 rows`; `6 × rows / {194.04 profile, 157.29–187.06 full runs} rows/s` | 44.0–54.2 h CPU reference at batch 256; GPU time unknown; about 0.29 GB checkpoints/results |
+   | CPU batch preparation alone | `6 × 5,117,625 / 7,100.46 rows/s` | 1.20 h feed floor; **not a GPU runtime estimate** |
 
-For review download **`runs/blueprint_scale/results/`** in full: `bc_best.pt`,
-`metrics.csv`, `holdout-best.json`, `holdout-untrained.json`, `train-tail.txt` and
-`run-summary.txt`. That results folder is sufficient for review, not for resume.
+   Conversion's active time still includes initial CPU contention. The training
+   reference excludes evaluation and file writes; throughput at batch 1,024 is
+   unmeasured. Validation averaged `154.66–179.06 s` per pass in R/A/S/B. Six
+   validations plus initial validation/startup/writes give
+   `6 × {154.66, 179.06} + {172.37, 209.31} = 1,100–1,284 s` CPU overhead.
+   The startup range uses R/A/S because B's original attempt wall is unknown;
+   A's time includes its deliberate restart. Two standalone reports took
+   `213.02–262.13 s`, used as a proxy for the runner's best/untrained CPU scoring.
+   Adding import, conversion, split and those overheads projects to
+   **46.7–57.0 h total on CPU**. This planning range includes observed runtime
+   variation; it is not a guaranteed bound. GPU validation time is unknown. Raw data, decisions and
+   cache project to `1.07 + 3.10 + 2.45 = 6.61 GB`; the measured local environment
+   is 5.68 GB. Six-epoch checkpoints and the results copy measured
+   `264,071,026 + 23,548,503 = 287,619,529 bytes`. Keeping a second work copy for
+   resume gives `5.68 + 2 × (6.61 + 0.288 + 0.0054) ≈ 19.5 GB` before source
+   and logs, hence 25 GB headroom. Split time scales interpreter startup too;
+   cache and storage projections are approximate. Backup creation and handback download time are unmeasured. Inputs and
+   exact arithmetic:
+   [scale-projections.json](briefs/03-artifacts/scale-projections.json).
 
-No new real-corpus runtime projection is available: stage 1 could not load its
-manifest. Brief 01's measurements were 28.5 minutes to convert 22k games on four
-cores (about 2.4 hours for 112k if linear), training 112–141 rows/s, and about 140 s
-per 104,037-row holdout score. These are **historical context**, not stage 1 or GPU
-measurements. After data recovery, run
-`python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-before`
-on an idle CPU; estimate training seconds as `6 * training_rows / measured_rows_per_second`
-and add evaluation/checkpoint time. Measure CUDA speed before budgeting a session.
+5. To survive a session ending, follow these four steps:
 
-CPU fallback (22k imported includes the fixed 2k holdout, leaving 20k training games):
+   - Interrupt the running cell while there is time to save. Archive **the entire
+     work directory**, then download the archive from the notebook's Files pane:
+
+     ```bash
+     %%bash
+     tar -czf /kaggle/working/blueprint_scale-resume.tar.gz \
+       -C /kaggle/working/fog/runs blueprint_scale
+     ```
+
+   - Upload that archive as a private Kaggle dataset. In the next session enable
+     Internet and the same GPU accelerator type/count, repeat cells 2–3 at the
+     same commit, and attach the saved dataset with **Add Input**.
+   - Restore it into the writable checkout with this Python cell:
+
+     ```python
+     from pathlib import Path
+     import subprocess
+     archive = next(Path("/kaggle/input").rglob("blueprint_scale-resume.tar.gz"))
+     destination = Path("/kaggle/working/fog/runs")
+     destination.mkdir(exist_ok=True)
+     subprocess.run(["tar", "-xzf", str(archive), "-C", str(destination)], check=True)
+     ```
+
+   - Run cell 4 again. Completed stages are skipped; training prints
+     `[bc] resume: completed epoch N/6`. It restores the last complete epoch and
+     repeats an unfinished epoch. An unfinished conversion is rerun. Retain all of
+     `raw/`, `cache/`, `decisions/`,
+     `split/`, `training/`, `output/` and `run.json`; `results/` alone cannot resume.
+
+6. When the runner prints `Results:`, download and hand back exactly
+   **`/kaggle/working/fog/runs/blueprint_scale/results/`**, including `bc_best.pt`,
+   `metrics.csv`, both holdout JSONs, `train-tail.txt` and `run-summary.txt`.
+   Package that one folder with this cell, then download
+   `blueprint_scale-results.tar.gz` from the Files pane. Keep the larger resume
+   archive separately.
+
+   ```bash
+   %%bash
+   tar -czf /kaggle/working/blueprint_scale-results.tar.gz \
+     -C /kaggle/working/fog/runs/blueprint_scale results
+   ```
+
+For a CPU-only machine, clone the same commit, run `uv sync --locked --extra dev`,
+build Showdown as in cell 3, and run from the repository root:
 
 ```sh
 uv run --no-sync python -m fog.scripts.run_replay_blueprint \
   --games 22000 --work-dir runs/blueprint_cpu20k --device cpu --batch-size 1024 --epochs 6
 ```
 
-Its stage 1 projection is unmeasured. At the historical brief 01 rate, six passes
-over 1,023,525 training rows would take about 12–15 hours **for training alone**,
-with a different batch size here; this is only a planning estimate. Importing only
-20k may omit some fixed holdout IDs and is therefore insufficient. Measure first.
-
-Likely notebook failures: (1) `uv sync` may fail building Rust `poke-engine`; the
-notebook installer above omits that unused engine for this replay-only pipeline;
-for the complete locked environment install Rust first and retry `uv sync --locked
---extra dev`. (2) If the CUDA assertion fails, enable GPU/restart and use the
-notebook's supported PyTorch/CUDA build; do not silently fall back to CPU. (3)
-Downloads require `huggingface.co` and its redirect/CDN hosts, including
-`us.aws.cdn.hf.co`; enable Internet and use an environment where those hosts are
-permitted. Retain error output and fix access through that environment's settings.
-None of these hosted-notebook steps has been verified here.
+The 22,000-game import retains the fixed holdout and leaves 20,000 training games.
+Import/conversion project to `194 s + 1,467 s = 27.7 min` active; six training passes
+are `6 × 1,023,525 / {194.04, 157.29} = 8.79–10.85 h` at measured batch-256
+speeds. Adding the overhead above gives about **9.6–11.7 h total**. Actual
+batch-1,024 throughput is unmeasured.
+The recipe file keeps batch 256; only the runner command requests 1,024.

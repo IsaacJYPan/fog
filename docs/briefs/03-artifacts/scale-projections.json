@@ -1,0 +1,126 @@
+{
+  "sources": {
+    "R": "docs/briefs/03-artifacts/R-summary.json",
+    "A": "docs/briefs/03-artifacts/A-summary.json",
+    "S": "docs/briefs/03-artifacts/S-summary.json",
+    "B": "docs/briefs/03-artifacts/B-summary.json",
+    "profile": "docs/briefs/03-artifacts/profile-after-timing.json",
+    "import": "docs/briefs/03-artifacts/continuation-import-wall.txt",
+    "conversion": "docs/briefs/03-artifacts/convert-wall.txt",
+    "conversion_pause": "docs/briefs/03-artifacts/conversion-pauses.txt",
+    "disk": "docs/briefs/03-artifacts/disk-bytes.json",
+    "split": "docs/briefs/03-artifacts/split-timing.json",
+    "checkpoint_storage": "docs/briefs/03-artifacts/checkpoint-storage.json",
+    "training_rows": "docs/briefs/03-artifacts/verify-split-output.txt"
+  },
+  "inputs": {
+    "measured_imported_games": 22000,
+    "scale_imported_games": 112000,
+    "scale_eligible_training_games_assumed": 100000,
+    "measured_training_games": 20000,
+    "measured_training_rows": 1023525,
+    "epochs": 6,
+    "measured_batch_size": 256,
+    "runner_batch_size": 1024,
+    "import_seconds": 194,
+    "conversion_wall_seconds": 2225,
+    "conversion_diagnostic_pause_seconds": 758,
+    "fixed_split_seconds": 2.154822686999978,
+    "observed_training_rows_per_second": {
+      "R": 187.06045301203753,
+      "A": 157.72479858558913,
+      "S": 158.58713344957806,
+      "B": 157.28838173290174,
+      "profile": 194.03996113140155
+    },
+    "batch_only_rows_per_second": 7100.464694857515,
+    "mean_validation_seconds_by_run": {
+      "R": 154.66223293949997,
+      "A": 172.19417904005525,
+      "S": 170.22690416000054,
+      "B": 179.06015897544555
+    },
+    "known_outside_epoch_seconds_by_run": {
+      "R": 172.37174261600103,
+      "A": 209.30552878500384,
+      "S": 198.98761782099973
+    },
+    "two_report_seconds_by_run": {
+      "R": 218.62111969500074,
+      "A": 256.3651200860004,
+      "S": 262.1305718750009,
+      "B": 213.01956158500025
+    },
+    "measured_disk_bytes": {
+      "raw": 209345372,
+      "decisions": 608097221,
+      "cache": 481396201,
+      "environment": 5675620035
+    },
+    "fixed_split_manifest_bytes": 700419,
+    "train_20000_manifest_bytes": 364134,
+    "six_epoch_checkpoint_and_results_copy_bytes": 287619529
+  },
+  "arithmetic": {
+    "scale_ratio": "112000/22000",
+    "scale_training_rows": "1023525/20000*100000",
+    "import_seconds": "194*scale_ratio",
+    "conversion_active_seconds": "(2225-758)*scale_ratio",
+    "split_seconds": "measured_fixed_split_seconds*scale_ratio (includes scaling interpreter startup)",
+    "scale_training_hours": "6*scale_training_rows/each observed training rate/3600; min,max",
+    "cpu_20k_training_hours": "6*1023525/each observed training rate/3600; min,max",
+    "nontraining_seconds": "low/high = 6*min/max(mean_validation_seconds_by_run) + min/max(known_outside_epoch_seconds_by_run) + min/max(two_report_seconds_by_run)",
+    "full_pipeline_hours": "training_hours + (import_active + conversion_active + split + nontraining_seconds)/3600; pair low with low, high with high",
+    "batch_feed_floor_hours": "6*scale_training_rows/batch_only_rows_per_second/3600",
+    "scale_data_disk_bytes": "each measured raw/decisions/cache byte count*scale_ratio",
+    "scale_manifest_bytes": "fixed_split_manifest_bytes*scale_ratio + train_20000_manifest_bytes/20000*100000 for an additional train_100000 copy",
+    "environment_work_and_archive_bytes": "environment + 2*(scale(raw+decisions+cache) + six_epoch_checkpoint_and_results_copy_bytes + scale_manifest_bytes)"
+  },
+  "projections": {
+    "scale_training_rows": 5117625.0,
+    "scale_import_seconds": 987.6363636363636,
+    "scale_conversion_active_seconds": 7468.363636363636,
+    "scale_split_seconds": 10.970006406545343,
+    "cpu_scale_training_observed_range_hours": [
+      43.95679606544556,
+      54.22762257471822
+    ],
+    "cpu_20k_training_observed_range_hours": [
+      8.79135921308911,
+      10.845524514943644
+    ],
+    "cpu_nontraining_observed_range_seconds": [
+      1313.364701838001,
+      1545.797054512678
+    ],
+    "cpu_22k_full_pipeline_observed_range_hours": [
+      9.618170192123833,
+      11.736900036387999
+    ],
+    "cpu_scale_full_pipeline_observed_range_hours": [
+      46.6735557066246,
+      57.00894675830689
+    ],
+    "cpu_batch_feed_floor_hours": 1.2012418012834243,
+    "scale_disk_bytes": {
+      "raw": 1065758257.4545454,
+      "decisions": 3095767670.5454545,
+      "cache": 2450744296.0
+    },
+    "scale_raw_decisions_cache_bytes": 6612270224.0,
+    "scale_manifest_bytes": 5386439.454545455,
+    "six_epoch_checkpoint_and_results_copy_bytes": 287619529,
+    "environment_work_and_archive_bytes": 19486172419.90909,
+    "suggested_available_disk_bytes": 25000000000
+  },
+  "limits": [
+    "Projections assume similar replay lengths/filtering yield on four CPU cores; hosted CPU and network speeds differ. These are planning references, not guaranteed bounds.",
+    "758 seconds of diagnostic pause are excluded from conversion wall; remaining active time includes initial CPU contention.",
+    "Batch256 throughput is measured; actual runner batch1024 throughput, GPU throughput/memory and GPU validation are unmeasured. CPU batch-feed floor is not a GPU runtime estimate.",
+    "B resumed after an environment stop with unknown original attempt wall. Its per-epoch training/validation timers are complete; startup/outside-epoch range uses only R/A/S known totals. A outside-epoch time includes its deliberate restart.",
+    "Two best/final CPU reports are a proxy for runner best/untrained scoring. Component min/max overheads are combined conservatively; no full scale pipeline was timed.",
+    "Split extrapolation scales interpreter startup as well as work. Manifest storage adds a projected train100000 duplicate.",
+    "Cache grows in whole downloaded shard chunks; linear disk scaling is approximate. Disk units are decimal bytes/GB.",
+    "25GB headroom includes the measured local environment plus two data/checkpoint/manifest copies and leaves room for source/logs. Hosted storage/install, archive creation and handback download time were not tested."
+  ]
+}

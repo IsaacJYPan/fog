@@ -1,0 +1,26 @@
+{
+  "run": "B",
+  "recorded_utc": "2026-11-13 10:51:05 UTC",
+  "training_rows": 156597,
+  "holdout_rows": 104037,
+  "epochs": 18,
+  "profile_source": "profile-after-timing.json",
+  "recent_runtime_sources": [
+    "A-summary.json",
+    "S-summary.json"
+  ],
+  "stage1_training_rows_per_second": 194.03996113140155,
+  "slower_recent_training_rows_per_second": 157.72479858558913,
+  "seconds_per_validation_pass": 172.19417904005525,
+  "holdout_passes": 19,
+  "standalone_reports_seconds": 262.1305718750009,
+  "stage1_reference_training_seconds": 14526.626286485282,
+  "stage1_reference_total_seconds": 18060.44626012133,
+  "recent_runtime_training_seconds": 17871.292436429467,
+  "recent_runtime_total_seconds": 21405.112410065518,
+  "projected_total_with_reports_seconds": 21405.112410065518,
+  "eight_hour_limit_seconds": 28800,
+  "skip_B": false,
+  "formula": "epochs*training_rows/rate + (epochs+1)*max(A,S validation seconds) + max(A,S two-report seconds); budget uses slower measured training rate",
+  "decision": "run B: both stage1 reference and conservative recent-rate budget are below eight hours"
+}

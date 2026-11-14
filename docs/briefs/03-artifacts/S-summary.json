@@ -1,0 +1,130 @@
+{
+  "run": "S",
+  "commit": "aed6f68253302b51e878c4e6e86665594e158fd1",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=6 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e6s2 seed=20261202",
+  "training_games": 1000,
+  "training_rows": 52983,
+  "epochs": 6,
+  "optimizer_steps": 1286,
+  "training_wall_seconds": 3224.912673417999,
+  "standalone_report_seconds": {
+    "best": 131.9551775309992,
+    "final": 130.1753943440017
+  },
+  "training_plus_reports_wall_seconds": 3487.043245293,
+  "epoch_training_seconds": [
+    329.84700939400136,
+    334.7258261229981,
+    334.74668379799914,
+    332.3858887039969,
+    336.3786263519978,
+    336.4795962660028
+  ],
+  "epoch_validation_seconds": [
+    168.59977781999987,
+    173.26817786500033,
+    168.83522432700192,
+    168.27320398600204,
+    172.30146852100006,
+    170.08357244099898
+  ],
+  "mean_validation_seconds": 170.22690416000054,
+  "aggregate_training_rows_per_second": 158.58713344957806,
+  "wall_outside_epoch_timers_seconds": 198.98761782099973,
+  "best_epoch": 6,
+  "final_epoch_policy_nll": 1.7949744585617153,
+  "final_epoch_policy_top1": 0.34524705721997484,
+  "best_report_policy_nll": 1.7949783031462527,
+  "best_report_policy_top1": 0.3452457660534136,
+  "best_report_value_mse": 1.2378855598674945,
+  "final_report_policy_nll": 1.7949783031462527,
+  "final_report_policy_top1": 0.3452457660534136,
+  "final_training_policy_nll": 1.7180564198518167,
+  "final_policy_holdout_minus_train_nll": 0.07691803870989866,
+  "minimum_epoch_value_mse": 0.9996323138273464,
+  "final_epoch_value_mse": 1.2378855574909837,
+  "earlier_metrics_unchanged_after_interruption": null,
+  "policy_value_curves": [
+    {
+      "epoch": 0,
+      "training_policy_nll": null,
+      "holdout_policy_nll": 2.3062756881605515,
+      "holdout_policy_top1": 0.11103454086143337,
+      "holdout_value_mse": 1.0003493492534574,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 1,
+      "training_policy_nll": 2.102341048064967,
+      "holdout_policy_nll": 2.0448623694505175,
+      "holdout_policy_top1": 0.2039839948358155,
+      "holdout_value_mse": 0.9996323138273464,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 2,
+      "training_policy_nll": 2.0006698177361333,
+      "holdout_policy_nll": 1.9622369588188555,
+      "holdout_policy_top1": 0.2583143852507675,
+      "holdout_value_mse": 1.067199074734004,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 3,
+      "training_policy_nll": 1.9153350509468743,
+      "holdout_policy_nll": 1.9107586307044018,
+      "holdout_policy_top1": 0.2952938279448557,
+      "holdout_value_mse": 1.0913180856021931,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 4,
+      "training_policy_nll": 1.8269905543189184,
+      "holdout_policy_nll": 1.8361390644801578,
+      "holdout_policy_top1": 0.3287226093643896,
+      "holdout_value_mse": 1.0725896018715384,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 5,
+      "training_policy_nll": 1.7575130742338212,
+      "holdout_policy_nll": 1.8049353547007199,
+      "holdout_policy_top1": 0.34033449126374793,
+      "holdout_value_mse": 1.1559531849920701,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 6,
+      "training_policy_nll": 1.7180564198518167,
+      "holdout_policy_nll": 1.7949744585617153,
+      "holdout_policy_top1": 0.34524705721997484,
+      "holdout_value_mse": 1.2378855574909837,
+      "constant_zero_value_mse": 1.0
+    }
+  ],
+  "sources": {
+    "metrics": "S-metrics.csv",
+    "state": "runs/blueprint/g1000e6s2/checkpoints/bc_state.pt",
+    "execution": "S-execution.json",
+    "reports": [
+      "S-holdout-best.json",
+      "S-holdout-final.json"
+    ]
+  },
+  "formulas": {
+    "epoch_training_seconds": "training_rows/train_rows_per_second",
+    "epoch_validation_seconds": "seconds_per_epoch - epoch_training_seconds",
+    "aggregate_training_rows_per_second": "epochs*training_rows/sum(epoch_training_seconds)",
+    "wall_outside_epoch_timers_seconds": "training_wall_seconds - sum(seconds_per_epoch)",
+    "final_policy_holdout_minus_train_nll": "last eval_action_ce - last primary_train_action_ce"
+  },
+  "controlled_comparison_with_R": {
+    "reference_source": "R-summary.json",
+    "final_policy_nll_S_minus_R": -0.015515575467418996,
+    "absolute_final_policy_nll_difference": 0.015515575467418996,
+    "twice_absolute_final_policy_nll_difference": 0.031031150934837992,
+    "final_policy_top1_S_minus_R": 0.004763206027765643,
+    "noise_method": "difference between the two six-epoch seeds; per brief, effects smaller than about twice this NLL difference are not claimed",
+    "formula": "S final epoch metric minus R final epoch metric"
+  }
+}

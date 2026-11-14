@@ -1,0 +1,196 @@
+{
+  "current_cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "current_affinity_cpu_count": 5,
+  "current_cpu_max": "400000 100000",
+  "current_platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "current_torch_source": "profile-after-timing.json",
+  "current_torch_version": "2.13.0+cu130",
+  "current_threads": 5,
+  "historical_cpu_source": "docs/briefs/01-report.md opening paragraph and docs/briefs/01-artifacts/stage3c-timing.txt",
+  "historical_cpu_description": "4 vCPU Intel Xeon @ 2.10 GHz",
+  "historical_torch_version": "2.13.0+cu130",
+  "historical_actual_torch_threads": "not recorded",
+  "interpretation": "Resume/selection preserve the complete six-epoch trajectory on this CPU. Original/current trainers match all 20 real-input losses and all 376 tensors, both in the shared observer process and in fresh children with NumPy/Torch initially absent. The tested startup-order difference does not change these updates. The historical trajectory remains different: CPU platforms differ and the historical thread count is unrecorded; specific hardware/thread/kernel contributions cannot be isolated here.",
+  "source_comparison_command": [
+    "git",
+    "diff",
+    "41cc7b9..4f9d75c",
+    "--",
+    "fog/models",
+    "fog/constants",
+    "fog/encoding",
+    "fog/training/dataset.py",
+    "fog/training/losses.py",
+    "configs/replay_blueprint_cpu.yaml"
+  ],
+  "source_comparison_diff_empty": true,
+  "source_comparison_diff": "",
+  "epoch0_comparison": {
+    "historical_source": "docs/briefs/01-artifacts/g1000-metrics.csv epoch0",
+    "current_source": "R-metrics.csv epoch0 (live runs/blueprint/g1000e6/metrics.csv before completion)",
+    "all_comparable_eval_metrics": {
+      "eval_action_ce": {
+        "brief01": 2.306466882050124,
+        "R": 2.306466876962614,
+        "R_minus_brief01": -5.087509968859649e-09
+      },
+      "eval_action_top1": {
+        "brief01": 0.10004880731076896,
+        "R": 0.10004880731076896,
+        "R_minus_brief01": 0.0
+      },
+      "eval_action_top1_lift": {
+        "brief01": 1.0430364464626267,
+        "R": 1.0430364464626267,
+        "R_minus_brief01": 0.0
+      },
+      "eval_avg_legal_actions": {
+        "brief01": 10.462220177417205,
+        "R": 10.462220177417205,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief": {
+        "brief01": 13.159648310447558,
+        "R": 13.159648287970848,
+        "R_minus_brief01": -2.247671027078013e-08
+      },
+      "eval_belief_chain": {
+        "brief01": 3.992781334655208,
+        "R": 3.992781309797452,
+        "R_minus_brief01": -2.48577558537022e-08
+      },
+      "eval_belief_chain_confident98_rate": {
+        "brief01": 0.02216042192309232,
+        "R": 0.02216042192309232,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_chain_dropped_count": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_chain_dropped_rate": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_chain_last_confident98_rate": {
+        "brief01": 0.016043523344097563,
+        "R": 0.016043523344097563,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_chain_last_count": {
+        "brief01": 25080.0,
+        "R": 25080.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_chain_last_true_prob": {
+        "brief01": 0.046444268943465754,
+        "R": 0.0464442689921011,
+        "R_minus_brief01": 4.863534575072492e-11
+      },
+      "eval_belief_chain_true_prob": {
+        "brief01": 0.05383504198227931,
+        "R": 0.053835041988796246,
+        "R_minus_brief01": 6.51693976561063e-12
+      },
+      "eval_belief_chain_valid_count": {
+        "brief01": 95384.0,
+        "R": 95384.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_dropped_count": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_dropped_rate": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_belief_valid_count": {
+        "brief01": 716171.0,
+        "R": 716171.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_imputation_0_correct_count": {
+        "brief01": 10403.0,
+        "R": 10403.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_imputation_0_nll": {
+        "brief01": 2.3064943811195757,
+        "R": 2.306494376130214,
+        "R_minus_brief01": -4.989361812590687e-09
+      },
+      "eval_imputation_0_nll_sum_count": {
+        "brief01": 239831.59224319458,
+        "R": 239831.59172439575,
+        "R_minus_brief01": -0.000518798828125
+      },
+      "eval_imputation_0_top1": {
+        "brief01": 0.10004712399380657,
+        "R": 0.10004712399380657,
+        "R_minus_brief01": 0.0
+      },
+      "eval_imputation_0_valid_count": {
+        "brief01": 103981.0,
+        "R": 103981.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_imputation_nll_range": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_imputation_top1_range": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_loss": {
+        "brief01": 3.670681717023684,
+        "R": 3.670681710863672,
+        "R_minus_brief01": -6.1600120560001415e-09
+      },
+      "eval_loss_relative": {
+        "brief01": 1.0,
+        "R": 1.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_policy_total_count": {
+        "brief01": 104037.0,
+        "R": 104037.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_policy_valid_count": {
+        "brief01": 103981.0,
+        "R": 103981.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_reconstruction_retention": {
+        "brief01": 0.0,
+        "R": 0.0,
+        "R_minus_brief01": 0.0
+      },
+      "eval_value": {
+        "brief01": 1.013186658976307,
+        "R": 1.0131866595515164,
+        "R_minus_brief01": 5.752094356381576e-10
+      }
+    },
+    "maximum_absolute_normalized_delta_excluding_sum_counts": 2.48577558537022e-08
+  },
+  "flag_off_full_repeat_summary": "R-default-summary.json",
+  "flag_off_all_non_timing_metrics_identical": true,
+  "flag_off_all_final_tensors_identical": true,
+  "real20_source": "real20-comparison.json",
+  "original_current_first20_losses_identical": true,
+  "original_current_after20_tensors_identical": true,
+  "profile_loss_equality_source": "real20-profile-equality.json",
+  "fresh_process_control_source": "fresh-real20/comparison.json",
+  "fresh_process_numpy_and_torch_initially_absent": true,
+  "fresh_original_current_first20_losses_identical": true,
+  "fresh_original_current_after20_tensors_identical": true
+}

@@ -1,0 +1,28 @@
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e18
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=861f513b56aa, torch_threads=5)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+[bc] epoch 1/18  train_loss=3.141  eval_loss=3.137  belief=8.617  chain=2.659  value=1.033  query_p=0.186  dropped=0.000%
+[bc] epoch 2/18  train_loss=2.943  eval_loss=2.971  belief=7.120  chain=2.312  value=1.015  query_p=0.235  dropped=0.000%
+
+$ /workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e18
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=861f513b56aa, torch_threads=5)
+[bc] resume: completed epoch 2/18
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+[bc] epoch 3/18  train_loss=2.767  eval_loss=2.939  belief=6.888  chain=2.233  value=1.124  query_p=0.247  dropped=0.000%
+[bc] epoch 4/18  train_loss=2.561  eval_loss=2.838  belief=6.512  chain=2.117  value=1.131  query_p=0.255  dropped=0.000%
+[bc] epoch 5/18  train_loss=2.399  eval_loss=2.810  belief=6.514  chain=2.102  value=1.129  query_p=0.269  dropped=0.000%
+[bc] epoch 6/18  train_loss=2.249  eval_loss=2.892  belief=6.750  chain=2.123  value=1.342  query_p=0.277  dropped=0.000%
+[bc] epoch 7/18  train_loss=2.111  eval_loss=2.853  belief=6.590  chain=2.086  value=1.331  query_p=0.297  dropped=0.000%
+[bc] epoch 8/18  train_loss=1.987  eval_loss=2.881  belief=6.934  chain=2.124  value=1.383  query_p=0.294  dropped=0.000%
+[bc] epoch 9/18  train_loss=1.891  eval_loss=2.952  belief=6.956  chain=2.114  value=1.459  query_p=0.303  dropped=0.000%
+[bc] epoch 10/18  train_loss=1.806  eval_loss=2.985  belief=7.111  chain=2.129  value=1.502  query_p=0.310  dropped=0.000%
+[bc] epoch 11/18  train_loss=1.731  eval_loss=2.999  belief=7.257  chain=2.142  value=1.535  query_p=0.313  dropped=0.000%
+[bc] epoch 12/18  train_loss=1.669  eval_loss=3.073  belief=7.390  chain=2.145  value=1.546  query_p=0.308  dropped=0.000%
+[bc] epoch 13/18  train_loss=1.612  eval_loss=3.098  belief=7.482  chain=2.163  value=1.561  query_p=0.315  dropped=0.000%
+[bc] epoch 14/18  train_loss=1.566  eval_loss=3.133  belief=7.547  chain=2.164  value=1.565  query_p=0.318  dropped=0.000%
+[bc] epoch 15/18  train_loss=1.528  eval_loss=3.196  belief=7.650  chain=2.174  value=1.593  query_p=0.318  dropped=0.000%
+[bc] epoch 16/18  train_loss=1.495  eval_loss=3.215  belief=7.744  chain=2.186  value=1.593  query_p=0.319  dropped=0.000%
+[bc] epoch 17/18  train_loss=1.474  eval_loss=3.230  belief=7.780  chain=2.192  value=1.598  query_p=0.323  dropped=0.000%
+[bc] epoch 18/18  train_loss=1.454  eval_loss=3.247  belief=7.818  chain=2.195  value=1.596  query_p=0.319  dropped=0.000%
+[bc] done -> runs/blueprint/g1000e18/checkpoints/bc_final.pt  (best eval epoch=8, loss=1.736)

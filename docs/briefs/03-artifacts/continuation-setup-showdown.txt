@@ -1,0 +1,19 @@
+npm warn Unknown project config "NODE_OPTIONS". This will stop working in the next major version of npm.
+npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported
+npm warn deprecated npmlog@6.0.2: This package is no longer supported.
+npm warn deprecated gauge@4.0.4: This package is no longer supported.
+npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.
+npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs
+
+added 355 packages in 5s
+npm notice
+npm notice New major version of npm available! 11.9.0 -> 12.2.2
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2
+npm notice To update run: npm install -g npm@12.2.2
+npm notice
+npm warn Unknown project config "NODE_OPTIONS". This will stop working in the next major version of npm.
+
+> pokemon-showdown@0.11.10 build
+> node build
+
+config.js does not exist. Creating one with default settings...

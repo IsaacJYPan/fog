@@ -1,0 +1,251 @@
+{
+  "run": "B",
+  "commit": "620d6c263e77974e84a8413a3a3adef0baf25aa5",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_3000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=18 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g3000e18",
+  "training_games": 3000,
+  "training_rows": 156597,
+  "epochs": 18,
+  "optimizer_steps": 11431,
+  "training_wall_seconds": null,
+  "training_wall_timing_status": "unknown original attempt wall and exit; do not count the UTC gap or downtime as training",
+  "known_resumed_attempt_wall_seconds": 3028.582033958,
+  "original_completed_epoch_timers_lower_bound_seconds": 18121.329808917,
+  "training_wall_lower_bound_seconds": 21149.911842874997,
+  "standalone_report_seconds": {
+    "best": 108.99228126800017,
+    "final": 104.02728031700008
+  },
+  "training_plus_reports_wall_seconds": null,
+  "training_plus_reports_wall_lower_bound_seconds": 21362.931404459996,
+  "unknown_attempt_count": 1,
+  "completed_epoch_timers_total_seconds": 21143.961498268996,
+  "epoch_training_seconds": [
+    993.6020524779997,
+    1005.3937186609984,
+    1011.2185175539997,
+    1036.9386751860002,
+    1025.3436739009994,
+    1020.838887619997,
+    1015.8625275209998,
+    1015.359298752999,
+    1023.2382669330035,
+    1027.6498265389964,
+    1027.4912729589996,
+    1032.1321918879985,
+    1026.6248921629958,
+    1052.0121094649949,
+    1053.146614735997,
+    872.403475635,
+    837.9843300209998,
+    843.6383046979998
+  ],
+  "epoch_validation_seconds": [
+    172.030969853,
+    172.86871485899962,
+    184.40744614000153,
+    187.5876096719985,
+    190.02139357000124,
+    180.20189063300495,
+    177.50621205300547,
+    180.48906580900086,
+    188.23775039299665,
+    178.42070801299997,
+    186.67345804999786,
+    178.86789820800186,
+    194.08306294700014,
+    192.48336128700612,
+    190.59774107300473,
+    154.353676962,
+    156.4206949710001,
+    157.83120706500006
+  ],
+  "mean_validation_seconds": 179.06015897544555,
+  "aggregate_training_rows_per_second": 157.28838173290174,
+  "wall_outside_epoch_timers_seconds": null,
+  "best_epoch": 8,
+  "final_epoch_policy_nll": 1.8425492999318487,
+  "final_epoch_policy_top1": 0.4264884677954068,
+  "best_report_policy_nll": 1.5790178625761455,
+  "best_report_policy_top1": 0.44080168492320715,
+  "best_report_value_mse": 1.3780044139488663,
+  "final_report_policy_nll": 1.842540122916291,
+  "final_report_policy_top1": 0.4264913782325617,
+  "final_training_policy_nll": 1.0627513144394864,
+  "final_policy_holdout_minus_train_nll": 0.7797979854923622,
+  "minimum_epoch_value_mse": 0.9565520444353067,
+  "final_epoch_value_mse": 1.6011739945509322,
+  "earlier_metrics_unchanged_after_environment_resume": true,
+  "policy_value_curves": [
+    {
+      "epoch": 0,
+      "training_policy_nll": null,
+      "holdout_policy_nll": 2.306466876962614,
+      "holdout_policy_top1": 0.10004880731076896,
+      "holdout_value_mse": 1.0131866595515164,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 1,
+      "training_policy_nll": 2.0317413994152056,
+      "holdout_policy_nll": 1.9125335935304837,
+      "holdout_policy_top1": 0.2915105958434184,
+      "holdout_value_mse": 0.9839963526089693,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 2,
+      "training_policy_nll": 1.8036232153722307,
+      "holdout_policy_nll": 1.7497562150263024,
+      "holdout_policy_top1": 0.36956442163957587,
+      "holdout_value_mse": 0.9574759475135511,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 3,
+      "training_policy_nll": 1.6880527010968656,
+      "holdout_policy_nll": 1.6779990577504795,
+      "holdout_policy_top1": 0.39762527937965275,
+      "holdout_value_mse": 1.0146945668859328,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 4,
+      "training_policy_nll": 1.6195625055749543,
+      "holdout_policy_nll": 1.6523891984668755,
+      "holdout_policy_top1": 0.40646628229936177,
+      "holdout_value_mse": 0.9565520444353067,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 5,
+      "training_policy_nll": 1.5657273665080715,
+      "holdout_policy_nll": 1.6111937903138283,
+      "holdout_policy_top1": 0.42170332646143516,
+      "holdout_value_mse": 0.9862440097361449,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 6,
+      "training_policy_nll": 1.5173951277473445,
+      "holdout_policy_nll": 1.6046851180453798,
+      "holdout_policy_top1": 0.42278255558359273,
+      "holdout_value_mse": 1.1916088816155366,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 7,
+      "training_policy_nll": 1.472723431184275,
+      "holdout_policy_nll": 1.615247686710875,
+      "holdout_policy_top1": 0.4330455108567393,
+      "holdout_value_mse": 1.2534601515181945,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 8,
+      "training_policy_nll": 1.425355260317824,
+      "holdout_policy_nll": 1.579014746195896,
+      "holdout_policy_top1": 0.44079956442995116,
+      "holdout_value_mse": 1.3780044141479149,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 9,
+      "training_policy_nll": 1.3781914411241567,
+      "holdout_policy_nll": 1.584348237230214,
+      "holdout_policy_top1": 0.4409423138299363,
+      "holdout_value_mse": 1.4194049411349063,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 10,
+      "training_policy_nll": 1.3291737361385974,
+      "holdout_policy_nll": 1.5805326731549172,
+      "holdout_policy_top1": 0.4423773079746461,
+      "holdout_value_mse": 1.50086341219988,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 11,
+      "training_policy_nll": 1.2809079241352055,
+      "holdout_policy_nll": 1.6213421825936956,
+      "holdout_policy_top1": 0.44029756597822584,
+      "holdout_value_mse": 1.517084455610597,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 12,
+      "training_policy_nll": 1.2341337582487657,
+      "holdout_policy_nll": 1.6401690344431124,
+      "holdout_policy_top1": 0.4397210120975462,
+      "holdout_value_mse": 1.523491200727567,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 13,
+      "training_policy_nll": 1.1926731063880263,
+      "holdout_policy_nll": 1.7002059122863347,
+      "holdout_policy_top1": 0.43336255539648044,
+      "holdout_value_mse": 1.5649176005956222,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 14,
+      "training_policy_nll": 1.1552874720653745,
+      "holdout_policy_nll": 1.7184211889446708,
+      "holdout_policy_top1": 0.43349104131021027,
+      "holdout_value_mse": 1.5720646453537166,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 15,
+      "training_policy_nll": 1.1230852986732993,
+      "holdout_policy_nll": 1.7794626391809294,
+      "holdout_policy_top1": 0.4307195789597753,
+      "holdout_value_mse": 1.5708050085850502,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 16,
+      "training_policy_nll": 1.0961293173471793,
+      "holdout_policy_nll": 1.7862030012537884,
+      "holdout_policy_top1": 0.4301078298070874,
+      "holdout_value_mse": 1.5920048458421578,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 17,
+      "training_policy_nll": 1.0775152191537722,
+      "holdout_policy_nll": 1.8321840970774728,
+      "holdout_policy_top1": 0.42804665932593505,
+      "holdout_value_mse": 1.5882050427273617,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 18,
+      "training_policy_nll": 1.0627513144394864,
+      "holdout_policy_nll": 1.8425492999318487,
+      "holdout_policy_top1": 0.4264884677954068,
+      "holdout_value_mse": 1.6011739945509322,
+      "constant_zero_value_mse": 1.0
+    }
+  ],
+  "sources": {
+    "metrics": "B-metrics.csv",
+    "state": "runs/blueprint/g3000e18/checkpoints/bc_state.pt",
+    "execution": "B-execution.json",
+    "resume_evidence": "B-environment-resume.json",
+    "original_attempt_lower_bound": "B-environment-resume-prefix.csv, sum seconds_per_epoch for epochs1\u201315",
+    "reports": [
+      "B-holdout-best.json",
+      "B-holdout-final.json"
+    ]
+  },
+  "formulas": {
+    "epoch_training_seconds": "156597/train_rows_per_second",
+    "epoch_validation_seconds": "seconds_per_epoch - epoch_training_seconds",
+    "aggregate_training_rows_per_second": "18*156597/sum(epoch_training_seconds)",
+    "training_wall_lower_bound_seconds": "sum known complete attempt walls + original completed epoch timer sum; no downtime",
+    "training_plus_reports_wall_lower_bound_seconds": "training_wall_lower_bound_seconds + sum standalone report walls",
+    "final_policy_holdout_minus_train_nll": "last eval_action_ce - last primary_train_action_ce"
+  }
+}

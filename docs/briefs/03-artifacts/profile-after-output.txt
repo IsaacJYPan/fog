@@ -1,0 +1,50 @@
+{
+  "warmup_steps": 20,
+  "measured_steps": 200,
+  "measured_rows": 49444,
+  "seconds_per_step": {
+    "batch_build": 0.03808686884500503,
+    "model_forward": 0.5891906612549951,
+    "backward_optimizer": 0.6347096077350034,
+    "other": 0.012080320015008965,
+    "total": 1.2740674578500124,
+    "belief_heads": 0.2696414922150302
+  },
+  "belief_share_of_model_forward": 0.4576472608046522,
+  "training_rows_per_second": 194.03996113140155,
+  "first_20_training_losses": [
+    3.7176108360290527,
+    3.7209677696228027,
+    3.658639907836914,
+    3.6672189235687256,
+    3.629140853881836,
+    3.6460916996002197,
+    3.597897529602051,
+    3.5662946701049805,
+    3.6037933826446533,
+    3.5303897857666016,
+    3.519587278366089,
+    3.5668399333953857,
+    3.4788646697998047,
+    3.465700626373291,
+    3.4775166511535645,
+    3.408133029937744,
+    3.4530394077301025,
+    3.4024391174316406,
+    3.4144206047058105,
+    3.342712879180908
+  ],
+  "torch_threads": 5,
+  "batch_building_only": {
+    "steps": 200,
+    "rows": 49599,
+    "seconds": 6.985317458999816,
+    "rows_per_second": 7100.464694857515
+  },
+  "device": "cpu",
+  "torch_version": "2.13.0+cu130",
+  "cuda_available": false,
+  "manifest": "runs/blueprint/split/train_1000.parquet",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -m fog.scripts.profile_replay_training --out runs/blueprint/profile-after",
+  "commit": "2a608ad88843f037d8655dd4a8ff297a928dd117"
+}

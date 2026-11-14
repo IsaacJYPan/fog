@@ -1,0 +1,6 @@
+{
+  "real_update_source": "real20-comparison.json",
+  "profile_source": "profile-after-timing.json",
+  "comparison": "first_20_losses_after == first_20_training_losses",
+  "all_20_losses_identical_to_profile": true
+}

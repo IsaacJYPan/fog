@@ -1,0 +1,19 @@
+{
+  "run": "R-default",
+  "recorded_utc": "2026-11-13 05:41:47 UTC",
+  "purpose": "required repeat of R with bc.resume and bc.selection_metric omitted; default loss checkpoint selection",
+  "profile_source": "docs/briefs/03-artifacts/profile-after-timing.json",
+  "evaluation_source": "R-summary.json epoch_validation_seconds",
+  "report_source": "R-summary.json standalone_report_seconds",
+  "training_rows": 52983,
+  "holdout_rows": 104037,
+  "epochs": 6,
+  "training_rows_per_second": 194.03996113140155,
+  "projected_training_seconds": 1638.3120164857344,
+  "projected_seconds_per_holdout_pass": 154.66223293949997,
+  "holdout_passes": 7,
+  "projected_reports_seconds": 218.62111969500074,
+  "projected_training_plus_evaluation_seconds": 2720.947647062234,
+  "projected_total_with_reports_seconds": 2939.5687667572347,
+  "formula": "epochs*training_rows/profile_training_rows_per_second + (epochs+1)*R_mean_validation_seconds + R_best_and_final_report_seconds"
+}

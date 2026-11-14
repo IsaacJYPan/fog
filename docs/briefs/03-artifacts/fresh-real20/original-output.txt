@@ -1,0 +1,102 @@
+$ /workspace/fog-roadmap/.venv/bin/python /workspace/fog-roadmap/docs/briefs/03-artifacts/check_fresh_updates.py --child original
+BC dataset: train=52983 decision rows; holdout=104037 rows  (config_hash=855d22a7593f)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.993
+{
+  "status": "completed_20_update_diagnostic_not_a_full_run",
+  "target": "original",
+  "target_bc_commit": "f0dc3d16eeecab8fbad545aed93af2b2de20a2c4",
+  "current_shared_code_commit": "0e937552905ac93b36938f2d765384651d7b2185",
+  "command": "/workspace/fog-roadmap/.venv/bin/python /workspace/fog-roadmap/docs/briefs/03-artifacts/check_fresh_updates.py --child original",
+  "target_initialization": "git show + importlib execution of original bc.py",
+  "original_source_command": "git show f0dc3d16eeecab8fbad545aed93af2b2de20a2c4:fog/training/bc.py",
+  "modules_present_before_target_loading": {
+    "numpy": false,
+    "torch": false
+  },
+  "modules_present_after_target_loading_before_helper": {
+    "numpy": true,
+    "torch": true
+  },
+  "relevant_module_insertion_order_after_target_before_helper": [
+    {
+      "index": 105,
+      "module": "fresh_original_bc"
+    },
+    {
+      "index": 171,
+      "module": "numpy._core._multiarray_umath"
+    },
+    {
+      "index": 198,
+      "module": "numpy._core"
+    },
+    {
+      "index": 216,
+      "module": "numpy.linalg"
+    },
+    {
+      "index": 245,
+      "module": "numpy"
+    },
+    {
+      "index": 273,
+      "module": "torch._C"
+    },
+    {
+      "index": 290,
+      "module": "torch.storage"
+    },
+    {
+      "index": 1183,
+      "module": "torch"
+    }
+  ],
+  "insertion_order_limit": "sys.modules insertion order, not module completion times",
+  "torch_version": "2.13.0+cu130",
+  "numpy_version": "2.5.1",
+  "torch_threads": 5,
+  "torch_interop_threads": 5,
+  "losses": [
+    3.7176108360290527,
+    3.7209677696228027,
+    3.658639907836914,
+    3.6672189235687256,
+    3.629140853881836,
+    3.6460916996002197,
+    3.597897529602051,
+    3.5662946701049805,
+    3.6037933826446533,
+    3.5303897857666016,
+    3.519587278366089,
+    3.5668399333953857,
+    3.4788646697998047,
+    3.465700626373291,
+    3.4775166511535645,
+    3.408133029937744,
+    3.4530394077301025,
+    3.4024391174316406,
+    3.4144206047058105,
+    3.342712879180908
+  ],
+  "state_dict_tensor_count": 376,
+  "state_dict_path": "runs/blueprint/original-current-real20/fresh-process/original-state.pt",
+  "run": {
+    "config": "configs/replay_blueprint_cpu.yaml",
+    "overrides": [
+      "bc.manifest=runs/blueprint/split/train_1000.parquet",
+      "bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet",
+      "bc.streaming=true",
+      "bc.epochs=6",
+      "bc.early_stopping_patience=0",
+      "log.dir=runs/blueprint/original-current-real20/fresh_original"
+    ],
+    "new_options_absent": [
+      "bc.resume",
+      "bc.selection_metric",
+      "bc.torch_threads"
+    ],
+    "torch_threads": 5,
+    "wall_seconds_including_full_baseline_evaluation": 220.87352423899938
+  },
+  "wall_seconds": 222.57859317999828
+}

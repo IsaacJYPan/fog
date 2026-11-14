@@ -1,0 +1,117 @@
+{
+  "run": "R",
+  "commit": "247a1e1a0f3833c1ec321ee91f62e2f16e236894",
+  "command": "/workspace/fog-roadmap/.venv/bin/python -u -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.streaming=true bc.epochs=6 bc.early_stopping_patience=0 bc.selection_metric=action_ce bc.resume=true log.dir=runs/blueprint/g1000e6",
+  "training_games": 1000,
+  "training_rows": 52983,
+  "epochs": 6,
+  "optimizer_steps": 1286,
+  "training_wall_seconds": 2799.7850532930006,
+  "standalone_report_seconds": {
+    "best": 108.49386590100039,
+    "final": 110.12725379400035
+  },
+  "training_plus_reports_wall_seconds": 3018.4061729880013,
+  "epoch_training_seconds": [
+    281.25865230399995,
+    283.5683000479994,
+    284.1643004530006,
+    281.7125330250001,
+    281.98725117400045,
+    286.7488760359993
+  ],
+  "epoch_validation_seconds": [
+    156.06778931699955,
+    156.70271907000006,
+    153.63622790999943,
+    152.83524826400026,
+    155.35085627599983,
+    153.3805568000007
+  ],
+  "mean_validation_seconds": 154.66223293949997,
+  "aggregate_training_rows_per_second": 187.06045301203753,
+  "wall_outside_epoch_timers_seconds": 172.37174261600103,
+  "best_epoch": 6,
+  "final_epoch_policy_nll": 1.8104900340291343,
+  "final_epoch_policy_top1": 0.3404838511922092,
+  "best_report_policy_nll": 1.810495609767996,
+  "best_report_policy_top1": 0.3404756638231985,
+  "final_report_policy_nll": 1.810495609767996,
+  "final_report_policy_top1": 0.3404756638231985,
+  "final_training_policy_nll": 1.7376904397566721,
+  "minimum_epoch_value_mse": 0.9938272327995069,
+  "final_epoch_value_mse": 1.2470203358916876,
+  "policy_value_curves": [
+    {
+      "epoch": 0,
+      "training_policy_nll": null,
+      "holdout_policy_nll": 2.306466876962614,
+      "holdout_policy_top1": 0.10004880731076896,
+      "holdout_value_mse": 1.0131866595515164,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 1,
+      "training_policy_nll": 2.106545815140151,
+      "holdout_policy_nll": 2.0454219067107138,
+      "holdout_policy_top1": 0.19805395754494673,
+      "holdout_value_mse": 1.004760897575973,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 2,
+      "training_policy_nll": 2.011730386091584,
+      "holdout_policy_nll": 1.9920271611703415,
+      "holdout_policy_top1": 0.22522335437041227,
+      "holdout_value_mse": 0.9938272327995069,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 3,
+      "training_policy_nll": 1.9381418378986301,
+      "holdout_policy_nll": 1.9169852547860664,
+      "holdout_policy_top1": 0.28503414420097406,
+      "holdout_value_mse": 1.1414943801586948,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 4,
+      "training_policy_nll": 1.8428396499861412,
+      "holdout_policy_nll": 1.8498714174910758,
+      "holdout_policy_top1": 0.3247297829783338,
+      "holdout_value_mse": 1.1091466621483277,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 5,
+      "training_policy_nll": 1.7765498621273925,
+      "holdout_policy_nll": 1.8256123984095027,
+      "holdout_policy_top1": 0.3339513867481328,
+      "holdout_value_mse": 1.1431498499975241,
+      "constant_zero_value_mse": 1.0
+    },
+    {
+      "epoch": 6,
+      "training_policy_nll": 1.7376904397566721,
+      "holdout_policy_nll": 1.8104900340291343,
+      "holdout_policy_top1": 0.3404838511922092,
+      "holdout_value_mse": 1.2470203358916876,
+      "constant_zero_value_mse": 1.0
+    }
+  ],
+  "sources": {
+    "metrics": "R-metrics.csv",
+    "state": "runs/blueprint/g1000e6/checkpoints/bc_state.pt",
+    "execution": "R-execution.json",
+    "reports": [
+      "R-holdout-best.json",
+      "R-holdout-final.json"
+    ]
+  },
+  "formulas": {
+    "epoch_training_seconds": "training_rows/train_rows_per_second",
+    "epoch_validation_seconds": "seconds_per_epoch - epoch_training_seconds",
+    "aggregate_training_rows_per_second": "epochs*training_rows/sum(epoch_training_seconds)",
+    "wall_outside_epoch_timers_seconds": "training_wall_seconds - sum(seconds_per_epoch)"
+  }
+}
