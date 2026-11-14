@@ -1422,3 +1422,11 @@ sums all trainer-attempt walls so retries cannot inflate end-to-end speed. CPU c
 15 focused tests pass; timing hooks preserve update metrics and model tensors with CUDA
 calls mocked; Ruff and byte compilation pass (`endtoend-*` artifacts). GPU PPO speed,
 end-to-end decisions/games per second and batched-path learning remain unmeasured.
+
+Timing equivalence was repeated with `PYTHONPATH=.` and an explicit print of the PPO
+module path, ensuring the shared virtual environment used this worktree's newly merged
+trainer. Command: `PYTHONPATH=. OMP_NUM_THREADS=1 MKL_NUM_THREADS=1
+/workspace/fog/.venv/bin/python -c 'import runpy; import fog.training.ppo as ppo;
+print(ppo.__file__); runpy.run_path("docs/briefs/06-artifacts/check_timing.py",
+run_name="__main__")'`. All update metrics and tensors remain identical;
+`endtoend-timing-equivalence.txt` records the current source path and CPU-only result.
