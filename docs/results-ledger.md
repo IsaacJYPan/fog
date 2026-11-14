@@ -1133,3 +1133,20 @@ The unmeasured brief-06 PPO session is planned at 30–60 minutes afterward: ear
 realistic result about 14:50 UTC, planning window 15:00–15:30. These are projections,
 not completion measurements or promises; a GPU-path failure would change them.
 `G20-to-brief06-eta.json` records the inputs and the owner's preservation choice.
+
+### Independent brief-06 runtime supersedes the planned handoff
+
+Concurrent updates on `work/collect-gpu` revealed an owner-selected separate single-T4
+runtime, independent of G20's Kaggle allocation. Its first CUDA probe failed from host
+RAM exhaustion while transferring unused probe buffers; no throughput is claimed for that
+failure. The other worker added a tested counters-only probe result, retaining real buffer
+transfer in PPO, and reserved a bounded replacement through 10:21 UTC. The combined
+brief-06 allocation upper bound is 2.959444 GPU-hours. Its raw results and current source
+are on `work/collect-gpu`; `brief06-independent-runtime.json` records the scheduling facts.
+
+The prepared duplicate private job was never submitted and is retired. G20 continues
+unchanged. The prior 14:50 brief-06 estimate applied to waiting for G20's Kaggle slot;
+this independent run may produce its full-loop result earlier, but PPO timing is still
+pending. G100 still waits for completed G20 curve/value reports and its CPU play smoke.
+G20's quota delta contains the earlier shared-account collection work, so its own session
+wall upper bound, not that contaminated delta, must drive G100's overhead projection.
