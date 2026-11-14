@@ -185,9 +185,11 @@ def main():
         # A continuation may attach the preceding private job's saved work archive.
         resumes = list(Path("/kaggle/input").rglob("replay-resume.tar.gz"))
         assert len(resumes) <= 1
+        assert not SPEC.get("resume_kernel_slug") or resumes, "saved work archive is required"
         if resumes:
             with tarfile.open(resumes[0]) as archive:
                 archive.extractall(WORK, filter="data")
+            assert (WORK / SPEC["run"] / "checkpoints/bc_state.pt").is_file()
         env = {**os.environ, "PYTHONPATH": str(ROOT)}
         with (OUTPUT / "train.txt").open("w") as log:
             status = run_worker([str(ROOT / ".venv/bin/python"), str(Path(__file__).resolve()),
