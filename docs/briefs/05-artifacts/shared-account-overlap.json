@@ -1,0 +1,12 @@
+{
+  "status": "smoke scheduling deviation",
+  "g20_started_at_utc": "2026-11-14T04:27:10.343000+00:00",
+  "other_collection_started_at_utc": "2026-11-14T04:12:48.377000+00:00",
+  "other_collection_observed_terminal_at_utc": "2026-11-14T04:38:30.967967+00:00",
+  "overlap_upper_seconds": 680.624967,
+  "source": "work/collect-gpu at a6b2fad38353f61bc0cd54843f1ad6a9b2889a51, collection-attempt2/collection-observed-terminal.json and authenticated owned-job listing",
+  "cause": "G20 submission checked the preceding replay job but not every active account job",
+  "user_priority": "Finish G20, then measure brief 06; keep G100 pending",
+  "next_launch_rule": "Authenticated list of all owned RUNNING/QUEUED jobs must be empty before submitting a GPU job",
+  "quota_note": "Global account quota includes separate brief-06 allocations; preserve it as an upper bound rather than attributing every delta to G20."
+}

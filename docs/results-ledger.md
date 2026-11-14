@@ -1094,3 +1094,20 @@ supervision/oracle routing, not every possible feature leak. `G3-label-perturbat
 records the result; repeat on the selected final-run checkpoint. Command: CPU Python,
 `FogAgent.from_tables`, unchanged config with `oracle=none`, paired forward passes and
 `torch.equal` on log-probability and value tensors.
+
+### Shared-account overlap and owner scheduling correction (smoke)
+
+A later read of `work/collect-gpu` at `a6b2fad` and an authenticated listing of owned
+jobs revealed that G20 began at 04:27:10 UTC while brief 06's collection attempt 2 was
+still running (observed terminal 04:38:31 UTC): at most 680.625 seconds of overlap.
+The submission checked the preceding replay run, but missed another active account job.
+Earlier statements that G20 ran alone do not describe this initial interval. Record the
+scheduling deviation; do not erase the measurements or claim the one-job rule was met.
+Global quota also contains brief 06's allocations and cannot all be attributed to G20.
+`shared-account-overlap.json` records the source and times.
+
+The owner explicitly chose to finish G20 before measuring brief 06's end-to-end training
+speed. G100 stays pending while the brief 06 measurement is prepared on its separate branch.
+Before every later launch, list all owned RUNNING/QUEUED jobs and require none active.
+G20 remains the only currently active job. Its completed epoch 4 has logged holdout value
+MSE 0.861 (rounded; full selected reports remain pending).
