@@ -1284,3 +1284,19 @@ Immediately before submission, the paginated owned list plus each job's status c
 private `NvidiaTeslaT4`, initially QUEUED. Exact submitted source, receipt, status and plan
 are retained. The new run remains unmeasured until its CSV and reports return. G20's
 curve/value/CPU play and four-file private-download round trip were completed first.
+
+### Queued final slot: distinguish elapsed wait from GPU quota
+
+The final slot remains QUEUED with no failure message. The official quota read after the
+prolonged wait still shows **11.118819 h used, 0 reserved, 45 h allowed**; the status
+observation is retained in `G100-queue-observation.json`. No training rate or completed
+epoch exists for this run yet. The earlier 14:42:59 timestamp is the submission request
+start; acceptance returned 2.455918 s later. Queued wall time has consumed no observed
+GPU quota. Its submission-to-terminal wall will be a loose upper bound, not an exact
+GPU charge. Keep both that bound and the final account-counter delta; the latter also
+conservatively includes any unrelated account activity. No duplicate job was submitted.
+
+Historical B play counts and full Wilson intervals are copied into
+`05-artifacts/B-play-summary.json`, with its original brief-03 source path and commit
+stamp retained. This is the existing 144/400 and 309/400 CPU smoke, not a new evaluation.
+It makes the baseline numbers cited by the brief-05 report available in that artifact directory.

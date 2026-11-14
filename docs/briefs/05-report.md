@@ -52,7 +52,7 @@ the ledger. The independent brief-06 timing is finished; G20 was not interrupted
 **Play and checks.** G20's 400 greedy games per opponent on `pool_b` score **0.520
 [0.471, 0.569]** vs SimpleHeuristics and **0.8675 [0.831, 0.897]** vs MaxDamage, with
 zero failures/truncations. B scored **0.360 [0.314, 0.408] / 0.7725 [0.729, 0.811]**
-respectively. G100 awaits training. All play rates are smoke, not strength gates.
+respectively ([historical B play](05-artifacts/B-play-summary.json)). G100 awaits training. All play rates are smoke, not strength gates.
 No protocol/manifest outcome mismatch appeared in 103,928 games. In 128 sampled games,
 6,283 serialized labels agree per side and 3,150 earlier observations survive future deletion.
 G20's 256-row label/oracle perturbation leaves policy/value tensors identical in evaluation
