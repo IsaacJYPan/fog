@@ -96,7 +96,7 @@
     },
     {
       "slug": "fog-p2-g100-20261114",
-      "status": "QUEUED",
+      "status": "RUNNING",
       "timeout_seconds": 28200,
       "internal_job_seconds_before_export": 27000,
       "actual_gpu_hours": null,

@@ -1,0 +1,23 @@
+{
+  "label": "smoke startup, no completed training epoch yet",
+  "job": "fog-p2-g100-20261114",
+  "status": "RUNNING",
+  "observed_at_utc": "2026-11-14T18:37:13.147971+00:00",
+  "account_quota_hours": 11.163913815277779,
+  "quota_before_seconds": 40027.748,
+  "startup_events": [
+    {
+      "stream_name": "stdout",
+      "time": 91.480938445,
+      "data": "{\"python\": \"3.13.16\", \"torch\": \"2.11.0+cu130\", \"cuda\": \"13.0\", \"gpu\": \"Tesla T4\", \"node\": \"v22.23.4\"}\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 91.481026787,
+      "data": "Training interpreter: /kaggle/working/fog/.venv/bin/python\n"
+    }
+  ],
+  "forecast_hours_after_allocation": 6.881063065200146,
+  "forecast_finish_utc_approx": "2026-11-15T01:30:00Z",
+  "note": "The long queued interval did not increase quota. Actual GPU time is bounded from the final account-counter delta separately from submission-wall time."
+}

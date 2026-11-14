@@ -1300,3 +1300,14 @@ Historical B play counts and full Wilson intervals are copied into
 `05-artifacts/B-play-summary.json`, with its original brief-03 source path and commit
 stamp retained. This is the existing 144/400 and 309/400 CPU smoke, not a new evaluation.
 It makes the baseline numbers cited by the brief-05 report available in that artifact directory.
+
+### Final fallback allocated after the uncharged queue (smoke startup)
+
+The final slot is now RUNNING, observed around 18:35 UTC after the long queue. Its
+startup log confirms **Tesla T4, Python 3.13.16, PyTorch 2.11.0+cu130, CUDA 13.0,
+Node v22.23.4**, matching G20's measured stack. Setup reached the training interpreter
+at about 91.5 s of script log time. `G100-startup.json` preserves the startup events and quota
+observation. No completed epoch or throughput is claimed yet. The conservative 6.881063-hour
+forecast after allocation puts export around **01:30 UTC on 15 November**; refine it
+from actual completed epochs. Queue time remains separate from charged GPU time, using
+the final account-counter delta as a conservative bound rather than counting the wait.

@@ -5,14 +5,14 @@ and **2.44 GiB** peak allocation. At 20,000 games, policy NLL is **1.278605**, v
 **1.579018**. Its own-best value Brier is **0.215320**, with late-third Brier **0.065683**
 below early; that checkpoint is **eight epochs before** the best policy. The exact
 20k-to-100k P2.4 decision and strict 100k value reading remain **unverified**. The budget
-selects a **40,955-game, six-epoch** fallback, now submitted; CPU play scores **0.520 vs SimpleHeuristics / 0.8675 vs MaxDamage**. **No gate is claimed.**
+selects a **40,955-game, six-epoch** fallback, now running; CPU play scores **0.520 vs SimpleHeuristics / 0.8675 vs MaxDamage**. **No gate is claimed.**
 
 | Run (smoke) | Games; epochs; batch | Policy epoch | Top-1 | NLL | Value Brier | Value ECE |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | B | 3,000; 18; 256 | 8 | 0.440802 | 1.579018 | 0.344501 | 0.298756 |
 | G3 | 3,000; **2/18**; 1024 | 2 | 0.300391 | 1.895671 | 0.244778 | 0.033124 |
 | G20 | 20,000; 18; 1024 | 12 | 0.544369 | 1.278605 | 0.254356 | 0.153633 |
-| G100, submitted fallback | 40,955; 6; 1024 | pending | — | — | — | — |
+| G100, running fallback | 40,955; 6; 1024 | pending | — | — | — | — |
 
 | Checkpoint (smoke) | Epoch | Train MSE | Holdout MSE / Brier / ECE | Early / middle / late Brier | Early / middle / late ECE |
 | --- | ---: | ---: | --- | --- | --- |
