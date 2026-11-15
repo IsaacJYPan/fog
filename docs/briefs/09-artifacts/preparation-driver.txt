@@ -1,0 +1,27 @@
+import json, os, subprocess, time
+from pathlib import Path
+root = Path('/workspace/fog')
+art = root / 'docs/briefs/09-artifacts'
+records = []
+def run(name, args, **kwargs):
+    start = time.monotonic()
+    with (art / (name + '.txt')).open('a') as log:
+        result = subprocess.run(args, stdout=log, stderr=subprocess.STDOUT, **kwargs)
+    records.append(dict(name=name, command=args, seconds=time.monotonic()-start,
+                        exit_code=result.returncode, cwd=kwargs.get('cwd', str(root)), commit='70cc5eda12345edffe11a998e2c4782f4ed7b161',
+                        environment={k:os.environ.get(k) for k in ('OMP_WAIT_POLICY','KMP_BLOCKTIME')}, smoke=True))
+    (art / 'preparation-execution.json').write_text(json.dumps(records, indent=2)+'\n')
+    if result.returncode: raise SystemExit(result.returncode)
+py = str(root / '.venv/bin/python')
+run('conversion', [py, '-m', 'fog.scripts.convert_replay_decisions', '--raw', 'data/metamon_gen9ou_r1500', '--out', 'data/metamon_gen9ou_r1500_decisions', '--imputations', '1', '--workers', '4', '--resume'])
+run('split', [py, '-m', 'fog.scripts.split_replay_manifest', '--manifest', 'data/metamon_gen9ou_r1500_decisions/manifest.parquet', '--out', 'runs/blueprint/split', '--holdout-ids', 'data/replay_splits/p2_holdout_2000_ids.txt', '--train-sizes', '1000'])
+import polars as pl
+m=pl.read_parquet('data/metamon_gen9ou_r1500_decisions/manifest.parquet')
+h=pl.read_parquet('runs/blueprint/split/holdout_manifest.parquet')
+t=pl.read_parquet('runs/blueprint/split/train_1000.parquet')
+assert (len(m),len(h),h['n_rows'].sum(),len(t),t['n_rows'].sum()) == (22000,2000,103944,1000,52955)
+assert set(h['id']) == set(Path('data/replay_splits/p2_holdout_2000_ids.txt').read_text().splitlines())
+(art/'data-counts.json').write_text(json.dumps(dict(smoke=True,games=len(m),rows=m['n_rows'].sum(),holdout_games=len(h),holdout_rows=h['n_rows'].sum(),training_games=len(t),training_rows=t['n_rows'].sum(),fixed_holdout_ids_match=True),indent=2)+'\n')
+# Freeze the baseline implementation while new opt-in paths are developed in the main worktree.
+env = dict(os.environ, PYTHONPATH='/workspace/fog-order-baseline', OMP_WAIT_POLICY='PASSIVE', KMP_BLOCKTIME='0')
+run('R1-training', [py, '-m', 'fog.training.bc', '--config', '/workspace/fog-order-baseline/configs/replay_blueprint_cpu.yaml', '--set', 'bc.manifest=runs/blueprint/split/train_1000.parquet', 'bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet', 'bc.epochs=8', 'bc.early_stopping_patience=0', 'bc.resume=true', 'bc.selection_metric=action_ce', 'log.dir=runs/order_blind_model/R1', 'seed=20261201'], env=env, cwd='/workspace/fog-order-baseline')

@@ -49,5 +49,33 @@
       "KMP_BLOCKTIME": "0"
     },
     "smoke": true
+  },
+  {
+    "name": "R1-training",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "/workspace/fog-order-baseline/configs/replay_blueprint_cpu.yaml",
+      "--set",
+      "bc.manifest=runs/blueprint/split/train_1000.parquet",
+      "bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet",
+      "bc.epochs=8",
+      "bc.early_stopping_patience=0",
+      "bc.resume=true",
+      "bc.selection_metric=action_ce",
+      "log.dir=runs/order_blind_model/R1",
+      "seed=20261201"
+    ],
+    "seconds": 4430.275132612,
+    "exit_code": 0,
+    "cwd": "/workspace/fog-order-baseline",
+    "commit": "70cc5eda12345edffe11a998e2c4782f4ed7b161",
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "smoke": true
   }
 ]

@@ -1912,3 +1912,18 @@ No value/feature/lead result or strength gate is claimed. Date is America/Los_An
 The initial conversion dispatcher was corrected before baseline training; its converter was
 interrupted and resumed from 9,227 per-game checkpoints, as `09-artifacts/preparation-restart.json`
 records. Report: `docs/briefs/09-report.md`. Measurements and stage 2 completion follow below.
+
+Stage 2 completed on 2026-11-15 UTC. All results below are smoke; both perspectives of a
+game stay together in the 2,000-draw percentile bootstrap. Policy uses 103,933 valid rows;
+value uses all 103,944 rows from the same 2,000 games. Eight epochs, 1,000 training games.
+
+| Run | Result (smoke; 95% game intervals) | Producing commit and command / evidence |
+| --- | --- | --- |
+| R1 | Policy e8: shuffled NLL 1.9253 [1.9189, 1.9316]; top-1 26.64 [26.34, 26.95]%; policy Brier 0.4038 [0.3887, 0.4176], ECE 0.3808 [0.3653, 0.3956]. Value e0: Brier 0.2533 [0.2532, 0.2534], ECE 0.0573 [0.0567, 0.0579] | `70cc5eda12345edffe11a998e2c4782f4ed7b161`; `python -m fog.training.bc --config /workspace/fog-order-baseline/configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind_model/R1 seed=20261201`; `09-artifacts/R1-metrics.csv`, `R1-selection.json`, `R1-best-{policy,value}-slot-check.json`; exact execution in `preparation-execution.json` |
+| R2 | Policy e8: shuffled NLL 1.8799 [1.8735, 1.8860]; top-1 28.24 [27.92, 28.57]%; policy Brier 0.3978 [0.3839, 0.4117], ECE 0.3744 [0.3596, 0.3893]. Value e0: Brier 0.2500 [0.2500, 0.2500], ECE 0.0015 [0.0009, 0.0021] | `c7007c8e2fdd7c63abe0299a0b6b64059c783168`; `python -m fog.training.bc --config configs/replay_order_blind_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind_model/R2 seed=20261201`; `09-artifacts/R2-metrics.csv`, `R2-selection.json`, `R2-best-{policy,value}-slot-check.json`; exact execution in `stage2-execution.json` |
+
+R1 matched the required reference within 0.0016 NLL. R2 stored/shuffled results match to
+four decimals for all/move/unmoved groups. `09-artifacts/stage2-summary.json` compares
+the observed differences with twice the historical R1 two-seed difference; no smaller
+difference is claimed. Both value selectors remain at or above Brier 0.25.
+The required perturbed-weight invariance evidence completes P2.2a; P2.3 and all gates remain open.

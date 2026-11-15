@@ -258,10 +258,11 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       seeded move and preview order, paired imputation draws, identity guards and per-game
       recovery. See "move-order leak removed and order-blind encoder (smoke)" in the ledger
       and `docs/briefs/07-report.md`; P2.2 remains open._
-- [ ] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
+- [x] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
       1, ledger "review of brief 07, stage 1"): the converter shuffles both with seeded streams.
-      Remaining, `docs/briefs/09-order-blind-model.md`: a model that cannot read slot order, shown
-      by a permutation test.
+      Brief 09 stage 2 completes the model side: every parameter perturbed, all four required
+      permutations on 64 holdout and 64 live rows, key-off negative controls; R2 stored/shuffled
+      metrics match to four decimals. See the ledger and `docs/briefs/09-report.md`.
 - [ ] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
       parity check between a converted log and the observations recorded while the same game
       was played, then own PP, forced replacement decisions and the history record brought

@@ -1,0 +1,34 @@
+import json
+from pathlib import Path
+art=Path('docs/briefs/09-artifacts')
+reference=json.loads(Path('docs/briefs/07-artifacts/stage1-summary.json').read_text())
+result={'smoke':True,'stages_complete':[2],'stages_not_started':[3,4,5], 'runs':{},
+        'historical_R1_seed_noise':reference['R1_seed_noise']}
+for name in ('R1','R2'):
+    selection=json.loads((art/f'{name}-selection.json').read_text())
+    policy=json.loads((art/f'{name}-best-policy-slot-check.json').read_text())
+    value=json.loads((art/f'{name}-best-value-slot-check.json').read_text())
+    result['runs'][name]={'selection':selection,'best_policy':policy,'best_value':value}
+a=result['runs']['R1']['best_policy']['policy']
+b=result['runs']['R2']['best_policy']['policy']
+result['observed_R2_minus_R1']={}
+for group in ('all','move','not_yet_moved'):
+    result['observed_R2_minus_R1'][group]={}
+    for metric in ('nll_shuffled','top1_shuffled'):
+        delta=b[group][metric]-a[group][metric]
+        threshold=reference['R1_seed_noise'][group][metric]['twice_difference']
+        result['observed_R2_minus_R1'][group][metric]={'delta':delta,
+            'twice_historical_R1_seed_difference':threshold,'exceeds_historical_noise':abs(delta)>threshold}
+    assert round(b[group]['nll_stored'],4)==round(b[group]['nll_shuffled'],4)
+    assert round(b[group]['top1_stored'],4)==round(b[group]['top1_shuffled'],4)
+result['R1_reference_absolute_nll_gap']=abs(a['all']['nll_stored']-1.9239)
+assert result['R1_reference_absolute_nll_gap']<=.01
+(art/'stage2-summary.json').write_text(json.dumps(result,indent=2)+'\n')
+for name in ('R1','R2'):
+    for selector in ('best_policy','best_value'):
+        r=result['runs'][name]
+        v=r[selector]['value']
+        print(name,selector,'epoch',r['selection'][selector+'_epoch'],
+              'Brier',v['brier'],v['interval95']['brier'],'ECE',v['ece'],v['interval95']['ece'])
+    print('policy',result['runs'][name]['best_policy']['policy'])
+print('deltas',result['observed_R2_minus_R1'])
