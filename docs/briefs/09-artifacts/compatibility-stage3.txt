@@ -1,0 +1,12 @@
+{
+  "smoke": true,
+  "original_commit": "70cc5eda12345edffe11a998e2c4782f4ed7b161",
+  "current_commit": "69b9d19b503702087d2d69a504b25019d2541fa3",
+  "observations": 64,
+  "strict_load": true,
+  "missing_keys": [],
+  "unexpected_keys": [],
+  "log_probs_bit_identical": true,
+  "value_bit_identical": true,
+  "configuration": "original config, all added keys absent or off"
+}

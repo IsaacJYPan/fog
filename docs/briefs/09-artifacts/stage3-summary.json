@@ -1,0 +1,807 @@
+{
+  "smoke": true,
+  "stages_complete": [
+    2,
+    3
+  ],
+  "stages_not_started": [
+    4,
+    5
+  ],
+  "selection": {
+    "smoke": true,
+    "commit": "69b9d19b503702087d2d69a504b25019d2541fa3",
+    "seed": 20261201,
+    "best_policy_epoch": 8,
+    "best_value_epoch": 0,
+    "policy_epoch_metrics": {
+      "epoch": "8",
+      "eval_action_ce": "1.8806213076813965",
+      "eval_action_top1": "0.28508746573531046",
+      "eval_action_top1_lift": "2.983064222620409",
+      "eval_avg_legal_actions": "10.464894558608481",
+      "eval_belief": "6.7783522696727365",
+      "eval_belief_chain": "2.052894426173851",
+      "eval_belief_chain_confident98_rate": "0.06955907356607843",
+      "eval_belief_chain_dropped_count": "0.0",
+      "eval_belief_chain_dropped_rate": "0.0",
+      "eval_belief_chain_last_confident98_rate": "0.055646927733532525",
+      "eval_belief_chain_last_count": "24953.0",
+      "eval_belief_chain_last_true_prob": "0.3185062915864318",
+      "eval_belief_chain_true_prob": "0.31787053257270526",
+      "eval_belief_chain_valid_count": "95300.0",
+      "eval_belief_dropped_count": "0.0",
+      "eval_belief_dropped_rate": "0.0",
+      "eval_belief_valid_count": "715637.0",
+      "eval_imputation_0_correct_count": "29630.0",
+      "eval_imputation_0_nll": "1.880615515642536",
+      "eval_imputation_0_nll_sum_count": "195458.0123872757",
+      "eval_imputation_0_top1": "0.28508750829861546",
+      "eval_imputation_0_valid_count": "103933.0",
+      "eval_imputation_nll_range": "0.0",
+      "eval_imputation_top1_range": "0.0",
+      "eval_loss": "3.627035582853705",
+      "eval_loss_relative": "1.0093665625743664",
+      "eval_outcome_alive": "0.5452397611265433",
+      "eval_outcome_hp": "0.09421916357742248",
+      "eval_policy_total_count": "103944.0",
+      "eval_policy_valid_count": "103933.0",
+      "eval_reconstruction_retention": "0.0",
+      "eval_value": "2.481812079765868",
+      "eval_value_brier": "0.4065050084668538",
+      "eval_value_ece": "0.3840956191629237",
+      "eval_value_pred_bin0_count": "308.79576855897903",
+      "eval_value_pred_bin1_count": "337.340289324522",
+      "eval_value_pred_bin2_count": "394.03785985708237",
+      "eval_value_pred_bin3_count": "509.42618591338396",
+      "eval_value_pred_bin4_count": "832.7083064149047",
+      "eval_value_pred_bin5_count": "2632.032143466582",
+      "eval_value_pred_bin6_count": "2182.2386590242386",
+      "eval_value_pred_bin7_count": "1704.6298661231995",
+      "eval_value_pred_bin8_count": "2433.8310342133045",
+      "eval_value_pred_bin9_count": "42394.011745512486",
+      "eval_value_rows_count": "103944.0",
+      "eval_value_target_bin0_count": "18155.0",
+      "eval_value_target_bin1_count": "1156.0",
+      "eval_value_target_bin2_count": "787.0",
+      "eval_value_target_bin3_count": "748.0",
+      "eval_value_target_bin4_count": "897.0",
+      "eval_value_target_bin5_count": "2305.0",
+      "eval_value_target_bin6_count": "1745.0",
+      "eval_value_target_bin7_count": "1138.0",
+      "eval_value_target_bin8_count": "1463.0",
+      "eval_value_target_bin9_count": "24132.0",
+      "primary_train_action_ce": "1.7728686205490534",
+      "primary_train_action_top1": "0.32606930416553986",
+      "primary_train_action_top1_lift": "3.4073856524040607",
+      "primary_train_avg_legal_actions": "10.449230477969962",
+      "primary_train_belief": "3.217414456068451",
+      "primary_train_belief_chain": "1.3865952034237905",
+      "primary_train_belief_chain_confident98_rate": "0.08167682247727577",
+      "primary_train_belief_chain_dropped_count": "0.0",
+      "primary_train_belief_chain_dropped_rate": "0.0",
+      "primary_train_belief_chain_last_confident98_rate": "0.07800037398809144",
+      "primary_train_belief_chain_last_count": "12310.0",
+      "primary_train_belief_chain_last_true_prob": "0.45058451601223304",
+      "primary_train_belief_chain_true_prob": "0.41105794916408683",
+      "primary_train_belief_chain_valid_count": "48266.0",
+      "primary_train_belief_dropped_count": "0.0",
+      "primary_train_belief_dropped_rate": "0.0",
+      "primary_train_belief_valid_count": "364681.0",
+      "primary_train_imputation_0_correct_count": "17267.0",
+      "primary_train_imputation_0_nll": "1.7728686207629119",
+      "primary_train_imputation_0_nll_sum_count": "93882.2578125",
+      "primary_train_imputation_0_top1": "0.3260693041261448",
+      "primary_train_imputation_0_valid_count": "52955.0",
+      "primary_train_imputation_nll_range": "0.0",
+      "primary_train_imputation_top1_range": "0.0",
+      "primary_train_loss": "2.098009965100332",
+      "primary_train_outcome_alive": "0.4823051832646579",
+      "primary_train_outcome_hp": "0.031899741675960436",
+      "primary_train_policy_total_count": "52955.0",
+      "primary_train_policy_valid_count": "52955.0",
+      "primary_train_reconstruction_retention": "0.0",
+      "primary_train_value": "0.08704073708432332",
+      "primary_train_value_brier": "0.028364343662248968",
+      "primary_train_value_ece": "0.0012777440830413665",
+      "primary_train_value_pred_bin0_count": "74.88743942975998",
+      "primary_train_value_pred_bin1_count": "86.48364847898483",
+      "primary_train_value_pred_bin2_count": "112.39493919909",
+      "primary_train_value_pred_bin3_count": "182.64466897398233",
+      "primary_train_value_pred_bin4_count": "732.0681258405093",
+      "primary_train_value_pred_bin5_count": "857.0000408022315",
+      "primary_train_value_pred_bin6_count": "376.3198453336954",
+      "primary_train_value_pred_bin7_count": "383.72852885723114",
+      "primary_train_value_pred_bin8_count": "504.95708617568016",
+      "primary_train_value_pred_bin9_count": "23404.443353533745",
+      "primary_train_value_rows_count": "52955.0",
+      "primary_train_value_target_bin0_count": "64.0",
+      "primary_train_value_target_bin1_count": "87.0",
+      "primary_train_value_target_bin2_count": "119.0",
+      "primary_train_value_target_bin3_count": "178.0",
+      "primary_train_value_target_bin4_count": "757.0",
+      "primary_train_value_target_bin5_count": "860.0",
+      "primary_train_value_target_bin6_count": "376.0",
+      "primary_train_value_target_bin7_count": "392.0",
+      "primary_train_value_target_bin8_count": "508.0",
+      "primary_train_value_target_bin9_count": "23399.0",
+      "seconds_per_epoch": "527.2470306129981",
+      "train_action_ce": "1.7728686205490534",
+      "train_action_top1": "0.32606930416553986",
+      "train_action_top1_lift": "3.4073856524040607",
+      "train_avg_legal_actions": "10.449230477969962",
+      "train_belief": "3.217414456068451",
+      "train_belief_chain": "1.3865952034237905",
+      "train_belief_chain_confident98_rate": "0.08167682247727577",
+      "train_belief_chain_dropped_count": "0.0",
+      "train_belief_chain_dropped_rate": "0.0",
+      "train_belief_chain_last_confident98_rate": "0.07800037398809144",
+      "train_belief_chain_last_count": "12310.0",
+      "train_belief_chain_last_true_prob": "0.45058451601223304",
+      "train_belief_chain_true_prob": "0.41105794916408683",
+      "train_belief_chain_valid_count": "48266.0",
+      "train_belief_dropped_count": "0.0",
+      "train_belief_dropped_rate": "0.0",
+      "train_belief_valid_count": "364681.0",
+      "train_imputation_0_correct_count": "17267.0",
+      "train_imputation_0_nll": "1.7728686207629119",
+      "train_imputation_0_nll_sum_count": "93882.2578125",
+      "train_imputation_0_top1": "0.3260693041261448",
+      "train_imputation_0_valid_count": "52955.0",
+      "train_imputation_nll_range": "0.0",
+      "train_imputation_top1_range": "0.0",
+      "train_loss": "2.098009965100332",
+      "train_outcome_alive": "0.4823051832646579",
+      "train_outcome_hp": "0.031899741675960436",
+      "train_policy_total_count": "52955.0",
+      "train_policy_valid_count": "52955.0",
+      "train_reconstruction_retention": "0.0",
+      "train_rows_per_second": "153.1338936078983",
+      "train_value": "0.08704073708432332",
+      "train_value_brier": "0.028364343662248968",
+      "train_value_ece": "0.0012777440830413665",
+      "train_value_pred_bin0_count": "74.88743942975998",
+      "train_value_pred_bin1_count": "86.48364847898483",
+      "train_value_pred_bin2_count": "112.39493919909",
+      "train_value_pred_bin3_count": "182.64466897398233",
+      "train_value_pred_bin4_count": "732.0681258405093",
+      "train_value_pred_bin5_count": "857.0000408022315",
+      "train_value_pred_bin6_count": "376.3198453336954",
+      "train_value_pred_bin7_count": "383.72852885723114",
+      "train_value_pred_bin8_count": "504.95708617568016",
+      "train_value_pred_bin9_count": "23404.443353533745",
+      "train_value_rows_count": "52955.0",
+      "train_value_target_bin0_count": "64.0",
+      "train_value_target_bin1_count": "87.0",
+      "train_value_target_bin2_count": "119.0",
+      "train_value_target_bin3_count": "178.0",
+      "train_value_target_bin4_count": "757.0",
+      "train_value_target_bin5_count": "860.0",
+      "train_value_target_bin6_count": "376.0",
+      "train_value_target_bin7_count": "392.0",
+      "train_value_target_bin8_count": "508.0",
+      "train_value_target_bin9_count": "23399.0"
+    },
+    "value_epoch_metrics": {
+      "epoch": "0",
+      "eval_action_ce": "2.30714809876212",
+      "eval_action_top1": "0.07596339310031193",
+      "eval_action_top1_lift": "0.7924922885091393",
+      "eval_avg_legal_actions": "10.464894558608481",
+      "eval_belief": "13.124548955573998",
+      "eval_belief_chain": "3.9995186166675962",
+      "eval_belief_chain_confident98_rate": "0.022513882996697793",
+      "eval_belief_chain_dropped_count": "0.0",
+      "eval_belief_chain_dropped_rate": "0.0",
+      "eval_belief_chain_last_confident98_rate": "0.014613067792761659",
+      "eval_belief_chain_last_count": "24953.0",
+      "eval_belief_chain_last_true_prob": "0.045613482938548264",
+      "eval_belief_chain_true_prob": "0.05461647862523053",
+      "eval_belief_chain_valid_count": "95300.0",
+      "eval_belief_dropped_count": "0.0",
+      "eval_belief_dropped_rate": "0.0",
+      "eval_belief_valid_count": "715637.0",
+      "eval_imputation_0_correct_count": "7895.0",
+      "eval_imputation_0_nll": "2.307151306617523",
+      "eval_imputation_0_nll_sum_count": "239789.15675067902",
+      "eval_imputation_0_top1": "0.0759623988531073",
+      "eval_imputation_0_valid_count": "103933.0",
+      "eval_imputation_nll_range": "0.0",
+      "eval_imputation_top1_range": "0.0",
+      "eval_loss": "3.593377983121447",
+      "eval_loss_relative": "1.0",
+      "eval_outcome_alive": "0.7329376591396031",
+      "eval_outcome_hp": "0.10150702737329416",
+      "eval_policy_total_count": "103944.0",
+      "eval_policy_valid_count": "103933.0",
+      "eval_reconstruction_retention": "0.0",
+      "eval_value": "0.693164008686543",
+      "eval_value_brier": "0.2500084022879762",
+      "eval_value_ece": "0.001471389811047606",
+      "eval_value_pred_bin0_count": "0.0",
+      "eval_value_pred_bin1_count": "0.0",
+      "eval_value_pred_bin2_count": "0.0",
+      "eval_value_pred_bin3_count": "0.0",
+      "eval_value_pred_bin4_count": "26.4666243584943",
+      "eval_value_pred_bin5_count": "52652.47551816104",
+      "eval_value_pred_bin6_count": "0.0",
+      "eval_value_pred_bin7_count": "0.0",
+      "eval_value_pred_bin8_count": "0.0",
+      "eval_value_pred_bin9_count": "0.0",
+      "eval_value_rows_count": "103944.0",
+      "eval_value_target_bin0_count": "0.0",
+      "eval_value_target_bin1_count": "0.0",
+      "eval_value_target_bin2_count": "0.0",
+      "eval_value_target_bin3_count": "0.0",
+      "eval_value_target_bin4_count": "22.0",
+      "eval_value_target_bin5_count": "52504.0",
+      "eval_value_target_bin6_count": "0.0",
+      "eval_value_target_bin7_count": "0.0",
+      "eval_value_target_bin8_count": "0.0",
+      "eval_value_target_bin9_count": "0.0",
+      "primary_train_action_ce": "",
+      "primary_train_action_top1": "",
+      "primary_train_action_top1_lift": "",
+      "primary_train_avg_legal_actions": "",
+      "primary_train_belief": "",
+      "primary_train_belief_chain": "",
+      "primary_train_belief_chain_confident98_rate": "",
+      "primary_train_belief_chain_dropped_count": "",
+      "primary_train_belief_chain_dropped_rate": "",
+      "primary_train_belief_chain_last_confident98_rate": "",
+      "primary_train_belief_chain_last_count": "",
+      "primary_train_belief_chain_last_true_prob": "",
+      "primary_train_belief_chain_true_prob": "",
+      "primary_train_belief_chain_valid_count": "",
+      "primary_train_belief_dropped_count": "",
+      "primary_train_belief_dropped_rate": "",
+      "primary_train_belief_valid_count": "",
+      "primary_train_imputation_0_correct_count": "",
+      "primary_train_imputation_0_nll": "",
+      "primary_train_imputation_0_nll_sum_count": "",
+      "primary_train_imputation_0_top1": "",
+      "primary_train_imputation_0_valid_count": "",
+      "primary_train_imputation_nll_range": "",
+      "primary_train_imputation_top1_range": "",
+      "primary_train_loss": "",
+      "primary_train_outcome_alive": "",
+      "primary_train_outcome_hp": "",
+      "primary_train_policy_total_count": "",
+      "primary_train_policy_valid_count": "",
+      "primary_train_reconstruction_retention": "",
+      "primary_train_value": "",
+      "primary_train_value_brier": "",
+      "primary_train_value_ece": "",
+      "primary_train_value_pred_bin0_count": "",
+      "primary_train_value_pred_bin1_count": "",
+      "primary_train_value_pred_bin2_count": "",
+      "primary_train_value_pred_bin3_count": "",
+      "primary_train_value_pred_bin4_count": "",
+      "primary_train_value_pred_bin5_count": "",
+      "primary_train_value_pred_bin6_count": "",
+      "primary_train_value_pred_bin7_count": "",
+      "primary_train_value_pred_bin8_count": "",
+      "primary_train_value_pred_bin9_count": "",
+      "primary_train_value_rows_count": "",
+      "primary_train_value_target_bin0_count": "",
+      "primary_train_value_target_bin1_count": "",
+      "primary_train_value_target_bin2_count": "",
+      "primary_train_value_target_bin3_count": "",
+      "primary_train_value_target_bin4_count": "",
+      "primary_train_value_target_bin5_count": "",
+      "primary_train_value_target_bin6_count": "",
+      "primary_train_value_target_bin7_count": "",
+      "primary_train_value_target_bin8_count": "",
+      "primary_train_value_target_bin9_count": "",
+      "seconds_per_epoch": "",
+      "train_action_ce": "",
+      "train_action_top1": "",
+      "train_action_top1_lift": "",
+      "train_avg_legal_actions": "",
+      "train_belief": "",
+      "train_belief_chain": "",
+      "train_belief_chain_confident98_rate": "",
+      "train_belief_chain_dropped_count": "",
+      "train_belief_chain_dropped_rate": "",
+      "train_belief_chain_last_confident98_rate": "",
+      "train_belief_chain_last_count": "",
+      "train_belief_chain_last_true_prob": "",
+      "train_belief_chain_true_prob": "",
+      "train_belief_chain_valid_count": "",
+      "train_belief_dropped_count": "",
+      "train_belief_dropped_rate": "",
+      "train_belief_valid_count": "",
+      "train_imputation_0_correct_count": "",
+      "train_imputation_0_nll": "",
+      "train_imputation_0_nll_sum_count": "",
+      "train_imputation_0_top1": "",
+      "train_imputation_0_valid_count": "",
+      "train_imputation_nll_range": "",
+      "train_imputation_top1_range": "",
+      "train_loss": "",
+      "train_outcome_alive": "",
+      "train_outcome_hp": "",
+      "train_policy_total_count": "",
+      "train_policy_valid_count": "",
+      "train_reconstruction_retention": "",
+      "train_rows_per_second": "",
+      "train_value": "",
+      "train_value_brier": "",
+      "train_value_ece": "",
+      "train_value_pred_bin0_count": "",
+      "train_value_pred_bin1_count": "",
+      "train_value_pred_bin2_count": "",
+      "train_value_pred_bin3_count": "",
+      "train_value_pred_bin4_count": "",
+      "train_value_pred_bin5_count": "",
+      "train_value_pred_bin6_count": "",
+      "train_value_pred_bin7_count": "",
+      "train_value_pred_bin8_count": "",
+      "train_value_pred_bin9_count": "",
+      "train_value_rows_count": "",
+      "train_value_target_bin0_count": "",
+      "train_value_target_bin1_count": "",
+      "train_value_target_bin2_count": "",
+      "train_value_target_bin3_count": "",
+      "train_value_target_bin4_count": "",
+      "train_value_target_bin5_count": "",
+      "train_value_target_bin6_count": "",
+      "train_value_target_bin7_count": "",
+      "train_value_target_bin8_count": "",
+      "train_value_target_bin9_count": ""
+    },
+    "native_value_selection": {
+      "best_value_epoch": 0,
+      "best_value_loss": 0.693164008686543,
+      "best_policy_epoch": 8
+    }
+  },
+  "best_policy": {
+    "smoke": true,
+    "manifest": "runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+    "checkpoint": "/workspace/fog/runs/order_blind_model/R3/checkpoints/bc_best.pt",
+    "rows": 103933,
+    "move_rows": 74853,
+    "label_share_by_move_slot": [
+      0.2509451858976928,
+      0.24834007988991758,
+      0.24817976567405448,
+      0.2525349685383351
+    ],
+    "not_yet_moved_rows": 20309,
+    "not_yet_moved_label_is_slot0": 0.24698409572110888,
+    "switch_only_rows": 2,
+    "largest_own_pp": 0.0,
+    "switch_rows": 29080,
+    "switch_label_counts_by_bench_position": [
+      5846,
+      5768,
+      5757,
+      5854,
+      5855
+    ],
+    "label_share_by_bench_position": [
+      0.20103163686382394,
+      0.19834938101788172,
+      0.19797111416781293,
+      0.2013067400275103,
+      0.20134112792297112
+    ],
+    "lead_order": {
+      "games": 2000,
+      "p1": {
+        "known_leads": 1999,
+        "unknown_leads": 1,
+        "counts_by_team_position": [
+          345,
+          305,
+          350,
+          338,
+          309,
+          352
+        ],
+        "share_by_team_position": [
+          0.17258629314657328,
+          0.15257628814407204,
+          0.17508754377188596,
+          0.16908454227113556,
+          0.15457728864432216,
+          0.176088044022011
+        ],
+        "share_position0": 0.17258629314657328
+      },
+      "p2": {
+        "known_leads": 1998,
+        "unknown_leads": 2,
+        "counts_by_team_position": [
+          346,
+          315,
+          365,
+          320,
+          320,
+          332
+        ],
+        "share_by_team_position": [
+          0.17317317317317318,
+          0.15765765765765766,
+          0.18268268268268267,
+          0.16016016016016016,
+          0.16016016016016016,
+          0.16616616616616617
+        ],
+        "share_position0": 0.17317317317317318
+      },
+      "games_with_both_leads_known": 1997,
+      "share_games_either_lead_position0": 0.314471707561342,
+      "share_games_both_leads_position0": 0.03104656985478217,
+      "source": "converter metadata"
+    },
+    "not_yet_moved_definition": "no move by the acting species in the stored history window",
+    "policy": {
+      "all": {
+        "rows": 103933,
+        "nll_stored": 1.880615513678186,
+        "nll_shuffled": 1.8806155098287705,
+        "top1_stored": 0.28508750829861546,
+        "top1_shuffled": 0.28508750829861546,
+        "interval95": {
+          "nll_stored": [
+            1.8743562111767464,
+            1.8868678084786357
+          ],
+          "nll_shuffled": [
+            1.8743562062452563,
+            1.8868678050996726
+          ],
+          "top1_stored": [
+            0.28155465158630005,
+            0.28838547644834517
+          ],
+          "top1_shuffled": [
+            0.28155465158630005,
+            0.28838547644834517
+          ]
+        }
+      },
+      "move": {
+        "rows": 74853,
+        "nll_stored": 1.7321251500042327,
+        "nll_shuffled": 1.7321251467623398,
+        "top1_stored": 0.3042229436361936,
+        "top1_shuffled": 0.3042229436361936,
+        "interval95": {
+          "nll_stored": [
+            1.7263663134717948,
+            1.7379458931893086
+          ],
+          "nll_shuffled": [
+            1.7263663104769513,
+            1.737945887612152
+          ],
+          "top1_stored": [
+            0.30008098426016616,
+            0.3080502480970369
+          ],
+          "top1_shuffled": [
+            0.30008098426016616,
+            0.3080502480970369
+          ]
+        }
+      },
+      "not_yet_moved": {
+        "rows": 20309,
+        "nll_stored": 1.6331515870689377,
+        "nll_shuffled": 1.6331515781373391,
+        "top1_stored": 0.3446255354768822,
+        "top1_shuffled": 0.3446255354768822,
+        "interval95": {
+          "nll_stored": [
+            1.6231557093171909,
+            1.644126577147529
+          ],
+          "nll_shuffled": [
+            1.6231557032908703,
+            1.6441265673112662
+          ],
+          "top1_stored": [
+            0.33801197287807455,
+            0.3510029871127241
+          ],
+          "top1_shuffled": [
+            0.33801197287807455,
+            0.3510029871127241
+          ]
+        },
+        "favourite_move_in_slot0_stored": 0.25210497808853216,
+        "favourite_move_in_slot0_shuffled": 0.2473287704958393
+      }
+    },
+    "value": {
+      "rows": 103944,
+      "brier": 0.40650500846595816,
+      "ece": 0.3840956192031758,
+      "share_below_0_1": 0.3923939813745863,
+      "observed_win_rate_below_0_1": 0.44511731679211514,
+      "share_above_0_9": 0.4112214269221889,
+      "observed_win_rate_above_0_9": 0.56457046603032,
+      "interval95": {
+        "brier": [
+          0.392816279452819,
+          0.4200870088561845
+        ],
+        "ece": [
+          0.37024874654832435,
+          0.3981010225534393
+        ],
+        "share_below_0_1": [
+          0.3852604133766512,
+          0.3998479264365138
+        ],
+        "observed_win_rate_below_0_1": [
+          0.4280372107587771,
+          0.46240318988935886
+        ],
+        "share_above_0_9": [
+          0.4036712373655202,
+          0.4187958232736553
+        ],
+        "observed_win_rate_above_0_9": [
+          0.5472615387798678,
+          0.5811417317387264
+        ]
+      }
+    },
+    "interval_method": {
+      "unit": "game (both perspectives together)",
+      "samples": 2000,
+      "seed": 0,
+      "method": "percentile bootstrap, row-weighted statistic"
+    }
+  },
+  "best_value": {
+    "smoke": true,
+    "manifest": "runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+    "checkpoint": "/workspace/fog/runs/order_blind_model/R3/checkpoints/bc_best_value.pt",
+    "rows": 103933,
+    "move_rows": 74853,
+    "label_share_by_move_slot": [
+      0.2509451858976928,
+      0.24834007988991758,
+      0.24817976567405448,
+      0.2525349685383351
+    ],
+    "not_yet_moved_rows": 20309,
+    "not_yet_moved_label_is_slot0": 0.24698409572110888,
+    "switch_only_rows": 2,
+    "largest_own_pp": 0.0,
+    "switch_rows": 29080,
+    "switch_label_counts_by_bench_position": [
+      5846,
+      5768,
+      5757,
+      5854,
+      5855
+    ],
+    "label_share_by_bench_position": [
+      0.20103163686382394,
+      0.19834938101788172,
+      0.19797111416781293,
+      0.2013067400275103,
+      0.20134112792297112
+    ],
+    "lead_order": {
+      "games": 2000,
+      "p1": {
+        "known_leads": 1999,
+        "unknown_leads": 1,
+        "counts_by_team_position": [
+          345,
+          305,
+          350,
+          338,
+          309,
+          352
+        ],
+        "share_by_team_position": [
+          0.17258629314657328,
+          0.15257628814407204,
+          0.17508754377188596,
+          0.16908454227113556,
+          0.15457728864432216,
+          0.176088044022011
+        ],
+        "share_position0": 0.17258629314657328
+      },
+      "p2": {
+        "known_leads": 1998,
+        "unknown_leads": 2,
+        "counts_by_team_position": [
+          346,
+          315,
+          365,
+          320,
+          320,
+          332
+        ],
+        "share_by_team_position": [
+          0.17317317317317318,
+          0.15765765765765766,
+          0.18268268268268267,
+          0.16016016016016016,
+          0.16016016016016016,
+          0.16616616616616617
+        ],
+        "share_position0": 0.17317317317317318
+      },
+      "games_with_both_leads_known": 1997,
+      "share_games_either_lead_position0": 0.314471707561342,
+      "share_games_both_leads_position0": 0.03104656985478217,
+      "source": "converter metadata"
+    },
+    "not_yet_moved_definition": "no move by the acting species in the stored history window",
+    "policy": {
+      "all": {
+        "rows": 103933,
+        "nll_stored": 2.3071513126667065,
+        "nll_shuffled": 2.3071513126575307,
+        "top1_stored": 0.0759623988531073,
+        "top1_shuffled": 0.0759623988531073,
+        "interval95": {
+          "nll_stored": [
+            2.299536554873224,
+            2.3143050568756
+          ],
+          "nll_shuffled": [
+            2.2995365555171423,
+            2.3143050569113344
+          ],
+          "top1_stored": [
+            0.07390423406978416,
+            0.07799683087786267
+          ],
+          "top1_shuffled": [
+            0.07390423406978416,
+            0.07799683087786267
+          ]
+        }
+      },
+      "move": {
+        "rows": 74853,
+        "nll_stored": 2.292437600007798,
+        "nll_shuffled": 2.29243760004602,
+        "top1_stored": 0.012370913657435239,
+        "top1_shuffled": 0.012370913657435239,
+        "interval95": {
+          "nll_stored": [
+            2.2845269965645794,
+            2.3001127087525273
+          ],
+          "nll_shuffled": [
+            2.284526996407763,
+            2.3001127086640523
+          ],
+          "top1_stored": [
+            0.011095552094814968,
+            0.01368191601268458
+          ],
+          "top1_shuffled": [
+            0.011095552094814968,
+            0.01368191601268458
+          ]
+        }
+      },
+      "not_yet_moved": {
+        "rows": 20309,
+        "nll_stored": 2.402465083274022,
+        "nll_shuffled": 2.4024650823524674,
+        "top1_stored": 0.0064011029592791376,
+        "top1_shuffled": 0.0064011029592791376,
+        "interval95": {
+          "nll_stored": [
+            2.397596086668567,
+            2.407147623644098
+          ],
+          "nll_shuffled": [
+            2.39759608693628,
+            2.4071476234321545
+          ],
+          "top1_stored": [
+            0.005324839930431201,
+            0.0074895524776108285
+          ],
+          "top1_shuffled": [
+            0.005324839930431201,
+            0.0074895524776108285
+          ]
+        },
+        "favourite_move_in_slot0_stored": 0.25791521000541634,
+        "favourite_move_in_slot0_shuffled": 0.2512186715249397
+      }
+    },
+    "value": {
+      "rows": 103944,
+      "brier": 0.25000840228783433,
+      "ece": 0.001471389770441569,
+      "share_below_0_1": 0.0,
+      "observed_win_rate_below_0_1": null,
+      "share_above_0_9": 0.0,
+      "observed_win_rate_above_0_9": null,
+      "interval95": {
+        "brier": [
+          0.2499775213131529,
+          0.25004004764566984
+        ],
+        "ece": [
+          0.0008797069770570453,
+          0.002106477279712026
+        ],
+        "share_below_0_1": [
+          0.0,
+          0.0
+        ],
+        "share_above_0_9": [
+          0.0,
+          0.0
+        ]
+      }
+    },
+    "interval_method": {
+      "unit": "game (both perspectives together)",
+      "samples": 2000,
+      "seed": 0,
+      "method": "percentile bootstrap, row-weighted statistic"
+    }
+  },
+  "data": {
+    "smoke": true,
+    "commit": "69b9d19b503702087d2d69a504b25019d2541fa3",
+    "ordinary_arrays_bit_identical": true,
+    "terminal_targets_valid": true,
+    "terminal_label_source": "public opponent views only; unique public base-species identities; unmatched identities rejected",
+    "public_terminal_cross_view_check": {
+      "corpus_games": 22000,
+      "games_with_both_outcomes": 22000,
+      "maximum_hp_antisymmetry_error": 0.0
+    },
+    "train_1000": {
+      "games": 1000,
+      "rows": 52955
+    },
+    "holdout_manifest": {
+      "games": 2000,
+      "rows": 103944
+    },
+    "corpus": {
+      "status": "complete",
+      "source_replays_considered": 22000,
+      "parsed_replays": 22000,
+      "quarantined_replays": 0,
+      "accepted_decision_versions": 1126792,
+      "all_decision_versions": 1130482,
+      "accepted_fraction": 0.9967359055694828,
+      "imputations_per_replay": 1,
+      "min_rating": 0,
+      "provenance_codes": {
+        "unknown": 0,
+        "inferred": 1,
+        "exact": 2
+      },
+      "public_state_reconstruction": "chronological_prefix_only",
+      "future_opponent_fields_used": false,
+      "private_truth": false,
+      "move_order": "seeded_permutation_after_completion",
+      "team_order": "seeded_public_preview_permutation",
+      "source_providers": [
+        "metamon_raw_replays"
+      ],
+      "filter_counts": {
+        "accepted": 1126792,
+        "called_or_unaligned_move": 2914,
+        "forced_or_unaligned_switch": 776
+      },
+      "imputation_method": "usage_baseline",
+      "candidate_bank_sha256": null,
+      "imputation_report": {}
+    }
+  }
+}

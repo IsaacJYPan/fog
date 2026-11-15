@@ -1,0 +1,74 @@
+"""Convert dense public outcomes; retain the fixed split and verify unchanged ordinary arrays."""
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+
+import numpy as np
+import polars as pl
+
+root = Path.cwd()
+art = root/'docs/briefs/09-artifacts'
+python = str(root/'.venv/bin/python')
+commit = subprocess.check_output(['git','rev-parse','HEAD'], text=True).strip()
+records = []
+def run(name, command):
+    start = time.monotonic()
+    with (art/(name+'.txt')).open('a') as log:
+        process = subprocess.run(command, stdout=log, stderr=subprocess.STDOUT,
+                                  env=dict(os.environ, OMP_WAIT_POLICY='PASSIVE', KMP_BLOCKTIME='0'))
+    records.append({'name':name, 'command':command, 'commit':commit, 'cwd':str(root),
+                    'seconds':time.monotonic()-start, 'exit_code':process.returncode, 'smoke':True})
+    (art/'value-data-execution.json').write_text(json.dumps(records, indent=2)+'\n')
+    if process.returncode: raise SystemExit(process.returncode)
+
+output = Path('data/metamon_gen9ou_r1500_value_public_decisions')
+split = Path('runs/order_blind_model/value_split')
+run('value-conversion', [python, '-m', 'fog.scripts.convert_replay_decisions', '--raw',
+    'data/metamon_gen9ou_r1500', '--out', str(output), '--imputations', '1', '--workers', '4', '--resume'])
+if not (split/'train_1000.parquet').exists():
+    run('value-split', [python, '-m', 'fog.scripts.split_replay_manifest', '--manifest',
+        str(output/'manifest.parquet'), '--out', str(split), '--holdout-ids',
+        'data/replay_splits/p2_holdout_2000_ids.txt', '--train-sizes', '1000'])
+quality = json.loads((output/'quality_report.json').read_text())
+assert quality['parsed_replays'] == 22000 and quality['quarantined_replays'] == 0
+counts = {'smoke':True, 'commit':commit, 'ordinary_arrays_bit_identical':True, 'terminal_targets_valid':True,
+          'terminal_label_source':'public opponent views only; stable preview identities; no imputed private abilities'}
+paired_games = 0
+maximum_error = 0.0
+for shard in pl.read_parquet(output/'manifest.parquet')['shard']:
+    with np.load(shard) as z:
+        positive = np.flatnonzero(z['outcome'] == 1)
+        negative = np.flatnonzero(z['outcome'] == -1)
+        assert z['terminal_valid'].all()
+        if len(positive) and len(negative):
+            left, right = positive[0], negative[0]
+            error = abs(float(z['terminal_hp_difference'][left] + z['terminal_hp_difference'][right]))
+            maximum_error = max(maximum_error,error)
+            assert error <= 1e-6, shard
+            for key in ['terminal_alive','terminal_alive_mask']:
+                np.testing.assert_array_equal(z[key][left],np.concatenate([z[key][right,6:],z[key][right,:6]]),err_msg=shard)
+            paired_games += 1
+counts['public_terminal_cross_view_check'] = {'corpus_games':22000,'games_with_both_outcomes':paired_games,'maximum_hp_antisymmetry_error':maximum_error}
+for name, games, expected_rows in [('train_1000',1000,52955), ('holdout_manifest',2000,103944)]:
+    original = pl.read_parquet(Path('runs/blueprint/split')/(name+'.parquet'))
+    current = pl.read_parquet(split/(name+'.parquet'))
+    assert original['id'].to_list() == current['id'].to_list()
+    assert len(current) == games and current['n_rows'].sum() == expected_rows
+    for old, new in zip(original.iter_rows(named=True), current.iter_rows(named=True), strict=True):
+        with np.load(old['shard']) as left, np.load(new['shard']) as right:
+            assert set(right.files)-set(left.files) == {'terminal_alive','terminal_alive_mask','terminal_hp_difference','terminal_valid'}
+            for key in left.files:
+                np.testing.assert_array_equal(left[key],right[key],err_msg=f'{old["id"]}: {key}')
+            assert right['terminal_valid'].all()
+            assert np.isfinite(right['terminal_hp_difference']).all()
+            assert np.abs(right['terminal_hp_difference']).max() <= 1.0
+            assert np.isin(right['terminal_alive'],[0,1]).all()
+    counts[name] = {'games':games,'rows':expected_rows}
+assert set(pl.read_parquet(split/'holdout_manifest.parquet')['id']) == set(Path('data/replay_splits/p2_holdout_2000_ids.txt').read_text().splitlines())
+counts['corpus'] = quality
+(art/'value-data-counts.json').write_text(json.dumps(counts, indent=2)+'\n')
+shutil.copyfile(output/'quality_report.json',art/'value-conversion-quality.json')
+print('Value data complete: all ordinary arrays identical in the 3,000 fixed-split games',flush=True)

@@ -1,0 +1,24 @@
+[
+  {
+    "name": "value-conversion",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.scripts.convert_replay_decisions",
+      "--raw",
+      "data/metamon_gen9ou_r1500",
+      "--out",
+      "data/metamon_gen9ou_r1500_value_decisions",
+      "--imputations",
+      "1",
+      "--workers",
+      "4",
+      "--resume"
+    ],
+    "commit": "699bd3f5f9038c7fc094e2a722133f76a083d586",
+    "cwd": "/workspace/fog",
+    "seconds": 337.90516914699947,
+    "exit_code": -15,
+    "smoke": true
+  }
+]

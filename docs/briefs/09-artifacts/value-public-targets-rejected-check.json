@@ -1,0 +1,518 @@
+{
+  "smoke": true,
+  "data_source_commit": "699bd3f5f9038c7fc094e2a722133f76a083d586",
+  "dataset": "data/metamon_gen9ou_r1500_value_decisions",
+  "sample": "first 500 lexically sorted completed shards",
+  "games": 500,
+  "paired_games": 500,
+  "threshold": 1e-05,
+  "mismatch_games": 84,
+  "maximum_error": 0.1666666716337204,
+  "mismatches": [
+    {
+      "game": "gen9ou-2049136773",
+      "hp_difference_winner": 0.09833332151174545,
+      "hp_difference_loser": -0.26499998569488525,
+      "antisymmetry_error": 0.1666666567325592
+    },
+    {
+      "game": "gen9ou-2049679303",
+      "hp_difference_winner": 0.33166661858558655,
+      "hp_difference_loser": -0.27666664123535156,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2051942293",
+      "hp_difference_winner": 0.0466667003929615,
+      "hp_difference_loser": 0.008333285339176655,
+      "antisymmetry_error": 0.05499998480081558
+    },
+    {
+      "game": "gen9ou-2052044040",
+      "hp_difference_winner": 0.08500000089406967,
+      "hp_difference_loser": -0.03000001050531864,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2052761730",
+      "hp_difference_winner": 0.130000039935112,
+      "hp_difference_loser": -0.12000000476837158,
+      "antisymmetry_error": 0.010000035166740417
+    },
+    {
+      "game": "gen9ou-2056728412",
+      "hp_difference_winner": 0.11333338171243668,
+      "hp_difference_loser": -0.0416666679084301,
+      "antisymmetry_error": 0.07166671752929688
+    },
+    {
+      "game": "gen9ou-2057986583",
+      "hp_difference_winner": 0.2866666913032532,
+      "hp_difference_loser": -0.2316666692495346,
+      "antisymmetry_error": 0.05500002205371857
+    },
+    {
+      "game": "gen9ou-2058033039",
+      "hp_difference_winner": 0.011666695587337017,
+      "hp_difference_loser": 0.04333329200744629,
+      "antisymmetry_error": 0.05499998852610588
+    },
+    {
+      "game": "gen9ou-2058233486",
+      "hp_difference_winner": 0.46833333373069763,
+      "hp_difference_loser": -0.42666664719581604,
+      "antisymmetry_error": 0.04166668653488159
+    },
+    {
+      "game": "gen9ou-2058674577",
+      "hp_difference_winner": 0.5683333277702332,
+      "hp_difference_loser": -0.513333261013031,
+      "antisymmetry_error": 0.05500006675720215
+    },
+    {
+      "game": "gen9ou-2058939959",
+      "hp_difference_winner": 0.1483333259820938,
+      "hp_difference_loser": -0.09333334118127823,
+      "antisymmetry_error": 0.05499998480081558
+    },
+    {
+      "game": "gen9ou-2059456863",
+      "hp_difference_winner": 0.3733333349227905,
+      "hp_difference_loser": -0.3566666543483734,
+      "antisymmetry_error": 0.016666680574417114
+    },
+    {
+      "game": "gen9ou-2059686835",
+      "hp_difference_winner": 0.7699999809265137,
+      "hp_difference_loser": -0.6850000023841858,
+      "antisymmetry_error": 0.08499997854232788
+    },
+    {
+      "game": "gen9ou-2060419313",
+      "hp_difference_winner": 0.2866666615009308,
+      "hp_difference_loser": -0.24666662514209747,
+      "antisymmetry_error": 0.04000003635883331
+    },
+    {
+      "game": "gen9ou-2060794582",
+      "hp_difference_winner": 0.20500004291534424,
+      "hp_difference_loser": -0.17999999225139618,
+      "antisymmetry_error": 0.02500005066394806
+    },
+    {
+      "game": "gen9ou-2060984608",
+      "hp_difference_winner": 0.383333295583725,
+      "hp_difference_loser": -0.32833337783813477,
+      "antisymmetry_error": 0.05499991774559021
+    },
+    {
+      "game": "gen9ou-2060997043",
+      "hp_difference_winner": 0.2866666316986084,
+      "hp_difference_loser": -0.2149999886751175,
+      "antisymmetry_error": 0.0716666430234909
+    },
+    {
+      "game": "gen9ou-2061000446",
+      "hp_difference_winner": 0.3916666805744171,
+      "hp_difference_loser": -0.3500000238418579,
+      "antisymmetry_error": 0.041666656732559204
+    },
+    {
+      "game": "gen9ou-2061747709",
+      "hp_difference_winner": 0.22166667878627777,
+      "hp_difference_loser": -0.20999997854232788,
+      "antisymmetry_error": 0.01166670024394989
+    },
+    {
+      "game": "gen9ou-2061802105",
+      "hp_difference_winner": 0.1666666716337204,
+      "hp_difference_loser": -0.3333333432674408,
+      "antisymmetry_error": 0.1666666716337204
+    },
+    {
+      "game": "gen9ou-2061942197",
+      "hp_difference_winner": 0.09500002861022949,
+      "hp_difference_loser": -0.055000025779008865,
+      "antisymmetry_error": 0.04000000283122063
+    },
+    {
+      "game": "gen9ou-2062444317",
+      "hp_difference_winner": 0.3383333683013916,
+      "hp_difference_loser": -0.25999999046325684,
+      "antisymmetry_error": 0.07833337783813477
+    },
+    {
+      "game": "gen9ou-2062699734",
+      "hp_difference_winner": 0.15833334624767303,
+      "hp_difference_loser": -0.10333333164453506,
+      "antisymmetry_error": 0.05500001460313797
+    },
+    {
+      "game": "gen9ou-2062866477",
+      "hp_difference_winner": 0.18000002205371857,
+      "hp_difference_loser": -0.1783333569765091,
+      "antisymmetry_error": 0.0016666650772094727
+    },
+    {
+      "game": "gen9ou-2063096359",
+      "hp_difference_winner": 0.6100000143051147,
+      "hp_difference_loser": -0.5600000023841858,
+      "antisymmetry_error": 0.050000011920928955
+    },
+    {
+      "game": "gen9ou-2063395623",
+      "hp_difference_winner": 0.14666666090488434,
+      "hp_difference_loser": -0.27166667580604553,
+      "antisymmetry_error": 0.1250000149011612
+    },
+    {
+      "game": "gen9ou-2063443195",
+      "hp_difference_winner": 0.27166667580604553,
+      "hp_difference_loser": -0.23000000417232513,
+      "antisymmetry_error": 0.0416666716337204
+    },
+    {
+      "game": "gen9ou-2063497279",
+      "hp_difference_winner": 0.27833330631256104,
+      "hp_difference_loser": -0.23499996960163116,
+      "antisymmetry_error": 0.04333333671092987
+    },
+    {
+      "game": "gen9ou-2063665249",
+      "hp_difference_winner": 0.2916666567325592,
+      "hp_difference_loser": -0.23666666448116302,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2063706850",
+      "hp_difference_winner": 0.21666665375232697,
+      "hp_difference_loser": -0.1966666728258133,
+      "antisymmetry_error": 0.019999980926513672
+    },
+    {
+      "game": "gen9ou-2063735305",
+      "hp_difference_winner": 0.27666664123535156,
+      "hp_difference_loser": -0.22166664898395538,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2063900898",
+      "hp_difference_winner": 0.2383333444595337,
+      "hp_difference_loser": -0.18333333730697632,
+      "antisymmetry_error": 0.05500000715255737
+    },
+    {
+      "game": "gen9ou-2063939521",
+      "hp_difference_winner": 0.5583333373069763,
+      "hp_difference_loser": -0.5033333897590637,
+      "antisymmetry_error": 0.0549999475479126
+    },
+    {
+      "game": "gen9ou-2064104091",
+      "hp_difference_winner": 0.4816666543483734,
+      "hp_difference_loser": -0.48000001907348633,
+      "antisymmetry_error": 0.001666635274887085
+    },
+    {
+      "game": "gen9ou-2064140093",
+      "hp_difference_winner": 0.21833331882953644,
+      "hp_difference_loser": -0.16333331167697906,
+      "antisymmetry_error": 0.05500000715255737
+    },
+    {
+      "game": "gen9ou-2064308870",
+      "hp_difference_winner": 0.31666669249534607,
+      "hp_difference_loser": -0.26999998092651367,
+      "antisymmetry_error": 0.0466667115688324
+    },
+    {
+      "game": "gen9ou-2064347568",
+      "hp_difference_winner": 0.2849999964237213,
+      "hp_difference_loser": -0.23000000417232513,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2064376113",
+      "hp_difference_winner": 0.2433333843946457,
+      "hp_difference_loser": -0.21500003337860107,
+      "antisymmetry_error": 0.028333351016044617
+    },
+    {
+      "game": "gen9ou-2064634929",
+      "hp_difference_winner": 0.24833333492279053,
+      "hp_difference_loser": -0.09000007063150406,
+      "antisymmetry_error": 0.15833327174186707
+    },
+    {
+      "game": "gen9ou-2064840665",
+      "hp_difference_winner": 0.22666668891906738,
+      "hp_difference_loser": -0.17166666686534882,
+      "antisymmetry_error": 0.05500002205371857
+    },
+    {
+      "game": "gen9ou-2064873283",
+      "hp_difference_winner": 0.26999998092651367,
+      "hp_difference_loser": -0.2149999886751175,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2064919922",
+      "hp_difference_winner": 0.061666686087846756,
+      "hp_difference_loser": -0.02333335019648075,
+      "antisymmetry_error": 0.038333334028720856
+    },
+    {
+      "game": "gen9ou-2064923013",
+      "hp_difference_winner": 0.46999993920326233,
+      "hp_difference_loser": -0.41499996185302734,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2064926771",
+      "hp_difference_winner": 0.32333335280418396,
+      "hp_difference_loser": -0.2683333158493042,
+      "antisymmetry_error": 0.05500003695487976
+    },
+    {
+      "game": "gen9ou-2065006930",
+      "hp_difference_winner": 0.43000006675720215,
+      "hp_difference_loser": -0.38499999046325684,
+      "antisymmetry_error": 0.04500007629394531
+    },
+    {
+      "game": "gen9ou-2065022474",
+      "hp_difference_winner": 0.4050000011920929,
+      "hp_difference_loser": -0.5716666579246521,
+      "antisymmetry_error": 0.1666666567325592
+    },
+    {
+      "game": "gen9ou-2065047003",
+      "hp_difference_winner": 0.10166660696268082,
+      "hp_difference_loser": -0.046666622161865234,
+      "antisymmetry_error": 0.05499998480081558
+    },
+    {
+      "game": "gen9ou-2065278505",
+      "hp_difference_winner": 0.5133333802223206,
+      "hp_difference_loser": -0.4583333432674408,
+      "antisymmetry_error": 0.05500003695487976
+    },
+    {
+      "game": "gen9ou-2065300347",
+      "hp_difference_winner": 0.5516666769981384,
+      "hp_difference_loser": -0.49666666984558105,
+      "antisymmetry_error": 0.05500000715255737
+    },
+    {
+      "game": "gen9ou-2065333612",
+      "hp_difference_winner": 0.1733333319425583,
+      "hp_difference_loser": -0.1666666716337204,
+      "antisymmetry_error": 0.006666660308837891
+    },
+    {
+      "game": "gen9ou-2065599673",
+      "hp_difference_winner": 0.23499999940395355,
+      "hp_difference_loser": -0.18000000715255737,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2066032667",
+      "hp_difference_winner": 0.35499992966651917,
+      "hp_difference_loser": -0.2999999523162842,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2066246329",
+      "hp_difference_winner": 0.1300000101327896,
+      "hp_difference_loser": -0.07499999552965164,
+      "antisymmetry_error": 0.05500001460313797
+    },
+    {
+      "game": "gen9ou-2066289365",
+      "hp_difference_winner": 0.5583333373069763,
+      "hp_difference_loser": -0.5066666603088379,
+      "antisymmetry_error": 0.05166667699813843
+    },
+    {
+      "game": "gen9ou-2066323641",
+      "hp_difference_winner": 0.0716666653752327,
+      "hp_difference_loser": -0.016666671261191368,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2066490672",
+      "hp_difference_winner": 0.08833334594964981,
+      "hp_difference_loser": -0.033333342522382736,
+      "antisymmetry_error": 0.055000003427267075
+    },
+    {
+      "game": "gen9ou-2066713900",
+      "hp_difference_winner": 0.4866666793823242,
+      "hp_difference_loser": -0.43166670203208923,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2066813779",
+      "hp_difference_winner": 0.31499993801116943,
+      "hp_difference_loser": -0.25999996066093445,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2067204973",
+      "hp_difference_winner": 0.565000057220459,
+      "hp_difference_loser": -0.51500004529953,
+      "antisymmetry_error": 0.050000011920928955
+    },
+    {
+      "game": "gen9ou-2067529211",
+      "hp_difference_winner": 0.20666666328907013,
+      "hp_difference_loser": -0.15166668593883514,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2067571752",
+      "hp_difference_winner": 0.1733333319425583,
+      "hp_difference_loser": -0.11833333969116211,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2067597903",
+      "hp_difference_winner": 0.23500001430511475,
+      "hp_difference_loser": -0.18000002205371857,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2067786371",
+      "hp_difference_winner": 0.28333333134651184,
+      "hp_difference_loser": -0.22833333909511566,
+      "antisymmetry_error": 0.05499999225139618
+    },
+    {
+      "game": "gen9ou-2068474129",
+      "hp_difference_winner": 0.35333332419395447,
+      "hp_difference_loser": -0.2983333468437195,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2068648538",
+      "hp_difference_winner": -0.06166664883494377,
+      "hp_difference_loser": 0.11666663736104965,
+      "antisymmetry_error": 0.05499998852610588
+    },
+    {
+      "game": "gen9ou-2068709493",
+      "hp_difference_winner": 0.6983333230018616,
+      "hp_difference_loser": -0.643333375453949,
+      "antisymmetry_error": 0.0549999475479126
+    },
+    {
+      "game": "gen9ou-2068795347",
+      "hp_difference_winner": 0.1416666954755783,
+      "hp_difference_loser": -0.3083333671092987,
+      "antisymmetry_error": 0.1666666716337204
+    },
+    {
+      "game": "gen9ou-2068823918",
+      "hp_difference_winner": 0.09833332896232605,
+      "hp_difference_loser": -0.26499998569488525,
+      "antisymmetry_error": 0.1666666567325592
+    },
+    {
+      "game": "gen9ou-2069003492",
+      "hp_difference_winner": -0.03833332657814026,
+      "hp_difference_loser": 0.09333333373069763,
+      "antisymmetry_error": 0.05500000715255737
+    },
+    {
+      "game": "gen9ou-2069198081",
+      "hp_difference_winner": 0.49000000953674316,
+      "hp_difference_loser": -0.4349999725818634,
+      "antisymmetry_error": 0.05500003695487976
+    },
+    {
+      "game": "gen9ou-2069269602",
+      "hp_difference_winner": 0.2916666567325592,
+      "hp_difference_loser": -0.2133333683013916,
+      "antisymmetry_error": 0.0783332884311676
+    },
+    {
+      "game": "gen9ou-2069329481",
+      "hp_difference_winner": 0.5583333373069763,
+      "hp_difference_loser": -0.5299999713897705,
+      "antisymmetry_error": 0.02833336591720581
+    },
+    {
+      "game": "gen9ou-2069655892",
+      "hp_difference_winner": 0.2616666853427887,
+      "hp_difference_loser": -0.2066667079925537,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2069884713",
+      "hp_difference_winner": 0.6833333373069763,
+      "hp_difference_loser": -0.628333330154419,
+      "antisymmetry_error": 0.05500000715255737
+    },
+    {
+      "game": "gen9ou-2070093920",
+      "hp_difference_winner": 0.3016667068004608,
+      "hp_difference_loser": -0.25833335518836975,
+      "antisymmetry_error": 0.043333351612091064
+    },
+    {
+      "game": "gen9ou-2070109281",
+      "hp_difference_winner": 0.2433333396911621,
+      "hp_difference_loser": -0.18833331763744354,
+      "antisymmetry_error": 0.05500002205371857
+    },
+    {
+      "game": "gen9ou-2070110267",
+      "hp_difference_winner": 0.18500001728534698,
+      "hp_difference_loser": -0.15833337604999542,
+      "antisymmetry_error": 0.026666641235351562
+    },
+    {
+      "game": "gen9ou-2070129988",
+      "hp_difference_winner": 0.26499995589256287,
+      "hp_difference_loser": -0.22166664898395538,
+      "antisymmetry_error": 0.04333330690860748
+    },
+    {
+      "game": "gen9ou-2070154508",
+      "hp_difference_winner": -0.16500000655651093,
+      "hp_difference_loser": -0.0016666665906086564,
+      "antisymmetry_error": 0.1666666716337204
+    },
+    {
+      "game": "gen9ou-2070156253",
+      "hp_difference_winner": 0.054999906569719315,
+      "hp_difference_loser": 7.947286206899662e-08,
+      "antisymmetry_error": 0.05499998480081558
+    },
+    {
+      "game": "gen9ou-2070232005",
+      "hp_difference_winner": 0.1416667252779007,
+      "hp_difference_loser": -0.06833338737487793,
+      "antisymmetry_error": 0.07333333790302277
+    },
+    {
+      "game": "gen9ou-2070439247",
+      "hp_difference_winner": 0.03166663646697998,
+      "hp_difference_loser": -0.19833330810070038,
+      "antisymmetry_error": 0.1666666716337204
+    },
+    {
+      "game": "gen9ou-2070630329",
+      "hp_difference_winner": 0.3683333396911621,
+      "hp_difference_loser": -0.3133333623409271,
+      "antisymmetry_error": 0.054999977350234985
+    },
+    {
+      "game": "gen9ou-2071355257",
+      "hp_difference_winner": 0.5049999356269836,
+      "hp_difference_loser": -0.44999995827674866,
+      "antisymmetry_error": 0.054999977350234985
+    }
+  ],
+  "used_for_training": false
+}

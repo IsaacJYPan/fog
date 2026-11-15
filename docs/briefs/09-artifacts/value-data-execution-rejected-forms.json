@@ -1,0 +1,45 @@
+[
+  {
+    "name": "value-conversion",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.scripts.convert_replay_decisions",
+      "--raw",
+      "data/metamon_gen9ou_r1500",
+      "--out",
+      "data/metamon_gen9ou_r1500_value_public_decisions",
+      "--imputations",
+      "1",
+      "--workers",
+      "4",
+      "--resume"
+    ],
+    "commit": "d86caf1d5911fee6974201bcbc4a8356e4fcec0f",
+    "cwd": "/workspace/fog",
+    "seconds": 1050.8698869070013,
+    "exit_code": 0,
+    "smoke": true
+  },
+  {
+    "name": "value-split",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.scripts.split_replay_manifest",
+      "--manifest",
+      "data/metamon_gen9ou_r1500_value_public_decisions/manifest.parquet",
+      "--out",
+      "runs/order_blind_model/value_split",
+      "--holdout-ids",
+      "data/replay_splits/p2_holdout_2000_ids.txt",
+      "--train-sizes",
+      "1000"
+    ],
+    "commit": "d86caf1d5911fee6974201bcbc4a8356e4fcec0f",
+    "cwd": "/workspace/fog",
+    "seconds": 4.097452031999637,
+    "exit_code": 0,
+    "smoke": true
+  }
+]

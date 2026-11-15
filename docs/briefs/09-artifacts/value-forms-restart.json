@@ -1,0 +1,20 @@
+{
+  "smoke": true,
+  "status": "partial R3 rejected before final comparison",
+  "source_commit": "d86caf1d5911fee6974201bcbc4a8356e4fcec0f",
+  "completed_epochs": 2,
+  "reason": "Ogerpon-only form matching missed other public battle forms; full raw-log switch scan and four public-state checks confirmed unmatched Dudunsparce-Three-Segment, Palafin-Hero, Mimikyu-Busted, Eiscue-Noice",
+  "unmatched_switch_event_counts": {
+    "dudunsparcethreesegment": 23,
+    "palafinhero": 215,
+    "mimikyubusted": 105,
+    "eiscuenoice": 4
+  },
+  "examples": {
+    "dudunsparcethreesegment": "gen9ou-2603566117",
+    "palafinhero": "gen9ou-2267702908",
+    "mimikyubusted": "gen9ou-2130472160",
+    "eiscuenoice": "gen9ou-2551484182"
+  },
+  "used_for_final_comparison": false
+}

@@ -1,0 +1,4 @@
+Source: 69b9d19b503702087d2d69a504b25019d2541fa3
+OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 .venv/bin/python -m pytest -q tests/test_value_targets.py tests/test_bc_resume.py tests/test_replay_slot_order_check.py tests/test_replay_supervision.py tests/test_replay_parser.py tests/test_bc_metrics.py tests/test_replay_conversion_resume.py tests/test_bc_scope.py tests/test_tera_parser_state.py
+.venv/bin/ruff check fog tests
+OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 .venv/bin/python runs/order_blind_model/check_compatibility.py

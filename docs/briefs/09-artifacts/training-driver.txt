@@ -1,0 +1,65 @@
+"""Fixed CPU smoke recipe and two independent checkpoint diagnostics."""
+import argparse
+import csv
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+
+parser = argparse.ArgumentParser()
+parser.add_argument('name')
+parser.add_argument('config')
+parser.add_argument('--seed', type=int, default=20261201)
+parser.add_argument('--split', default='runs/order_blind_model/terminal_split')
+args = parser.parse_args()
+root = Path.cwd()
+art = root/'docs/briefs/09-artifacts'
+python = str(root/'.venv/bin/python')
+env = dict(os.environ, OMP_WAIT_POLICY='PASSIVE', KMP_BLOCKTIME='0')
+commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
+records = []
+
+def run(label, command):
+    start = time.monotonic()
+    with (art/(label+'.txt')).open('a') as log:
+        process = subprocess.run(command, env=env, stdout=log, stderr=subprocess.STDOUT)
+    records.append({'name': label, 'command': command, 'cwd': str(root), 'commit': commit,
+                    'seconds': time.monotonic()-start, 'exit_code': process.returncode,
+                    'environment': {'OMP_WAIT_POLICY': 'PASSIVE', 'KMP_BLOCKTIME': '0'},
+                    'smoke': True})
+    (art/(args.name+'-execution.json')).write_text(json.dumps(records, indent=2)+'\n')
+    if process.returncode:
+        raise SystemExit(process.returncode)
+
+runroot = root/'runs/order_blind_model'/args.name
+run(args.name+'-training', [python, '-m', 'fog.training.bc', '--config', args.config, '--set',
+    f'bc.manifest={args.split}/train_1000.parquet',
+    f'bc.holdout_manifest={args.split}/holdout_manifest.parquet', 'bc.epochs=8',
+    'bc.early_stopping_patience=0', 'bc.resume=true', 'bc.selection_metric=action_ce',
+    f'log.dir={runroot}', f'seed={args.seed}'])
+shutil.copyfile(runroot/'metrics.csv', art/(args.name+'-metrics.csv'))
+rows = list(csv.DictReader((runroot/'metrics.csv').open()))
+policy = min(rows, key=lambda r: float(r['eval_action_ce']))
+value = min(rows, key=lambda r: float(r['eval_value']))
+native = json.loads((runroot/'value_selection.json').read_text())
+assert native['best_policy_epoch'] == int(policy['epoch'])
+assert native['best_value_epoch'] == int(value['epoch'])
+selection = {'smoke': True, 'commit': commit, 'seed': args.seed,
+             'best_policy_epoch': int(policy['epoch']), 'best_value_epoch': int(value['epoch']),
+             'policy_epoch_metrics': policy, 'value_epoch_metrics': value,
+             'native_value_selection': native}
+(art/(args.name+'-selection.json')).write_text(json.dumps(selection, indent=2)+'\n')
+for label, filename in [('policy', 'bc_best.pt'), ('value', 'bc_best_value.pt')]:
+    run(args.name+'-best-'+label+'-slot-check', [python, '-m', 'fog.eval.replay_slot_order_check',
+        '--config', args.config, '--manifest', f'{args.split}/holdout_manifest.parquet',
+        '--checkpoint', str(runroot/'checkpoints'/filename),
+        '--out', str(art/(args.name+'-best-'+label+'-slot-check.json'))])
+    result = json.loads((art/(args.name+'-best-'+label+'-slot-check.json')).read_text())
+    for group in ('all', 'move', 'not_yet_moved'):
+        # Epoch-zero value checkpoints can have exact policy ties; argmax's first-slot
+        # tie break need not permute. The required top-1 comparison is at best policy.
+        for metric in (('nll', 'top1') if label == 'policy' else ('nll',)):
+            assert round(result['policy'][group][metric+'_stored'], 4) == round(result['policy'][group][metric+'_shuffled'], 4)
+print(args.name+' measurements complete', flush=True)
