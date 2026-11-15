@@ -2735,3 +2735,9 @@ Observed saved blocks: 176 games, 140 wins, 5618 decisions, 9 fallbacks, 0 rejec
 400-game smoke; same seed blocks across cells.
 
 | 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.775 [0.732, 0.813] (310-90-0) | 3.419 | 28/12836 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget curve stage complete
+
+Budget charged 40.0000 allocated core-hours. Complete cells: ['800 ms K=8', '200 ms K=8', '3200 ms K=8', '800 ms K=1', '800 ms K=32', '200 ms K=1', '200 ms K=32', '3200 ms K=1']. Unfinished/not run: ['3200 ms K=32']. The 40-core-hour cap stops further cells.
+
+

@@ -1,0 +1,296 @@
+[showdown-selection] mcts vs simpleheuristics: 4/100 A=4 B=0 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 8/100 A=7 B=1 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 12/100 A=11 B=1 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 16/100 A=14 B=2 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 20/100 A=18 B=2 draws=0 failures=0
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (9989) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+[showdown-selection] mcts vs simpleheuristics: 24/100 A=21 B=3 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 28/100 A=25 B=3 draws=0 failures=0
