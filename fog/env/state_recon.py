@@ -82,6 +82,13 @@ _ENGINE_VOLATILES = {
     "protosynthesisspe", "quarkdriveatk", "quarkdrivedef", "quarkdrivespa", "quarkdrivespd",
     "quarkdrivespe", "flashfire",
 }
+# A charging move is public via `-prepare`, but poke-env keeps it separately from effects.
+_CHARGE_VOLATILES = {
+    "bounce", "dig", "dive", "fly", "freezeshock", "geomancy", "iceburn", "meteorbeam",
+    "electroshot", "phantomforce", "razorwind", "shadowforce", "skullbash", "skyattack",
+    "skydrop", "solarbeam", "solarblade",
+}
+_ENGINE_VOLATILES |= _CHARGE_VOLATILES
 # poke-env names a binding move by the move itself; the engine has one volatile for all of them
 _BINDING_EFFECTS = {"bind", "clamp", "firespin", "infestation", "magmastorm", "sandtomb",
                     "snaptrap", "thundercage", "whirlpool", "wrap"}
@@ -153,6 +160,35 @@ def _rest_attempts(view: Any) -> dict[str, int]:
     return asleep
 
 
+def _pending_charges(view: Any) -> dict[str, str] | None:
+    """Public charge turns, including immediate completion by Power Herb or sunlight.
+
+    poke-env's preparing_move stays set after the protocol's -anim / Power Herb event, so it
+    cannot alone distinguish a pending second turn from a move already completed this turn.
+    """
+    from fog.encoding.history import observations_by_turn
+
+    try:
+        obs = observations_by_turn(view)
+    except Exception:  # noqa: BLE001 - engine-shaped views use their explicit effect set
+        return None
+    pending: dict[str, str] = {}
+    for turn in sorted(obs):
+        for ev in getattr(obs[turn], "events", None) or []:
+            if len(ev) < 3:
+                continue
+            kind, key = ev[1], event_mon_key(ev[2])
+            if kind == "-prepare" and len(ev) > 3:
+                move = to_id(ev[3])
+                if move in _CHARGE_VOLATILES:
+                    pending[key] = move
+            elif kind in ("move", "-anim", "switch", "drag", "faint", "cant") or (
+                kind == "-enditem" and len(ev) > 3 and to_id(ev[3]) == "powerherb"
+            ):
+                pending.pop(key, None)
+    return pending
+
+
 def _tera_from_log(view: Any) -> dict[str, str]:
     """Public-log scan: mon key ('p1: Name') -> Tera type for every ``-terastallize`` event. This
     backs up the parser's per-mon flag so a side's used Tera is never lost from the rebuilt state
@@ -174,6 +210,8 @@ def _tera_from_log(view: Any) -> dict[str, str]:
 def _pre_tera_species(sid: str, tables) -> str:
     """'ogerponwellspringtera' -> 'ogerponwellspring': sampled worlds and team preview use the
     pre-Tera forme, while the battle log switches the species on Terastallization."""
+    if sid == "ogerpontealtera":
+        return "ogerpon"
     if sid.endswith("tera") and sid[:-4] in tables.species["features"]:
         return sid[:-4]
     return sid
@@ -328,20 +366,23 @@ def _side_conditions(cond_dict: dict, turn: int) -> pe.SideConditions:
     return pe.SideConditions(**kw)
 
 
-def _active_volatiles(mon: Any) -> tuple[set[str], int]:
+def _active_volatiles(mon: Any, charging_move: str | None = None) -> tuple[set[str], int]:
     """(engine volatile-status set, substitute health) from a view mon's effects dict."""
     vols = {to_id(getattr(e, "name", e)) for e in (getattr(mon, "effects", None) or {})}
     if vols & _BINDING_EFFECTS:
         vols.add("partiallytrapped")
+    if charging_move in _CHARGE_VOLATILES:
+        vols.add(charging_move)
     vols &= _ENGINE_VOLATILES
     sub_hp = 1 if "substitute" in vols else 0  # health >0 flags the sub; exact value is hidden
     return vols, sub_hp
 
 
 def _build_side(mons: list, active_idx: int, active_view: Any | None, cond_dict: dict,
-                turn: int) -> pe.Side:
+                turn: int, charging_move: str | None = None) -> pe.Side:
     boosts = getattr(active_view, "boosts", None) or {}
-    vols, sub_hp = _active_volatiles(active_view) if active_view is not None else (set(), 0)
+    vols, sub_hp = (_active_volatiles(active_view, charging_move)
+                    if active_view is not None else (set(), 0))
     if sub_hp and 0 <= active_idx < len(mons):
         sub_hp = max(1, mons[active_idx].maxhp // 4)
     return pe.Side(
@@ -488,6 +529,7 @@ def reconstruct_battle(
     # ---- my side (searcher, exact) --------------------------------------------------------------
     rest = _rest_attempts(view)
     tera_log = _tera_from_log(view)
+    charges = _pending_charges(view) or {}
     my_items = list((getattr(view, "team", None) or {}).items())[:N_SLOTS]
     my_view_mons = [m for _, m in my_items]
     my_mons = [_engine_mon_from_self(m, tables, rest.get(str(k)), tera_log.get(str(k)))
@@ -527,9 +569,14 @@ def reconstruct_battle(
 
     # ---- assemble sides + field (searcher's actual role decides side_one/side_two) --------------
     my_side = _build_side(my_mons, my_active, my_active_view,
-                          getattr(view, "side_conditions", None) or {}, turn)
+                          getattr(view, "side_conditions", None) or {}, turn,
+                          next((charges.get(str(k)) for k, m in my_items
+                                if m is my_active_view), None))
     opp_side = _build_side(opp_mons, opp_active, opp_active_view,
-                           getattr(view, "opponent_side_conditions", None) or {}, turn)
+                           getattr(view, "opponent_side_conditions", None) or {}, turn,
+                           next((charges.get(str(k)) for k, m in
+                                 (getattr(view, "opponent_team", None) or {}).items()
+                                 if m is opp_active_view), None))
     sides = {role: my_side, opp_role: opp_side}
     # items as they stand in this rebuilt state, keyed like the public log ('p1: Pelipper')
     items = {str(k): str(mon.item) for (k, _), mon in zip(my_items, my_mons)}

@@ -425,3 +425,43 @@ def test_lead_weather_ability_lasts_five_turns_on_the_engine_backend():
     battle = EngineBattle(pelipper, P_ONE, seed=1, battle_tag="lead-weather")
     assert str(battle.state.weather).lower() == "rain"
     assert int(battle.state.weather_turns_remaining) == 5
+
+
+@pytest.mark.parametrize("species,original", [
+    ("ogerpontealtera", "ogerpon"),
+    ("ogerponwellspringtera", "ogerponwellspring"),
+    ("ogerponhearthflametera", "ogerponhearthflame"),
+    ("ogerponcornerstonetera", "ogerponcornerstone"),
+])
+def test_ogerpon_tera_formes_match_the_submitted_world(species, original):
+    from fog.env.state_recon import _pre_tera_species
+
+    assert _pre_tera_species(species, _tables()) == original
+
+
+@pytest.mark.parametrize("move", ["phantomforce", "meteorbeam", "electroshot"])
+def test_public_preparing_move_reaches_engine_and_forces_its_second_turn(move):
+    import poke_engine as pe
+    from fog.env.state_recon import _active_volatiles, _pending_charges
+
+    events = [["", "move", "p1a: Mew", move, "", "[still]"],
+              ["", "-prepare", "p1a: Mew", move]]
+    charges = _pending_charges(_events_view(events))
+    vols, _ = _active_volatiles(SimpleNamespace(effects={}), charges["p1: Mew"])
+    assert vols == {move}
+
+    def engine_mon(name):
+        return pe.Pokemon(id=name, hp=300, maxhp=300, ability="none", item="none",
+                          moves=[pe.Move(id=move), pe.Move(id="splash")])
+
+    state = pe.State(side_one=pe.Side(pokemon=[engine_mon("mew")], volatile_statuses=vols),
+                     side_two=pe.Side(pokemon=[engine_mon("snorlax")]))
+    choices = _root_choices(state)
+    assert choices and all(choice.removesuffix("-tera") == move for choice in choices)
+
+    # Both a normal second move and an immediate animation clear the charge. In the latter
+    # case poke-env's preparing_move is stale, so reconstruction must use the public events.
+    for end in (["", "move", "p1a: Mew", move, "p2a: Snorlax"],
+                ["", "-anim", "p1a: Mew", move, "p2a: Snorlax"],
+                ["", "-enditem", "p1a: Mew", "Power Herb"]):
+        assert _pending_charges(_events_view([*events, end])) == {}
