@@ -2683,3 +2683,23 @@ larger than on the CPU.
 **What follows.** Train the replay policy and value without belief passes (brief 13 now does).
 The opponent-team model is not needed until P4.1; train it then, on its own, with the trunk
 frozen. For self-play the same skip is in brief 14.
+
+## 2026-11-15: the policy-only training step, control on one machine
+
+The control promised in the previous section: the same recipe, data, seed and machine (4 CPU
+cores, PyTorch 2.13.0 CPU), run one after the other, differing only in the belief losses.
+Smoke; one seed each.
+
+| Run | Belief losses | Best holdout NLL (epoch) | Top-1 at that epoch | NLL / top-1 at epoch 8 | Value MSE at epoch 8 | Train rows/s | Seconds per epoch | Whole run |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| A | 0.05 and 0.05 (config values) | 1.9235 (8) | 26.60% | 1.9235 / 26.60% | 1.61 | 193 to 202 | 398 | 3,361 s |
+| B | none, passes skipped | 1.9248 (6) | 26.15% | 1.9274 / 26.47% | 1.58 | 412 to 436 | 176 | 1,481 s |
+
+Per-epoch numbers: `docs/notes/policy-only-step/{A,B}-metrics.csv`. Run A reproduces brief
+07's R1 from another machine (1.9239).
+
+The difference in best NLL is 0.0013, against 0.0107 for twice the gap between two seeds
+(brief 07), so no difference is claimed. Training is 2.1 to 2.2 times as fast in rows per
+second and the whole run, with its nine holdout passes, 2.27 times. The reading of the
+previous section stands, now measured on one machine. Still not shown: 20,000 games or more,
+and a GPU.
