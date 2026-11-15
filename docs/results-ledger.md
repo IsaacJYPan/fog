@@ -1629,6 +1629,18 @@ bound **2.441111 GPU-hours**. The budget remained three; no extension was used. 
 backup/deadline helpers were stopped. The short timing request is complete; the original
 full learning check and complete same-runtime matrix remain unverified.
 
+### End-to-end games/second recomputation (smoke)
+
+At `bc5bd85`, a read-only arithmetic check sums the completed-prefix collection events to
+26,268 learner decisions and 1,024 games. Dividing by the recorded 700.389269-second wall
+gives **37.504858 decisions/s and 1.462044 games/s**, including collection, PPO updates,
+startup and checkpoint writes. Dividing the same retained work by the whole
+995.824165-second attempt, including the discarded unfinished update, gives **26.378151
+decisions/s and 1.028294 games/s**. These are two explicit timing scopes for the same short
+smoke; the 100k learning/evaluation run remains unverified. No new GPU work was run.
+Evidence: `06-artifacts/runtime-t4-counts/endtoend-recomputed.json`; source training commit
+`ac75355`, command unchanged from the preceding rows.
+
 ## 2026-11-14: review of brief 06
 
 The branch `work/collect-gpu` (head `bc5bd85`) was reviewed and merged into `work/roadmap`. The
