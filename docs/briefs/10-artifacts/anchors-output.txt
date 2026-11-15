@@ -1,0 +1,82 @@
+[showdown-selection] A0 vs A1: 40/1000 A=3 B=37 draws=0 failures=0
+[showdown-selection] A0 vs A1: 80/1000 A=8 B=72 draws=0 failures=0
+[showdown-selection] A0 vs A1: 120/1000 A=9 B=111 draws=0 failures=0
+[showdown-selection] A0 vs A1: 160/1000 A=11 B=149 draws=0 failures=0
+[showdown-selection] A0 vs A1: 200/1000 A=13 B=187 draws=0 failures=0
+[showdown-selection] A0 vs A1: 240/1000 A=18 B=222 draws=0 failures=0
+[showdown-selection] A0 vs A1: 280/1000 A=21 B=259 draws=0 failures=0
+[showdown-selection] A0 vs A1: 320/1000 A=23 B=297 draws=0 failures=0
+[showdown-selection] A0 vs A1: 360/1000 A=26 B=334 draws=0 failures=0
+[showdown-selection] A0 vs A1: 400/1000 A=31 B=369 draws=0 failures=0
+[showdown-selection] A0 vs A1: 440/1000 A=38 B=402 draws=0 failures=0
+[showdown-selection] A0 vs A1: 480/1000 A=39 B=441 draws=0 failures=0
+[showdown-selection] A0 vs A1: 520/1000 A=42 B=478 draws=0 failures=0
+[showdown-selection] A0 vs A1: 560/1000 A=50 B=510 draws=0 failures=0
+[showdown-selection] A0 vs A1: 600/1000 A=57 B=543 draws=0 failures=0
+[showdown-selection] A0 vs A1: 640/1000 A=60 B=580 draws=0 failures=0
+[showdown-selection] A0 vs A1: 680/1000 A=65 B=615 draws=0 failures=0
+[showdown-selection] A0 vs A1: 720/1000 A=67 B=653 draws=0 failures=0
+[showdown-selection] A0 vs A1: 760/1000 A=69 B=691 draws=0 failures=0
+[showdown-selection] A0 vs A1: 800/1000 A=73 B=727 draws=0 failures=0
+[showdown-selection] A0 vs A1: 840/1000 A=85 B=755 draws=0 failures=0
+[showdown-selection] A0 vs A1: 880/1000 A=94 B=786 draws=0 failures=0
+[showdown-selection] A0 vs A1: 920/1000 A=96 B=824 draws=0 failures=0
+[showdown-selection] A0 vs A1: 960/1000 A=99 B=861 draws=0 failures=0
+[showdown-selection] A0 vs A1: 1000/1000 A=102 B=898 draws=0 failures=0
+[showdown-selection] RESULT A0 vs A1: 0.102 [0.085, 0.122] (102-898, draws=0)
+[showdown-selection] A0 vs A2: 40/1000 A=1 B=39 draws=0 failures=0
+[showdown-selection] A0 vs A2: 80/1000 A=2 B=78 draws=0 failures=0
+[showdown-selection] A0 vs A2: 120/1000 A=2 B=118 draws=0 failures=0
+[showdown-selection] A0 vs A2: 160/1000 A=5 B=155 draws=0 failures=0
+[showdown-selection] A0 vs A2: 200/1000 A=6 B=194 draws=0 failures=0
+[showdown-selection] A0 vs A2: 240/1000 A=7 B=233 draws=0 failures=0
+[showdown-selection] A0 vs A2: 280/1000 A=8 B=272 draws=0 failures=0
+[showdown-selection] A0 vs A2: 320/1000 A=9 B=311 draws=0 failures=0
+[showdown-selection] A0 vs A2: 360/1000 A=11 B=349 draws=0 failures=0
+[showdown-selection] A0 vs A2: 400/1000 A=12 B=388 draws=0 failures=0
+[showdown-selection] A0 vs A2: 440/1000 A=15 B=425 draws=0 failures=0
+[showdown-selection] A0 vs A2: 480/1000 A=15 B=465 draws=0 failures=0
+[showdown-selection] A0 vs A2: 520/1000 A=17 B=503 draws=0 failures=0
+[showdown-selection] A0 vs A2: 560/1000 A=20 B=540 draws=0 failures=0
+[showdown-selection] A0 vs A2: 600/1000 A=21 B=579 draws=0 failures=0
+[showdown-selection] A0 vs A2: 640/1000 A=21 B=619 draws=0 failures=0
+[showdown-selection] A0 vs A2: 680/1000 A=23 B=657 draws=0 failures=0
+[showdown-selection] A0 vs A2: 720/1000 A=25 B=695 draws=0 failures=0
+[showdown-selection] A0 vs A2: 760/1000 A=26 B=734 draws=0 failures=0
+[showdown-selection] A0 vs A2: 800/1000 A=26 B=774 draws=0 failures=0
+[showdown-selection] A0 vs A2: 840/1000 A=27 B=813 draws=0 failures=0
+[showdown-selection] A0 vs A2: 880/1000 A=30 B=850 draws=0 failures=0
+[showdown-selection] A0 vs A2: 920/1000 A=32 B=888 draws=0 failures=0
+[showdown-selection] A0 vs A2: 960/1000 A=32 B=928 draws=0 failures=0
+[showdown-selection] A0 vs A2: 1000/1000 A=34 B=966 draws=0 failures=0
+[showdown-selection] RESULT A0 vs A2: 0.034 [0.024, 0.047] (34-966, draws=0)
+[showdown-selection] A1 vs A2: 40/1000 A=7 B=33 draws=0 failures=0
+[showdown-selection] A1 vs A2: 80/1000 A=15 B=65 draws=0 failures=0
+[showdown-selection] A1 vs A2: 120/1000 A=23 B=97 draws=0 failures=0
+[showdown-selection] A1 vs A2: 160/1000 A=27 B=133 draws=0 failures=0
+[showdown-selection] A1 vs A2: 200/1000 A=34 B=166 draws=0 failures=0
+[showdown-selection] A1 vs A2: 240/1000 A=43 B=197 draws=0 failures=0
+[showdown-selection] A1 vs A2: 280/1000 A=52 B=228 draws=0 failures=0
+[showdown-selection] A1 vs A2: 320/1000 A=58 B=262 draws=0 failures=0
+[showdown-selection] A1 vs A2: 360/1000 A=65 B=295 draws=0 failures=0
+[showdown-selection] A1 vs A2: 400/1000 A=73 B=327 draws=0 failures=0
+[showdown-selection] A1 vs A2: 440/1000 A=83 B=357 draws=0 failures=0
+[showdown-selection] A1 vs A2: 480/1000 A=92 B=388 draws=0 failures=0
+[showdown-selection] A1 vs A2: 520/1000 A=98 B=422 draws=0 failures=0
+[showdown-selection] A1 vs A2: 560/1000 A=103 B=457 draws=0 failures=0
+[showdown-selection] A1 vs A2: 600/1000 A=110 B=490 draws=0 failures=0
+[showdown-selection] A1 vs A2: 640/1000 A=116 B=524 draws=0 failures=0
+[showdown-selection] A1 vs A2: 680/1000 A=123 B=557 draws=0 failures=0
+[showdown-selection] A1 vs A2: 720/1000 A=132 B=588 draws=0 failures=0
+[showdown-selection] A1 vs A2: 760/1000 A=141 B=619 draws=0 failures=0
+[showdown-selection] A1 vs A2: 800/1000 A=148 B=652 draws=0 failures=0
+[showdown-selection] A1 vs A2: 840/1000 A=152 B=688 draws=0 failures=0
+[showdown-selection] A1 vs A2: 880/1000 A=156 B=724 draws=0 failures=0
+[showdown-selection] A1 vs A2: 920/1000 A=161 B=759 draws=0 failures=0
+[showdown-selection] A1 vs A2: 960/1000 A=169 B=791 draws=0 failures=0
+[showdown-selection] A1 vs A2: 1000/1000 A=175 B=825 draws=0 failures=0
+[showdown-selection] RESULT A1 vs A2: 0.175 [0.153, 0.200] (175-825, draws=0)
+[showdown-selection] report -> runs/replay_team_pool/anchors.json
+| 2026-11-14 | A0 | A1 | showdown_direct | 1000 | 0.102 [0.085, 0.122] (102-898-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+| 2026-11-14 | A0 | A2 | showdown_direct | 1000 | 0.034 [0.024, 0.047] (34-966-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+| 2026-11-14 | A1 | A2 | showdown_direct | 1000 | 0.175 [0.153, 0.200] (175-825-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |

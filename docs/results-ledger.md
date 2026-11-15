@@ -1954,3 +1954,38 @@ warning comes from disabling the cache plugin. No hosted workflow or GPU job was
 Anchor round-robin: pending on the validation directory. A3 is unavailable: `runs/` has no
 retained imitation checkpoint. No substitute will be used. P0.7 remains unchecked until A0–A2
 have completed the required games; G0's A3 clause remains unmeasured.
+
+### Stage 2 completed: validation anchors
+
+The round-robin ran at `66a1e29`, on the same committed validation pool (141 teams). A0 is
+Random, A1 is the existing MaxDamage baseline (poke-env MaxBasePowerPlayer), and A2 is
+SimpleHeuristics. Factories return the existing scripted names, so the local runner's seeded
+randomness and resume behavior are unchanged. Each pair played 250 four-game blocks crossing
+both team assignments and both player positions: **1,000 matched games per pair**, 3,000 total.
+All games resolved; zero failures, genuine draws or truncations. Test teams were not played.
+
+Printed rows, copied verbatim from `10-artifacts/anchors-output.txt` (full per-game results and
+protocol in `10-artifacts/anchors.json`):
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95% Wilson] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-14 | A0 | A1 | showdown_direct | 1000 | 0.102 [0.085, 0.122] (102-898-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+| 2026-11-14 | A0 | A2 | showdown_direct | 1000 | 0.034 [0.024, 0.047] (34-966-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+| 2026-11-14 | A1 | A2 | showdown_direct | 1000 | 0.175 [0.153, 0.200] (175-825-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+
+Thus MaxDamage won 898/1,000 against Random; SimpleHeuristics won 966/1,000 against Random and
+825/1,000 against MaxDamage. These meet the brief's minimum game count. The scripted controllers
+have no decision-timing or fallback counters, so the printed columns are `n/a`; the match wall
+seconds are saved in the JSON. These rows do not establish a learned-agent strength tier.
+
+Correction to the stage-1 filter description above: the two unrenderable completions were **not
+unknown-item completions**. Both were Ditto sides (`gen9ou-2139396661`, `gen9ou-2443965990`, p2):
+the one-move learnset leaves three move columns unknown. The builder conservatively drops such
+incomplete sheets rather than inventing moves or retrying. The counts, committed pool and hashes
+are unchanged. The validator-equivalence test now explicitly checks an illegal item as well as a
+legal team; final focused checks remain 34 passed and repository lint clean (updated artifacts).
+
+P0.7 is complete under brief 10's A0–A2 acceptance rule. A3 is unavailable, with no substitute;
+G0 remains open (including its A3 clause and remaining throughput work). G1 and tier claims were
+not attempted. All pool files are unchanged from `3506a39`. No checkpoint training, hosted
+workflow, forum fetch or test-split play was performed.

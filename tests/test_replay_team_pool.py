@@ -151,8 +151,11 @@ def test_preview_composition_is_a_species_multiset():
 @pytest.mark.skipif(not HAS_SHOWDOWN, reason="pinned Showdown not built")
 def test_persistent_validator_agrees_with_cli():
     paste = next(Path("data/teams/pool_a").glob("*.txt")).read_text()
+    invalid = paste.replace(" @ ", " @ InvalidItem", 1)
     with ShowdownValidator() as validator:
-        for text in (paste, paste.replace("Leftovers", "InvalidItem")):
+        assert not validator(paste)
+        assert validator(invalid)
+        for text in (paste, invalid):
             ok, _ = validate_team(text)
             assert (not validator(text)) == ok
 

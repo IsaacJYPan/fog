@@ -139,7 +139,7 @@ cites the `fog` commit that produced the result.
       (c) it writes its JSON report and prints one ready-to-paste Markdown ledger row (candidate,
       opponent, games, win rate, 95% interval, mean seconds per decision, fallback count, commit,
       command). Paste that row into `docs/results-ledger.md`.
-- [ ] **P0.7 Fix the anchor set and the team split.** Blocked in cloud sandboxes on
+- [x] **P0.7 Fix the anchor set and the team split.** The forum bank was blocked in cloud sandboxes on
       2026-11-12 (ledger): the forum pages the collector reads answered it with a login page
       (HTTP 403), so the bank has to be collected on a machine where those pages open, then
       made available to sandboxes (owner decision in section 8). Anchors: `A0` Random, `A1` MaxDamage, `A2`
@@ -156,9 +156,10 @@ cites the `fog` commit that produced the result.
       later, tier claims (section 1) use its test split. Reason and limits are in the ledger
       section "plan changes after the leak"._
 
-      _2026-11-14: brief 10 built and verified the committed replay pool: 600 train, 141
-      validation and 62 test teams/compositions. All validate on pinned Showdown, and the fresh
-      build reproduced byte for byte. The A0–A2 validation round-robin is pending; P0.7 stays
+      _2026-11-14: brief 10 completed: 600 train, 141 validation and 62 test teams/compositions,
+      all validator-clean and reproduced byte for byte. The validation A0–A2 round-robin has
+      1,000 matched games per pair, zero failures or truncations: A1 beats A0 89.8%, A2 beats A0
+      96.6%, A2 beats A1 82.5%. P0.7 is complete under brief 10; A3 is unavailable and G0 remains
       open. See `docs/briefs/10-report.md` and the ledger's replay-derived pool section._
 
 **Gate G0:** P0.6 and P0.7 done; `A0–A3` round-robin recorded with ≥ 1,000 games per pair;
