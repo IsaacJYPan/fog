@@ -1,0 +1,142 @@
+[
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "acting moves",
+    "max_logit_error": 3.0547380447387695e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.7136335372924805e-07
+  },
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "other own moves",
+    "max_logit_error": 4.3958425521850586e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.6391277313232422e-07
+  },
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "other opponent moves",
+    "max_logit_error": 4.023313522338867e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.4901161193847656e-07
+  },
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "own team",
+    "max_logit_error": 3.5762786865234375e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.6391277313232422e-07
+  },
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "opponent team",
+    "max_logit_error": 3.5762786865234375e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.341104507446289e-07
+  },
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": false,
+    "permutation": "acting moves",
+    "max_logit_error": 0.027001112699508667,
+    "max_log_probability_error": 0.015437602996826172,
+    "max_value_error": 0.0038057342171669006
+  },
+  {
+    "source": "synthetic",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": false,
+    "permutation": "own team",
+    "max_logit_error": 0.24864619970321655,
+    "max_log_probability_error": 0.33774828910827637,
+    "max_value_error": 0.0021970756351947784
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "acting moves",
+    "max_logit_error": 3.8743019104003906e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.341104507446289e-07
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "other own moves",
+    "max_logit_error": 3.8743019104003906e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.7136335372924805e-07
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "other opponent moves",
+    "max_logit_error": 3.650784492492676e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.4156103134155273e-07
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "own team",
+    "max_logit_error": 4.6193599700927734e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.341104507446289e-07
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "opponent team",
+    "max_logit_error": 4.023313522338867e-07,
+    "max_log_probability_error": 7.152557373046875e-07,
+    "max_value_error": 1.7136335372924805e-07
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": false,
+    "permutation": "acting moves",
+    "max_logit_error": 0.024644523859024048,
+    "max_log_probability_error": 0.015664100646972656,
+    "max_value_error": 0.0031891316175460815
+  },
+  {
+    "source": "live",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": false,
+    "permutation": "own team",
+    "max_logit_error": 0.24685564637184143,
+    "max_log_probability_error": 0.28036022186279297,
+    "max_value_error": 0.0024043191224336624
+  }
+]

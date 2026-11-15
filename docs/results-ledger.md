@@ -1895,3 +1895,20 @@ P3. Reading behind the order: EngineMCTS at a quarter of its budget already beat
 SimpleHeuristics 0.88 in a 100-game smoke, while the best replay model (20,000 games, old rows)
 scores 0.52 in a 400-game smoke. The search agent is the nearest gated result and the teacher
 for P3, and it has been waiting only for a team pool.
+
+
+## 2026-11-14: order-blind model, value targets and move features (smoke)
+
+Brief 09, branch `work/order-blind-model`, implementation `b824430` from `70cc5ed`.
+Preparation and stage 2 representation checks only; R1 is running and R2 has not started.
+No value/feature/lead result or strength gate is claimed. Date is America/Los_Angeles.
+
+| Check | Result (smoke) | Producing commit and command / evidence |
+| --- | --- | --- |
+| Corrected corpus | 22,000 games, zero quarantines, 1,126,792 rows; fixed holdout 2,000 games / 103,944 rows; training 1,000 games / 52,955 rows | Converter source `70cc5ed`; `python -m fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/metamon_gen9ou_r1500_decisions --imputations 1 --workers 4 --resume`; split with `--holdout-ids data/replay_splits/p2_holdout_2000_ids.txt --train-sizes 1000`; `09-artifacts/preparation-execution.json`, `conversion-quality.json`, `data-counts.json` |
+| Permutation acceptance | Every parameter perturbed; 64 holdout, 64 live and 64 synthetic observations; all four permutations within 1e-5; key-off acting-move and own-bench checks fail. Ten acceptance tests pass | `b824430`; `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 FOG_ORDER_BLIND_TEST_REPORT=docs/briefs/09-artifacts/permutations-holdout.json .venv/bin/python -m pytest -q tests/test_order_blind_model.py`; `09-artifacts/tests-stage2-acceptance.txt`, `permutations.json` |
+| Default compatibility | Strict original checkpoint load and bit-identical policy/value on 64 live rows; all three same-machine rollout digests match | Original `70cc5ed`, new `b824430`; `09-artifacts/compatibility-stage2.json`, `digests-summary.json` (exact probe commands) |
+
+The initial conversion dispatcher was corrected before baseline training; its converter was
+interrupted and resumed from 9,227 per-game checkpoints, as `09-artifacts/preparation-restart.json`
+records. Report: `docs/briefs/09-report.md`. Measurements and stage 2 completion follow below.

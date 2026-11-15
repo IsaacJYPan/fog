@@ -1,0 +1,30 @@
+{
+  "smoke": true,
+  "commit": "b8244303bbf8fc4399d79614c085eed69551feba",
+  "sources": {
+    "holdout": {
+      "observations": 64,
+      "all_parameters_perturbed": true,
+      "max_logit_error": 3.8743019104003906e-07,
+      "max_log_probability_error": 7.152557373046875e-07,
+      "max_value_error": 1.6391277313232422e-07,
+      "key_off_acting_moves_and_bench_fail": true
+    },
+    "live": {
+      "observations": 64,
+      "all_parameters_perturbed": true,
+      "max_logit_error": 4.6193599700927734e-07,
+      "max_log_probability_error": 7.152557373046875e-07,
+      "max_value_error": 1.7136335372924805e-07,
+      "key_off_acting_moves_and_bench_fail": true
+    },
+    "synthetic": {
+      "observations": 64,
+      "all_parameters_perturbed": true,
+      "max_logit_error": 4.3958425521850586e-07,
+      "max_log_probability_error": 4.76837158203125e-07,
+      "max_value_error": 1.7136335372924805e-07,
+      "key_off_acting_moves_and_bench_fail": true
+    }
+  }
+}

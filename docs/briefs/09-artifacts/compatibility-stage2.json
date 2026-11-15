@@ -1,0 +1,10 @@
+{
+  "smoke": true,
+  "original_commit": "70cc5eda12345edffe11a998e2c4782f4ed7b161",
+  "observations": 64,
+  "strict_load": true,
+  "missing_keys": [],
+  "unexpected_keys": [],
+  "log_probs_bit_identical": true,
+  "value_bit_identical": true
+}

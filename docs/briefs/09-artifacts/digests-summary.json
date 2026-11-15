@@ -1,0 +1,66 @@
+{
+  "smoke": true,
+  "before_commit": "70cc5eda12345edffe11a998e2c4782f4ed7b161",
+  "after_commit": "b8244303bbf8fc4399d79614c085eed69551feba",
+  "all_new_keys_off": {
+    "model.order_blind_entities": false
+  },
+  "runs": [
+    {
+      "name": "sequential",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "fog.eval.showdown_rollout_probe",
+        "--games",
+        "6"
+      ],
+      "before": "0d026fed7728c0c4",
+      "after": "0d026fed7728c0c4",
+      "matches": true,
+      "before_file": "digest-sequential-before.txt",
+      "after_file": "digest-sequential-after.txt"
+    },
+    {
+      "name": "batched",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "fog.eval.showdown_rollout_probe",
+        "--batch",
+        "32",
+        "--games",
+        "64",
+        "--threads",
+        "2"
+      ],
+      "before": "ef414aee0fe96bad",
+      "after": "ef414aee0fe96bad",
+      "matches": true,
+      "before_file": "digest-batched-before.txt",
+      "after_file": "digest-batched-after.txt"
+    },
+    {
+      "name": "maxdamage",
+      "command": [
+        ".venv/bin/python",
+        "-m",
+        "fog.eval.showdown_rollout_probe",
+        "--batch",
+        "32",
+        "--games",
+        "96",
+        "--opponent",
+        "MaxDamage",
+        "--pool",
+        "data/teams/pool_a"
+      ],
+      "before": "40644081cca71ebe",
+      "after": "40644081cca71ebe",
+      "matches": true,
+      "before_file": "digest-maxdamage-before.txt",
+      "after_file": "digest-maxdamage-after.txt"
+    }
+  ],
+  "note": "Only digest equality is used; these concurrent-job timings are not throughput measurements."
+}

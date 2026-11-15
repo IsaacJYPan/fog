@@ -1,0 +1,2 @@
+BC dataset: train=52955 decision rows; holdout=103944 rows  (config_hash=e6d5c7545432, torch_threads=5)
+[bc] baseline  loss=3.671  belief=13.160  chain=3.992
