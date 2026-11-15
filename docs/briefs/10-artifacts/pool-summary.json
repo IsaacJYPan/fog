@@ -1,0 +1,35 @@
+{
+  "train": {
+    "teams": 600,
+    "compositions": 600,
+    "mean_revealed_fields": 27.276666666666667,
+    "mean_sampled_fields": 62.723333333333336,
+    "mean_revealed_moves": 15.745
+  },
+  "validation": {
+    "teams": 141,
+    "compositions": 141,
+    "mean_revealed_fields": 27.26950354609929,
+    "mean_sampled_fields": 62.730496453900706,
+    "mean_revealed_moves": 15.78014184397163
+  },
+  "test": {
+    "teams": 62,
+    "compositions": 62,
+    "mean_revealed_fields": 27.306451612903224,
+    "mean_sampled_fields": 62.693548387096776,
+    "mean_revealed_moves": 15.629032258064516
+  },
+  "all": {
+    "teams": 803,
+    "mean_revealed_fields": 27.277708592777085,
+    "mean_sampled_fields": 62.72229140722291,
+    "mean_revealed_moves": 15.742216687422166
+  },
+  "reproduction": {
+    "files_compared": 807,
+    "byte_identical": true,
+    "fresh_checkpoints": true
+  },
+  "a3_available": false
+}

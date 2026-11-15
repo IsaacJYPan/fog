@@ -156,6 +156,11 @@ cites the `fog` commit that produced the result.
       later, tier claims (section 1) use its test split. Reason and limits are in the ledger
       section "plan changes after the leak"._
 
+      _2026-11-14: brief 10 built and verified the committed replay pool: 600 train, 141
+      validation and 62 test teams/compositions. All validate on pinned Showdown, and the fresh
+      build reproduced byte for byte. The A0–A2 validation round-robin is pending; P0.7 stays
+      open. See `docs/briefs/10-report.md` and the ledger's replay-derived pool section._
+
 **Gate G0:** P0.6 and P0.7 done; `A0–A3` round-robin recorded with ≥ 1,000 games per pair;
 measured `showdown_direct` throughput recorded after P0.2–P0.5.
 
