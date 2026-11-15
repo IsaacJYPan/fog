@@ -9,6 +9,11 @@ Reusable prompt for any agent session:
 
 > Continue the next task in ROADMAP.md and follow AGENTS.md.
 
+Since 2026-11-13 the work is run as numbered briefs. [docs/briefs/QUEUE.md](docs/briefs/QUEUE.md)
+lists them in order with the prompt for each, and [docs/briefs/REVIEW.md](docs/briefs/REVIEW.md)
+says how a finished brief is checked and merged. Use those first; this file is the plan they
+serve.
+
 Read [AGENTS.md](AGENTS.md) first (rules of evidence, scope freeze), then this file, then
 [docs/search-and-belief-design.md](docs/search-and-belief-design.md) before touching search or belief
 code. Every measured result goes in [docs/results-ledger.md](docs/results-ledger.md).
@@ -119,6 +124,8 @@ cites the `fog` commit that produced the result.
       and evidence are off the runtime, which was released at a cumulative upper bound of
       2.441111 GPU-hours. Learning, greedy evaluation and six remaining probe repeats are
       unverified, so P0.5 stays open. See `docs/briefs/06-report.md` and the latest ledger section._
+      _2026-11-14: a per-row Python loop in the belief training path was removed (CPU: 230 ms to
+      1.4 ms per 1,024 rows; GPU effect unmeasured). Briefs 08 and 14 measure and continue._
 
 - [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already
@@ -141,6 +148,13 @@ cites the `fog` commit that produced the result.
       public team bank per `KAGGLE_TRAINING.md`, split once into train/validation/test by
       composition, commit the three manifests' hashes to the ledger, and never evaluate on train.
       The test split is touched only for tier claims.
+      _2026-11-15: the forum bank is still not collected. Until it is, the team bank is the
+      replay-derived pool of `docs/briefs/10-replay-team-pool.md`
+      (`data/teams/replay_v1/{train,validation,test}`): real high-rated teams from public
+      previews with revealed fields kept and the rest sampled from usage, split by composition
+      and by time. It satisfies this task for gates G0 to G2. If the forum bank is collected
+      later, tier claims (section 1) use its test split. Reason and limits are in the ledger
+      section "plan changes after the leak"._
 
 **Gate G0:** P0.6 and P0.7 done; `A0–A3` round-robin recorded with ≥ 1,000 games per pair;
 measured `showdown_direct` throughput recorded after P0.2–P0.5.
@@ -244,6 +258,14 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       seeded move and preview order, paired imputation draws, identity guards and per-game
       recovery. See "move-order leak removed and order-blind encoder (smoke)" in the ledger
       and `docs/briefs/07-report.md`; P2.2 remains open._
+- [ ] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
+      1, ledger "review of brief 07, stage 1"): the converter shuffles both with seeded streams.
+      Remaining, `docs/briefs/09-order-blind-model.md`: a model that cannot read slot order, shown
+      by a permutation test.
+- [ ] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
+      parity check between a converted log and the observations recorded while the same game
+      was played, then own PP, forced replacement decisions and the history record brought
+      into line.
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
@@ -263,6 +285,11 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       unchanged value head still fails the constant reference. Model/value/features/lead
       stages and historical digest reproduction remain open; see `docs/briefs/07-report.md`.
       P2.3 and G2 remain open._
+      _2026-11-15: brief 05's 20,000-game run (on the old rows) found the value head best at
+      epoch 4 (Brier 0.215) and the policy at epoch 12 (value Brier 0.254 there). Save and
+      report the two checkpoints separately. Denser value targets, a logistic value loss, move
+      features and a trained lead head are in brief 09; the run at scale on corrected rows is
+      `docs/briefs/13-replay-scale-corrected.md`._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
@@ -285,7 +312,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       "replay blueprint learning curve at 1k–20k games"._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
-SimpleHeuristics, and its value head has expected calibration error < 0.05 on the holdout.
+SimpleHeuristics, and its value head has expected calibration error < 0.05 **and Brier score
+< 0.24** on the holdout (added 2026-11-15: calibration alone is met by a model that predicts
+0.5 everywhere, as the six-epoch model of brief 01 did; a constant scores 0.25).
 **If it fails on play strength but the offline metrics are good:** this is covariate shift from
 imputed own-team sheets and teacher-forced states. Go to P3 (on-policy relabelling fixes exactly
 this) and use the P2 model as its initial weights. **If value calibration fails:** check for
@@ -369,6 +398,9 @@ EngineMCTS (or whichever agent tops the anchor round-robin) as the champion.
       decisions, `lr` ≥ `1e-4` with a KL constraint to the champion, against a league of past
       champions and anchors. Kill it if it has not passed a promotion test after 20 million
       decisions. Expert iteration is the default because its targets are dense.
+      _2026-11-15: if this arm is opened, use the anchored update with a moving anchor
+      described in `docs/equilibrium-training.md` rather than plain PPO; the trainer already has
+      the anchor term._
 
 ## 5. Compute assumptions
 
@@ -430,6 +462,8 @@ their tests; do not delete them.
   cannot see it; either track the three split packages in this repository or keep evaluation
   on a machine that has them. Until one of these happens, gates G0 and G1 cannot be closed.
 - Un-freezing anything in section 7 ahead of its gate.
+- Where the retained imitation checkpoint `A3` is. It is not in a fresh clone. Until it is
+  found, the head-to-head clause of G2 is recorded as not measurable, not as passed.
 
 ## 9. Parking lot
 
@@ -443,3 +477,11 @@ Ideas that are deliberately not scheduled. Add to this list instead of starting 
 - Profile scalar reads from GPU tensors in `BeliefModel._permute_hidden_moves` before a
   behaviour-preserving GPU optimisation: brief 06's short smoke is forward-bound and one live
   stack was in this loop. Its exact share is unmeasured; no implementation change is scheduled.
+  _Done 2026-11-14 (ledger, "per-row Python removed from the belief training path")._
+- Regret-matching selection at simultaneous nodes in FogMCTS instead of decoupled PUCT, which
+  need not converge where the equilibrium is mixed (design document, section 4, test 2).
+- Equilibrium search over sampled team candidates with a belief factored per Pokémon, for
+  small fixed pools only (`docs/equilibrium-training.md`, last section).
+- Removing the parameters that get no gradient in the typed-token configuration (about 2.5 of
+  5.9 million: the older three-encoder backbone and unused policy paths). It breaks old
+  checkpoints, so only together with a retrain.

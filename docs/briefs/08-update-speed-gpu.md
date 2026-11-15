@@ -42,19 +42,28 @@ Do it from a small script that loads the saved checkpoint and one saved batch, o
 timing shim like brief 06's `training_timing.py`; do not edit the trainer. Also take three
 `py-spy dump` stacks of the main process during an update and keep them.
 
-## 5. What to hand back
+## 5. Stage 3: the replay trainer's step
+
+The same loop ran in replay training (`fog/training/bc.py`) whenever
+`loss.belief_chain_coef` is above zero, and brief 05 measured 583 rows/s on a T4 with it.
+With random weights and any converted replay shards (the 1,000-game split is enough; build it
+as in `docs/briefs/09-order-blind-model.md` section 2), run `configs/replay_blueprint_cpu.yaml`
+with `device=cuda`, batch 1,024, for 200 optimizer steps and report rows per second and
+seconds per step. Time one step by part as in stage 2.
+
+## 6. What to hand back
 
 1. One new section in `docs/results-ledger.md`
    (`## <date>: PPO update speed on a GPU after the belief-loop fix (smoke)`).
 2. `docs/briefs/08-artifacts/`: metrics CSV, the per-part timing JSON, the stacks, the hardware
    record. Text and JSON only.
 3. `docs/briefs/08-report.md`, at most one page: **Answer** (step time before and after; end
-   to end before and after; the largest remaining part of the update and its share; whether
+   to end before and after; the replay trainer's rows per second against 583; the largest remaining part of the update and its share; whether
    collection or the update now takes more of the hour), the tables, not verified.
 
 Final message: the **Answer** paragraph, the branch name and the last commit hash.
 
-## 6. How the reviewer will check this
+## 7. How the reviewer will check this
 
 - Every number is in a file under `docs/briefs/08-artifacts/`; GPU-hours are 1 or less.
 - No code under `fog/` changed; no account name or token is in the repository.

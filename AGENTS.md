@@ -6,6 +6,9 @@ For people and coding agents. Nothing outside this repository is needed to conti
 2. Read [docs/results-ledger.md](docs/results-ledger.md). It says what has actually been measured.
 3. Before changing search or belief code, read
    [docs/search-and-belief-design.md](docs/search-and-belief-design.md).
+4. Work is handed out as numbered briefs. [docs/briefs/QUEUE.md](docs/briefs/QUEUE.md) says
+   which to start and in what order; [docs/briefs/REVIEW.md](docs/briefs/REVIEW.md) says how a
+   finished one is checked and merged.
 
 ## Repository conventions
 

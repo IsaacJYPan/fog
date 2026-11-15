@@ -1873,3 +1873,25 @@ Consequence for brief 05. Its G20 and G100 runs trained on the old rows, so thei
 accuracy (G20: NLL 1.279, top-1 54.4%) is inflated and is not comparable with any number on
 corrected rows. Their timing, value and play measurements stand as measured. The next replay
 run on a GPU should use the corrected converter and the belief-loop fix of 2026-11-14.
+
+## 2026-11-15: plan changes after the leak
+
+No measurement. This section records why `ROADMAP.md` changed on this date, as `AGENTS.md`
+requires, and what the owner asked for: a plan that other people and agents can carry on
+without the session that wrote it.
+
+| Change | Why |
+| --- | --- |
+| The work is run from `docs/briefs/QUEUE.md`, reviewed by `docs/briefs/REVIEW.md` | Reviews were done by one session that will not be available. The procedure it followed is now written down and can be given to any agent |
+| P0.7 accepts a replay-derived team pool (brief 10) | The forum bank has been blocked on an owner action since 2026-11-12 and it blocks G0 and G1. The replays already hold thousands of real high-rated compositions with public previews. Limits: unrevealed items, spreads and moves are sampled from usage, so teams can be less coherent than a person's; tier claims should use the forum bank's test split if it is ever collected |
+| New tasks P2.2a and P2.2b | The move-order leak (ledger, "review of brief 07, stage 1") and four other differences between replay rows and live observations found by reading the code on 2026-11-14 |
+| Gate G2 also requires value Brier below 0.24 | A tightening. ECE below 0.05 is met by predicting 0.5 everywhere (brief 01's six-epoch model: ECE 0.032, value MSE 0.92 to 1.05). No current model benefits: every value head measured on corrected rows scores 0.39 |
+| P5.4 points to `docs/equilibrium-training.md` | Plain self-play has no convergence guarantee in a zero-sum game; the anchored form does in the tabular case, and the trainer already has the anchor term. A Kuhn poker check is in that document. Self-play stays frozen until G3 |
+| Parking lot: regret-matching selection in tree search; sampled-candidate equilibrium search on small pools; removing parameters with no gradient | Recorded so they are not rediscovered; none is scheduled |
+
+Order of work from here: the replay policy line (briefs 09, 12, 13, ending at G2) and the
+search line (briefs 10, 11, ending at G1) in parallel; speed (briefs 08, 14) alongside; then
+P3. Reading behind the order: EngineMCTS at a quarter of its budget already beats
+SimpleHeuristics 0.88 in a 100-game smoke, while the best replay model (20,000 games, old rows)
+scores 0.52 in a 400-game smoke. The search agent is the nearest gated result and the teacher
+for P3, and it has been waiting only for a team pool.
