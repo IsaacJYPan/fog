@@ -2707,3 +2707,9 @@ Observed saved blocks: 200 games, 182 wins, 5487 decisions, 13 fallbacks, 0 reje
 400-game smoke; same seed blocks across cells.
 
 | 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.782 [0.739, 0.820] (313-87-0) | 0.904 | 13/12388 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget 800 ms K=32
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.915 [0.884, 0.939] (366-34-0) | 1.027 | 13/10785 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k32 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":32,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |

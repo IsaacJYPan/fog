@@ -1,0 +1,1798 @@
+{
+  "status": "complete",
+  "protocol": {
+    "simulator": "pinned Pokemon Showdown, direct in-memory worker",
+    "format": "gen9ou",
+    "pool": "data/teams/replay_v1/validation",
+    "pool_size": 141,
+    "games_per_row": 100,
+    "block_size": 4,
+    "block_design": "both team assignments crossed with both player positions",
+    "seed": 12002,
+    "temperature": 0.0,
+    "max_turns": 800,
+    "device": "cpu",
+    "checkpoint_configs": {},
+    "checkpoint_tera_logit_bonuses": {},
+    "score_schema_version": 2,
+    "action_stats_schema_version": 2,
+    "action_stats": false,
+    "policy_diagnostics": false,
+    "primary_score": "win=1, genuine draw=0.5, loss=0; truncations unresolved",
+    "draws_excluded_from_win_rate": true,
+    "controllers": {
+      "mcts": "fog.search.engine_mcts:showdown_controller"
+    },
+    "controller_kwargs": {
+      "mcts": {
+        "k": 32,
+        "budget_ms": 800,
+        "threads": 1
+      }
+    }
+  },
+  "checkpoints": {},
+  "rows": [
+    {
+      "label": "mcts vs simpleheuristics",
+      "a": "mcts",
+      "b": "simpleheuristics",
+      "requested_games": 100,
+      "completed_games": 100,
+      "a_wins": 89,
+      "b_wins": 11,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "turns": 2363,
+      "wall_s": 2744.815000618997,
+      "game_scores": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "game_counters": [
+        {
+          "a": {
+            "decisions": 16,
+            "searched": 16,
+            "single_option": 0,
+            "worlds_sampled": 512,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 14.60288239098736,
+            "rejected": 0,
+            "decision_seconds": 18.46143744398796,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 38,
+            "searched": 37,
+            "single_option": 1,
+            "worlds_sampled": 1184,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 33.28914855098992,
+            "rejected": 0,
+            "decision_seconds": 39.2371040959988,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 33,
+            "searched": 32,
+            "single_option": 1,
+            "worlds_sampled": 1024,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 25.520844709015364,
+            "rejected": 0,
+            "decision_seconds": 30.72074657898702,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 20,
+            "searched": 20,
+            "single_option": 0,
+            "worlds_sampled": 640,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.406145390992606,
+            "rejected": 0,
+            "decision_seconds": 19.794168897995405,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 20,
+            "searched": 20,
+            "single_option": 0,
+            "worlds_sampled": 640,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 17.92875349600581,
+            "rejected": 0,
+            "decision_seconds": 21.204874013001245,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 22,
+            "searched": 22,
+            "single_option": 0,
+            "worlds_sampled": 704,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 20.022493903994473,
+            "rejected": 0,
+            "decision_seconds": 24.192280036008015,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 29,
+            "searched": 29,
+            "single_option": 0,
+            "worlds_sampled": 928,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 23.843739180996636,
+            "rejected": 0,
+            "decision_seconds": 28.54137111700402,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 23,
+            "searched": 23,
+            "single_option": 0,
+            "worlds_sampled": 736,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.375040745999286,
+            "rejected": 0,
+            "decision_seconds": 22.487871212000755,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 13,
+            "searched": 13,
+            "single_option": 0,
+            "worlds_sampled": 416,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 11.73386341099831,
+            "rejected": 0,
+            "decision_seconds": 13.964419428997644,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.269780461992923,
+            "rejected": 0,
+            "decision_seconds": 19.338992683999095,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 15,
+            "searched": 15,
+            "single_option": 0,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 12.761187592001079,
+            "rejected": 0,
+            "decision_seconds": 15.344377882007393,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 19,
+            "single_option": 0,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.840985434999311,
+            "rejected": 0,
+            "decision_seconds": 16.941615395000554,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 29,
+            "searched": 29,
+            "single_option": 0,
+            "worlds_sampled": 928,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 26.60194775099444,
+            "rejected": 0,
+            "decision_seconds": 31.85623751899402,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 23,
+            "searched": 23,
+            "single_option": 0,
+            "worlds_sampled": 736,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 21.43818195199492,
+            "rejected": 0,
+            "decision_seconds": 26.137635958995816,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 26,
+            "searched": 26,
+            "single_option": 0,
+            "worlds_sampled": 832,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 22.120110298990767,
+            "rejected": 0,
+            "decision_seconds": 26.344560546993307,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 23,
+            "searched": 23,
+            "single_option": 0,
+            "worlds_sampled": 736,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 19.370541366006364,
+            "rejected": 0,
+            "decision_seconds": 23.22204687800695,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 22,
+            "searched": 21,
+            "single_option": 1,
+            "worlds_sampled": 672,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.907987811006024,
+            "rejected": 0,
+            "decision_seconds": 22.10054746098831,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.4649680059847,
+            "rejected": 0,
+            "decision_seconds": 19.671097817001282,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 14,
+            "searched": 14,
+            "single_option": 0,
+            "worlds_sampled": 448,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 11.926518529999157,
+            "rejected": 0,
+            "decision_seconds": 14.174041124992073,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 20,
+            "searched": 20,
+            "single_option": 0,
+            "worlds_sampled": 640,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 14.715335018001497,
+            "rejected": 0,
+            "decision_seconds": 17.76698035500158,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 23,
+            "searched": 23,
+            "single_option": 0,
+            "worlds_sampled": 736,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 21.03451821899216,
+            "rejected": 0,
+            "decision_seconds": 24.82901305498308,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 29,
+            "searched": 29,
+            "single_option": 0,
+            "worlds_sampled": 928,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 26.087148566002725,
+            "rejected": 0,
+            "decision_seconds": 30.621322433002206,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.750550775999727,
+            "rejected": 0,
+            "decision_seconds": 16.53454356000293,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 36,
+            "searched": 36,
+            "single_option": 0,
+            "worlds_sampled": 1152,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 28.939345352999226,
+            "rejected": 0,
+            "decision_seconds": 35.19011761199363,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 24,
+            "searched": 24,
+            "single_option": 0,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 22.02754690999791,
+            "rejected": 0,
+            "decision_seconds": 26.36130339200099,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 52,
+            "searched": 52,
+            "single_option": 0,
+            "worlds_sampled": 1664,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 47.25949322400993,
+            "rejected": 0,
+            "decision_seconds": 56.627636949007865,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 34,
+            "searched": 34,
+            "single_option": 0,
+            "worlds_sampled": 1088,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 29.23648057700484,
+            "rejected": 0,
+            "decision_seconds": 34.9028542539927,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 24,
+            "searched": 24,
+            "single_option": 0,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 21.239120926002215,
+            "rejected": 0,
+            "decision_seconds": 25.454388818990992,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 33,
+            "searched": 31,
+            "single_option": 2,
+            "worlds_sampled": 992,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 27.996932728998217,
+            "rejected": 0,
+            "decision_seconds": 33.500308097991365,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 24,
+            "searched": 24,
+            "single_option": 0,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 22.369502609995834,
+            "rejected": 0,
+            "decision_seconds": 26.964502787996025,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 14.95874656099113,
+            "rejected": 0,
+            "decision_seconds": 17.765076636995218,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 21,
+            "searched": 21,
+            "single_option": 0,
+            "worlds_sampled": 672,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 17.47572618299455,
+            "rejected": 0,
+            "decision_seconds": 20.99961221000558,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 22,
+            "searched": 22,
+            "single_option": 0,
+            "worlds_sampled": 704,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 19.845303258007334,
+            "rejected": 0,
+            "decision_seconds": 23.24968031199387,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 21,
+            "searched": 21,
+            "single_option": 0,
+            "worlds_sampled": 672,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.834894544001145,
+            "rejected": 0,
+            "decision_seconds": 22.238831875009055,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 27,
+            "searched": 26,
+            "single_option": 1,
+            "worlds_sampled": 832,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 20.05390004199944,
+            "rejected": 0,
+            "decision_seconds": 24.670665577003092,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 25,
+            "searched": 25,
+            "single_option": 0,
+            "worlds_sampled": 800,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 19.29828822700074,
+            "rejected": 0,
+            "decision_seconds": 23.228680923006323,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 14,
+            "searched": 13,
+            "single_option": 1,
+            "worlds_sampled": 416,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 11.644605188001151,
+            "rejected": 0,
+            "decision_seconds": 14.013759175995801,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 22,
+            "searched": 22,
+            "single_option": 0,
+            "worlds_sampled": 704,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 19.801728460999584,
+            "rejected": 0,
+            "decision_seconds": 23.540810997001245,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 28,
+            "searched": 27,
+            "single_option": 1,
+            "worlds_sampled": 864,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 21.298827095997694,
+            "rejected": 0,
+            "decision_seconds": 26.301855671998055,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 20,
+            "searched": 19,
+            "single_option": 1,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.831439479981782,
+            "rejected": 0,
+            "decision_seconds": 17.055242346996238,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 15,
+            "searched": 15,
+            "single_option": 0,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.623568423994584,
+            "rejected": 0,
+            "decision_seconds": 16.10315657600586,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 43,
+            "searched": 41,
+            "single_option": 2,
+            "worlds_sampled": 1312,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 646466,
+            "tera_entries_dropped": 96,
+            "search_seconds": 37.38782226200783,
+            "rejected": 0,
+            "decision_seconds": 45.13965410898163,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 41,
+            "searched": 40,
+            "single_option": 1,
+            "worlds_sampled": 1280,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 256498,
+            "tera_entries_dropped": 96,
+            "search_seconds": 33.05207683799381,
+            "rejected": 0,
+            "decision_seconds": 39.73885831000007,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 14.658503296992421,
+            "rejected": 0,
+            "decision_seconds": 17.691301310002018,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 31,
+            "searched": 31,
+            "single_option": 0,
+            "worlds_sampled": 992,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 28.189970319992426,
+            "rejected": 0,
+            "decision_seconds": 33.64010009201229,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.396528349996515,
+            "rejected": 0,
+            "decision_seconds": 19.283525789989653,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 47,
+            "searched": 47,
+            "single_option": 0,
+            "worlds_sampled": 1504,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 38.90327450901168,
+            "rejected": 0,
+            "decision_seconds": 46.8409194770029,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 33,
+            "searched": 33,
+            "single_option": 0,
+            "worlds_sampled": 1056,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 27.68769544000679,
+            "rejected": 0,
+            "decision_seconds": 33.22934706599335,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 34,
+            "searched": 34,
+            "single_option": 0,
+            "worlds_sampled": 1088,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 30.759164766994218,
+            "rejected": 0,
+            "decision_seconds": 36.387033935992804,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 19,
+            "single_option": 0,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 17.297965344005206,
+            "rejected": 0,
+            "decision_seconds": 20.5934896990002,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 20,
+            "searched": 20,
+            "single_option": 0,
+            "worlds_sampled": 640,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.3974163200146,
+            "rejected": 0,
+            "decision_seconds": 19.70294795499649,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 25,
+            "searched": 24,
+            "single_option": 1,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.416211312000087,
+            "rejected": 0,
+            "decision_seconds": 22.182176125003025,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 33,
+            "searched": 33,
+            "single_option": 0,
+            "worlds_sampled": 1056,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 30.16681870600587,
+            "rejected": 0,
+            "decision_seconds": 35.61782615201082,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 21,
+            "searched": 21,
+            "single_option": 0,
+            "worlds_sampled": 672,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.944855792989983,
+            "rejected": 0,
+            "decision_seconds": 22.190963140998065,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 27,
+            "searched": 26,
+            "single_option": 1,
+            "worlds_sampled": 832,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 20.13737762899109,
+            "rejected": 0,
+            "decision_seconds": 24.285719201005122,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 25,
+            "searched": 25,
+            "single_option": 0,
+            "worlds_sampled": 800,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.000930357997277,
+            "rejected": 0,
+            "decision_seconds": 21.868698523001513,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.33771298099964,
+            "rejected": 0,
+            "decision_seconds": 19.20862519199727,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 31,
+            "searched": 31,
+            "single_option": 0,
+            "worlds_sampled": 992,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 28.179041644008976,
+            "rejected": 0,
+            "decision_seconds": 33.19717612800014,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 25,
+            "searched": 25,
+            "single_option": 0,
+            "worlds_sampled": 800,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 22.773399725010677,
+            "rejected": 0,
+            "decision_seconds": 26.878413382000872,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 26,
+            "searched": 26,
+            "single_option": 0,
+            "worlds_sampled": 832,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 23.03294610800367,
+            "rejected": 0,
+            "decision_seconds": 27.829737062995264,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 15,
+            "searched": 15,
+            "single_option": 0,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.582406544996047,
+            "rejected": 0,
+            "decision_seconds": 16.1666691940045,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 29,
+            "searched": 29,
+            "single_option": 0,
+            "worlds_sampled": 928,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 26.41636856700643,
+            "rejected": 0,
+            "decision_seconds": 31.227931051991618,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 81,
+            "searched": 81,
+            "single_option": 0,
+            "worlds_sampled": 2592,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 72.6322547420059,
+            "rejected": 0,
+            "decision_seconds": 86.80194628599202,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 15,
+            "searched": 15,
+            "single_option": 0,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.680094315001043,
+            "rejected": 0,
+            "decision_seconds": 16.331068365001556,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 22,
+            "searched": 22,
+            "single_option": 0,
+            "worlds_sampled": 704,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 19.843954952997592,
+            "rejected": 0,
+            "decision_seconds": 23.549114854002255,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 32,
+            "searched": 32,
+            "single_option": 0,
+            "worlds_sampled": 1024,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 28.95976047599106,
+            "rejected": 0,
+            "decision_seconds": 34.31736980000278,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 20,
+            "searched": 20,
+            "single_option": 0,
+            "worlds_sampled": 640,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 15.660414418001892,
+            "rejected": 0,
+            "decision_seconds": 19.011175654992257,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 19,
+            "single_option": 0,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.939125148994208,
+            "rejected": 0,
+            "decision_seconds": 17.089198342007876,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 14,
+            "searched": 14,
+            "single_option": 0,
+            "worlds_sampled": 448,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 12.595381002010981,
+            "rejected": 0,
+            "decision_seconds": 15.117787640007009,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 23,
+            "searched": 23,
+            "single_option": 0,
+            "worlds_sampled": 736,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 20.900687370012747,
+            "rejected": 0,
+            "decision_seconds": 24.693683500005136,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 17,
+            "searched": 17,
+            "single_option": 0,
+            "worlds_sampled": 544,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.054947700005869,
+            "rejected": 0,
+            "decision_seconds": 15.833076691993483,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 15,
+            "searched": 15,
+            "single_option": 0,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.573512833998393,
+            "rejected": 0,
+            "decision_seconds": 16.137678104994848,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 19,
+            "single_option": 0,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 17.27933443999791,
+            "rejected": 0,
+            "decision_seconds": 20.367747388994758,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 36,
+            "searched": 35,
+            "single_option": 1,
+            "worlds_sampled": 1120,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 31.985397884000122,
+            "rejected": 0,
+            "decision_seconds": 38.17514838700663,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 29,
+            "searched": 29,
+            "single_option": 0,
+            "worlds_sampled": 928,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 23.09499515000425,
+            "rejected": 0,
+            "decision_seconds": 28.25808220501858,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 24,
+            "searched": 24,
+            "single_option": 0,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 20.10464652900191,
+            "rejected": 0,
+            "decision_seconds": 24.125076950007497,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 19,
+            "single_option": 0,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 17.290236884993647,
+            "rejected": 0,
+            "decision_seconds": 20.710503892001725,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 18,
+            "searched": 18,
+            "single_option": 0,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.189768590011226,
+            "rejected": 0,
+            "decision_seconds": 19.28787351199935,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 15,
+            "searched": 15,
+            "single_option": 0,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 11.983451202999277,
+            "rejected": 0,
+            "decision_seconds": 14.494967334008834,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 24,
+            "searched": 24,
+            "single_option": 0,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.487013500987814,
+            "rejected": 0,
+            "decision_seconds": 22.705084369008546,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 32,
+            "searched": 30,
+            "single_option": 2,
+            "worlds_sampled": 960,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 27.248929068995494,
+            "rejected": 0,
+            "decision_seconds": 32.04564059498807,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 52,
+            "searched": 52,
+            "single_option": 0,
+            "worlds_sampled": 1664,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 47.20715448400733,
+            "rejected": 0,
+            "decision_seconds": 55.719674827989365,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 22,
+            "searched": 22,
+            "single_option": 0,
+            "worlds_sampled": 704,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.399538272991776,
+            "rejected": 0,
+            "decision_seconds": 21.867039507003938,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 28,
+            "searched": 28,
+            "single_option": 0,
+            "worlds_sampled": 896,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 22.21094523400825,
+            "rejected": 0,
+            "decision_seconds": 26.751114865001,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 31,
+            "searched": 31,
+            "single_option": 0,
+            "worlds_sampled": 992,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 28.435828060006315,
+            "rejected": 0,
+            "decision_seconds": 33.76885734800453,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 12,
+            "searched": 9,
+            "single_option": 3,
+            "worlds_sampled": 288,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 8.151024464001239,
+            "rejected": 0,
+            "decision_seconds": 9.662781210998219,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 16,
+            "searched": 15,
+            "single_option": 1,
+            "worlds_sampled": 480,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 12.938908566993632,
+            "rejected": 0,
+            "decision_seconds": 15.526232234002237,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 138,
+            "searched": 137,
+            "single_option": 1,
+            "worlds_sampled": 4384,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 121.28558462300134,
+            "rejected": 0,
+            "decision_seconds": 146.97299132500484,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 16,
+            "searched": 16,
+            "single_option": 0,
+            "worlds_sampled": 512,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 14.607257972005755,
+            "rejected": 0,
+            "decision_seconds": 17.112300411001343,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 18,
+            "single_option": 1,
+            "worlds_sampled": 576,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 16.24185873798706,
+            "rejected": 0,
+            "decision_seconds": 19.2111324199941,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 21,
+            "searched": 19,
+            "single_option": 2,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 15.568566580997867,
+            "rejected": 0,
+            "decision_seconds": 18.681100305988366,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 37,
+            "searched": 37,
+            "single_option": 0,
+            "worlds_sampled": 1184,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 29.68165419298748,
+            "rejected": 0,
+            "decision_seconds": 35.669802244989114,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 24,
+            "searched": 24,
+            "single_option": 0,
+            "worlds_sampled": 768,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 21.871340045992838,
+            "rejected": 0,
+            "decision_seconds": 26.10885076600607,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 46,
+            "searched": 44,
+            "single_option": 2,
+            "worlds_sampled": 1408,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 39.782287984991854,
+            "rejected": 0,
+            "decision_seconds": 47.36594104599499,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 51,
+            "searched": 48,
+            "single_option": 3,
+            "worlds_sampled": 1536,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 38.62695159199575,
+            "rejected": 0,
+            "decision_seconds": 47.23622765900291,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 19,
+            "searched": 19,
+            "single_option": 0,
+            "worlds_sampled": 608,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 14.739629921994492,
+            "rejected": 0,
+            "decision_seconds": 17.900831281000137,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 21,
+            "searched": 21,
+            "single_option": 0,
+            "worlds_sampled": 672,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 18.928162641994277,
+            "rejected": 0,
+            "decision_seconds": 22.37229736799418,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 36,
+            "searched": 36,
+            "single_option": 0,
+            "worlds_sampled": 1152,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 32.7342773360142,
+            "rejected": 0,
+            "decision_seconds": 38.837831295004435,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 42,
+            "searched": 42,
+            "single_option": 0,
+            "worlds_sampled": 1344,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 35.45686540199313,
+            "rejected": 0,
+            "decision_seconds": 42.441335536015686,
+            "order_errors": 0
+          }
+        },
+        {
+          "a": {
+            "decisions": 16,
+            "searched": 16,
+            "single_option": 0,
+            "worlds_sampled": 512,
+            "worlds_dropped": 0,
+            "fallbacks": 0,
+            "unmapped_visits": 0,
+            "tera_entries_dropped": 0,
+            "search_seconds": 13.688713254003233,
+            "rejected": 0,
+            "decision_seconds": 16.435963260995777,
+            "order_errors": 0
+          }
+        }
+      ],
+      "sequential": null,
+      "decisive_games": 100,
+      "a_win_rate_decisive": 0.89,
+      "wilson_95_low": 0.8136870349691969,
+      "wilson_95_high": 0.9374580364293543,
+      "finished_games": 100,
+      "true_draws": 0,
+      "a_score": 0.89,
+      "mean_turns": 23.63,
+      "games_per_second": 0.03643232785358885,
+      "a_counter_totals": {
+        "decisions": 2671,
+        "searched": 2641,
+        "single_option": 30,
+        "worlds_sampled": 84512,
+        "worlds_dropped": 0,
+        "fallbacks": 0,
+        "unmapped_visits": 902964,
+        "tera_entries_dropped": 192,
+        "search_seconds": 2282.5270657489273,
+        "rejected": 0,
+        "decision_seconds": 2733.2514113889374,
+        "order_errors": 0
+      },
+      "b_counter_totals": {},
+      "a_fidelity": {
+        "games": 100,
+        "decisions": 2671,
+        "fallbacks": 0,
+        "fallback_rate": 0.0,
+        "games_with_fallback": 0,
+        "max_fallbacks_in_a_game": 0,
+        "worlds_sampled": 84512,
+        "worlds_dropped": 0,
+        "world_drop_rate": 0.0,
+        "rejected": 0,
+        "order_errors": 0,
+        "tera_entries_dropped": 192,
+        "unmapped_visits": 902964,
+        "seconds_per_decision": 1.0233064063605157,
+        "failure_reasons": {}
+      },
+      "b_fidelity": null
+    }
+  ]
+}
