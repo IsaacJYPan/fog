@@ -1,0 +1,6 @@
+{
+  "label": "CPU engineering smoke; no GPU requested",
+  "exit_code": 0,
+  "stdout": "Process 7: python3 -u /kaggle/src/script.py\nPython v3.13.18 (/usr/bin/python3.13)\n\nThread 7 (active): \"MainThread\"\n    _PollLikeSelector.select (selectors.py:398)\n    Popen._communicate (subprocess.py:2155)\n    Popen.communicate (subprocess.py:1223)\n    profiler_dump (script.py:22)\n    <module> (script.py:33)\n",
+  "stderr": ""
+}

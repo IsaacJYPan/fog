@@ -7,6 +7,7 @@ command, returning the trainer's normal halt signal after two saved updates.
 from __future__ import annotations
 
 import contextlib
+import ctypes
 import csv
 import json
 import math
@@ -131,13 +132,45 @@ class Parts(contextlib.AbstractContextManager):
         return False
 
 
+def profiler_dump(command):
+    """Permit only this profiler child to inspect its own benchmark parent.
+
+    Linux's default ptrace rule prevents a child from reading its parent. Set
+    PR_SET_PTRACER on this process to that child's PID, then revoke it. No host
+    policy or permissions on any other process are changed.
+    """
+    read_fd, write_fd = os.pipe()
+    gate = "import os,sys; os.read(int(sys.argv[1]),1); os.execv(sys.argv[2],sys.argv[2:])"
+    child = subprocess.Popen([sys.executable, "-c", gate, str(read_fd), *command],
+                             pass_fds=(read_fd,), stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE, text=True)
+    os.close(read_fd)
+    libc = ctypes.CDLL(None, use_errno=True)
+    libc.prctl.argtypes = [ctypes.c_int, ctypes.c_ulong, ctypes.c_ulong,
+                          ctypes.c_ulong, ctypes.c_ulong]
+    libc.prctl.restype = ctypes.c_int
+    try:
+        if libc.prctl(0x59616d61, child.pid, 0, 0, 0) != 0:
+            raise OSError(ctypes.get_errno(), "PR_SET_PTRACER profiler-child grant failed")
+        os.write(write_fd, b"1")
+        stdout, stderr = child.communicate(timeout=15)
+        return subprocess.CompletedProcess(command, child.returncode, stdout, stderr)
+    finally:
+        os.close(write_fd)
+        if child.poll() is None:
+            child.kill()
+            child.communicate()
+        if libc.prctl(0x59616d61, 0, 0, 0, 0) != 0:
+            raise OSError(ctypes.get_errno(), "PR_SET_PTRACER revoke failed")
+
+
 def stacks(stop):
     for index in range(3):
         if stop.wait(0.1):
             return
         command = [sys.executable.replace("python", "py-spy"), "dump", "--pid", str(os.getpid())]
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=15)
+            result = profiler_dump(command)
             (OUT / f"update-stack-{index + 1}.txt").write_text(result.stdout + result.stderr)
             dump(f"update-stack-{index + 1}.json", {"command": command, "exit_code": result.returncode,
                                                    "update": 2})

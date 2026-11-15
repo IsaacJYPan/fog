@@ -1,0 +1,12 @@
+{
+  "label": "smoke, conservative allocation planning",
+  "primary_attempts_quota_seconds": 482.38500000000204,
+  "prior_gpu_seconds_upper_bound_counting_both_devices": 964.7700000000041,
+  "followup_purpose": "capture three py-spy dump stacks during update 2; primary PPO and replay metrics remain unchanged",
+  "cpu_preflight": "private CPU-only job passed after per-process grant to exact profiler child and revocation",
+  "local_preflight": "same prctl option returned EINVAL in the local cloud sandbox; GPU platform CPU preflight used instead",
+  "followup_max_gpus": 2,
+  "followup_platform_timeout_seconds": 900,
+  "combined_gpu_hours_upper_bound": 0.7679916666666678,
+  "measurement_code_unchanged_under_fog": true
+}

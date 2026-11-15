@@ -24,7 +24,10 @@ def main():
     root = Path('/kaggle/temp/fog')
     output = Path('/kaggle/working/08-artifacts')
     output.mkdir(parents=True, exist_ok=True)
-    deadline = started + 1440
+    platform_limit = int(os.environ.get("FOG08_PLATFORM_TIMEOUT", "1740"))
+    if not 600 <= platform_limit <= 1740:
+        raise ValueError("Unsupported platform timeout")
+    deadline = started + platform_limit - 300
     commit = os.environ['FOG_COMMIT']
     env = dict(os.environ, OMP_NUM_THREADS='1', MKL_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1',
                FOG08_OUTPUT=str(output))
@@ -117,8 +120,9 @@ print(m.select(pl.len(),pl.col("n_rows").sum()))
         shutil.copy2(root / 'runs/collect_gpu/metrics.csv', output / 'ppo-metrics.csv')
         summarize(output, commit)
         print('PPO_STAGE_COMPLETE', flush=True)
-        run([python, 'docs/briefs/08-artifacts/measure.py', 'replay'], 'replay')
-        print('REPLAY_STAGE_COMPLETE', flush=True)
+        if not os.environ.get('FOG08_PPO_ONLY'):
+            run([python, 'docs/briefs/08-artifacts/measure.py', 'replay'], 'replay')
+            print('REPLAY_STAGE_COMPLETE', flush=True)
         # Export the native update checkpoints for restart outside the public repo.
         with zipfile.ZipFile('/kaggle/working/checkpoints.zip', 'w', zipfile.ZIP_STORED) as archive:
             for folder in (root / 'runs/collect_gpu/checkpoints', work):
@@ -132,8 +136,8 @@ print(m.select(pl.len(),pl.col("n_rows").sum()))
         seconds = time.monotonic() - started
         write('budget.json', {'status': status, 'allocated_gpus': gpu_count, 'job_seconds': seconds,
                               'gpu_hours': gpu_count * seconds / 3600 if gpu_count else None,
-                              'platform_timeout_seconds': 1740,
-                              'allocation_upper_bound_gpu_hours': gpu_count * 1740 / 3600 if gpu_count else None,
+                              'platform_timeout_seconds': platform_limit,
+                              'allocation_upper_bound_gpu_hours': gpu_count * platform_limit / 3600 if gpu_count else None,
                               'records': records})
 
 
