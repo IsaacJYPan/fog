@@ -2691,3 +2691,7 @@ Stage 1 passes: default-budget 200-game smoke, fallbacks below 5%, no rejected a
 400-game smoke; same seed blocks across cells.
 
 | 2026-11-14 | mcts | simpleheuristics | showdown_direct | 400 | 0.910 [0.878, 0.934] (364-36-0) | 0.261 | 28/10738 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-200-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### Partial 3,200 ms / K=8 checkpoint (run continues)
+
+Observed saved blocks: 200 games, 182 wins, 5487 decisions, 13 fallbacks, 0 rejected actions, 0 failed games and 0 truncations. **Partial smoke, not a completed curve cell or gate.** The curve allocation at observation is 9.354326 core-hours. Raw matched-block reports and the allocation checkpoint are pushed for recovery. Source remains `aa38e46`; the exact command and launch commit remain in `11-artifacts/measurement-progress.json`.

@@ -1,0 +1,11 @@
+[showdown-selection] mcts vs simpleheuristics: 4/100 A=3 B=1 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 8/100 A=7 B=1 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 12/100 A=11 B=1 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 16/100 A=14 B=2 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 20/100 A=17 B=3 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 24/100 A=21 B=3 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 28/100 A=24 B=4 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 32/100 A=28 B=4 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 36/100 A=30 B=6 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 40/100 A=34 B=6 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 44/100 A=38 B=6 draws=0 failures=0
