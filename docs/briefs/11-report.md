@@ -12,7 +12,7 @@ Regenerator healing (821). Engine round-trip: 3,526 positions, 11 residual core 
 extended last-move, Wish, Future Sight, toxic counts and timers remain approximate.
 
 **Measurements.** Default-budget fidelity smoke: simpleheuristics: 200 games, 93.500% [95% 89.198%, 96.162%], fallbacks 2/5341, rejected 0, 1.776 s/decision.
-Budget allocated so far: 3.676 core-hours (40-hour cap).
+Budget allocated so far: 15.460 core-hours (40-hour cap).
 All runs use validation teams, pinned Showdown `e440c4a`, CPU, one search thread, fixed
 matched blocks, no sequential stop. The gate requests 1,008 games per opponent so all four
 shards have equal whole-block sizes (252 each); the merger requires equal shard protocols.
