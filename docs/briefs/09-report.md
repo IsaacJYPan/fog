@@ -1,42 +1,37 @@
-# Brief 09: order-blind model (stages 2–3 complete)
+# Brief 09: order-blind model (stages 2–4 complete)
 
-**Answer.** The order-blind model passes the perturbed-weight permutation test and matches stored/shuffled results to four decimals. R2 shuffled NLL/top-1 is 1.8799/28.24% versus R1's 1.9253/26.64%, beyond twice the historical R1 seed gaps. The value head still carries no useful outcome information: R3 best-value Brier 0.2500, epoch 0; its best-policy NLL/top-1 is 1.8806/28.51%. Stages 2–3 are complete; move features, rare-move/play comparisons and leads are pending. All results are smoke.
+**Answer.** The order-blind model passes perturbed-weight permutation checks and improves shuffled NLL/top-1 from R1’s 1.9253/26.64% to R2’s 1.8799/28.24%. Value still fails the constant-0.5 Brier reference. Mechanics improve moves seen 1–19 times (NLL 2.0192→1.8193), but show no unseen-move gain (130 rows). R4’s play scores were 38.50%/77.00% against SimpleHeuristics/MaxDamage versus R1’s 14.75%/39.75%. Leads remain pending. All results are smoke.
 
-CPU: AMD EPYC 9V74, four-core quota, five logical CPUs visible; PyTorch 2.13.0+cu130,
-CUDA unavailable. Pinned Showdown `e440c4a`. Branch `work/order-blind-model` from `70cc5ed`;
-R1 source `70cc5ed`, R2 `c7007c8` (model `b824430`), R3 `69b9d19`.
+CPU: AMD EPYC 9V74, four-core quota, five logical CPUs; PyTorch 2.13.0+cu130, no CUDA.
+Pinned Showdown `e440c4a`. Sources: R1 `70cc5ed`, R2 `c7007c8` (model `b824430`),
+R3 `69b9d19`, both R4 seeds `4066edc`. Branch `work/order-blind-model` from `70cc5ed`.
 
-## Fixed data and recipe
+22,000 games, zero quarantines, 1,126,792 rows; fixed training 1,000 games/52,955 rows,
+holdout 2,000 games/103,944 rows (103,933 policy-valid). Every run uses eight epochs, batch
+256, cosine 3e-4→3e-5, no early stop. Seeds 20261201 and, for R4b, 20261202.
+R1 reproduced the 1.9239 reference within 0.0016 NLL.
 
-22,000 corrected games, zero quarantines, 1,126,792 rows. The exact fixed holdout has
-2,000 games / 103,944 rows (103,933 policy-valid); training has 1,000 games / 52,955 rows.
-All three runs use eight CPU epochs, batch 256, cosine 3e-4 to 3e-5, no early stop, seed 20261201.
-R1 reproduced the 1.9239 reference within 0.0016 NLL. The initial conversion resumed 9,227
-per-game checkpoints after a dispatcher interruption.
+## Policy at best policy epoch
 
-## Policy at the best policy epoch
+Each cell is shuffled NLL / top-1 %. All 95% intervals resample whole games, keeping both
+perspectives; full intervals are in each `R*-best-policy-slot-check.json`.
+“Unmoved” means no earlier move in retained history, not the entire game.
 
-Shuffled-slot numbers below; 95% intervals resample 2,000 whole games, keeping both sides.
-“Unmoved” means no earlier move in the retained history, not the entire game.
+| Run / epoch | All | Move | Unmoved |
+| --- | --- | --- | --- |
+| R1 / 8 | 1.9253 / 26.64 | 1.7664 / 29.16 | 1.6697 / 33.46 |
+| R2 / 8 | 1.8799 / 28.24 | 1.7280 / 30.26 | 1.6281 / 33.98 |
+| R3 / 8 | 1.8806 / 28.51 | 1.7321 / 30.42 | 1.6332 / 34.46 |
+| R4 / 7 | 1.8041 / 33.25 | 1.6804 / 36.36 | 1.5554 / 40.84 |
+| R4b / 6 | 1.8139 / 32.80 | 1.6776 / 36.66 | 1.5763 / 40.51 |
 
-| Run / group | NLL [95%] | Top-1 % [95%] |
-| --- | --- | --- |
-| R1 e8 / all | 1.9253 [1.9189, 1.9316] | 26.64 [26.34, 26.95] |
-| R1 e8 / move | 1.7664 [1.7607, 1.7720] | 29.16 [28.80, 29.53] |
-| R1 e8 / unmoved | 1.6697 [1.6599, 1.6805] | 33.46 [32.79, 34.10] |
-| R2 e8 / all | 1.8799 [1.8735, 1.8860] | 28.24 [27.92, 28.57] |
-| R2 e8 / move | 1.7280 [1.7223, 1.7334] | 30.26 [29.90, 30.65] |
-| R2 e8 / unmoved | 1.6281 [1.6184, 1.6386] | 33.98 [33.31, 34.64] |
-| R3 e8 / all | 1.8806 [1.8744, 1.8869] | 28.51 [28.16, 28.84] |
-| R3 e8 / move | 1.7321 [1.7264, 1.7379] | 30.42 [30.01, 30.81] |
-| R3 e8 / unmoved | 1.6332 [1.6232, 1.6441] | 34.46 [33.80, 35.10] |
+R2/R3/both R4 seeds match stored/shuffled NLL and top-1 to four decimals. R2’s all-row
+gain exceeds twice the historical R1 seed gap. R4’s all/move/unmoved gains exceed twice
+its seed gap (`stage2-summary.json`, `stage4-summary.json`).
 
-R2 and R3 stored and shuffled NLL/top-1 match to four decimals in all three groups.
-Historical R1 seed thresholds and differences are in `stage2-summary.json`; R1 was rerun once.
+## Value selection
 
-## Value checkpoint selection
-
-| Run / selector / epoch | Brier [95%] | ECE [95%] |
+| Run / checkpoint / epoch | Brier [95%] | ECE [95%] |
 | --- | --- | --- |
 | R1 / policy / 8 | 0.4038 [0.3887, 0.4176] | 0.3808 [0.3653, 0.3956] |
 | R1 / value / 0 | 0.2533 [0.2532, 0.2534] | 0.0573 [0.0567, 0.0579] |
@@ -44,50 +39,62 @@ Historical R1 seed thresholds and differences are in `stage2-summary.json`; R1 w
 | R2 / value / 0 | 0.2500 [0.2500, 0.2500] | 0.0015 [0.0009, 0.0021] |
 | R3 / policy / 8 | 0.4065 [0.3928, 0.4201] | 0.3841 [0.3702, 0.3981] |
 | R3 / value / 0 | 0.2500 [0.2500, 0.2500] | 0.0015 [0.0009, 0.0021] |
+| R4 / policy / 7 | 0.4017 [0.3877, 0.4162] | 0.3731 [0.3586, 0.3880] |
+| R4 / value / 0 | 0.2567 [0.2566, 0.2568] | 0.0819 [0.0813, 0.0825] |
+| R4b / policy / 6 | 0.3878 [0.3731, 0.4020] | 0.3601 [0.3449, 0.3747] |
+| R4b / value / 0 | 0.2707 [0.2705, 0.2708] | 0.1438 [0.1432, 0.1444] |
 
-Brier at or above 0.25 carries no useful outcome information here. Value selection includes epoch 0. R1/R2 initial checkpoints were reconstructed and
-verified against all initial tensor digests; R3 saves value and policy selections natively.
+Brier ≥0.25 carries no useful outcome information here. Native independent value selection
+includes epoch 0; R1/R2 epoch-zero checkpoints were reconstructed and tensor-verified.
+For R3 policy: p<0.1 share 39.24%, observed wins 44.51%; p>0.9 share 41.12%, wins 56.46%.
+R3 value selection has no extreme predictions. All extreme statistics/intervals are in both checkpoint JSONs (decision-weighted).
 
-## Public terminal targets
+## Move frequency and play
 
-R3 uses stable cross-entropy on the unsaturated win logit, plus coefficient-0.1 survival and
-HP-difference auxiliary heads. Labels are training-only and never enter an encoder.
-Per-epoch Brier, global-bin ECE and both auxiliary losses are in `R3-metrics.csv`.
+Move groups count policy-valid training labels; ordinary/Tera share identity. Cells are
+NLL / top-1 %; game intervals: `rare-moves.json`. Gains for 1–19 and 20+ exceed twice
+their R4 seed gaps. Unseen-move NLL worsens; its 130-row intervals are broad.
 
-Two label attempts were rejected: 84/500 games failed a cross-view check; the first form fix
-then missed non-Ogerpon forms, so a two-epoch R3 run was discarded. Targets now use public
-opponent views and unique base-species identities, rejecting unmatched forms. All 22,000 games
-pass identity/coherence checks; old arrays are identical in the 3,000 fixed-split games.
-Ninety-five affected tests and Ruff pass (`tests-stage3-general-forms.txt`).
+| Training count / rows | R3 | R4 | R4b |
+| --- | --- | --- | --- |
+| never / 130 | 1.8840 / 25.38 | 2.0163 / 15.38 | 2.0197 / 22.31 |
+| 1_to_19 / 2171 | 2.0192 / 11.93 | 1.8193 / 29.25 | 1.7940 / 31.74 |
+| 20_or_more / 72552 | 1.7233 / 30.98 | 1.6757 / 36.62 | 1.6735 / 36.84 |
 
-Extreme predictions below use decision-weighted game outcomes; intervals resample games.
-Each cell is prediction share % → observed win %. Empty groups are n/a.
+Greedy play uses brief 03’s `pool_b`, 400 games/cell, shared matched seed 0, both teams
+and sides crossed. Timing overlaps R4b training; it does not measure isolated throughput.
+Only primary-seed best-policy checkpoints play; pool B is not held out.
 
-| R3 checkpoint | p < 0.1 | p > 0.9 |
+| Policy / opponent | W–L / draws / unresolved / failures | Score and interval |
 | --- | --- | --- |
-| policy | 39.24 → 44.51 | 41.12 → 56.46 |
-| value | 0.00 → n/a | 0.00 → n/a |
+| R1 vs simpleheuristics | 59–341 / 0 / 0 / 0 | 14.75 [11.00, 18.50]% block bootstrap |
+| R1 vs maxdamage | 159–241 / 0 / 0 / 0 | 39.75 [34.75, 44.75]% block bootstrap |
+| R4 vs simpleheuristics | 154–246 / 0 / 0 / 0 | 38.50 [33.75, 43.25]% block bootstrap |
+| R4 vs maxdamage | 308–92 / 0 / 0 / 0 | 77.00 [72.75, 81.50]% block bootstrap |
 
-Exact extreme-frequency intervals are in `R3-best-{policy,value}-slot-check.json`.
+Primary score treats genuine draws as 0.5 and truncations as unresolved; full native
+scores/action statistics are in `play.json`; block intervals and paired differences are in
+`play-block-intervals.json`. No strength claim.
 
-## Implementation, checks and limits
+## Defects, implementation and limits
 
-`model.order_blind_entities` defaults off. Shared move vectors pool symmetrically; creature
-positions and numeric IDs are removed, and history retains kind plus identity. Control legality
-counts and optional global pooling are symmetric. Ordered architecture combinations are rejected.
-`hist_opp_action` is a public move-table ID, not a private slot. Belief decoders and their
-slot-indexed queries are unchanged; policy and value do not read their predictions.
+Two dense-label attempts were rejected: 84/500 games disagreed across views, then a narrow
+form fix missed other forms and its R3 run stopped after two epochs. Final public-only
+base-species matching passes all 22,000 games; old arrays match in all 3,000 fixed-split games.
+Initial conversion resumed 9,227 completed games after interruption.
 
-Every parameter was perturbed before testing all four required permutations on 64 holdout,
-64 live and 64 synthetic observations. Ten acceptance tests pass, including key-off negative
-controls; 40 related model/config tests pass. Worst log-probability error is 7.153e-7.
-Ruff is clean. The original checkpoint loads strictly with bit-identical policy/value on 64
-live observations (`compatibility-stage3.json`). Three same-machine digests matched at stage 2;
-they will be repeated after the remaining changes.
+All new behavior defaults off. Shared move pooling removes arbitrary order; public history
+keeps kind and identity (`hist_opp_action` is a public global move ID). Value targets never
+enter encoders. Mechanics use generated table facts and exactly eleven named candidate
+columns; excluded columns, including NaNs, cannot affect outputs or gradients. Belief
+decoders and their slot-indexed queries are unchanged.
 
-Evidence is under `09-artifacts/`: `data-counts.json`, `permutations.json`, test logs,
-`compatibility-stage3.json`, `digests-summary.json`, per-run metrics/selection/slot-check files
-and command execution records. The slot-check JSON contains every group interval.
+All parameters are perturbed before four permutation checks on 64 synthetic, 64 holdout and
+64 live observations; key-off move/bench controls fail as required. Mechanical-on tests and
+89 affected tests pass; Ruff is clean. The old checkpoint was strictly loaded with identical
+outputs at stage 3. Final compatibility and all-off digests will repeat after leads.
 
-**Not verified:** stages 4–5, R4 second seed, rare-move and play comparisons. No strength or
-phase gate is claimed. No search, PPO or belief source changed.
+Evidence: all commands, metrics and checks are under `09-artifacts/`.
+
+**Not verified:** stage 5, final all-off regression checks, playing-strength or phase gates.
+No search, PPO or belief source changed.

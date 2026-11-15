@@ -1,0 +1,145 @@
+import json
+import numpy as np
+from pathlib import Path
+import shlex
+import shutil
+
+root=Path.cwd(); art=root/'docs/briefs/09-artifacts'
+names=('R1','R2','R3','R4','R4-seed2')
+diags={n:{k:json.loads((art/f'{n}-best-{k}-slot-check.json').read_text()) for k in ('policy','value')} for n in names}
+select={n:json.loads((art/f'{n}-selection.json').read_text()) for n in names}
+rare=json.loads((art/'rare-moves.json').read_text())
+play=json.loads((root/'runs/order_blind_model/play.json').read_text())
+assert play['status']=='complete' and len(play['rows'])==4
+for row in play['rows']:
+    assert row['completed_games']+row['failures']==400
+assert select['R4']['commit']==select['R4-seed2']['commit']==rare['commit']
+source=rare['commit']
+# Resample whole matched blocks; keep the same bootstrap indices for paired policies.
+rng=np.random.default_rng(0)
+indices=rng.integers(0,100,size=(10000,100))
+play_intervals={'smoke':True,'source':source,'samples':10000,'seed':0,'unit':'matched four-game block','analysis_command':'python runs/order_blind_model/finish_stage4.py','analysis_source':'09-artifacts/stage4-summary-driver.txt','unresolved':'excluded from each resampled denominator; never counted as draws','rows':{},'paired_R4_minus_R1':{}}
+resampled={}
+for row in play['rows']:
+    scores=np.array([np.nan if x is None else x for x in row['game_scores']]).reshape(100,4)
+    numerator=np.nansum(scores,axis=1); denominator=np.isfinite(scores).sum(axis=1)
+    samples=numerator[indices].sum(axis=1)/denominator[indices].sum(axis=1)
+    resampled[row['label']]=samples
+    play_intervals['rows'][row['label']]={'score':row['a_score'],'interval95':np.quantile(samples,[.025,.975]).tolist()}
+for opponent in ('simpleheuristics','maxdamage'):
+    a='R1 vs '+opponent; b='R4 vs '+opponent
+    play_intervals['paired_R4_minus_R1'][opponent]={'difference':play_intervals['rows'][b]['score']-play_intervals['rows'][a]['score'],'interval95':np.quantile(resampled[b]-resampled[a],[.025,.975]).tolist()}
+(art/'play-block-intervals.json').write_text(json.dumps(play_intervals,indent=2)+'\n')
+comparisons={}
+for group in ('all','move','not_yet_moved'):
+    comparisons[group]={}
+    for metric in ('nll_shuffled','top1_shuffled'):
+        a=diags['R4']['policy']['policy'][group][metric]
+        b=diags['R4-seed2']['policy']['policy'][group][metric]
+        old=diags['R3']['policy']['policy'][group][metric]
+        comparisons[group][metric]={'R3':old,'R4':a,'R4_seed2':b,'R4_minus_R3':a-old,'twice_seed_gap':2*abs(a-b),'exceeds_noise':abs(a-old)>2*abs(a-b)}
+rare_comparison={}
+for group in ('never','1_to_19','20_or_more'):
+    rare_comparison[group]={}
+    for metric in ('nll','top1'):
+        a=rare['models']['R4']['groups'][group][metric]
+        b=rare['models']['R4-seed2']['groups'][group][metric]
+        old=rare['models']['R3']['groups'][group][metric]
+        rare_comparison[group][metric]={'R3':old,'R4':a,'R4_seed2':b,'R4_minus_R3':None if a is None else a-old,'twice_seed_gap':None if a is None else 2*abs(a-b),'exceeds_noise':None if a is None else abs(a-old)>2*abs(a-b)}
+summary={'smoke':True,'source':source,'stages_complete':[2,3,4],'stage_pending':5,'standard_groups':comparisons,'rare_groups':rare_comparison,'play_rows':play['rows'],'play_has_second_seed':False,'play_strength_gate':False}
+(art/'stage4-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+shutil.copyfile(root/'runs/order_blind_model/play.json',art/'play.json')
+meta=json.loads((art/'play-execution.json').read_text()); meta['status']='complete'; meta['rows']=4; meta['games']=1600
+(art/'play-execution.json').write_text(json.dumps(meta,indent=2)+'\n')
+def f(x,n=4): return 'n/a' if x is None else f'{x:.{n}f}'
+def ci(x,bounds,n=4,scale=1):
+    return f'{x*scale:.{n}f} [{bounds[0]*scale:.{n}f}, {bounds[1]*scale:.{n}f}]'
+
+answer='The order-blind model passes all perturbed-weight permutation checks and improves shuffled holdout NLL/top-1 from R1’s 1.9253/26.64% to R2’s 1.8799/28.24%. The value head still fails the 0.25 Brier criterion. Mechanics, rare-move and matched play results are measured below; the lead stage remains pending. All results are smoke.'
+lines=['# Brief 09: order-blind model (stages 2–4 complete)','', '**Answer.** '+answer,'',
+'CPU: AMD EPYC 9V74, four-core quota, five logical CPUs; PyTorch 2.13.0+cu130, no CUDA.',
+'Pinned Showdown `e440c4a`. Sources: R1 `70cc5ed`, R2 `c7007c8` (model `b824430`),',
+f'R3 `69b9d19`, both R4 seeds `{source[:7]}`. Branch `work/order-blind-model` from `70cc5ed`.','',
+'22,000 games, zero quarantines, 1,126,792 rows; fixed training 1,000 games/52,955 rows,',
+'holdout 2,000 games/103,944 rows (103,933 policy-valid). Every run uses eight epochs, batch',
+'256, cosine 3e-4→3e-5, no early stop. Seeds 20261201 and, for R4b, 20261202.',
+'R1 reproduced the 1.9239 reference within 0.0016 NLL.','',
+'## Policy at best policy epoch','',
+'Each cell is shuffled NLL / top-1 %. All 95% intervals resample whole games, keeping both',
+'perspectives; full intervals are in each `R*-best-policy-slot-check.json`.',
+'“Unmoved” means no earlier move in retained history, not the entire game.','',
+'| Run / epoch | All | Move | Unmoved |','| --- | --- | --- | --- |']
+for name in names:
+    cells=[]
+    for group in ('all','move','not_yet_moved'):
+        r=diags[name]['policy']['policy'][group]
+        cells.append(f'{r["nll_shuffled"]:.4f} / {100*r["top1_shuffled"]:.2f}')
+    lines.append(f'| {name.replace("-seed2","b")} / {select[name]["best_policy_epoch"]} | '+' | '.join(cells)+' |')
+lines += ['', 'R2–R4 stored/shuffled NLL and top-1 match to four decimals in all groups. R2’s all-row',
+'gain exceeds twice the historical R1 seed gap (`stage2-summary.json`). Mechanics effects',
+'are compared with twice the observed R4 seed gap in `stage4-summary.json`.','',
+'## Value selection','', '| Run / checkpoint / epoch | Brier [95%] | ECE [95%] |','| --- | --- | --- |']
+for name in names:
+    for kind in ('policy','value'):
+        r=diags[name][kind]['value']
+        lines.append(f'| {name.replace("-seed2","b")} / {kind} / {select[name]["best_"+kind+"_epoch"]} | '+ci(r['brier'],r['interval95']['brier'])+' | '+ci(r['ece'],r['interval95']['ece'])+' |')
+lines += ['', 'Brier ≥0.25 carries no useful outcome information here. Native independent value selection',
+'includes epoch 0; R1/R2 epoch-zero checkpoints were reconstructed and tensor-verified.',
+'All per-epoch metrics and both checkpoint diagnostics include value calibration.',
+'For R3 policy: p<0.1 share 39.24%, observed wins 44.51%; p>0.9 share 41.12%, wins 56.46%.',
+'R3 value selection has no extreme predictions. All runs’ extreme shares, conditional win',
+'frequencies and game intervals are in the two checkpoint JSONs (decision-weighted).','',
+'## Move frequency and play','', 'Move groups count policy-valid training labels, merging ordinary/Tera identity. Cells are',
+'NLL / top-1 %. Exact game-bootstrap intervals are in `rare-moves.json`.','',
+'| Training count / rows | R3 | R4 | R4b |','| --- | --- | --- | --- |']
+for group in ('never','1_to_19','20_or_more'):
+    rows=rare['models']['R3']['groups'][group]['rows']
+    cells=[]
+    for name in ('R3','R4','R4-seed2'):
+        r=rare['models'][name]['groups'][group]
+        cells.append(f(r['nll'])+' / '+f(None if r['top1'] is None else 100*r['top1'],2))
+    lines.append(f'| {group} / {rows} | '+' | '.join(cells)+' |')
+lines += ['', 'Greedy play uses brief 03’s `pool_b`, 400 games/cell, shared matched seed 0, both teams',
+'and sides crossed. Timing overlaps R4b training; it does not measure isolated throughput.',
+'Only primary-seed best-policy checkpoints play. Pool B is not a held-out strength gate.','',
+'| Policy / opponent | W–L / draws / unresolved / failures | Score and interval |','| --- | --- | --- |']
+for row in play['rows']:
+    lines.append(f'| {row["label"]} | {row["a_wins"]}–{row["b_wins"]} / {row["draws"]-row["truncated"]} / {row["truncated"]} / {row["failures"]} | '+ci(row['a_score'],play_intervals['rows'][row['label']]['interval95'],2,100)+'% block bootstrap |')
+lines += ['', 'Primary score treats genuine draws as 0.5 and truncations as unresolved; full native',
+'scores/action statistics are in `play.json`; block intervals and paired differences are in',
+'`play-block-intervals.json`. No strength claim.','',
+'## Defects, implementation and limits','',
+'Two dense-label attempts were rejected: 84/500 games disagreed across views, then a narrow',
+'form fix missed other forms and its R3 run stopped after two epochs. Final public-only',
+'base-species matching passes all 22,000 games; old arrays match in all 3,000 fixed-split games.',
+'The initial corrected-data conversion resumed 9,227 completed games after interruption.','',
+'All new behavior defaults off. Shared move pooling removes arbitrary order; public history',
+'keeps kind and identity (`hist_opp_action` is a public global move ID). Value targets never',
+'enter encoders. Mechanics use generated table facts and exactly eleven named candidate',
+'columns; excluded columns, including NaNs, cannot affect outputs or gradients. Belief',
+'decoders and their slot-indexed queries are unchanged.','',
+'All parameters are perturbed before four permutation checks on 64 synthetic, 64 holdout and',
+'64 live observations; key-off move/bench controls fail as required. Mechanical-on tests and',
+'89 affected tests pass; Ruff is clean. The old checkpoint was strictly loaded with identical',
+'outputs at stage 3. Final compatibility and all-off digests will repeat after leads.','',
+'Evidence: `09-artifacts/` execution records, per-run CSV/selection/slot checks,',
+'`stage4-summary.json`, `rare-moves.json`, `play.json`, and check/test logs.','',
+'**Not verified:** stage 5, final all-off regression checks, playing-strength or phase gates.',
+'No search, PPO or belief source changed.']
+(root/'docs/briefs/09-report.md').write_text('\n'.join(lines)+'\n')
+ledger=root/'docs/results-ledger.md'
+with ledger.open('a') as stream:
+    stream.write('\nStage 4 completed (smoke). Mechanical features default off; public table facts and exactly eleven candidate columns are qualified by 89 affected tests, excluded-column NaN/gradient checks, and all-parameter-noise permutation checks (64 synthetic/holdout/live).\n\n')
+    stream.write('| Run | Result (smoke; 95% whole-game intervals) | Producing commit and command / evidence |\n| --- | --- | --- |\n')
+    for name in ('R4','R4-seed2'):
+        execution=json.loads((art/f'{name}-execution.json').read_text())
+        command=execution[0]['command']; command[0]='python'
+        p=diags[name]['policy']['policy']['all']; vp=diags[name]['policy']['value']; vv=diags[name]['value']['value']
+        stream.write(f'| {name} | Policy e{select[name]["best_policy_epoch"]}: NLL '+ci(p['nll_shuffled'],p['interval95']['nll_shuffled'])+'; top-1 '+ci(p['top1_shuffled'],p['interval95']['top1_shuffled'],2,100)+'%; policy Brier '+ci(vp['brier'],vp['interval95']['brier'])+', ECE '+ci(vp['ece'],vp['interval95']['ece'])+f'; value e{select[name]["best_value_epoch"]}: Brier '+ci(vv['brier'],vv['interval95']['brier'])+', ECE '+ci(vv['ece'],vv['interval95']['ece'])+f' | `{source}`; `{shlex.join(command)}`; 1,000 train / 2,000 holdout games; `09-artifacts/{name}-{{metrics.csv,selection.json,execution.json}}`, `{name}-best-{{policy,value}}-slot-check.json` |\n')
+    stream.write(f'| Rare-move comparison | Never / 1–19 / 20+ training labels; full-14-action NLL/top-1 and game intervals for R3/R4/R4-seed2; twice-seed-gap comparisons in stage4-summary | `{source}`; `{rare["command"]}`; 1,000 train / 2,000 holdout games; `09-artifacts/rare-moves.json` |\n')
+    for row in play['rows']:
+        stream.write(f'| {row["label"]} | {row["a_wins"]}–{row["b_wins"]}, {row["draws"]-row["truncated"]} true draws, {row["truncated"]} unresolved, {row["failures"]} failures; decisive win rate '+ci(row['a_win_rate_decisive'],[row['wilson_95_low'],row['wilson_95_high']],2,100)+f'% (Wilson); native primary/block scores retained | `{source}`; `{shlex.join(meta["command"])}`; 400 games; `09-artifacts/play.json`, `play-execution.json` |\n')
+    stream.write('\nPlay uses the same global seed-0 schedule for both policies/opponents, with teams and sides crossed, temperature 0. Play overlaps second-seed training; timings are contended. Pool B is not a held-out gate. Per-run differences below twice the R4 seed gap are not claimed. All results are smoke; no gate changed.\n')
+shutil.copyfile(Path(__file__),art/'stage4-summary-driver.txt')
+print(json.dumps(summary,indent=2))
+print('Report words:',len(' '.join(lines).split()))

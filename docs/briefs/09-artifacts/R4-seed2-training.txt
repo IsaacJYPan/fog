@@ -1,0 +1,11 @@
+BC dataset: train=52955 decision rows; holdout=103944 rows  (config_hash=d211e5b1731a, torch_threads=5)
+[bc] baseline  loss=3.668  belief=13.243  chain=3.999
+[bc] epoch 1/8  train_loss=2.913  eval_loss=2.812  belief=6.991  chain=2.343  value=0.738  query_p=0.218  dropped=0.000%
+[bc] epoch 2/8  train_loss=2.534  eval_loss=2.928  belief=6.402  chain=2.127  value=1.118  query_p=0.263  dropped=0.000%
+[bc] epoch 3/8  train_loss=2.333  eval_loss=3.127  belief=6.241  chain=2.059  value=1.593  query_p=0.283  dropped=0.000%
+[bc] epoch 4/8  train_loss=2.221  eval_loss=3.364  belief=6.322  chain=2.037  value=2.069  query_p=0.300  dropped=0.000%
+[bc] epoch 5/8  train_loss=2.143  eval_loss=3.421  belief=6.516  chain=2.049  value=2.212  query_p=0.303  dropped=0.000%
+[bc] epoch 6/8  train_loss=2.079  eval_loss=3.534  belief=6.647  chain=2.046  value=2.441  query_p=0.312  dropped=0.000%
+[bc] epoch 7/8  train_loss=2.036  eval_loss=3.684  belief=6.696  chain=2.046  value=2.733  query_p=0.314  dropped=0.000%
+[bc] epoch 8/8  train_loss=2.008  eval_loss=3.690  belief=6.766  chain=2.054  value=2.737  query_p=0.315  dropped=0.000%
+[bc] done -> /workspace/fog/runs/order_blind_model/R4-seed2/checkpoints/bc_final.pt  (best eval epoch=6, loss=1.814)

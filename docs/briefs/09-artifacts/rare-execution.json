@@ -1,0 +1,30 @@
+{
+  "smoke": true,
+  "commit": "4066edc1d756e41a28b136156daba5f57060fdae",
+  "command": [
+    ".venv/bin/python",
+    "-m",
+    "fog.eval.replay_move_frequency_report",
+    "--config",
+    "R3=configs/replay_value_cpu.yaml",
+    "--checkpoint",
+    "R3=runs/order_blind_model/R3/checkpoints/bc_best.pt",
+    "--config",
+    "R4=configs/replay_mechanical_cpu.yaml",
+    "--checkpoint",
+    "R4=runs/order_blind_model/R4/checkpoints/bc_best.pt",
+    "--config",
+    "R4-seed2=configs/replay_mechanical_cpu.yaml",
+    "--checkpoint",
+    "R4-seed2=runs/order_blind_model/R4-seed2/checkpoints/bc_best.pt",
+    "--train-manifest",
+    "runs/order_blind_model/terminal_split/train_1000.parquet",
+    "--holdout-manifest",
+    "runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+    "--out",
+    "docs/briefs/09-artifacts/rare-moves.json"
+  ],
+  "seconds": 329.505854179999,
+  "exit_code": 0,
+  "cpu_contention": "May overlap second-seed checkpoint diagnostics; no timing claim."
+}

@@ -1,0 +1,194 @@
+{
+  "smoke": true,
+  "manifest": "runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+  "checkpoint": "/workspace/fog/runs/order_blind_model/R4-seed2/checkpoints/bc_best_value.pt",
+  "rows": 103933,
+  "move_rows": 74853,
+  "label_share_by_move_slot": [
+    0.2509451858976928,
+    0.24834007988991758,
+    0.24817976567405448,
+    0.2525349685383351
+  ],
+  "not_yet_moved_rows": 20309,
+  "not_yet_moved_label_is_slot0": 0.24698409572110888,
+  "switch_only_rows": 2,
+  "largest_own_pp": 0.0,
+  "switch_rows": 29080,
+  "switch_label_counts_by_bench_position": [
+    5846,
+    5768,
+    5757,
+    5854,
+    5855
+  ],
+  "label_share_by_bench_position": [
+    0.20103163686382394,
+    0.19834938101788172,
+    0.19797111416781293,
+    0.2013067400275103,
+    0.20134112792297112
+  ],
+  "lead_order": {
+    "games": 2000,
+    "p1": {
+      "known_leads": 1999,
+      "unknown_leads": 1,
+      "counts_by_team_position": [
+        345,
+        305,
+        350,
+        338,
+        309,
+        352
+      ],
+      "share_by_team_position": [
+        0.17258629314657328,
+        0.15257628814407204,
+        0.17508754377188596,
+        0.16908454227113556,
+        0.15457728864432216,
+        0.176088044022011
+      ],
+      "share_position0": 0.17258629314657328
+    },
+    "p2": {
+      "known_leads": 1998,
+      "unknown_leads": 2,
+      "counts_by_team_position": [
+        346,
+        315,
+        365,
+        320,
+        320,
+        332
+      ],
+      "share_by_team_position": [
+        0.17317317317317318,
+        0.15765765765765766,
+        0.18268268268268267,
+        0.16016016016016016,
+        0.16016016016016016,
+        0.16616616616616617
+      ],
+      "share_position0": 0.17317317317317318
+    },
+    "games_with_both_leads_known": 1997,
+    "share_games_either_lead_position0": 0.314471707561342,
+    "share_games_both_leads_position0": 0.03104656985478217,
+    "source": "converter metadata"
+  },
+  "not_yet_moved_definition": "no move by the acting species in the stored history window",
+  "policy": {
+    "all": {
+      "rows": 103933,
+      "nll_stored": 2.3049147473887532,
+      "nll_shuffled": 2.304914746433317,
+      "top1_stored": 0.10826205343827273,
+      "top1_shuffled": 0.10826205343827273,
+      "interval95": {
+        "nll_stored": [
+          2.297326171304919,
+          2.312026622871934
+        ],
+        "nll_shuffled": [
+          2.2973261704918695,
+          2.3120266218687635
+        ],
+        "top1_stored": [
+          0.10553090820834518,
+          0.11098427177793851
+        ],
+        "top1_shuffled": [
+          0.10553090820834518,
+          0.11098427177793851
+        ]
+      }
+    },
+    "move": {
+      "rows": 74853,
+      "nll_stored": 2.29078114031312,
+      "nll_shuffled": 2.2907811396665334,
+      "top1_stored": 0.04001175637582996,
+      "top1_shuffled": 0.04001175637582996,
+      "interval95": {
+        "nll_stored": [
+          2.282935055355824,
+          2.29838751965724
+        ],
+        "nll_shuffled": [
+          2.282935054991176,
+          2.2983875194992023
+        ],
+        "top1_stored": [
+          0.03790935115247489,
+          0.04231049035994416
+        ],
+        "top1_shuffled": [
+          0.03790935115247489,
+          0.04231049035994416
+        ]
+      }
+    },
+    "not_yet_moved": {
+      "rows": 20309,
+      "nll_stored": 2.4007226358846934,
+      "nll_shuffled": 2.400722635209669,
+      "top1_stored": 0.029691269880348613,
+      "top1_shuffled": 0.029691269880348613,
+      "interval95": {
+        "nll_stored": [
+          2.3958758987615374,
+          2.4053879172959998
+        ],
+        "nll_shuffled": [
+          2.3958758975794967,
+          2.4053879155785443
+        ],
+        "top1_stored": [
+          0.027429308895342248,
+          0.032079302862461585
+        ],
+        "top1_shuffled": [
+          0.027429308895342248,
+          0.032079302862461585
+        ]
+      },
+      "favourite_move_in_slot0_stored": 0.24427593677679846,
+      "favourite_move_in_slot0_shuffled": 0.24570387512925304
+    }
+  },
+  "value": {
+    "rows": 103944,
+    "brier": 0.27066612361322784,
+    "ece": 0.14382718972526884,
+    "share_below_0_1": 0.0,
+    "observed_win_rate_below_0_1": null,
+    "share_above_0_9": 0.0,
+    "observed_win_rate_above_0_9": null,
+    "interval95": {
+      "brier": [
+        0.27049164489286526,
+        0.2708376624884157
+      ],
+      "ece": [
+        0.1432073937491455,
+        0.14443026488123012
+      ],
+      "share_below_0_1": [
+        0.0,
+        0.0
+      ],
+      "share_above_0_9": [
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "interval_method": {
+    "unit": "game (both perspectives together)",
+    "samples": 2000,
+    "seed": 0,
+    "method": "percentile bootstrap, row-weighted statistic"
+  }
+}
