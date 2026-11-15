@@ -1,0 +1,14 @@
+{
+  "label": "smoke",
+  "commit": "e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f",
+  "cpu_model": "Intel(R) Xeon(R) CPU @ 2.00GHz",
+  "logical_cpus": 4,
+  "affinity_cpus": 4,
+  "cpu_quota": "400000 100000",
+  "rollout_workers": 4,
+  "gpu": [
+    "Tesla T4, 15360 MiB",
+    "Tesla T4, 15360 MiB"
+  ],
+  "started_utc": "2026-11-15T05:33:18.477374+00:00"
+}

@@ -1,0 +1,22 @@
+{
+  "label": "smoke",
+  "commit": "e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f",
+  "completed_updates": 2,
+  "decisions": 26330,
+  "optimizer_steps": 78.0,
+  "processed_rows": 78990.0,
+  "collection_seconds": 89.60986,
+  "update_seconds": 112.17861,
+  "optimization_seconds": 102.55221,
+  "wall_seconds": 214.41013479232788,
+  "mean_optimizer_step_seconds": 1.314771923076923,
+  "processed_rows_per_second": 770.2418114636437,
+  "collection_decisions_per_second": 293.8292728054703,
+  "end_to_end_decisions_per_second": 122.8020309091385,
+  "collection_wall_share": 0.41793668049690746,
+  "update_wall_share": 0.5231963969830685,
+  "other_wall_share": 0.05886692252002405,
+  "peak_learner_allocated_bytes": 10455752192,
+  "timing_caveat": "One minibatch in update 2 has synchronized part hooks and three concurrent py-spy dumps; includes their overhead. Native config and schedules unchanged except rollout_workers; stops after checkpoint 2.",
+  "sampled_peak_all_process_gpu_mib_through_ppo": 11333.0
+}

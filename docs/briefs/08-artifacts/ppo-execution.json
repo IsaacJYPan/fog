@@ -1,0 +1,12 @@
+{
+  "label": "smoke",
+  "commit": "e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f",
+  "name": "ppo",
+  "command": [
+    "/kaggle/temp/fog/.venv/bin/python",
+    "docs/briefs/08-artifacts/measure.py",
+    "ppo"
+  ],
+  "exit_code": 0,
+  "seconds": 217.93147099699996
+}
