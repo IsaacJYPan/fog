@@ -2630,3 +2630,33 @@ missing; what a row lacks or gets wrong compared with play is the more likely li
 (briefs 09 and 12), which is a hypothesis until brief 13 measures it.
 
 The hosted account's meter stood at 17.1 GPU-hours when the work ended.
+
+## 2026-11-14: EngineMCTS fidelity, budget curve and gate G1
+
+Brief 11, branch `work/g1`, based on `f36bc11`. CPU only: four-core quota on AMD EPYC 9V74,
+Python 3.12.14, locked environment, pinned Showdown `e440c4a`. Validation split only;
+no test-split files read. Exact commands are in `docs/briefs/11-artifacts/commands.json`.
+
+Fidelity baseline (`f36bc11`): `python -m fog.scripts.fuzz_recon_showdown --pool
+ data/teams/replay_v1/validation --games 200 --max-turns 80 --seed 0 --out
+ docs/briefs/11-artifacts/fuzz-showdown-before.json` checked 14,362 positions; 1,214
+with any mismatch, zero reconstruction exceptions. `python -m fog.scripts.fuzz_recon
+--pool data/teams/replay_v1/validation --games 2000 --max-turns 40 --extended --seed 0`
+checked 3,526 engine positions; 11 with core differences, 2,234 with extended differences.
+Before files and the environment are retained in `11-artifacts/`.
+
+Reconstruction fixes at `aa38e46`: map Ogerpon-Teal-Tera back to Ogerpon for matching a
+submitted-world slot; read pending charge moves from public events, including completion by
+Power Herb / immediate animation. Regressions cover both player views, HP/active/used-Tera
+across re-entry, all four Ogerpon forms, charge-only engine root options and charge completion.
+The same Showdown command with `--out docs/briefs/11-artifacts/fuzz-showdown-final.json`
+has 1,043 mismatching positions and zero exceptions. Opponent HP (96), Tera (56), active
+identity (10), and missing Phantom Force (52) / Meteor Beam (34) differences are gone.
+Fields overlap. Most remaining positions are hidden benched Regenerator healing (821).
+The remaining exact labels/counts are in the JSON; they are not fallback rates.
+
+Checks: 45 focused tests, 84 integration tests, `ruff check fog tests` clean (commands and
+captured results retained). A 200-game default-budget validation smoke is now running in two
+100-game matched-block shards, seeds 11000/11001, K=8, 1600 ms, one search thread, no SPRT,
+max turns 800. No match result yet. P1.3/P1.4 remain unchecked, G1 open; budget curve and
+1,000-game/opponent gate rows have not started. See `docs/briefs/11-report.md`.

@@ -1,0 +1,22 @@
+{
+  "fog_commit": "f36bc11d2b5390419f5b4fc805cdaa8487adea12",
+  "showdown_commit": "e440c4a18385274f10c405d0b158b6a962ce6d94",
+  "python": "3.12.14",
+  "packages": {
+    "torch": "2.13.0",
+    "poke-env": "0.15.0",
+    "poke-engine": "0.0.48",
+    "ruff": "0.15.22"
+  },
+  "cpu_max": "400000 100000",
+  "cpu_model": "AMD EPYC 9V74 80-Core Processor",
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "device": "cpu",
+  "usage_priors": "committed fog/constants/generated; no external download"
+}
