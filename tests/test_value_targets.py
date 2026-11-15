@@ -248,3 +248,100 @@ def test_outcome_auxiliaries_respect_the_existing_trunk_gradient_switch():
     assert all(p.grad is None for p in agent.shared_latent.parameters())
     assert all(p.grad is None for p in agent.shared_to_value.parameters())
     assert all(p.grad is None for p in agent.backbone.parameters())
+
+
+def test_terminal_targets_ignore_imputed_regenerator_healing():
+    from fog.constants.schema import SET_EV_COLS, SET_N_ATTRS
+    from fog.constants.tables import TABLES
+
+    replay = {'players':['A','B'], 'log': '''|gametype|singles
+|player|p1|A|1|1600
+|player|p2|B|2|1600
+|teamsize|p1|2
+|teamsize|p2|1
+|gen|9
+|tier|[Gen 9] OU
+|clearpoke
+|poke|p1|Alomomola|
+|poke|p1|Garchomp|
+|poke|p2|Corviknight|
+|teampreview
+|start
+|switch|p1a: Fish|Alomomola|100/100
+|switch|p2a: Bird|Corviknight|100/100
+|turn|1
+|move|p2a: Bird|Brave Bird|p1a: Fish
+|-damage|p1a: Fish|50/100
+|move|p1a: Fish|Wish|p1a: Fish
+|turn|2
+|switch|p1a: Chomp|Garchomp|100/100
+|move|p2a: Bird|Roost|p2a: Bird
+|-heal|p2a: Bird|100/100
+|win|A'''}
+
+    def sheet(entries):
+        result = np.full((6,SET_N_ATTRS),-1,dtype=np.int64)
+        result[:,list(SET_EV_COLS)] = 0
+        result[:,7] = 0
+        for row,(species,ability,move) in zip(result[:len(entries)],entries,strict=True):
+            row[0] = TABLES.species_index(species)
+            row[2] = TABLES.ability_index(ability)
+            row[3] = TABLES.move_index(move)
+        return result
+
+    private = {'p1':sheet([('alomomola','regenerator','wish'),('garchomp','roughskin','earthquake')]),
+               'p2':sheet([('corviknight','pressure','roost')])}
+    first = parse_replay(replay,private_sets=private)['rows']
+    assert first and any(row['role']=='p1' for row in first) and any(row['role']=='p2' for row in first)
+    assert first[0]['obs'].entity_ids[0,2] == TABLES.ability_index('regenerator')
+    private['p1'][0,2] = TABLES.ability_index('hydration')
+    second = parse_replay(replay,private_sets=private)['rows']
+    for rows in (first,second):
+        for row in rows:
+            # Publicly last seen: Fish 50%, Chomp 100%, Bird 100%. The sheet's hidden
+            # Regenerator must not make this 83% and must not change training labels.
+            assert row['terminal_hp_difference'] == pytest.approx(1/12 if row['role']=='p1' else -1/12)
+    for left,right in zip(first,second,strict=True):
+        np.testing.assert_array_equal(left['terminal_alive'],right['terminal_alive'])
+        assert left['terminal_hp_difference'] == right['terminal_hp_difference']
+
+
+def test_terminal_labels_match_a_fainted_ogerpon_after_tera_reentry():
+    replay = {'players':['A','B'], 'log': '''|gametype|singles
+|player|p1|A|1|1600
+|player|p2|B|2|1600
+|teamsize|p1|2
+|teamsize|p2|1
+|gen|9
+|tier|[Gen 9] OU
+|clearpoke
+|poke|p1|Ogerpon-Wellspring|
+|poke|p1|Ting-Lu|
+|poke|p2|Corviknight|
+|teampreview
+|start
+|switch|p1a: Mask|Ogerpon-Wellspring|100/100
+|switch|p2a: Bird|Corviknight|100/100
+|turn|1
+|-terastallize|p1a: Mask|Water
+|detailschange|p1a: Mask|Ogerpon-Wellspring-Tera, F, tera:Water
+|move|p2a: Bird|Brave Bird|p1a: Mask
+|-damage|p1a: Mask|25/100
+|move|p1a: Mask|Horn Leech|p2a: Bird
+|turn|2
+|switch|p1a: Ruin|Ting-Lu|100/100
+|move|p2a: Bird|Brave Bird|p1a: Ruin
+|-damage|p1a: Ruin|50/100
+|turn|3
+|switch|p1a: Mask|Ogerpon-Wellspring-Tera, F, tera:Water|25/100
+|move|p2a: Bird|Brave Bird|p1a: Mask
+|-damage|p1a: Mask|0 fnt
+|faint|p1a: Mask
+|win|B'''}
+    rows = parse_replay(replay)['rows']
+    assert {r['role'] for r in rows} == {'p1','p2'}
+    for row in rows:
+        own = [0.,1.,0.,0.,0.,0.]
+        opponent = [1.,0.,0.,0.,0.,0.]
+        np.testing.assert_array_equal(row['terminal_alive'],own+opponent if row['role']=='p1' else opponent+own)
+        assert row['terminal_hp_difference'] == pytest.approx(-1/12 if row['role']=='p1' else 1/12)

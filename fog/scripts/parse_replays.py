@@ -69,6 +69,7 @@ class _PerspectiveState:
         if self.private_set is not None:
             self.tracker.record_exact_private_truth(self.private_set)
         self._preview_slot = 0
+        self._preview_species: list[str] = []
         self.move_order: dict[str, list[str]] = {}   # mon-key -> discovered move ids (slot order)
         self.rows: list[dict] = []
         self._pending_obs = None
@@ -86,6 +87,7 @@ class _PerspectiveState:
         if player != self.role:
             return
         species = details.split(",")[0].strip()
+        self._preview_species.append(_to_id(species))
         mon = self.battle.get_pokemon(
             f"{player}: {species}",
             force_self_team=True,
@@ -407,29 +409,40 @@ def replay_player_names(replay_json: dict) -> dict[str, str]:
     return names
 
 
-def _terminal_targets(st) -> dict:
-    from fog.encoding.entities import L, encode_entities
-    from fog.encoding.reveals import build_belief_input, opponent_slots, opponent_views_from_battle
+def _public_terminal_state(battle, preview_species: list[str]) -> dict:
+    """Read one side only through its opponent's public battle, never its imputed sheet.
 
-    opponent = opponent_slots(st.battle)
-    tokens = build_belief_input(opponent_views_from_battle(st.battle, TABLES), TABLES)["tokens"]
-    raw, _, _ = encode_entities(st.battle, TABLES, opp_tokens=tokens,
-                                perspective=st.role, tracker=st.tracker)
-    own_count = len(team_order(st.battle)[:6])
-    present = np.asarray([i < own_count for i in range(6)] +
-                         [sid is not None for sid, _ in opponent], dtype=bool)
-    hp = raw[:, L.hp].copy()
-    for index, mon in enumerate(team_order(st.battle)[:6]):
-        if not getattr(mon, "max_hp", None) and not getattr(mon, "fainted", False):
-            hp[index] = 1.0  # no public HP condition was ever recorded for this preview member
-    for index, (sid, mon) in enumerate(opponent):
-        if sid is not None and mon is None:
-            hp[6 + index] = 1.0  # publicly unused preview member
-    hp = np.where(present, hp, 0.0)
+    A request-side Pokemon can infer Regenerator healing from an imputed private ability.
+    Opponent-side Pokemon contain public evidence only. Match battle forms to the original
+    preview identity so a switched-out and re-entered Ogerpon is not mistaken for unused.
+    """
+    from fog.encoding.events import submitted_species_id
+
+    health = {species: 1.0 for species in preview_species}
+    alive = {species: 1.0 for species in preview_species}
+    for mon in (getattr(battle, "opponent_team", None) or {}).values():
+        species = submitted_species_id(mon.species)
+        if species not in health:
+            continue
+        fainted = bool(getattr(mon, "fainted", False))
+        hp = getattr(mon, "current_hp_fraction", None)
+        health[species] = (0.0 if fainted else 1.0) if not getattr(mon, "max_hp", None) else float(hp)
+        alive[species] = float(not fainted)
+    count = len(preview_species)
     return {
-        "terminal_alive": np.where(present, 1.0 - raw[:, L.fainted], 0.0).astype(np.float32),
-        "terminal_alive_mask": present,
-        "terminal_hp_difference": float((hp[:6].sum() - hp[6:].sum()) / 6),
+        "hp": np.asarray([health[x] for x in preview_species] + [0.] * (6-count), dtype=np.float32),
+        "alive": np.asarray([alive[x] for x in preview_species] + [0.] * (6-count), dtype=np.float32),
+        "mask": np.asarray([True] * count + [False] * (6-count)),
+    }
+
+
+def _terminal_targets(st, public_end: dict[str, dict]) -> dict:
+    own = public_end[st.role]
+    opponent = public_end["p2" if st.role == "p1" else "p1"]
+    return {
+        "terminal_alive": np.concatenate([own["alive"], opponent["alive"]]),
+        "terminal_alive_mask": np.concatenate([own["mask"], opponent["mask"]]),
+        "terminal_hp_difference": float((own["hp"].sum() - opponent["hp"].sum()) / 6),
         "terminal_valid": True,
     }
 
@@ -525,6 +538,10 @@ def parse_replay(
         "p1": _censored_truth(p1.battle),
         "p2": _censored_truth(p2.battle),
     }
+    public_end = {
+        "p1": _public_terminal_state(p2.battle, p1._preview_species),
+        "p2": _public_terminal_state(p1.battle, p2._preview_species),
+    }
     out_rows = []
     for st, won in ((p1, p1_win), (p2, None if p1_win is None else not p1_win)):
         belief = belief_by_role[st.role]
@@ -533,7 +550,7 @@ def parse_replay(
         # public self-belief target should contain, including original-vs-current semantics.
         self_belief = belief_by_role[other]
         outcome = 0.0 if won is None else (1.0 if won else -1.0)
-        terminal = _terminal_targets(st)
+        terminal = _terminal_targets(st, public_end)
         for r in st.rows:
             out_rows.append(
                 {
