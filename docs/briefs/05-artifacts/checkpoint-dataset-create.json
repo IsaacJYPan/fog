@@ -1,0 +1,13 @@
+{
+  "slug": "fog-p2-gpu-checkpoints-20261114",
+  "private_requested": true,
+  "files": [
+    "checkpoints.json",
+    "G3-bc_best.pt",
+    "G3-bc_best_value.pt"
+  ],
+  "command": "official KaggleApi.dataset_create_new(public=False, quiet=True)",
+  "status": "Ok",
+  "error": "",
+  "wall_seconds": 19.110049822000292
+}

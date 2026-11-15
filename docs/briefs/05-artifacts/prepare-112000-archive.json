@@ -1,0 +1,15 @@
+{
+  "file": "replay-work.bin",
+  "bytes": 2385762558,
+  "sha256": "f77292ff5f4dee5c309850d851a10620871a41eb27df7125005fb8099c701af1",
+  "archive_seconds": 111.60009153099963,
+  "contents": [
+    "raw",
+    "decisions",
+    "split",
+    "output",
+    "run.json"
+  ],
+  "excluded": "download cache",
+  "format": "gzip tar retained as opaque binary file in Kaggle"
+}

@@ -1,0 +1,178 @@
+{
+  "status": "historical_smoke_reference",
+  "source": "docs/briefs/03-artifacts/B-holdout-best.json and B-metrics.csv",
+  "policy_epoch": 8,
+  "value_epoch": 4,
+  "training_value_mse_at_policy_epoch": 0.2720150538745187,
+  "training_value_mse_at_value_epoch": 0.746102672385065,
+  "holdout_value_mse_at_value_epoch": 0.9565520444353067,
+  "best_policy_report": {
+    "checkpoint": "runs/blueprint/g3000e18/checkpoints/bc_best.pt",
+    "untrained": false,
+    "manifest": "runs/blueprint/split/holdout_manifest.parquet",
+    "games": 2000,
+    "rows": 104037,
+    "policy_rows": 103981,
+    "commit": "26107f2f5ade1853f87dc630a300804402c2497f",
+    "policy": {
+      "rows": 103981,
+      "top1": 0.44080168492320715,
+      "nll": 1.5790178625761455,
+      "avg_legal_actions": 10.464161721853031,
+      "top1_lift": 4.612620118301745,
+      "move": {
+        "rows": 74874,
+        "top1": 0.5299703501883164,
+        "nll": 1.305971177766763,
+        "avg_legal_actions": 10.32029810080936,
+        "top1_lift": 5.469451998533753
+      },
+      "switch": {
+        "rows": 29107,
+        "top1": 0.21142680454873397,
+        "nll": 2.2813952109259468,
+        "avg_legal_actions": 10.834232315250627,
+        "top1_lift": 2.290647118152072
+      }
+    },
+    "switch_diagnostics": {
+      "human_switch_rows": 29107,
+      "human_move_rows": 74874,
+      "mean_switch_probability_on_human_switch": 0.4549105330730017,
+      "mean_switch_probability_on_human_move": 0.19294228787027803,
+      "switch_target_top1": 0.44978871061943865
+    },
+    "value": {
+      "rows": 104037,
+      "value_mse": 1.3780044139488663,
+      "brier": 0.3445011034872166,
+      "ece": 0.2987564215133597,
+      "reliability": [
+        {
+          "bin": 0,
+          "lo": 0.0,
+          "hi": 0.1,
+          "count": 23255,
+          "mean_predicted": 0.03488040383183502,
+          "observed_win_rate": 0.39673188561599654
+        },
+        {
+          "bin": 1,
+          "lo": 0.1,
+          "hi": 0.2,
+          "count": 6617,
+          "mean_predicted": 0.14628155968404347,
+          "observed_win_rate": 0.44461236209762733
+        },
+        {
+          "bin": 2,
+          "lo": 0.2,
+          "hi": 0.3,
+          "count": 5212,
+          "mean_predicted": 0.24915610413343653,
+          "observed_win_rate": 0.4746738296239447
+        },
+        {
+          "bin": 3,
+          "lo": 0.3,
+          "hi": 0.4,
+          "count": 4456,
+          "mean_predicted": 0.3493222804034473,
+          "observed_win_rate": 0.486983842010772
+        },
+        {
+          "bin": 4,
+          "lo": 0.4,
+          "hi": 0.5,
+          "count": 4412,
+          "mean_predicted": 0.450056605230822,
+          "observed_win_rate": 0.4986400725294651
+        },
+        {
+          "bin": 5,
+          "lo": 0.5,
+          "hi": 0.6,
+          "count": 4633,
+          "mean_predicted": 0.5504714316932239,
+          "observed_win_rate": 0.49622274983811787
+        },
+        {
+          "bin": 6,
+          "lo": 0.6,
+          "hi": 0.7,
+          "count": 5191,
+          "mean_predicted": 0.6519568295271335,
+          "observed_win_rate": 0.5029859371989983
+        },
+        {
+          "bin": 7,
+          "lo": 0.7,
+          "hi": 0.8,
+          "count": 6473,
+          "mean_predicted": 0.7510737079235532,
+          "observed_win_rate": 0.5102734435346825
+        },
+        {
+          "bin": 8,
+          "lo": 0.8,
+          "hi": 0.9,
+          "count": 8513,
+          "mean_predicted": 0.8538388723907271,
+          "observed_win_rate": 0.5244919534829084
+        },
+        {
+          "bin": 9,
+          "lo": 0.9,
+          "hi": 1.0,
+          "count": 35275,
+          "mean_predicted": 0.9686058017820606,
+          "observed_win_rate": 0.5914953933380581
+        }
+      ]
+    },
+    "value_by_phase": {
+      "early": {
+        "rows": 34997,
+        "brier": 0.343345436150971,
+        "value_mse": 1.373381744603884,
+        "ece": 0.2782107887396412
+      },
+      "middle": {
+        "rows": 33692,
+        "brier": 0.36372281102863524,
+        "value_mse": 1.454891244114541,
+        "ece": 0.32812319009522606
+      },
+      "late": {
+        "rows": 35348,
+        "brier": 0.32732409543247815,
+        "value_mse": 1.3092963817299126,
+        "ece": 0.29110705926150915
+      }
+    },
+    "phase_definition": "(turn - 1) * 3 // last turn of the game; turn read from field, capped at 50",
+    "rows_at_turn_cap": 4297,
+    "constant_half_brier_reference": 0.25,
+    "seconds": 107.10328477199982
+  },
+  "extremes": [
+    {
+      "bin": 0,
+      "lo": 0.0,
+      "hi": 0.1,
+      "count": 23255,
+      "mean_predicted": 0.03488040383183502,
+      "observed_win_rate": 0.39673188561599654
+    },
+    {
+      "bin": 9,
+      "lo": 0.9,
+      "hi": 1.0,
+      "count": 35275,
+      "mean_predicted": 0.9686058017820606,
+      "observed_win_rate": 0.5914953933380581
+    }
+  ],
+  "extreme_share": 0.5625883099281986,
+  "best_value_report_status": "not available in brief 03 artifacts; no historical weights in this checkout"
+}

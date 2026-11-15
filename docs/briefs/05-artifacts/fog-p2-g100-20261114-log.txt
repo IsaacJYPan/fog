@@ -1,0 +1,228 @@
+[{"stream_name":"stderr","time":0.775716736,"data":"Cloning into '/kaggle/working/fog'...\n"}
+,{"stream_name":"stderr","time":2.046763358,"data":"Note: switching to '46e9c0da2c1b6caa01ab3da0b5bba2e103029662'.\n"}
+,{"stream_name":"stderr","time":2.046788458,"data":"\n"}
+,{"stream_name":"stderr","time":2.046792619,"data":"You are in 'detached HEAD' state. You can look around, make experimental\n"}
+,{"stream_name":"stderr","time":2.046795841,"data":"changes and commit them, and you can discard any commits you make in this\n"}
+,{"stream_name":"stderr","time":2.046799037,"data":"state without impacting any branches by switching back to a branch.\n"}
+,{"stream_name":"stderr","time":2.04680193,"data":"\n"}
+,{"stream_name":"stderr","time":2.046804661,"data":"If you want to create a new branch to retain commits you create, you may\n"}
+,{"stream_name":"stderr","time":2.046807558,"data":"do so (now or later) by using -c with the switch command. Example:\n"}
+,{"stream_name":"stderr","time":2.046810387,"data":"\n"}
+,{"stream_name":"stderr","time":2.046813192,"data":"  git switch -c \u003cnew-branch-name\u003e\n"}
+,{"stream_name":"stderr","time":2.046830199,"data":"\n"}
+,{"stream_name":"stderr","time":2.046835331,"data":"Or undo this operation with:\n"}
+,{"stream_name":"stderr","time":2.046839934,"data":"\n"}
+,{"stream_name":"stderr","time":2.046844527,"data":"  git switch -\n"}
+,{"stream_name":"stderr","time":2.046849337,"data":"\n"}
+,{"stream_name":"stderr","time":2.046853511,"data":"Turn off this advice by setting config variable advice.detachedHead to false\n"}
+,{"stream_name":"stderr","time":2.04685775,"data":"\n"}
+,{"stream_name":"stderr","time":2.046861782,"data":"HEAD is now at 46e9c0d Record full G20 curve, value selections, private recovery and CPU play smoke [skip ci]\n"}
+,{"stream_name":"stderr","time":2.101135225,"data":"Submodule 'server/pokemon-showdown' (https://github.com/smogon/pokemon-showdown) registered for path 'server/pokemon-showdown'\n"}
+,{"stream_name":"stderr","time":2.104724893,"data":"Cloning into '/kaggle/working/fog/server/pokemon-showdown'...\n"}
+,{"stream_name":"stdout","time":24.42593457,"data":"Submodule path 'server/pokemon-showdown': checked out 'e440c4a18385274f10c405d0b158b6a962ce6d94'\n"}
+,{"stream_name":"stderr","time":27.867345455,"data":"npm warn deprecated rimraf@3.0.2: Rimraf versions prior to v4 are no longer supported\n"}
+,{"stream_name":"stderr","time":27.870085589,"data":"npm warn deprecated npmlog@6.0.2: This package is no longer supported.\n"}
+,{"stream_name":"stderr","time":28.485249907,"data":"npm warn deprecated are-we-there-yet@3.0.1: This package is no longer supported.\n"}
+,{"stream_name":"stderr","time":28.559918939,"data":"npm warn deprecated gauge@4.0.4: This package is no longer supported.\n"}
+,{"stream_name":"stderr","time":28.582335814,"data":"npm warn deprecated @npmcli/move-file@1.1.2: This functionality has been moved to @npmcli/fs\n"}
+,{"stream_name":"stdout","time":31.234036925,"data":"\n"}
+,{"stream_name":"stdout","time":31.234070863,"data":"added 355 packages, and audited 356 packages in 6s\n"}
+,{"stream_name":"stdout","time":31.23475336,"data":"\n"}
+,{"stream_name":"stdout","time":31.234782033,"data":"72 packages are looking for funding\n"}
+,{"stream_name":"stdout","time":31.234788666,"data":"  run `npm fund` for details\n"}
+,{"stream_name":"stdout","time":31.279970539,"data":"\n"}
+,{"stream_name":"stdout","time":31.279994494,"data":"27 vulnerabilities (3 low, 6 moderate, 16 high, 2 critical)\n"}
+,{"stream_name":"stdout","time":31.280000527,"data":"\n"}
+,{"stream_name":"stdout","time":31.280005454,"data":"To address issues that do not require attention, run:\n"}
+,{"stream_name":"stdout","time":31.280021418,"data":"  npm audit fix\n"}
+,{"stream_name":"stdout","time":31.280025751,"data":"\n"}
+,{"stream_name":"stdout","time":31.280031511,"data":"To address all issues (including breaking changes), run:\n"}
+,{"stream_name":"stdout","time":31.280036529,"data":"  npm audit fix --force\n"}
+,{"stream_name":"stdout","time":31.280044067,"data":"\n"}
+,{"stream_name":"stdout","time":31.280047936,"data":"Run `npm audit` for details.\n"}
+,{"stream_name":"stderr","time":31.28159205,"data":"npm notice\n"}
+,{"stream_name":"stderr","time":31.281606557,"data":"npm notice New major version of npm available! 10.8.2 -\u003e 12.2.2\n"}
+,{"stream_name":"stderr","time":31.281610948,"data":"npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.2\n"}
+,{"stream_name":"stderr","time":31.281631136,"data":"npm notice To update run: npm install -g npm@12.2.2\n"}
+,{"stream_name":"stderr","time":31.281635807,"data":"npm notice\n"}
+,{"stream_name":"stdout","time":31.451842114,"data":"\n"}
+,{"stream_name":"stdout","time":31.451893723,"data":"\u003e pokemon-showdown@0.11.10 build\n"}
+,{"stream_name":"stdout","time":31.451899932,"data":"\u003e node build\n"}
+,{"stream_name":"stdout","time":31.451904198,"data":"\n"}
+,{"stream_name":"stdout","time":31.492690679,"data":"config.js does not exist. Creating one with default settings...\n"}
+,{"stream_name":"stdout","time":34.706918691,"data":"pip 26.2.2 from /usr/local/lib/python3.13/dist-packages/pip (python 3.13)\n"}
+,{"stream_name":"stdout","time":35.843795197,"data":"Collecting poke-env==0.15.0\n"}
+,{"stream_name":"stdout","time":35.966703009,"data":"  Downloading poke_env-0.15.0-py3-none-any.whl.metadata (7.3 kB)\n"}
+,{"stream_name":"stdout","time":36.436355509,"data":"Collecting numpy==2.5.1\n"}
+,{"stream_name":"stdout","time":36.459728548,"data":"  Downloading numpy-2.5.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)\n"}
+,{"stream_name":"stdout","time":36.699980368,"data":"Collecting polars==1.43.0\n"}
+,{"stream_name":"stdout","time":36.722724828,"data":"  Downloading polars-1.43.0-py3-none-any.whl.metadata (11 kB)\n"}
+,{"stream_name":"stdout","time":36.933456865,"data":"Collecting pyarrow==25.0.0\n"}
+,{"stream_name":"stdout","time":36.961451726,"data":"  Downloading pyarrow-25.0.0-cp313-cp313-manylinux_2_28_x86_64.whl.metadata (3.0 kB)\n"}
+,{"stream_name":"stdout","time":36.978370374,"data":"Requirement already satisfied: pyyaml==6.0.3 in /usr/local/lib/python3.13/dist-packages (6.0.3)\n"}
+,{"stream_name":"stdout","time":37.021728739,"data":"Collecting tensorboard==2.20.0\n"}
+,{"stream_name":"stdout","time":37.043650567,"data":"  Downloading tensorboard-2.20.0-py3-none-any.whl.metadata (1.8 kB)\n"}
+,{"stream_name":"stdout","time":38.062098717,"data":"Collecting aiohttp==3.14.2\n"}
+,{"stream_name":"stdout","time":38.084919952,"data":"  Downloading aiohttp-3.14.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (8.3 kB)\n"}
+,{"stream_name":"stdout","time":38.274126502,"data":"Collecting scikit-learn==1.9.0\n"}
+,{"stream_name":"stdout","time":38.295642468,"data":"  Downloading scikit_learn-1.9.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (11 kB)\n"}
+,{"stream_name":"stdout","time":38.38018127,"data":"Collecting tqdm==4.69.0\n"}
+,{"stream_name":"stdout","time":38.403379348,"data":"  Downloading tqdm-4.69.0-py3-none-any.whl.metadata (57 kB)\n"}
+,{"stream_name":"stdout","time":38.444189035,"data":"Requirement already satisfied: gymnasium\u003e=1.0.0 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (1.2.0)\n"}
+,{"stream_name":"stdout","time":38.446047333,"data":"Requirement already satisfied: orjson\u003e=3.10.15 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (3.13.0)\n"}
+,{"stream_name":"stdout","time":38.44686304,"data":"Requirement already satisfied: pettingzoo\u003e=1.24.3 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (1.27.0)\n"}
+,{"stream_name":"stdout","time":38.447608541,"data":"Requirement already satisfied: requests\u003e=2.32.3 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (2.34.2)\n"}
+,{"stream_name":"stdout","time":38.448314418,"data":"Requirement already satisfied: tabulate\u003e=0.9.0 in /usr/local/lib/python3.13/dist-packages (from poke-env==0.15.0) (0.9.0)\n"}
+,{"stream_name":"stdout","time":38.714438568,"data":"Collecting websockets==16.0 (from poke-env==0.15.0)\n"}
+,{"stream_name":"stdout","time":38.737242184,"data":"  Downloading websockets-16.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (6.8 kB)\n"}
+,{"stream_name":"stdout","time":38.80526841,"data":"Collecting polars-runtime-32==1.43.0 (from polars==1.43.0)\n"}
+,{"stream_name":"stdout","time":38.83483688,"data":"  Downloading polars_runtime_32-1.43.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (1.5 kB)\n"}
+,{"stream_name":"stdout","time":38.849082417,"data":"Requirement already satisfied: absl-py\u003e=0.4 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (2.0.0)\n"}
+,{"stream_name":"stdout","time":38.849834049,"data":"Requirement already satisfied: grpcio\u003e=1.48.2 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (1.85.1)\n"}
+,{"stream_name":"stdout","time":38.850461393,"data":"Requirement already satisfied: markdown\u003e=2.6.8 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (3.11.2)\n"}
+,{"stream_name":"stdout","time":38.852031841,"data":"Requirement already satisfied: packaging in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (26.3)\n"}
+,{"stream_name":"stdout","time":38.852662482,"data":"Requirement already satisfied: pillow in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (13.0.0)\n"}
+,{"stream_name":"stdout","time":38.853341494,"data":"Requirement already satisfied: protobuf!=4.24.0,\u003e=3.19.6 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (7.36.2)\n"}
+,{"stream_name":"stdout","time":38.854045136,"data":"Requirement already satisfied: setuptools\u003e=41.0.0 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (81.0.0)\n"}
+,{"stream_name":"stdout","time":38.854746577,"data":"Requirement already satisfied: tensorboard-data-server\u003c0.8.0,\u003e=0.7.0 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (0.7.2)\n"}
+,{"stream_name":"stdout","time":38.855398859,"data":"Requirement already satisfied: werkzeug\u003e=1.0.1 in /usr/local/lib/python3.13/dist-packages (from tensorboard==2.20.0) (3.1.9)\n"}
+,{"stream_name":"stdout","time":38.856463931,"data":"Requirement already satisfied: aiohappyeyeballs\u003e=2.5.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (2.7.1)\n"}
+,{"stream_name":"stdout","time":38.857128172,"data":"Requirement already satisfied: aiosignal\u003e=1.4.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (1.4.0)\n"}
+,{"stream_name":"stdout","time":38.857866925,"data":"Requirement already satisfied: attrs\u003e=17.3.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (26.1.0)\n"}
+,{"stream_name":"stdout","time":38.858691797,"data":"Requirement already satisfied: frozenlist\u003e=1.1.1 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (1.8.0)\n"}
+,{"stream_name":"stdout","time":38.859189786,"data":"Requirement already satisfied: multidict\u003c7.0,\u003e=4.5 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (6.9.1)\n"}
+,{"stream_name":"stdout","time":38.859875361,"data":"Requirement already satisfied: propcache\u003e=0.2.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (0.5.4)\n"}
+,{"stream_name":"stdout","time":38.860557603,"data":"Requirement already satisfied: yarl\u003c2.0,\u003e=1.17.0 in /usr/local/lib/python3.13/dist-packages (from aiohttp==3.14.2) (1.25.1)\n"}
+,{"stream_name":"stdout","time":38.862538655,"data":"Requirement already satisfied: scipy\u003e=1.10.0 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (1.16.3)\n"}
+,{"stream_name":"stdout","time":38.863171713,"data":"Requirement already satisfied: joblib\u003e=1.4.0 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (1.6.0)\n"}
+,{"stream_name":"stdout","time":38.863868384,"data":"Requirement already satisfied: narwhals\u003e=2.0.1 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (2.27.1)\n"}
+,{"stream_name":"stdout","time":38.864552741,"data":"Requirement already satisfied: threadpoolctl\u003e=3.5.0 in /usr/local/lib/python3.13/dist-packages (from scikit-learn==1.9.0) (3.7.0)\n"}
+,{"stream_name":"stdout","time":38.879393401,"data":"Requirement already satisfied: idna\u003e=2.0 in /usr/local/lib/python3.13/dist-packages (from yarl\u003c2.0,\u003e=1.17.0-\u003eaiohttp==3.14.2) (3.20)\n"}
+,{"stream_name":"stdout","time":38.894600435,"data":"Requirement already satisfied: typing-extensions~=4.12 in /usr/local/lib/python3.13/dist-packages (from grpcio\u003e=1.48.2-\u003etensorboard==2.20.0) (4.16.0)\n"}
+,{"stream_name":"stdout","time":38.901693299,"data":"Requirement already satisfied: cloudpickle\u003e=1.2.0 in /usr/local/lib/python3.13/dist-packages (from gymnasium\u003e=1.0.0-\u003epoke-env==0.15.0) (3.1.2)\n"}
+,{"stream_name":"stdout","time":38.902495544,"data":"Requirement already satisfied: farama-notifications\u003e=0.0.1 in /usr/local/lib/python3.13/dist-packages (from gymnasium\u003e=1.0.0-\u003epoke-env==0.15.0) (0.0.6)\n"}
+,{"stream_name":"stdout","time":38.957539652,"data":"Requirement already satisfied: charset_normalizer\u003c4,\u003e=2 in /usr/local/lib/python3.13/dist-packages (from requests\u003e=2.32.3-\u003epoke-env==0.15.0) (3.4.9)\n"}
+,{"stream_name":"stdout","time":38.95840003,"data":"Requirement already satisfied: urllib3\u003c3,\u003e=1.26 in /usr/local/lib/python3.13/dist-packages (from requests\u003e=2.32.3-\u003epoke-env==0.15.0) (2.8.0)\n"}
+,{"stream_name":"stdout","time":38.959171813,"data":"Requirement already satisfied: certifi\u003e=2023.5.7 in /usr/local/lib/python3.13/dist-packages (from requests\u003e=2.32.3-\u003epoke-env==0.15.0) (2026.10.23)\n"}
+,{"stream_name":"stdout","time":38.995791876,"data":"Requirement already satisfied: markupsafe\u003e=2.1.1 in /usr/local/lib/python3.13/dist-packages (from werkzeug\u003e=1.0.1-\u003etensorboard==2.20.0) (3.0.4)\n"}
+,{"stream_name":"stderr","time":39.011067834,"data":"WARNING: The candidate selected for download or install is a yanked version: 'polars' candidate (version 1.43.0 at https://files.pythonhosted.org/packages/76/28/a8eac2c1d1b2d2a4ba2eb745921616d863185d94b1afd91cbb07af9ef21a/polars-1.43.0-py3-none-any.whl (from https://pypi.org/simple/polars/) (requires-python:\u003e=3.10))\n"}
+,{"stream_name":"stderr","time":39.011083042,"data":"Reason for being yanked: \u003cnone given\u003e\n"}
+,{"stream_name":"stderr","time":39.011572105,"data":"WARNING: The candidate selected for download or install is a yanked version: 'polars-runtime-32' candidate (version 1.43.0 at https://files.pythonhosted.org/packages/ab/7d/24ae73389aac03296925973c4e2cbe2e4982e859b9fad69eb1a72b9026fa/polars_runtime_32-1.43.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (from https://pypi.org/simple/polars-runtime-32/) (requires-python:\u003e=3.10))\n"}
+,{"stream_name":"stderr","time":39.01159862,"data":"Reason for being yanked: \u003cnone given\u003e\n"}
+,{"stream_name":"stdout","time":39.034588349,"data":"Downloading poke_env-0.15.0-py3-none-any.whl (1.4 MB)\n"}
+,{"stream_name":"stdout","time":39.116548254,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.4/1.4 MB 20.9 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":39.146278285,"data":"Downloading numpy-2.5.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)\n"}
+,{"stream_name":"stdout","time":39.333413708,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 88.9 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":39.355122564,"data":"Downloading polars-1.43.0-py3-none-any.whl (846 kB)\n"}
+,{"stream_name":"stdout","time":39.376448105,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 846.5/846.5 kB 32.0 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":39.402049824,"data":"Downloading pyarrow-25.0.0-cp313-cp313-manylinux_2_28_x86_64.whl (50.1 MB)\n"}
+,{"stream_name":"stdout","time":39.928238751,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 50.1/50.1 MB 95.4 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":39.955108605,"data":"Downloading tensorboard-2.20.0-py3-none-any.whl (5.5 MB)\n"}
+,{"stream_name":"stdout","time":40.005871261,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.5/5.5 MB 111.3 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":40.031924961,"data":"Downloading aiohttp-3.14.2-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (1.8 MB)\n"}
+,{"stream_name":"stdout","time":40.061905246,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.8/1.8 MB 59.6 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":40.087479145,"data":"Downloading scikit_learn-1.9.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.1 MB)\n"}
+,{"stream_name":"stdout","time":40.178945668,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.1/9.1 MB 99.7 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":40.206976661,"data":"Downloading tqdm-4.69.0-py3-none-any.whl (676 kB)\n"}
+,{"stream_name":"stdout","time":40.22709945,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 676.7/676.7 kB 24.2 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":40.249386908,"data":"Downloading polars_runtime_32-1.43.0-cp310-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (57.3 MB)\n"}
+,{"stream_name":"stdout","time":40.846472698,"data":"   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 57.3/57.3 MB 95.9 MB/s  0:00:00\n"}
+,{"stream_name":"stdout","time":40.869545439,"data":"Downloading websockets-16.0-cp313-cp313-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (184 kB)\n"}
+,{"stream_name":"stdout","time":43.804581915,"data":"Installing collected packages: websockets, tqdm, pyarrow, polars-runtime-32, numpy, tensorboard, polars, aiohttp, scikit-learn, poke-env\n"}
+,{"stream_name":"stdout","time":43.805483533,"data":"  Attempting uninstall: websockets\n"}
+,{"stream_name":"stdout","time":43.825221128,"data":"    Found existing installation: websockets 15.0.1\n"}
+,{"stream_name":"stdout","time":43.825688288,"data":"    Not uninstalling websockets at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":43.826021394,"data":"    Can't uninstall 'websockets'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":43.928997765,"data":"  Attempting uninstall: tqdm\n"}
+,{"stream_name":"stdout","time":43.950110033,"data":"    Found existing installation: tqdm 4.67.3\n"}
+,{"stream_name":"stdout","time":43.950561436,"data":"    Not uninstalling tqdm at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":43.950906456,"data":"    Can't uninstall 'tqdm'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":44.005154766,"data":"  Attempting uninstall: pyarrow\n"}
+,{"stream_name":"stdout","time":44.016694418,"data":"    Found existing installation: pyarrow 23.0.1\n"}
+,{"stream_name":"stdout","time":44.017160566,"data":"    Not uninstalling pyarrow at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":44.017511182,"data":"    Can't uninstall 'pyarrow'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":45.355493919,"data":"  Attempting uninstall: polars-runtime-32\n"}
+,{"stream_name":"stdout","time":45.366223089,"data":"    Found existing installation: polars-runtime-32 1.35.2\n"}
+,{"stream_name":"stdout","time":45.36668236,"data":"    Not uninstalling polars-runtime-32 at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":45.367041153,"data":"    Can't uninstall 'polars-runtime-32'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":46.203353463,"data":"  Attempting uninstall: numpy\n"}
+,{"stream_name":"stdout","time":46.219089593,"data":"    Found existing installation: numpy 2.1.3\n"}
+,{"stream_name":"stdout","time":46.219551524,"data":"    Not uninstalling numpy at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":46.219852418,"data":"    Can't uninstall 'numpy'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":48.637025591,"data":"  Attempting uninstall: tensorboard\n"}
+,{"stream_name":"stdout","time":48.65116608,"data":"    Found existing installation: tensorboard 2.21.0\n"}
+,{"stream_name":"stdout","time":48.651738356,"data":"    Not uninstalling tensorboard at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":48.65209397,"data":"    Can't uninstall 'tensorboard'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":49.037029065,"data":"  Attempting uninstall: polars\n"}
+,{"stream_name":"stdout","time":49.056608579,"data":"    Found existing installation: polars 1.35.2\n"}
+,{"stream_name":"stdout","time":49.05713087,"data":"    Not uninstalling polars at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":49.057526107,"data":"    Can't uninstall 'polars'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":49.495640341,"data":"  Attempting uninstall: aiohttp\n"}
+,{"stream_name":"stdout","time":49.518803554,"data":"    Found existing installation: aiohttp 3.14.5\n"}
+,{"stream_name":"stdout","time":49.519319048,"data":"    Not uninstalling aiohttp at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":49.519687744,"data":"    Can't uninstall 'aiohttp'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":49.731951017,"data":"  Attempting uninstall: scikit-learn\n"}
+,{"stream_name":"stdout","time":49.753600517,"data":"    Found existing installation: scikit-learn 1.6.1\n"}
+,{"stream_name":"stdout","time":49.754081583,"data":"    Not uninstalling scikit-learn at /usr/local/lib/python3.13/dist-packages, outside environment /kaggle/working/fog/.venv\n"}
+,{"stream_name":"stdout","time":49.754355759,"data":"    Can't uninstall 'scikit-learn'. No files were found to uninstall.\n"}
+,{"stream_name":"stdout","time":52.143888309,"data":"\n"}
+,{"stream_name":"stderr","time":52.145123818,"data":"ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behaviour is the source of the following dependency conflicts.\n"}
+,{"stream_name":"stderr","time":52.145147778,"data":"bigframes 2.51.0 requires google-cloud-bigquery-storage\u003c3.0.0,\u003e=2.30.0, which is not installed.\n"}
+,{"stream_name":"stderr","time":52.145153141,"data":"nilearn 0.14.1 requires scikit-learn!=1.7.0,!=1.9.0,\u003e=1.5.0, but you have scikit-learn 1.9.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145157164,"data":"ydata-profiling 4.18.4 requires numpy\u003c2.4,\u003e=1.22, but you have numpy 2.5.1 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145161296,"data":"dopamine-rl 4.1.2 requires gym\u003c=0.25.2, but you have gym 0.26.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145165611,"data":"moviepy 1.0.3 requires decorator\u003c5.0,\u003e=4.0.2, but you have decorator 5.3.1 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145170432,"data":"cudf-cu13 26.6.0 requires pyarrow\u003c24,\u003e=19.0.0, but you have pyarrow 25.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145174336,"data":"ydf 0.15.0 requires protobuf\u003c7.0.0,\u003e=5.29.1, but you have protobuf 7.36.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145178419,"data":"numba 0.61.2 requires numpy\u003c2.3,\u003e=1.24, but you have numpy 2.5.1 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145182305,"data":"cudf-polars-cu13 26.6.0 requires polars\u003c1.40,\u003e=1.35, but you have polars 1.43.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145186193,"data":"gradio 6.30.0 requires pillow\u003c13.0,\u003e=8.0, but you have pillow 13.0.0 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.14519011,"data":"google-adk 2.7.1 requires aiohttp!=3.14.2, but you have aiohttp 3.14.2 which is incompatible.\n"}
+,{"stream_name":"stderr","time":52.145194233,"data":"google-adk 2.7.1 requires websockets\u003c16,\u003e=15.0.1, but you have websockets 16.0 which is incompatible.\n"}
+,{"stream_name":"stdout","time":52.146917793,"data":"Successfully installed aiohttp-3.14.2 numpy-2.5.1 poke-env-0.15.0 polars-1.43.0 polars-runtime-32-1.43.0 pyarrow-25.0.0 scikit-learn-1.9.0 tensorboard-2.20.0 tqdm-4.69.0 websockets-16.0\n"}
+,{"stream_name":"stdout","time":52.781593647,"data":"Obtaining file:///kaggle/working/fog\n"}
+,{"stream_name":"stdout","time":52.783982454,"data":"  Installing build dependencies: started\n"}
+,{"stream_name":"stdout","time":55.57921275,"data":"  Installing build dependencies: finished with status 'done'\n"}
+,{"stream_name":"stdout","time":55.580175587,"data":"  Checking if build backend supports build_editable: started\n"}
+,{"stream_name":"stdout","time":55.902482529,"data":"  Checking if build backend supports build_editable: finished with status 'done'\n"}
+,{"stream_name":"stdout","time":55.903595375,"data":"  Getting requirements to build editable: started\n"}
+,{"stream_name":"stdout","time":56.316734454,"data":"  Getting requirements to build editable: finished with status 'done'\n"}
+,{"stream_name":"stdout","time":56.318062951,"data":"  Preparing editable metadata (pyproject.toml): started\n"}
+,{"stream_name":"stdout","time":56.591559926,"data":"  Preparing editable metadata (pyproject.toml): finished with status 'done'\n"}
+,{"stream_name":"stdout","time":56.630022362,"data":"Building wheels for collected packages: fog\n"}
+,{"stream_name":"stdout","time":56.631157273,"data":"  Building editable for fog (pyproject.toml): started\n"}
+,{"stream_name":"stdout","time":56.937641876,"data":"  Building editable for fog (pyproject.toml): finished with status 'done'\n"}
+,{"stream_name":"stdout","time":56.938500803,"data":"  Created wheel for fog: filename=fog-0.0.1-0.editable-py3-none-any.whl size=5515 sha256=fa83c144ed57c92032aaff16bcd758642d27586a7b1169d650cdb1bfb2193c9b\n"}
+,{"stream_name":"stdout","time":56.938812791,"data":"  Stored in directory: /tmp/pip-ephem-wheel-cache-dsp888dy/wheels/88/8e/63/02b570d5530d9d29aaa2641e72eb84533e505c0d073309785b\n"}
+,{"stream_name":"stdout","time":56.941734551,"data":"Successfully built fog\n"}
+,{"stream_name":"stdout","time":56.95482787,"data":"Installing collected packages: fog\n"}
+,{"stream_name":"stdout","time":58.175356289,"data":"Successfully installed fog-0.0.1\n"}
+,{"stream_name":"stdout","time":59.328308014,"data":"\n"}
+,{"stream_name":"stdout","time":59.328343184,"data":"added 24 packages in 1s\n"}
+,{"stream_name":"stdout","time":91.480938445,"data":"{\"python\": \"3.13.16\", \"torch\": \"2.11.0+cu130\", \"cuda\": \"13.0\", \"gpu\": \"Tesla T4\", \"node\": \"v22.23.4\"}\n"}
+,{"stream_name":"stdout","time":91.481026787,"data":"Training interpreter: /kaggle/working/fog/.venv/bin/python\n"}
+,{"stream_name":"stdout","time":196.102159525,"data":"Input restored in 104.605 s\n"}
+,{"stream_name":"stdout","time":367.726603093,"data":"BC dataset: train=2090705 decision rows; holdout=104037 rows  (config_hash=33d693b9c73c, torch_threads=2)\n"}
+,{"stream_name":"stdout","time":367.726686715,"data":"[bc] baseline  loss=3.671  belief=13.157  chain=3.994\n"}
+,{"stream_name":"stdout","time":3771.072669412,"data":"[bc] epoch 1/6  train_loss=2.520  eval_loss=2.267  belief=5.027  chain=1.706  value=0.862  query_p=0.326  dropped=0.000%\n"}
+,{"stream_name":"stdout","time":3771.373577444,"data":"Saved epoch 1; peak GPU bytes 2621049856\n"}
+,{"stream_name":"stdout","time":7168.900657468,"data":"[bc] epoch 2/6  train_loss=2.161  eval_loss=2.121  belief=4.665  chain=1.588  value=0.851  query_p=0.350  dropped=0.000%\n"}
+,{"stream_name":"stdout","time":7169.199824999,"data":"Saved epoch 2; peak GPU bytes 2621049856\n"}
+,{"stream_name":"stdout","time":10558.131489957,"data":"[bc] epoch 3/6  train_loss=2.031  eval_loss=2.038  belief=4.508  chain=1.531  value=0.842  query_p=0.372  dropped=0.000%\n"}
+,{"stream_name":"stdout","time":10558.433683607,"data":"Saved epoch 3; peak GPU bytes 2621049856\n"}
+,{"stream_name":"stdout","time":13944.056111281,"data":"[bc] epoch 4/6  train_loss=1.951  eval_loss=1.991  belief=4.337  chain=1.492  value=0.842  query_p=0.377  dropped=0.000%\n"}
+,{"stream_name":"stdout","time":13944.354218282,"data":"Saved epoch 4; peak GPU bytes 2621049856\n"}
+,{"stream_name":"stdout","time":17325.133077649,"data":"[bc] epoch 5/6  train_loss=1.901  eval_loss=1.971  belief=4.286  chain=1.475  value=0.836  query_p=0.385  dropped=0.000%\n"}
+,{"stream_name":"stdout","time":17325.431587363,"data":"Saved epoch 5; peak GPU bytes 2621049856\n"}
+,{"stream_name":"stdout","time":20719.218471194,"data":"[bc] epoch 6/6  train_loss=1.882  eval_loss=1.973  belief=4.283  chain=1.476  value=0.844  query_p=0.383  dropped=0.000%\n"}
+,{"stream_name":"stdout","time":20719.519014626,"data":"Saved epoch 6; peak GPU bytes 2621156352\n"}
+,{"stream_name":"stdout","time":20719.660049536,"data":"[bc] done -\u003e /kaggle/working/replay-work/G100/checkpoints/bc_final.pt  (best eval epoch=6, loss=1.263)\n"}
+,{"stream_name":"stdout","time":20929.387606397,"data":"rows=104037 policy_rows=103981 top1=0.5455 lift=5.708 nll=1.2634 brier=0.2110 ece=0.0243 seconds=207.9 -\u003e /kaggle/working/results/holdout-bc_best.json\n"}
+,{"stream_name":"stdout","time":21140.971782934,"data":"rows=104037 policy_rows=103981 top1=0.5450 lift=5.703 nll=1.2651 brier=0.2089 ece=0.0091 seconds=209.3 -\u003e /kaggle/working/results/holdout-bc_best_value.json\n"}
+,{"stream_name":"stderr","time":21452.809251541,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":21452.809295315,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":21453.079477134,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":21453.0795277,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":21453.888011502,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":21454.429372907,"data":"[NbConvertApp] Writing 323760 bytes to __results__.html\n"}
+]

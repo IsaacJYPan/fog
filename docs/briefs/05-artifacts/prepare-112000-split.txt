@@ -1,0 +1,7 @@
+
+$ /workspace/fog/.venv/bin/python -u -m fog.scripts.split_replay_manifest --manifest runs/p2_gpu_112000/decisions/manifest.parquet --out runs/p2_gpu_112000/split --holdout-ids data/replay_splits/p2_holdout_2000_ids.txt --train-sizes 20000 100000 --skip-oversized-train-sizes
+dropped_newer_games=8072
+runs/p2_gpu_112000/split/train_manifest.parquet
+runs/p2_gpu_112000/split/holdout_manifest.parquet
+runs/p2_gpu_112000/split/train_20000.parquet
+runs/p2_gpu_112000/split/train_100000.parquet

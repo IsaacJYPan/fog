@@ -1,0 +1,7 @@
+BC dataset: train=156597 decision rows; holdout=104037 rows  (config_hash=95275e1b24c7, torch_threads=2)
+[bc] resume: completed epoch 1/18
+[bc] baseline  loss=3.671  belief=13.157  chain=3.994
+[bc] epoch 2/18  train_loss=2.935  eval_loss=2.847  belief=6.962  chain=2.282  value=0.979  query_p=0.218  dropped=0.000%
+Saved epoch 2; peak GPU bytes 2619988480
+rows=104037 policy_rows=103981 top1=0.3004 lift=3.143 nll=1.8957 brier=0.2448 ece=0.0331 seconds=208.8 -> /kaggle/working/results/holdout-bc_best.json
+rows=104037 policy_rows=103981 top1=0.3004 lift=3.143 nll=1.8957 brier=0.2448 ece=0.0331 seconds=207.4 -> /kaggle/working/results/holdout-bc_best_value.json

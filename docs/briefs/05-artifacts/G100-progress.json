@@ -1,0 +1,59 @@
+{
+  "label": "smoke live progress, not final selected-checkpoint results",
+  "job": "fog-p2-g100-20261114",
+  "status": "RUNNING",
+  "observed_at_utc": "2026-11-14T22:15:29.460509+00:00",
+  "completed_epochs": 3,
+  "target_epochs": 6,
+  "completed_epoch_wall_seconds_including_validation_save": [
+    3403.646890729,
+    3397.826247555,
+    3389.2338586079995
+  ],
+  "median_epoch_wall_seconds": 3397.826247555,
+  "account_quota_hours": 14.80177679,
+  "training_finish_projection_utc": "2026-11-15T00:20:22.724491+00:00",
+  "reports_export_finish_projection_utc": [
+    "2026-11-15T00:30:22.724491+00:00",
+    "2026-11-15T00:40:22.724491+00:00"
+  ],
+  "communicated_planning_window_utc": [
+    "2026-11-15T00:40:00Z",
+    "2026-11-15T01:00:00Z"
+  ],
+  "projection_basis": "Completed-epoch log timings, approximate GPU start derived from the account meter. This assumes no concurrent account GPU use; derived starts from earlier observations agree. Adds margin in the communicated window.",
+  "monitor_recovered_at_utc": "2026-11-14T22:13:13+00:00",
+  "monitor_recovery_scope": "Local read-only watcher and post-run collector restarted; same remote GPU job continued, no new submission/cancellation.",
+  "events": [
+    {
+      "stream_name": "stdout",
+      "time": 3771.072669412,
+      "data": "[bc] epoch 1/6  train_loss=2.520  eval_loss=2.267  belief=5.027  chain=1.706  value=0.862  query_p=0.326  dropped=0.000%\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 3771.373577444,
+      "data": "Saved epoch 1; peak GPU bytes 2621049856\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 7168.900657468,
+      "data": "[bc] epoch 2/6  train_loss=2.161  eval_loss=2.121  belief=4.665  chain=1.588  value=0.851  query_p=0.350  dropped=0.000%\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 7169.199824999,
+      "data": "Saved epoch 2; peak GPU bytes 2621049856\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 10558.131489957,
+      "data": "[bc] epoch 3/6  train_loss=2.031  eval_loss=2.038  belief=4.508  chain=1.531  value=0.842  query_p=0.372  dropped=0.000%\n"
+    },
+    {
+      "stream_name": "stdout",
+      "time": 10558.433683607,
+      "data": "Saved epoch 3; peak GPU bytes 2621049856\n"
+    }
+  ]
+}

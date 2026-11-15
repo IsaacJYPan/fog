@@ -1,0 +1,20 @@
+{
+  "slug": "fog-p2-g3-stop2-20261114",
+  "private_requested": true,
+  "spec": {
+    "commit": "530ae08cac2f27d3e53c0cfa535e44e8f56e7074",
+    "run": "G3",
+    "games": 3000,
+    "epochs": 18,
+    "batch_size": 1024,
+    "stop_after_epoch": 2
+  },
+  "dataset_slug": "fog-p2-gpu-22000-20261114",
+  "timeout_seconds": 600,
+  "command": "official KaggleApi.kernels_push(acc=NvidiaTeslaT4)",
+  "version": 1,
+  "kernel_id": 144907876,
+  "error": "",
+  "invalid_dataset_sources": [],
+  "submission_wall_seconds": 2.8611100420002913
+}

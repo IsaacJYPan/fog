@@ -1,0 +1,41 @@
+BC dataset: train=1023525 decision rows; holdout=104037 rows  (config_hash=e803804d5ee2, torch_threads=2)
+[bc] baseline  loss=3.671  belief=13.157  chain=3.994
+[bc] epoch 1/18  train_loss=2.730  eval_loss=2.454  belief=5.643  chain=1.880  value=0.894  query_p=0.284  dropped=0.000%
+Saved epoch 1; peak GPU bytes 2621058048
+[bc] epoch 2/18  train_loss=2.329  eval_loss=2.288  belief=5.119  chain=1.715  value=0.878  query_p=0.318  dropped=0.000%
+Saved epoch 2; peak GPU bytes 2621058048
+[bc] epoch 3/18  train_loss=2.195  eval_loss=2.199  belief=4.894  chain=1.656  value=0.871  query_p=0.332  dropped=0.000%
+Saved epoch 3; peak GPU bytes 2621058048
+[bc] epoch 4/18  train_loss=2.103  eval_loss=2.135  belief=4.718  chain=1.605  value=0.861  query_p=0.345  dropped=0.000%
+Saved epoch 4; peak GPU bytes 2621058048
+[bc] epoch 5/18  train_loss=2.032  eval_loss=2.118  belief=4.635  chain=1.582  value=0.871  query_p=0.364  dropped=0.000%
+Saved epoch 5; peak GPU bytes 2621058048
+[bc] epoch 6/18  train_loss=1.969  eval_loss=2.102  belief=4.590  chain=1.559  value=0.905  query_p=0.366  dropped=0.000%
+Saved epoch 6; peak GPU bytes 2621058048
+[bc] epoch 7/18  train_loss=1.911  eval_loss=2.052  belief=4.549  chain=1.543  value=0.871  query_p=0.375  dropped=0.000%
+Saved epoch 7; peak GPU bytes 2621058048
+[bc] epoch 8/18  train_loss=1.855  eval_loss=2.050  belief=4.555  chain=1.542  value=0.887  query_p=0.378  dropped=0.000%
+Saved epoch 8; peak GPU bytes 2621320192
+[bc] epoch 9/18  train_loss=1.802  eval_loss=2.061  belief=4.477  chain=1.516  value=0.940  query_p=0.381  dropped=0.000%
+Saved epoch 9; peak GPU bytes 2621320192
+[bc] epoch 10/18  train_loss=1.748  eval_loss=2.059  belief=4.535  chain=1.522  value=0.941  query_p=0.387  dropped=0.000%
+Saved epoch 10; peak GPU bytes 2621320192
+[bc] epoch 11/18  train_loss=1.699  eval_loss=2.080  belief=4.507  chain=1.512  value=0.990  query_p=0.391  dropped=0.000%
+Saved epoch 11; peak GPU bytes 2621320192
+[bc] epoch 12/18  train_loss=1.655  eval_loss=2.091  belief=4.560  chain=1.518  value=1.017  query_p=0.393  dropped=0.000%
+Saved epoch 12; peak GPU bytes 2621320192
+[bc] epoch 13/18  train_loss=1.618  eval_loss=2.116  belief=4.568  chain=1.516  value=1.059  query_p=0.394  dropped=0.000%
+Saved epoch 13; peak GPU bytes 2621320192
+[bc] epoch 14/18  train_loss=1.590  eval_loss=2.128  belief=4.551  chain=1.512  value=1.083  query_p=0.393  dropped=0.000%
+Saved epoch 14; peak GPU bytes 2621320192
+[bc] epoch 15/18  train_loss=1.569  eval_loss=2.131  belief=4.573  chain=1.513  value=1.097  query_p=0.396  dropped=0.000%
+Saved epoch 15; peak GPU bytes 2621320192
+[bc] epoch 16/18  train_loss=1.556  eval_loss=2.142  belief=4.595  chain=1.514  value=1.107  query_p=0.398  dropped=0.000%
+Saved epoch 16; peak GPU bytes 2621320192
+[bc] epoch 17/18  train_loss=1.547  eval_loss=2.144  belief=4.622  chain=1.521  value=1.110  query_p=0.397  dropped=0.000%
+Saved epoch 17; peak GPU bytes 2621320192
+[bc] epoch 18/18  train_loss=1.543  eval_loss=2.165  belief=4.639  chain=1.520  value=1.140  query_p=0.397  dropped=0.000%
+Saved epoch 18; peak GPU bytes 2621320192
+[bc] done -> /kaggle/working/replay-work/G20/checkpoints/bc_final.pt  (best eval epoch=12, loss=1.279)
+rows=104037 policy_rows=103981 top1=0.5444 lift=5.696 nll=1.2786 brier=0.2544 ece=0.1536 seconds=213.6 -> /kaggle/working/results/holdout-bc_best.json
+rows=104037 policy_rows=103981 top1=0.5032 lift=5.266 nll=1.3885 brier=0.2153 ece=0.0162 seconds=230.2 -> /kaggle/working/results/holdout-bc_best_value.json

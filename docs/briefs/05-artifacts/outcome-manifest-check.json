@@ -1,0 +1,13 @@
+{
+  "status": "smoke full prepared manifest versus protocol outcome check",
+  "commit": "8b88e149161433632aadb37dd3301e5715cc58de",
+  "counts": {
+    "prepared_training": 101928,
+    "protocol_p1_win_False": 51928,
+    "protocol_p1_win_True": 52000,
+    "fixed_holdout": 2000
+  },
+  "issues": [],
+  "seconds": 24.984269526999924,
+  "scope": "All eligible prepared training games and the fixed holdout; sampled serialized per-side rows are checked separately in value-input-checks.json. No data or filters changed."
+}

@@ -1989,3 +1989,644 @@ P0.7 is complete under brief 10's A0–A2 acceptance rule. A3 is unavailable, wi
 G0 remains open (including its A3 clause and remaining throughput work). G1 and tier claims were
 not attempted. All pool files are unchanged from `3506a39`. No checkpoint training, hosted
 workflow, forum fetch or test-split play was performed.
+
+## 2026-11-14: replay blueprint on a GPU at 3,000 to 100,000 games (smoke)
+
+Brief 05 is in progress on `work/p2-gpu-scale`; no gate is claimed. Implementation commit
+`bd6db4161cb3d6d563ae4a98f9415771601d4d8c` adds CPU-only preparation and independent,
+resumable best-value checkpoint selection, both default off. No model, loss, schedule or filter
+changed. Affected validation: `uv run --no-sync python -m pytest -q -p no:cacheprovider --tb=short
+tests/test_bc_resume.py tests/test_run_replay_blueprint.py tests/test_bc_metrics.py
+tests/test_bc_scope.py tests/test_replay_holdout_report.py`: **71 passed**, 37.50 s, outside the
+command sandbox; `uv run --no-sync python -m ruff check fog tests`: clean. Earlier sandbox
+attempts timed out in the dependency's asynchronous exit and are retained as failures in
+`docs/briefs/05-artifacts/validation-attempts.json`.
+
+| Run (smoke) | Command | Code commit | Games / interval | Status |
+| --- | --- | --- | --- | --- |
+| CPU preparation, first set | `uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 22000 --work-dir runs/p2_gpu_22000 --device cuda --batch-size 1024 --epochs 18 --prepare-only` | `bd6db41` | pending / n/a | import finished, conversion running; no training |
+| CPU preparation, second set | `uv run --no-sync python -m fog.scripts.run_replay_blueprint --games 112000 --work-dir runs/p2_gpu_112000 --device cuda --batch-size 1024 --epochs 18 --prepare-only` | `bd6db41` | pending / n/a | import running; no training |
+
+Both preparations began with these implementation bytes before the code commit was made.
+Kaggle client authentication and job-list access succeeded. `kaggle quota --format json`
+reported 0.00 GPU-hours used and 45.00 available; this brief remains capped at 20. No GPU job
+submitted and no GPU checkpoint or new play result exists at this checkpoint. Historical B
+reference files, budget, test results and job template: `docs/briefs/05-artifacts/`.
+
+### Stage 0 first set completed (smoke; no training)
+
+The first preparation command above completed under the same `bd6db41` application bytes:
+22,000/22,000 games accepted, zero quarantines; train **20,000 / 1,023,525 rows**, holdout
+**2,000 / 104,037 rows**, exact fixed holdout IDs. Nested 1,000 / 3,000 subsets match
+**52,983 / 156,597 rows**, splitter seed 20260804. Newest training upload 1771553139 is before
+oldest holdout upload 1771561053. Import / conversion / split wall: **92.066 / 1,000.359 /
+3.294 s**. These are CPU preparation walls with concurrent setup/tests and the larger import,
+not an idle throughput benchmark. Repeating the identical prepare command skips all stages.
+Commands and complete counts/timers: `docs/briefs/05-artifacts/prepare-22000.json`, `prepare-22000-run.json`,
+`prepare-22000-quality.json`, `prepare-22000-skip.txt`, plus import/split text outputs. Private upload is next.
+The 112,000-game import also reached its target and conversion is running; usable training
+count is not yet known. No GPU time or play result is claimed.
+
+### Private G3 pilot submission (smoke, result pending)
+
+The 468,727,506-byte CPU work archive uploaded privately as `fog-p2-gpu-22000-20261114` in
+186.132 s. The official dataset metadata/status reads return HTTP 403,
+`Permission 'datasets.get' was denied`; creation was accepted, and privacy was requested
+explicitly. At code `f67c9587b75ffa838a5cffec0ca0c60b555c5c9f`,
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="600")` accepted private script
+`fog-p2-g3-stop-20261114`, version 1, no invalid dataset sources. Its G3 config is 3,000 games,
+18 epochs, batch 1,024, CUDA, separate best-value checkpoint enabled; a completed-epoch hook
+will deliberately stop after epoch 2. Initial expected session time 3–6 minutes is a planning
+estimate from the prior CPU feed ceiling, **not a measured GPU rate**; hard cap is 10 minutes,
+conservatively 1/3 GPU-hour if two devices are billed. Actual use and training results pending.
+Source, accepted response and budget: `docs/briefs/05-artifacts/`.
+
+### First hosted attempt failed before training; corrected retry running (smoke)
+
+`fog-p2-g3-stop-20261114` ended **ERROR**, not a training result. Setup took **126.478 s**,
+Python **3.13.16**, PyTorch **2.11.0+cu130**, CUDA **13.0**, GPU **Tesla T4**; the job
+then failed at **132.475 s** because Kaggle had expanded `replay-work.tar.gz` into ordinary
+files. Quota used **138.869 s = 0.0385747222 h**, including session overhead. See
+`G3-stop-job-runtime.json`, `G3-stop-setup-log.txt`, `gpu-hours.json`. Full kernel metadata
+confirms `is_private=true`; the owned dataset listing also confirms the dataset is private.
+
+Restore fixes `6dcbf51` / `530ae08` support both layouts and make restored manifests writable;
+**3 tests pass**, lint clean, no training/data semantics change.
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="600")` accepted private retry
+`fog-p2-g3-stop2-20261114`, version 1, code `530ae08cac2f27d3e53c0cfa535e44e8f56e7074`,
+same two-epoch interruption plan. Expected **4–7 min** from measured setup plus still-unmeasured
+training/export, capped at **10 min**. Retry is running; no training number claimed.
+
+### Corrected pilot capped without output; safer input and export handling (smoke)
+
+`fog-p2-g3-stop2-20261114`, code `530ae08`, ended **CANCEL_ACKNOWLEDGED** at its requested
+600-second cap; no training log/checkpoint was returned (output fetch HTTP 404). The last live
+event is the successful runtime probe at **98.617 s**; the stage reached afterward is unknown.
+Final quota total **749.868 s / 0.208296667 h**, hence this attempt used **610.999 s** including
+platform overhead. It is a failed/partial attempt, never an 18-epoch result.
+
+`29ffeb4` adds opaque-archive input and an internal worker deadline reserving export time;
+**5 local tests pass**, including preserving a saved marker after the worker is stopped.
+Selected policy/value weights are now exported separately from the resume archive (`3f0f59a`).
+No model, loss, schedule or filter changed. A redundant new dataset destination was rejected
+by automatic approval review as outside the approved sensitive-data destination scope.
+The safer update of existing private `fog-p2-gpu-22000-20261114` was permitted: same archive
+bytes, filename `replay-work.bin`, old versions retained, **102.839 s** upload/version wall.
+This avoids archive expansion; its effect on hosted training remains unmeasured.
+See `prepare-22000-version2.json`, input tests and the exact scripts/status/log artifacts.
+
+### Opaque-input pilot accepted (smoke; measurements pending)
+
+The owned listing confirms versioned `fog-p2-gpu-22000-20261114` remains private and now
+contains exactly one `replay-work.bin`; its bytes are identical to the original archive.
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="600")` accepted private
+`fog-p2-g3-stop3-20261114`, version 1, code `106034c87187d351e01873ee6e99213370ab9e3c`.
+G3 remains 3,000 games / 18 epochs / batch 1,024 / CUDA, with the deliberate epoch-2 stop.
+The worker deadline begins export by 480 s, ahead of the platform cap. Initial estimate
+**4–7 min** uses the measured 97–126 s setup range; extraction/training speed remains unknown.
+Prior ended attempts used 749.868 quota seconds. Exact source, submission, input verification
+and budget are retained; no new training number is claimed.
+
+### Opaque restore succeeded; first epoch still incomplete (smoke)
+
+`fog-p2-g3-stop3-20261114` completed its **outer job** and exported saved work, but training
+was **interrupted_for_export before epoch 1 completed**. Installation **92.656 s**, input
+restore **21.109 s**, export began at **480.315 s**. The returned training log has the dataset
+line and initial validation only; no completed epoch rate or GPU-memory result exists. Total
+settled quota **1,295.563 s / 0.359878611 h** across the three attempts; this job used
+**545.695 s**. Sources: `G3-stop3-job-runtime.json`, `G3-stop3-train.txt`, status/full log.
+
+Private `fog-p2-g3-stop4-20261114` was accepted at code
+`3b81a6154e1cc597233acba4670e266054decf8a`, version 1, same G3 18-epoch settings, now stopping
+after the first completed epoch. Command: `KaggleApi.kernels_push(acc="NvidiaTeslaT4",
+timeout="1800")`; internal export deadline 1,500 s. Planning range **9–27 min** follows the
+observed incomplete 365-second worker attempt plus setup/restore/export, not a measured
+epoch rate. Its maximum fits the roughly 38 minutes left in stage 1's one-hour allowance.
+No second GPU job is active. Exact source and submission are retained.
+
+### First completed GPU epoch and complete CPU preparation (smoke)
+
+| Run (smoke) | Train / holdout games | Epochs | Batch/device | Holdout NLL / top-1 | Holdout value MSE | Train rows/s | Code | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| G3 partial | 3000 / 2000 | 1 of 18 | 1024 / Tesla T4 | 2.016241 / 0.212143 | 0.998706 | 604.194 | `3b81a61` | `python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set device=cuda bc.manifest=/kaggle/working/replay-work/split/train_3000.parquet bc.holdout_manifest=/kaggle/working/replay-work/split/holdout_manifest.parquet bc.batch_size=1024 bc.epochs=18 bc.resume=true bc.selection_metric=action_ce bc.keep_best_value=true bc.streaming=true bc.early_stopping_patience=0 log.dir=/kaggle/working/replay-work/G3` |
+
+This job deliberately stopped after epoch 1. Training 156,597 rows took 259.186 s; initial and
+epoch validation took 160.716 / 154.323 s. Peak PyTorch allocation **2,619,046,912 bytes**
+(2.439178 GiB), CUDA device 0, two T4s visible. Python 3.13.16 / PyTorch 2.11.0+cu130 /
+CUDA 13.0; two CPU threads. Installation **137.037 s**, wall before export **746.991 s**;
+job quota **824.787 s**, total ended-job quota **2,120.350 s = 0.588986111 h**. Raw files:
+`G3-stop4-*` and `G3-first-epoch-summary.json`. Intervals are n/a for these offline diagnostics.
+
+At the measured rate and validation time, G3 18 epochs project to **7,603.822 s**, excluding
+setup/writes, above stage 1's one-hour cap; G20 projects to **33,431.119 s**. These are
+projections, not completed runs. Per AGENTS.md's impossible-task rule, ROADMAP now states the
+smallest clear next step: retain partial G3 and verify continuation within the unchanged hour,
+then prioritize G20 with default batch 1,024 under the unchanged 20-hour total. No complete
+G3-versus-B or GPU batch-256 comparison, batch-quality conclusion or gate is claimed.
+
+Private `fog-p2-g3-resume-20261114` was accepted, code `e05d5d1`, attaching the preceding
+private job's saved work. Same 18-epoch config, deliberate stop after epoch 2, internal export
+deadline 1,200 s, platform cap 1,400 s. Expected 15–20 min from measured epoch/validation and
+setup; that cap keeps all calibration below one quota-hour. Reports of both partial selected
+checkpoints are requested. Continuation proof remains pending returned metrics.
+
+CPU preparation of 112,000 games is complete: **101,928 / 5,217,022 training games/rows**,
+**2,000 / 104,037 fixed holdout games/rows**, **8,072** newer games excluded, zero quarantines.
+All 20,000 first-set training IDs are contained in the larger set; all **2,000** holdout NPZs
+are byte-identical. Max training upload **1771559041** precedes min holdout **1771561053**.
+Rating floor stays **1500**, no wider dates or lower floor required. Import / conversion / split
+wall **789.940 / 4,452.866 / 2.740 s**, with initial raw/cache reuse and local check contention,
+not an idle throughput benchmark. Commands/counts/timers: `prepare-112000*`.
+The **2,385,762,558-byte** opaque archive is uploading to the brief's second private dataset.
+
+### Real continuation verified; G3 calibration closed as partial (smoke)
+
+`fog-p2-g3-resume-20261114` ended **COMPLETE** with training deliberately stopped at epoch 2.
+The raw `[0,1]` metrics CSV is an **exact byte prefix** of `[0,1,2]`; JSON/CSV proof is in
+`G3-resume-check.json` and both before/after files. Both selected checkpoints are epoch 2.
+Aggregate training rate **613.027 rows/s** (epochs **604.194 / 622.123**), epoch-validation
+**154.323 / 149.778 s**. Peak allocation **2,619,988,480 bytes**. Both reports: top-1
+**0.300391**, policy NLL **1.895671**, value MSE **0.979114**, Brier **0.244778**, ECE
+**0.033124**. This is **2 of 18 epochs**, not a completed G3 or a valid full-schedule batch/device
+comparison. Command/config/source: `G3-training-runtime.json`, submitted script at `e05d5d1`.
+
+The continuation used **1,044.105 quota seconds**; complete calibration total
+**3,164.455 s = 0.879015278 h**, including every failed/partial setup. No calibration gate
+or GPU-256 quality conclusion is claimed. G20 retains the brief default batch 1,024, with
+that limitation explicit. Projection using the slower measured epoch and conservative
+validation/overhead allowance is **9.596 h** for G20; planned platform cap **11 h**, internal
+export deadline **10 h 40 min**, all within the unchanged 20-hour total. `G20-plan.json` holds
+the inputs and arithmetic.
+
+Timing clarification for the preceding row: epoch-minus-validation was **259.186 s**;
+the actual training timer from rows/rate was **259.183 s**. The 0.003 s difference is other
+epoch overhead. Projections already used the exact rows/rate value and are unchanged.
+
+Both partial G3 weights were uploaded to the explicitly required private checkpoint dataset
+`fog-p2-gpu-checkpoints-20261114`; the one-command download was executed and both byte sizes
+and SHA-256 values match `checkpoints.json`. It contains partial G3 only; G20/G100 await training.
+See `checkpoint-dataset-create.json` and `checkpoint-download-check.json`; no account identity
+or weights are committed.
+
+The second corpus upload was interrupted by a workspace restart. An owned-dataset check
+confirmed no object had been committed; retry to the **same prescribed destination** succeeded
+in **47.825 s**, reusing uploaded content. This is a retry wall, not a cold-transfer benchmark;
+the earlier interrupted wall is unknown. Its private owned listing confirms exactly one
+**2,385,762,558-byte** `replay-work.bin`. CPU preparation and both private input uploads are now
+complete (`prepare-112000-{recovery-check,upload,private-check}.json`).
+
+### G20 submitted (smoke; no completed result yet)
+
+Private `fog-p2-g20-20261114`, version 1, was accepted at code
+`7a234972abf8d4c6dde8629353588aa2558f1fd0`: **20,000 games / 1,023,525 rows**, **18 epochs**,
+batch **1,024**, CUDA, both checkpoint-selection options active, no early stopping. Command:
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="39600")`; internal export deadline
+**38,400 s**. Expected **9.596 GPU-hours** from the conservative measured inputs in
+`G20-plan.json`; cap **11 h**. All prior jobs ended before submission, at total quota
+**0.879015278 h**. Exact source/submission and verified private status are retained.
+
+`docs/replay-blueprint-scale-run.md` now gives actual hosted measurements, CPU preparation
+counts/times, private input slugs, the exact job source, concrete continuation steps and the
+tested checkpoint download. G20 and G100 are still pending; no curve, play or gate result is
+claimed by a running job.
+
+### Available value tables and input checks while G20 trains (smoke)
+
+At `8b88e149161433632aadb37dd3301e5715cc58de`, read-only CPU checks used the
+existing `parse_replay_policy_versions(..., imputations=1, seed=20260804)` reconstruction,
+with a separate protocol-player/winner reader. A seeded sample of 64 nested G20 training
+and 64 fixed holdout games contained 6,283 accepted serialized rows: no per-side outcome-sign
+mismatch. Holding each legitimate imputed own sheet fixed, deleting the second half of each
+log left all earlier observation fields and opponent reveal tokens identical across 3,150
+rows. This is sampled smoke, not a full-corpus isolation proof. The independent full prepared
+manifest/protocol check covered 101,928 training plus 2,000 holdout games with zero winner or
+player-order discrepancies (24.984 s). Commands: CPU Python calling the existing parser and
+NumPy shard reader, and a separate raw-log/Polars manifest comparison; no optimizer, filters
+or data changed. Results and method are in `value-input-checks.json` and
+`outcome-manifest-check.json` under `docs/briefs/05-artifacts/`.
+
+The named `fog/eval/leakage_metrics.py` contains readability/reveal statistics, not a
+privileged-input check. The chronological-prefix comparison above checks the intended input
+isolation directly; trained-checkpoint label perturbation remains pending G100. The value
+learning criterion and G2 remain unverified. Existing B and partial G3 reports now feed
+`curve-value-tables.json` and the complete ten-bin `reliability.csv`; unavailable historical
+best-value details stay null. The unchanged holdout-report scorer runs on CPU even when its
+config says CUDA; training validation uses CUDA, and both report passes consume session quota.
+
+The portable `uv run --no-project --with kaggle==2.2.5 --with six python -c ...` owner download
+was exercised against the existing private checkpoint dataset. Both initial G3 files matched
+inventory bytes and SHA-256 (`checkpoint-portable-download-check.json`). It will be repeated
+after adding G20/G100. No new GPU job was started; G20 continues alone.
+
+### G20 live progress and partial G3 label routing (smoke)
+
+G20 has saved epochs 1 and 2 of 18, with logged (rounded) holdout value MSE 0.894 and
+0.878 and roughly 32-minute epochs including validation. `G20-progress.json` preserves the
+live log events and observation time; these are not final selected-checkpoint metrics. The
+existing private job continues alone with the same configuration/source pin. Do not compare
+rounded aggregate losses with B's full-precision policy NLL.
+
+At `fda1a94`, CPU inference from the partial G3 own-best value checkpoint gave identical
+policy/value tensors after negating outcomes, replacing terminal auxiliary labels and
+injecting optional privileged truth/action fields: one fixed 256-row holdout batch, both
+in evaluation mode and in training mode with matched RNG. No optimizer ran. This checks
+supervision/oracle routing, not every possible feature leak. `G3-label-perturbation.json`
+records the result; repeat on the selected final-run checkpoint. Command: CPU Python,
+`FogAgent.from_tables`, unchanged config with `oracle=none`, paired forward passes and
+`torch.equal` on log-probability and value tensors.
+
+### Shared-account overlap and owner scheduling correction (smoke)
+
+A later read of `work/collect-gpu` at `a6b2fad` and an authenticated listing of owned
+jobs revealed that G20 began at 04:27:10 UTC while brief 06's collection attempt 2 was
+still running (observed terminal 04:38:31 UTC): at most 680.625 seconds of overlap.
+The submission checked the preceding replay run, but missed another active account job.
+Earlier statements that G20 ran alone do not describe this initial interval. Record the
+scheduling deviation; do not erase the measurements or claim the one-job rule was met.
+Global quota also contains brief 06's allocations and cannot all be attributed to G20.
+`shared-account-overlap.json` records the source and times.
+
+The owner explicitly chose to finish G20 before measuring brief 06's end-to-end training
+speed. G100 stays pending while the brief 06 measurement is prepared on its separate branch.
+Before every later launch, list all owned RUNNING/QUEUED jobs and require none active.
+G20 remains the only currently active job. Its completed epoch 4 has logged holdout value
+MSE 0.861 (rounded; full selected reports remain pending).
+
+### G20 epoch 5 and verified account-wide submission guard (smoke)
+
+G20 has completed five of its 18 epochs; logged holdout value MSE at epoch 5 is 0.871
+(rounded), with the earlier epoch-4 value 0.861. Full-precision selected checkpoint reports
+remain pending. `G20-progress.json` preserves all five completed-epoch log events.
+
+The new launch guard paginates every owned job and reads its status. It checked 20 jobs,
+found only G20 active, and blocked submission (`account-wide-guard-live.json`). A larger
+initial list hit HTTP 429; smaller pages, throttled reads and bounded retry resolved it.
+No job was submitted by either guard check. The owner's requested order remains G20,
+then brief 06 end-to-end timing, then the remaining GPU scale work.
+
+### Projected handoff to brief 06 (planning only)
+
+At 07:19 UTC, the five completed G20 epochs took 1,909.859–1,928.435 seconds each,
+median 1,923.599. Thirteen remain. Their median projects the training endpoint to
+14:08:52 UTC, then allow 10–15 minutes for both holdout reports and checkpoint export.
+The unmeasured brief-06 PPO session is planned at 30–60 minutes afterward: earliest
+realistic result about 14:50 UTC, planning window 15:00–15:30. These are projections,
+not completion measurements or promises; a GPU-path failure would change them.
+`G20-to-brief06-eta.json` records the inputs and the owner's preservation choice.
+
+### Independent brief-06 runtime supersedes the planned handoff
+
+Concurrent updates on `work/collect-gpu` revealed an owner-selected separate single-T4
+runtime, independent of G20's Kaggle allocation. Its first CUDA probe failed from host
+RAM exhaustion while transferring unused probe buffers; no throughput is claimed for that
+failure. The other worker added a tested counters-only probe result, retaining real buffer
+transfer in PPO, and reserved a bounded replacement through 10:21 UTC. The combined
+brief-06 allocation upper bound is 2.959444 GPU-hours. Its raw results and current source
+are on `work/collect-gpu`; `brief06-independent-runtime.json` records the scheduling facts.
+
+The prepared duplicate private job was never submitted and is retired. G20 continues
+unchanged. The prior 14:50 brief-06 estimate applied to waiting for G20's Kaggle slot;
+this independent run may produce its full-loop result earlier, but PPO timing is still
+pending. G100 still waits for completed G20 curve/value reports and its CPU play smoke.
+G20's quota delta contains the earlier shared-account collection work, so its own session
+wall upper bound, not that contaminated delta, must drive G100's overhead projection.
+
+### Independent end-to-end speed result, G20 preserved (smoke)
+
+`work/collect-gpu` at `bc5bd85` published the short timing result from its independent
+single T4, released by 09:49:54 UTC. Two completed PPO updates at training commit
+`ac75355` retain 26,268 learner decisions / 1,024 games in 700.389269 seconds, including
+startup and checkpoint writes: **37.504858 decisions/s / 1.462044 games/s**. The whole
+995.824165-second attempt includes an unfinished third update and yields **26.378151
+retained decisions/s / 1.028294 games/s**. Native update time is 71.897% of completed-prefix
+wall time. The worker reports a separate owner instruction to shorten the learning run;
+100k decisions, the 200-game evaluation and the full self-play matrix remain unverified.
+No learning/strength gate is claimed. Exact published training command, native timers and
+source pin are copied in `brief06-short-run-summary.json`; independent division/count
+checks are in `brief06-endtoend-recomputed.json`. Cumulative brief-06 allocation upper
+bound is 2.441111 GPU-hours, separate from the brief-05 Kaggle budget. No duplicate
+allocation was submitted. G20 remains running unchanged, with epoch 10 of 18 saved.
+G100 can follow G20 curve/value reports and CPU play without a further brief-06 GPU job.
+
+### Completed G20, separate policy/value selections, and conservative final-slot plan (smoke)
+
+Private `fog-p2-g20-20261114` completed and exported by 14:17:26 UTC, at training
+source `7a234972abf8d4c6dde8629353588aa2558f1fd0`. Actual execution is the retained
+`fog-p2-g20-20261114.py` worker calling unchanged `bc.train`; submission command was
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="39600")`. The complete resolved
+training command/overrides are in `G20-training-runtime.json`: CUDA, original 20k manifest,
+fixed 2k holdout, batch 1024, 18 epochs, resume, policy-CE selection and the independently
+saved value checkpoint, streaming on, early stopping off. CSV contains exactly epochs 0–18;
+training status is complete. No loss, schedule, model or filter changed.
+
+| Run (smoke) | Train games / rows | Epochs / batch | Policy / value epochs | Train rows/s | Holdout top-1 / policy NLL | Policy-checkpoint value Brier / ECE | Own-best value MSE / Brier / ECE | Commit |
+| --- | --- | --- | --- | ---: | --- | --- | --- | --- |
+| G20, complete | 20,000 / 1,023,525 | 18 / 1024 | 12 / 4 | 583.241649 | 0.544368683 / 1.278605058 | 0.254355678 / 0.153632606 | 0.861281370 / 0.215320343 / 0.016158573 | `7a23497` |
+
+Per-epoch train rates are 579.961717–585.537242 rows/s; validation is 161.165194–166.059520 s,
+with peak learner allocation 2,621,320,192 bytes (2.441295 GiB). Training including validation
+is 34,692.389136 s; hosted setup is 92.034458 s. The selected policy has 103,981 legal-policy
+holdout rows; value reports cover all 104,037. Own-best early/middle/late Brier is
+0.244753784 / 0.222778563 / 0.179070357: late is 0.065683427 below early. That value
+checkpoint is eight epochs before the policy checkpoint. Its train MSE is 0.832760363,
+versus 0.543420724 at the later policy selection; the latter's holdout MSE has worsened to
+1.017422711. The policy NLL improves by 0.300412805 from historical B. These are diagnostic
+smoke results. They do not establish the brief's strict **100k** reading or any strength gate.
+Both full holdout reports, phase metrics, extreme shares/win rates and all ten reliability
+bins are in `G20-holdout-*.json`, `curve-value-tables.json` and `reliability.csv`.
+
+G20's own session upper bound is 35,426.124028 s = 9.840590 h, from conservative 04:27:00
+start to observed terminal. Its global quota delta includes the earlier other brief and
+is not attributed wholly to G20. Calibration plus the own-session bound is at most
+10.719605 replay quota-hours; the account's observed counter is 11.118819. `gpu-hours.json`
+records both scopes, using Kaggle quota units, one CUDA device used, two T4s visible.
+
+Both G20 selected weights have been added to the **same private checkpoint dataset**,
+version 2, retaining version 1. The literal portable owner command was run in a fresh ignored
+folder: all four G3/G20 file sizes and SHA-256 values match the public inventory
+(`checkpoint-version-G20.json`, `checkpoint-portable-download-G20.json`). No weights or
+account identity are committed. CPU label/oracle perturbation on 256 holdout rows leaves
+policy/value tensors identical in evaluation and matched-RNG training modes
+(`G20-label-perturbation.json`); the earlier sampled prefix/sign checks remain bounded smoke.
+
+`G100-plan.json` uses the slowest G20 train rate, longest validation, measured own-session
+setup/export overhead scaled to the full archive, and a two-hour forecast reserve. All
+101,928 prepared games for six epochs project to 57,054.752635 s (15.848542 h), which does
+not fit. The largest seeded nested prefix that fits is **41,071 games / 2,096,584 rows**,
+six epochs, projecting 24,772.228739 s (6.881175 h). It contains every original G20 game
+and no holdout game. The new manifest was made on CPU; rating floor and dates are unchanged.
+The projected conservative account total is 17.999994 quota-hours. Planned hard platform
+cap 28,200 s, internal deadline 27,000 s, keeps even the cap total below 20; the forecast's
+two-hour reserve supplies the overrun allowance. No G100 GPU job has been submitted yet.
+Its exact 20k-to-100k P2.4 branch and strict 100k value test will remain unverified because
+this is the brief-authorized fallback. G20 CPU play is running before G100 training.
+
+### G20 CPU play complete and input-layout correction before G100 (smoke)
+
+Command, from the unchanged application at `325a46f` (the dirty flag covers new docs/results):
+`OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 PYTHONPATH=. .venv/bin/python -m
+fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config
+configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/p2_gpu_checkpoints/G20-bc_best.pt
+--checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics
+--opponent maxdamage --games 400 --temperature 0 --action-stats --resume
+--out runs/p2_gpu_play/G20-play.json`. Model source is `7a23497`, policy epoch 12.
+Pinned Showdown `e440c4a`; the original matched teams/sides/seeds recipe is unchanged.
+Raw command, 349.939293-second total wall and exit 0 are in `G20-play-command.json`.
+
+| Candidate (smoke) | Opponent | Games | W-L-D | Win rate [95% Wilson] | Failures / truncations | Seconds/decision / fallbacks | Commit |
+| --- | --- | ---: | --- | --- | --- | --- | --- |
+| G20 policy epoch 12 | simpleheuristics | 400 | 208-192-0 | 0.5200 [0.471083, 0.568537] | 0 / 0 | not emitted / not emitted | `325a46f` |
+| G20 policy epoch 12 | maxdamage | 400 | 347-53-0 | 0.8675 [0.830754, 0.897255] | 0 / 0 | not emitted / not emitted | `325a46f` |
+
+The result file is `G20-play.json`, separate from historical B and the later model's output.
+These 400-game rows are smoke, not T1/G2 evidence. B's reference rates were 0.360
+[0.314, 0.408] and 0.7725 [0.729, 0.811]. G20's action statistics are retained; per-decision
+wall and fallback counters were not emitted, so no zero is invented.
+
+An intermediate CPU repack included the conversion cache. Its 4,075,781,022-byte
+archive was never uploaded or attached to a job; it is explicitly discarded in
+`prepare-112000-G100-bundle-with-cache.json`. Rebuild only the original top-level layout
+(`raw`, `decisions`, `split`, `run.json`, `output`), omitting that CPU-only cache.
+No GPU time was used. The initial 41,071-game forecast remains a superseded preliminary
+plan in `G100-plan-before-archive-check.json`.
+
+The final planner allows 2 MiB for the new manifest in the original full-corpus archive,
+rounds setup/report/export allowance up to a whole minute (1,980 s), and verifies that the
+actual upload fits that byte bound. The largest fitting nested prefix is now **40,955 games /
+2,090,705 rows**, six epochs, projected **24,771.827035 s = 6.881063 h**. The exact 100k
+rules stay unverified; no filters or training settings changed. The two-hour forecast reserve
+and 28,200/27,000-second platform/internal caps stay unchanged. G20 curve/value reports,
+private persistence and CPU play are all complete before the final GPU slot is submitted.
+
+The corrected CPU archive is **2,386,510,456 bytes**, SHA-256
+`5457cc642d2ecc63152a36ec4d2d78cf150c8efeaa1c37209807be1429fbfe9f`, below the
+2 MiB added-manifest planning allowance. Its CPU packaging wall is 81.327875 s; it includes
+the original layout and excludes the conversion cache. The same private large-input
+dataset now has ready **version 2**, with version 1 retained; upload/processing/readiness
+took 704.252935 s and used no GPU. Evidence: `prepare-112000-G100-{bundle,version}.json`.
+The account quota remained 40,027.748 seconds before final submission.
+
+### Final bounded fallback submitted (smoke forecast; no G100 result yet)
+
+Private `fog-p2-g100-20261114` version 1, kernel 145012268, was accepted from source
+`46e9c0da2c1b6caa01ab3da0b5bba2e103029662` at 14:42:59 UTC: **40,955 games /
+2,090,705 rows**, **six epochs**, batch **1,024**, same model/loss/optimizer/schedule recipe,
+CUDA, both independent checkpoint selections, streaming, no early stop. Command:
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="28200")`. Its internal export deadline
+is 27,000 s. Expected **6.881063 quota-hours** from the completed G20 measurements; the
+forecast conservative account total is 17.999882 h, reserving two hours. Hard-cap account
+total is at most 18.952152 h. Inputs are ready private large-corpus version 2, including
+the CPU nested manifest; no GPU import, conversion or splitting is run.
+
+Immediately before submission, the paginated owned list plus each job's status checked
+**20 jobs**, found no RUNNING/QUEUED job, and allowed launch; fresh quota was unchanged at
+40,027.748 s. `fog-p2-g100-20261114-account-guard.json` records that check. GetKernel confirms
+private `NvidiaTeslaT4`, initially QUEUED. Exact submitted source, receipt, status and plan
+are retained. The new run remains unmeasured until its CSV and reports return. G20's
+curve/value/CPU play and four-file private-download round trip were completed first.
+
+### Queued final slot: distinguish elapsed wait from GPU quota
+
+The final slot remains QUEUED with no failure message. The official quota read after the
+prolonged wait still shows **11.118819 h used, 0 reserved, 45 h allowed**; the status
+observation is retained in `G100-queue-observation.json`. No training rate or completed
+epoch exists for this run yet. The earlier 14:42:59 timestamp is the submission request
+start; acceptance returned 2.455918 s later. Queued wall time has consumed no observed
+GPU quota. Its submission-to-terminal wall will be a loose upper bound, not an exact
+GPU charge. Keep both that bound and the final account-counter delta; the latter also
+conservatively includes any unrelated account activity. No duplicate job was submitted.
+
+Historical B play counts and full Wilson intervals are copied into
+`05-artifacts/B-play-summary.json`, with its original brief-03 source path and commit
+stamp retained. This is the existing 144/400 and 309/400 CPU smoke, not a new evaluation.
+It makes the baseline numbers cited by the brief-05 report available in that artifact directory.
+
+### Final fallback allocated after the uncharged queue (smoke startup)
+
+The final slot is now RUNNING, observed around 18:35 UTC after the long queue. Its
+startup log confirms **Tesla T4, Python 3.13.16, PyTorch 2.11.0+cu130, CUDA 13.0,
+Node v22.23.4**, matching G20's measured stack. Setup reached the training interpreter
+at about 91.5 s of script log time. `G100-startup.json` preserves the startup events and quota
+observation. No completed epoch or throughput is claimed yet. The conservative 6.881063-hour
+forecast after allocation puts export around **01:30 UTC on 15 November**; refine it
+from actual completed epochs. Queue time remains separate from charged GPU time, using
+the final account-counter delta as a conservative bound rather than counting the wait.
+
+### First final-slot epoch saved (smoke progress, no final selection yet)
+
+G100 fallback has saved epoch 1/6. The log confirms **2,090,705 training rows /
+104,037 holdout rows**, two torch threads, with input restore **104.605 s**. First-epoch
+wall from the baseline log through its completed save is **3,403.646891 s**, including
+validation and checkpoint overhead. Raw events and the one-epoch projection are retained
+in `G100-first-epoch-progress.json`; the broader communicated completion window is
+**00:40–01:00 UTC on 15 November**. This is a projection, not a completed run or measured
+steady-state throughput. The CSV/selected-checkpoint reports remain pending; no NLL is
+inferred from the rounded joint-loss log. The dataset/epochs/configuration are unchanged.
+
+### Progress refresh and local monitor recovery (smoke, 22:13 UTC)
+
+A fresh direct status query confirms the same private final-slot job is RUNNING with
+**three of six epochs saved** and no failure message. The local watcher and waiting
+collector had stopped; they were restarted, and the remote training continued throughout.
+No GPU job was canceled or duplicated. The latest meter is about **14.76 account quota-hours**
+against the 20-hour conservative budget. Epoch walls are **3,403.646891 / 3,397.826248 /
+3,389.233859 s**, including validation and save, so the **00:40–01:00 UTC on 15 November**
+export projection remains conservative. `G100-progress.json` retains raw epoch events and
+the timing assumptions. Full CSV, selection reports, final checkpoint persistence and CPU
+play still wait for the six-epoch run to finish; no final G100 NLL or strength is claimed.
+
+### Owner ends the foreground wait; final slot continues in the background
+
+The owner asked to report progress without waiting for G100. G20 and the short brief-06
+throughput result are complete. The existing final GPU job continues unchanged at three
+of six saved epochs; no cancel or duplicate submission was made. The local read-only
+watcher and completion collector now have independent process sessions and file-backed
+logs, verified alive after detachment. On completion the collector downloads raw metrics
+and both reports, versions the same private checkpoint dataset and tests all six hashes,
+then runs the specified CPU diagnostics and 400-game/opponent smoke. These final G100
+results remain pending; this entry makes no completed-run or gate claim.
+
+### 2026-11-15: final fallback and all follow-up evidence complete (smoke)
+
+Private `fog-p2-g100-20261114` completed and exported by **00:33:06 UTC**; the detached
+collector finished checkpoint persistence, diagnostics and CPU play by **00:40:56 UTC**.
+No further GPU allocation was made. Actual source is `46e9c0da2c1b6caa01ab3da0b5bba2e103029662`;
+`fog-p2-g100-20261114.py` calls unchanged `bc.train`, CUDA, `train_40955.parquet`, fixed
+2k holdout, batch1024, six epochs, resume, policy-CE selection, independently saved best
+value, streaming, early stopping off. Submission command was
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="28200")`; the full resolved config
+command is retained in `G100-training-runtime.json`.
+
+| Run (smoke) | Games / rows | Epochs / batch | Policy / value epochs | Train rows/s | Top-1 / NLL | Policy value Brier / ECE | Own-best value MSE / Brier / ECE | Commit |
+| --- | --- | --- | --- | ---: | --- | --- | --- | --- |
+| G100 fallback, complete | 40,955 / 2,090,705 | 6 /1024 | 6 / 5 | 643.919560 | 0.545474654 / 1.263436895 | 0.210989323 / 0.024287480 | 0.835634712 / 0.208908678 / 0.009065196 | `46e9c0d` |
+
+CSV contains exactly epochs0–6, with 2,090,705 rows per training epoch and
+runtime status complete. Rates are 641.717205–646.036499 rows/s;
+validation 144.275986–147.351477 s; peak
+2,621,156,352 bytes. Training/validation wall is
+20507.284637 s; installation 90.763706 s;
+the two CPU holdout reports total 417.246273 s. The per-epoch CSV, last log lines,
+runtime metadata and both reports are retained without changing raw metric bytes.
+
+Own-best value epoch5 is one before policy epoch6. Its early/middle/late Brier is
+0.243595556 / 0.216147087 / 0.167666934, gap **0.075928622**; train MSE 0.800861495,
+holdout MSE 0.835634712, ECE 0.009065196. Low/high shares are 0.026673203 / 0.036304392,
+observed win rates 0.078198198 / 0.930103257. Both numerical value thresholds are met
+at **40,955**, not at the required 100k point. Strict 100k learning remains unverified.
+The observed 20k→40,955 NLL gain is **0.015168163**; train/holdout NLL at the larger point
+is 1.225838184 / 1.263436895. Neither exact 100k P2.4 branch is established; no wide model,
+loss, schedule or data-filter change was made. `curve-value-tables.json` and `reliability.csv`
+contain the complete available diagnostics. B's historical own-best weights remain absent.
+
+Final G100 label/oracle perturbation on 256 holdout rows has identical policy/value tensors
+in evaluation and matched-RNG training modes (`G100-label-perturbation.json`). Earlier
+full-manifest winner and sampled per-side/prefix checks apply to this nested subset;
+these are bounded smoke checks, not exhaustive isolation proof. The named leakage module's
+readability-only limitation remains recorded. No new loss or architecture was introduced.
+
+CPU play command, unchanged application at `20fbada8f3cf6307262b9ba314c29ea81087cf55`; model source `46e9c0d`:
+
+```sh
+/workspace/fog/.venv/bin/python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/p2_gpu_checkpoints/G100-bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0 --action-stats --resume --out /workspace/fog/runs/p2_gpu_play/G100-play.json
+```
+
+| Candidate (smoke) | Opponent | Games | W-L-D | Win rate [95% Wilson] | Failures / truncations | Seconds/decision / fallbacks | Commit |
+| --- | --- | ---: | --- | --- | --- | --- | --- |
+| G100 fallback policy epoch6 | simpleheuristics | 400 | 209-191-0 | 0.5225 [0.473569, 0.571003] | 0 / 0 | not emitted / not emitted | `20fbada` |
+| G100 fallback policy epoch6 | maxdamage | 400 | 343-57-0 | 0.8575 [0.819837, 0.888362] | 0 / 0 | not emitted / not emitted | `20fbada` |
+
+Total CPU play command wall: **324.211583 s**. Separate output `G100-play.json`;
+pinned Showdown `e440c4a`, same pool_b matched recipe, greedy. G20 was 0.520/0.8675 and B
+0.360/0.7725; the two larger models' intervals overlap. No play-strength gate is claimed.
+
+Private checkpoint dataset **version3** retains all **six** selected files and earlier
+versions. The literal portable owner command was executed in a fresh directory; all sizes
+and SHA-256 values match `checkpoints.json` (`checkpoint-version-G100.json`,
+`checkpoint-portable-download-G100.json`). No weights, account identity or token are committed.
+
+GPU accounting uses Kaggle quota-hours. Calibration used **0.879015278 h**; G20's own-session
+bound is **9.840590008 h**. The final account delta from its immediate pre-submission meter
+is **5.959728333 h**, a conservative G100 charge bound excluding its uncharged queue and
+including any unrelated account activity. The submission-wall bound is 9.835289352 h and
+must not be treated as a GPU charge. Replay-job bounds sum to **16.679333619 h**; the
+conservative whole-account meter is **17.078547222 h**, below 20 with **2.921452778 h** left.
+`gpu-hours.json` preserves each scope, including failed calibration attempts and the earlier
+shared-account overlap. All P2 boxes stay unchecked; the exact100k point and full G3/batch
+calibration remain the next missing evidence, with every original threshold unchanged.
+
+## 2026-11-15: review of brief 10
+
+The branch `work/replay-team-pool` (head `3f929cc`) was reviewed and merged into
+`work/roadmap`. Checked in review, on the reviewer's machine:
+
+- **Rebuilt from nothing.** A fresh import of the pinned revision (22,000 games, the same
+  rejection counts as 2026-11-13) and `python -m fog.scripts.build_replay_team_pool` gave all
+  803 team files and the three split manifests byte for byte as committed.
+- All 803 committed teams pass pinned Showdown's Gen 9 OU validator. No composition is shared
+  between splits. All 62 test teams come from the 2,000 newest games and their compositions
+  are first seen there. The split manifests' SHA-256 values match the top manifest.
+- The script and the eleven-line evaluation change, read line by line; no player name or
+  nickname is exported. `tests/test_replay_team_pool.py` passes (15); `ruff` is clean.
+- The three round-robin rows against `docs/briefs/10-artifacts/anchors.json`
+  (102, 34 and 175 wins of 1,000; no failures or truncations). Not re-run.
+
+| Fact | Value |
+| --- | --- |
+| Teams (one composition each) | 600 train, 141 validation, 62 test |
+| Where sides were lost | 44,000 sides; 9,850 rated 1700 or more; 1,839 with 14 or more moves revealed; 1,439 pass the validator; 999 compositions; 803 after the caps |
+| How much of a team is real | 27.3 of 90 fields revealed on average; 15.7 of 24 moves |
+| MaxDamage against Random | 0.898 |
+| SimpleHeuristics against Random | 0.966 |
+| SimpleHeuristics against MaxDamage | 0.825 |
+
+Three cautions for whoever uses the pool.
+
+1. **Spreads are sampled without regard to the moves.** `validation/team_000.txt` has a
+   Talonflame with a Bold nature (lowers Attack) carrying Flare Blitz and Swords Dance. Both
+   sides of a matched block draw from the same pool, so comparisons between agents are fair,
+   but absolute win rates may differ from those on teams people built.
+2. **For a model trained on replays, only the test split is unseen.** Validation compositions
+   are 15% of those that occur in older games, so they are in the replay training data.
+   Brief 13 now drops training rows whose acting side has a validation composition. Search
+   without learning (brief 11) is not affected.
+3. The test split has 62 teams, not the 150 the cap allows.
+
+P0.7 is ticked. G0 as written also asks for anchor `A3`, which is in no clone; that clause is
+recorded as not measurable until the owner finds the checkpoint (queue, "Owner"). Brief 11
+can start.
+
+## 2026-11-15: review of brief 05
+
+The branch `work/p2-gpu-scale` (head `538ef7c`) was reviewed and merged into `work/roadmap`.
+**Every model in it was trained and scored on the old rows, which gave away the label through
+move order** (review of brief 07, stage 1). Its policy NLL and top-1 are therefore inflated
+and are not comparable with numbers on corrected rows. Its timing, value and play numbers
+stand as measured. Everything is smoke. Checked in review:
+
+- The two tables, the rates, epochs and play counts in `docs/briefs/05-report.md` against
+  `docs/briefs/05-artifacts/{G20,G100}-summary.json`, `{G20,G100}-play.json` and
+  `gpu-hours.json`. All agree (for example 208 and 209 wins of 400 against SimpleHeuristics).
+- The code change: `bc.keep_best_value` (default off) saves the checkpoint with the lowest
+  holdout value loss, and `run_replay_blueprint --prepare-only`. Nothing in the model or the
+  losses changed. The three covering test files pass (38); `ruff` is clean.
+- No account name or token was found in the artifacts; commits are authored as the owner.
+- Not re-run: any training or play.
+
+| Question | Answer | Evidence |
+| --- | --- | --- |
+| How fast is replay training on a T4? | 583 and 644 rows/s | 20,000 games (1.02 million rows): 29 minutes an epoch plus 2.7 of validation; 18 epochs cost 9.8 GPU-hours. 40,955 games, 6 epochs: 6.0 GPU-hours. All 101,928 prepared games for 6 epochs projected to 15.9 hours and did not fit the budget |
+| Does the value head work with more games? | Yes | Own-best holdout Brier 0.215 (20,000 games, epoch 4) and 0.209 (40,955, epoch 5), ECE 0.016 and 0.009, against 0.345 at 3,000 games. Predictions below 0.1 or above 0.9 were won 7.8% and 93.0% of the time |
+| Does it need its own checkpoint? | At 18 epochs, yes | 20,000 games: value best at epoch 4, policy at epoch 12, where value Brier is back to 0.254 |
+| Does doubling the data improve the policy? | A little, offline | Holdout NLL 1.2786 to 1.2634 (inflated rows; 18 against 6 epochs) |
+| Does it improve play? | No | Against SimpleHeuristics 0.520 and 0.5225; against MaxDamage 0.8675 and 0.8575; 400 games each on `pool_b`, intervals overlap |
+
+Reading. Two things are settled for the old rows: the value head's failure at 3,000 games was
+too few games and too many epochs, not the architecture; and twice the data bought nothing in
+play. The P2.4 decision rule cannot be applied (the larger run is 40,955 games, not 100,000,
+with a third of the epochs, and the gain of 0.015 falls between its two thresholds). Play at
+0.52 against SimpleHeuristics is far from G2's 0.65. More of the same rows is not what is
+missing; what a row lacks or gets wrong compared with play is the more likely limit
+(briefs 09 and 12), which is a hypothesis until brief 13 measures it.
+
+The hosted account's meter stood at 17.1 GPU-hours when the work ended.

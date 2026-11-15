@@ -286,3 +286,60 @@ def test_thread_option_leaves_runtime_setting_unchanged_by_default(tiny_training
     monkeypatch.setattr(torch, "set_num_threads", calls.append)
     bc.train(tiny_training)
     assert calls == []
+
+
+@pytest.mark.parametrize("value_scores,expected_epoch", [
+    ([1.0, 0.8, 0.7, 0.9, 1.1], 2),
+    ([0.5, 0.8, 0.7, 0.9, 1.1], 0),
+])
+def test_best_value_checkpoint_tracks_mse_independently_and_recovers_on_resume(
+    tiny_training, monkeypatch, value_scores, expected_epoch,
+):
+    def scores(values):
+        iterator = iter(values)
+
+        def evaluate(*_args, **_kwargs):
+            return {"loss": 2.0, "action_ce": 1.0, "belief": 0.0,
+                    "belief_chain": 0.0, "value": next(iterator),
+                    "belief_chain_dropped_rate": 0.0}
+
+        monkeypatch.setattr(bc, "_fixed_eval", evaluate)
+
+    tiny_training["bc"]["keep_best_value"] = True
+    scores(value_scores)
+    with monkeypatch.context() as stop:
+        _interrupt_after_epoch(stop, 2)
+        with pytest.raises(KeyboardInterrupt):
+            bc.train(tiny_training)
+    saved = _state(tiny_training)
+    assert saved["best_value_epoch"] == expected_epoch
+    assert saved["best_epoch"] == 0
+    best_value = Path(tiny_training["log"]["dir"]) / "checkpoints/bc_best_value.pt"
+    torch.save({}, best_value)
+    scores(value_scores[3:])
+    bc.train(tiny_training)
+    final = _state(tiny_training)
+    assert final["best_value_epoch"] == expected_epoch
+    assert final["best_value_mse"] == min(value_scores)
+    _assert_state_equal(saved["best_value_model"], final["best_value_model"])
+    _assert_state_equal(saved["best_value_model"], torch.load(best_value, weights_only=True))
+
+
+def test_best_value_option_defaults_off_and_preserves_training(tiny_training):
+    default = copy.deepcopy(tiny_training)
+    _seed_external()
+    bc.train(default)
+    directory = Path(default["log"]["dir"]) / "checkpoints"
+    assert not (directory / "bc_best_value.pt").exists()
+    enabled = copy.deepcopy(tiny_training)
+    enabled["log"]["dir"] += "-value"
+    enabled["bc"]["keep_best_value"] = True
+    _seed_external()
+    bc.train(enabled)
+    _assert_state_equal(_state(default)["model"], _state(enabled)["model"])
+    ignored = {"seconds_per_epoch", "train_rows_per_second"}
+    assert [{k: v for k, v in r.items() if k not in ignored} for r in _history(default)] == [
+        {k: v for k, v in r.items() if k not in ignored} for r in _history(enabled)
+    ]
+    config = load_config_with_args("configs/replay_blueprint_cpu.yaml", ["bc.keep_best_value=true"])
+    assert config["bc"]["keep_best_value"] is True

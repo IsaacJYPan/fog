@@ -19,7 +19,7 @@ def _args(tmp_path, **changes):
     values = dict(games=6, work_dir=tmp_path / "run", device="cpu", batch_size=256,
                   epochs=2, workers=1, config=Path("configs/replay_blueprint_cpu.yaml"),
                   holdout_ids=tmp_path / "absent.txt", chronological_holdout_games=2,
-                  max_shards=46, max_download_mb=6000, parquet=[])
+                  max_shards=46, max_download_mb=6000, parquet=[], prepare_only=False)
     values.update(changes)
     return argparse.Namespace(**values)
 
@@ -130,6 +130,28 @@ def test_runner_refuses_missing_fixed_holdout_before_starting_import(tmp_path, m
         runner.run(args)
     assert calls == []
     assert not args.work_dir.exists()
+
+
+def test_prepare_only_skips_cuda_check_and_resumes_without_repreparing(tmp_path, monkeypatch):
+    args = _args(tmp_path, prepare_only=True, device="cuda")
+    calls = _stub_scripts(monkeypatch, args)
+    import torch
+
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+    assert runner.run(args) == args.work_dir / "split"
+    assert [command[3] for command in calls] == [
+        "fog.scripts.import_metamon_replays", "fog.scripts.convert_replay_decisions",
+        "fog.scripts.split_replay_manifest",
+    ]
+    assert not (args.work_dir / "training").exists()
+    assert not (args.work_dir / "results").exists()
+    before = len(calls)
+    args.prepare_only = False
+    monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+    assert runner.run(args) == args.work_dir / "results"
+    assert [command[3] for command in calls[before:]] == [
+        "fog.training.bc", "fog.eval.replay_holdout_report", "fog.eval.replay_holdout_report",
+    ]
 
 
 def test_runner_refuses_changed_training_arguments(tmp_path, monkeypatch):

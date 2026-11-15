@@ -34,13 +34,18 @@ to switch on; use exactly those. If it names none, use the current model.
 
 Import and convert with the merged converter (`--resume`): the fixed 2,000-game holdout, and
 nested training sets of 20,000 and 100,000 games (as many as pass the filters; brief 05
-prepared 101,928). Report games, rows, row counts per split, and the row check of
+prepared 101,928). **Drop every training row whose acting side has a team composition that
+is in `data/teams/replay_v1/validation`** (the six preview species as a multiset; do it when
+building the training manifest, and report how many games and rows it removes): those teams
+are used for evaluation in stage 3, and the roadmap requires evaluation teams to be disjoint
+from training teams by composition. Report games, rows, row counts per split, and the row check of
 `fog.eval.replay_slot_order_check` on the holdout (label share per move slot near 25%).
 
 ## 4. Stage 2: training
 
 1. One epoch on 20,000 games first, to measure rows per second and seconds per validation.
-   Brief 05 measured 583 rows/s before the loop fix. From the measurement, choose the largest
+   Brief 05 measured 583 to 644 rows/s before the loop fix (29 minutes an epoch at 20,000
+   games; all 101,928 games for six epochs projected to 15.9 hours). From the measurement, choose the largest
    nested training set and epoch count that finish inside the budget with two hours spare,
    and write the arithmetic down before starting.
 2. Train 20,000 games to its best holdout policy NLL, then the larger set. Batch 1,024. Save
@@ -50,7 +55,10 @@ prepared 101,928). Report games, rows, row counts per split, and the row check o
    that resample games, the ten-bin reliability table, and the slot check (stored against
    shuffled).
 
-Apply ROADMAP P2.4's decision rule to the 20,000-to-larger step and state the outcome.
+Apply ROADMAP P2.4's decision rule to the 20,000-to-larger step and state the outcome. Give
+the two sizes the same number of epochs, or say that the rule could not be applied. For
+reference, on the old rows brief 05 got holdout NLL 1.2786 and 1.2634 (inflated), own-best
+value Brier 0.215 and 0.209, and play of 0.52 against SimpleHeuristics at both sizes.
 
 ## 5. Stage 3: play
 

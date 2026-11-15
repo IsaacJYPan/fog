@@ -1,0 +1,16 @@
+{
+  "label": "smoke owner-download round trip",
+  "slug": "fog-p2-gpu-checkpoints-20261114",
+  "is_private": true,
+  "dataset_version": 2,
+  "command": "uv run --no-project --with kaggle==2.2.5 --with six python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values[\"username\"]+\"/fog-p2-gpu-checkpoints-20261114\", path=\"checkpoints\", unzip=True, quiet=True)'",
+  "working_directory": "runs/p2_gpu_checkpoint_portable_G20",
+  "downloaded_files_verified": [
+    "G3-bc_best.pt",
+    "G3-bc_best_value.pt",
+    "G20-bc_best.pt",
+    "G20-bc_best_value.pt"
+  ],
+  "all_sizes_and_sha256_match": true,
+  "wall_seconds": 30.302243778998672
+}

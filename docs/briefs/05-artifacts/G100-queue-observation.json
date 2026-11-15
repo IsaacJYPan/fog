@@ -1,0 +1,11 @@
+{
+  "label": "smoke queue/accounting observation, not training throughput",
+  "job": "fog-p2-g100-20261114",
+  "status": "QUEUED",
+  "status_observed_at_utc": "2026-11-14T16:10:22.699829+00:00",
+  "account_quota_hours": 11.118818888888889,
+  "recent_official_reserved_gpu_hours": 0.0,
+  "total_allowed_gpu_hours": 45.0,
+  "recorded_before_utc": "2026-11-14T16:10:58.993334+00:00",
+  "note": "Quota and reservations have not increased while queued. Submission-wall time includes this uncharged queue and is only a loose bound; preserve the final account-counter delta separately."
+}

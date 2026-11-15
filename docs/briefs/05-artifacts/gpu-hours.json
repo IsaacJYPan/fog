@@ -1,0 +1,136 @@
+{
+  "budget_gpu_hours": 20,
+  "jobs": [
+    {
+      "slug": "fog-p2-g3-stop-20261114",
+      "status": "ERROR before training: expanded input archive",
+      "timeout_seconds": 600,
+      "actual_gpu_hours": 0.038574722222222226,
+      "expected_session_minutes": [
+        3,
+        6
+      ],
+      "planning_basis": "Initial GPU speed unmeasured; roughly 90 s feed floor from brief 03 CPU batch-only measurement plus GPU computation, install and export. Not a measured GPU estimate.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333,
+      "quota_seconds_used": 138.869
+    },
+    {
+      "slug": "fog-p2-g3-stop2-20261114",
+      "status": "CANCEL_ACKNOWLEDGED; no training output returned",
+      "timeout_seconds": 600,
+      "actual_gpu_hours": 0.16972194444444444,
+      "quota_start_seconds": 138.869,
+      "expected_session_minutes": [
+        4,
+        7
+      ],
+      "planning_basis": "Measured first hosted install 126.478 s, remaining GPU computation unmeasured; two epochs then export.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333,
+      "quota_seconds_used": 610.999
+    },
+    {
+      "slug": "fog-p2-g3-stop3-20261114",
+      "status": "COMPLETE outer job; training interrupted before epoch 1",
+      "timeout_seconds": 600,
+      "internal_job_seconds_before_export": 480,
+      "actual_gpu_hours": 0.15158194444444445,
+      "quota_start_seconds": 749.868,
+      "expected_session_minutes": [
+        4,
+        7
+      ],
+      "planning_basis": "Measured hosted install 97-126 s; opaque extraction and training unmeasured; export starts by internal deadline.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "conservative_cap_gpu_hours_if_two_devices": 0.3333333333333333,
+      "quota_seconds_used": 545.695
+    },
+    {
+      "slug": "fog-p2-g3-stop4-20261114",
+      "status": "COMPLETE outer job; deliberately interrupted after epoch 1",
+      "timeout_seconds": 1800,
+      "internal_job_seconds_before_export": 1500,
+      "actual_gpu_hours": 0.22910749999999994,
+      "quota_start_seconds": 1295.563,
+      "expected_session_minutes": [
+        9,
+        27
+      ],
+      "planning_basis": "Prior worker stopped after roughly 365 s without a complete epoch; opaque restore measured 21.109 s and install 92.656 s. Longer first-epoch measurement, bounded within stage 1 budget.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "quota_seconds_used": 824.7869999999998
+    },
+    {
+      "slug": "fog-p2-g3-resume-20261114",
+      "status": "COMPLETE outer job; deliberately stopped after epoch 2, both reports returned",
+      "timeout_seconds": 1400,
+      "internal_job_seconds_before_export": 1200,
+      "actual_gpu_hours": 0.29002916666666667,
+      "quota_start_seconds": 2120.35,
+      "expected_session_minutes": [
+        15,
+        20
+      ],
+      "planning_basis": "One resumed 413.509-second epoch, two partial-checkpoint reports, measured hosted setup/restore/export overhead.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "quota_seconds_used": 1044.105
+    },
+    {
+      "slug": "fog-p2-g20-20261114",
+      "status": "COMPLETE; full 18-epoch CSV and both selected-checkpoint reports collected",
+      "timeout_seconds": 39600,
+      "internal_job_seconds_before_export": 38400,
+      "actual_gpu_hours": null,
+      "quota_start_seconds": 3164.455,
+      "expected_gpu_hours": 9.596168824074969,
+      "planning_basis": "Slowest measured G3 epoch, conservative measured validation time, and 1,000 s setup/report/export/write allowance; see G20-plan.json.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "session_seconds_upper": 35426.124028,
+      "session_start_conservative_utc": "2026-11-14T04:27:00+00:00",
+      "terminal_observed_utc": "2026-11-14T14:17:26.124028+00:00",
+      "session_quota_hours_upper": 9.840590007777777,
+      "account_quota_delta_includes_other_brief": true,
+      "quota_delta_seconds_including_other_brief": 36863.293,
+      "actual_gpu_hours_note": "Shared quota delta is not attributable to G20; use its own measured session upper bound."
+    },
+    {
+      "slug": "fog-p2-g100-20261114",
+      "status": "COMPLETE; six epochs, both reports, private persistence and CPU play complete",
+      "timeout_seconds": 28200,
+      "internal_job_seconds_before_export": 27000,
+      "actual_gpu_hours": null,
+      "quota_start_seconds": 40027.748,
+      "submission_started_utc": "2026-11-14T14:42:59.655880+00:00",
+      "expected_gpu_hours": 6.881063065200146,
+      "expected_training_games": 40955,
+      "expected_training_rows": 2090705,
+      "expected_epochs": 6,
+      "planning_basis": "Actual slowest G20 rate and max validation, rounded measured archive-scaled overhead, largest seeded nested prefix, two-hour forecast reserve; see G100-plan.json.",
+      "requested_accelerator": "NvidiaTeslaT4",
+      "source_commit": "46e9c0da2c1b6caa01ab3da0b5bba2e103029662",
+      "session_seconds_upper": 35407.041668,
+      "session_quota_hours_upper": 9.835289352222222,
+      "terminal_observed_utc": "2026-11-15T00:33:06.697548+00:00",
+      "account_quota_delta_seconds": 21455.021999999997,
+      "actual_gpu_hours_note": "Exact isolated per-job charge is unavailable; the 5.959728-hour account-counter delta is a conservative charge bound and excludes the uncharged queue. The longer submission-wall bound is retained separately.",
+      "submission_wall_hours_upper": 9.835289352222222,
+      "charge_counter_delta_comparable": true,
+      "charged_quota_hours_upper": 5.959728333333333,
+      "charge_bound_basis": "minimum of submission-wall upper bound and account-counter delta; the latter excludes uncharged queue and may include unrelated account activity"
+    }
+  ],
+  "used_gpu_hours": null,
+  "quota_before": {
+    "gpu_used_hours": 0,
+    "gpu_remaining_hours": 45,
+    "command": "kaggle quota --format json"
+  },
+  "status": "COMPLETE: G20 and six-epoch nested fallback collected, six private weights verified, both CPU play evaluations complete",
+  "last_observed_total_quota_hours": 17.07854722222222,
+  "calibration_gpu_hours": 0.8790152777777778,
+  "used_account_quota_hours_for_conservative_budget": 17.07854722222222,
+  "replay_jobs_quota_hours_upper": 16.679333618888887,
+  "budget_accounting_units": "Kaggle quota-hours; two T4s visible, CUDA device 0 used. The account total also includes earlier work from another brief.",
+  "remaining_budget_quota_hours_conservative": 2.9214527777777803
+}

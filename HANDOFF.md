@@ -11,8 +11,9 @@ named) or **[assumed]**.
 2. `docs/briefs/REVIEW.md`: how a finished task is checked and merged.
 3. `AGENTS.md`, `ROADMAP.md`, and the newest sections of `docs/results-ledger.md`.
 
-**Today:** start briefs 09 and 10 (CPU, in parallel). Start brief 08 when the GPU is free.
-Review brief 05 when its worker reports the larger run.
+**Now:** start briefs 09 and 11 (CPU, in parallel) and brief 08 (GPU). Briefs 05 and 10 are
+merged; their reviews are the newest ledger sections. The table of unmerged branches in
+section 2 is out of date in that respect: nothing is waiting for review.
 
 ## 1. Objective and arrangement
 

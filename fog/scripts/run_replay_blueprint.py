@@ -147,7 +147,7 @@ def run(args: argparse.Namespace) -> Path:
             "holdout IDs before a scale run; --chronological-holdout-games is only "
             "an alternative holdout for a smoke run."
         )
-    if args.device == "cuda":
+    if args.device == "cuda" and not args.prepare_only:
         import torch
 
         if not torch.cuda.is_available():
@@ -159,7 +159,7 @@ def run(args: argparse.Namespace) -> Path:
     logs.mkdir(exist_ok=True)
     state_path = work / "run.json"
     settings = {key: (str(value) if isinstance(value, Path) else value)
-                for key, value in vars(args).items() if key != "work_dir"}
+                for key, value in vars(args).items() if key not in {"work_dir", "prepare_only"}}
     settings["parquet"] = [str(path) for path in args.parquet]
     settings["resolved_config"] = load_config(args.config)
     settings["holdout_contents"] = (args.holdout_ids.read_text(encoding="utf-8")
@@ -316,6 +316,11 @@ def run(args: argparse.Namespace) -> Path:
         print(f"Training on all {training_counts[0]} eligible games; fewer than 100000 remain",
               flush=True)
 
+    if args.prepare_only:
+        print(f"Prepared: {split}; training games/rows: {training_counts}; "
+              f"holdout games/rows: {holdout_counts}", flush=True)
+        return split
+
     training = work / "training"
     stage("train", lambda: _train_complete(training, args.epochs), lambda: [_command(
         "fog.training.bc", "--config", args.config, "--set",
@@ -372,6 +377,8 @@ def main() -> None:
     parser.add_argument("--batch-size", type=int, default=1024)
     parser.add_argument("--epochs", type=int, default=6)
     parser.add_argument("--workers", type=int, default=4)
+    parser.add_argument("--prepare-only", action="store_true",
+                        help="import, convert and split on CPU, then exit before training")
     parser.add_argument("--config", type=Path, default=Path("configs/replay_blueprint_cpu.yaml"))
     holdout = parser.add_mutually_exclusive_group()
     holdout.add_argument("--holdout-ids", type=Path, default=DEFAULT_HOLDOUT)

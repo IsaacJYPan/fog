@@ -1,0 +1,28 @@
+{
+  "status": "smoke, partial G3 after verified cross-job continuation",
+  "target_epochs": 18,
+  "completed_epochs": 2,
+  "policy_epoch": 2,
+  "value_epoch": 2,
+  "training_rows_per_second_aggregate": 613.0273672036343,
+  "epoch_training_rows_per_second": [
+    604.1942443236809,
+    622.122596751296
+  ],
+  "epoch_validation_seconds": [
+    154.32265983899993,
+    149.77815582799997
+  ],
+  "peak_gpu_memory_bytes": 2619988480,
+  "training_value_mse_at_policy_epoch": 0.9889021559926369,
+  "training_value_mse_at_value_epoch": 0.9889021559926369,
+  "policy_report": "G3-holdout-best.json",
+  "value_report": "G3-holdout-best-value.json",
+  "heldout_policy_nll": 1.8956713002508316,
+  "heldout_top1": 0.3003914176628423,
+  "heldout_value_mse": 0.9791137188483331,
+  "heldout_brier": 0.24477842971208327,
+  "heldout_ece": 0.03312375930298456,
+  "late_brier_below_early": 0.006287201718903068,
+  "full_batch_device_comparison_status": "not verified; full G3 does not fit calibration hour"
+}

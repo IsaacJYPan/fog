@@ -690,6 +690,7 @@ def train(cfg: dict) -> dict:
             raise ValueError("bc.torch_threads must be positive")
         torch.set_num_threads(threads)
     selection_metric = str(bc_cfg.get("selection_metric", "loss"))
+    keep_best_value = bool(bc_cfg.get("keep_best_value", False))
     if selection_metric not in {"loss", "action_ce"}:
         raise ValueError("bc.selection_metric must be 'loss' or 'action_ce'")
     loss_cfg = cfg.get("loss", {})
@@ -1097,6 +1098,8 @@ def train(cfg: dict) -> dict:
         # was committed. Restore both to the last complete epoch before replaying that epoch.
         _write_metrics(metrics_path, history)
         torch.save(resumed["best_model"], ckpt_dir / "bc_best.pt")
+        if keep_best_value:
+            torch.save(resumed["best_value_model"], ckpt_dir / "bc_best_value.pt")
         _restore_rng_state(resumed["rng"])
         print(f"[bc] resume: completed epoch {resumed['epoch']}/{epochs}", flush=True)
     if guard_baseline is not None and guard_metric not in guard_baseline:
@@ -1191,11 +1194,15 @@ def train(cfg: dict) -> dict:
     best_eval_loss = initial_selection_loss
     best_meaningful_eval_loss = initial_selection_loss
     best_epoch = 0
+    best_value_mse = baseline["value"]
+    best_value_epoch = 0
     epochs_without_improvement = 0
     step = 0
     start_epoch = 0
     if resumed is None:
         torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
+        if keep_best_value:
+            torch.save(agent.state_dict(), ckpt_dir / "bc_best_value.pt")
     else:
         best_eval_loss = resumed["best_eval_loss"]
         best_meaningful_eval_loss = resumed["best_meaningful_eval_loss"]
@@ -1204,6 +1211,9 @@ def train(cfg: dict) -> dict:
         step = resumed["step"]
         start_epoch = resumed["epoch"]
         metrics = resumed["metrics"]
+        if keep_best_value:
+            best_value_mse = resumed["best_value_mse"]
+            best_value_epoch = resumed["best_value_epoch"]
         if resumed["early_stopped"]:
             start_epoch = epochs
     for epoch in range(start_epoch, epochs):
@@ -1621,6 +1631,11 @@ def train(cfg: dict) -> dict:
             best_epoch = epoch + 1
             torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
 
+        if keep_best_value and eval_metrics["value"] < best_value_mse:
+            best_value_mse = eval_metrics["value"]
+            best_value_epoch = epoch + 1
+            torch.save(agent.state_dict(), ckpt_dir / "bc_best_value.pt")
+
         if selection_loss < best_meaningful_eval_loss - early_stopping_min_delta:
             best_meaningful_eval_loss = selection_loss
             epochs_without_improvement = 0
@@ -1683,6 +1698,13 @@ def train(cfg: dict) -> dict:
                     "guard_baseline": guard_baseline,
                     "initial_digests": initial_digests,
                     "rng": _rng_state(),
+                    **({
+                        "best_value_mse": best_value_mse,
+                        "best_value_epoch": best_value_epoch,
+                        "best_value_model": torch.load(
+                            ckpt_dir / "bc_best_value.pt", map_location="cpu", weights_only=False
+                        ),
+                    } if keep_best_value else {}),
                 },
                 state_path,
             )

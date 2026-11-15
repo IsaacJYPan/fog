@@ -1,0 +1,17 @@
+BC dataset: train=2090705 decision rows; holdout=104037 rows  (config_hash=33d693b9c73c, torch_threads=2)
+[bc] baseline  loss=3.671  belief=13.157  chain=3.994
+[bc] epoch 1/6  train_loss=2.520  eval_loss=2.267  belief=5.027  chain=1.706  value=0.862  query_p=0.326  dropped=0.000%
+Saved epoch 1; peak GPU bytes 2621049856
+[bc] epoch 2/6  train_loss=2.161  eval_loss=2.121  belief=4.665  chain=1.588  value=0.851  query_p=0.350  dropped=0.000%
+Saved epoch 2; peak GPU bytes 2621049856
+[bc] epoch 3/6  train_loss=2.031  eval_loss=2.038  belief=4.508  chain=1.531  value=0.842  query_p=0.372  dropped=0.000%
+Saved epoch 3; peak GPU bytes 2621049856
+[bc] epoch 4/6  train_loss=1.951  eval_loss=1.991  belief=4.337  chain=1.492  value=0.842  query_p=0.377  dropped=0.000%
+Saved epoch 4; peak GPU bytes 2621049856
+[bc] epoch 5/6  train_loss=1.901  eval_loss=1.971  belief=4.286  chain=1.475  value=0.836  query_p=0.385  dropped=0.000%
+Saved epoch 5; peak GPU bytes 2621049856
+[bc] epoch 6/6  train_loss=1.882  eval_loss=1.973  belief=4.283  chain=1.476  value=0.844  query_p=0.383  dropped=0.000%
+Saved epoch 6; peak GPU bytes 2621156352
+[bc] done -> /kaggle/working/replay-work/G100/checkpoints/bc_final.pt  (best eval epoch=6, loss=1.263)
+rows=104037 policy_rows=103981 top1=0.5455 lift=5.708 nll=1.2634 brier=0.2110 ece=0.0243 seconds=207.9 -> /kaggle/working/results/holdout-bc_best.json
+rows=104037 policy_rows=103981 top1=0.5450 lift=5.703 nll=1.2651 brier=0.2089 ece=0.0091 seconds=209.3 -> /kaggle/working/results/holdout-bc_best_value.json

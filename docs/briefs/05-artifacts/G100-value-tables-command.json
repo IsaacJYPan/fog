@@ -1,0 +1,10 @@
+{
+  "label": "smoke",
+  "command": [
+    "/workspace/fog/.venv/bin/python",
+    "runs/p2_gpu_checks/summarize_value.py"
+  ],
+  "source_commit": "20fbada8f3cf6307262b9ba314c29ea81087cf55",
+  "wall_seconds": 0.02487203199416399,
+  "exit_code": 0
+}

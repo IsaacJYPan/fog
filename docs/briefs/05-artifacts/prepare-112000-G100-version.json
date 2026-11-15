@@ -1,0 +1,19 @@
+{
+  "label": "smoke CPU-prepared private input persistence",
+  "slug": "fog-p2-gpu-112000-20261114",
+  "is_private": true,
+  "status": "ready",
+  "version_before": 1,
+  "version_after": 2,
+  "old_versions_deleted": false,
+  "files": {
+    "replay-work.bin": 2386510456
+  },
+  "sha256": "5457cc642d2ecc63152a36ec4d2d78cf150c8efeaa1c37209807be1429fbfe9f",
+  "nested_training_games": 40955,
+  "nested_training_rows": 2090705,
+  "fixed_holdout_games": 2000,
+  "wall_seconds": 704.2529346049996,
+  "gpu_time_used": 0,
+  "command": "KaggleApi.dataset_create_version(quiet=True, convert_to_csv=False, delete_old_versions=False)"
+}

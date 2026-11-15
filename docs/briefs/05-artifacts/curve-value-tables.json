@@ -1,0 +1,878 @@
+{
+  "status": "smoke, available completed/partial outputs only",
+  "curve": [
+    {
+      "run": "B",
+      "status": "historical full 18-epoch CPU smoke",
+      "training_games": 3000,
+      "policy_epoch": 8,
+      "policy": {
+        "rows": 103981,
+        "top1": 0.44080168492320715,
+        "nll": 1.5790178625761455,
+        "avg_legal_actions": 10.464161721853031,
+        "top1_lift": 4.612620118301745,
+        "move": {
+          "rows": 74874,
+          "top1": 0.5299703501883164,
+          "nll": 1.305971177766763,
+          "avg_legal_actions": 10.32029810080936,
+          "top1_lift": 5.469451998533753
+        },
+        "switch": {
+          "rows": 29107,
+          "top1": 0.21142680454873397,
+          "nll": 2.2813952109259468,
+          "avg_legal_actions": 10.834232315250627,
+          "top1_lift": 2.290647118152072
+        }
+      },
+      "value": {
+        "rows": 104037,
+        "value_mse": 1.3780044139488663,
+        "brier": 0.3445011034872166,
+        "ece": 0.2987564215133597,
+        "reliability": [
+          {
+            "bin": 0,
+            "lo": 0.0,
+            "hi": 0.1,
+            "count": 23255,
+            "mean_predicted": 0.03488040383183502,
+            "observed_win_rate": 0.39673188561599654
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 6617,
+            "mean_predicted": 0.14628155968404347,
+            "observed_win_rate": 0.44461236209762733
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "count": 5212,
+            "mean_predicted": 0.24915610413343653,
+            "observed_win_rate": 0.4746738296239447
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "count": 4456,
+            "mean_predicted": 0.3493222804034473,
+            "observed_win_rate": 0.486983842010772
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 4412,
+            "mean_predicted": 0.450056605230822,
+            "observed_win_rate": 0.4986400725294651
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "count": 4633,
+            "mean_predicted": 0.5504714316932239,
+            "observed_win_rate": 0.49622274983811787
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "count": 5191,
+            "mean_predicted": 0.6519568295271335,
+            "observed_win_rate": 0.5029859371989983
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "count": 6473,
+            "mean_predicted": 0.7510737079235532,
+            "observed_win_rate": 0.5102734435346825
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 8513,
+            "mean_predicted": 0.8538388723907271,
+            "observed_win_rate": 0.5244919534829084
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 35275,
+            "mean_predicted": 0.9686058017820606,
+            "observed_win_rate": 0.5914953933380581
+          }
+        ]
+      },
+      "source": "B-holdout-best.json"
+    },
+    {
+      "run": "G3",
+      "status": "smoke, partial G3 after verified cross-job continuation",
+      "training_games": 3000,
+      "policy_epoch": 2,
+      "policy": {
+        "rows": 103981,
+        "top1": 0.3003914176628423,
+        "nll": 1.8956713002508316,
+        "avg_legal_actions": 10.464161721853031,
+        "top1_lift": 3.1433443742806806,
+        "move": {
+          "rows": 74874,
+          "top1": 0.36383791436279617,
+          "nll": 1.697881762933018,
+          "avg_legal_actions": 10.32029810080936,
+          "top1_lift": 3.754915736600804
+        },
+        "switch": {
+          "rows": 29107,
+          "top1": 0.13718349537911842,
+          "nll": 2.404459351823786,
+          "avg_legal_actions": 10.834232315250627,
+          "top1_lift": 1.48627785875548
+        }
+      },
+      "value": {
+        "rows": 104037,
+        "value_mse": 0.9791137188483331,
+        "brier": 0.24477842971208327,
+        "ece": 0.03312375930298456,
+        "reliability": [
+          {
+            "bin": 0,
+            "lo": 0.0,
+            "hi": 0.1,
+            "count": 0,
+            "mean_predicted": null,
+            "observed_win_rate": null
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 0,
+            "mean_predicted": null,
+            "observed_win_rate": null
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "count": 0,
+            "mean_predicted": null,
+            "observed_win_rate": null
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "count": 2183,
+            "mean_predicted": 0.38818478190770567,
+            "observed_win_rate": 0.24599175446633073
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 74758,
+            "mean_predicted": 0.46304253692060515,
+            "observed_win_rate": 0.470718852831804
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "count": 26925,
+            "mean_predicted": 0.5259641446545736,
+            "observed_win_rate": 0.6192757660167131
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "count": 171,
+            "mean_predicted": 0.6116506571048185,
+            "observed_win_rate": 0.9005847953216374
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "count": 0,
+            "mean_predicted": null,
+            "observed_win_rate": null
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 0,
+            "mean_predicted": null,
+            "observed_win_rate": null
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 0,
+            "mean_predicted": null,
+            "observed_win_rate": null
+          }
+        ]
+      },
+      "source": "G3-holdout-best.json"
+    },
+    {
+      "run": "G20",
+      "status": "smoke, complete training schedule",
+      "training_games": 20000,
+      "policy_epoch": 12,
+      "policy": {
+        "rows": 103981,
+        "top1": 0.544368682740116,
+        "nll": 1.278605057795469,
+        "avg_legal_actions": 10.464161721853031,
+        "top1_lift": 5.696361932504678,
+        "move": {
+          "rows": 74874,
+          "top1": 0.6475679140956807,
+          "nll": 1.0116772348290652,
+          "avg_legal_actions": 10.32029810080936,
+          "top1_lift": 6.683093913986733
+        },
+        "switch": {
+          "rows": 29107,
+          "top1": 0.27890198234101765,
+          "nll": 1.9652424239543496,
+          "avg_legal_actions": 10.834232315250627,
+          "top1_lift": 3.021688869866513
+        }
+      },
+      "value": {
+        "rows": 104037,
+        "value_mse": 1.0174227106139881,
+        "brier": 0.25435567765349704,
+        "ece": 0.1536326063660996,
+        "reliability": [
+          {
+            "bin": 0,
+            "lo": 0.0,
+            "hi": 0.1,
+            "count": 14021,
+            "mean_predicted": 0.05068285961896255,
+            "observed_win_rate": 0.23906996647885315
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 9692,
+            "mean_predicted": 0.14787769594064096,
+            "observed_win_rate": 0.3840280643829963
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "count": 8407,
+            "mean_predicted": 0.2495023049542662,
+            "observed_win_rate": 0.421553467348638
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "count": 9299,
+            "mean_predicted": 0.3511129800153748,
+            "observed_win_rate": 0.44843531562533606
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 10471,
+            "mean_predicted": 0.4497303411073542,
+            "observed_win_rate": 0.5024352974883011
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "count": 9414,
+            "mean_predicted": 0.5488108900942815,
+            "observed_win_rate": 0.5146590184831102
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "count": 8594,
+            "mean_predicted": 0.6490249152891103,
+            "observed_win_rate": 0.5393297649522923
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "count": 7851,
+            "mean_predicted": 0.7503978170235284,
+            "observed_win_rate": 0.5797987517513693
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 10018,
+            "mean_predicted": 0.8540571417892305,
+            "observed_win_rate": 0.6264723497704132
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 16270,
+            "mean_predicted": 0.9504903997353564,
+            "observed_win_rate": 0.7497234173325138
+          }
+        ]
+      },
+      "source": "G20-holdout-best.json"
+    },
+    {
+      "run": "G100",
+      "status": "smoke, complete training schedule",
+      "training_games": 40955,
+      "policy_epoch": 6,
+      "policy": {
+        "rows": 103981,
+        "top1": 0.5454746540233312,
+        "nll": 1.2634368950146473,
+        "avg_legal_actions": 10.464161721853031,
+        "top1_lift": 5.707934994871968,
+        "move": {
+          "rows": 74874,
+          "top1": 0.638365787856933,
+          "nll": 1.032195536579634,
+          "avg_legal_actions": 10.32029810080936,
+          "top1_lift": 6.5881252280415765
+        },
+        "switch": {
+          "rows": 29107,
+          "top1": 0.30652420379977324,
+          "nll": 1.8582754380270898,
+          "avg_legal_actions": 10.834232315250627,
+          "top1_lift": 3.3209544342139723
+        }
+      },
+      "value": {
+        "rows": 104037,
+        "value_mse": 0.8439572913684429,
+        "brier": 0.21098932284211072,
+        "ece": 0.024287479513263627,
+        "reliability": [
+          {
+            "bin": 0,
+            "lo": 0.0,
+            "hi": 0.1,
+            "count": 3521,
+            "mean_predicted": 0.06657824340072487,
+            "observed_win_rate": 0.09400738426583358
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 7033,
+            "mean_predicted": 0.1529150530537009,
+            "observed_win_rate": 0.18626475188397554
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "count": 9439,
+            "mean_predicted": 0.2517867275028363,
+            "observed_win_rate": 0.2813857400148321
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "count": 12087,
+            "mean_predicted": 0.3524746555396431,
+            "observed_win_rate": 0.3714734839083313
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 17933,
+            "mean_predicted": 0.45431975577831013,
+            "observed_win_rate": 0.46233201360620085
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "count": 18615,
+            "mean_predicted": 0.5462705866839899,
+            "observed_win_rate": 0.5363953800698361
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "count": 12540,
+            "mean_predicted": 0.6479046761912355,
+            "observed_win_rate": 0.6058213716108453
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "count": 10472,
+            "mean_predicted": 0.7492413242967234,
+            "observed_win_rate": 0.7064553093964858
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 8054,
+            "mean_predicted": 0.8471451442043924,
+            "observed_win_rate": 0.8102806059101068
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 4343,
+            "mean_predicted": 0.9342501915780295,
+            "observed_win_rate": 0.9143449228643794
+          }
+        ]
+      },
+      "source": "G100-holdout-best.json"
+    }
+  ],
+  "value": [
+    {
+      "run": "B",
+      "selection": "policy",
+      "epoch": 8,
+      "training_value_mse": 0.2720150538745187,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 1.3780044139488663,
+        "brier": 0.3445011034872166,
+        "ece": 0.2987564215133597
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.343345436150971,
+          "value_mse": 1.373381744603884,
+          "ece": 0.2782107887396412
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.36372281102863524,
+          "value_mse": 1.454891244114541,
+          "ece": 0.32812319009522606
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.32732409543247815,
+          "value_mse": 1.3092963817299126,
+          "ece": 0.29110705926150915
+        }
+      },
+      "source": "B-holdout-best.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 23255,
+        "mean_predicted": 0.03488040383183502,
+        "observed_win_rate": 0.39673188561599654,
+        "share": 0.2235262454703615
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 35275,
+        "mean_predicted": 0.9686058017820606,
+        "observed_win_rate": 0.5914953933380581,
+        "share": 0.3390620644578371
+      },
+      "extreme_share": 0.5625883099281986,
+      "extreme_observed_win_rate": 0.5141124209806937
+    },
+    {
+      "run": "B",
+      "selection": "value",
+      "epoch": 4,
+      "training_value_mse": 0.746102672385065,
+      "overall": {
+        "value_mse": 0.9565520444353067,
+        "brier": null,
+        "ece": null
+      },
+      "by_phase": null,
+      "low_probability": null,
+      "high_probability": null,
+      "extreme_share": null,
+      "unavailable": "historical own-best value weights/report absent; no new training"
+    },
+    {
+      "run": "G3",
+      "selection": "policy",
+      "epoch": 2,
+      "training_value_mse": 0.9889021559926369,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.9791137188483331,
+        "brier": 0.24477842971208327,
+        "ece": 0.03312375930298456
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.24806435695731047,
+          "value_mse": 0.9922574278292419,
+          "ece": 0.020288472240995947
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.24451401840655917,
+          "value_mse": 0.9780560736262367,
+          "ece": 0.027854439368650827
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.2417771552384074,
+          "value_mse": 0.9671086209536296,
+          "ece": 0.05085405432776639
+        }
+      },
+      "source": "G3-holdout-best.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 0,
+        "mean_predicted": null,
+        "observed_win_rate": null,
+        "share": 0.0
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 0,
+        "mean_predicted": null,
+        "observed_win_rate": null,
+        "share": 0.0
+      },
+      "extreme_share": 0.0,
+      "extreme_observed_win_rate": null
+    },
+    {
+      "run": "G3",
+      "selection": "value",
+      "epoch": 2,
+      "training_value_mse": 0.9889021559926369,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.9791137188483331,
+        "brier": 0.24477842971208327,
+        "ece": 0.03312375930298456
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.24806435695731047,
+          "value_mse": 0.9922574278292419,
+          "ece": 0.020288472240995947
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.24451401840655917,
+          "value_mse": 0.9780560736262367,
+          "ece": 0.027854439368650827
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.2417771552384074,
+          "value_mse": 0.9671086209536296,
+          "ece": 0.05085405432776639
+        }
+      },
+      "source": "G3-holdout-best-value.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 0,
+        "mean_predicted": null,
+        "observed_win_rate": null,
+        "share": 0.0
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 0,
+        "mean_predicted": null,
+        "observed_win_rate": null,
+        "share": 0.0
+      },
+      "extreme_share": 0.0,
+      "extreme_observed_win_rate": null
+    },
+    {
+      "run": "G20",
+      "selection": "policy",
+      "epoch": 12,
+      "training_value_mse": 0.5434207237074004,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 1.0174227106139881,
+        "brier": 0.25435567765349704,
+        "ece": 0.1536326063660996
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.2708913151945205,
+          "value_mse": 1.083565260778082,
+          "ece": 0.12931751212150905
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.27767310300615305,
+          "value_mse": 1.1106924120246122,
+          "ece": 0.19475665168158487
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.21575919689065667,
+          "value_mse": 0.8630367875626267,
+          "ece": 0.1385088092208185
+        }
+      },
+      "source": "G20-holdout-best.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 14021,
+        "mean_predicted": 0.05068285961896255,
+        "observed_win_rate": 0.23906996647885315,
+        "share": 0.1347693609004489
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 16270,
+        "mean_predicted": 0.9504903997353564,
+        "observed_win_rate": 0.7497234173325138,
+        "share": 0.15638667012697405
+      },
+      "extreme_share": 0.29115603102742293,
+      "extreme_observed_win_rate": 0.5133538014591793
+    },
+    {
+      "run": "G20",
+      "selection": "value",
+      "epoch": 4,
+      "training_value_mse": 0.8327603633962365,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.8612813703334076,
+        "brier": 0.2153203425833519,
+        "ece": 0.016158572745421707
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.2447537836801875,
+          "value_mse": 0.97901513472075,
+          "ece": 0.021834214353568852
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.22277856275701108,
+          "value_mse": 0.8911142510280443,
+          "ece": 0.032836978144609535
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.1790703569503067,
+          "value_mse": 0.7162814278012268,
+          "ece": 0.027886446592544994
+        }
+      },
+      "source": "G20-holdout-best-value.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 2311,
+        "mean_predicted": 0.07512497370607252,
+        "observed_win_rate": 0.07875378623972307,
+        "share": 0.022213251054913157
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 1552,
+        "mean_predicted": 0.9225257174255922,
+        "observed_win_rate": 0.946520618556701,
+        "share": 0.014917769639647433
+      },
+      "extreme_share": 0.03713102069456059,
+      "extreme_observed_win_rate": 0.42738804038312195
+    },
+    {
+      "run": "G100",
+      "selection": "policy",
+      "epoch": 6,
+      "training_value_mse": 0.7940772771632341,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.8439572913684429,
+        "brier": 0.21098932284211072,
+        "ece": 0.024287479513263627
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.2454287299401799,
+          "value_mse": 0.9817149197607196,
+          "ece": 0.032740623428409374
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.21872690133832476,
+          "value_mse": 0.874907605353299,
+          "ece": 0.03623412715321665
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.169516808841161,
+          "value_mse": 0.678067235364644,
+          "ece": 0.008662165709104457
+        }
+      },
+      "source": "G100-holdout-best.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 3521,
+        "mean_predicted": 0.06657824340072487,
+        "observed_win_rate": 0.09400738426583358,
+        "share": 0.033843728673452714
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 4343,
+        "mean_predicted": 0.9342501915780295,
+        "observed_win_rate": 0.9143449228643794,
+        "share": 0.04174476388208041
+      },
+      "extreme_share": 0.07558849255553313,
+      "extreme_observed_win_rate": 0.5470498474059003
+    },
+    {
+      "run": "G100",
+      "selection": "value",
+      "epoch": 5,
+      "training_value_mse": 0.8008614949933437,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.8356347121122167,
+        "brier": 0.20890867802805418,
+        "ece": 0.009065196062646169
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.24359555623942017,
+          "value_mse": 0.9743822249576807,
+          "ece": 0.021997963117434786
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.21614708729019314,
+          "value_mse": 0.8645883491607725,
+          "ece": 0.01829611443133428
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.16766693417767628,
+          "value_mse": 0.6706677367107051,
+          "ece": 0.014700517131490228
+        }
+      },
+      "source": "G100-holdout-best-value.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 2775,
+        "mean_predicted": 0.06834508828214697,
+        "observed_win_rate": 0.0781981981981982,
+        "share": 0.026673202802848985
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 3777,
+        "mean_predicted": 0.9333710090363502,
+        "observed_win_rate": 0.9301032565528197,
+        "share": 0.03630439170679662
+      },
+      "extreme_share": 0.0629775945096456,
+      "extreme_observed_win_rate": 0.5692918192918193
+    }
+  ],
+  "high_bin_boundary": "The saved reports use [0.9,1]. Their float32 values, converted to float64 probabilities as (v+1)/2, cannot map exactly to 0.9, so this also counts strict >0.9.",
+  "p2_4": {
+    "status": "unverified at 100k; budget fallback only",
+    "training_games": [
+      20000,
+      40955
+    ],
+    "observed_nll_improvement": 0.015168162780821781,
+    "larger_point_training_nll": 1.2258381841123642,
+    "larger_point_holdout_nll": 1.2634368950146473,
+    "exact_100k_point_present": false
+  },
+  "value_reading": {
+    "status": "strict 100k reading unverified",
+    "actual_training_games": 40955,
+    "required_training_games": 100000,
+    "own_best_brier": 0.20890867802805418,
+    "early_minus_late_brier": 0.07592862206174389,
+    "satisfies_numerical_thresholds_at_fallback": true
+  }
+}
