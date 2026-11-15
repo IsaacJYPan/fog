@@ -2741,3 +2741,9 @@ Observed saved blocks: 176 games, 140 wins, 5618 decisions, 9 fallbacks, 0 rejec
 Budget charged 40.0000 allocated core-hours. Complete cells: ['800 ms K=8', '200 ms K=8', '3200 ms K=8', '800 ms K=1', '800 ms K=32', '200 ms K=1', '200 ms K=32', '3200 ms K=1']. Unfinished/not run: ['3200 ms K=32']. The 40-core-hour cap stops further cells.
 
 
+
+### Capped final budget cell: 3,200 ms / K=32
+
+Stopped at 40.0000 allocated core-hours as required by brief 11. This is a partial smoke, not a completed 400-game curve cell or a gate. The saved whole matched blocks contain 96 games; unfinished games at the cap are excluded. Derived totals are in `11-artifacts/budget-capped-summary.json`; the literal shard checkpoints remain available for inspection. There are eight complete cells, one partial cell, and no never-started cells. P1.4 stays unchecked because all nine full cells were not measured.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct (partial/capped) | 96 | 0.927 [0.857, 0.964] (89-7-0) | 3.543 | 11/2283 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k32 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":32,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
