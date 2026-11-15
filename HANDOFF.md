@@ -12,8 +12,7 @@ named) or **[assumed]**.
 3. `AGENTS.md`, `ROADMAP.md`, and the newest sections of `docs/results-ledger.md`.
 
 **Now:** start briefs 09 and 11 (CPU, in parallel) and brief 08 (GPU). Briefs 05 and 10 are
-merged; their reviews are the newest ledger sections. The table of unmerged branches in
-section 2 is out of date in that respect: nothing is waiting for review.
+merged.
 
 ## 1. Objective and arrangement
 
@@ -53,11 +52,14 @@ updates the queue. Workers cannot see each other and nobody watches them work.
 | Briefs 01 to 03: replay curve on CPU | Policy limited by data; value head memorises games | reviews of briefs 01, 02, 03 |
 | EngineMCTS | 0.88 against SimpleHeuristics and 0.99 against MaxDamage at a quarter budget, 100-game smokes; never gated | EngineMCTS on pinned Showdown; smoke after the Showdown-state fixes |
 
-Not merged:
+Also merged on 2026-11-15 (reviews are the newest ledger sections):
 
-| Branch | State |
+| What | Result |
 | --- | --- |
-| `work/p2-gpu-scale` (brief 05) | 20,000-game run complete; a 40,955-game, six-epoch run was at 3 of 6 epochs at the last push (2026-11-14 22:22 UTC). **Trained on the old leaky rows.** Not reviewed. Draft numbers: policy NLL 1.279 and top-1 54.4% (inflated); value Brier 0.215 at its own best epoch (4), 0.254 at the policy's best epoch (12); play 0.520 against SimpleHeuristics and 0.8675 against MaxDamage in 400 games each; 583 rows/s on a T4 |
+| Brief 10: team pool | `data/teams/replay_v1`: 600 train, 141 validation, 62 test teams from replays, rebuilt byte for byte in review. SimpleHeuristics beats MaxDamage 0.825 on validation (1,000 games) |
+| Brief 05: replay training on a GPU | **Old leaky rows**, so accuracy is inflated. 583 to 644 rows/s on a T4. Value head works from 20,000 games (Brier 0.215 and 0.209 at its own best epoch). Play against SimpleHeuristics 0.520 at 20,000 games and 0.5225 at 40,955: doubling the data changed nothing |
+
+Nothing is waiting for review.
 
 Rollout reference digests (`python -m fog.eval.showdown_rollout_probe ...`): `--games 6` =
 `23405989f4665988`; `--batch 32 --games 64 --threads 2` = `0efd4319547a4b3b`; `--batch 32
@@ -125,7 +127,7 @@ under its key.
 ## 6. Not verified
 
 - Anything about the belief-loop fix on a GPU (brief 08).
-- Brief 05's results (not reviewed), and any replay model at scale on corrected rows.
+- Any replay model at scale on corrected rows.
 - Whether the leak helped or hurt play: no play run compares old and corrected rows yet.
 - Whether move features are why unseen teams do not transfer.
 - The full test suite has not been run since 2026-11-14 (1,017 passed, 1 failed, as above);
