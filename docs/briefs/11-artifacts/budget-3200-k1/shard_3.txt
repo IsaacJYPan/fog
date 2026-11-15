@@ -1,0 +1,23 @@
+[showdown-selection] mcts vs simpleheuristics: 4/100 A=4 B=0 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 8/100 A=8 B=0 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 12/100 A=12 B=0 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 16/100 A=15 B=1 draws=0 failures=0
+
+thread '<unnamed>' (8007) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread '<unnamed>' (8007) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (8007) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (8007) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+[showdown-selection] mcts vs simpleheuristics: 20/100 A=19 B=1 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 24/100 A=21 B=3 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 28/100 A=24 B=4 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 32/100 A=27 B=5 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 36/100 A=29 B=7 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 40/100 A=32 B=8 draws=0 failures=0
