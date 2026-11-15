@@ -1,6 +1,6 @@
 {
   "source_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
-  "budget_core_seconds": 80086.81712590401,
+  "budget_core_seconds": 82846.86716217201,
   "jobs": {
     "budget-800-k8": {
       "command": "/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":8,\"budget_ms\":800,\"threads\":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4",
@@ -46,6 +46,15 @@
       "wall_seconds_this_attempt": 3035.976471086,
       "child_cpu_seconds_this_attempt": 11111.660079999998,
       "exit_code": 0
+    },
+    "budget-200-k1": {
+      "command": "/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-200-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":1,\"budget_ms\":200,\"threads\":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4",
+      "fog_commit": "2c1262c0d7944bd42f277d69dfc01de88ae0fa17",
+      "status": "complete",
+      "pid": 7410,
+      "wall_seconds_this_attempt": 690.0125090670008,
+      "child_cpu_seconds_this_attempt": 2647.4944010000063,
+      "exit_code": 0
     }
   },
   "published": [
@@ -54,7 +63,8 @@
     "budget 200 ms K=8",
     "budget 3200 ms K=8",
     "budget 800 ms K=1",
-    "budget 800 ms K=32"
+    "budget 800 ms K=32",
+    "budget 200 ms K=1"
   ],
   "status": "not yet measured; budget curve running"
 }
