@@ -345,3 +345,76 @@ def test_terminal_labels_match_a_fainted_ogerpon_after_tera_reentry():
         opponent = [1.,0.,0.,0.,0.,0.]
         np.testing.assert_array_equal(row['terminal_alive'],own+opponent if row['role']=='p1' else opponent+own)
         assert row['terminal_hp_difference'] == pytest.approx(-1/12 if row['role']=='p1' else 1/12)
+
+
+@pytest.mark.parametrize('species,form',[
+    ('Dudunsparce','Dudunsparce-Three-Segment'),('Palafin','Palafin-Hero'),
+    ('Mimikyu','Mimikyu-Busted'),('Eiscue','Eiscue-Noice'),
+])
+def test_public_terminal_labels_match_general_forms_after_reentry(species,form):
+    replay = {'players':['A','B'], 'log':f'''|gametype|singles
+|player|p1|A|1|1600
+|player|p2|B|2|1600
+|teamsize|p1|2
+|teamsize|p2|1
+|gen|9
+|tier|[Gen 9] OU
+|clearpoke
+|poke|p1|{species}|
+|poke|p1|Garchomp|
+|poke|p2|Corviknight|
+|teampreview
+|start
+|switch|p1a: Mon|{species}|100/100
+|switch|p2a: Bird|Corviknight|100/100
+|turn|1
+|move|p2a: Bird|Flash Cannon|p1a: Mon
+|-damage|p1a: Mon|25/100
+|detailschange|p1a: Mon|{form}
+|move|p1a: Mon|Protect|p1a: Mon
+|turn|2
+|switch|p1a: Chomp|Garchomp|100/100
+|move|p2a: Bird|Flash Cannon|p1a: Chomp
+|-damage|p1a: Chomp|50/100
+|turn|3
+|switch|p1a: Mon|{form}|25/100
+|move|p2a: Bird|Flash Cannon|p1a: Mon
+|-damage|p1a: Mon|0 fnt
+|faint|p1a: Mon
+|win|B'''}
+    rows = parse_replay(replay)['rows']
+    assert {r['role'] for r in rows} == {'p1','p2'}
+    for row in rows:
+        own = [0.,1.,0.,0.,0.,0.]
+        opponent = [1.,0.,0.,0.,0.,0.]
+        np.testing.assert_array_equal(row['terminal_alive'],own+opponent if row['role']=='p1' else opponent+own)
+        assert row['terminal_hp_difference'] == pytest.approx(-1/12 if row['role']=='p1' else 1/12)
+
+
+def test_unmatched_public_terminal_identity_is_an_error():
+    from fog.scripts.parse_replays import _public_terminal_state
+    battle = SimpleNamespace(opponent_team={'p2: Extra':SimpleNamespace(
+        species='pikachu',base_species='pikachu')})
+    with pytest.raises(ValueError,match='cannot map public terminal species'):
+        _public_terminal_state(battle,['garchomp'])
+
+
+def test_legacy_log_without_preview_keeps_rows_but_marks_terminal_targets_invalid():
+    replay = {'players':['A','B'], 'log':'''|gametype|singles
+|player|p1|A|1|1600
+|player|p2|B|2|1600
+|gen|9
+|tier|[Gen 9] OU
+|start
+|switch|p1a: Chomp|Garchomp|100/100
+|switch|p2a: Bird|Corviknight|100/100
+|turn|1
+|move|p1a: Chomp|Earthquake|p2a: Bird
+|move|p2a: Bird|Roost|p2a: Bird
+|turn|2
+|move|p1a: Chomp|Earthquake|p2a: Bird
+|move|p2a: Bird|Roost|p2a: Bird
+|win|A'''}
+    rows = parse_replay(replay)['rows']
+    assert rows and all(not r['terminal_valid'] for r in rows)
+    assert not rows_to_arrays(rows)['terminal_valid'].any()

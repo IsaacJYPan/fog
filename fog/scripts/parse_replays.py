@@ -414,16 +414,24 @@ def _public_terminal_state(battle, preview_species: list[str]) -> dict:
 
     A request-side Pokemon can infer Regenerator healing from an imputed private ability.
     Opponent-side Pokemon contain public evidence only. Match battle forms to the original
-    preview identity so a switched-out and re-entered Ogerpon is not mistaken for unused.
+    preview identity using public base-species metadata; unmatched identities are errors.
     """
+    from poke_env.data import GenData
+
     from fog.encoding.events import submitted_species_id
 
+    dex = GenData.from_gen(9).pokedex
+    preview_base = {sid: _to_id(dex.get(sid, {}).get("baseSpecies", sid))
+                    for sid in preview_species}
     health = {species: 1.0 for species in preview_species}
     alive = {species: 1.0 for species in preview_species}
     for mon in (getattr(battle, "opponent_team", None) or {}).values():
         species = submitted_species_id(mon.species)
         if species not in health:
-            continue
+            matches = [sid for sid in preview_species if preview_base[sid] == mon.base_species]
+            if len(matches) != 1:
+                raise ValueError(f"cannot map public terminal species {mon.species!r} to preview")
+            species = matches[0]
         fainted = bool(getattr(mon, "fainted", False))
         hp = getattr(mon, "current_hp_fraction", None)
         health[species] = (0.0 if fainted else 1.0) if not getattr(mon, "max_hp", None) else float(hp)
@@ -436,7 +444,9 @@ def _public_terminal_state(battle, preview_species: list[str]) -> dict:
     }
 
 
-def _terminal_targets(st, public_end: dict[str, dict]) -> dict:
+def _terminal_targets(st, public_end: dict[str, dict] | None) -> dict:
+    if public_end is None:
+        return {"terminal_valid": False}
     own = public_end[st.role]
     opponent = public_end["p2" if st.role == "p1" else "p1"]
     return {
@@ -538,10 +548,12 @@ def parse_replay(
         "p1": _censored_truth(p1.battle),
         "p2": _censored_truth(p2.battle),
     }
-    public_end = {
-        "p1": _public_terminal_state(p2.battle, p1._preview_species),
-        "p2": _public_terminal_state(p1.battle, p2._preview_species),
-    }
+    public_end = None
+    if p1._preview_species and p2._preview_species:
+        public_end = {
+            "p1": _public_terminal_state(p2.battle, p1._preview_species),
+            "p2": _public_terminal_state(p1.battle, p2._preview_species),
+        }
     out_rows = []
     for st, won in ((p1, p1_win), (p2, None if p1_win is None else not p1_win)):
         belief = belief_by_role[st.role]
