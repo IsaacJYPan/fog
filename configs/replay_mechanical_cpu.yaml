@@ -1,0 +1,6 @@
+# Brief 09 R4: public move metadata and the eleven permitted candidate facts.
+extends: replay_value_cpu.yaml
+model:
+  mechanical_features: true
+log:
+  dir: runs/order_blind_model/R4

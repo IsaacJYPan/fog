@@ -54,6 +54,8 @@ class EntityEmbeddings(nn.Module):
         species_dim: int = 64,
         small_dim: int = 24,
         order_blind: bool = False,
+        mechanical_features: bool = False,
+        move_tables=None,
     ) -> None:
         super().__init__()
         self.species = nn.Embedding(n_species, species_dim)
@@ -72,8 +74,19 @@ class EntityEmbeddings(nn.Module):
         # species, item, ability, move0..3, last move, compressed native nature/EV block
         self.order_blind = bool(order_blind)
         self.raw_dim = ENTITY_RAW_DIM - (8 if self.order_blind else 0)
+        self.mechanical = None
+        if mechanical_features:
+            from fog.constants.tables import TABLES
+            from fog.models.mechanical_features import MechanicalMoveFeatures
+
+            if not self.order_blind:
+                raise ValueError("mechanical_features requires order_blind_entities")
+            self.mechanical = MechanicalMoveFeatures(move_tables if move_tables is not None else TABLES)
+            if self.mechanical.values.shape[0] != n_moves:
+                raise ValueError("mechanical move tables must match embedding cardinalities")
+        mechanical_dim = self.mechanical.out_dim if self.mechanical is not None else 0
         self.move_encoder = (
-            nn.Sequential(nn.Linear(small_dim + 2, 48), nn.GELU(), nn.Linear(48, small_dim))
+            nn.Sequential(nn.Linear(small_dim + 2 + mechanical_dim, 48), nn.GELU(), nn.Linear(48, small_dim))
             if self.order_blind else None
         )
         self.out_dim = species_dim + small_dim * (2 + (1 if self.order_blind else 4) + 1 + 1)
@@ -95,7 +108,10 @@ class EntityEmbeddings(nn.Module):
             return embedded
         pp = raw[..., L.move_pp : L.move_pp + 4].unsqueeze(-1)
         known = raw[..., L.epistemic + 2 : L.epistemic + 6].unsqueeze(-1)
-        return self.move_encoder(torch.cat([embedded, pp, known], dim=-1))
+        pieces = [embedded, pp, known]
+        if self.mechanical is not None:
+            pieces.append(self.mechanical(move_ids).to(embedded.dtype))
+        return self.move_encoder(torch.cat(pieces, dim=-1))
 
     def forward(self, entity_ids: torch.Tensor, raw: torch.Tensor | None = None) -> torch.Tensor:
         assert entity_ids.shape[-1] >= BASE_ID_FIELDS
@@ -543,7 +559,7 @@ class TurnHistoryEncoder(nn.Module):
 class Backbone(nn.Module):
     """Three explicit encoders: private, public state, and public history."""
 
-    def __init__(self, cfg: dict | None = None, sizes: dict | None = None) -> None:
+    def __init__(self, cfg: dict | None = None, sizes: dict | None = None, *, tables=None) -> None:
         super().__init__()
         cfg = cfg or {}
         hidden = int(cfg.get("entity_hidden", 128))
@@ -563,9 +579,14 @@ class Backbone(nn.Module):
                 n_natures=sizes["n_natures"] + 1,
                 n_ev_units=sizes["n_ev_units"] + 1,
                 order_blind=bool(cfg.get("order_blind_entities", False)),
+                mechanical_features=bool(cfg.get("mechanical_features", False)),
+                move_tables=tables,
             )
         else:
-            self.embeds = EntityEmbeddings(order_blind=bool(cfg.get("order_blind_entities", False)))
+            self.embeds = EntityEmbeddings(
+                order_blind=bool(cfg.get("order_blind_entities", False)),
+                mechanical_features=bool(cfg.get("mechanical_features", False)), move_tables=tables,
+            )
 
         self.current_state_encoder = CurrentStateEncoder(
             self.embeds.out_dim, hidden, self.current_dim, dropout, self.embeds.raw_dim

@@ -72,6 +72,10 @@ def _permute_moves(batch, slots, generator):
     actions[acting, 4:8] = perm[acting] + 4
     out["legality_mask"] = batch["legality_mask"].gather(1, actions)
     _history_actions_by_identity(out)
+    if isinstance(batch.get("action_features"), torch.Tensor):
+        width = batch["action_features"].shape[-1]
+        out["action_features"] = batch["action_features"].gather(
+            1, actions.unsqueeze(-1).expand(-1, -1, width))
     return out, actions
 
 
@@ -99,6 +103,10 @@ def _permute_team(batch, side, generator):
         actions[:, 8:13] = 8 + (targets[:, :, None] == old_bench[:, None, :]).long().argmax(-1)
         out["legality_mask"] = batch["legality_mask"].gather(1, actions)
         _history_actions_by_identity(out)
+    if isinstance(batch.get("action_features"), torch.Tensor):
+        width = batch["action_features"].shape[-1]
+        out["action_features"] = batch["action_features"].gather(
+            1, actions.unsqueeze(-1).expand(-1, -1, width))
     return out, actions
 
 
@@ -277,6 +285,19 @@ def test_optional_global_and_dynamic_inputs_are_also_order_blind(observations):
     baseline = agent(observations, need_belief=False)
     for name, (changed, actions) in _permutations(observations):
         result = agent(changed, need_belief=False)
+        torch.testing.assert_close(result.log_probs, baseline.log_probs.gather(1, actions),
+                                   atol=1e-5, rtol=0, msg=name)
+        torch.testing.assert_close(result.value, baseline.value, atol=1e-5, rtol=0, msg=name)
+
+
+@torch.no_grad()
+def test_mechanical_model_remains_order_blind(observations):
+    agent = _agent(True, mechanical_features=True)
+    baseline, logits = _forward(agent, observations)
+    for name, (changed, actions) in _permutations(observations):
+        result, permuted_logits = _forward(agent, changed)
+        torch.testing.assert_close(permuted_logits, logits.gather(1, actions),
+                                   atol=1e-5, rtol=0, msg=name)
         torch.testing.assert_close(result.log_probs, baseline.log_probs.gather(1, actions),
                                    atol=1e-5, rtol=0, msg=name)
         torch.testing.assert_close(result.value, baseline.value, atol=1e-5, rtol=0, msg=name)
