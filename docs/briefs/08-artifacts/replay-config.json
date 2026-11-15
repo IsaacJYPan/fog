@@ -1,0 +1,101 @@
+{
+  "label": "smoke",
+  "config": {
+    "seed": 20261201,
+    "device": "cuda",
+    "mixed_precision": false,
+    "pins": {
+      "showdown_commit": "e440c4a18385274f10c405d0b158b6a962ce6d94",
+      "ou_banlist_date": "2026-06",
+      "usage_month": "2026-06",
+      "usage_rating_cut": 1695
+    },
+    "env": {
+      "backend": "showdown_direct",
+      "showdown_root": "server/pokemon-showdown",
+      "rollout_workers": 1,
+      "rollout_worker_mode": "process",
+      "actor_threads": 1,
+      "opponent_cache_size": 2,
+      "rollout_worker_timeout": 900,
+      "server_url": "ws://localhost:8000/showdown/websocket",
+      "battle_format": "gen9ou",
+      "num_workers": 8,
+      "no_security": true,
+      "team_pool": null,
+      "concurrent_battles": 1
+    },
+    "encoding": {
+      "history_cap": 60,
+      "history_encoder": "causal_transformer",
+      "species_embed_dim": 64,
+      "entity_hidden": 128,
+      "current_dim": 256,
+      "history_dim": 256,
+      "state_dim": 256,
+      "dyn_dim": 256,
+      "dropout": 0.05
+    },
+    "model": {
+      "history_transformer_layers": 2,
+      "history_heads": 4,
+      "history_gru_hidden": 256,
+      "belief_decoder_layers": 2,
+      "belief_dim": 128,
+      "aux_into_trunk": true,
+      "oracle": "none",
+      "shared_latent_trunk": true,
+      "shared_latent_learned_only": true,
+      "shared_latent_contextual": true,
+      "shared_typed_world_tokens": true,
+      "shared_recent_history_tokens": 8,
+      "shared_entity_dim": 128,
+      "shared_latent_dim": 3072,
+      "shared_contextual_layers": 4,
+      "shared_contextual_heads": 4,
+      "shared_contextual_ff_dim": 512,
+      "shared_contextual_dropout": 0.05,
+      "shared_contextual_head_readers": true,
+      "token_action_policy": true,
+      "action_query_policy": true,
+      "action_query_heads": 4,
+      "simple_rule_prior_strength": 0.0,
+      "history_ff_dim": 512
+    },
+    "loss": {
+      "value_coef": 0.5,
+      "belief_coef": 0.05,
+      "self_belief_coef": 0.0,
+      "belief_chain_coef": 0.05,
+      "self_belief_chain_coef": 0.0,
+      "preview_coef": 0.0,
+      "action_coef": 1.0,
+      "require_exact_chosen_action_features": true,
+      "require_exact_chosen_legality": true
+    },
+    "log": {
+      "dir": "runs/blueprint",
+      "tensorboard": false,
+      "checkpoint_every_decisions": 200000,
+      "halt_on_regression_sigma": 2.0
+    },
+    "experiment": "replay_blueprint_cpu",
+    "bc": {
+      "manifest": "runs/blueprint/split/train_manifest.parquet",
+      "holdout_manifest": "runs/blueprint/split/holdout_manifest.parquet",
+      "holdout_fraction": 0.0,
+      "scope": "full",
+      "epochs": 6,
+      "batch_size": 1024,
+      "lr": 0.0003,
+      "lr_final": 3e-05,
+      "eval_batches": 0,
+      "early_stopping_patience": 2,
+      "early_stopping_min_delta": 0.002,
+      "streaming": false
+    },
+    "preflight": {
+      "required": false
+    }
+  }
+}

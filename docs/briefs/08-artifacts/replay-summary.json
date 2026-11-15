@@ -1,0 +1,95 @@
+{
+  "label": "smoke",
+  "steps": 200,
+  "rows": 204800,
+  "seconds": 110.68709564099993,
+  "seconds_per_step": 0.5534354782049996,
+  "rows_per_second": 1850.260853028828,
+  "skipped_nonfinite_steps": 0,
+  "samples": [
+    {
+      "step": 1,
+      "rows": 1024,
+      "seconds": 1.2946338269999842,
+      "loss": 3.660031318664551
+    },
+    {
+      "step": 2,
+      "rows": 2048,
+      "seconds": 1.8452342169999838,
+      "loss": 3.6361680030822754
+    },
+    {
+      "step": 3,
+      "rows": 3072,
+      "seconds": 2.388231246999908,
+      "loss": 3.629401206970215
+    },
+    {
+      "step": 20,
+      "rows": 20480,
+      "seconds": 11.604832501999908,
+      "loss": 3.3305420875549316
+    },
+    {
+      "step": 40,
+      "rows": 40960,
+      "seconds": 22.589692296999942,
+      "loss": 3.1262166500091553
+    },
+    {
+      "step": 60,
+      "rows": 61440,
+      "seconds": 33.63894096799993,
+      "loss": 3.086613655090332
+    },
+    {
+      "step": 80,
+      "rows": 81920,
+      "seconds": 44.570009217999996,
+      "loss": 3.0842700004577637
+    },
+    {
+      "step": 100,
+      "rows": 102400,
+      "seconds": 55.62256409899999,
+      "loss": 3.036648750305176
+    },
+    {
+      "step": 120,
+      "rows": 122880,
+      "seconds": 66.63491169099996,
+      "loss": 2.9910526275634766
+    },
+    {
+      "step": 140,
+      "rows": 143360,
+      "seconds": 77.58581845599997,
+      "loss": 2.970189094543457
+    },
+    {
+      "step": 160,
+      "rows": 163840,
+      "seconds": 88.59454149699991,
+      "loss": 2.9378509521484375
+    },
+    {
+      "step": 180,
+      "rows": 184320,
+      "seconds": 99.52698349599996,
+      "loss": 2.833796262741089
+    },
+    {
+      "step": 200,
+      "rows": 204800,
+      "seconds": 110.56477798599997,
+      "loss": 2.8130221366882324
+    }
+  ],
+  "dataset_rows": 49478,
+  "manifest": "/kaggle/temp/fog/runs/update-speed/manifest.parquet",
+  "random_weights": true,
+  "batch_size": 1024,
+  "warmup_steps": 0,
+  "scope": "200 successful native CUDA BC updates including batch building and the synchronized second-step profile; loading model and dataset excluded; each epoch's partial final batch skipped"
+}

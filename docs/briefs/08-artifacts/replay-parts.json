@@ -1,0 +1,33 @@
+{
+  "label": "smoke",
+  "rows": 1024,
+  "seconds": {
+    "shared_trunk": 0.029940082000052826,
+    "opponent_belief": 0.16400550499997735,
+    "policy_value_heads": 0.001941752999982782,
+    "forward_other": 0.004941541999983201,
+    "loss_assembly": 0.012857725000003484,
+    "backward": 0.19652774800010775,
+    "gradient_clip_and_metrics": 0.003560996999908639,
+    "optimizer_step": 0.0036357010000074297
+  },
+  "shares": {
+    "shared_trunk": 0.07172805268300153,
+    "opponent_belief": 0.39291126533721216,
+    "policy_value_heads": 0.004651896460400326,
+    "forward_other": 0.011838550906755512,
+    "loss_assembly": 0.03080350869386959,
+    "backward": 0.47082545272249104,
+    "gradient_clip_and_metrics": 0.008531151665282899,
+    "optimizer_step": 0.008710121530986928
+  },
+  "total_seconds": 0.41741105300002346,
+  "forward_seconds": 0.20082888199999616,
+  "calls": {
+    "shared_trunk": 2,
+    "opponent_belief": 2,
+    "policy_value_heads": 1
+  },
+  "partition_seconds": 0.41741105300002346,
+  "scope": "one native minibatch; synchronized before and after every part; shared_trunk includes both perspectives' backbone and shared_latent; forward_other contains projections, context assembly and timing-hook overhead"
+}
