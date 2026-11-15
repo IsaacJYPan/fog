@@ -140,6 +140,9 @@ def write_report():
             f"rejected {r['a_fidelity']['rejected']}, "
             f"{r['a_fidelity']['seconds_per_decision']:.3f} s/decision"
             for r in json.loads(path.read_text())['rows'])
+    smoke_path = ART / 'fidelity-smoke' / 'merged.json'
+    smoke_reasons = (json.loads(smoke_path.read_text())['rows'][0]['a_fidelity']['failure_reasons']
+                     if smoke_path.exists() else {})
     cells = []
     for budget, k in ORDER:
         path = ART / f'budget-{budget}-k{k}' / 'merged.json'
@@ -176,7 +179,7 @@ Commands, launch commits, completed/partial JSONs, counters and printed rows are
 Source `aa38e46`; no test-split files read, no threshold or search variant changed.
 Unfinished stages and not-run cells are explicit in `measurement-progress.json`.
 Residual Flash Fire, Unburden, locked moves, screen/item bookkeeping and engine chance
-approximations remain. A failed gate requires manual loss/mechanics diagnosis before a retry.
+approximations remain. Smoke failure reasons: {smoke_reasons}. A failed gate requires manual loss/mechanics diagnosis before a retry.
 
 Resume from the repository root: `.venv/bin/python docs/briefs/11-artifacts/continue_measurements.py`.
 '''
