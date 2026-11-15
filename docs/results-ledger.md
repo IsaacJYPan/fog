@@ -2679,3 +2679,9 @@ four-core quota; budget/gate jobs will run without another simulator job.
 Stage 1 passes: default-budget 200-game smoke, fallbacks below 5%, no rejected actions. P1.3 complete. This is smoke, not G1.
 
 | 2026-11-14 | mcts | simpleheuristics | showdown_direct | 200 | 0.935 [0.892, 0.962] (187-13-0) | 1.776 | 2/5341 | `aa38e46` | `python -m fog.eval.run_shards --shards 2 --games 200 --seed 11000 --out-dir docs/briefs/11-artifacts/fidelity-smoke -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-14: budget 800 ms K=8
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-14 | mcts | simpleheuristics | showdown_direct | 400 | 0.917 [0.886, 0.941] (367-33-0) | 0.896 | 27/10674 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |

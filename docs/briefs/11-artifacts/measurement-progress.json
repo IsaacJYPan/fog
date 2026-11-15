@@ -1,9 +1,20 @@
 {
   "source_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
-  "budget_core_seconds": 0.0,
-  "jobs": {},
+  "budget_core_seconds": 10127.587108663996,
+  "jobs": {
+    "budget-800-k8": {
+      "command": "/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":8,\"budget_ms\":800,\"threads\":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4",
+      "fog_commit": "ad71834f7710fed5568ae76ed31946482a8da418",
+      "status": "complete",
+      "pid": 3628,
+      "wall_seconds_this_attempt": 2531.896777165999,
+      "child_cpu_seconds_this_attempt": 9607.704316,
+      "exit_code": 0
+    }
+  },
   "published": [
-    "fidelity smoke complete"
+    "fidelity smoke complete",
+    "budget 800 ms K=8"
   ],
   "status": "not yet measured; budget curve running"
 }
