@@ -1,0 +1,59 @@
+Pecharunt @ blacksludge
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Recover
+- Shadow Ball
+- Foul Play
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 SpD / 12 Spe
+Calm Nature
+- Roar
+- Scorching Sands
+- Roost
+- U-turn
+
+Hydrapple @ rockyhelmet
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Earth Power
+- Fickle Beam
+- Giga Drain
+- Leaf Storm
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Ice
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Play Rough
+- Body Slam
+- Aqua Jet
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Earthquake
+- Flash Cannon
+- Stealth Rock
+- Iron Head
+
+Mandibuzz @ rockyhelmet
+Ability: overcoat
+Tera Type: Water
+EVs: 248 HP / 244 Def / 16 Spe
+Impish Nature
+- Knock Off
+- Roost
+- Defog
+- Toxic

@@ -1,0 +1,59 @@
+Greninja @ lifeorb
+Ability: protean
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Liquidation
+- Spikes
+- Surf
+- U-turn
+
+Scizor @ metronome
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Close Combat
+- Defog
+- Bullet Punch
+- U-turn
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 248 HP / 104 SpD / 156 Spe
+Jolly Nature
+- Crunch
+- Heavy Slam
+- Roar
+- Close Combat
+
+Gholdengo @ custapberry
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Make It Rain
+- Shadow Ball
+- Recover
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Knock Off
+- Facade
+- Protect
+- Spikes
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 176 Def / 80 SpD
+Calm Nature
+- Knock Off
+- Moonblast
+- Moonlight
+- Calm Mind

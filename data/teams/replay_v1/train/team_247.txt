@@ -1,0 +1,59 @@
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Will-O-Wisp
+- Slack Off
+- Torch Song
+- Hex
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Fire Blast
+- Stored Power
+- Psyshock
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Roost
+- Stealth Rock
+- Spikes
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Knock Off
+- Ivy Cudgel
+- U-turn
+
+Ting-Lu @ redcard
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Stealth Rock
+- Spikes
+- Whirlwind
+
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Flamethrower
+- Dragon Darts
+- Will-O-Wisp

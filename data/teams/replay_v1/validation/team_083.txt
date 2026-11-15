@@ -1,0 +1,59 @@
+Deoxys-Speed @ ejectpack
+Ability: pressure
+Tera Type: Fighting
+EVs: 152 HP / 252 SpA / 104 Spe
+Modest Nature
+- Superpower
+- Psycho Boost
+- Knock Off
+- Stealth Rock
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 248 HP / 252 Atk / 8 Def
+Brave Nature
+- Earthquake
+- Facade
+- Headlong Rush
+- Fire Punch
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Aqua Cutter
+- Ceaseless Edge
+- Sucker Punch
+- Flip Turn
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Healing Wish
+- Earth Power
+- Moonblast
+- Springtide Storm
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Toxic
+- Foul Play
+- Parting Shot
+- Malignant Chain

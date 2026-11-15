@@ -1,0 +1,59 @@
+Dragonite @ punchingglove
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Extreme Speed
+- Waterfall
+- Dragon Dance
+
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spirit Break
+- Low Kick
+- Light Screen
+- Parting Shot
+
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Healing Wish
+- Mystical Fire
+- Moonblast
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Bulk Up
+- Stealth Rock
+- Rapid Spin
+
+Scizor @ heavydutyboots
+Ability: technician
+Tera Type: Flying
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- Close Combat
+- Bullet Punch
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Thunderclap
+- Dragon Pulse
+- Volt Switch
+- Thunderbolt

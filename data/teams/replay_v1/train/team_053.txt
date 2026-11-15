@@ -1,0 +1,59 @@
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Dark
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Flip Turn
+- Scald
+- Play Rough
+- Mirror Coat
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 236 Def / 12 SpD / 16 Spe
+Impish Nature
+- Toxic
+- Earthquake
+- Protect
+- Knock Off
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Encore
+- Trailblaze
+- U-turn
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Substitute
+- Body Press
+- Crunch
+- Close Combat
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Quick Attack
+- Shadow Ball
+- U-turn
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Knock Off
+- U-turn
+- Defog
+- Bullet Punch

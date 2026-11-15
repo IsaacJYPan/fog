@@ -1,0 +1,59 @@
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- U-turn
+- Roost
+- Body Press
+- Iron Defense
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Normal
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Body Slam
+- Aqua Jet
+- Flip Turn
+- Wish
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Ice Beam
+- Sludge Bomb
+- Future Sight
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Grass Knot
+- Flower Trick
+- Knock Off
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Focus Blast
+- Shadow Ball
+- Recover
+- Nasty Plot

@@ -1,0 +1,59 @@
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Dragon Dance
+- Draco Meteor
+- Earth Power
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 248 HP / 164 Atk / 96 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Fang
+- Crunch
+- Stone Edge
+- Close Combat
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Knock Off
+- Rapid Spin
+- Headlong Rush
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Hurricane
+- Heat Wave
+- Volt Switch
+- Thunderbolt
+
+Empoleon @ leftovers
+Ability: competitive
+Tera Type: Ground
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Vacuum Wave
+- Surf
+- Grass Knot
+- Knock Off

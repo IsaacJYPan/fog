@@ -1,0 +1,59 @@
+Tyranitar @ smoothrock
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Stealth Rock
+- Ice Beam
+- Knock Off
+- Stone Edge
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Hex
+- Thunder Wave
+- Recover
+- Make It Rain
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Roar
+- Ice Fang
+- Heavy Slam
+- Close Combat
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- Grassy Glide
+- Wood Hammer
+
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Poison
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Spikes
+- Stealth Rock
+- Earthquake
+- Dragon Tail
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Heat Wave
+- Roost
+- Hurricane

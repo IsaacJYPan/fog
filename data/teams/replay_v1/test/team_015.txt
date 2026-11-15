@@ -1,0 +1,59 @@
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Aurora Veil
+- Encore
+- Freeze-Dry
+- Moonblast
+
+Samurott-Hisui @ heavydutyboots
+Ability: sharpness
+Tera Type: Poison
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Razor Shell
+- Sucker Punch
+- Aqua Cutter
+- Knock Off
+
+Ceruledge @ lifeorb
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 232 HP / 252 Atk / 4 Def / 20 Spe
+Adamant Nature
+- Poltergeist
+- Shadow Sneak
+- Bitter Blade
+- Swords Dance
+
+Latias @ weaknesspolicy
+Ability: levitate
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Calm Mind
+- Psychic
+- Stored Power
+- Recover
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Stealth Rock
+- Earth Power
+- Meteor Beam
+- Sludge Wave
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Crunch
+- Reflect
+- Heavy Slam
+- Body Press

@@ -1,0 +1,59 @@
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Recover
+- Nasty Plot
+- Make It Rain
+
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Nasty Plot
+- Dark Pulse
+- Will-O-Wisp
+
+Ting-Lu @ weaknesspolicy
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Whirlwind
+- Spikes
+- Stealth Rock
+- Ruination
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Thunder Wave
+- Hurricane
+- Roost
+- Volt Switch
+
+Primarina @ assaultvest
+Ability: liquidvoice
+Tera Type: Steel
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Flip Turn
+- Surf
+- Moonblast
+- Encore
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Knock Off
+- Protect
+- Facade
+- Swords Dance

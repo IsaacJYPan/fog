@@ -1,0 +1,59 @@
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Ice Beam
+- Sludge Bomb
+- Nasty Plot
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Swords Dance
+- Knock Off
+- Protect
+- Facade
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Grass
+EVs: 252 HP / 160 Def / 96 Spe
+Bold Nature
+- Body Press
+- Roost
+- Iron Defense
+- Brave Bird
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Earthquake
+- Body Press
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Flamethrower
+- Psyshock
+- Sludge Bomb
+- Ice Beam
+
+Raging Bolt @ assaultvest
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Volt Switch
+- Draco Meteor
+- Thunderbolt
+- Thunderclap

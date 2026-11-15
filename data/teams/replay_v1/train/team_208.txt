@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Grassy Glide
+- Swords Dance
+- U-turn
+- Wood Hammer
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Recover
+- Protect
+- Salt Cure
+- Curse
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- Gunk Shot
+- U-turn
+
+Raging Bolt @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Dragon Pulse
+- Thunderbolt
+- Volt Switch
+- Thunderclap
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 184 Def / 28 SpA / 48 Spe
+Bold Nature
+- Flamethrower
+- Psychic Noise
+- Future Sight
+- Chilly Reception
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Taunt
+- Stealth Rock
+- U-turn

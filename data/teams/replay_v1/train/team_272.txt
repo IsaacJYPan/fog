@@ -1,0 +1,59 @@
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Water
+EVs: 248 HP / 244 Def / 16 Spe
+Impish Nature
+- Roost
+- Defog
+- Foul Play
+- Knock Off
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 40 Def / 220 Spe
+Bold Nature
+- Slack Off
+- Torch Song
+- Hex
+- Will-O-Wisp
+
+Excadrill @ leftovers
+Ability: moldbreaker
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Earthquake
+- Stealth Rock
+- Iron Head
+- Rapid Spin
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 212 Def / 44 Spe
+Bold Nature
+- Pain Split
+- Hydro Pump
+- Volt Switch
+- Protect
+
+Conkeldurr @ flameorb
+Ability: guts
+Tera Type: Fighting
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Knock Off
+- Drain Punch
+- Mach Punch
+- Thunder Punch
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 80 HP / 172 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Grassy Glide
+- Spiky Shield
+- Horn Leech

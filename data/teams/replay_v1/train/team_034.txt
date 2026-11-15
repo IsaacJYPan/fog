@@ -1,0 +1,59 @@
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Focus Blast
+- Volt Switch
+- Tachyon Cutter
+- Future Sight
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Taunt
+- Knock Off
+- Play Rough
+- Ivy Cudgel
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Ghost
+EVs: 4 Atk / 252 Def / 252 SpD
+Sassy Nature
+- Wish
+- Aqua Jet
+- Scald
+- Flip Turn
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Court Change
+- High Jump Kick
+- U-turn
+- Pyro Ball
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Fairy
+EVs: 76 HP / 252 Atk / 8 SpD / 172 Spe
+Adamant Nature
+- Swords Dance
+- Fire Punch
+- Headlong Rush
+- Facade
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Recover
+- Psyshock
+- Dazzling Gleam

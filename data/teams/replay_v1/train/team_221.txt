@@ -1,0 +1,59 @@
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 188 HP / 252 SpA / 68 Spe
+Modest Nature
+- Calm Mind
+- Dragon Pulse
+- Solar Beam
+- Volt Switch
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Close Combat
+- Rest
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Destiny Bond
+- Shadow Ball
+- Calm Mind
+
+Cinderace @ focussash
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- High Jump Kick
+- Low Kick
+- Pyro Ball
+- Court Change
+
+Kingambit @ shucaberry
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Low Kick
+- Kowtow Cleave
+- Iron Head
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Earthquake
+- U-turn
+- Stealth Rock
+- Stone Edge

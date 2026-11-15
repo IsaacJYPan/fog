@@ -1,0 +1,59 @@
+Jirachi @ heavydutyboots
+Ability: serenegrace
+Tera Type: Poison
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Cosmic Power
+- Psychic Noise
+- Protect
+- Iron Head
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Roost
+- Volt Switch
+- Hurricane
+- Thunder Wave
+
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Leaf Storm
+- Glare
+- Leech Seed
+- Dragon Pulse
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Roost
+- Brave Bird
+- U-turn
+
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- Substitute
+- Draco Meteor
+- Freeze-Dry
+- Earth Power
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Knock Off
+- Earthquake
+- Rapid Spin
+- Stealth Rock

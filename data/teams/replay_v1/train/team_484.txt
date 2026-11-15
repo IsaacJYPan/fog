@@ -1,0 +1,59 @@
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Flip Turn
+- Psychic Noise
+- Protect
+- Alluring Voice
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Calm Mind
+- Thunderclap
+- Thunderbolt
+- Dragon Pulse
+
+Heatran @ assaultvest
+Ability: flashfire
+Tera Type: Ghost
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Power Gem
+- Lava Plume
+- Magma Storm
+- Flash Cannon
+
+Weezing-Galar @ blacksludge
+Ability: levitate
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Will-O-Wisp
+- Strange Steam
+- Defog
+
+Garchomp @ loadeddice
+Ability: roughskin
+Tera Type: Ghost
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Stealth Rock
+- Scale Shot
+- Dragon Tail
+- Earthquake
+
+Weavile @ focussash
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Triple Axel
+- Swords Dance
+- Knock Off

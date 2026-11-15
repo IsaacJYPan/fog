@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- U-turn
+- Grassy Glide
+- High Horsepower
+- Knock Off
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Low Kick
+- Knock Off
+- Swords Dance
+
+Clefable @ lifeorb
+Ability: magicguard
+Tera Type: Ghost
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Moonblast
+- Flamethrower
+- Moonlight
+- Calm Mind
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Hurricane
+- Thunder Wave
+- Heat Wave
+
+Clodsire @ blacksludge
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Stealth Rock
+- Recover
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Hex
+- Torch Song
+- Will-O-Wisp
+- Slack Off

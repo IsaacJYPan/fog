@@ -1,0 +1,59 @@
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Fire Blast
+- Draco Meteor
+- Phantom Force
+- Will-O-Wisp
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Stealth Rock
+- Rapid Spin
+- Bulk Up
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Chilly Reception
+- Future Sight
+- Flamethrower
+- Psychic Noise
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Roost
+- Body Press
+- Iron Defense
+- Brave Bird
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Volt Switch
+- Psyshock
+- Focus Blast
+- Tachyon Cutter
+
+Kyurem @ expertbelt
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Ice Beam
+- Dragon Dance
+- Earth Power

@@ -1,0 +1,59 @@
+Greninja @ lifeorb
+Ability: battlebond
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Hydro Pump
+- Dark Pulse
+- Water Shuriken
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Calm Mind
+- Draco Meteor
+- Dragon Pulse
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Encore
+- Vacuum Wave
+- Shadow Ball
+- Moonblast
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Fire Blast
+- Dazzling Gleam
+- Fiery Dance
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Headlong Rush
+- Ice Spinner
+- Stealth Rock
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance

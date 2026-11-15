@@ -1,0 +1,59 @@
+Latios @ weaknesspolicy
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Psychic Noise
+- Calm Mind
+- Draco Meteor
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Parting Shot
+- Malignant Chain
+- Recover
+
+Zamazenta @ lightclay
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Body Press
+- Close Combat
+- Iron Defense
+- Stone Edge
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stone Edge
+- U-turn
+- Stealth Rock
+- Taunt
+
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Dark
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Razor Shell
+- Sacred Sword
+- Encore
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Iron Head
+- Low Kick

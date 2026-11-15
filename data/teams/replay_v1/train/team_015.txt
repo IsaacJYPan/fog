@@ -1,0 +1,59 @@
+Porygon2 @ eviolite
+Ability: trace
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Trick Room
+- Tri Attack
+- Foul Play
+- Shadow Ball
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Soft-Boiled
+- Calm Mind
+- Seismic Toss
+- Stealth Rock
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 196 HP / 56 Atk / 252 SpD / 4 Spe
+Adamant Nature
+- Sleep Talk
+- Rest
+- Curse
+- Waterfall
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Toxic
+- Chilly Reception
+- Flamethrower
+- Protect
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Scald
+- Flip Turn
+- Protect
+- Wish
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dragon
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Knock Off
+- Swords Dance
+- Spikes
+- Protect

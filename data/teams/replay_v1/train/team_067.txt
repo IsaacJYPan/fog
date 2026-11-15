@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Synthesis
+- Spikes
+- Ivy Cudgel
+- Knock Off
+
+Muk-Alola @ assaultvest
+Ability: poisontouch
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Drain Punch
+- Knock Off
+- Poison Jab
+- Protect
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Thunder Wave
+- Roost
+- Hurricane
+- Volt Switch
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Aqua Jet
+- Wish
+- Mirror Coat
+- Flip Turn
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Recover
+- Make It Rain
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Close Combat
+- Ice Punch
+- Supercell Slam
+- Wild Charge

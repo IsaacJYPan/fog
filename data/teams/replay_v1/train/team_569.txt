@@ -1,0 +1,59 @@
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Tachyon Cutter
+- Volt Switch
+- Psychic Noise
+- Psyshock
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Iron Defense
+- Substitute
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Aqua Cutter
+- Ceaseless Edge
+- Sucker Punch
+- Knock Off
+
+Landorus-Therian @ lightball
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earthquake
+- U-turn
+- Taunt
+- Rock Tomb
+
+Hatterene @ ejectbutton
+Ability: magicbounce
+Tera Type: Flying
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Trick
+- Mystical Fire
+- Psychic Noise
+- Nuzzle
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderclap
+- Draco Meteor
+- Dragon Pulse
+- Calm Mind

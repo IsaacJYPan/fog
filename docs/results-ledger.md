@@ -1895,3 +1895,97 @@ P3. Reading behind the order: EngineMCTS at a quarter of its budget already beat
 SimpleHeuristics 0.88 in a 100-game smoke, while the best replay model (20,000 games, old rows)
 scores 0.52 in a 400-game smoke. The search agent is the nearest gated result and the teacher
 for P3, and it has been waiting only for a team pool.
+
+## 2026-11-14: replay-derived team pool and anchor round-robin
+
+Brief 10, stage 1 complete at `3506a39`; stage 2 pending. Pool statistics below are smoke
+construction diagnostics, not agent-strength evidence. Evidence: `docs/briefs/10-artifacts/`;
+exact pool and per-team evidence counts: `data/teams/replay_v1/`.
+
+Recreated the pinned import with `uv run --no-sync python -m fog.scripts.import_metamon_replays
+--out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f
+--min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600`.
+It reproduced 22,000 games and the earlier rejection counts: 77,225 below rating, 4,176 invalid
+metadata, 495 outside dates, 840 other format (`import-output.txt`). No decision-row conversion
+was needed: the fast public-set extractor reuses the existing submitted-set evidence handling.
+Pinned Showdown: `e440c4a18385274f10c405d0b158b6a962ce6d94`; CPU only.
+
+Build: `uv run --no-sync python -m fog.scripts.build_replay_team_pool --seed 0`, at `3506a39`.
+One completion per side seeded by replay id, side and build seed; no retries after rejection.
+A persistent Node process calls exactly the pinned CLI's `Teams.import` / `validateTeam` API.
+
+| Filter (smoke construction counts) | Remaining / dropped |
+| --- | --- |
+| Imported games / sides | 22,000 / 44,000 |
+| Rated at least 1700 | 9,850 sides; 34,150 dropped |
+| Six known preview species | 9,849; 1 dropped |
+| At least 14 revealed moves | 1,839; 8,010 dropped |
+| Renderable completion | 1,837; 2 unknown-item completions dropped |
+| Pinned Gen 9 OU validator accepts | 1,439; 398 dropped |
+| Most-revealed valid side per species multiset | 999 compositions; 440 duplicates dropped |
+| Before seeded caps (train / validation / test) | 796 / 141 / 62 |
+| Committed teams and distinct compositions | 600 / 141 / 62 |
+
+Temporal exclusion uses **all** imported known previews, including sides below 1700 or with too
+few moves; no test composition appears in any non-holdout game. The fixed 2,000 holdout ids were
+checked against the newest games by `(uploadtime, id)`. Test compositions occur only there.
+Validation is a seeded 15% of the other compositions, before caps. Split manifests:
+
+| Split | SHA-256 of `<split>/manifest.json` |
+| --- | --- |
+| test | `eddd528afe9581d1f0b4a56a0b66041f2fd4ab19bcec8870be9a1e768d2a8eca` |
+| train | `35e839989802d031120cf0aff2f5b8b632cd5087ba3d02b902cdda7750fda925` |
+| validation | `fa8588caad7cc52a628da650b25ca2176865afe81ca680b0fe010f1744a8badd` |
+
+Smoke evidence completeness: the 803 committed teams average 27.2777 revealed / 62.7223 sampled
+of 90 scalar fields, including six exact species; 15.7422 of 24 moves are revealed. Of the 84
+non-species fields, 21.2777 (25.33%) are revealed. All nature/EV fields are sampled. Unrevealed
+items, abilities, moves and Tera types are usage samples, so these teams can be less coherent
+than teams built by a person. This is not a bank of exact submitted human team sheets.
+
+Verification: all 803 teams validate; all composition groups are disjoint; the full fresh rebuild
+(`--out runs/replay_team_pool/reproduced --work-dir runs/replay_team_pool/fresh-build --seed 0`)
+reproduced all 807 pool/manifest files byte for byte. Exported pastes contain canonical species
+names and set fields only; manifests allow only replay ids, composition ids and numeric counts,
+never original nicknames or player fields. `tests-output.txt`: 34 passed (including the raw
+older-preview check); `lint-output.txt`: `ruff check fog tests` passed. The pytest cache-option
+warning comes from disabling the cache plugin. No hosted workflow or GPU job was started.
+
+Anchor round-robin: pending on the validation directory. A3 is unavailable: `runs/` has no
+retained imitation checkpoint. No substitute will be used. P0.7 remains unchecked until A0–A2
+have completed the required games; G0's A3 clause remains unmeasured.
+
+### Stage 2 completed: validation anchors
+
+The round-robin ran at `66a1e29`, on the same committed validation pool (141 teams). A0 is
+Random, A1 is the existing MaxDamage baseline (poke-env MaxBasePowerPlayer), and A2 is
+SimpleHeuristics. Factories return the existing scripted names, so the local runner's seeded
+randomness and resume behavior are unchanged. Each pair played 250 four-game blocks crossing
+both team assignments and both player positions: **1,000 matched games per pair**, 3,000 total.
+All games resolved; zero failures, genuine draws or truncations. Test teams were not played.
+
+Printed rows, copied verbatim from `10-artifacts/anchors-output.txt` (full per-game results and
+protocol in `10-artifacts/anchors.json`):
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95% Wilson] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-14 | A0 | A1 | showdown_direct | 1000 | 0.102 [0.085, 0.122] (102-898-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+| 2026-11-14 | A0 | A2 | showdown_direct | 1000 | 0.034 [0.024, 0.047] (34-966-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+| 2026-11-14 | A1 | A2 | showdown_direct | 1000 | 0.175 [0.153, 0.200] (175-825-0) | n/a | n/a | `66a1e29` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller A0=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A0={"name":"random"}' --controller A1=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A1={"name":"maxdamage"}' --controller A2=fog.eval.showdown_direct_selection:scripted_controller --controller-kwargs 'A2={"name":"simpleheuristics"}' --head-to-head --games 1000 --seed 0 --max-turns 800 --progress-every 40 --resume --out runs/replay_team_pool/anchors.json` |
+
+Thus MaxDamage won 898/1,000 against Random; SimpleHeuristics won 966/1,000 against Random and
+825/1,000 against MaxDamage. These meet the brief's minimum game count. The scripted controllers
+have no decision-timing or fallback counters, so the printed columns are `n/a`; the match wall
+seconds are saved in the JSON. These rows do not establish a learned-agent strength tier.
+
+Correction to the stage-1 filter description above: the two unrenderable completions were **not
+unknown-item completions**. Both were Ditto sides (`gen9ou-2139396661`, `gen9ou-2443965990`, p2):
+the one-move learnset leaves three move columns unknown. The builder conservatively drops such
+incomplete sheets rather than inventing moves or retrying. The counts, committed pool and hashes
+are unchanged. The validator-equivalence test now explicitly checks an illegal item as well as a
+legal team; final focused checks remain 34 passed and repository lint clean (updated artifacts).
+
+P0.7 is complete under brief 10's A0–A2 acceptance rule. A3 is unavailable, with no substitute;
+G0 remains open (including its A3 clause and remaining throughput work). G1 and tier claims were
+not attempted. All pool files are unchanged from `3506a39`. No checkpoint training, hosted
+workflow, forum fetch or test-split play was performed.

@@ -1,0 +1,59 @@
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Temper Flare
+- Stealth Rock
+- Ice Spinner
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Horn Leech
+- Ivy Cudgel
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Grassy Glide
+- Wood Hammer
+- U-turn
+- Knock Off
+
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Ghost
+EVs: 252 HP / 96 Def / 136 SpA / 24 SpD
+Relaxed Nature
+- Roar
+- Stone Edge
+- Knock Off
+- Stealth Rock
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Body Press
+- Roost
+- Defog
+- U-turn
+
+Dragapult @ leftovers
+Ability: clearbody
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Darts
+- Will-O-Wisp
+- Hex
+- Substitute

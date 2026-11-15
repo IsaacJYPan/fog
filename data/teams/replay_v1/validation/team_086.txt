@@ -1,0 +1,59 @@
+Heatran @ airballoon
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 252 SpA / 4 Spe
+Hardy Nature
+- Protect
+- Earth Power
+- Flash Cannon
+- Stealth Rock
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Encore
+- Gigaton Hammer
+- Protect
+- Stealth Rock
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 64 HP / 4 Def / 188 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Knock Off
+- Rapid Spin
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Synthesis
+- Encore
+- U-turn
+- Ivy Cudgel
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Draco Meteor
+- Shadow Ball
+- Dragon Dance
+
+Dragonite @ weaknesspolicy
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Extreme Speed
+- Dragon Tail
+- Earthquake
+- Roost

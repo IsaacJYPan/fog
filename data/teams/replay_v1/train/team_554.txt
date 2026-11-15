@@ -1,0 +1,59 @@
+Samurott-Hisui @ rockyhelmet
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Flip Turn
+- Taunt
+- Ceaseless Edge
+- Razor Shell
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Thunder Wave
+- Volt Switch
+- Roost
+- Hurricane
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Temper Flare
+- Ice Spinner
+- Rapid Spin
+
+Iron Treads @ airballoon
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Knock Off
+- Earthquake
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Volcanion @ choicespecs
+Ability: waterabsorb
+Tera Type: Fairy
+EVs: 48 HP / 252 SpA / 208 Spe
+Modest Nature
+- Earth Power
+- Will-O-Wisp
+- Steam Eruption
+- Flamethrower

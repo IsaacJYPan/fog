@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Knock Off
+- Toxic
+- Protect
+- Earthquake
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 244 HP / 12 SpA / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Recover
+- Make It Rain
+
+Toxapex @ blacksludge
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 136 Def / 124 SpD
+Impish Nature
+- Poison Jab
+- Toxic
+- Haze
+- Surf
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Stealth Rock
+- Recover
+- Salt Cure
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Knock Off
+- Rapid Spin
+- Bulk Up
+
+Iron Valiant @ choicespecs
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Shadow Ball
+- Knock Off
+- Trick

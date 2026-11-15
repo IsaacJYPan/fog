@@ -1,0 +1,59 @@
+Dragonite @ lifeorb
+Ability: multiscale
+Tera Type: Fire
+EVs: 248 HP / 168 Def / 92 Spe
+Bold Nature
+- Outrage
+- Earthquake
+- Fire Punch
+- Dragon Dance
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 40 HP / 64 Def / 200 SpA / 64 SpD / 140 Spe
+Modest Nature
+- Draco Meteor
+- Calm Mind
+- Thunderclap
+- Volt Switch
+
+Iron Treads @ heavydutyboots
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 64 HP / 252 Atk / 192 Spe
+Jolly Nature
+- Earthquake
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Mirror Coat
+- Wish
+- Scald
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stone Edge
+- Body Press
+- Crunch
+- Close Combat
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Psychic Noise
+- Chilly Reception
+- Flamethrower
+- Sludge Bomb

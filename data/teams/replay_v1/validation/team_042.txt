@@ -1,0 +1,59 @@
+Dragapult @ choicescarf
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- U-turn
+- Will-O-Wisp
+- Hex
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Will-O-Wisp
+- Court Change
+- Pyro Ball
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- Grass Knot
+- U-turn
+- Stealth Rock
+
+Greninja @ choicespecs
+Ability: protean
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Sludge Wave
+- Dark Pulse
+- Surf
+- Water Shuriken
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Thunder Wave
+- Moonblast
+- Knock Off
+
+Zamazenta @ choiceband
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Stone Edge
+- Close Combat
+- Crunch
+- Ice Fang

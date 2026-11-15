@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Protect
+- Spikes
+- Earthquake
+- U-turn
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Stealth Rock
+- Lava Plume
+- Overheat
+- Will-O-Wisp
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Matcha Gotcha
+- Calm Mind
+- Shadow Ball
+- Strength Sap
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Iron Defense
+- Roost
+- U-turn
+- Body Press
+
+Tentacruel @ assaultvest
+Ability: raindish
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Rapid Spin
+- Sludge Bomb
+- Knock Off
+- Surf
+
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Sucker Punch
+- Dark Pulse
+- Ice Beam

@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 220 Atk / 36 SpA / 252 Spe
+Naive Nature
+- Substitute
+- Draco Meteor
+- Freeze-Dry
+- Icicle Spear
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+- Stealth Rock
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Earth Power
+- Stone Edge
+- U-turn
+- Grass Knot
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Toxic
+- Parting Shot
+- Shadow Ball
+- Malignant Chain
+
+Primarina @ covertcloak
+Ability: torrent
+Tera Type: Poison
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Calm Mind
+- Moonblast
+- Substitute
+- Psychic Noise

@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Vacuum Wave
+- Swords Dance
+- Knock Off
+- Spirit Break
+
+Greninja @ lifeorb
+Ability: battlebond
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Dark Pulse
+- Hydro Pump
+- Spikes
+
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Earth Power
+- Sludge Wave
+- Mortal Spin
+- Stealth Rock
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Low Kick
+
+Iron Jugulis @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Taunt
+- Knock Off
+- Earth Power
+- Hurricane
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fire
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Flamethrower
+- Fiery Dance
+- Sludge Wave
+- Overheat

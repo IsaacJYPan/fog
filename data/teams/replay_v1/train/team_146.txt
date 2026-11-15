@@ -1,0 +1,59 @@
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 192 Def / 64 SpD
+Bold Nature
+- Toxic Spikes
+- Recover
+- Poison Jab
+- Acid Spray
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Fire
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Heat Wave
+- Nasty Plot
+- Hurricane
+
+Hippowdon @ smoothrock
+Ability: sandstream
+Tera Type: Rock
+EVs: 248 HP / 112 Def / 148 SpD
+Impish Nature
+- Whirlwind
+- Body Press
+- Earthquake
+- Slack Off
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Knock Off
+- Encore
+- Synthesis
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Iron Defense
+- Roost
+- Spikes
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Fairy
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Calm Mind
+- Soft-Boiled
+- Seismic Toss
+- Shadow Ball

@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Normal
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Flamethrower
+- Seismic Toss
+- Stealth Rock
+- Soft-Boiled
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Toxic
+- Recover
+- Malignant Chain
+- Parting Shot
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Ghost
+EVs: 80 HP / 252 Def / 176 Spe
+Impish Nature
+- Whirlwind
+- Body Press
+- Taunt
+- Brave Bird
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Earthquake
+- Protect
+- Swords Dance
+- Knock Off
+
+Keldeo @ leftovers
+Ability: justified
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Air Slash
+- Surf
+- Vacuum Wave
+- Secret Sword
+
+Zarude @ heavydutyboots
+Ability: leafguard
+Tera Type: Ghost
+EVs: 252 HP / 40 Atk / 216 Spe
+Jolly Nature
+- Trailblaze
+- Synthesis
+- Knock Off
+- Swords Dance

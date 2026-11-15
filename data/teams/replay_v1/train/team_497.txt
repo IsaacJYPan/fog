@@ -1,0 +1,59 @@
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Roost
+- Body Press
+- Iron Defense
+- Spikes
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Bulk Up
+- Rapid Spin
+- Headlong Rush
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Curse
+- Recover
+- Stealth Rock
+- Salt Cure
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Trick
+- Future Sight
+- Chilly Reception
+- Sludge Bomb
+
+Tornadus-Therian @ lifeorb
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Bleakwind Storm
+- Knock Off
+- Heat Wave
+- U-turn
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Ivy Cudgel
+- U-turn
+- Knock Off

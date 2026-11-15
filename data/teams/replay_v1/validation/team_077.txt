@@ -1,0 +1,59 @@
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Poison
+EVs: 44 Def / 212 SpA / 252 Spe
+Timid Nature
+- Sludge Bomb
+- Ice Beam
+- Knock Off
+- Dark Pulse
+
+Enamorus @ heavydutyboots
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Earth Power
+- Moonblast
+- Superpower
+- Mystical Fire
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Earth Power
+- U-turn
+- Taunt
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Steel
+EVs: 120 HP / 192 SpA / 196 Spe
+Modest Nature
+- Make It Rain
+- Shadow Ball
+- Trick
+- Recover
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Ice Spinner
+- Dragon Dance
+- Low Kick
+- Earthquake
+
+Ting-Lu @ custapberry
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Ruination
+- Whirlwind
+- Stealth Rock

@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 152 Atk / 104 SpA / 252 Spe
+Naive Nature
+- Aura Sphere
+- Close Combat
+- Swords Dance
+- Destiny Bond
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Pyro Ball
+- Court Change
+- Swords Dance
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Knock Off
+- Stealth Rock
+- Earthquake
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Low Kick
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Ice Beam
+- Psyshock
+- Thunder Wave
+- Chilly Reception
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ice
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Blizzard
+- Dragon Dance
+- Draco Meteor
+- Freeze-Dry

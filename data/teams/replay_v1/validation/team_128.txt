@@ -1,0 +1,59 @@
+Tinkaton @ leftovers
+Ability: moldbreaker
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Gigaton Hammer
+- Thunder Wave
+- Encore
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Head Smash
+- Ice Spinner
+- Bulk Up
+
+Slither Wing @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 172 HP / 252 Def / 84 Spe
+Impish Nature
+- U-turn
+- First Impression
+- Wild Charge
+- Earthquake
+
+Skeledirge @ kasibberry
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Bold Nature
+- Torch Song
+- Earth Power
+- Slack Off
+- Will-O-Wisp
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Swords Dance
+- Facade
+- Knock Off
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 HP / 176 Def / 80 Spe
+Jolly Nature
+- Swords Dance
+- Encore
+- U-turn
+- Knock Off

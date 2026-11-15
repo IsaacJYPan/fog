@@ -1,0 +1,59 @@
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Meteor Beam
+- Earth Power
+- Mortal Spin
+- Stealth Rock
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Water
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Swords Dance
+- Liquidation
+- Knock Off
+- Moonblast
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 180 HP / 232 Def / 96 Spe
+Impish Nature
+- Stealth Rock
+- Headlong Rush
+- Ice Spinner
+- Supercell Slam
+
+Dragapult @ leftovers
+Ability: cursedbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Draco Meteor
+- Hex
+- Dragon Darts
+- Substitute
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Spikes
+- Ivy Cudgel
+- Trailblaze
+- Synthesis

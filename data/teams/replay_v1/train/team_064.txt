@@ -1,0 +1,59 @@
+Latias @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Stored Power
+- Psychic
+- Draco Meteor
+- Aura Sphere
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Acrobatics
+- Flip Turn
+- Tickle
+- Wish
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Spikes
+- Swords Dance
+- Encore
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Whirlwind
+- Payback
+- Sleep Talk
+- Earthquake
+
+Fezandipiti @ leftovers
+Ability: toxicchain
+Tera Type: Dark
+EVs: 248 HP / 196 SpD / 64 Spe
+Careful Nature
+- Moonblast
+- Calm Mind
+- Beat Up
+- Roost
+
+Scizor @ lumberry
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Dual Wingbeat
+- Bullet Punch
+- U-turn
+- Close Combat

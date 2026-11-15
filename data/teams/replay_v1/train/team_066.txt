@@ -1,0 +1,59 @@
+Lokix @ choiceband
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- First Impression
+- Leech Life
+- Knock Off
+- U-turn
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Close Combat
+- Moonblast
+- Shadow Ball
+- Calm Mind
+
+Alomomola @ choiceband
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Mirror Coat
+- Play Rough
+- Wish
+- Flip Turn
+
+Mandibuzz @ heavydutyboots
+Ability: overcoat
+Tera Type: Steel
+EVs: 248 HP / 244 Def / 16 Spe
+Impish Nature
+- Foul Play
+- U-turn
+- Roost
+- Defog
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Make It Rain
+- Recover
+- Trick
+- Shadow Ball

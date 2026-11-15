@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ground
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Swords Dance
+- Protect
+- Knock Off
+- Toxic
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Poison
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Stored Power
+- Stealth Rock
+- Moonlight
+- Moonblast
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Roost
+- Brave Bird
+- Body Press
+- Iron Defense
+
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Ice Shard
+- Swords Dance
+- Icicle Crash
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Slack Off
+- Will-O-Wisp
+- Torch Song
+- Hex
+
+Volcanion @ choicespecs
+Ability: waterabsorb
+Tera Type: Ground
+EVs: 160 HP / 252 SpA / 96 Spe
+Modest Nature
+- Will-O-Wisp
+- Steam Eruption
+- Sludge Bomb
+- Taunt

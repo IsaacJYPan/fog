@@ -1,0 +1,59 @@
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Ice Beam
+- Stealth Rock
+- Ice Punch
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Protect
+- Spikes
+- U-turn
+- Earthquake
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strength Sap
+- Calm Mind
+- Matcha Gotcha
+- Shadow Ball
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Roar
+- Crunch
+- Close Combat
+- Stone Edge
+
+Fezandipiti @ heavydutyboots
+Ability: toxicchain
+Tera Type: Water
+EVs: 248 HP / 152 Atk / 44 SpD / 64 Spe
+Careful Nature
+- Roost
+- Swagger
+- U-turn
+- Beat Up
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Low Kick

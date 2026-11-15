@@ -1,0 +1,59 @@
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Normal
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Draco Meteor
+- Hex
+- Will-O-Wisp
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 132 Def / 128 Spe
+Bold Nature
+- Torch Song
+- Slack Off
+- Shadow Ball
+- Hex
+
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Steel
+EVs: 248 HP / 244 Def / 16 Spe
+Impish Nature
+- Roost
+- Iron Defense
+- Defog
+- Foul Play
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Pain Split
+- Flamethrower
+- Will-O-Wisp
+
+Milotic @ leftovers
+Ability: marvelscale
+Tera Type: Dragon
+EVs: 252 HP / 252 SpA / 4 SpD
+Quiet Nature
+- Scald
+- Recover
+- Mirror Coat
+- Alluring Voice
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Knock Off
+- U-turn
+- Stealth Rock
+- Protect

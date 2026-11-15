@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Water
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Steel Beam
+- Earthquake
+- Stealth Rock
+- Stone Edge
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Malignant Chain
+- Parting Shot
+- Recover
+- Foul Play
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Horn Leech
+- Swords Dance
+- Ivy Cudgel
+- Synthesis
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Dark
+EVs: 100 Atk / 156 SpA / 252 Spe
+Naive Nature
+- Nasty Plot
+- Sludge Bomb
+- Focus Blast
+- Dark Pulse
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Defense
+- Crunch
+- Substitute
+- Body Press
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Spinner
+- Extreme Speed
+- Earthquake
+- Dragon Dance

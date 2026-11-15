@@ -1,0 +1,59 @@
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Malignant Chain
+- Parting Shot
+- Recover
+- Toxic
+
+Clefable @ lifeorb
+Ability: magicguard
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Moonlight
+- Knock Off
+- Moonblast
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Poison
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Dark Pulse
+- Knock Off
+- Focus Blast
+- Thunder Wave
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 144 Atk / 56 SpD / 60 Spe
+Adamant Nature
+- Razor Shell
+- Sucker Punch
+- Encore
+- Knock Off
+
+Raging Bolt @ choicespecs
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 112 HP / 216 Def / 8 SpA / 172 Spe
+Modest Nature
+- Draco Meteor
+- Solar Beam
+- Roar
+- Thunderclap
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earthquake
+- Stealth Rock
+- U-turn
+- Stone Edge

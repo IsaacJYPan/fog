@@ -1,0 +1,59 @@
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Ghost
+EVs: 100 HP / 252 SpA / 156 Spe
+Modest Nature
+- Substitute
+- Leaf Storm
+- Leech Seed
+- Knock Off
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Normal
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Ice Beam
+- Protect
+- Freeze-Dry
+- Earth Power
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Spinner
+- Rapid Spin
+- Steel Beam
+- Earth Power
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Moonblast
+- Skill Swap
+- Sticky Web
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Sacred Sword
+- Ceaseless Edge
+- Aqua Cutter
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Spirit Break
+- Encore
+- Swords Dance

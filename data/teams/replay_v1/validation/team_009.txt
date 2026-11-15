@@ -1,0 +1,59 @@
+Goodra-Hisui @ assaultvest
+Ability: gooey
+Tera Type: Flying
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flash Cannon
+- Heavy Slam
+- Knock Off
+- Dragon Tail
+
+Cobalion @ heavydutyboots
+Ability: justified
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Stealth Rock
+- Roar
+- Body Press
+- Volt Switch
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Poison
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Aqua Jet
+- Flip Turn
+- Protect
+- Wish
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Toxic
+- Spikes
+- Earthquake
+- Protect
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Flying
+EVs: 248 HP / 132 Def / 128 Spe
+Bold Nature
+- Torch Song
+- Hex
+- Shadow Ball
+- Will-O-Wisp
+
+Meowscarada @ heavydutyboots
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Flower Trick
+- U-turn
+- Knock Off

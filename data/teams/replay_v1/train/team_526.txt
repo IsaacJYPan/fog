@@ -1,0 +1,59 @@
+Mamoswine @ choiceband
+Ability: thickfat
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Icicle Spear
+- Ice Shard
+- Icicle Crash
+
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Stealth Rock
+- Mortal Spin
+- Power Gem
+- Earth Power
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psyshock
+- Tachyon Cutter
+- Focus Blast
+- Calm Mind
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Iron Defense
+- Roar
+- Stone Edge
+- Heavy Slam
+
+Sinistcha @ colburberry
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Strength Sap
+- Shadow Ball
+- Matcha Gotcha
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 4 HP / 252 Atk / 252 SpD
+Careful Nature
+- Knock Off
+- Flip Turn
+- Aqua Cutter
+- Ceaseless Edge

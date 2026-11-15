@@ -1,0 +1,59 @@
+Mimikyu @ lifeorb
+Ability: disguise
+Tera Type: Water
+EVs: 252 HP / 228 Def / 28 SpD
+Relaxed Nature
+- Play Rough
+- Trick Room
+- Swords Dance
+- Curse
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Nuzzle
+- Trick Room
+- Healing Wish
+- Pain Split
+
+Torkoal @ heatrock
+Ability: drought
+Tera Type: Grass
+EVs: 248 HP / 36 Def / 224 SpD
+Calm Nature
+- Solar Beam
+- Eruption
+- Body Press
+- Rapid Spin
+
+Hoopa-Unbound @ focussash
+Ability: magician
+Tera Type: Dark
+EVs: 36 HP / 252 Atk / 220 Spe
+Lonely Nature
+- Drain Punch
+- Trick Room
+- Psychic
+- Trick
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Facade
+- Fire Punch
+- Headlong Rush
+- Swords Dance
+
+Whimsicott @ heavydutyboots
+Ability: chlorophyll
+Tera Type: Ghost
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Memento
+- Shadow Ball
+- Trick Room
+- Leech Seed

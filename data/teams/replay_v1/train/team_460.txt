@@ -1,0 +1,59 @@
+Ting-Lu @ redcard
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Stealth Rock
+- Ruination
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Electric
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Draco Meteor
+- Calm Mind
+- Discharge
+- Thunderclap
+
+Gholdengo @ lifeorb
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Recover
+- Shadow Ball
+- Trick
+
+Enamorus @ lifeorb
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Mystical Fire
+- Substitute
+- Earth Power
+- Healing Wish
+
+Quaquaval @ leftovers
+Ability: moxie
+Tera Type: Ground
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Triple Axel
+- Rapid Spin
+- Aqua Step
+- Encore
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Stun Spore
+- Skill Swap
+- Sticky Web
+- Moonblast

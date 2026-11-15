@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Heavy Slam
+- Spikes
+- Sleep Talk
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Psyshock
+- Focus Blast
+- Vacuum Wave
+
+Clodsire @ blacksludge
+Ability: waterabsorb
+Tera Type: Dark
+EVs: 56 HP / 200 Def / 252 SpD
+Sassy Nature
+- Poison Jab
+- Spikes
+- Amnesia
+- Earthquake
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Dragon Dance
+- Ice Spinner
+- Ice Beam
+
+Gholdengo @ choicespecs
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Thunder Wave
+- Shadow Ball
+- Trick
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Electric
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Earthquake
+- Rapid Spin
+- Headlong Rush

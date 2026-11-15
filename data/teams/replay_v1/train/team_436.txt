@@ -1,0 +1,59 @@
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Encore
+- Razor Shell
+- Ceaseless Edge
+- Knock Off
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Nasty Plot
+- Make It Rain
+- Thunder Wave
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Earthquake
+- Fire Punch
+- Scale Shot
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Dragon Pulse
+- Thunderclap
+- Calm Mind
+- Thunderbolt
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- U-turn
+- Earth Power
+- Taunt
+- Stealth Rock
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Iron Defense
+- Roar
+- Crunch

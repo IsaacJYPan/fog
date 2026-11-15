@@ -1,0 +1,59 @@
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Knock Off
+- Earthquake
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Normal
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Protect
+- Stealth Rock
+- Earth Power
+- Magma Storm
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Make It Rain
+- Nasty Plot
+- Thunder Wave
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Spikes
+- Knock Off
+- U-turn
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Vacuum Wave
+- Calm Mind
+- Encore
+- Moonblast
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Darts
+- Flamethrower
+- Shadow Ball
+- Draco Meteor

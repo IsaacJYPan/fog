@@ -1,0 +1,59 @@
+Toxapex @ leftovers
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 136 Def / 124 SpD
+Impish Nature
+- Recover
+- Toxic Spikes
+- Poison Jab
+- Haze
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Spikes
+- Stealth Rock
+- Rest
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 112 HP / 252 Atk / 144 Spe
+Jolly Nature
+- Knock Off
+- Protect
+- U-turn
+- Spikes
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Fairy
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Shadow Ball
+- Recover
+- Parting Shot
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Waterfall
+- Body Press
+- Curse
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Stealth Rock
+- Shadow Ball
+- Soft-Boiled
+- Calm Mind

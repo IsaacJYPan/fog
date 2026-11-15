@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- U-turn
+- Taunt
+- Stealth Rock
+- Earth Power
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Fighting
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Flip Turn
+- Sacred Sword
+- Ceaseless Edge
+- Knock Off
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Triple Axel
+- Beat Up
+- Ice Shard
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+- Sucker Punch
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Malignant Chain
+- Shadow Ball
+- Nasty Plot
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Close Combat
+- Rapid Spin
+- Headlong Rush

@@ -1,0 +1,59 @@
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Recover
+- Make It Rain
+- Hex
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Weather Ball
+- Bleakwind Storm
+- U-turn
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Close Combat
+- Headlong Rush
+- Knock Off
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Whirlwind
+- Stealth Rock
+- Spikes
+- Earthquake
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 128 Atk / 128 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Heavy Slam
+- Crunch
+- Roar
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Power Whip
+- Trailblaze
+- Synthesis
+- Ivy Cudgel

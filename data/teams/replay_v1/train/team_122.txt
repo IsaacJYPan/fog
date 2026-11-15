@@ -1,0 +1,59 @@
+Garganacl @ heavydutyboots
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Iron Defense
+- Salt Cure
+- Body Press
+- Recover
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 120 HP / 192 SpA / 196 Spe
+Modest Nature
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+- Trick
+
+Hydrapple @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Giga Drain
+- Draco Meteor
+- Fickle Beam
+- Nasty Plot
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Ice Spinner
+- Stealth Rock
+- Headlong Rush
+
+Blaziken @ lifeorb
+Ability: speedboost
+Tera Type: Electric
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Focus Energy
+- Focus Blast
+- Overheat
+- Thunder Punch
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Poison
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Knock Off
+- Bleakwind Storm
+- Nasty Plot

@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Earthquake
+- Protect
+- Spikes
+- Knock Off
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Stealth Rock
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 44 HP / 252 Atk / 96 Def / 116 Spe
+Adamant Nature
+- Ivy Cudgel
+- Encore
+- Power Whip
+- Swords Dance
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Foul Play
+- Shadow Ball
+- Parting Shot
+- Malignant Chain
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Flying
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- U-turn
+- Roost
+- Defog
+- Brave Bird
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Draco Meteor
+- Thunderclap
+- Calm Mind
+- Thunderbolt

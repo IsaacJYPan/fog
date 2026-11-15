@@ -1,0 +1,59 @@
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 244 SpD / 8 Spe
+Careful Nature
+- Grass Knot
+- Earthquake
+- Earth Power
+- U-turn
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Encore
+- Moonblast
+- Calm Mind
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Low Kick
+- Swords Dance
+- Iron Head
+- Sucker Punch
+
+Blaziken @ lifeorb
+Ability: speedboost
+Tera Type: Fighting
+EVs: 4 Atk / 252 SpA / 252 Spe
+Rash Nature
+- Protect
+- Flare Blitz
+- Swords Dance
+- Close Combat
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Psychic
+- Calm Mind
+- Volt Switch
+- Focus Blast
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Encore
+- Play Rough
+- Swords Dance

@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Synthesis
+- Ivy Cudgel
+- Knock Off
+- Horn Leech
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Substitute
+- Iron Defense
+- Body Press
+- Crunch
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Discharge
+- Hurricane
+- Volt Switch
+- U-turn
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Ice
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Flamethrower
+- Sludge Bomb
+- Ice Beam
+- Psyshock
+
+Iron Treads @ expertbelt
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 64 HP / 252 Atk / 192 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Earthquake
+- Knock Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Spikes
+- Earthquake
+- Protect
+- Toxic

@@ -1,0 +1,59 @@
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Curse
+- Shadow Ball
+- Draco Meteor
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Stealth Rock
+- Moonlight
+- Knock Off
+- Moonblast
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 40 Atk / 124 SpD / 96 Spe
+Adamant Nature
+- Aqua Cutter
+- Sucker Punch
+- Knock Off
+- Ceaseless Edge
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Defog
+- Brave Bird
+- U-turn
+- Body Press
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Ice Beam
+- Flamethrower
+- Psyshock
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Bulk Up
+- Headlong Rush
+- Rapid Spin

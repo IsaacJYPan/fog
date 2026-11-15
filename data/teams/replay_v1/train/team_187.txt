@@ -1,0 +1,59 @@
+Hydrapple @ leftovers
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Leaf Storm
+- Nasty Plot
+- Earth Power
+- Giga Drain
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 184 Def / 28 SpA / 48 Spe
+Bold Nature
+- Chilly Reception
+- Ice Beam
+- Toxic
+- Future Sight
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Spikes
+- Heavy Slam
+- Stealth Rock
+- Earthquake
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Recover
+- Earthquake
+- Salt Cure
+- Protect
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Court Change
+- Pyro Ball
+- Will-O-Wisp
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Iron Defense
+- Brave Bird
+- Roost
+- Defog

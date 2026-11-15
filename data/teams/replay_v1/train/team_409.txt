@@ -1,0 +1,59 @@
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Roost
+- Thunder Wave
+- Hurricane
+- Volt Switch
+
+Dragapult @ leftovers
+Ability: clearbody
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Will-O-Wisp
+- Substitute
+- Hex
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Hex
+- Trick
+- Calm Mind
+
+Iron Treads @ focussash
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Earthquake
+- Ice Spinner
+- Stealth Rock
+- Steel Beam
+
+Kommo-o @ leftovers
+Ability: soundproof
+Tera Type: Ghost
+EVs: 36 HP / 220 Atk / 252 Spe
+Jolly Nature
+- Flamethrower
+- Clanging Scales
+- Substitute
+- Clangorous Soul
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Steel
+EVs: 252 HP / 248 Def / 8 SpA
+Modest Nature
+- Surf
+- Draining Kiss
+- Calm Mind
+- Substitute

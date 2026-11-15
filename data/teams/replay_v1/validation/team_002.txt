@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Seismic Toss
+- Stealth Rock
+- Soft-Boiled
+- Protect
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Tickle
+- Wish
+- Mirror Coat
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Curse
+- Rest
+- Sleep Talk
+- Body Press
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Will-O-Wisp
+- Defog
+- Air Slash
+- Roost
+
+Clodsire @ blacksludge
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Toxic
+- Recover
+- Amnesia
+- Poison Jab
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Swords Dance
+- Knock Off
+- Spikes
+- Protect

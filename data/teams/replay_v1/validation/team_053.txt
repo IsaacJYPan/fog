@@ -1,0 +1,59 @@
+Hoopa-Unbound @ choiceband
+Ability: magician
+Tera Type: Dark
+EVs: 248 HP / 252 Atk / 8 SpA
+Brave Nature
+- Gunk Shot
+- Zen Headbutt
+- Knock Off
+- Psychic
+
+Dragapult @ lightclay
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Substitute
+- Dragon Darts
+- Will-O-Wisp
+- U-turn
+
+Tinkaton @ airballoon
+Ability: pickpocket
+Tera Type: Ice
+EVs: 248 HP / 28 Def / 232 Spe
+Jolly Nature
+- Stealth Rock
+- Encore
+- Gigaton Hammer
+- Thunder Wave
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Thunder Wave
+- Volt Switch
+- Hurricane
+- U-turn
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Court Change
+- Will-O-Wisp
+- Sucker Punch
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Play Rough
+- U-turn
+- Ivy Cudgel
+- Knock Off

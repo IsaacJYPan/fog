@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Ivy Cudgel
+- Horn Leech
+- Play Rough
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Electric
+EVs: 252 HP / 16 Def / 216 SpD / 24 Spe
+Careful Nature
+- Ice Punch
+- Recover
+- Salt Cure
+- Body Press
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Electric
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- Defog
+- Roost
+- U-turn
+
+Latios @ covertcloak
+Ability: levitate
+Tera Type: Psychic
+EVs: 252 HP / 160 Def / 16 SpA / 80 Spe
+Modest Nature
+- Draco Meteor
+- Ice Beam
+- Luster Purge
+- Recover
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+- Sucker Punch
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Ice Beam
+- Chilly Reception
+- Thunder Wave
+- Future Sight

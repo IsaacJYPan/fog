@@ -1,0 +1,59 @@
+Dragapult @ airballoon
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- U-turn
+- Hex
+- Dragon Darts
+- Draco Meteor
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Psychic Noise
+- Calm Mind
+- Tachyon Cutter
+- Focus Blast
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Knock Off
+- Horn Leech
+- Taunt
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 60 HP / 252 Def / 196 Spe
+Bold Nature
+- Roost
+- U-turn
+- Defog
+- Iron Defense
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Moonblast
+- Psyshock
+- Encore
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Earthquake
+- Whirlwind
+- Ruination

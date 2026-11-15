@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Thunder Wave
+- Stealth Rock
+- Calm Mind
+- Soft-Boiled
+
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Fairy
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Stealth Rock
+- Earthquake
+- Swords Dance
+- Spikes
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Flying
+EVs: 248 HP / 228 Def / 32 Spe
+Bold Nature
+- Overheat
+- Hurricane
+- Defog
+- Roost
+
+Toxapex @ leftovers
+Ability: regenerator
+Tera Type: Flying
+EVs: 248 HP / 136 Def / 124 SpD
+Impish Nature
+- Toxic Spikes
+- Haze
+- Toxic
+- Recover
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Body Press
+- Curse
+- Sleep Talk
+- Rest
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Knock Off
+- Earthquake
+- Swords Dance

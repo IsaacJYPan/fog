@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- U-turn
+- Will-O-Wisp
+- Sucker Punch
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Knock Off
+- Earthquake
+- Bulk Up
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Ivy Cudgel
+- Play Rough
+- Horn Leech
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Earthquake
+- Stealth Rock
+- Grass Knot
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Shadow Ball
+- Seismic Toss
+- Heal Bell
+- Soft-Boiled
+
+Skeledirge @ leftovers
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Torch Song
+- Hex
+- Will-O-Wisp
+- Slack Off

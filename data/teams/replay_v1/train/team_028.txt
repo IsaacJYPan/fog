@@ -1,0 +1,59 @@
+Alomomola @ covertcloak
+Ability: regenerator
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Flip Turn
+- Scald
+- Mirror Coat
+- Wish
+
+Goodra-Hisui @ assaultvest
+Ability: sapsipper
+Tera Type: Ghost
+EVs: 248 HP / 252 SpA / 8 SpD
+Quiet Nature
+- Flash Cannon
+- Thunderbolt
+- Draco Meteor
+- Knock Off
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Steel
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Dragon Darts
+- Draco Meteor
+- U-turn
+- Phantom Force
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- U-turn
+- Taunt
+- Earth Power
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Will-O-Wisp
+- Sucker Punch
+- Court Change
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Dance
+- Icicle Spear
+- Draco Meteor
+- Earth Power

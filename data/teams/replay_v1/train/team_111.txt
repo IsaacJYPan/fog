@@ -1,0 +1,59 @@
+Garchomp @ loadeddice
+Ability: roughskin
+Tera Type: Ghost
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Earthquake
+- Scale Shot
+- Stealth Rock
+- Endure
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- U-turn
+- Ivy Cudgel
+- Play Rough
+- Knock Off
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roar
+- Will-O-Wisp
+- Flamethrower
+- U-turn
+
+Basculegion-F @ mysticwater
+Ability: swiftswim
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Endeavor
+- Ice Beam
+- Substitute
+- Surf
+
+Ceruledge @ weaknesspolicy
+Ability: weakarmor
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Bitter Blade
+- Poltergeist
+- Shadow Sneak
+
+Cinderace
+Ability: libero
+Tera Type: Ghost
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Gunk Shot
+- Pyro Ball
+- Court Change
+- U-turn

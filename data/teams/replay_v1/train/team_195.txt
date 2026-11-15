@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Sucker Punch
+- Swords Dance
+- Court Change
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Knock Off
+
+Pecharunt @ shucaberry
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Foul Play
+- Parting Shot
+- Recover
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Salt Cure
+- Recover
+- Iron Defense
+- Stealth Rock
+
+Darkrai @ focussash
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Taunt
+- Ice Beam
+- Will-O-Wisp
+- Dark Pulse
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- U-turn
+- Hurricane
+- Discharge
+- Roost

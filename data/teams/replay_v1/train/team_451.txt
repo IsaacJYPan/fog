@@ -1,0 +1,59 @@
+Toucannon @ heavydutyboots
+Ability: keeneye
+Tera Type: Grass
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Beak Blast
+- Roost
+- Rock Blast
+- Knock Off
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 184 Atk / 52 Def / 24 Spe
+Adamant Nature
+- Scale Shot
+- Dragon Dance
+- Fire Punch
+- Extreme Speed
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Close Combat
+- Psychic Fangs
+- Crunch
+- Body Press
+
+Iron Treads @ airballoon
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- Earthquake
+- Stealth Rock
+
+Zapdos @ choicespecs
+Ability: static
+Tera Type: Flying
+EVs: 248 HP / 244 Def / 16 Spe
+Bold Nature
+- U-turn
+- Roost
+- Heat Wave
+- Hurricane
+
+Primarina @ assaultvest
+Ability: liquidvoice
+Tera Type: Poison
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Moonblast
+- Shadow Ball
+- Psychic Noise
+- Flip Turn

@@ -1,0 +1,59 @@
+Greninja @ choicespecs
+Ability: protean
+Tera Type: Water
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Water Shuriken
+- Surf
+- Ice Beam
+- Hydro Pump
+
+Weezing-Galar @ rockyhelmet
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Sludge Bomb
+- Protect
+- Will-O-Wisp
+
+Quaquaval @ choiceband
+Ability: moxie
+Tera Type: Steel
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- U-turn
+- Ice Spinner
+- Close Combat
+- Aqua Step
+
+Scream Tail @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 SpA / 252 Spe
+Timid Nature
+- Protect
+- Encore
+- Dazzling Gleam
+- Wish
+
+Orthworm @ leftovers
+Ability: eartheater
+Tera Type: Electric
+EVs: 252 HP / 16 Def / 240 SpD
+Impish Nature
+- Spikes
+- Curse
+- Body Press
+- Stealth Rock
+
+Goodra-Hisui @ assaultvest
+Ability: sapsipper
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Thunderbolt
+- Ice Beam
+- Draco Meteor
+- Earthquake

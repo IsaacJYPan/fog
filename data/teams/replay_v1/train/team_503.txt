@@ -1,0 +1,59 @@
+Ninetales-Alola @ choicescarf
+Ability: snowwarning
+Tera Type: Ghost
+EVs: 4 HP / 252 SpD / 252 Spe
+Timid Nature
+- Aurora Veil
+- Moonblast
+- Encore
+- Blizzard
+
+Glimmora @ choicescarf
+Ability: toxicdebris
+Tera Type: Grass
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Mortal Spin
+- Energy Ball
+- Sludge Wave
+- Power Gem
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Close Combat
+- Stealth Rock
+
+Gholdengo @ leftovers
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Shadow Ball
+- Nasty Plot
+- Thunder Wave
+- Make It Rain
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Knock Off
+- Ivy Cudgel
+- Power Whip
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Fire
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Ceaseless Edge
+- Flip Turn
+- Knock Off
+- Sucker Punch

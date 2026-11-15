@@ -1,0 +1,59 @@
+Gholdengo @ metalcoat
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 244 HP / 12 SpA / 252 Spe
+Timid Nature
+- Make It Rain
+- Nasty Plot
+- Recover
+- Shadow Ball
+
+Zamazenta @ lightclay
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Body Press
+- Heavy Slam
+- Psychic Fangs
+- Close Combat
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Stealth Rock
+- Ruination
+- Earthquake
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Knock Off
+- Moonlight
+- Stealth Rock
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Dragon Tail
+- Earthquake
+- Roost
+
+Deoxys-Speed @ ejectpack
+Ability: pressure
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Nasty Plot
+- Thunderbolt
+- Pain Split
+- Knock Off

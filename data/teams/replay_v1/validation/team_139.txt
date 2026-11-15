@@ -1,0 +1,59 @@
+Weavile @ lifeorb
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- Swords Dance
+- Ice Shard
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Sludge Wave
+- Energy Ball
+- Discharge
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Low Kick
+- Kowtow Cleave
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Earth Power
+- U-turn
+- Stealth Rock
+- Taunt
+
+Primarina @ custapberry
+Ability: torrent
+Tera Type: Bug
+EVs: 216 Def / 208 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Aqua Jet
+- Moonblast
+- Flip Turn
+- Calm Mind
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Dragon Pulse
+- Draco Meteor
+- Thunderclap

@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- U-turn
+- Encore
+- Synthesis
+
+Great Tusk @ ejectpack
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+- Stealth Rock
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+- Sucker Punch
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Hex
+- Dazzling Gleam
+- Nasty Plot
+
+Samurott-Hisui @ heavydutyboots
+Ability: sharpness
+Tera Type: Ghost
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Razor Shell
+- Knock Off
+- Aqua Cutter
+- Ceaseless Edge
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Ice Punch
+- Knock Off
+- Swords Dance

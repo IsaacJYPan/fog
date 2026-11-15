@@ -1,0 +1,59 @@
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Rock
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- Earth Power
+- Ice Beam
+- Ancient Power
+- Freeze-Dry
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Chilly Reception
+- Thunder Wave
+- Future Sight
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+- Knock Off
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Rock
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Salt Cure
+- Iron Defense
+- Recover
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fire
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- U-turn
+- Brave Bird
+- Agility
+- Roost

@@ -1,0 +1,59 @@
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 76 HP / 252 Atk / 8 SpD / 172 Spe
+Adamant Nature
+- Fire Punch
+- Facade
+- Headlong Rush
+- Swords Dance
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Flip Turn
+- Mirror Coat
+- Play Rough
+- Scald
+
+Pecharunt @ shucaberry
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 Atk / 252 Spe
+Jolly Nature
+- Parting Shot
+- Malignant Chain
+- Shadow Ball
+- Recover
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- Iron Defense
+- Crunch
+- Reflect
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Brave Bird
+- Hurricane
+- Will-O-Wisp
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Earthquake
+- Ice Spinner
+- Rapid Spin

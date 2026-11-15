@@ -1,0 +1,59 @@
+Araquanid @ custapberry
+Ability: waterbubble
+Tera Type: Ghost
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Surf
+- Sticky Web
+- Endure
+- Lunge
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Shadow Ball
+- Psyshock
+- Make It Rain
+- Nasty Plot
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Dragon Pulse
+- Calm Mind
+- Thunderclap
+- Thunder
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Knock Off
+- Aura Sphere
+- Swords Dance
+
+Ceruledge @ lifeorb
+Ability: weakarmor
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Bitter Blade
+- Swords Dance
+- Poltergeist
+- Shadow Sneak
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Fighting
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Psycho Boost
+- Nasty Plot
+- Focus Blast
+- Taunt

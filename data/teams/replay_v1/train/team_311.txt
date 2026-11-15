@@ -1,0 +1,59 @@
+Deoxys-Speed @ wiseglasses
+Ability: pressure
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Focus Blast
+- Taunt
+- Spikes
+- Nasty Plot
+
+Darkrai @ roseliberry
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Sludge Bomb
+- Focus Blast
+- Nasty Plot
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Reflect
+- Iron Defense
+- Body Press
+- Rest
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- U-turn
+- Earth Power
+- Sludge Bomb
+- Stealth Rock
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 176 HP / 68 Atk / 12 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Ivy Cudgel
+- Horn Leech
+- Play Rough
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Earthquake
+- Roost
+- Ice Spinner
+- Extreme Speed

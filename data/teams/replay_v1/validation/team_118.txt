@@ -1,0 +1,59 @@
+Infernape @ lifeorb
+Ability: ironfist
+Tera Type: Ground
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Overheat
+- Vacuum Wave
+- Will-O-Wisp
+- Stealth Rock
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 120 HP / 152 Atk / 60 SpD / 176 Spe
+Adamant Nature
+- Taunt
+- Knock Off
+- Sucker Punch
+- Razor Shell
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Make It Rain
+- Shadow Ball
+- Recover
+- Nasty Plot
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Calm Mind
+- Vacuum Wave
+- Shadow Ball
+- Thunderbolt
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Headlong Rush
+- Bulk Up
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Iron Defense
+- Roar
+- Close Combat

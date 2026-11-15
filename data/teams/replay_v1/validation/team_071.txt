@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 84 HP / 252 Atk / 172 Spe
+Jolly Nature
+- Close Combat
+- Heavy Slam
+- Iron Defense
+- Crunch
+
+Deoxys-Speed @ weaknesspolicy
+Ability: pressure
+Tera Type: Ghost
+EVs: 152 HP / 252 SpA / 104 Spe
+Modest Nature
+- Stored Power
+- Knock Off
+- Recover
+- Cosmic Power
+
+Corviknight @ leftovers
+Ability: mirrorarmor
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Bulk Up
+- Roost
+- Power Trip
+- Agility
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Roost
+- Extreme Speed
+- Scale Shot
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Dazzling Gleam
+- Psychic
+- Energy Ball
+
+Scizor @ lifeorb
+Ability: technician
+Tera Type: Steel
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- U-turn
+- Quick Attack
+- Bullet Punch
+- Swords Dance

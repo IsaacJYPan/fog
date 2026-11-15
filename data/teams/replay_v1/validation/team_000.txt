@@ -1,0 +1,59 @@
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 172 Def / 88 Spe
+Bold Nature
+- Roost
+- Flare Blitz
+- Swords Dance
+- Hurricane
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Flying
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Draining Kiss
+- Psychic Noise
+- Calm Mind
+- Mystical Fire
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Crunch
+- Roar
+- Ice Fang
+- Close Combat
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Tickle
+- Flip Turn
+- Protect
+- Wish
+
+Amoonguss @ rockyhelmet
+Ability: regenerator
+Tera Type: Dark
+EVs: 228 HP / 216 Def / 28 SpA / 36 SpD
+Bold Nature
+- Foul Play
+- Stun Spore
+- Sludge Bomb
+- Stomping Tantrum
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Roost
+- U-turn
+- Brave Bird
+- Defog

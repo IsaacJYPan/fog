@@ -1,0 +1,59 @@
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Tail Glow
+- Acid Armor
+- Scald
+- Substitute
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+- Bulk Up
+
+Grimmsnarl @ leftovers
+Ability: prankster
+Tera Type: Dark
+EVs: 252 HP / 116 Atk / 56 Def / 24 SpD / 60 Spe
+Adamant Nature
+- Play Rough
+- Light Screen
+- Parting Shot
+- Reflect
+
+Dragonite @ choiceband
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Earthquake
+- Extreme Speed
+- Encore
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 140 SpD / 116 Spe
+Calm Nature
+- Magma Storm
+- Substitute
+- Earth Power
+- Taunt
+
+Tinkaton @ lifeorb
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Gigaton Hammer
+- Knock Off
+- Stealth Rock
+- Encore

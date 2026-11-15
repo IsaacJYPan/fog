@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 128 Atk / 128 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Body Press
+- Crunch
+- Iron Defense
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Icicle Spear
+- Substitute
+- Earth Power
+- Freeze-Dry
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Psychic Noise
+- Future Sight
+- Grass Knot
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Knock Off
+- Rapid Spin
+- Stealth Rock
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 248 HP / 184 Atk / 52 Def / 24 Spe
+Adamant Nature
+- Fire Punch
+- Scale Shot
+- Dragon Tail
+- Rock Slide
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Psychic
+EVs: 252 HP / 4 Def / 252 SpA
+Quiet Nature
+- Psychic Noise
+- Nuzzle
+- Mystical Fire
+- Pain Split

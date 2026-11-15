@@ -1,0 +1,59 @@
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Knock Off
+- Dark Pulse
+- Trick
+
+Dragapult @ leftovers
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- U-turn
+- Will-O-Wisp
+- Hex
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Low Kick
+- Ivy Cudgel
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- U-turn
+- Roost
+- Defog
+- Brave Bird
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock
+- Knock Off
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Chilly Reception
+- Sludge Bomb
+- Ice Beam
+- Flamethrower

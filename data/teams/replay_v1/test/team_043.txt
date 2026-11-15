@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Iron Defense
+- Stone Edge
+- Substitute
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Shadow Ball
+- Phantom Force
+- Draco Meteor
+- Fire Blast
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Roost
+- Volt Switch
+- Heat Wave
+- Hurricane
+
+Volcanion @ shucaberry
+Ability: waterabsorb
+Tera Type: Fairy
+EVs: 160 Def / 80 SpA / 64 SpD / 204 Spe
+Modest Nature
+- Sludge Bomb
+- Taunt
+- Steam Eruption
+- Flamethrower
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Knock Off
+- Rapid Spin
+- Earthquake
+- Stealth Rock

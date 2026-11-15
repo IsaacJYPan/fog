@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Waterfall
+- Rest
+- Curse
+- Sleep Talk
+
+Clefable @ heavydutyboots
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 80 SpA / 176 Spe
+Modest Nature
+- Protect
+- Stealth Rock
+- Moonlight
+- Moonblast
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ghost
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Toxic
+- Substitute
+- Knock Off
+- Protect
+
+Toxapex @ leftovers
+Ability: regenerator
+Tera Type: Bug
+EVs: 248 HP / 8 Def / 252 SpD
+Bold Nature
+- Baneful Bunker
+- Recover
+- Poison Jab
+- Infestation
+
+Clodsire @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Poison Jab
+- Recover
+- Spikes
+- Earthquake
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Brave Bird
+- U-turn
+- Defog
+- Protect

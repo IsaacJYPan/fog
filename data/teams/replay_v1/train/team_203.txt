@@ -1,0 +1,59 @@
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Fairy
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Fire Punch
+- Protect
+- Facade
+- Drain Punch
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Poison
+EVs: 216 Def / 208 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Calm Mind
+- Psychic Noise
+- Substitute
+- Moonblast
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Encore
+- Ivy Cudgel
+- Horn Leech
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- U-turn
+- High Jump Kick
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Iron Defense
+- Roost
+- Stealth Rock
+- Body Press
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Dragon Darts
+- Shadow Ball
+- U-turn

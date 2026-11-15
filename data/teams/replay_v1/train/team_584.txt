@@ -1,0 +1,59 @@
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Sludge Wave
+- Fiery Dance
+- Overheat
+- Discharge
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Ice Spinner
+- Earthquake
+- Stealth Rock
+- Rapid Spin
+
+Iron Valiant @ lifeorb
+Ability: quarkdrive
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Close Combat
+- Thunderbolt
+- Knock Off
+- Ice Punch
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sacred Sword
+- Flip Turn
+- Razor Shell
+- Ceaseless Edge
+
+Skeledirge @ leftovers
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Will-O-Wisp
+- Hex
+- Slack Off
+- Roar
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Roost
+- Hurricane
+- U-turn

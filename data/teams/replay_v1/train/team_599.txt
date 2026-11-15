@@ -1,0 +1,59 @@
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Wood Hammer
+- Knock Off
+- Grassy Glide
+- U-turn
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Heavy Slam
+- Body Press
+- Iron Head
+- Iron Defense
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Poison
+EVs: 248 HP / 208 SpA / 52 SpD
+Modest Nature
+- Flip Turn
+- Moonblast
+- Surf
+- Substitute
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderclap
+- Calm Mind
+- Volt Switch
+- Thunderbolt
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Grass
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Taunt
+- Earth Power
+- Stealth Rock
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Fire
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Bullet Punch
+- Knock Off
+- Swords Dance
+- U-turn

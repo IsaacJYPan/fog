@@ -1,0 +1,59 @@
+Garchomp @ lifeorb
+Ability: roughskin
+Tera Type: Poison
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Dragon Tail
+- Stealth Rock
+- Rest
+- Swords Dance
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Steel
+EVs: 240 HP / 100 Def / 108 SpD / 60 Spe
+Bold Nature
+- Nuzzle
+- Draining Kiss
+- Pain Split
+- Psychic Noise
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Fairy
+EVs: 248 HP / 124 SpA / 132 SpD / 4 Spe
+Modest Nature
+- Freeze-Dry
+- Ice Beam
+- Earth Power
+- Protect
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Body Press
+- Rest
+- Iron Defense
+- Crunch
+
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Knock Off
+- Focus Blast
+- Bleakwind Storm

@@ -1,0 +1,59 @@
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Power Gem
+- Earth Power
+- Mortal Spin
+- Stealth Rock
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 112 HP / 144 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Recover
+- Parting Shot
+- Shadow Ball
+
+Mimikyu @ redcard
+Ability: disguise
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Swords Dance
+- Destiny Bond
+- Play Rough
+- Will-O-Wisp
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Vacuum Wave
+- Swords Dance
+- Knock Off
+- Moonblast
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Roar
+- Crunch
+- Ice Fang
+- Heavy Slam
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 200 HP / 56 Atk / 248 SpD / 4 Spe
+Adamant Nature
+- Supercell Slam
+- Heavy Slam
+- Drain Punch
+- Swords Dance

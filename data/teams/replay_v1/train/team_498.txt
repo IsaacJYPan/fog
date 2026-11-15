@@ -1,0 +1,59 @@
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Spirit Break
+- Reflect
+- Light Screen
+- Low Kick
+
+Kommo-o @ leftovers
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 244 HP / 16 Atk / 248 Spe
+Jolly Nature
+- Clangorous Soul
+- Drain Punch
+- Shadow Claw
+- Substitute
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Psyshock
+- Tachyon Cutter
+- Focus Blast
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ground
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Icicle Spear
+- Dragon Dance
+- Earth Power
+- Freeze-Dry
+
+Okidogi @ leftovers
+Ability: toxicchain
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Ice Punch
+- Bulk Up
+- Knock Off
+- Drain Punch
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Curse
+- Recover
+- Salt Cure

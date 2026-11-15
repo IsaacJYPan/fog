@@ -1,0 +1,59 @@
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 200 HP / 252 Atk / 56 Spe
+Adamant Nature
+- Razor Shell
+- Ceaseless Edge
+- Knock Off
+- Aqua Cutter
+
+Tornadus-Therian @ lifeorb
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Knock Off
+- Heat Wave
+- U-turn
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 112 HP / 144 SpA / 252 Spe
+Timid Nature
+- Recover
+- Parting Shot
+- Malignant Chain
+- Foul Play
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Stealth Rock
+- Close Combat
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Flamethrower
+- Calm Mind
+- Moonlight
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Crunch
+- Close Combat
+- Body Press
+- Ice Fang

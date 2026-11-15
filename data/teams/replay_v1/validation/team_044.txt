@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Sucker Punch
+- High Jump Kick
+- Court Change
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Rapid Spin
+- Head Smash
+- Earthquake
+- Ice Spinner
+
+Dragonite @ expertbelt
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Breaking Swipe
+- Thunderbolt
+- Ice Beam
+- Extreme Speed
+
+Cloyster @ whiteherb
+Ability: skilllink
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Shard
+- Icicle Spear
+- Drill Run
+- Shell Smash
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Ghost
+EVs: 252 HP / 64 Def / 8 SpA / 124 SpD / 60 Spe
+Modest Nature
+- Psychic Noise
+- Draining Kiss
+- Surf
+- Whirlpool

@@ -1,0 +1,59 @@
+Tornadus-Therian @ choicespecs
+Ability: regenerator
+Tera Type: Steel
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- Heat Wave
+- Bleakwind Storm
+- Knock Off
+- U-turn
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Steel
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Flip Turn
+- Substitute
+- Surf
+- Moonblast
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 120 HP / 44 Atk / 248 SpD / 96 Spe
+Adamant Nature
+- Headlong Rush
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 104 Def / 156 SpD
+Impish Nature
+- U-turn
+- Brave Bird
+- Roost
+- Spite
+
+Darkrai @ blackglasses
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Bomb
+- Trick
+- Focus Blast
+- Dark Pulse
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Chilly Reception
+- Trick
+- Future Sight
+- Sludge Wave

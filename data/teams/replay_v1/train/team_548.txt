@@ -1,0 +1,59 @@
+Jolteon @ heavydutyboots
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Calm Mind
+- Alluring Voice
+- Thunderbolt
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Sludge Bomb
+- Focus Blast
+- Chilly Reception
+- Ice Beam
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 180 HP / 232 Def / 96 Spe
+Impish Nature
+- Ice Spinner
+- Rapid Spin
+- Stealth Rock
+- Body Press
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Roost
+- U-turn
+- Will-O-Wisp
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Swords Dance
+- Kowtow Cleave
+
+Hydrapple @ choicespecs
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Nasty Plot
+- Earth Power
+- Giga Drain
+- Fickle Beam

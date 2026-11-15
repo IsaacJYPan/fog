@@ -1,0 +1,59 @@
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Energy Ball
+- Tail Glow
+- Surf
+- Ice Beam
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Moonblast
+- Sticky Web
+- Trick
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 136 Def / 48 SpD / 76 Spe
+Calm Nature
+- Recover
+- Shadow Ball
+- Focus Blast
+- Make It Rain
+
+Garchomp @ loadeddice
+Ability: roughskin
+Tera Type: Poison
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Fire Fang
+- Spikes
+- Scale Shot
+- Earthquake
+
+Iron Moth @ powerherb
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Flamethrower
+- Dazzling Gleam
+- Meteor Beam
+- Sludge Wave
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Stone Edge
+- Rapid Spin
+- Ice Spinner

@@ -1,0 +1,59 @@
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Body Slam
+- Wish
+- Protect
+- Flip Turn
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Facade
+- Protect
+- Fire Punch
+- Headlong Rush
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 248 HP / 240 Def / 20 Spe
+Bold Nature
+- Pain Split
+- Defog
+- Acid Spray
+- Strange Steam
+
+Goodra-Hisui @ choicespecs
+Ability: gooey
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Knock Off
+- Dragon Pulse
+- Acid Spray
+- Flamethrower
+
+Iron Crown @ weaknesspolicy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Stored Power
+- Agility
+- Psyshock
+- Calm Mind
+
+Blaziken @ focussash
+Ability: speedboost
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Rash Nature
+- Blaze Kick
+- Swords Dance
+- Reversal
+- Close Combat

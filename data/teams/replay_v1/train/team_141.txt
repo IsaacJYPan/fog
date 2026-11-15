@@ -1,0 +1,59 @@
+Jirachi @ leftovers
+Ability: serenegrace
+Tera Type: Dark
+EVs: 248 HP / 44 SpA / 216 Spe
+Timid Nature
+- Fire Punch
+- Protect
+- Iron Head
+- Wish
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Wave Crash
+- Sleep Talk
+- Liquidation
+- Rest
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Swords Dance
+- Knock Off
+- Protect
+- Spikes
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Water
+EVs: 72 HP / 184 Def / 252 SpD
+Calm Nature
+- Soft-Boiled
+- Stealth Rock
+- Calm Mind
+- Seismic Toss
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 252 HP / 192 Def / 64 Spe
+Timid Nature
+- Will-O-Wisp
+- Defog
+- Roost
+- Overheat
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 192 Def / 64 SpD
+Bold Nature
+- Recover
+- Poison Jab
+- Baneful Bunker
+- Toxic

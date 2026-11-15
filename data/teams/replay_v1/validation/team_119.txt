@@ -1,0 +1,59 @@
+Ribombee @ lightclay
+Ability: sweetveil
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sticky Web
+- Reflect
+- Light Screen
+- Skill Swap
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Calm Mind
+- Volt Switch
+- Dragon Pulse
+- Thunderbolt
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Leech Seed
+- Horn Leech
+- Swords Dance
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Nasty Plot
+- Focus Blast
+- Dazzling Gleam
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Bulk Up
+- Head Smash
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Discharge
+- Energy Ball
+- Psychic
+- Fiery Dance

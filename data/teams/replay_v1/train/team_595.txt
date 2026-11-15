@@ -1,0 +1,59 @@
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Fighting
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Recover
+- Parting Shot
+- Shadow Ball
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Sucker Punch
+- Flip Turn
+- Ceaseless Edge
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- Ice Beam
+- Earth Power
+- Substitute
+- Freeze-Dry
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Heavy Slam
+- Reflect
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Earthquake
+- U-turn
+- Taunt

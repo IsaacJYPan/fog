@@ -1,0 +1,59 @@
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Psychic Noise
+- Trick
+- Toxic
+- Ice Beam
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ghost
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Swords Dance
+- Protect
+- Knock Off
+- Facade
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 104 Def / 144 SpD / 12 Spe
+Bold Nature
+- Roost
+- Brave Bird
+- Flamethrower
+- Roar
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Will-O-Wisp
+- Draco Meteor
+- Dragon Darts
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Ice
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Gigaton Hammer
+- Thunder Wave
+- Encore
+- Stealth Rock
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Flying
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Volt Switch
+- Thunderbolt
+- Weather Ball
+- Thunderclap

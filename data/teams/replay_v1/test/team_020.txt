@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Earthquake
+- Swords Dance
+- Protect
+- Facade
+
+Kyurem @ heavydutyboots
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Blizzard
+- Protect
+- Ice Beam
+- Freeze-Dry
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Swords Dance
+- U-turn
+- Pyro Ball
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Chilly Reception
+- Flamethrower
+- Sludge Bomb
+- Trick
+
+Meowscarada @ heavydutyboots
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Grass Knot
+- Triple Axel
+- Knock Off
+- Flower Trick
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Roost
+- Power Trip
+- U-turn
+- Defog

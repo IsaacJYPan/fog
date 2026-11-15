@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Moonblast
+- Calm Mind
+- Wish
+- Flamethrower
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Spinner
+- Extreme Speed
+- Encore
+- Dragon Dance
+
+Thundurus-Therian @ heavydutyboots
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Thunderbolt
+- Agility
+- Nasty Plot
+- Psychic
+
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Scald
+- Acid Armor
+- Take Heart
+- Stored Power
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Moonblast
+- Thunderbolt
+- Calm Mind
+- Close Combat
+
+Klefki @ lightclay
+Ability: prankster
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Dazzling Gleam
+- Spikes
+- Thunder Wave
+- Reflect

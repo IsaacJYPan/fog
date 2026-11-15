@@ -1,0 +1,59 @@
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Future Sight
+- Ice Beam
+- Chilly Reception
+- Thunder Wave
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Iron Defense
+- Spikes
+- Whirlwind
+- Roost
+
+Iron Treads @ heavydutyboots
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Earthquake
+- Rapid Spin
+- Stealth Rock
+
+Lokix @ heavydutyboots
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- U-turn
+- Taunt
+- First Impression
+- Knock Off
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Bold Nature
+- Recover
+- Infestation
+- Surf
+- Toxic
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Flamethrower
+- Shadow Ball
+- U-turn
+- Dragon Darts

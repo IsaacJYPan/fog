@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ground
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Swords Dance
+- Earthquake
+- Facade
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Mirror Coat
+- Scald
+- Flip Turn
+- Play Rough
+
+Cobalion @ rockyhelmet
+Ability: justified
+Tera Type: Ghost
+EVs: 104 HP / 252 Def / 152 Spe
+Timid Nature
+- Roar
+- Body Press
+- Stealth Rock
+- Stone Edge
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 52 HP / 252 Atk / 204 Spe
+Adamant Nature
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+- Knock Off
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Dragon Darts
+- U-turn
+- Thunder Wave
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 200 Def / 56 SpD / 4 Spe
+Bold Nature
+- Recover
+- Parting Shot
+- Foul Play
+- Malignant Chain

@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Swords Dance
+- Low Kick
+- Kowtow Cleave
+- Sucker Punch
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Swords Dance
+- Encore
+- Moonblast
+- Close Combat
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Make It Rain
+- Shadow Ball
+- Dazzling Gleam
+- Thunderbolt
+
+Araquanid @ custapberry
+Ability: waterbubble
+Tera Type: Grass
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Liquidation
+- Sticky Web
+- Pounce
+- Surf
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+- Bulk Up
+
+Porygon-Z @ choicespecs
+Ability: download
+Tera Type: Normal
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Shadow Ball
+- Thunderbolt
+- Dark Pulse

@@ -1,0 +1,59 @@
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Temper Flare
+- Knock Off
+- Head Smash
+
+Latios @ souldew
+Ability: levitate
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Draco Meteor
+- Luster Purge
+- Agility
+- Calm Mind
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+- Sucker Punch
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Spikes
+- Toxic
+- Earthquake
+- Protect
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Ground
+EVs: 252 HP / 248 Def / 8 SpA
+Modest Nature
+- Draining Kiss
+- Psychic Noise
+- Moonblast
+- Calm Mind
+
+Meowscarada @ choicescarf
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- U-turn
+- Flower Trick

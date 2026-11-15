@@ -1,0 +1,59 @@
+Heatran @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 88 Def / 8 SpA / 124 SpD / 40 Spe
+Calm Nature
+- Magma Storm
+- Taunt
+- Stealth Rock
+- Protect
+
+Amoonguss @ heavydutyboots
+Ability: regenerator
+Tera Type: Flying
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Toxic
+- Grass Knot
+- Stun Spore
+- Leaf Storm
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 48 HP / 252 Atk / 208 Spe
+Adamant Nature
+- Body Press
+- Liquidation
+- Sleep Talk
+- Curse
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Normal
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Shadow Ball
+- Calm Mind
+- Seismic Toss
+- Soft-Boiled
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Wish
+- Moonblast
+- Protect
+- Knock Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Earthquake
+- Spikes
+- Knock Off

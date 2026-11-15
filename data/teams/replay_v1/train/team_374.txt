@@ -1,0 +1,59 @@
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Dark
+EVs: 76 HP / 252 Atk / 180 Spe
+Adamant Nature
+- Swords Dance
+- Knock Off
+- Drain Punch
+- Grassy Glide
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Steel Beam
+- Ice Spinner
+- Rapid Spin
+- Earth Power
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Will-O-Wisp
+- U-turn
+- Draco Meteor
+
+Hatterene @ grassyseed
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Calm Mind
+- Trick Room
+- Psyshock
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Body Press
+- Salt Cure
+- Iron Defense
+- Recover
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ice
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Ice Beam
+- Earth Power
+- Draco Meteor
+- Icicle Spear

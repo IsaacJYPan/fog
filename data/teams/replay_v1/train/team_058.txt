@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Heavy Slam
+- Stealth Rock
+- Earthquake
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Scald
+- Flip Turn
+- Healing Wish
+- Mirror Coat
+
+Great Tusk @ choiceband
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Make It Rain
+- Thunderbolt
+- Recover
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Recover
+- Parting Shot
+- Foul Play
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Dragon Dance
+- Earthquake
+- Roost

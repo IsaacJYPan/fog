@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Dragon Dance
+- Protect
+- Substitute
+- Icicle Spear
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- Knock Off
+- Low Kick
+- Grassy Glide
+- Wood Hammer
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Ivy Cudgel
+- U-turn
+- Knock Off
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Stealth Rock
+- Earth Power
+- U-turn
+- Earthquake
+
+Muk-Alola @ assaultvest
+Ability: poisontouch
+Tera Type: Flying
+EVs: 252 HP / 4 Atk / 252 SpD
+Sassy Nature
+- Poison Jab
+- Ice Punch
+- Drain Punch
+- Knock Off
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Steel
+EVs: 240 HP / 100 Def / 108 SpD / 60 Spe
+Bold Nature
+- Psychic Noise
+- Pain Split
+- Draining Kiss
+- Psyshock

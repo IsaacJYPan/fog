@@ -1,0 +1,59 @@
+Slither Wing @ assaultvest
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 28 Atk / 220 Def / 8 Spe
+Impish Nature
+- First Impression
+- U-turn
+- Close Combat
+- Low Kick
+
+Samurott-Hisui @ blackglasses
+Ability: sharpness
+Tera Type: Poison
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Knock Off
+- Razor Shell
+- Flip Turn
+- Aqua Cutter
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Court Change
+- Pyro Ball
+- U-turn
+
+Primarina @ choicespecs
+Ability: torrent
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Aqua Jet
+- Draining Kiss
+- Surf
+- Moonblast
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Nasty Plot
+- Recover
+- Make It Rain
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- U-turn
+- Stone Edge
+- Swords Dance

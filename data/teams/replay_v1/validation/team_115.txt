@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Body Press
+- Salt Cure
+- Curse
+- Recover
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Trick
+- Future Sight
+- Sludge Bomb
+- Chilly Reception
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ground
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Earth Power
+- Scale Shot
+- Focus Blast
+- Ice Beam
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strange Steam
+- Will-O-Wisp
+- Defog
+- Pain Split
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 252 HP / 192 Def / 48 SpA / 16 Spe
+Bold Nature
+- Roost
+- U-turn
+- Flamethrower
+- Scorching Sands
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Rapid Spin
+- Stomping Tantrum
+- Knock Off
+- Earth Power

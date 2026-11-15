@@ -1,0 +1,59 @@
+Wo-Chien @ leftovers
+Ability: tabletsofruin
+Tera Type: Poison
+EVs: 252 HP / 156 Def / 100 Spe
+Bold Nature
+- Protect
+- Ruination
+- Foul Play
+- Leech Seed
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Flamethrower
+- Moonlight
+- Stealth Rock
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Shadow Ball
+- Malignant Chain
+- Recover
+- Parting Shot
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 196 HP / 204 Atk / 108 Spe
+Adamant Nature
+- Earthquake
+- Extreme Speed
+- Scale Shot
+- Dragon Dance
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Water
+EVs: 64 HP / 252 Atk / 192 Spe
+Jolly Nature
+- Rapid Spin
+- Earthquake
+- Stealth Rock
+- Ice Spinner
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sucker Punch
+- Knock Off
+- Ice Beam
+- Dark Pulse

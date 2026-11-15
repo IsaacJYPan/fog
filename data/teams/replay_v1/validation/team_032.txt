@@ -1,0 +1,59 @@
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Will-O-Wisp
+- Dragon Dance
+- Hex
+- Flamethrower
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Roost
+- Flamethrower
+- Roar
+
+Iron Hands @ leftovers
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Drain Punch
+- Swords Dance
+- Close Combat
+- Ice Punch
+
+Pecharunt @ leftovers
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Recover
+- Shadow Ball
+- Parting Shot
+
+Breloom @ focussash
+Ability: poisonheal
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Rock Tomb
+- Bullet Seed
+- Bulldoze
+
+Hoopa-Unbound @ ejectpack
+Ability: magician
+Tera Type: Dark
+EVs: 224 HP / 12 Atk / 76 Def / 76 SpA / 24 SpD / 96 Spe
+Mild Nature
+- Hyperspace Fury
+- Drain Punch
+- Knock Off
+- Gunk Shot

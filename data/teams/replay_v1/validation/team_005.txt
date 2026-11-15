@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Ice Beam
+- Moonblast
+- Focus Blast
+- Moonlight
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Protect
+- Flip Turn
+- Play Rough
+- Body Slam
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Shadow Ball
+- Recover
+- Malignant Chain
+- Parting Shot
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- U-turn
+- Gunk Shot
+- Will-O-Wisp
+
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Focus Blast
+- Psyshock
+- Tachyon Cutter
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Encore
+- Roost
+- Extreme Speed
+- Dragon Dance

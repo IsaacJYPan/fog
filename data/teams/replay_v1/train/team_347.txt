@@ -1,0 +1,59 @@
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Ruination
+- Spikes
+- Whirlwind
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 120 HP / 192 SpA / 196 Spe
+Modest Nature
+- Trick
+- Recover
+- Shadow Ball
+- Make It Rain
+
+Deoxys-Speed @ redcard
+Ability: pressure
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- Superpower
+- Knock Off
+- Psychic Noise
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Roost
+- Dragon Dance
+- Extreme Speed
+
+Okidogi @ choicescarf
+Ability: toxicchain
+Tera Type: Normal
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Gunk Shot
+- Knock Off
+- Drain Punch
+- Ice Punch
+
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Ice
+EVs: 220 Atk / 36 SpA / 252 Spe
+Naive Nature
+- Substitute
+- Freeze-Dry
+- Icicle Spear
+- Earth Power

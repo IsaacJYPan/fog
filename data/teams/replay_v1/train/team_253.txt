@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 80 Def / 176 Spe
+Bold Nature
+- Knock Off
+- Moonlight
+- Stealth Rock
+- Moonblast
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Earthquake
+- Sleep Talk
+- Rest
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Shadow Ball
+- Thunder Wave
+- Nasty Plot
+- Make It Rain
+
+Latios @ souldew
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Draco Meteor
+- Recover
+- Calm Mind
+
+Slither Wing @ choiceband
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 252 HP / 28 Atk / 220 Def / 8 Spe
+Impish Nature
+- Morning Sun
+- First Impression
+- Close Combat
+- Will-O-Wisp
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Spikes
+- Encore
+- Synthesis
+- Rock Tomb

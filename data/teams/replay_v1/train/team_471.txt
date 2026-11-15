@@ -1,0 +1,59 @@
+Tyranitar @ weaknesspolicy
+Ability: sandstream
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Stone Edge
+- Knock Off
+- Ice Punch
+- Low Kick
+
+Excadrill @ airballoon
+Ability: moldbreaker
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Earthquake
+- Rock Slide
+- Rapid Spin
+- Iron Head
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Parting Shot
+- Recover
+- Shadow Ball
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roost
+- U-turn
+- Roar
+- Flamethrower
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Salt Cure
+- Stealth Rock
+- Body Press
+- Recover
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 20 HP / 252 Def / 236 Spe
+Impish Nature
+- Crunch
+- Body Press
+- Iron Defense
+- Substitute

@@ -1,0 +1,59 @@
+Salamence @ heavydutyboots
+Ability: intimidate
+Tera Type: Fire
+EVs: 148 HP / 216 Def / 120 Spe
+Impish Nature
+- Roost
+- Flamethrower
+- Air Slash
+- Dragon Tail
+
+Florges @ leftovers
+Ability: flowerveil
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Moonblast
+- Psychic
+- Calm Mind
+- Giga Drain
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Sassy Nature
+- Recover
+- Spikes
+- Earthquake
+- Stealth Rock
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Court Change
+- Pyro Ball
+- Sucker Punch
+
+Hoopa-Unbound @ ejectpack
+Ability: magician
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Hyperspace Fury
+- Psychic Noise
+- Zen Headbutt
+- Knock Off
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Icicle Spear
+- Dragon Dance
+- Substitute

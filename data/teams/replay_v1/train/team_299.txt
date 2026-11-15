@@ -1,0 +1,59 @@
+Volcanion @ shucaberry
+Ability: waterabsorb
+Tera Type: Fairy
+EVs: 80 HP / 216 SpA / 212 Spe
+Modest Nature
+- Will-O-Wisp
+- Flamethrower
+- Steam Eruption
+- Earth Power
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Future Sight
+- Sludge Bomb
+- Chilly Reception
+- Trick
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Heavy Slam
+- Close Combat
+- Body Press
+- Crunch
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- U-turn
+- Iron Defense
+- Body Press
+- Defog
+
+Hatterene @ custapberry
+Ability: magicbounce
+Tera Type: Water
+EVs: 248 HP / 204 Def / 56 SpD
+Bold Nature
+- Pain Split
+- Psychic Noise
+- Nuzzle
+- Draining Kiss
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Sleep Talk
+- Rest
+- Spikes
+- Payback

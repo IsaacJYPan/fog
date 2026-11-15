@@ -1,0 +1,59 @@
+Clodsire @ covertcloak
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Amnesia
+- Recover
+- Curse
+- Waterfall
+
+Walking Wake @ mysticwater
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Flip Turn
+- Knock Off
+- Draco Meteor
+- Scald
+
+Dragapult @ lifeorb
+Ability: cursedbody
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Draco Meteor
+- Hex
+- Phantom Force
+
+Corviknight @ leftovers
+Ability: mirrorarmor
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Brave Bird
+- Roost
+- Defog
+- Bulk Up
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Rest
+- Wave Crash
+- Curse
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dark
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Protect
+- Knock Off
+- Toxic
+- Earthquake

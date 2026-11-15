@@ -1,0 +1,59 @@
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Wish
+- Aqua Jet
+- Protect
+- Flip Turn
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- Bleakwind Storm
+- Knock Off
+- Taunt
+- U-turn
+
+Tyranitar @ choiceband
+Ability: sandstream
+Tera Type: Flying
+EVs: 184 HP / 72 Def / 252 SpA
+Quiet Nature
+- Knock Off
+- Low Kick
+- Stealth Rock
+- Ice Punch
+
+Gholdengo @ babiriberry
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Recover
+- Hex
+- Thunder Wave
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Whirlwind
+- Spikes
+- Ruination
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Light Screen
+- Crunch
+- Body Press

@@ -1,0 +1,59 @@
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Earth Power
+- Magma Storm
+- Protect
+- Taunt
+
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Grass
+EVs: 76 HP / 252 Atk / 180 Spe
+Adamant Nature
+- High Horsepower
+- Knock Off
+- Grassy Glide
+- Wood Hammer
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Horn Leech
+- Grassy Glide
+- Ivy Cudgel
+- Swords Dance
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Aurora Veil
+- Moonblast
+- Encore
+- Freeze-Dry
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Recover
+- Nasty Plot
+- Shadow Ball
+- Dazzling Gleam
+
+Mabosstiff @ choiceband
+Ability: stakeout
+Tera Type: Bug
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- Ice Fang
+- Destiny Bond
+- Crunch
+- Psychic Fangs

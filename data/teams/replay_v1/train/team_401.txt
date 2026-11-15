@@ -1,0 +1,59 @@
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Draco Meteor
+- Dragon Pulse
+- Calm Mind
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Poison
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- Heat Wave
+- Knock Off
+- U-turn
+- Bleakwind Storm
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Knock Off
+- Ice Spinner
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- U-turn
+- Will-O-Wisp
+- Hex
+- Dragon Darts
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Thunder Wave
+- Future Sight
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Defense
+- Roar
+- Body Press
+- Crunch

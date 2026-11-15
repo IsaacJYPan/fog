@@ -1,0 +1,59 @@
+Chesnaught @ leftovers
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Knock Off
+- Synthesis
+- Body Press
+- Iron Defense
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Ghost
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Calm Mind
+- Psychic Noise
+- Draining Kiss
+- Pain Split
+
+Darkrai @ expertbelt
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Focus Blast
+- Will-O-Wisp
+- Ice Beam
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Brave Bird
+- U-turn
+- Roost
+- Iron Defense
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 20 Atk / 236 Spe
+Jolly Nature
+- Rest
+- Sleep Talk
+- Heavy Slam
+- Earthquake
+
+Dragapult @ lightclay
+Ability: clearbody
+Tera Type: Dragon
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- U-turn
+- Quick Attack
+- Dragon Darts

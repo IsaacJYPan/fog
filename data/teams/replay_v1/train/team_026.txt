@@ -1,0 +1,59 @@
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Earth Power
+- Fickle Beam
+- Draco Meteor
+- Giga Drain
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Court Change
+- Pyro Ball
+- High Jump Kick
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Protect
+- Earthquake
+- Toxic
+- Knock Off
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Curse
+- Sleep Talk
+- Liquidation
+- Rest
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Magma Storm
+- Will-O-Wisp
+- Protect
+- Taunt
+
+Alomomola @ leftovers
+Ability: regenerator
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Aqua Jet
+- Flip Turn
+- Wish
+- Protect

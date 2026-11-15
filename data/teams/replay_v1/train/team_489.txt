@@ -1,0 +1,59 @@
+Iron Valiant @ lifeorb
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Vacuum Wave
+- Encore
+- Shadow Ball
+- Destiny Bond
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- U-turn
+- Roost
+- Hurricane
+- Discharge
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- Dragon Dance
+- Ice Beam
+- Icicle Spear
+- Earth Power
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Toxic
+- Earthquake
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Salt Cure
+- Recover
+- Stealth Rock
+- Protect
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Protect
+- Swords Dance
+- Toxic
+- Earthquake

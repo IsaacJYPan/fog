@@ -1,0 +1,59 @@
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Scald
+- Flip Turn
+- Tickle
+- Body Slam
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Stealth Rock
+- Earthquake
+- Knock Off
+- Rapid Spin
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Earthquake
+- Knock Off
+- Swords Dance
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Strange Steam
+- Will-O-Wisp
+- Defog
+
+Scream Tail @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 4 SpA / 252 Spe
+Timid Nature
+- Perish Song
+- Play Rough
+- Wish
+- Protect
+
+Goodra-Hisui @ leftovers
+Ability: sapsipper
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Ice Beam
+- Flamethrower
+- Flash Cannon

@@ -1,0 +1,59 @@
+Iron Jugulis @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Taunt
+- Hurricane
+- Earth Power
+- Dark Pulse
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rock Tomb
+- Synthesis
+- Swords Dance
+- Ivy Cudgel
+
+Scizor @ lifeorb
+Ability: technician
+Tera Type: Dark
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Knock Off
+- Bullet Punch
+- Close Combat
+- Swords Dance
+
+Sandy Shocks @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 48 HP / 208 SpA / 252 Spe
+Timid Nature
+- Stealth Rock
+- Spikes
+- Discharge
+- Earth Power
+
+Latios @ choicescarf
+Ability: levitate
+Tera Type: Fighting
+EVs: 252 HP / 160 Def / 16 SpA / 80 Spe
+Modest Nature
+- Aura Sphere
+- Agility
+- Calm Mind
+- Stored Power
+
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Fairy
+EVs: 200 HP / 56 SpA / 252 Spe
+Timid Nature
+- Alluring Voice
+- Stored Power
+- Surf
+- Tail Glow

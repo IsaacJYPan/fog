@@ -1,0 +1,59 @@
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 44 HP / 252 Atk / 180 Def / 28 SpD / 4 Spe
+Adamant Nature
+- Ice Punch
+- Swords Dance
+- Thunder Punch
+- Drain Punch
+
+Dragapult @ choiceband
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Surf
+- Dragon Darts
+- Draco Meteor
+- Flamethrower
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Future Sight
+- Trick
+- Psychic Noise
+- Chilly Reception
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Swords Dance
+- U-turn
+- Will-O-Wisp
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Wish
+- Flip Turn
+- Aqua Jet
+- Protect
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 176 HP / 44 Atk / 120 SpD / 168 Spe
+Adamant Nature
+- Rock Tomb
+- Taunt
+- Stealth Rock
+- U-turn

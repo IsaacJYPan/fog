@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Spinner
+- Earthquake
+- Stone Edge
+- Dragon Dance
+
+Kingambit @ heavydutyboots
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance
+- Iron Head
+
+Cresselia @ redcard
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Thunder Wave
+- Ice Beam
+- Moonlight
+- Lunar Dance
+
+Iron Treads @ airballoon
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Earthquake
+- Ice Spinner
+
+Iron Valiant @ leftovers
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Moonblast
+- Calm Mind
+- Encore
+
+Volcanion @ ejectpack
+Ability: waterabsorb
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Overheat
+- Steam Eruption
+- Flamethrower
+- Will-O-Wisp

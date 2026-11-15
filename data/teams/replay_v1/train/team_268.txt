@@ -1,0 +1,59 @@
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Volt Switch
+- Focus Blast
+- Tachyon Cutter
+- Psyshock
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Scorching Sands
+- Roost
+- U-turn
+
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Water
+EVs: 248 HP / 144 Atk / 56 SpD / 60 Spe
+Adamant Nature
+- Razor Shell
+- Ceaseless Edge
+- Knock Off
+- Flip Turn
+
+Clodsire @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Dark
+EVs: 116 HP / 148 Def / 244 SpD
+Careful Nature
+- Toxic
+- Stealth Rock
+- Earthquake
+- Recover
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Flying
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Strange Steam
+- Defog
+- Will-O-Wisp
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Heavy Slam
+- Close Combat
+- Crunch
+- Reflect

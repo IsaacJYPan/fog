@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Low Kick
+- U-turn
+- Knock Off
+- High Horsepower
+
+Hawlucha @ grassyseed
+Ability: unburden
+Tera Type: Steel
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- Acrobatics
+- Encore
+- Swords Dance
+- Close Combat
+
+Comfey @ lifeorb
+Ability: triage
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpA
+Modest Nature
+- Stored Power
+- Taunt
+- Draining Kiss
+- Calm Mind
+
+Heatran @ powerherb
+Ability: flashfire
+Tera Type: Bug
+EVs: 252 HP / 252 SpA / 4 Spe
+Hardy Nature
+- Magma Storm
+- Taunt
+- Stealth Rock
+- Solar Beam
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 184 Atk / 112 SpD / 212 Spe
+Adamant Nature
+- Ice Spinner
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+
+Pecharunt @ colburberry
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Shadow Ball
+- Recover
+- Foul Play
+- Nasty Plot

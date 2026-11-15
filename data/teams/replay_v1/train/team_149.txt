@@ -1,0 +1,59 @@
+Mew @ weaknesspolicy
+Ability: synchronize
+Tera Type: Fairy
+EVs: 88 HP / 168 SpA / 252 Spe
+Timid Nature
+- Calm Mind
+- Earth Power
+- Draining Kiss
+- Ice Beam
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Fairy
+EVs: 72 HP / 180 Def / 4 SpA / 252 Spe
+Timid Nature
+- Encore
+- Blizzard
+- Aurora Veil
+- Freeze-Dry
+
+Weezing-Galar @ heavydutyboots
+Ability: mistysurge
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Memento
+- Sludge Bomb
+- Will-O-Wisp
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Iron Head
+- Ice Spinner
+- Dragon Dance
+- Dragon Tail
+
+Breloom @ lifeorb
+Ability: technician
+Tera Type: Fighting
+EVs: 252 Atk / 40 Def / 216 Spe
+Adamant Nature
+- Leech Seed
+- Swords Dance
+- Mach Punch
+- Bulldoze
+
+Scizor @ leftovers
+Ability: technician
+Tera Type: Steel
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Swords Dance
+- Trailblaze
+- Thief
+- Bullet Punch

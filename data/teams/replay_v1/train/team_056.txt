@@ -1,0 +1,59 @@
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Wish
+- Scald
+- Flip Turn
+- Mirror Coat
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Knock Off
+- Flower Trick
+- Spikes
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+- Earthquake
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Make It Rain
+- Trick
+- Focus Blast
+- Shadow Ball
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 140 SpD / 116 Spe
+Calm Nature
+- Earth Power
+- Stealth Rock
+- Magma Storm
+- Lava Plume
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 196 HP / 204 Atk / 108 Spe
+Adamant Nature
+- Roost
+- Extreme Speed
+- Earthquake
+- Dragon Tail

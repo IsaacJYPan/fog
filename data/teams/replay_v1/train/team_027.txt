@@ -1,0 +1,59 @@
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Toxic
+- Sludge Wave
+- Chilly Reception
+- Future Sight
+
+Alomomola @ leftovers
+Ability: regenerator
+Tera Type: Fairy
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Whirlpool
+- Flip Turn
+- Wish
+- Protect
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- U-turn
+- Sucker Punch
+- Court Change
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flower Trick
+- U-turn
+- Triple Axel
+- Knock Off
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Encore
+- Play Rough
+- Substitute
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Wave Crash
+- Waterfall
+- Rest
+- Body Press

@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Tail
+- Roost
+- Ice Spinner
+- Earthquake
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Chilly Reception
+- Sludge Bomb
+- Psychic
+- Trick
+
+Weavile @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Swords Dance
+- Triple Axel
+- Ice Shard
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Endeavor
+- Close Combat
+- Rapid Spin
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Fairy
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Will-O-Wisp
+- Magma Storm
+- Protect
+- Taunt
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Horn Leech
+- Play Rough
+- Ivy Cudgel
+- Encore

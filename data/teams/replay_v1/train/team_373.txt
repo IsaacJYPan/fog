@@ -1,0 +1,59 @@
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Thunder Wave
+- Volt Switch
+- Roost
+- Hurricane
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Psyshock
+- Tachyon Cutter
+- Volt Switch
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 248 HP / 180 Def / 80 SpD
+Impish Nature
+- Salt Cure
+- Curse
+- Earthquake
+- Recover
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock
+- Bulk Up
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Ceaseless Edge
+- Razor Shell
+- Sucker Punch
+- Knock Off
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 248 HP / 8 Atk / 252 Def
+Impish Nature
+- Hex
+- Dragon Darts
+- Will-O-Wisp
+- U-turn

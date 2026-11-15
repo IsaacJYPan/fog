@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Stone Edge
+- Substitute
+- Crunch
+- Body Press
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Dazzling Gleam
+- Fiery Dance
+- Toxic Spikes
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- Toxic
+- Protect
+- Knock Off
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Steel
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Moonblast
+- Charge Beam
+- Moonlight
+- Cosmic Power
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Fairy
+EVs: 72 HP / 184 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Stealth Rock
+- Thunder Wave
+- Soft-Boiled
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Fairy
+EVs: 168 Atk / 88 SpA / 252 Spe
+Hasty Nature
+- Draco Meteor
+- Icicle Spear
+- Ice Beam
+- Earth Power

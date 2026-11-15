@@ -1,0 +1,59 @@
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Stealth Rock
+- Earthquake
+- Whirlwind
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Encore
+- Trailblaze
+- Ivy Cudgel
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Morning Sun
+- Sludge Wave
+- Whirlwind
+- Fiery Dance
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Encore
+- Knock Off
+- Close Combat
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Poison
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Scale Shot
+- Substitute
+- Dragon Dance
+- Draco Meteor
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Recover
+- Trick
+- Make It Rain
+- Shadow Ball

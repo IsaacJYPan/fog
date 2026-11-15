@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Whirlwind
+- Stealth Rock
+- Spikes
+- Earthquake
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Dragon Darts
+- Draco Meteor
+- Phantom Force
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- U-turn
+- High Jump Kick
+
+Meowscarada @ choicescarf
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Triple Axel
+- Knock Off
+- Flower Trick
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- U-turn
+- Iron Defense
+- Roost
+- Body Press
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Flying
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderclap
+- Thunderbolt
+- Calm Mind
+- Dragon Pulse

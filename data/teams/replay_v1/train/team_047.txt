@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Whirlwind
+- Stealth Rock
+- Sleep Talk
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Ivy Cudgel
+- Knock Off
+- U-turn
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Body Slam
+- Flip Turn
+- Mirror Coat
+- Wish
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Nasty Plot
+- Recover
+- Thunder Wave
+- Hex
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Sludge Bomb
+- Dark Pulse
+- Will-O-Wisp
+- Ice Beam
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Earthquake
+- Stone Edge
+- Extreme Speed

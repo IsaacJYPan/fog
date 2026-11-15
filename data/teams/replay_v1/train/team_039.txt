@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- U-turn
+- Toxic
+- Swords Dance
+- Spikes
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Mirror Coat
+- Protect
+- Wish
+- Flip Turn
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Flying
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Will-O-Wisp
+- Slack Off
+- Hex
+- Torch Song
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Knock Off
+- Moonlight
+- Calm Mind
+- Moonblast
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Low Kick
+- Ice Shard
+
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Glare
+- Synthesis
+- Leaf Storm
+- Leech Seed

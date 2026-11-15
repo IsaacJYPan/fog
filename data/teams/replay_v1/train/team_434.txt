@@ -1,0 +1,59 @@
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sticky Web
+- Stun Spore
+- Moonblast
+- Skill Swap
+
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Taunt
+- Leaf Storm
+- Giga Drain
+- Glare
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Thunderbolt
+- Thunderclap
+- Calm Mind
+- Dragon Pulse
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 120 HP / 204 SpA / 184 Spe
+Timid Nature
+- Thunderbolt
+- Psyshock
+- Nasty Plot
+- Recover
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Trick
+- Moonblast
+- Thunderbolt
+
+Dragonite @ lumberry
+Ability: multiscale
+Tera Type: Fire
+EVs: 196 HP / 204 Atk / 108 Spe
+Adamant Nature
+- Dragon Dance
+- Extreme Speed
+- Ice Spinner
+- Fire Punch

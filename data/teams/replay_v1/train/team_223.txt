@@ -1,0 +1,59 @@
+Latios @ choicescarf
+Ability: levitate
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Psychic Noise
+- Calm Mind
+- Luster Purge
+- Trick
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Play Rough
+- Encore
+- Knock Off
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Pyro Ball
+- Court Change
+- Will-O-Wisp
+
+Slowking-Galar @ leftovers
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Future Sight
+- Trick
+- Chilly Reception
+- Toxic
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Roar
+- Body Press
+- Iron Defense
+- Crunch

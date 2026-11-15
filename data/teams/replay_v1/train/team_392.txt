@@ -1,0 +1,59 @@
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Poison
+EVs: 120 HP / 152 Atk / 60 SpD / 176 Spe
+Adamant Nature
+- Aqua Jet
+- Ceaseless Edge
+- Flip Turn
+- Razor Shell
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Sludge Wave
+- Energy Ball
+- Morning Sun
+
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Fire Blast
+- U-turn
+- Draco Meteor
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Poison
+EVs: 248 HP / 208 SpA / 52 SpD
+Modest Nature
+- Moonblast
+- Psychic Noise
+- Surf
+- Substitute
+
+Kingambit @ covertcloak
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+- Iron Head
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Temper Flare
+- Ice Spinner
+- Headlong Rush
+- Bulk Up

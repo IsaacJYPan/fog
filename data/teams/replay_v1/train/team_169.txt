@@ -1,0 +1,59 @@
+Chesnaught @ rockyhelmet
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Iron Defense
+- Knock Off
+- Body Press
+- Spikes
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Fire Punch
+- Earthquake
+- Dragon Dance
+- Extreme Speed
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Thunder Wave
+- Nasty Plot
+- Hex
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 8 HP / 108 Atk / 140 SpD / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Stealth Rock
+- Ice Spinner
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Flamethrower
+- Ice Beam
+- Sludge Bomb
+- Chilly Reception
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Dark Pulse
+- Ice Beam
+- Sludge Bomb

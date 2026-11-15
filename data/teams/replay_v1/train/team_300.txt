@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 168 Atk / 88 SpA / 252 Spe
+Hasty Nature
+- Protect
+- Earth Power
+- Freeze-Dry
+- Substitute
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Earthquake
+- Whirlwind
+- Ruination
+- Stealth Rock
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- U-turn
+- Roost
+- Brave Bird
+- Body Press
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Will-O-Wisp
+- Pain Split
+- Strange Steam
+
+Zamazenta @ choiceband
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Roar
+- Body Press
+- Close Combat
+- Heavy Slam
+
+Toxapex @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 244 Def / 12 Spe
+Impish Nature
+- Surf
+- Haze
+- Acid Spray
+- Sludge Bomb

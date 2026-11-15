@@ -1,0 +1,59 @@
+Arcanine-Hisui @ choiceband
+Ability: rockhead
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Stealth Rock
+- Head Smash
+- Flare Blitz
+- Extreme Speed
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 248 HP / 240 Def / 20 Spe
+Bold Nature
+- Strange Steam
+- Defog
+- Toxic
+- Pain Split
+
+Slither Wing @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Electric
+EVs: 172 HP / 252 Def / 84 Spe
+Impish Nature
+- First Impression
+- Close Combat
+- Flare Blitz
+- Morning Sun
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Protect
+- Wish
+- Flip Turn
+- Mirror Coat
+
+Kyurem @ nevermeltice
+Ability: pressure
+Tera Type: Ice
+EVs: 168 Atk / 88 SpA / 252 Spe
+Hasty Nature
+- Protect
+- Freeze-Dry
+- Ice Beam
+- Earth Power
+
+Landorus-Therian @ lightball
+Ability: intimidate
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- U-turn
+- Fling
+- Earthquake

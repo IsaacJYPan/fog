@@ -1,0 +1,59 @@
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Headlong Rush
+- Stealth Rock
+- Rapid Spin
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Psychic Fangs
+- Dragon Darts
+- Quick Attack
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Future Sight
+- Sludge Bomb
+- Chilly Reception
+- Flamethrower
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Protect
+- Freeze-Dry
+- Earth Power
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Sucker Punch
+- Court Change
+- U-turn
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- U-turn
+- Roost
+- Thunder Wave

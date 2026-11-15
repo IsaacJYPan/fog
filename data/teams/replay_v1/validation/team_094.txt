@@ -1,0 +1,59 @@
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Psychic Noise
+- Future Sight
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Stealth Rock
+- Rapid Spin
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Wood Hammer
+- U-turn
+- Grassy Glide
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 140 HP / 252 Atk / 116 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Swords Dance
+- Low Kick
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Hex
+- Dragon Darts
+- Will-O-Wisp
+- Substitute
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roar
+- Will-O-Wisp
+- U-turn
+- Flamethrower

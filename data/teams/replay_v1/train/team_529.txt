@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Facade
+- Swords Dance
+- Knock Off
+- Spikes
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 200 HP / 252 Atk / 56 Spe
+Adamant Nature
+- Swords Dance
+- Ceaseless Edge
+- Knock Off
+- Sucker Punch
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Headlong Rush
+- Stealth Rock
+- Rapid Spin
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 252 HP / 176 Def / 56 SpD / 24 Spe
+Bold Nature
+- Roost
+- U-turn
+- Roar
+- Flamethrower
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strength Sap
+- Shadow Ball
+- Matcha Gotcha
+- Calm Mind
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Moonblast
+- Knock Off
+- Trick

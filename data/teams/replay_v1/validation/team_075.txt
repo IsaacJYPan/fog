@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Sleep Talk
+- Curse
+- Liquidation
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flower Trick
+- Triple Axel
+- U-turn
+- Knock Off
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- U-turn
+- Knock Off
+- Close Combat
+- Bullet Punch
+
+Darkrai @ expertbelt
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Dark Pulse
+- Trick
+- Nasty Plot
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 232 HP / 88 Def / 188 Spe
+Impish Nature
+- Rapid Spin
+- Stealth Rock
+- Taunt
+- Earthquake
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Thunder Wave
+- Chilly Reception
+- Future Sight
+- Sludge Bomb

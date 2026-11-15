@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Ivy Cudgel
+- Encore
+- Power Whip
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Low Kick
+- Sucker Punch
+
+Moltres @ heavydutyboots
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 HP / 176 Def / 56 SpD / 24 Spe
+Bold Nature
+- Will-O-Wisp
+- Flamethrower
+- Roost
+- U-turn
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+- Stealth Rock
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 72 SpA / 176 SpD
+Calm Nature
+- Thunder Wave
+- Sludge Bomb
+- Future Sight
+- Chilly Reception
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Roar
+- Close Combat
+- Iron Defense

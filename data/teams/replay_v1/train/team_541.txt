@@ -1,0 +1,59 @@
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Volt Switch
+- Hurricane
+- Thunder Wave
+- Roost
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 248 HP / 100 Def / 16 SpA / 144 Spe
+Modest Nature
+- Shadow Ball
+- Calm Mind
+- Strength Sap
+- Hex
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Icicle Crash
+- Triple Axel
+- Ice Shard
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+- Iron Head
+
+Goodra-Hisui @ assaultvest
+Ability: gooey
+Tera Type: Ghost
+EVs: 248 HP / 140 SpA / 96 SpD / 24 Spe
+Calm Nature
+- Dragon Tail
+- Knock Off
+- Sludge Bomb
+- Draco Meteor
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Spikes
+- Ruination
+- Heavy Slam
+- Stealth Rock

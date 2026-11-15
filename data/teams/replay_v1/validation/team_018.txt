@@ -1,0 +1,59 @@
+Avalugg-Hisui @ choiceband
+Ability: sturdy
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Crunch
+- Body Press
+- Aurora Veil
+- Curse
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Slack Off
+- Will-O-Wisp
+- Torch Song
+- Hex
+
+Enamorus @ metronome
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Mystical Fire
+- Calm Mind
+- Earth Power
+- Moonblast
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Bitter Blade
+- Poltergeist
+- Shadow Sneak
+- Swords Dance
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Flying
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Spikes
+- Recover
+- Toxic
+- Earthquake
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Sucker Punch
+- Swords Dance

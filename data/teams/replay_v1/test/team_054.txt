@@ -1,0 +1,59 @@
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Grass
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- Grassy Glide
+- Knock Off
+- Wood Hammer
+- U-turn
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Trick
+- Make It Rain
+- Shadow Ball
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Whirlwind
+- Stealth Rock
+- Ruination
+- Rest
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Iron Defense
+- Roar
+- Crunch
+- Body Press
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+- Bulk Up
+
+Primarina @ choicespecs
+Ability: torrent
+Tera Type: Poison
+EVs: 252 HP / 152 Def / 104 Spe
+Bold Nature
+- Flip Turn
+- Psychic Noise
+- Moonblast
+- Surf

@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Ruination
+- Earthquake
+- Whirlwind
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Magma Storm
+- Earth Power
+- Taunt
+- Lava Plume
+
+Hydreigon @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Nasty Plot
+- Substitute
+- Draco Meteor
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 236 Def / 12 SpD / 16 Spe
+Impish Nature
+- Earthquake
+- Swords Dance
+- Facade
+- Protect
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 84 HP / 252 Atk / 172 Spe
+Jolly Nature
+- Body Press
+- Crunch
+- Iron Defense
+- Roar
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Shadow Ball
+- Recover
+- Toxic
+- Parting Shot

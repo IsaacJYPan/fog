@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Whirlwind
+- Stealth Rock
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Trick
+- Future Sight
+- Chilly Reception
+- Sludge Bomb
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Whirlwind
+- Roost
+- Body Press
+- Spikes
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Flip Turn
+- Wish
+- Protect
+- Scald
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Dragon
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Will-O-Wisp
+- Hex
+- U-turn
+
+Meowscarada @ choicescarf
+Ability: protean
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Spikes
+- U-turn
+- Flower Trick

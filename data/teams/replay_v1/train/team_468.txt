@@ -1,0 +1,59 @@
+Hydreigon @ weaknesspolicy
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Dance
+- Dragon Pulse
+- Earthquake
+- Flash Cannon
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Water
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Moonblast
+- Aurora Veil
+- Encore
+- Misty Terrain
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Roar
+- Iron Defense
+- Crunch
+
+Enamorus @ leftovers
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Earth Power
+- Healing Wish
+- Moonblast
+- Zen Headbutt
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fire
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Substitute
+- Discharge
+- Dazzling Gleam
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- Earthquake
+- Ice Spinner

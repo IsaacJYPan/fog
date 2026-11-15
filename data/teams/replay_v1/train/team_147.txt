@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Steel
+EVs: 72 HP / 184 Def / 252 SpD
+Calm Nature
+- Metronome
+- Soft-Boiled
+- Calm Mind
+- Shadow Ball
+
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Metronome
+- Hurricane
+- Bleakwind Storm
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Metronome
+- Sludge Bomb
+- Flamethrower
+- Chilly Reception
+
+Lilligant-Hisui @ heavydutyboots
+Ability: chlorophyll
+Tera Type: Grass
+EVs: 136 HP / 252 Atk / 120 Spe
+Adamant Nature
+- Petal Blizzard
+- Ice Spinner
+- Defog
+- Synthesis
+
+Iron Hands @ leftovers
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 136 HP / 48 Atk / 252 SpD
+Adamant Nature
+- Swords Dance
+- Body Press
+- Ice Punch
+- Drain Punch
+
+Slowbro @ rockyhelmet
+Ability: regenerator
+Tera Type: Dragon
+EVs: 228 HP / 252 SpA / 28 SpD
+Quiet Nature
+- Body Press
+- Scald
+- Metronome
+- Slack Off

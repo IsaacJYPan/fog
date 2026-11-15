@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Will-O-Wisp
+- U-turn
+- Pyro Ball
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Headlong Rush
+- Knock Off
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Fire Blast
+- Chilly Reception
+- Future Sight
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Defog
+- Brave Bird
+- Drill Peck
+- Reflect
+
+Raging Bolt @ assaultvest
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Volt Switch
+- Draco Meteor
+- Thunderclap
+- Thunderbolt
+
+Whimsicott @ leftovers
+Ability: chlorophyll
+Tera Type: Ghost
+EVs: 192 HP / 20 Def / 252 SpA / 44 Spe
+Modest Nature
+- Stun Spore
+- U-turn
+- Encore
+- Giga Drain

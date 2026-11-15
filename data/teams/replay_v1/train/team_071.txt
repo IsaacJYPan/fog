@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Protect
+- Toxic
+- Earthquake
+- Spikes
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Play Rough
+- Protect
+- Icy Wind
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Parting Shot
+- Foul Play
+- Recover
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Earthquake
+- Close Combat
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Ice Shard
+- Triple Axel
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Tachyon Cutter
+- Focus Blast
+- Volt Switch

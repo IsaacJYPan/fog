@@ -1,0 +1,59 @@
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Low Kick
+- Stealth Rock
+- Ice Punch
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Rapid Spin
+- Protect
+- Earthquake
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Power Whip
+- Encore
+- Knock Off
+
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Steel
+EVs: 248 HP / 160 Def / 100 Spe
+Bold Nature
+- Toxic
+- Foul Play
+- Roost
+- Iron Defense
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Spikes
+- Earthquake
+- Sleep Talk
+- Whirlwind
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Matcha Gotcha
+- Nasty Plot
+- Strength Sap
+- Shadow Ball

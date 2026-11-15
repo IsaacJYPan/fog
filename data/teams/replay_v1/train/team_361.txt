@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Fire
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- Giga Impact
+- Grassy Glide
+- High Horsepower
+- Swords Dance
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Curse
+- Sleep Talk
+- Avalanche
+- Body Press
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Volt Switch
+- Tachyon Cutter
+- Psychic Noise
+
+Weavile @ lifeorb
+Ability: pressure
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Knock Off
+- Triple Axel
+- Low Kick
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Grass
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Recover
+- Salt Cure
+- Stealth Rock
+- Protect
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Head Smash
+- Headlong Rush
+- Ice Spinner

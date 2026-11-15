@@ -1,0 +1,59 @@
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Flip Turn
+- Aqua Cutter
+- Ceaseless Edge
+- Knock Off
+
+Scream Tail @ leftovers
+Ability: protosynthesis
+Tera Type: Electric
+EVs: 252 HP / 4 SpA / 252 Spe
+Timid Nature
+- Encore
+- Protect
+- Wish
+- Stealth Rock
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Make It Rain
+- Nasty Plot
+- Trick
+- Shadow Ball
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Stealth Rock
+- Rapid Spin
+- Earthquake
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flamethrower
+- Ice Beam
+- Psychic Noise
+- Future Sight
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Electric
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Hurricane
+- Heat Wave
+- Discharge

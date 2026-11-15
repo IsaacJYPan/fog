@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Stealth Rock
+- Stone Edge
+- Steel Beam
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Fire Punch
+- Dragon Dance
+- Earthquake
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Shadow Ball
+- Recover
+- Thunderbolt
+- Nasty Plot
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Poison
+EVs: 216 Def / 208 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Flip Turn
+- Moonblast
+- Surf
+- Psychic Noise
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Crunch
+- Rest
+- Body Press
+- Iron Defense
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Substitute
+- Discharge
+- Fiery Dance

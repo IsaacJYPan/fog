@@ -1,0 +1,59 @@
+Thundurus-Therian @ heavydutyboots
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Agility
+- Volt Switch
+- Nasty Plot
+- Focus Blast
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- High Jump Kick
+- Sucker Punch
+- Pyro Ball
+
+Mandibuzz @ rockyhelmet
+Ability: overcoat
+Tera Type: Steel
+EVs: 248 HP / 244 Def / 16 Spe
+Impish Nature
+- Roost
+- Toxic
+- Defog
+- Foul Play
+
+Latios @ covertcloak
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Luster Purge
+- Stored Power
+- Aura Sphere
+- Psychic Noise
+
+Jirachi @ assaultvest
+Ability: serenegrace
+Tera Type: Steel
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Psychic
+- Icy Wind
+- Aura Sphere
+- Doom Desire
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Headlong Rush
+- Close Combat
+- Ice Spinner
+- Stealth Rock

@@ -1,0 +1,59 @@
+Alomomola @ covertcloak
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Wish
+- Protect
+- Tickle
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Ghost
+EVs: 252 HP / 80 Def / 176 Spe
+Bold Nature
+- Pain Split
+- Defog
+- Will-O-Wisp
+- Sludge Bomb
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Soft-Boiled
+- Calm Mind
+- Heal Bell
+
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Icicle Crash
+- Knock Off
+- Ice Shard
+- Swords Dance
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Stealth Rock
+- Earthquake
+- Rapid Spin
+- Volt Switch
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ground
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Iron Defense
+- Roost
+- Body Press

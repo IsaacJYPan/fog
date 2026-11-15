@@ -1,0 +1,59 @@
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Recover
+- Make It Rain
+- Shadow Ball
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Dark Pulse
+- Focus Blast
+- Sludge Bomb
+
+Garchomp @ loadeddice
+Ability: roughskin
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Naive Nature
+- Spikes
+- Scale Shot
+- Iron Head
+- Dragon Tail
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Ice Spinner
+- Dragon Dance
+- Extreme Speed
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Grass
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Venoshock
+- Earth Power
+- Mortal Spin
+- Stealth Rock
+
+Iron Boulder @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Mighty Cleave
+- Earthquake
+- Zen Headbutt
+- Close Combat

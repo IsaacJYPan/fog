@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 248 HP / 8 Atk / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- U-turn
+- Knock Off
+- Taunt
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 4 SpA / 200 SpD / 52 Spe
+Calm Nature
+- Parting Shot
+- Malignant Chain
+- Hex
+- Recover
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Ice Spinner
+- Rapid Spin
+- Stealth Rock
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- U-turn
+- Roost
+- Roar
+
+Iron Crown @ choicescarf
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Volt Switch
+- Psychic Noise
+- Calm Mind
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Ruination
+- Payback
+- Rest

@@ -1,0 +1,59 @@
+Articuno @ heavydutyboots
+Ability: pressure
+Tera Type: Rock
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Roost
+- Ancient Power
+- Freeze-Dry
+- Brave Bird
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 228 SpD / 36 Spe
+Careful Nature
+- Swords Dance
+- Protect
+- Knock Off
+- Facade
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Roost
+- Body Press
+- Whirlwind
+- Spikes
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Stealth Rock
+- Moonblast
+- Moonlight
+- Thunder Wave
+
+Darkrai @ blackglasses
+Ability: baddreams
+Tera Type: Poison
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Will-O-Wisp
+- Ice Beam
+- Dark Pulse
+- Sludge Bomb
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Shadow Ball
+- Make It Rain
+- Recover
+- Trick

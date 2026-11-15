@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Taunt
+- Stealth Rock
+- Earthquake
+- U-turn
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ghost
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- U-turn
+- Brave Bird
+- Roost
+- Defog
+
+Zoroark-Hisui @ lifeorb
+Ability: illusion
+Tera Type: Ground
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Low Kick
+- Focus Blast
+- Shadow Sneak
+- Shadow Ball
+
+Raging Bolt @ choicespecs
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Thunderclap
+- Calm Mind
+- Volt Switch
+- Dragon Pulse
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 112 HP / 144 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Shadow Ball
+- Recover
+- Parting Shot
+
+Samurott-Hisui @ heavydutyboots
+Ability: sharpness
+Tera Type: Ground
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Sucker Punch
+- Ceaseless Edge
+- Flip Turn
+- Razor Shell

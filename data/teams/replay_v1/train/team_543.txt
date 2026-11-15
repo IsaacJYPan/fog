@@ -1,0 +1,59 @@
+Greninja @ lifeorb
+Ability: protean
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Ice Beam
+- Hydro Pump
+- Spikes
+
+Venusaur @ lifeorb
+Ability: chlorophyll
+Tera Type: Fire
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Sludge Bomb
+- Growth
+- Earth Power
+- Giga Drain
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 244 Def / 160 SpA / 104 Spe
+Modest Nature
+- Draco Meteor
+- Dragon Pulse
+- Thunderbolt
+- Thunderclap
+
+Moltres @ lifeorb
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Flamethrower
+- Roar
+- Roost
+
+Tyranitar @ smoothrock
+Ability: sandstream
+Tera Type: Ghost
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Stone Edge
+- Ice Beam
+- Thunder Wave
+- Low Kick
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin

@@ -1,0 +1,59 @@
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Flip Turn
+- Knock Off
+- Ceaseless Edge
+- Razor Shell
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ghost
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Protect
+- Toxic
+- Earthquake
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Close Combat
+- Ice Spinner
+- Headlong Rush
+
+Tinkaton @ airballoon
+Ability: pickpocket
+Tera Type: Water
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Stealth Rock
+- Knock Off
+- Gigaton Hammer
+- Encore
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- U-turn
+- Will-O-Wisp
+- Hex
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Recover
+- Stealth Rock
+- Salt Cure
+- Protect

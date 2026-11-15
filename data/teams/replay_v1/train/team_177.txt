@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Recover
+- Stealth Rock
+- Salt Cure
+- Protect
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Water
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Moonlight
+- Moonblast
+- Thunder Wave
+- Stealth Rock
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Quick Attack
+- Pyro Ball
+- U-turn
+- Sucker Punch
+
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Surf
+- Alluring Voice
+- Energy Ball
+- Tail Glow
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Low Kick
+- Horn Leech
+- Ivy Cudgel
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+- Knock Off

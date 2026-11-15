@@ -1,0 +1,59 @@
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Thunderbolt
+- Draco Meteor
+- Dragon Pulse
+- Calm Mind
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Aqua Cutter
+- Sucker Punch
+- Ceaseless Edge
+- Razor Shell
+
+Dragonite @ silkscarf
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Dragon Dance
+- Ice Spinner
+- Extreme Speed
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Recover
+- Shadow Ball
+- Nasty Plot
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Temper Flare
+- Stealth Rock
+- Rapid Spin
+
+Enamorus @ leftovers
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Mystical Fire
+- Healing Wish
+- Moonblast
+- Earth Power

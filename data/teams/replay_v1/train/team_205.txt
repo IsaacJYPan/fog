@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Pyro Ball
+- U-turn
+- High Jump Kick
+
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Healing Wish
+- Earth Power
+- Mystical Fire
+- Moonblast
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Trick
+- Chilly Reception
+- Sludge Bomb
+- Future Sight
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Grass Knot
+- Earth Power
+- U-turn
+- Taunt
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Defense
+- Close Combat
+- Crunch
+- Roar
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Substitute
+- Ice Beam
+- Earth Power
+- Freeze-Dry

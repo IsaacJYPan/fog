@@ -1,0 +1,59 @@
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 160 Def / 96 Spe
+Impish Nature
+- Iron Defense
+- Roost
+- Spikes
+- Body Press
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Swords Dance
+- Beat Up
+- Triple Axel
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Stealth Rock
+- Toxic
+- Recover
+
+Cresselia @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Lunar Blessing
+- Moonlight
+- Stored Power
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Shadow Ball
+- Calm Mind
+- Matcha Gotcha
+- Strength Sap
+
+Garganacl @ heavydutyboots
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Curse
+- Salt Cure
+- Recover

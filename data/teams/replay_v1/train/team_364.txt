@@ -1,0 +1,59 @@
+Tyranitar @ smoothrock
+Ability: sandstream
+Tera Type: Ghost
+EVs: 240 HP / 16 Atk / 252 SpD
+Careful Nature
+- Ice Beam
+- Roar
+- Stealth Rock
+- Knock Off
+
+Excadrill @ airballoon
+Ability: sandrush
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Earthquake
+- Rapid Spin
+- Iron Head
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Will-O-Wisp
+- Roost
+- U-turn
+- Flamethrower
+
+Donphan @ shellbell
+Ability: sturdy
+Tera Type: Ground
+EVs: 252 Atk / 252 Def / 4 Spe
+Adamant Nature
+- Rapid Spin
+- Stealth Rock
+- Endeavor
+- Ice Shard
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- U-turn
+- Horn Leech
+- Ivy Cudgel
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Dragon Pulse
+- Weather Ball
+- Calm Mind

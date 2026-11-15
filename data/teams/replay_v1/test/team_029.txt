@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 40 Atk / 216 SpA / 252 Spe
+Naive Nature
+- Moonblast
+- Spirit Break
+- Vacuum Wave
+- Focus Blast
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Fire
+EVs: 120 HP / 152 Atk / 60 SpD / 176 Spe
+Adamant Nature
+- Razor Shell
+- Flip Turn
+- Knock Off
+- Ceaseless Edge
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Thunder Wave
+- Stealth Rock
+- Moonlight
+- Psyshock
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 44 HP / 128 Atk / 84 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Stealth Rock
+- Rapid Spin
+
+Latios @ souldew
+Ability: levitate
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psyshock
+- Flip Turn
+- Aura Sphere
+- Future Sight
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Nasty Plot
+- Shadow Ball
+- Focus Blast

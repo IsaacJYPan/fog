@@ -1,0 +1,59 @@
+Samurott-Hisui @ blackglasses
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Razor Shell
+- Flip Turn
+- Ceaseless Edge
+- Aqua Jet
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Swords Dance
+- Close Combat
+- Hex
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Stealth Rock
+- Earthquake
+- Rapid Spin
+- Ice Spinner
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Earthquake
+- Ice Spinner
+- Encore
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Trick
+- Shadow Ball
+- Recover
+- Thunderbolt
+
+Rotom-Wash @ rockyhelmet
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Pain Split
+- Hydro Pump
+- Volt Switch

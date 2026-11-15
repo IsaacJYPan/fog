@@ -1,0 +1,59 @@
+Chesnaught @ rockyhelmet
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 228 Def
+Impish Nature
+- Synthesis
+- Body Press
+- Iron Defense
+- Spikes
+
+Muk-Alola @ assaultvest
+Ability: poisontouch
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Poison Jab
+- Shadow Sneak
+- Drain Punch
+- Knock Off
+
+Hatterene @ focussash
+Ability: magicbounce
+Tera Type: Normal
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Healing Wish
+- Future Sight
+- Psychic Noise
+- Pain Split
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Power Whip
+- Encore
+- Swords Dance
+- Horn Leech
+
+Regidrago @ choicespecs
+Ability: dragonsmaw
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Outrage
+- Earth Power
+- Dragon Pulse
+- Dragon Energy
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psyshock
+- Shadow Ball
+- Make It Rain
+- Focus Blast

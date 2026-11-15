@@ -1,0 +1,59 @@
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Scald
+- Flip Turn
+- Mirror Coat
+- Body Slam
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Sucker Punch
+- Pyro Ball
+- U-turn
+
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Dragon
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Flamethrower
+- Draco Meteor
+- Hydro Pump
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Freeze-Dry
+- Draco Meteor
+- Substitute

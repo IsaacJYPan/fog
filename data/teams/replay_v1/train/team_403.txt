@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Whirlwind
+- Ruination
+- Spikes
+- Taunt
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- U-turn
+- Stealth Rock
+- Earth Power
+
+Heatran @ heavydutyboots
+Ability: flamebody
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Earth Power
+- Stealth Rock
+- Taunt
+- Lava Plume
+
+Latias @ covertcloak
+Ability: levitate
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Recover
+- Psychic
+- Healing Wish
+- Draco Meteor
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Earth Power
+- Protect
+- Blizzard
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Curse
+- Draco Meteor
+- Will-O-Wisp
+- Dragon Darts

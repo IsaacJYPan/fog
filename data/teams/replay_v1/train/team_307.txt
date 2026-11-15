@@ -1,0 +1,59 @@
+Ninetales @ heatrock
+Ability: drought
+Tera Type: Ghost
+EVs: 192 HP / 72 SpA / 244 Spe
+Timid Nature
+- Foul Play
+- Will-O-Wisp
+- Overheat
+- Encore
+
+Cresselia @ ejectbutton
+Ability: levitate
+Tera Type: Fairy
+EVs: 248 HP / 200 Def / 60 SpD
+Relaxed Nature
+- Moonlight
+- Ice Beam
+- Thunderbolt
+- Lunar Dance
+
+Raging Bolt @ lifeorb
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Calm Mind
+- Thunderbolt
+- Dragon Pulse
+- Weather Ball
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Sludge Wave
+- Substitute
+- Energy Ball
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Stealth Rock
+- Headlong Rush
+- Rapid Spin
+
+Walking Wake @ wiseglasses
+Ability: protosynthesis
+Tera Type: Water
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Flip Turn
+- Hydro Steam
+- Knock Off
+- Draco Meteor

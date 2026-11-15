@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Horn Leech
+- Swords Dance
+- Spikes
+- Ivy Cudgel
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- Heat Wave
+- Bleakwind Storm
+- Knock Off
+- U-turn
+
+Moltres-Galar @ sitrusberry
+Ability: berserk
+Tera Type: Dark
+EVs: 12 HP / 12 Def / 252 SpA / 232 Spe
+Modest Nature
+- Nasty Plot
+- Sucker Punch
+- Fiery Wrath
+- U-turn
+
+Sandslash-Alola @ assaultvest
+Ability: slushrush
+Tera Type: Ice
+EVs: 72 HP / 252 Atk / 4 SpD / 180 Spe
+Adamant Nature
+- Knock Off
+- Triple Axel
+- Rapid Spin
+- Low Kick
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Facade
+- U-turn
+- Knock Off
+- Protect
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Ice Beam
+- Sludge Bomb
+- Future Sight
+- Chilly Reception

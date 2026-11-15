@@ -1,0 +1,59 @@
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+- Low Kick
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Freeze-Dry
+- Earth Power
+- Blizzard
+- Icicle Spear
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Sucker Punch
+- Razor Shell
+- Ceaseless Edge
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Vacuum Wave
+- Moonblast
+- Shadow Ball
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Ground
+EVs: 248 HP / 132 SpD / 128 Spe
+Careful Nature
+- Taunt
+- Stone Edge
+- Stealth Rock
+- Earthquake
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Sludge Wave
+- Discharge
+- Morning Sun
+- Fiery Dance

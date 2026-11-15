@@ -1,0 +1,59 @@
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Protect
+- Defog
+- Strange Steam
+- Sludge Bomb
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Blizzard
+- Earth Power
+- Protect
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Pyro Ball
+- Court Change
+- U-turn
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 40 HP / 216 Def / 252 SpD
+Relaxed Nature
+- Ruination
+- Rest
+- Stealth Rock
+- Earthquake
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Crunch
+- Order Up
+- Rest
+- Waterfall
+
+Cresselia @ covertcloak
+Ability: levitate
+Tera Type: Poison
+EVs: 252 HP / 180 Def / 56 SpD / 20 Spe
+Calm Nature
+- Moonblast
+- Calm Mind
+- Moonlight
+- Stored Power

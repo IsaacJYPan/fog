@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Impish Nature
+- Body Press
+- Avalanche
+- Rest
+- Waterfall
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Sludge Bomb
+- Pain Split
+- Will-O-Wisp
+
+Toxapex @ ejectbutton
+Ability: regenerator
+Tera Type: Dragon
+EVs: 248 HP / 8 Def / 252 SpD
+Bold Nature
+- Infestation
+- Surf
+- Sludge Bomb
+- Ice Beam
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Stealth Rock
+- Rapid Spin
+- Protect
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Soft-Boiled
+- Stealth Rock
+- Calm Mind
+- Seismic Toss
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Protect
+- Acrobatics
+- Wish
+- Flip Turn

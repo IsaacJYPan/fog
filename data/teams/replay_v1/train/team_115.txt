@@ -1,0 +1,59 @@
+Zoroark-Hisui @ lifeorb
+Ability: illusion
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Flamethrower
+- Poltergeist
+- Bitter Malice
+- Shadow Sneak
+
+Blaziken @ airballoon
+Ability: speedboost
+Tera Type: Fire
+EVs: 4 Atk / 252 SpA / 252 Spe
+Rash Nature
+- Stone Edge
+- Flare Blitz
+- Close Combat
+- Protect
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Iron Defense
+- Brave Bird
+- U-turn
+- Body Press
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Steel
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Stealth Rock
+- Wish
+- Moonblast
+- Protect
+
+Swampert @ assaultvest
+Ability: damp
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 SpD
+Sassy Nature
+- Stealth Rock
+- Knock Off
+- Earthquake
+- Flip Turn
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Earthquake
+- Dragon Dance
+- Extreme Speed
+- Ice Beam

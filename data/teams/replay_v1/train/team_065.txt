@@ -1,0 +1,59 @@
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Dragon
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Flip Turn
+- Wish
+- Healing Wish
+- Protect
+
+Hoopa-Unbound @ assaultvest
+Ability: magician
+Tera Type: Dark
+EVs: 252 HP / 180 Def / 76 SpA
+Quiet Nature
+- Psychic
+- Knock Off
+- Gunk Shot
+- Hyperspace Fury
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 80 Def / 176 Spe
+Bold Nature
+- Sludge Bomb
+- Pain Split
+- Toxic
+- Will-O-Wisp
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Recover
+- Parting Shot
+- Nasty Plot
+- Toxic
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Grass
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Recover
+- Earthquake
+- Salt Cure
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 248 HP / 124 Def / 8 SpD / 128 Spe
+Bold Nature
+- Grass Knot
+- Stealth Rock
+- U-turn
+- Stone Edge

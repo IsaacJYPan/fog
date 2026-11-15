@@ -1,0 +1,59 @@
+Raging Bolt @ lifeorb
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Draco Meteor
+- Dragon Pulse
+- Volt Switch
+- Thunderclap
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Roost
+- Roar
+- U-turn
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Ivy Cudgel
+- Power Whip
+- Spikes
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Headlong Rush
+- Ice Spinner
+
+Fezandipiti @ leftovers
+Ability: toxicchain
+Tera Type: Dark
+EVs: 252 HP / 148 Def / 44 SpD / 64 Spe
+Careful Nature
+- Roost
+- Play Rough
+- Dark Pulse
+- U-turn
+
+Gholdengo @ leftovers
+Ability: goodasgold
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Hex
+- Shadow Ball
+- Recover

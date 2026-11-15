@@ -1,0 +1,59 @@
+Tyranitar @ heavydutyboots
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Stealth Rock
+- Heavy Slam
+- Stone Edge
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Nasty Plot
+- Hex
+- Thunder Wave
+
+Sandy Shocks @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 48 HP / 208 SpA / 252 Spe
+Timid Nature
+- Thunderbolt
+- Volt Switch
+- Earth Power
+- Spikes
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Fighting
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Heat Wave
+- Knock Off
+- Bleakwind Storm
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Roar
+- Heavy Slam
+- Body Press
+- Iron Defense
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Wish
+- Tickle
+- Protect
+- Flip Turn

@@ -1,0 +1,59 @@
+Metagross @ choiceband
+Ability: clearbody
+Tera Type: Steel
+EVs: 252 Atk / 252 SpA / 4 Spe
+Naughty Nature
+- Knock Off
+- Heavy Slam
+- Psychic Fangs
+- Stealth Rock
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 44 HP / 128 Atk / 84 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+
+Haxorus @ loadeddice
+Ability: moldbreaker
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Scale Shot
+- Swords Dance
+- Earthquake
+- Close Combat
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fire
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Psychic
+- Substitute
+- Fiery Dance
+- Sludge Wave
+
+Zoroark-Hisui @ choicespecs
+Ability: illusion
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Low Kick
+- Shadow Ball
+- Hyper Voice
+- Giga Impact
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Water
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Moonblast
+- Freeze-Dry
+- Aurora Veil
+- Encore

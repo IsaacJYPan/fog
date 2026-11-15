@@ -1,0 +1,59 @@
+Fezandipiti @ heavydutyboots
+Ability: toxicchain
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Dark Pulse
+- Play Rough
+- Swagger
+- Beat Up
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Dragon Darts
+- Draco Meteor
+- Will-O-Wisp
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Rapid Spin
+- Stealth Rock
+- Headlong Rush
+- Ice Spinner
+
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Aqua Jet
+- Razor Shell
+- Ceaseless Edge
+- Knock Off
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 SpD / 12 Spe
+Calm Nature
+- Flamethrower
+- Roost
+- Roar
+- Will-O-Wisp
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Flying
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Dual Wingbeat
+- Swords Dance
+- Quick Attack
+- Knock Off

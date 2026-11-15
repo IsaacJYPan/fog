@@ -1,0 +1,59 @@
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Moonblast
+- Encore
+- Aurora Veil
+
+Rillaboom @ heavydutyboots
+Ability: grassysurge
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- Grassy Glide
+- Taunt
+
+Iron Hands @ grassyseed
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Drain Punch
+- Ice Punch
+- Supercell Slam
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Draco Meteor
+- Volt Switch
+- Thunderclap
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Temper Flare
+- Ice Spinner
+- Bulk Up
+
+Gengar @ choicescarf
+Ability: cursedbody
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Sludge Bomb
+- Encore
+- Shadow Ball

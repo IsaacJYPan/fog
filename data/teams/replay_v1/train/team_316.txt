@@ -1,0 +1,59 @@
+Empoleon @ airballoon
+Ability: competitive
+Tera Type: Grass
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Grass Knot
+- Flip Turn
+- Surf
+- Stealth Rock
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Spikes
+- Ruination
+- Whirlwind
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Hex
+- Recover
+- Parting Shot
+- Toxic
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Ice Beam
+- Knock Off
+- Will-O-Wisp
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Ivy Cudgel
+- U-turn
+- Encore
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Dragon Dance
+- Dragon Tail
+- Earthquake

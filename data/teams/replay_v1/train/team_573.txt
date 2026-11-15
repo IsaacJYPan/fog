@@ -1,0 +1,59 @@
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Heavy Slam
+- Iron Defense
+- Rest
+- Body Press
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Dazzling Gleam
+- Mystical Fire
+- Draining Kiss
+- Nuzzle
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Protect
+- Substitute
+- Freeze-Dry
+
+Zapdos @ choicespecs
+Ability: static
+Tera Type: Flying
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Volt Switch
+- Thunder Wave
+- Hurricane
+- Heat Wave
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- U-turn
+- Taunt
+- Earthquake
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance

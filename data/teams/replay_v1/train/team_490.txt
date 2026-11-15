@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Protect
+- Recover
+- Salt Cure
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Earthquake
+- Protect
+- Facade
+- Swords Dance
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Psychic
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Icicle Spear
+- Knock Off
+- Triple Axel
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Roost
+- Spikes
+- Iron Defense
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Chilly Reception
+- Flamethrower
+- Future Sight
+
+Raging Bolt @ choicespecs
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderclap
+- Thunderbolt
+- Calm Mind
+- Volt Switch

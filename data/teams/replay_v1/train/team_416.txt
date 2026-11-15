@@ -1,0 +1,59 @@
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Ghost
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Scale Shot
+- Dragon Tail
+- Swords Dance
+- Earthquake
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Razor Shell
+- Sucker Punch
+- Knock Off
+- Ceaseless Edge
+
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 132 Def / 128 SpD
+Calm Nature
+- Meteor Beam
+- Mortal Spin
+- Stealth Rock
+- Power Gem
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Psyshock
+- Trick
+- Shadow Ball
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Crunch
+- Body Press
+- Roar
+- Iron Defense
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Dragon Dance
+- Earthquake
+- Stone Edge

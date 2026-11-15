@@ -1,0 +1,59 @@
+Ogerpon @ scopelens
+Ability: defiant
+Tera Type: Grass
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Knock Off
+- Encore
+- Synthesis
+
+Great Tusk @ ejectpack
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Ice Spinner
+- Headlong Rush
+- Stealth Rock
+- Temper Flare
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Flip Turn
+- Razor Shell
+- Knock Off
+- Ceaseless Edge
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Thunder Wave
+- Psychic
+- Future Sight
+
+Dragapult @ choiceband
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Draco Meteor
+- Will-O-Wisp
+- U-turn
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Grass
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Defog
+- U-turn
+- Bulk Up
+- Roost

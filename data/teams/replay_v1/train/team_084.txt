@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Calm Mind
+- Tachyon Cutter
+- Volt Switch
+- Psyshock
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Substitute
+- Extreme Speed
+- Dragon Dance
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Avalanche
+- Swords Dance
+- Drain Punch
+- Earthquake
+
+Amoonguss @ rockyhelmet
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Foul Play
+- Giga Drain
+- Seed Bomb
+- Sludge Bomb
+
+Dragapult @ airballoon
+Ability: cursedbody
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Reflect
+- U-turn
+- Curse

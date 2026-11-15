@@ -1,0 +1,59 @@
+Cresselia @ sitrusberry
+Ability: levitate
+Tera Type: Poison
+EVs: 176 HP / 252 SpA / 80 Spe
+Modest Nature
+- Moonlight
+- Lunar Dance
+- Trick Room
+- Psychic
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Psychic Noise
+- Trick Room
+- Draining Kiss
+- Healing Wish
+
+Kingambit @ lumberry
+Ability: defiant
+Tera Type: Dark
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Ice Punch
+- Close Combat
+- Drain Punch
+
+Smeargle @ focussash
+Ability: owntempo
+Tera Type: Ghost
+EVs: 20 HP / 240 Def / 248 SpD
+Careful Nature
+- Sticky Web
+- Court Change
+- Healing Wish
+- Burning Bulwark
+
+Porygon2 @ eviolite
+Ability: download
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Shadow Ball
+- Trick Room
+- Ice Beam
+- Foul Play

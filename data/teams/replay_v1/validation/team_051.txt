@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Pyro Ball
+- Swords Dance
+- U-turn
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Taunt
+- Stealth Rock
+- U-turn
+- Earth Power
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 100 SpA / 104 SpD / 52 Spe
+Modest Nature
+- Mystical Fire
+- Draining Kiss
+- Future Sight
+- Psychic Noise
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Nasty Plot
+- Dark Pulse
+- Sludge Bomb
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Substitute
+- Freeze-Dry
+- Dragon Dance
+- Icicle Spear
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Close Combat
+- Knock Off
+- Calm Mind
+- Moonblast

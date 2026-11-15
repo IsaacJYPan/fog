@@ -1,0 +1,59 @@
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Flying
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Wish
+- Protect
+- Flip Turn
+- Scald
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Fairy
+EVs: 248 HP / 252 Atk / 8 Def
+Brave Nature
+- Drain Punch
+- Facade
+- Fire Punch
+- Headlong Rush
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Knock Off
+- Taunt
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ice
+EVs: 252 HP / 76 Atk / 92 SpD / 88 Spe
+Adamant Nature
+- U-turn
+- Iron Defense
+- Brave Bird
+- Roost
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Draco Meteor
+- Shadow Ball
+- U-turn
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Shadow Ball
+- Malignant Chain
+- Parting Shot
+- Foul Play

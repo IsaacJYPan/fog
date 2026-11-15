@@ -1,0 +1,59 @@
+Slowking-Galar @ leftovers
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Chilly Reception
+- Focus Blast
+- Sludge Bomb
+- Ice Beam
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Earth Power
+- Ice Beam
+- Freeze-Dry
+- Draco Meteor
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- U-turn
+- Will-O-Wisp
+
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Bleakwind Storm
+- Taunt
+- U-turn
+
+Hydrapple @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Fickle Beam
+- Giga Drain
+- Body Press
+- Earth Power
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance
+- Iron Head

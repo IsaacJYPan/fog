@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Substitute
+- Earth Power
+- Protect
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Knock Off
+- Sucker Punch
+- Encore
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+
+Tinkaton @ leftovers
+Ability: moldbreaker
+Tera Type: Water
+EVs: 248 HP / 28 Def / 232 Spe
+Jolly Nature
+- Thunder Wave
+- Gigaton Hammer
+- Encore
+- Stealth Rock
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 72 Atk / 168 SpD / 20 Spe
+Adamant Nature
+- Flamethrower
+- U-turn
+- Will-O-Wisp
+- Roost
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Flamethrower
+- U-turn
+- Draco Meteor
+- Shadow Ball

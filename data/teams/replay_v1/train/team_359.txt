@@ -1,0 +1,59 @@
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 244 Def / 12 Spe
+Impish Nature
+- Infestation
+- Acid Spray
+- Surf
+- Ice Beam
+
+Dragapult @ leftovers
+Ability: clearbody
+Tera Type: Dragon
+EVs: 208 HP / 252 Atk / 48 Spe
+Jolly Nature
+- U-turn
+- Hex
+- Thunder Wave
+- Substitute
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Swords Dance
+- Kowtow Cleave
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Encore
+- Vacuum Wave
+- Moonblast
+- Destiny Bond
+
+Dondozo @ rockyhelmet
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Curse
+- Rest
+- Waterfall
+- Body Press

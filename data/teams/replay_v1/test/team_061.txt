@@ -1,0 +1,59 @@
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Hurricane
+- Roost
+- Weather Ball
+- Ice Beam
+
+Kingambit @ blackglasses
+Ability: defiant
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Swords Dance
+- Low Kick
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Will-O-Wisp
+- Strange Steam
+- Toxic Spikes
+
+Scizor @ lumberry
+Ability: technician
+Tera Type: Steel
+EVs: 248 HP / 84 Atk / 160 Def / 16 Spe
+Impish Nature
+- Knock Off
+- Bullet Punch
+- U-turn
+- Close Combat
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Draco Meteor
+- Volt Switch
+- Weather Ball
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Ivy Cudgel
+- Horn Leech
+- Spikes

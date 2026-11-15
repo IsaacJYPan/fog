@@ -1,0 +1,59 @@
+Landorus-Therian @ leftovers
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Stealth Rock
+- Sludge Bomb
+- Taunt
+
+Chesnaught @ rockyhelmet
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Synthesis
+- Spikes
+- Iron Defense
+- Body Press
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Steel
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Psychic Noise
+- Sparkling Aria
+- Whirlpool
+- Moonblast
+
+Delphox @ grassyseed
+Ability: magician
+Tera Type: Poison
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Grass Knot
+- Encore
+- Flamethrower
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Fairy
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Dragon Dance
+- U-turn
+- Phantom Force
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+- Low Kick

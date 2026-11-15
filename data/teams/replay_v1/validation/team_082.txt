@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Protect
+- Spikes
+- Earthquake
+- Toxic Spikes
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Encore
+- Ivy Cudgel
+- U-turn
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Earthquake
+- Dragon Tail
+- Outrage
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Bug
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Focus Blast
+- Thunder Wave
+- Hex
+
+Deoxys-Speed @ lightclay
+Ability: pressure
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Knock Off
+- Psycho Boost
+- Spikes
+- Stealth Rock
+
+Slither Wing @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 28 Atk / 220 Def / 8 Spe
+Impish Nature
+- First Impression
+- U-turn
+- Morning Sun
+- Earthquake

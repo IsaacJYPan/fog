@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 252 HP / 72 Def / 184 SpD
+Careful Nature
+- Agility
+- Facade
+- Earthquake
+- Stealth Rock
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Sassy Nature
+- Protect
+- Salt Cure
+- Recover
+- Stealth Rock
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 160 Def / 96 Spe
+Bold Nature
+- Whirlwind
+- Iron Defense
+- Spikes
+- Body Press
+
+Zapdos @ throatspray
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- U-turn
+- Hurricane
+- Roost
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strength Sap
+- Matcha Gotcha
+- Shadow Ball
+- Calm Mind
+
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Will-O-Wisp
+- Knock Off
+- Dark Pulse

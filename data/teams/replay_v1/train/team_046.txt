@@ -1,0 +1,59 @@
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- U-turn
+- Brave Bird
+- Screech
+- Roost
+
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Swords Dance
+- Triple Axel
+- Knock Off
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 4 Atk / 252 Def / 252 SpD
+Sassy Nature
+- Scald
+- Wish
+- Flip Turn
+- Protect
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Stealth Rock
+- Earthquake
+- Poison Jab
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Sassy Nature
+- Thunder Wave
+- Future Sight
+- Sludge Bomb
+- Chilly Reception
+
+Lokix @ choiceband
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- First Impression
+- Taunt
+- U-turn

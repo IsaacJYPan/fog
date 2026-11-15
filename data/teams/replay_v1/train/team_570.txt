@@ -1,0 +1,59 @@
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Fairy
+EVs: 252 HP / 28 Def / 40 SpA / 188 Spe
+Timid Nature
+- Ice Beam
+- Acid Armor
+- Surf
+- Alluring Voice
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Nuzzle
+- Calm Mind
+- Mystical Fire
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Dazzling Gleam
+- Sludge Wave
+- Fiery Dance
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Encore
+- Freeze-Dry
+- Moonblast
+- Aurora Veil
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ice
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Icicle Spear
+- Earth Power
+- Dragon Dance
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Roar
+- Stone Edge
+- Close Combat
+- Crunch

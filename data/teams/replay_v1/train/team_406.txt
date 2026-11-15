@@ -1,0 +1,59 @@
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Ghost
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Phantom Force
+- U-turn
+- Hex
+- Dragon Darts
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Volt Switch
+- Psychic
+- Psychic Noise
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Knock Off
+- Taunt
+- Horn Leech
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fire
+EVs: 252 HP / 176 Def / 56 SpD / 24 Spe
+Bold Nature
+- Roar
+- Scorching Sands
+- Roost
+- Will-O-Wisp
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Psyshock
+- Shadow Ball
+- Calm Mind
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Whirlwind
+- Stealth Rock
+- Ruination
+- Earthquake

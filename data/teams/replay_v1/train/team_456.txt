@@ -1,0 +1,59 @@
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Fire Punch
+- Ice Punch
+- Facade
+- Headlong Rush
+
+Sinistcha @ ejectpack
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Leaf Storm
+- Curse
+- Trick Room
+- Strength Sap
+
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Ghost
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Earthquake
+- Ice Beam
+- Stealth Rock
+- Knock Off
+
+Excadrill @ airballoon
+Ability: sandrush
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Earthquake
+- Swords Dance
+- Substitute
+- Rapid Spin
+
+Reuniclus @ focussash
+Ability: magicguard
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Trick Room
+- Shadow Ball
+- Psychic Noise
+- Encore
+
+Enamorus @ lifeorb
+Ability: contrary
+Tera Type: Ground
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Healing Wish
+- Mystical Fire
+- Moonblast
+- Earth Power

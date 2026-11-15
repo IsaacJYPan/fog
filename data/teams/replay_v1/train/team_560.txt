@@ -1,0 +1,59 @@
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Volt Switch
+- Draco Meteor
+- Calm Mind
+- Thunderbolt
+
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Grassy Glide
+- Knock Off
+- Swords Dance
+- U-turn
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 180 HP / 232 Def / 96 Spe
+Impish Nature
+- Bulk Up
+- Headlong Rush
+- Rapid Spin
+- Taunt
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Low Kick
+- Swords Dance
+- Sucker Punch
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 SpD / 12 Spe
+Calm Nature
+- Roost
+- Flamethrower
+- Will-O-Wisp
+- U-turn
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Future Sight
+- Trick
+- Thunder Wave

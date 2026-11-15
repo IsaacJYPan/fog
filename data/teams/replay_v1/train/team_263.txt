@@ -1,0 +1,59 @@
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Avalanche
+- Sleep Talk
+- Earthquake
+- Body Press
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Recover
+- Spikes
+- Toxic
+- Earthquake
+
+Sinistcha @ leftovers
+Ability: heatproof
+Tera Type: Steel
+EVs: 252 HP / 172 Def / 84 SpA
+Bold Nature
+- Strength Sap
+- Matcha Gotcha
+- Calm Mind
+- Shadow Ball
+
+Darkrai @ expertbelt
+Ability: baddreams
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Dark Pulse
+- Sludge Bomb
+- Nasty Plot
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 140 HP / 252 Atk / 116 Spe
+Adamant Nature
+- Sucker Punch
+- Low Kick
+- Iron Head
+- Kowtow Cleave
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 128 HP / 132 Def / 248 Spe
+Jolly Nature
+- Earthquake
+- Earth Power
+- U-turn
+- Stealth Rock

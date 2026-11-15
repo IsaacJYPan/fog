@@ -1,0 +1,59 @@
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- U-turn
+- Brave Bird
+- Body Press
+
+Okidogi @ leftovers
+Ability: toxicchain
+Tera Type: Water
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Poison Jab
+- Bulk Up
+- Knock Off
+- Drain Punch
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Fighting
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Superpower
+- Skill Swap
+- Spikes
+- Psycho Boost
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Discharge
+- Hurricane
+- Thunder
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Whirlwind
+- Earthquake
+- Ruination
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Water
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Blizzard
+- Pain Split
+- Freeze-Dry
+- Aurora Veil

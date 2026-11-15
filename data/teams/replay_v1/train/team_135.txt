@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Rest
+- Body Press
+- Waterfall
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Calm Mind
+- Soft-Boiled
+- Stealth Rock
+- Seismic Toss
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- Roost
+- Body Press
+- Defog
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Spikes
+- Knock Off
+- Earthquake
+- Protect
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 244 Def / 12 Spe
+Impish Nature
+- Infestation
+- Recover
+- Ice Beam
+- Toxic Spikes
+
+Slaking @ choiceband
+Ability: truant
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Giga Impact
+- Earthquake
+- Double-Edge
+- Fire Punch

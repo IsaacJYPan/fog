@@ -1,0 +1,59 @@
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Recover
+- Make It Rain
+- Shadow Ball
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Parting Shot
+- Shadow Ball
+- Recover
+- Foul Play
+
+Zamazenta @ choiceband
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Roar
+- Close Combat
+- Crunch
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Rapid Spin
+- Knock Off
+- Earthquake
+- Stealth Rock
+
+Dragonite @ lifeorb
+Ability: multiscale
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Tail
+- Fire Punch
+- Extreme Speed
+- Earthquake
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Flip Turn
+- Knock Off
+- Sucker Punch
+- Ceaseless Edge

@@ -1,0 +1,59 @@
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Dragon Darts
+- Phantom Force
+- Dragon Dance
+
+Greninja @ lifeorb
+Ability: protean
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hydro Pump
+- Ice Beam
+- Surf
+- Grass Knot
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Earthquake
+- Head Smash
+- Stealth Rock
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+- Trick
+
+Walking Wake @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Substitute
+- Agility
+- Hydro Steam
+- Draco Meteor
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Fire Punch
+- Headlong Rush
+- Swords Dance
+- Facade

@@ -1,0 +1,5224 @@
+{
+  "format": "gen9ou",
+  "seed": 0,
+  "split": "validation",
+  "teams": [
+    {
+      "composition": [
+        "alomomola",
+        "amoonguss",
+        "corviknight",
+        "hatterene",
+        "talonflame",
+        "zamazenta"
+      ],
+      "file": "team_000.txt",
+      "first_seen_replay_id": "gen9ou-2420548296",
+      "first_seen_uploadtime": 1755049205,
+      "rating": 1741,
+      "replay_id": "gen9ou-2420548296",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p2",
+      "uploadtime": 1755049205
+    },
+    {
+      "composition": [
+        "alomomola",
+        "avalugg",
+        "blissey",
+        "clodsire",
+        "corviknight",
+        "slowkinggalar"
+      ],
+      "file": "team_001.txt",
+      "first_seen_replay_id": "gen9ou-2412147699",
+      "first_seen_uploadtime": 1753892128,
+      "rating": 1831,
+      "replay_id": "gen9ou-2417317063",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1754598390
+    },
+    {
+      "composition": [
+        "alomomola",
+        "blissey",
+        "clodsire",
+        "dondozo",
+        "gliscor",
+        "talonflame"
+      ],
+      "file": "team_002.txt",
+      "first_seen_replay_id": "gen9ou-2058122919",
+      "first_seen_uploadtime": 1707797855,
+      "rating": 1709,
+      "replay_id": "gen9ou-2061942197",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1708236427
+    },
+    {
+      "composition": [
+        "alomomola",
+        "blissey",
+        "corviknight",
+        "dondozo",
+        "gliscor",
+        "slowkinggalar"
+      ],
+      "file": "team_003.txt",
+      "first_seen_replay_id": "gen9ou-2363656311",
+      "first_seen_uploadtime": 1747210182,
+      "rating": 1759,
+      "replay_id": "gen9ou-2376334526",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 5,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 1,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1748785287
+    },
+    {
+      "composition": [
+        "alomomola",
+        "ceruledge",
+        "greattusk",
+        "hatterene",
+        "torkoal",
+        "walkingwake"
+      ],
+      "file": "team_004.txt",
+      "first_seen_replay_id": "gen9ou-2393664484",
+      "first_seen_uploadtime": 1751179679,
+      "rating": 1854,
+      "replay_id": "gen9ou-2393664484",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1751179679
+    },
+    {
+      "composition": [
+        "alomomola",
+        "cinderace",
+        "clefable",
+        "dragonite",
+        "ironcrown",
+        "pecharunt"
+      ],
+      "file": "team_005.txt",
+      "first_seen_replay_id": "gen9ou-2169324975",
+      "first_seen_uploadtime": 1722229124,
+      "rating": 1701,
+      "replay_id": "gen9ou-2169324975",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1722229124
+    },
+    {
+      "composition": [
+        "alomomola",
+        "cinderace",
+        "gholdengo",
+        "gliscor",
+        "greattusk",
+        "kyurem"
+      ],
+      "file": "team_006.txt",
+      "first_seen_replay_id": "gen9ou-2089400179",
+      "first_seen_uploadtime": 1711451042,
+      "rating": 1761,
+      "replay_id": "gen9ou-2093159046",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1711919993
+    },
+    {
+      "composition": [
+        "alomomola",
+        "clefable",
+        "clodsire",
+        "mandibuzz",
+        "sinistcha",
+        "tinkaton"
+      ],
+      "file": "team_007.txt",
+      "first_seen_replay_id": "gen9ou-2410027713",
+      "first_seen_uploadtime": 1753590271,
+      "rating": 1744,
+      "replay_id": "gen9ou-2410631491",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 1,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 5,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1753680372
+    },
+    {
+      "composition": [
+        "alomomola",
+        "clodsire",
+        "garganacl",
+        "skarmory",
+        "ursaluna",
+        "weezinggalar"
+      ],
+      "file": "team_008.txt",
+      "first_seen_replay_id": "gen9ou-2347297007",
+      "first_seen_uploadtime": 1745214641,
+      "rating": 1723,
+      "replay_id": "gen9ou-2347297007",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1745214641
+    },
+    {
+      "composition": [
+        "alomomola",
+        "cobalion",
+        "gliscor",
+        "goodrahisui",
+        "meowscarada",
+        "skeledirge"
+      ],
+      "file": "team_009.txt",
+      "first_seen_replay_id": "gen9ou-2080449382",
+      "first_seen_uploadtime": 1710375962,
+      "rating": 1848,
+      "replay_id": "gen9ou-2083945800",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 4,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 2,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1710800248
+    },
+    {
+      "composition": [
+        "alomomola",
+        "dragapult",
+        "excadrill",
+        "garganacl",
+        "primarina",
+        "tyranitar"
+      ],
+      "file": "team_010.txt",
+      "first_seen_replay_id": "gen9ou-2241851726",
+      "first_seen_uploadtime": 1731349873,
+      "rating": 1846,
+      "replay_id": "gen9ou-2313169871",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 65
+      },
+      "side": "p1",
+      "uploadtime": 1741200199
+    },
+    {
+      "composition": [
+        "alomomola",
+        "dragapult",
+        "garganacl",
+        "irontreads",
+        "pawmot",
+        "rillaboom"
+      ],
+      "file": "team_011.txt",
+      "first_seen_replay_id": "gen9ou-2180275613",
+      "first_seen_uploadtime": 1723677825,
+      "rating": 1730,
+      "replay_id": "gen9ou-2218011255",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 66
+      },
+      "side": "p2",
+      "uploadtime": 1728329921
+    },
+    {
+      "composition": [
+        "alomomola",
+        "dragapult",
+        "gliscor",
+        "tinglu",
+        "tinkaton",
+        "zamazenta"
+      ],
+      "file": "team_012.txt",
+      "first_seen_replay_id": "gen9ou-2108541195",
+      "first_seen_uploadtime": 1713730065,
+      "rating": 1885,
+      "replay_id": "gen9ou-2108541195",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1713730065
+    },
+    {
+      "composition": [
+        "amoonguss",
+        "blissey",
+        "clefable",
+        "dondozo",
+        "gliscor",
+        "heatran"
+      ],
+      "file": "team_013.txt",
+      "first_seen_replay_id": "gen9ou-2392340295",
+      "first_seen_uploadtime": 1750975472,
+      "rating": 1739,
+      "replay_id": "gen9ou-2392340295",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1750975472
+    },
+    {
+      "composition": [
+        "amoonguss",
+        "blissey",
+        "clodsire",
+        "dondozo",
+        "gliscor",
+        "skarmory"
+      ],
+      "file": "team_014.txt",
+      "first_seen_replay_id": "gen9ou-2078179219",
+      "first_seen_uploadtime": 1710122920,
+      "rating": 1748,
+      "replay_id": "gen9ou-2118304852",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1714921303
+    },
+    {
+      "composition": [
+        "armarouge",
+        "dragapult",
+        "glimmora",
+        "kingambit",
+        "landorustherian",
+        "ogerponwellspring"
+      ],
+      "file": "team_015.txt",
+      "first_seen_replay_id": "gen9ou-2411796266",
+      "first_seen_uploadtime": 1753837118,
+      "rating": 1714,
+      "replay_id": "gen9ou-2412256797",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1753904254
+    },
+    {
+      "composition": [
+        "armarouge",
+        "hatterene",
+        "hawlucha",
+        "indeedee",
+        "torkoal",
+        "ursaluna"
+      ],
+      "file": "team_016.txt",
+      "first_seen_replay_id": "gen9ou-2156484286",
+      "first_seen_uploadtime": 1720321381,
+      "rating": 1791,
+      "replay_id": "gen9ou-2495083676",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1765090240
+    },
+    {
+      "composition": [
+        "articuno",
+        "clefable",
+        "darkrai",
+        "gholdengo",
+        "gliscor",
+        "skarmory"
+      ],
+      "file": "team_017.txt",
+      "first_seen_replay_id": "gen9ou-2539667304",
+      "first_seen_uploadtime": 1771094765,
+      "rating": 1787,
+      "replay_id": "gen9ou-2539667304",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1771094765
+    },
+    {
+      "composition": [
+        "avalugghisui",
+        "ceruledge",
+        "clodsire",
+        "enamorus",
+        "kingambit",
+        "skeledirge"
+      ],
+      "file": "team_018.txt",
+      "first_seen_replay_id": "gen9ou-2129536253",
+      "first_seen_uploadtime": 1716550850,
+      "rating": 1715,
+      "replay_id": "gen9ou-2129536253",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 0,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 22
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 6,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 68
+      },
+      "side": "p1",
+      "uploadtime": 1716550850
+    },
+    {
+      "composition": [
+        "azumarill",
+        "cinderace",
+        "clodsire",
+        "corviknight",
+        "hydrapple",
+        "ogerponwellspring"
+      ],
+      "file": "team_019.txt",
+      "first_seen_replay_id": "gen9ou-2086654652",
+      "first_seen_uploadtime": 1711111475,
+      "rating": 1722,
+      "replay_id": "gen9ou-2098689148",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1712584029
+    },
+    {
+      "composition": [
+        "basculegion",
+        "greninja",
+        "pelipper",
+        "ragingbolt",
+        "scizor",
+        "tornadustherian"
+      ],
+      "file": "team_020.txt",
+      "first_seen_replay_id": "gen9ou-2418309877",
+      "first_seen_uploadtime": 1754742923,
+      "rating": 1859,
+      "replay_id": "gen9ou-2418309877",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 6,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 0,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1754742923
+    },
+    {
+      "composition": [
+        "blaziken",
+        "ceruledge",
+        "dragonite",
+        "irontreads",
+        "moltres",
+        "ogerpon"
+      ],
+      "file": "team_021.txt",
+      "first_seen_replay_id": "gen9ou-2107846702",
+      "first_seen_uploadtime": 1713637204,
+      "rating": 1712,
+      "replay_id": "gen9ou-2107846702",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 30
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 60
+      },
+      "side": "p2",
+      "uploadtime": 1713637204
+    },
+    {
+      "composition": [
+        "blaziken",
+        "dragonite",
+        "gholdengo",
+        "greattusk",
+        "ironmoth",
+        "ribombee"
+      ],
+      "file": "team_022.txt",
+      "first_seen_replay_id": "gen9ou-2330496453",
+      "first_seen_uploadtime": 1743240380,
+      "rating": 1740,
+      "replay_id": "gen9ou-2330496453",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 32
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 58
+      },
+      "side": "p1",
+      "uploadtime": 1743240380
+    },
+    {
+      "composition": [
+        "blissey",
+        "chesnaught",
+        "clefable",
+        "cresselia",
+        "dondozo",
+        "gliscor"
+      ],
+      "file": "team_023.txt",
+      "first_seen_replay_id": "gen9ou-2186495499",
+      "first_seen_uploadtime": 1724459423,
+      "rating": 1901,
+      "replay_id": "gen9ou-2186960633",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 31
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 59
+      },
+      "side": "p1",
+      "uploadtime": 1724525605
+    },
+    {
+      "composition": [
+        "blissey",
+        "cinderace",
+        "greattusk",
+        "landorustherian",
+        "ogerponwellspring",
+        "skeledirge"
+      ],
+      "file": "team_024.txt",
+      "first_seen_replay_id": "gen9ou-2226574748",
+      "first_seen_uploadtime": 1729372433,
+      "rating": 1709,
+      "replay_id": "gen9ou-2226574748",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1729372433
+    },
+    {
+      "composition": [
+        "blissey",
+        "clefable",
+        "dondozo",
+        "gliscor",
+        "heatran",
+        "hydrapple"
+      ],
+      "file": "team_025.txt",
+      "first_seen_replay_id": "gen9ou-2272330488",
+      "first_seen_uploadtime": 1735605139,
+      "rating": 1790,
+      "replay_id": "gen9ou-2272330488",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 1,
+        "moves": 21,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 32
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 5,
+        "moves": 3,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 58
+      },
+      "side": "p2",
+      "uploadtime": 1735605139
+    },
+    {
+      "composition": [
+        "blissey",
+        "clefable",
+        "gliscor",
+        "ironmoth",
+        "kyurem",
+        "zamazenta"
+      ],
+      "file": "team_026.txt",
+      "first_seen_replay_id": "gen9ou-2285383542",
+      "first_seen_uploadtime": 1737478143,
+      "rating": 1882,
+      "replay_id": "gen9ou-2416459634",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1754489838
+    },
+    {
+      "composition": [
+        "blissey",
+        "clodsire",
+        "corviknight",
+        "dondozo",
+        "garganacl",
+        "gliscor"
+      ],
+      "file": "team_027.txt",
+      "first_seen_replay_id": "gen9ou-2061922805",
+      "first_seen_uploadtime": 1708233798,
+      "rating": 1790,
+      "replay_id": "gen9ou-2272330488",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 5,
+        "moves": 22,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 37
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 1,
+        "moves": 2,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 53
+      },
+      "side": "p1",
+      "uploadtime": 1735605139
+    },
+    {
+      "composition": [
+        "blissey",
+        "cresselia",
+        "kingambit",
+        "pawmot",
+        "skeledirge",
+        "weezinggalar"
+      ],
+      "file": "team_028.txt",
+      "first_seen_replay_id": "gen9ou-2111763432",
+      "first_seen_uploadtime": 1714103515,
+      "rating": 1820,
+      "replay_id": "gen9ou-2111763432",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 21,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 34
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 3,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 56
+      },
+      "side": "p1",
+      "uploadtime": 1714103515
+    },
+    {
+      "composition": [
+        "blissey",
+        "darkrai",
+        "dondozo",
+        "gliscor",
+        "greattusk",
+        "moltres"
+      ],
+      "file": "team_029.txt",
+      "first_seen_replay_id": "gen9ou-2453104337",
+      "first_seen_uploadtime": 1759330311,
+      "rating": 1701,
+      "replay_id": "gen9ou-2453104337",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1759330311
+    },
+    {
+      "composition": [
+        "blissey",
+        "dondozo",
+        "garchomp",
+        "gliscor",
+        "talonflame",
+        "toxapex"
+      ],
+      "file": "team_030.txt",
+      "first_seen_replay_id": "gen9ou-2307964304",
+      "first_seen_uploadtime": 1740532907,
+      "rating": 1738,
+      "replay_id": "gen9ou-2307964304",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1740532907
+    },
+    {
+      "composition": [
+        "blissey",
+        "gliscor",
+        "keldeo",
+        "pecharunt",
+        "skarmory",
+        "zarude"
+      ],
+      "file": "team_031.txt",
+      "first_seen_replay_id": "gen9ou-2542890070",
+      "first_seen_uploadtime": 1771511439,
+      "rating": 1742,
+      "replay_id": "gen9ou-2542890070",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1771511439
+    },
+    {
+      "composition": [
+        "breloom",
+        "dragapult",
+        "hoopaunbound",
+        "ironhands",
+        "moltres",
+        "pecharunt"
+      ],
+      "file": "team_032.txt",
+      "first_seen_replay_id": "gen9ou-2123665586",
+      "first_seen_uploadtime": 1715595460,
+      "rating": 1732,
+      "replay_id": "gen9ou-2123665586",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1715595460
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "crawdaunt",
+        "dragonite",
+        "greattusk",
+        "ironcrown",
+        "thundurus"
+      ],
+      "file": "team_033.txt",
+      "first_seen_replay_id": "gen9ou-2413519713",
+      "first_seen_uploadtime": 1754079531,
+      "rating": 1836,
+      "replay_id": "gen9ou-2415035477",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1754300474
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "deoxysspeed",
+        "grimmsnarl",
+        "moltresgalar",
+        "ogerponwellspring",
+        "zamazenta"
+      ],
+      "file": "team_034.txt",
+      "first_seen_replay_id": "gen9ou-2488825881",
+      "first_seen_uploadtime": 1764192060,
+      "rating": 1818,
+      "replay_id": "gen9ou-2488825881",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1764192060
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "deoxysspeed",
+        "ironvaliant",
+        "kingambit",
+        "landorustherian",
+        "ogerponwellspring"
+      ],
+      "file": "team_035.txt",
+      "first_seen_replay_id": "gen9ou-2413132168",
+      "first_seen_uploadtime": 1754023971,
+      "rating": 1778,
+      "replay_id": "gen9ou-2415968797",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p2",
+      "uploadtime": 1754420949
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "dragonite",
+        "glimmora",
+        "ironvaliant",
+        "kingambit",
+        "ragingbolt"
+      ],
+      "file": "team_036.txt",
+      "first_seen_replay_id": "gen9ou-2094933309",
+      "first_seen_uploadtime": 1712132213,
+      "rating": 1751,
+      "replay_id": "gen9ou-2094933309",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1712132213
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "dragonite",
+        "greattusk",
+        "irontreads",
+        "ogerponwellspring",
+        "ragingbolt"
+      ],
+      "file": "team_037.txt",
+      "first_seen_replay_id": "gen9ou-2360802243",
+      "first_seen_uploadtime": 1746846575,
+      "rating": 1832,
+      "replay_id": "gen9ou-2365275170",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 30
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 60
+      },
+      "side": "p1",
+      "uploadtime": 1747402079
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "garganacl",
+        "landorustherian",
+        "quaquaval",
+        "slitherwing",
+        "slowking"
+      ],
+      "file": "team_038.txt",
+      "first_seen_replay_id": "gen9ou-2166963486",
+      "first_seen_uploadtime": 1721875223,
+      "rating": 1717,
+      "replay_id": "gen9ou-2166963486",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1721875223
+    },
+    {
+      "composition": [
+        "ceruledge",
+        "gholdengo",
+        "greattusk",
+        "ogerponwellspring",
+        "ragingbolt",
+        "ribombee"
+      ],
+      "file": "team_039.txt",
+      "first_seen_replay_id": "gen9ou-2303300744",
+      "first_seen_uploadtime": 1739907567,
+      "rating": 1750,
+      "replay_id": "gen9ou-2538210922",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1770907131
+    },
+    {
+      "composition": [
+        "chansey",
+        "enamorus",
+        "greattusk",
+        "kingambit",
+        "ogerponwellspring",
+        "pecharunt"
+      ],
+      "file": "team_040.txt",
+      "first_seen_replay_id": "gen9ou-2229689382",
+      "first_seen_uploadtime": 1729744236,
+      "rating": 1787,
+      "replay_id": "gen9ou-2560348785",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 1,
+        "moves": 20,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 5,
+        "moves": 4,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1773680045
+    },
+    {
+      "composition": [
+        "chesnaught",
+        "gholdengo",
+        "hatterene",
+        "mukalola",
+        "ogerponcornerstone",
+        "regidrago"
+      ],
+      "file": "team_041.txt",
+      "first_seen_replay_id": "gen9ou-2136822134",
+      "first_seen_uploadtime": 1717519070,
+      "rating": 1722,
+      "replay_id": "gen9ou-2582723279",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 1,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 5,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1776110157
+    },
+    {
+      "composition": [
+        "cinderace",
+        "clefable",
+        "dragapult",
+        "greninja",
+        "landorustherian",
+        "zamazenta"
+      ],
+      "file": "team_042.txt",
+      "first_seen_replay_id": "gen9ou-2108541195",
+      "first_seen_uploadtime": 1713730065,
+      "rating": 1885,
+      "replay_id": "gen9ou-2108541195",
+      "revealed_fields": {
+        "ability": 4,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 2,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1713730065
+    },
+    {
+      "composition": [
+        "cinderace",
+        "clefable",
+        "latios",
+        "slowkinggalar",
+        "weavile",
+        "zapdos"
+      ],
+      "file": "team_043.txt",
+      "first_seen_replay_id": "gen9ou-2418176947",
+      "first_seen_uploadtime": 1754716431,
+      "rating": 1703,
+      "replay_id": "gen9ou-2556328488",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1773191290
+    },
+    {
+      "composition": [
+        "cinderace",
+        "cloyster",
+        "dragonite",
+        "greattusk",
+        "kingambit",
+        "primarina"
+      ],
+      "file": "team_044.txt",
+      "first_seen_replay_id": "gen9ou-2100247319",
+      "first_seen_uploadtime": 1712755658,
+      "rating": 1907,
+      "replay_id": "gen9ou-2100247319",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1712755658
+    },
+    {
+      "composition": [
+        "cinderace",
+        "corviknight",
+        "dragapult",
+        "meowscarada",
+        "ragingbolt",
+        "tinglu"
+      ],
+      "file": "team_045.txt",
+      "first_seen_replay_id": "gen9ou-2095746014",
+      "first_seen_uploadtime": 1712223069,
+      "rating": 1743,
+      "replay_id": "gen9ou-2552462585",
+      "revealed_fields": {
+        "ability": 4,
+        "evs": 0,
+        "item": 2,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 2,
+        "evs": 36,
+        "item": 4,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1772724723
+    },
+    {
+      "composition": [
+        "cinderace",
+        "corviknight",
+        "dragonite",
+        "greattusk",
+        "slowkinggalar",
+        "tornadustherian"
+      ],
+      "file": "team_046.txt",
+      "first_seen_replay_id": "gen9ou-2415711655",
+      "first_seen_uploadtime": 1754391843,
+      "rating": 1844,
+      "replay_id": "gen9ou-2415711655",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 32
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 58
+      },
+      "side": "p1",
+      "uploadtime": 1754391843
+    },
+    {
+      "composition": [
+        "cinderace",
+        "corviknight",
+        "greattusk",
+        "meowscarada",
+        "ragingbolt",
+        "slowkinggalar"
+      ],
+      "file": "team_047.txt",
+      "first_seen_replay_id": "gen9ou-2296251164",
+      "first_seen_uploadtime": 1738943609,
+      "rating": 1763,
+      "replay_id": "gen9ou-2323942546",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1742482565
+    },
+    {
+      "composition": [
+        "cinderace",
+        "corviknight",
+        "ogerponwellspring",
+        "rillaboom",
+        "slowkinggalar",
+        "tinglu"
+      ],
+      "file": "team_048.txt",
+      "first_seen_replay_id": "gen9ou-2422250606",
+      "first_seen_uploadtime": 1755284982,
+      "rating": 1988,
+      "replay_id": "gen9ou-2427170003",
+      "revealed_fields": {
+        "ability": 4,
+        "evs": 0,
+        "item": 2,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 31
+      },
+      "sampled_fields": {
+        "ability": 2,
+        "evs": 36,
+        "item": 4,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 59
+      },
+      "side": "p2",
+      "uploadtime": 1755974880
+    },
+    {
+      "composition": [
+        "cinderace",
+        "darkrai",
+        "gholdengo",
+        "kyurem",
+        "tinglu",
+        "zamazenta"
+      ],
+      "file": "team_049.txt",
+      "first_seen_replay_id": "gen9ou-2132243026",
+      "first_seen_uploadtime": 1716914002,
+      "rating": 1835,
+      "replay_id": "gen9ou-2132243026",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1716914002
+    },
+    {
+      "composition": [
+        "cinderace",
+        "darkrai",
+        "gliscor",
+        "kingambit",
+        "latios",
+        "primarina"
+      ],
+      "file": "team_050.txt",
+      "first_seen_replay_id": "gen9ou-2136839478",
+      "first_seen_uploadtime": 1717521402,
+      "rating": 1714,
+      "replay_id": "gen9ou-2136839478",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p1",
+      "uploadtime": 1717521402
+    },
+    {
+      "composition": [
+        "cinderace",
+        "darkrai",
+        "hatterene",
+        "ironvaliant",
+        "kyurem",
+        "landorustherian"
+      ],
+      "file": "team_051.txt",
+      "first_seen_replay_id": "gen9ou-2143434912",
+      "first_seen_uploadtime": 1718400785,
+      "rating": 1737,
+      "replay_id": "gen9ou-2235844873",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1730531555
+    },
+    {
+      "composition": [
+        "cinderace",
+        "dragapult",
+        "greattusk",
+        "kyurem",
+        "slowkinggalar",
+        "zapdos"
+      ],
+      "file": "team_052.txt",
+      "first_seen_replay_id": "gen9ou-2184371294",
+      "first_seen_uploadtime": 1724204069,
+      "rating": 1817,
+      "replay_id": "gen9ou-2184371294",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p2",
+      "uploadtime": 1724204069
+    },
+    {
+      "composition": [
+        "cinderace",
+        "dragapult",
+        "hoopaunbound",
+        "ogerpon",
+        "tinkaton",
+        "zapdos"
+      ],
+      "file": "team_053.txt",
+      "first_seen_replay_id": "gen9ou-2108151096",
+      "first_seen_uploadtime": 1713674957,
+      "rating": 1716,
+      "replay_id": "gen9ou-2108151096",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 1,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 5,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1713674957
+    },
+    {
+      "composition": [
+        "cinderace",
+        "dragonite",
+        "ironvaliant",
+        "kyurem",
+        "landorustherian",
+        "scizor"
+      ],
+      "file": "team_054.txt",
+      "first_seen_replay_id": "gen9ou-2480184054",
+      "first_seen_uploadtime": 1762993544,
+      "rating": 1709,
+      "replay_id": "gen9ou-2480920166",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 1,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 5,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1763089078
+    },
+    {
+      "composition": [
+        "cinderace",
+        "gholdengo",
+        "landorustherian",
+        "primarina",
+        "samurotthisui",
+        "slitherwing"
+      ],
+      "file": "team_055.txt",
+      "first_seen_replay_id": "gen9ou-2363086791",
+      "first_seen_uploadtime": 1747146885,
+      "rating": 1702,
+      "replay_id": "gen9ou-2363086791",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 1,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 5,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1747146885
+    },
+    {
+      "composition": [
+        "clefable",
+        "clodsire",
+        "rillaboom",
+        "skeledirge",
+        "weavile",
+        "zapdos"
+      ],
+      "file": "team_056.txt",
+      "first_seen_replay_id": "gen9ou-2236764253",
+      "first_seen_uploadtime": 1730669155,
+      "rating": 1711,
+      "replay_id": "gen9ou-2236960552",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1730693885
+    },
+    {
+      "composition": [
+        "clefable",
+        "corviknight",
+        "dragonite",
+        "gliscor",
+        "samurotthisui",
+        "weavile"
+      ],
+      "file": "team_057.txt",
+      "first_seen_replay_id": "gen9ou-2418051918",
+      "first_seen_uploadtime": 1754698107,
+      "rating": 1892,
+      "replay_id": "gen9ou-2418051918",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 20,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 31
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 4,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 59
+      },
+      "side": "p2",
+      "uploadtime": 1754698107
+    },
+    {
+      "composition": [
+        "clefable",
+        "corviknight",
+        "dragonite",
+        "gliscor",
+        "tinglu",
+        "weavile"
+      ],
+      "file": "team_058.txt",
+      "first_seen_replay_id": "gen9ou-2316299871",
+      "first_seen_uploadtime": 1741601207,
+      "rating": 1718,
+      "replay_id": "gen9ou-2413551070",
+      "revealed_fields": {
+        "ability": 4,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 2,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 63
+      },
+      "side": "p2",
+      "uploadtime": 1754083270
+    },
+    {
+      "composition": [
+        "clefable",
+        "corviknight",
+        "gliscor",
+        "skeledirge",
+        "volcanion",
+        "weavile"
+      ],
+      "file": "team_059.txt",
+      "first_seen_replay_id": "gen9ou-2112503301",
+      "first_seen_uploadtime": 1714190877,
+      "rating": 1796,
+      "replay_id": "gen9ou-2112682576",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1714222982
+    },
+    {
+      "composition": [
+        "clefable",
+        "corviknight",
+        "greninja",
+        "heatran",
+        "rillaboom",
+        "tyranitar"
+      ],
+      "file": "team_060.txt",
+      "first_seen_replay_id": "gen9ou-2154672348",
+      "first_seen_uploadtime": 1720041880,
+      "rating": 1708,
+      "replay_id": "gen9ou-2154672348",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1720041880
+    },
+    {
+      "composition": [
+        "clefable",
+        "dondozo",
+        "dragapult",
+        "gliscor",
+        "hoopaunbound",
+        "slowkinggalar"
+      ],
+      "file": "team_061.txt",
+      "first_seen_replay_id": "gen9ou-2091337940",
+      "first_seen_uploadtime": 1711667241,
+      "rating": 1746,
+      "replay_id": "gen9ou-2091337940",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1711667241
+    },
+    {
+      "composition": [
+        "clefable",
+        "dragonite",
+        "gholdengo",
+        "gliscor",
+        "ogerpon",
+        "slitherwing"
+      ],
+      "file": "team_062.txt",
+      "first_seen_replay_id": "gen9ou-2194079865",
+      "first_seen_uploadtime": 1725413009,
+      "rating": 1772,
+      "replay_id": "gen9ou-2426058755",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 1,
+        "moves": 21,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 31
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 5,
+        "moves": 3,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 59
+      },
+      "side": "p2",
+      "uploadtime": 1755824155
+    },
+    {
+      "composition": [
+        "clefable",
+        "dragonite",
+        "greattusk",
+        "hydrapple",
+        "kingambit",
+        "slowkinggalar"
+      ],
+      "file": "team_063.txt",
+      "first_seen_replay_id": "gen9ou-2416466584",
+      "first_seen_uploadtime": 1754490784,
+      "rating": 1800,
+      "replay_id": "gen9ou-2416466584",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 66
+      },
+      "side": "p2",
+      "uploadtime": 1754490784
+    },
+    {
+      "composition": [
+        "clefable",
+        "dragonite",
+        "heatran",
+        "pecharunt",
+        "tinglu",
+        "zamazenta"
+      ],
+      "file": "team_064.txt",
+      "first_seen_replay_id": "gen9ou-2532991452",
+      "first_seen_uploadtime": 1770244287,
+      "rating": 1784,
+      "replay_id": "gen9ou-2597297984",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1777476929
+    },
+    {
+      "composition": [
+        "clefable",
+        "excadrill",
+        "moltres",
+        "slowkinggalar",
+        "tinglu",
+        "tyranitar"
+      ],
+      "file": "team_065.txt",
+      "first_seen_replay_id": "gen9ou-2097232224",
+      "first_seen_uploadtime": 1712394759,
+      "rating": 1747,
+      "replay_id": "gen9ou-2097232224",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1712394759
+    },
+    {
+      "composition": [
+        "clefable",
+        "garganacl",
+        "gholdengo",
+        "gliscor",
+        "greattusk",
+        "moltres"
+      ],
+      "file": "team_066.txt",
+      "first_seen_replay_id": "gen9ou-2420763105",
+      "first_seen_uploadtime": 1755086346,
+      "rating": 1739,
+      "replay_id": "gen9ou-2420763105",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1755086346
+    },
+    {
+      "composition": [
+        "clefable",
+        "gholdengo",
+        "slowkinggalar",
+        "tinglu",
+        "zamazenta",
+        "zapdos"
+      ],
+      "file": "team_067.txt",
+      "first_seen_replay_id": "gen9ou-2213708269",
+      "first_seen_uploadtime": 1727804655,
+      "rating": 1754,
+      "replay_id": "gen9ou-2213708269",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1727804655
+    },
+    {
+      "composition": [
+        "clodsire",
+        "cresselia",
+        "garganacl",
+        "sinistcha",
+        "skarmory",
+        "weavile"
+      ],
+      "file": "team_068.txt",
+      "first_seen_replay_id": "gen9ou-2123975832",
+      "first_seen_uploadtime": 1715627099,
+      "rating": 1801,
+      "replay_id": "gen9ou-2124080278",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 32
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 58
+      },
+      "side": "p1",
+      "uploadtime": 1715637514
+    },
+    {
+      "composition": [
+        "clodsire",
+        "dragonite",
+        "gholdengo",
+        "greattusk",
+        "ironvaliant",
+        "tinglu"
+      ],
+      "file": "team_069.txt",
+      "first_seen_replay_id": "gen9ou-2067888068",
+      "first_seen_uploadtime": 1708948156,
+      "rating": 1887,
+      "replay_id": "gen9ou-2094223399",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1712056252
+    },
+    {
+      "composition": [
+        "clodsire",
+        "irontreads",
+        "kingambit",
+        "ogerpon",
+        "ragingbolt",
+        "zamazenta"
+      ],
+      "file": "team_070.txt",
+      "first_seen_replay_id": "gen9ou-2458482987",
+      "first_seen_uploadtime": 1760032512,
+      "rating": 1816,
+      "replay_id": "gen9ou-2458482987",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 20,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 32
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 4,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 58
+      },
+      "side": "p1",
+      "uploadtime": 1760032512
+    },
+    {
+      "composition": [
+        "corviknight",
+        "deoxysspeed",
+        "dragonite",
+        "ironmoth",
+        "scizor",
+        "zamazenta"
+      ],
+      "file": "team_071.txt",
+      "first_seen_replay_id": "gen9ou-2351714076",
+      "first_seen_uploadtime": 1745751354,
+      "rating": 1757,
+      "replay_id": "gen9ou-2351714076",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 5,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 1,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1745751354
+    },
+    {
+      "composition": [
+        "corviknight",
+        "enamorus",
+        "greattusk",
+        "hatterene",
+        "ragingbolt",
+        "slowkinggalar"
+      ],
+      "file": "team_072.txt",
+      "first_seen_replay_id": "gen9ou-2161569045",
+      "first_seen_uploadtime": 1721082960,
+      "rating": 1711,
+      "replay_id": "gen9ou-2175202382",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1723024852
+    },
+    {
+      "composition": [
+        "corviknight",
+        "garganacl",
+        "greattusk",
+        "kingambit",
+        "kyurem",
+        "slowkinggalar"
+      ],
+      "file": "team_073.txt",
+      "first_seen_replay_id": "gen9ou-2349157199",
+      "first_seen_uploadtime": 1745433297,
+      "rating": 1773,
+      "replay_id": "gen9ou-2349157199",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1745433297
+    },
+    {
+      "composition": [
+        "cresselia",
+        "diancie",
+        "hatterene",
+        "hoopaunbound",
+        "kingambit",
+        "ursaluna"
+      ],
+      "file": "team_074.txt",
+      "first_seen_replay_id": "gen9ou-2170862402",
+      "first_seen_uploadtime": 1722446251,
+      "rating": 1769,
+      "replay_id": "gen9ou-2186011400",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p1",
+      "uploadtime": 1724407110
+    },
+    {
+      "composition": [
+        "darkrai",
+        "dondozo",
+        "greattusk",
+        "meowscarada",
+        "scizor",
+        "slowkinggalar"
+      ],
+      "file": "team_075.txt",
+      "first_seen_replay_id": "gen9ou-2084935069",
+      "first_seen_uploadtime": 1710908751,
+      "rating": 1763,
+      "replay_id": "gen9ou-2084945736",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1710910510
+    },
+    {
+      "composition": [
+        "darkrai",
+        "dragapult",
+        "garganacl",
+        "greattusk",
+        "skarmory",
+        "slowkinggalar"
+      ],
+      "file": "team_076.txt",
+      "first_seen_replay_id": "gen9ou-2113795066",
+      "first_seen_uploadtime": 1714365919,
+      "rating": 1812,
+      "replay_id": "gen9ou-2114155016",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 23
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 67
+      },
+      "side": "p2",
+      "uploadtime": 1714411379
+    },
+    {
+      "composition": [
+        "darkrai",
+        "dragonite",
+        "enamorus",
+        "gholdengo",
+        "landorustherian",
+        "tinglu"
+      ],
+      "file": "team_077.txt",
+      "first_seen_replay_id": "gen9ou-2169320897",
+      "first_seen_uploadtime": 1722228022,
+      "rating": 1844,
+      "replay_id": "gen9ou-2169322965",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1722228683
+    },
+    {
+      "composition": [
+        "darkrai",
+        "dragonite",
+        "gholdengo",
+        "greattusk",
+        "ogerponwellspring",
+        "slowkinggalar"
+      ],
+      "file": "team_078.txt",
+      "first_seen_replay_id": "gen9ou-2296313508",
+      "first_seen_uploadtime": 1738949837,
+      "rating": 1760,
+      "replay_id": "gen9ou-2572101517",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1774988765
+    },
+    {
+      "composition": [
+        "darkrai",
+        "dragonite",
+        "ogerpon",
+        "pecharunt",
+        "tinglu",
+        "tinkaton"
+      ],
+      "file": "team_079.txt",
+      "first_seen_replay_id": "gen9ou-2276933154",
+      "first_seen_uploadtime": 1736294474,
+      "rating": 1775,
+      "replay_id": "gen9ou-2276933154",
+      "revealed_fields": {
+        "ability": 4,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 2,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1736294474
+    },
+    {
+      "composition": [
+        "darkrai",
+        "gholdengo",
+        "ironvaliant",
+        "landorustherian",
+        "manaphy",
+        "ragingbolt"
+      ],
+      "file": "team_080.txt",
+      "first_seen_replay_id": "gen9ou-2177515072",
+      "first_seen_uploadtime": 1723320745,
+      "rating": 1768,
+      "replay_id": "gen9ou-2197074401",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 21,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 34
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 3,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 56
+      },
+      "side": "p1",
+      "uploadtime": 1725794414
+    },
+    {
+      "composition": [
+        "darkrai",
+        "gliscor",
+        "greattusk",
+        "ragingbolt",
+        "skarmory",
+        "slowkinggalar"
+      ],
+      "file": "team_081.txt",
+      "first_seen_replay_id": "gen9ou-2175199306",
+      "first_seen_uploadtime": 1723023770,
+      "rating": 1711,
+      "replay_id": "gen9ou-2175202382",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p2",
+      "uploadtime": 1723024852
+    },
+    {
+      "composition": [
+        "deoxysspeed",
+        "dragonite",
+        "gholdengo",
+        "gliscor",
+        "ogerpon",
+        "slitherwing"
+      ],
+      "file": "team_082.txt",
+      "first_seen_replay_id": "gen9ou-2150851189",
+      "first_seen_uploadtime": 1719472494,
+      "rating": 1893,
+      "replay_id": "gen9ou-2176375031",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 1,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 5,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1723166109
+    },
+    {
+      "composition": [
+        "deoxysspeed",
+        "enamorus",
+        "kingambit",
+        "pecharunt",
+        "samurotthisui",
+        "ursaluna"
+      ],
+      "file": "team_083.txt",
+      "first_seen_replay_id": "gen9ou-2416439397",
+      "first_seen_uploadtime": 1754487436,
+      "rating": 1721,
+      "replay_id": "gen9ou-2416439397",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1754487436
+    },
+    {
+      "composition": [
+        "deoxysspeed",
+        "grimmsnarl",
+        "ironhands",
+        "ironmoth",
+        "irontreads",
+        "ogerponwellspring"
+      ],
+      "file": "team_084.txt",
+      "first_seen_replay_id": "gen9ou-2417535330",
+      "first_seen_uploadtime": 1754627549,
+      "rating": 1791,
+      "replay_id": "gen9ou-2417535330",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1754627549
+    },
+    {
+      "composition": [
+        "dragapult",
+        "dragonite",
+        "gholdengo",
+        "glimmora",
+        "irontreads",
+        "manaphy"
+      ],
+      "file": "team_085.txt",
+      "first_seen_replay_id": "gen9ou-2492856827",
+      "first_seen_uploadtime": 1764779033,
+      "rating": 1819,
+      "replay_id": "gen9ou-2492856827",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1764779033
+    },
+    {
+      "composition": [
+        "dragapult",
+        "dragonite",
+        "greattusk",
+        "heatran",
+        "ogerponwellspring",
+        "tinkaton"
+      ],
+      "file": "team_086.txt",
+      "first_seen_replay_id": "gen9ou-2100084121",
+      "first_seen_uploadtime": 1712733336,
+      "rating": 1907,
+      "replay_id": "gen9ou-2100247319",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 23
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 67
+      },
+      "side": "p2",
+      "uploadtime": 1712755658
+    },
+    {
+      "composition": [
+        "dragapult",
+        "gholdengo",
+        "glimmora",
+        "ironmoth",
+        "kingambit",
+        "ogerponwellspring"
+      ],
+      "file": "team_087.txt",
+      "first_seen_replay_id": "gen9ou-2381002399",
+      "first_seen_uploadtime": 1749401646,
+      "rating": 1849,
+      "replay_id": "gen9ou-2405670023",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1752960704
+    },
+    {
+      "composition": [
+        "dragapult",
+        "gholdengo",
+        "greattusk",
+        "moltres",
+        "ogerponwellspring",
+        "tinglu"
+      ],
+      "file": "team_088.txt",
+      "first_seen_replay_id": "gen9ou-2175229876",
+      "first_seen_uploadtime": 1723029022,
+      "rating": 1741,
+      "replay_id": "gen9ou-2175229876",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1723029022
+    },
+    {
+      "composition": [
+        "dragapult",
+        "glimmora",
+        "greattusk",
+        "ironvaliant",
+        "kingambit",
+        "ogerponwellspring"
+      ],
+      "file": "team_089.txt",
+      "first_seen_replay_id": "gen9ou-2212440547",
+      "first_seen_uploadtime": 1727651100,
+      "rating": 1736,
+      "replay_id": "gen9ou-2212440547",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1727651100
+    },
+    {
+      "composition": [
+        "dragapult",
+        "gliscor",
+        "mandibuzz",
+        "milotic",
+        "skeledirge",
+        "weezinggalar"
+      ],
+      "file": "team_090.txt",
+      "first_seen_replay_id": "gen9ou-2062982561",
+      "first_seen_uploadtime": 1708367651,
+      "rating": 1717,
+      "replay_id": "gen9ou-2214769357",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1727925073
+    },
+    {
+      "composition": [
+        "dragapult",
+        "gliscor",
+        "meowscarada",
+        "skarmory",
+        "slowkinggalar",
+        "tinglu"
+      ],
+      "file": "team_091.txt",
+      "first_seen_replay_id": "gen9ou-2241358123",
+      "first_seen_uploadtime": 1731280031,
+      "rating": 1750,
+      "replay_id": "gen9ou-2241358123",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 2,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 4,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1731280031
+    },
+    {
+      "composition": [
+        "dragapult",
+        "greattusk",
+        "hawlucha",
+        "heatran",
+        "mimikyu",
+        "rillaboom"
+      ],
+      "file": "team_092.txt",
+      "first_seen_replay_id": "gen9ou-2205902888",
+      "first_seen_uploadtime": 1726846803,
+      "rating": 1762,
+      "replay_id": "gen9ou-2242763674",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p2",
+      "uploadtime": 1731461479
+    },
+    {
+      "composition": [
+        "dragapult",
+        "greattusk",
+        "kingambit",
+        "moltres",
+        "ogerponwellspring",
+        "slowkinggalar"
+      ],
+      "file": "team_093.txt",
+      "first_seen_replay_id": "gen9ou-2362632325",
+      "first_seen_uploadtime": 1747087268,
+      "rating": 1730,
+      "replay_id": "gen9ou-2453324834",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1759351129
+    },
+    {
+      "composition": [
+        "dragapult",
+        "greattusk",
+        "kingambit",
+        "moltres",
+        "rillaboom",
+        "slowkinggalar"
+      ],
+      "file": "team_094.txt",
+      "first_seen_replay_id": "gen9ou-2158346763",
+      "first_seen_uploadtime": 1720601906,
+      "rating": 1775,
+      "replay_id": "gen9ou-2356144497",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 1,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 5,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1746292735
+    },
+    {
+      "composition": [
+        "dragapult",
+        "irontreads",
+        "ogerponwellspring",
+        "overqwil",
+        "pelipper",
+        "zapdos"
+      ],
+      "file": "team_095.txt",
+      "first_seen_replay_id": "gen9ou-2282321672",
+      "first_seen_uploadtime": 1737049451,
+      "rating": 1703,
+      "replay_id": "gen9ou-2282321672",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p1",
+      "uploadtime": 1737049451
+    },
+    {
+      "composition": [
+        "dragapult",
+        "ironvaliant",
+        "kingambit",
+        "landorustherian",
+        "rillaboom",
+        "volcanion"
+      ],
+      "file": "team_096.txt",
+      "first_seen_replay_id": "gen9ou-2169247449",
+      "first_seen_uploadtime": 1722217496,
+      "rating": 1840,
+      "replay_id": "gen9ou-2169247449",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1722217496
+    },
+    {
+      "composition": [
+        "dragonite",
+        "garchomp",
+        "gholdengo",
+        "glimmora",
+        "ironmoth",
+        "umbreon"
+      ],
+      "file": "team_097.txt",
+      "first_seen_replay_id": "gen9ou-2059284003",
+      "first_seen_uploadtime": 1707930728,
+      "rating": 1740,
+      "replay_id": "gen9ou-2151908931",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1719624409
+    },
+    {
+      "composition": [
+        "dragonite",
+        "garganacl",
+        "greattusk",
+        "hoopaunbound",
+        "moltres",
+        "ogerponwellspring"
+      ],
+      "file": "team_098.txt",
+      "first_seen_replay_id": "gen9ou-2451438548",
+      "first_seen_uploadtime": 1759120721,
+      "rating": 1810,
+      "replay_id": "gen9ou-2451438548",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1759120721
+    },
+    {
+      "composition": [
+        "dragonite",
+        "gholdengo",
+        "greattusk",
+        "ironvaliant",
+        "kingambit",
+        "slowkinggalar"
+      ],
+      "file": "team_099.txt",
+      "first_seen_replay_id": "gen9ou-2069721229",
+      "first_seen_uploadtime": 1709146921,
+      "rating": 1966,
+      "replay_id": "gen9ou-2094999678",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1712143377
+    },
+    {
+      "composition": [
+        "dragonite",
+        "gholdengo",
+        "hatterene",
+        "samurotthisui",
+        "tinglu",
+        "zamazenta"
+      ],
+      "file": "team_100.txt",
+      "first_seen_replay_id": "gen9ou-2409753137",
+      "first_seen_uploadtime": 1753552105,
+      "rating": 1753,
+      "replay_id": "gen9ou-2409753137",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1753552105
+    },
+    {
+      "composition": [
+        "dragonite",
+        "gholdengo",
+        "irontreads",
+        "landorustherian",
+        "ragingbolt",
+        "zamazenta"
+      ],
+      "file": "team_101.txt",
+      "first_seen_replay_id": "gen9ou-2427437701",
+      "first_seen_uploadtime": 1756008462,
+      "rating": 1749,
+      "replay_id": "gen9ou-2427437701",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 20,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 33
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 4,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 57
+      },
+      "side": "p2",
+      "uploadtime": 1756008462
+    },
+    {
+      "composition": [
+        "dragonite",
+        "gliscor",
+        "keldeo",
+        "sinistcha",
+        "tinglu",
+        "tinkaton"
+      ],
+      "file": "team_102.txt",
+      "first_seen_replay_id": "gen9ou-2210803664",
+      "first_seen_uploadtime": 1727440451,
+      "rating": 1723,
+      "replay_id": "gen9ou-2406915745",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 30
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 60
+      },
+      "side": "p2",
+      "uploadtime": 1753146834
+    },
+    {
+      "composition": [
+        "dragonite",
+        "greattusk",
+        "ironmoth",
+        "meowscarada",
+        "slowkinggalar",
+        "walkingwake"
+      ],
+      "file": "team_103.txt",
+      "first_seen_replay_id": "gen9ou-2172077279",
+      "first_seen_uploadtime": 1722615078,
+      "rating": 1738,
+      "replay_id": "gen9ou-2411049698",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 1,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 5,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1753737903
+    },
+    {
+      "composition": [
+        "dragonite",
+        "greattusk",
+        "magnezone",
+        "meowscarada",
+        "ogerponwellspring",
+        "slowkinggalar"
+      ],
+      "file": "team_104.txt",
+      "first_seen_replay_id": "gen9ou-2419351164",
+      "first_seen_uploadtime": 1754889113,
+      "rating": 1798,
+      "replay_id": "gen9ou-2419351164",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1754889113
+    },
+    {
+      "composition": [
+        "dragonite",
+        "hatterene",
+        "irontreads",
+        "kyurem",
+        "slowkinggalar",
+        "zamazenta"
+      ],
+      "file": "team_105.txt",
+      "first_seen_replay_id": "gen9ou-2421153923",
+      "first_seen_uploadtime": 1755131130,
+      "rating": 1816,
+      "replay_id": "gen9ou-2421153923",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1755131130
+    },
+    {
+      "composition": [
+        "dragonite",
+        "infernape",
+        "sinistcha",
+        "tinglu",
+        "tinkaton",
+        "zamazenta"
+      ],
+      "file": "team_106.txt",
+      "first_seen_replay_id": "gen9ou-2287806630",
+      "first_seen_uploadtime": 1737785566,
+      "rating": 1714,
+      "replay_id": "gen9ou-2287806630",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1737785566
+    },
+    {
+      "composition": [
+        "empoleon",
+        "greattusk",
+        "kingambit",
+        "kyurem",
+        "zamazenta",
+        "zapdos"
+      ],
+      "file": "team_107.txt",
+      "first_seen_replay_id": "gen9ou-2426634227",
+      "first_seen_uploadtime": 1755897883,
+      "rating": 1707,
+      "replay_id": "gen9ou-2426634227",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 2,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 4,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1755897883
+    },
+    {
+      "composition": [
+        "enamorus",
+        "garganacl",
+        "gliscor",
+        "greattusk",
+        "heatran",
+        "rillaboom"
+      ],
+      "file": "team_108.txt",
+      "first_seen_replay_id": "gen9ou-2100842753",
+      "first_seen_uploadtime": 1712816311,
+      "rating": 1779,
+      "replay_id": "gen9ou-2100842753",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1712816311
+    },
+    {
+      "composition": [
+        "enamorus",
+        "garganacl",
+        "greattusk",
+        "ironcrown",
+        "kingambit",
+        "sinistcha"
+      ],
+      "file": "team_109.txt",
+      "first_seen_replay_id": "gen9ou-2227210405",
+      "first_seen_uploadtime": 1729458709,
+      "rating": 1716,
+      "replay_id": "gen9ou-2227210405",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 3,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 3,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1729458709
+    },
+    {
+      "composition": [
+        "enamorus",
+        "ironhands",
+        "ironvaliant",
+        "ogerponcornerstone",
+        "ragingbolt",
+        "scizor"
+      ],
+      "file": "team_110.txt",
+      "first_seen_replay_id": "gen9ou-2215798934",
+      "first_seen_uploadtime": 1728052107,
+      "rating": 1702,
+      "replay_id": "gen9ou-2215798934",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1728052107
+    },
+    {
+      "composition": [
+        "excadrill",
+        "keldeo",
+        "mandibuzz",
+        "skarmory",
+        "tornadustherian",
+        "tyranitar"
+      ],
+      "file": "team_111.txt",
+      "first_seen_replay_id": "gen9ou-2405670023",
+      "first_seen_uploadtime": 1752960704,
+      "rating": 1849,
+      "replay_id": "gen9ou-2405670023",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1752960704
+    },
+    {
+      "composition": [
+        "garchomp",
+        "gholdengo",
+        "greattusk",
+        "ironmoth",
+        "manaphy",
+        "ribombee"
+      ],
+      "file": "team_112.txt",
+      "first_seen_replay_id": "gen9ou-2225830526",
+      "first_seen_uploadtime": 1729273825,
+      "rating": 1708,
+      "replay_id": "gen9ou-2229046460",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 6,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 0,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1729676615
+    },
+    {
+      "composition": [
+        "garganacl",
+        "gholdengo",
+        "gliscor",
+        "greattusk",
+        "ironvaliant",
+        "toxapex"
+      ],
+      "file": "team_113.txt",
+      "first_seen_replay_id": "gen9ou-2062368185",
+      "first_seen_uploadtime": 1708292995,
+      "rating": 1716,
+      "replay_id": "gen9ou-2129050329",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 6,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 31
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 0,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 59
+      },
+      "side": "p2",
+      "uploadtime": 1716487622
+    },
+    {
+      "composition": [
+        "garganacl",
+        "ironmoth",
+        "irontreads",
+        "ogerponwellspring",
+        "ragingbolt",
+        "rillaboom"
+      ],
+      "file": "team_114.txt",
+      "first_seen_replay_id": "gen9ou-2482419208",
+      "first_seen_uploadtime": 1763314165,
+      "rating": 1829,
+      "replay_id": "gen9ou-2482419208",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1763314165
+    },
+    {
+      "composition": [
+        "garganacl",
+        "irontreads",
+        "kyurem",
+        "moltres",
+        "slowkinggalar",
+        "weezinggalar"
+      ],
+      "file": "team_115.txt",
+      "first_seen_replay_id": "gen9ou-2535066064",
+      "first_seen_uploadtime": 1770509846,
+      "rating": 1825,
+      "replay_id": "gen9ou-2573293727",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1775117630
+    },
+    {
+      "composition": [
+        "garganacl",
+        "ironvaliant",
+        "moltres",
+        "quaquaval",
+        "sinistcha",
+        "tinglu"
+      ],
+      "file": "team_116.txt",
+      "first_seen_replay_id": "gen9ou-2184691860",
+      "first_seen_uploadtime": 1724250398,
+      "rating": 1737,
+      "replay_id": "gen9ou-2184691860",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 5,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 30
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 1,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 60
+      },
+      "side": "p2",
+      "uploadtime": 1724250398
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "glimmora",
+        "greattusk",
+        "kingambit",
+        "ogerponwellspring",
+        "ribombee"
+      ],
+      "file": "team_117.txt",
+      "first_seen_replay_id": "gen9ou-2433403665",
+      "first_seen_uploadtime": 1756780722,
+      "rating": 1704,
+      "replay_id": "gen9ou-2433403665",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p1",
+      "uploadtime": 1756780722
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "greattusk",
+        "infernape",
+        "ironvaliant",
+        "samurotthisui",
+        "zamazenta"
+      ],
+      "file": "team_118.txt",
+      "first_seen_replay_id": "gen9ou-2322117659",
+      "first_seen_uploadtime": 1742273017,
+      "rating": 1724,
+      "replay_id": "gen9ou-2322924039",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p1",
+      "uploadtime": 1742362852
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "greattusk",
+        "ironmoth",
+        "ogerponwellspring",
+        "ragingbolt",
+        "ribombee"
+      ],
+      "file": "team_119.txt",
+      "first_seen_replay_id": "gen9ou-2248863973",
+      "first_seen_uploadtime": 1732272821,
+      "rating": 1802,
+      "replay_id": "gen9ou-2270731496",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 5,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 1,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p1",
+      "uploadtime": 1735348606
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "greattusk",
+        "landorustherian",
+        "mukalola",
+        "primarina",
+        "ragingbolt"
+      ],
+      "file": "team_120.txt",
+      "first_seen_replay_id": "gen9ou-2130658958",
+      "first_seen_uploadtime": 1716698943,
+      "rating": 1725,
+      "replay_id": "gen9ou-2130658958",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 4,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 2,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1716698943
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "hatterene",
+        "kyurem",
+        "landorustherian",
+        "rillaboom",
+        "zamazenta"
+      ],
+      "file": "team_121.txt",
+      "first_seen_replay_id": "gen9ou-2421415650",
+      "first_seen_uploadtime": 1755174240,
+      "rating": 1724,
+      "replay_id": "gen9ou-2421415650",
+      "revealed_fields": {
+        "ability": 4,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 2,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p2",
+      "uploadtime": 1755174240
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "hydreigon",
+        "ironvaliant",
+        "latios",
+        "rotomwash",
+        "tinglu"
+      ],
+      "file": "team_122.txt",
+      "first_seen_replay_id": "gen9ou-2296804544",
+      "first_seen_uploadtime": 1739021090,
+      "rating": 1704,
+      "replay_id": "gen9ou-2359420154",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p2",
+      "uploadtime": 1746687783
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "ironmoth",
+        "ironvaliant",
+        "kyurem",
+        "ogerponwellspring",
+        "tinglu"
+      ],
+      "file": "team_123.txt",
+      "first_seen_replay_id": "gen9ou-2340999507",
+      "first_seen_uploadtime": 1744432746,
+      "rating": 1732,
+      "replay_id": "gen9ou-2353766532",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1745997146
+    },
+    {
+      "composition": [
+        "gholdengo",
+        "landorustherian",
+        "samurotthisui",
+        "scizor",
+        "thundurustherian",
+        "zamazenta"
+      ],
+      "file": "team_124.txt",
+      "first_seen_replay_id": "gen9ou-2402163838",
+      "first_seen_uploadtime": 1752442397,
+      "rating": 1729,
+      "replay_id": "gen9ou-2412904995",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1753993526
+    },
+    {
+      "composition": [
+        "glimmora",
+        "ironvaliant",
+        "ogerponwellspring",
+        "ragingbolt",
+        "scizor",
+        "zamazenta"
+      ],
+      "file": "team_125.txt",
+      "first_seen_replay_id": "gen9ou-2197985905",
+      "first_seen_uploadtime": 1725905265,
+      "rating": 1770,
+      "replay_id": "gen9ou-2212952810",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 0,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 6,
+        "total": 66
+      },
+      "side": "p1",
+      "uploadtime": 1727717197
+    },
+    {
+      "composition": [
+        "gliscor",
+        "greattusk",
+        "ironcrown",
+        "ogerpon",
+        "slowkinggalar",
+        "weavile"
+      ],
+      "file": "team_126.txt",
+      "first_seen_replay_id": "gen9ou-2130849292",
+      "first_seen_uploadtime": 1716733048,
+      "rating": 1848,
+      "replay_id": "gen9ou-2130849292",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p1",
+      "uploadtime": 1716733048
+    },
+    {
+      "composition": [
+        "gliscor",
+        "greattusk",
+        "ogerpon",
+        "skeledirge",
+        "slitherwing",
+        "tinkaton"
+      ],
+      "file": "team_127.txt",
+      "first_seen_replay_id": "gen9ou-2432962527",
+      "first_seen_uploadtime": 1756732452,
+      "rating": 1791,
+      "replay_id": "gen9ou-2432962527",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 3,
+        "moves": 19,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 3,
+        "moves": 5,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1756732452
+    },
+    {
+      "composition": [
+        "gliscor",
+        "greattusk",
+        "ogerponwellspring",
+        "skeledirge",
+        "slitherwing",
+        "tinkaton"
+      ],
+      "file": "team_128.txt",
+      "first_seen_replay_id": "gen9ou-2415571085",
+      "first_seen_uploadtime": 1754366989,
+      "rating": 1798,
+      "replay_id": "gen9ou-2415571085",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 30
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 60
+      },
+      "side": "p2",
+      "uploadtime": 1754366989
+    },
+    {
+      "composition": [
+        "greattusk",
+        "heatran",
+        "kingambit",
+        "kyurem",
+        "latias",
+        "pecharunt"
+      ],
+      "file": "team_129.txt",
+      "first_seen_replay_id": "gen9ou-2423103370",
+      "first_seen_uploadtime": 1755410958,
+      "rating": 1801,
+      "replay_id": "gen9ou-2430742735",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 5,
+        "moves": 18,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 32
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 1,
+        "moves": 6,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 58
+      },
+      "side": "p2",
+      "uploadtime": 1756427194
+    },
+    {
+      "composition": [
+        "greattusk",
+        "ironcrown",
+        "kingambit",
+        "lokix",
+        "pecharunt",
+        "quaquaval"
+      ],
+      "file": "team_130.txt",
+      "first_seen_replay_id": "gen9ou-2450086894",
+      "first_seen_uploadtime": 1758927643,
+      "rating": 1729,
+      "replay_id": "gen9ou-2450332495",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 16,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 29
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 8,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 61
+      },
+      "side": "p1",
+      "uploadtime": 1758968025
+    },
+    {
+      "composition": [
+        "greattusk",
+        "irontreads",
+        "kyurem",
+        "slowkinggalar",
+        "tornadustherian",
+        "zamazenta"
+      ],
+      "file": "team_131.txt",
+      "first_seen_replay_id": "gen9ou-2389049741",
+      "first_seen_uploadtime": 1750514736,
+      "rating": 1894,
+      "replay_id": "gen9ou-2412236710",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 4,
+        "moves": 17,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 30
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 2,
+        "moves": 7,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 60
+      },
+      "side": "p2",
+      "uploadtime": 1753901667
+    },
+    {
+      "composition": [
+        "greattusk",
+        "kingambit",
+        "kyurem",
+        "moltres",
+        "slowkinggalar",
+        "zamazenta"
+      ],
+      "file": "team_132.txt",
+      "first_seen_replay_id": "gen9ou-2152144406",
+      "first_seen_uploadtime": 1719669436,
+      "rating": 1783,
+      "replay_id": "gen9ou-2422933163",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1755385572
+    },
+    {
+      "composition": [
+        "greattusk",
+        "kingambit",
+        "moltres",
+        "ogerponwellspring",
+        "rillaboom",
+        "slowkinggalar"
+      ],
+      "file": "team_133.txt",
+      "first_seen_replay_id": "gen9ou-2168600565",
+      "first_seen_uploadtime": 1722118115,
+      "rating": 1745,
+      "replay_id": "gen9ou-2175386879",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1723047345
+    },
+    {
+      "composition": [
+        "greattusk",
+        "scizor",
+        "sinistcha",
+        "slowkinggalar",
+        "tinglu",
+        "tornadustherian"
+      ],
+      "file": "team_134.txt",
+      "first_seen_replay_id": "gen9ou-2417779037",
+      "first_seen_uploadtime": 1754666279,
+      "rating": 1831,
+      "replay_id": "gen9ou-2417779037",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 1,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 23
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 5,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 67
+      },
+      "side": "p2",
+      "uploadtime": 1754666279
+    },
+    {
+      "composition": [
+        "grimmsnarl",
+        "ironhands",
+        "latios",
+        "screamtail",
+        "talonflame",
+        "ursaluna"
+      ],
+      "file": "team_135.txt",
+      "first_seen_replay_id": "gen9ou-2486048831",
+      "first_seen_uploadtime": 1763802691,
+      "rating": 1705,
+      "replay_id": "gen9ou-2486048831",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 5,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 1,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1763802691
+    },
+    {
+      "composition": [
+        "hatterene",
+        "kyurem",
+        "landorustherian",
+        "mukalola",
+        "ogerpon",
+        "rillaboom"
+      ],
+      "file": "team_136.txt",
+      "first_seen_replay_id": "gen9ou-2425282247",
+      "first_seen_uploadtime": 1755725359,
+      "rating": 1749,
+      "replay_id": "gen9ou-2425282247",
+      "revealed_fields": {
+        "ability": 3,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 27
+      },
+      "sampled_fields": {
+        "ability": 3,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 63
+      },
+      "side": "p2",
+      "uploadtime": 1755725359
+    },
+    {
+      "composition": [
+        "hawlucha",
+        "ironmoth",
+        "kingambit",
+        "reuniclus",
+        "rillaboom",
+        "sandyshocks"
+      ],
+      "file": "team_137.txt",
+      "first_seen_replay_id": "gen9ou-2125115614",
+      "first_seen_uploadtime": 1715885627,
+      "rating": 1704,
+      "replay_id": "gen9ou-2125115614",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 25
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 65
+      },
+      "side": "p2",
+      "uploadtime": 1715885627
+    },
+    {
+      "composition": [
+        "ironjugulis",
+        "latios",
+        "manaphy",
+        "ogerpon",
+        "sandyshocks",
+        "scizor"
+      ],
+      "file": "team_138.txt",
+      "first_seen_replay_id": "gen9ou-2515742823",
+      "first_seen_uploadtime": 1768031104,
+      "rating": 1811,
+      "replay_id": "gen9ou-2578140919",
+      "revealed_fields": {
+        "ability": 0,
+        "evs": 0,
+        "item": 2,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 24
+      },
+      "sampled_fields": {
+        "ability": 6,
+        "evs": 36,
+        "item": 4,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 66
+      },
+      "side": "p2",
+      "uploadtime": 1775653203
+    },
+    {
+      "composition": [
+        "ironmoth",
+        "kingambit",
+        "landorustherian",
+        "primarina",
+        "ragingbolt",
+        "weavile"
+      ],
+      "file": "team_139.txt",
+      "first_seen_replay_id": "gen9ou-2410027713",
+      "first_seen_uploadtime": 1753590271,
+      "rating": 1761,
+      "replay_id": "gen9ou-2410477581",
+      "revealed_fields": {
+        "ability": 1,
+        "evs": 0,
+        "item": 5,
+        "moves": 15,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 28
+      },
+      "sampled_fields": {
+        "ability": 5,
+        "evs": 36,
+        "item": 1,
+        "moves": 9,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 62
+      },
+      "side": "p1",
+      "uploadtime": 1753658568
+    },
+    {
+      "composition": [
+        "irontreads",
+        "landorustherian",
+        "ragingbolt",
+        "samurotthisui",
+        "slowkinggalar",
+        "zamazenta"
+      ],
+      "file": "team_140.txt",
+      "first_seen_replay_id": "gen9ou-2185386798",
+      "first_seen_uploadtime": 1724333573,
+      "rating": 1749,
+      "replay_id": "gen9ou-2185403563",
+      "revealed_fields": {
+        "ability": 2,
+        "evs": 0,
+        "item": 3,
+        "moves": 14,
+        "nature": 0,
+        "species": 6,
+        "tera": 1,
+        "total": 26
+      },
+      "sampled_fields": {
+        "ability": 4,
+        "evs": 36,
+        "item": 3,
+        "moves": 10,
+        "nature": 6,
+        "species": 0,
+        "tera": 5,
+        "total": 64
+      },
+      "side": "p2",
+      "uploadtime": 1724335662
+    }
+  ]
+}

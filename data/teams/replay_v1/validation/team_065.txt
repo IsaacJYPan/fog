@@ -1,0 +1,59 @@
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Punch
+- Ice Beam
+- Knock Off
+- Low Kick
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Stealth Rock
+- Calm Mind
+- Moonlight
+- Moonblast
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Sassy Nature
+- Chilly Reception
+- Sludge Bomb
+- Toxic
+- Future Sight
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Scorching Sands
+- U-turn
+- Roost
+
+Excadrill @ leftovers
+Ability: sandrush
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Rapid Spin
+- Iron Head
+- Earthquake
+- Substitute
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Whirlwind
+- Earthquake
+- Ruination

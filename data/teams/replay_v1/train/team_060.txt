@@ -1,0 +1,59 @@
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Mirror Coat
+- Aqua Jet
+- Protect
+- Flip Turn
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Dragon Tail
+- Thunder Wave
+- Extreme Speed
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+
+Weezing-Galar @ airballoon
+Ability: neutralizinggas
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Will-O-Wisp
+- Defog
+- Toxic Spikes
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 HP / 120 Atk / 136 Spe
+Jolly Nature
+- U-turn
+- Spikes
+- Knock Off
+- Ivy Cudgel
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Heavy Slam
+- Howl
+- Crunch

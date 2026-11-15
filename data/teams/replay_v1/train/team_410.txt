@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 64 HP / 252 Atk / 192 Spe
+Jolly Nature
+- Iron Head
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Thunderbolt
+- Calm Mind
+- Thunderclap
+- Volt Switch
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earth Power
+- Stealth Rock
+- Rock Tomb
+- Grass Knot
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Body Press
+- Close Combat
+- Iron Defense
+- Crunch
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Poison
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Substitute
+- Moonblast
+- Surf
+- Whirlpool
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Hex
+- U-turn
+- Dragon Darts

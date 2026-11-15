@@ -1,0 +1,59 @@
+Latios @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Recover
+- Calm Mind
+- Aura Sphere
+- Luster Purge
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Vacuum Wave
+- Thunderbolt
+- Close Combat
+- Moonblast
+
+Landorus-Therian @ leftovers
+Ability: intimidate
+Tera Type: Ghost
+EVs: 120 HP / 136 SpA / 252 Spe
+Timid Nature
+- Smack Down
+- Earthquake
+- U-turn
+- Stealth Rock
+
+Scizor @ leftovers
+Ability: technician
+Tera Type: Ground
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Defog
+- Bullet Punch
+- U-turn
+- Knock Off
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Earthquake
+- Ruination
+- Whirlwind
+- Payback
+
+Goodra-Hisui @ assaultvest
+Ability: sapsipper
+Tera Type: Fairy
+EVs: 248 HP / 252 SpA / 8 SpD
+Modest Nature
+- Knock Off
+- Dragon Pulse
+- Flamethrower
+- Acid Spray

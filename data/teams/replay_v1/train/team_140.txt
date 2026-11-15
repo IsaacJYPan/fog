@@ -1,0 +1,59 @@
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Baneful Bunker
+- Poison Jab
+- Toxic Spikes
+- Toxic
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Spikes
+- Protect
+- Earthquake
+- Knock Off
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Soft-Boiled
+- Shadow Ball
+- Calm Mind
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Body Press
+- Curse
+- Sleep Talk
+- Waterfall
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Scorching Sands
+- Will-O-Wisp
+- Flamethrower
+- U-turn
+
+Cresselia @ rockyhelmet
+Ability: levitate
+Tera Type: Poison
+EVs: 252 HP / 176 Def / 80 SpD
+Calm Nature
+- Lunar Dance
+- Calm Mind
+- Moonblast
+- Moonlight

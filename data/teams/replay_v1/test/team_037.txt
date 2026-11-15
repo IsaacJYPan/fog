@@ -1,0 +1,59 @@
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Recover
+- Malignant Chain
+- Shadow Ball
+- Parting Shot
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Make It Rain
+- Recover
+- Trick
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Steel
+EVs: 248 HP / 232 Def / 28 Spe
+Timid Nature
+- Psycho Boost
+- Thunderbolt
+- Knock Off
+- Nasty Plot
+
+Ting-Lu @ redcard
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Stealth Rock
+- Whirlwind
+- Spikes
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roar
+- Flamethrower
+- U-turn
+- Roost
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Bug
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Draining Kiss
+- Moonblast
+- Surf
+- Flip Turn

@@ -1,0 +1,59 @@
+Rabsca @ leppaberry
+Ability: synchronize
+Tera Type: Bug
+EVs: 252 HP / 56 Def / 200 SpD
+Calm Nature
+- Psyshock
+- Trick Room
+- Memento
+- Revival Blessing
+
+Iron Hands @ quickclaw
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Close Combat
+- Heavy Slam
+- Earthquake
+- Ice Punch
+
+Kingambit @ choiceband
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Low Kick
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Cresselia @ leftovers
+Ability: levitate
+Tera Type: Poison
+EVs: 252 HP / 180 Def / 56 SpD / 20 Spe
+Calm Nature
+- Trick
+- Moonblast
+- Trick Room
+- Lunar Dance
+
+Diancie @ leftovers
+Ability: clearbody
+Tera Type: Ground
+EVs: 248 HP / 4 Def / 252 SpA / 4 SpD
+Quiet Nature
+- Encore
+- Trick Room
+- Calm Mind
+- Draining Kiss
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Trick Room
+- Psychic Noise
+- Healing Wish
+- Draining Kiss

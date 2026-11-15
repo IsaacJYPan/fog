@@ -1,0 +1,59 @@
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Grass Knot
+- Flower Trick
+- Knock Off
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Psychic Noise
+- Tachyon Cutter
+- Focus Blast
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Close Combat
+- Headlong Rush
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roost
+- U-turn
+- Roar
+- Will-O-Wisp
+
+Dragapult @ choiceband
+Ability: clearbody
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Substitute
+- Fire Blast
+- Shadow Ball
+- U-turn
+
+Toxapex @ leftovers
+Ability: regenerator
+Tera Type: Grass
+EVs: 248 HP / 136 Def / 124 SpD
+Impish Nature
+- Surf
+- Haze
+- Toxic Spikes
+- Toxic

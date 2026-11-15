@@ -1,0 +1,59 @@
+Dragonite @ choiceband
+Ability: multiscale
+Tera Type: Normal
+EVs: 196 HP / 204 Atk / 108 Spe
+Adamant Nature
+- Outrage
+- Earthquake
+- Fire Punch
+- Ice Spinner
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Ice Spinner
+- Headlong Rush
+
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Psychic Noise
+- Tachyon Cutter
+- Psyshock
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Discharge
+- Overheat
+- Fiery Dance
+
+Meowscarada @ choicescarf
+Ability: protean
+Tera Type: Dark
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Flower Trick
+- Triple Axel
+- Knock Off
+- U-turn
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Ghost
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Substitute
+- Draining Kiss
+- Psychic Noise
+- Calm Mind

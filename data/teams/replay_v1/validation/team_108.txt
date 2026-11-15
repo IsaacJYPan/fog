@@ -1,0 +1,59 @@
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Earth Power
+- Flash Cannon
+- Magma Storm
+- Protect
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Toxic
+- Protect
+- Earthquake
+- Knock Off
+
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Grass
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Wood Hammer
+- Knock Off
+- Low Kick
+- Grassy Glide
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Close Combat
+- Rapid Spin
+- Ice Spinner
+
+Garganacl @ rockyhelmet
+Ability: purifyingsalt
+Tera Type: Grass
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Stealth Rock
+- Protect
+- Salt Cure
+- Recover
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Mystical Fire
+- Healing Wish
+- Moonblast
+- Earth Power

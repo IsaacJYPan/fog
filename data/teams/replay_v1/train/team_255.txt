@@ -1,0 +1,59 @@
+Hydreigon @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Dark Pulse
+- Flash Cannon
+- Substitute
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Thunder Wave
+- Stealth Rock
+- Moonblast
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Triple Axel
+- Ice Shard
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Ivy Cudgel
+- Play Rough
+- Power Whip
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Discharge
+- U-turn
+- Hurricane
+- Roost

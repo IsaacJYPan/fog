@@ -1,0 +1,59 @@
+Milotic @ assaultvest
+Ability: competitive
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpA
+Modest Nature
+- Recover
+- Alluring Voice
+- Haze
+- Scald
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Spikes
+- Protect
+- Earthquake
+- Knock Off
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Hex
+- Torch Song
+- Slack Off
+- Will-O-Wisp
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Knock Off
+- Moonblast
+- Stealth Rock
+- Moonlight
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Seismic Toss
+- Soft-Boiled
+- Shadow Ball
+
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Fairy
+EVs: 248 HP / 244 Def / 16 Spe
+Bold Nature
+- Defog
+- Foul Play
+- Roost
+- Toxic

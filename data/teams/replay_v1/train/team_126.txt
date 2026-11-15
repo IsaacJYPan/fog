@@ -1,0 +1,59 @@
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Flying
+EVs: 248 HP / 172 Def / 88 Spe
+Bold Nature
+- Flamethrower
+- U-turn
+- Quick Attack
+- Defog
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Toxic
+- Spikes
+- Protect
+- Earthquake
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Ice
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Protect
+- Knock Off
+- Wish
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Protect
+- Seismic Toss
+- Stealth Rock
+- Soft-Boiled
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Waterfall
+- Sleep Talk
+- Soak
+- Wave Crash
+
+Clodsire @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Steel
+EVs: 136 HP / 252 Def / 120 SpD
+Careful Nature
+- Poison Sting
+- Poison Jab
+- Recover
+- Amnesia

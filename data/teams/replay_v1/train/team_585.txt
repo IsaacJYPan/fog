@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Stealth Rock
+- Earthquake
+- Rapid Spin
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Low Kick
+- Knock Off
+- Ivy Cudgel
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Aqua Jet
+- Sucker Punch
+- Knock Off
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Earth Power
+- Dragon Dance
+- Icicle Spear
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Substitute
+- Toxic Spikes
+- Sludge Wave
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 208 HP / 44 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Thunder Wave
+- Roost
+- Hurricane

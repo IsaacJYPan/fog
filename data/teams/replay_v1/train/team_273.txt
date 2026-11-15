@@ -1,0 +1,59 @@
+Corviknight @ heavydutyboots
+Ability: pressure
+Tera Type: Ground
+EVs: 248 HP / 200 Def / 60 SpD
+Impish Nature
+- Roost
+- Defog
+- Brave Bird
+- Bulk Up
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ground
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Protect
+- Earth Power
+- Freeze-Dry
+- Draco Meteor
+
+Suicune @ leftovers
+Ability: pressure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Substitute
+- Scald
+- Calm Mind
+- Protect
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Flying
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Hex
+- Slack Off
+- Torch Song
+- Will-O-Wisp
+
+Cresselia @ ejectbutton
+Ability: levitate
+Tera Type: Poison
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Trick
+- Thunder Wave
+- Light Screen
+- Lunar Dance
+
+Gardevoir @ grassyseed
+Ability: trace
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Trick
+- Calm Mind
+- Shadow Ball
+- Moonblast

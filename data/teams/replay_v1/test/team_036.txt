@@ -1,0 +1,59 @@
+Hoopa-Unbound @ ejectpack
+Ability: magician
+Tera Type: Poison
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Drain Punch
+- Knock Off
+- Zen Headbutt
+- Hyperspace Fury
+
+Iron Treads @ assaultvest
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Stealth Rock
+- Knock Off
+- Rapid Spin
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Grass
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Earth Power
+- Lava Plume
+- Will-O-Wisp
+- Stealth Rock
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Roar
+- Heavy Slam
+- Body Press
+- Iron Defense
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Matcha Gotcha
+- Shadow Ball
+- Strength Sap
+- Calm Mind
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Poison
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Ice Beam
+- Knock Off
+- Will-O-Wisp
+- Dark Pulse

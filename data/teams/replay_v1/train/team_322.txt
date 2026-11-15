@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Dragon
+EVs: 248 HP / 116 Def / 144 Spe
+Impish Nature
+- U-turn
+- Stealth Rock
+- Grass Knot
+- Earth Power
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Roar
+- Crunch
+- Body Press
+- Iron Defense
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Weather Ball
+- Calm Mind
+- Draco Meteor
+- Thunderclap
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Dark Pulse
+- Will-O-Wisp
+- Ice Beam
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Focus Blast
+- Make It Rain
+- Nasty Plot
+- Thunder Wave
+
+Dragonite @ covertcloak
+Ability: multiscale
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Roost
+- Air Slash
+- Encore

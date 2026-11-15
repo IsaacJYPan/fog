@@ -1,0 +1,59 @@
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Taunt
+- Aqua Cutter
+- Knock Off
+- Ceaseless Edge
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 136 Def / 48 SpD / 76 Spe
+Calm Nature
+- Thunder
+- Trick
+- Make It Rain
+- Shadow Ball
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Power Whip
+- Swords Dance
+- Encore
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Iron Head
+- Dragon Tail
+- Fire Punch
+- Extreme Speed
+
+Ceruledge @ airballoon
+Ability: weakarmor
+Tera Type: Fairy
+EVs: 80 HP / 252 Atk / 176 Spe
+Adamant Nature
+- Close Combat
+- Shadow Sneak
+- Bitter Blade
+- Swords Dance

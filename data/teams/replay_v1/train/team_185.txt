@@ -1,0 +1,59 @@
+Garchomp @ choicescarf
+Ability: roughskin
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Body Slam
+- Endure
+- Stealth Rock
+- Dragon Tail
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Vacuum Wave
+- Calm Mind
+- Focus Blast
+- Moonblast
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Flying
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Thunderbolt
+- Calm Mind
+- Dragon Pulse
+- Weather Ball
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Horn Leech
+- Swords Dance
+- Encore
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- U-turn
+- Iron Defense
+- Roost
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Court Change
+- Pyro Ball
+- Sucker Punch

@@ -1,0 +1,59 @@
+Tornadus-Therian @ lifeorb
+Ability: regenerator
+Tera Type: Water
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- Bleakwind Storm
+- Focus Blast
+- Knock Off
+- Heat Wave
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Bulk Up
+- Headlong Rush
+- Knock Off
+- Close Combat
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Roost
+- Dragon Dance
+- Extreme Speed
+- Earthquake
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Chilly Reception
+- Ice Beam
+- Future Sight
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- U-turn
+- Pyro Ball
+- Will-O-Wisp
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- U-turn
+- Roost
+- Body Press

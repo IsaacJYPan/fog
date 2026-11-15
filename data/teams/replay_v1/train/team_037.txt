@@ -1,0 +1,59 @@
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- U-turn
+- Hurricane
+- Heat Wave
+
+Weezing-Galar @ shucaberry
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Will-O-Wisp
+- Defog
+- Toxic
+- Protect
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Will-O-Wisp
+- Pyro Ball
+- Court Change
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Heavy Slam
+- Ruination
+- Earthquake
+- Stealth Rock
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Iron Defense
+- Heavy Slam
+- Crunch
+- Close Combat
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Tickle
+- Flip Turn
+- Body Slam
+- Wish

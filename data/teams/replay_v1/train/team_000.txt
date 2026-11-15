@@ -1,0 +1,59 @@
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Soft-Boiled
+- Stealth Rock
+- Flamethrower
+- Seismic Toss
+
+Amoonguss @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 252 Def
+Sassy Nature
+- Stun Spore
+- Foul Play
+- Synthesis
+- Toxic
+
+Bronzong @ leftovers
+Ability: levitate
+Tera Type: Fairy
+EVs: 252 HP / 164 Def / 92 SpD
+Sassy Nature
+- Stealth Rock
+- Body Press
+- Protect
+- Gyro Ball
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Spikes
+- Earthquake
+- Knock Off
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Waterfall
+- Body Press
+- Rest
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Mirror Coat
+- Wish
+- Protect

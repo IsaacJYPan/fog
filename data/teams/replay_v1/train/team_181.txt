@@ -1,0 +1,59 @@
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Earth Power
+- Freeze-Dry
+- Draco Meteor
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Psychic Noise
+- Thunder Wave
+- Sludge Bomb
+- Ice Beam
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Earthquake
+- Stealth Rock
+- Whirlwind
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ghost
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Iron Defense
+- Roost
+- U-turn
+- Brave Bird
+
+Darkrai @ expertbelt
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Bomb
+- Ice Beam
+- Trick
+- Dark Pulse
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Court Change
+- Pyro Ball
+- U-turn

@@ -1,0 +1,59 @@
+Iron Crown @ lifeorb
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Tachyon Cutter
+- Calm Mind
+- Focus Blast
+- Psyshock
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- U-turn
+- High Horsepower
+- Wood Hammer
+- Knock Off
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- Ice Spinner
+- Stealth Rock
+
+Primarina @ choicespecs
+Ability: torrent
+Tera Type: Steel
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Flip Turn
+- Aqua Jet
+- Psychic Noise
+- Moonblast
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Brave Bird
+- Roost
+- Defog
+- Body Press
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Thunder Wave
+- Fire Blast
+- Draco Meteor
+- U-turn

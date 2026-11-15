@@ -1,0 +1,59 @@
+Darkrai @ focussash
+Ability: baddreams
+Tera Type: Ghost
+EVs: 32 HP / 4 Def / 220 SpA / 252 Spe
+Timid Nature
+- Sludge Bomb
+- Trick
+- Dark Pulse
+- Ice Beam
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Will-O-Wisp
+- Protect
+- Sludge Bomb
+- Pain Split
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ground
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Flip Turn
+- Body Slam
+- Protect
+- Wish
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- U-turn
+- Defog
+- Roost
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Roar
+- Heavy Slam
+- Iron Defense
+- Body Press
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Protect
+- Earthquake
+- Facade
+- Swords Dance

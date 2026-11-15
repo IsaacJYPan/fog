@@ -1,0 +1,59 @@
+Chansey @ eviolite
+Ability: naturalcure
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Shadow Ball
+- Soft-Boiled
+- Calm Mind
+- Seismic Toss
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- U-turn
+- Court Change
+- Sucker Punch
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Hex
+- Dragon Darts
+- Will-O-Wisp
+- Substitute
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Roost
+- Brave Bird
+- Iron Defense
+- Body Press
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Steel
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Psychic Noise
+- Encore
+- Whirlpool
+- Moonblast
+
+Ursaluna @ leftovers
+Ability: guts
+Tera Type: Ghost
+EVs: 248 HP / 252 Atk / 8 Def
+Brave Nature
+- Rest
+- Body Slam
+- Earthquake
+- Sleep Talk

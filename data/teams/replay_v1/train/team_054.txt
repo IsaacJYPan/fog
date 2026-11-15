@@ -1,0 +1,59 @@
+Lokix @ protectivepads
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- U-turn
+- First Impression
+- Leech Life
+- Knock Off
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Stealth Rock
+- Temper Flare
+- Ice Spinner
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Recover
+- Parting Shot
+- Shadow Ball
+- Malignant Chain
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Dragon
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Draco Meteor
+- Hex
+- U-turn
+- Will-O-Wisp
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Tickle
+- Wish
+- Mirror Coat
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Psyshock
+- Psychic Noise
+- Calm Mind
+- Tachyon Cutter

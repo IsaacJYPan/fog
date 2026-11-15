@@ -1,0 +1,59 @@
+Arcanine-Hisui @ choiceband
+Ability: rockhead
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Head Smash
+- Close Combat
+- Flare Blitz
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Normal
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Thunder Wave
+- Moonlight
+- Calm Mind
+- Moonblast
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Earthquake
+- Spikes
+- Sleep Talk
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Hex
+- Recover
+- Parting Shot
+- Malignant Chain
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Fire Punch
+- Ice Spinner
+- Earthquake
+- Extreme Speed
+
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Will-O-Wisp
+- Focus Blast
+- Dark Pulse

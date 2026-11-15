@@ -1,0 +1,59 @@
+Mimikyu @ lifeorb
+Ability: disguise
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Trick Room
+- Play Rough
+- Curse
+- Destiny Bond
+
+Hatterene @ ejectbutton
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpA
+Quiet Nature
+- Healing Wish
+- Trick Room
+- Mystical Fire
+- Psychic Noise
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Headlong Rush
+- Fire Punch
+- Facade
+- Swords Dance
+
+Diancie @ powerherb
+Ability: clearbody
+Tera Type: Ground
+EVs: 248 HP / 4 Def / 252 SpA / 4 SpD
+Quiet Nature
+- Earth Power
+- Meteor Beam
+- Moonblast
+- Trick Room
+
+Torkoal @ heatrock
+Ability: drought
+Tera Type: Fire
+EVs: 248 HP / 36 Def / 224 SpD
+Calm Nature
+- Body Press
+- Sunny Day
+- Solar Beam
+- Flamethrower
+
+Hawlucha @ grassyseed
+Ability: moldbreaker
+Tera Type: Steel
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- U-turn
+- Encore
+- Defog
+- Close Combat

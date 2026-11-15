@@ -1,0 +1,59 @@
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Pulse
+- Thunderclap
+- Thunderbolt
+- Draco Meteor
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Head Smash
+- Rapid Spin
+- Ice Spinner
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Flamethrower
+- Psyshock
+- Sludge Bomb
+- Future Sight
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fighting
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Iron Defense
+- Brave Bird
+- Body Press
+- Roost
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Pyro Ball
+- Court Change
+- U-turn
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Knock Off
+- Trick
+- Dark Pulse

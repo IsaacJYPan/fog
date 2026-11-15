@@ -1,0 +1,59 @@
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Dark Pulse
+- Focus Blast
+- Thunder Wave
+- Knock Off
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Pyro Ball
+- U-turn
+- Court Change
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Rock Slide
+- Ruination
+- Earthquake
+- Spikes
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Water
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Hex
+- Psyshock
+- Thunder Wave
+- Make It Rain
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ice
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Earth Power
+- Blizzard
+- Icicle Spear
+- Ice Beam
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 84 HP / 252 Atk / 172 Spe
+Jolly Nature
+- Roar
+- Crunch
+- Heavy Slam
+- Body Press

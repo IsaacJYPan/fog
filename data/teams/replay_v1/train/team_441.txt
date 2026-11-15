@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Close Combat
+- Rapid Spin
+- Headlong Rush
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Payback
+- Taunt
+- Ruination
+- Stealth Rock
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Nuzzle
+- Calm Mind
+- Psychic Noise
+
+Dragonite @ silkscarf
+Ability: multiscale
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Fire Punch
+- Dragon Dance
+- Encore
+- Scale Shot
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Knock Off
+- Close Combat
+- U-turn
+- Swords Dance
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Protect
+- Freeze-Dry
+- Dragon Dance
+- Icicle Spear

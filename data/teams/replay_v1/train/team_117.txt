@@ -1,0 +1,59 @@
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- Headlong Rush
+- Stealth Rock
+- Knock Off
+
+Clodsire @ leftovers
+Ability: waterabsorb
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Recover
+- Toxic
+- Gunk Shot
+- Earthquake
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Play Rough
+- Horn Leech
+
+Hatterene @ custapberry
+Ability: magicbounce
+Tera Type: Steel
+EVs: 248 HP / 204 Def / 56 SpD
+Bold Nature
+- Draining Kiss
+- Psyshock
+- Healing Wish
+- Calm Mind
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Thunder Wave
+- Discharge
+- Volt Switch
+- Roost
+
+Blaziken @ airballoon
+Ability: speedboost
+Tera Type: Fighting
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Swords Dance
+- Focus Energy
+- Close Combat
+- Protect

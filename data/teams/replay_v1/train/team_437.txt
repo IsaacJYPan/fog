@@ -1,0 +1,59 @@
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Stealth Rock
+- Whirlwind
+- Ruination
+- Earthquake
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Hurricane
+- Roost
+- Volt Switch
+- Discharge
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Body Press
+- Stone Edge
+- Crunch
+- Heavy Slam
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Grass
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Whirlpool
+- Substitute
+- Flip Turn
+- Draining Kiss
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Thunder Wave
+- Recover
+- Nasty Plot
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Encore
+- Dragon Dance
+- Extreme Speed
+- Earthquake

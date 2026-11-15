@@ -1,0 +1,59 @@
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Sludge Bomb
+- Nasty Plot
+- Focus Blast
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Hex
+- Dragon Darts
+- U-turn
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Future Sight
+- Sludge Bomb
+- Slack Off
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 248 HP / 28 Def / 232 Spe
+Jolly Nature
+- Encore
+- Stealth Rock
+- Knock Off
+- Gigaton Hammer
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Will-O-Wisp
+- Roost
+- Roar
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Ruination
+- Earthquake
+- Whirlwind

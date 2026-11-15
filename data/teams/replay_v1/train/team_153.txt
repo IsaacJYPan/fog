@@ -1,0 +1,59 @@
+Serperior @ heavydutyboots
+Ability: contrary
+Tera Type: Steel
+EVs: 36 HP / 236 SpA / 236 Spe
+Timid Nature
+- Glare
+- Substitute
+- Leaf Storm
+- Synthesis
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 204 HP / 248 SpD / 56 Spe
+Careful Nature
+- Iron Defense
+- Roost
+- U-turn
+- Body Press
+
+Ceruledge @ lifeorb
+Ability: weakarmor
+Tera Type: Bug
+EVs: 80 HP / 252 Atk / 176 Spe
+Adamant Nature
+- Poltergeist
+- Bitter Blade
+- Swords Dance
+- Shadow Sneak
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Horn Leech
+- Power Whip
+- Ivy Cudgel
+- Swords Dance
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Dragon Dance
+- Earthquake
+- Scale Shot
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Ruination
+- Earthquake
+- Stealth Rock
+- Whirlwind

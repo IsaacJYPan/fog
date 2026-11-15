@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Earthquake
+- Encore
+- Scale Shot
+
+Primarina @ mentalherb
+Ability: liquidvoice
+Tera Type: Steel
+EVs: 248 HP / 208 SpA / 52 SpD
+Modest Nature
+- Moonblast
+- Substitute
+- Calm Mind
+- Psychic Noise
+
+Darkrai @ expertbelt
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Thunder Wave
+- Sludge Bomb
+- Focus Blast
+
+Cresselia @ covertcloak
+Ability: levitate
+Tera Type: Poison
+EVs: 248 HP / 44 Def / 216 Spe
+Bold Nature
+- Ice Beam
+- Moonlight
+- Stored Power
+- Calm Mind
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance
+- Iron Head
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 232 HP / 88 Def / 188 Spe
+Impish Nature
+- Stealth Rock
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin

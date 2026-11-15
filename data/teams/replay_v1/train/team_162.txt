@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Body Press
+- Crunch
+- Iron Defense
+- Roar
+
+Ceruledge @ airballoon
+Ability: flashfire
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Bitter Blade
+- Destiny Bond
+- Swords Dance
+- Poltergeist
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Earth Power
+- Spikes
+- Mortal Spin
+- Meteor Beam
+
+Hatterene @ assaultvest
+Ability: magicbounce
+Tera Type: Flying
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Psychic Noise
+- Draining Kiss
+- Nuzzle
+- Pain Split
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Taunt
+- Stealth Rock
+- U-turn
+- Earth Power
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Sucker Punch
+- Swords Dance

@@ -1,0 +1,59 @@
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Fairy
+EVs: 248 HP / 124 SpA / 132 SpD / 4 Spe
+Modest Nature
+- Freeze-Dry
+- Ice Beam
+- Dragon Dance
+- Draco Meteor
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 96 HP / 160 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Power Whip
+- Horn Leech
+- Ivy Cudgel
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Flying
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Knock Off
+- Bullet Punch
+- Close Combat
+- U-turn
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 SpD / 12 Spe
+Calm Nature
+- Roar
+- U-turn
+- Roost
+- Flamethrower
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 52 HP / 252 Atk / 204 Spe
+Adamant Nature
+- Headlong Rush
+- Stealth Rock
+- Rapid Spin
+- Ice Spinner
+
+Muk-Alola @ leftovers
+Ability: poisontouch
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Poison Fang
+- Knock Off
+- Protect
+- Drain Punch

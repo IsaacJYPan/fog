@@ -1,0 +1,59 @@
+Slither Wing @ choiceband
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 172 HP / 252 Def / 84 Spe
+Impish Nature
+- U-turn
+- Close Combat
+- First Impression
+- Will-O-Wisp
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Recover
+- Stealth Rock
+- Salt Cure
+
+Ceruledge @ lifeorb
+Ability: flashfire
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Bitter Blade
+- Bulk Up
+- Close Combat
+
+Quaquaval @ leftovers
+Ability: moxie
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Knock Off
+- Rapid Spin
+- Close Combat
+- Aqua Step
+
+Landorus-Therian @ choiceband
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- U-turn
+- Hammer Arm
+- Earthquake
+
+Slowking @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 100 Def / 108 SpA / 52 SpD
+Calm Nature
+- Fire Blast
+- Chilly Reception
+- Future Sight
+- Thunder Wave

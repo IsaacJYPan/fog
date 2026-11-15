@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Court Change
+- Pyro Ball
+- Gunk Shot
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Sleep Talk
+- Rest
+- Earthquake
+- Ruination
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Trick
+- Chilly Reception
+- Sludge Bomb
+- Future Sight
+
+Zapdos @ sharpbeak
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Roost
+- Thunderbolt
+- Hurricane
+- Volt Switch
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Ivy Cudgel
+- Rock Tomb
+- U-turn
+
+Kyurem @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Freeze-Dry
+- Draco Meteor
+- Shadow Ball

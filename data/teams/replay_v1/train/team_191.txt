@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Protect
+- Substitute
+- Freeze-Dry
+- Earth Power
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- U-turn
+- Pyro Ball
+- Sucker Punch
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Power Whip
+- Synthesis
+- Ivy Cudgel
+- Knock Off
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Foul Play
+- Parting Shot
+- Recover
+- Malignant Chain
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Earthquake
+- Whirlwind
+- Ruination
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Roost
+- Body Press
+- Brave Bird
+- U-turn

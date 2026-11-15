@@ -1,0 +1,59 @@
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Reflect
+- Thunder Wave
+- Light Screen
+- Spirit Break
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ice
+EVs: 220 Atk / 36 SpA / 252 Spe
+Naive Nature
+- Icicle Spear
+- Earth Power
+- Flash Cannon
+- Dragon Dance
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Draco Meteor
+- Thunder Wave
+- Hex
+
+Necrozma @ leftovers
+Ability: prismarmor
+Tera Type: Poison
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naughty Nature
+- Photon Geyser
+- Moonlight
+- Calm Mind
+- Heat Wave
+
+Magnezone @ leftovers
+Ability: magnetpull
+Tera Type: Ghost
+EVs: 76 Def / 252 SpA / 180 Spe
+Modest Nature
+- Iron Defense
+- Volt Switch
+- Mirror Coat
+- Thunderbolt
+
+Cinderace @ choicescarf
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Swords Dance
+- Pyro Ball
+- Sucker Punch
+- Court Change

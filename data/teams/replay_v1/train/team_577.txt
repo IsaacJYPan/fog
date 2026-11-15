@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Knock Off
+- High Horsepower
+- Wood Hammer
+- U-turn
+
+Hawlucha @ grassyseed
+Ability: unburden
+Tera Type: Steel
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- Acrobatics
+- Swords Dance
+- Roost
+- Close Combat
+
+Volcanion @ grassyseed
+Ability: waterabsorb
+Tera Type: Water
+EVs: 4 HP / 252 Def / 252 SpA
+Modest Nature
+- Flamethrower
+- Sludge Bomb
+- Steam Eruption
+- Earth Power
+
+Kingambit @ mentalherb
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 140 HP / 252 Atk / 116 Spe
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Kowtow Cleave
+- Low Kick
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Draco Meteor
+- Calm Mind
+- Dragon Pulse
+- Thunderclap
+
+Iron Treads @ heavydutyboots
+Ability: quarkdrive
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Iron Head
+- Stealth Rock

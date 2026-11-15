@@ -1,0 +1,59 @@
+Ninetales-Alola @ rockyhelmet
+Ability: snowwarning
+Tera Type: Water
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Pain Split
+- Moonblast
+- Encore
+- Aurora Veil
+
+Meowscarada @ lifeorb
+Ability: protean
+Tera Type: Grass
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Sucker Punch
+- Knock Off
+- Flower Trick
+- U-turn
+
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Grass
+EVs: 112 HP / 48 Def / 252 SpA / 96 Spe
+Modest Nature
+- Psychic
+- Take Heart
+- Stored Power
+- Tail Glow
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Make It Rain
+- Trick
+- Recover
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- Close Combat
+- Ice Spinner
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Dragon Claw
+- Dragon Dance
+- Scale Shot
+- Extreme Speed

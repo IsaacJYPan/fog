@@ -1,0 +1,59 @@
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Future Sight
+- Sludge Bomb
+- Chilly Reception
+- Slack Off
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Spikes
+- Iron Defense
+- Body Press
+- Roost
+
+Blaziken @ lifeorb
+Ability: speedboost
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Stone Edge
+- Close Combat
+- Flare Blitz
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 172 HP / 228 Atk / 108 Spe
+Adamant Nature
+- U-turn
+- Stealth Rock
+- Protect
+- Toxic
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 244 Def / 12 Spe
+Impish Nature
+- Surf
+- Recover
+- Haze
+- Infestation
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Knock Off
+- Triple Axel
+- Swords Dance

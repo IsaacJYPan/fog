@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- U-turn
+- Wood Hammer
+- Grassy Glide
+- Knock Off
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Taunt
+- Psychic
+- Earth Power
+
+Samurott-Hisui @ salacberry
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Sacred Sword
+- Ceaseless Edge
+- Flip Turn
+- Sucker Punch
+
+Primarina @ choicespecs
+Ability: torrent
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Protect
+- Flip Turn
+- Moonblast
+- Psychic Noise
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Nasty Plot
+- Focus Blast
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Outrage
+- Dragon Tail
+- Earthquake
+- Dragon Dance

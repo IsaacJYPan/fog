@@ -1,0 +1,59 @@
+Pawmot @ leppaberry
+Ability: naturalcure
+Tera Type: Grass
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Revival Blessing
+- Knock Off
+- Rest
+
+Cresselia @ rockyhelmet
+Ability: levitate
+Tera Type: Fairy
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Lunar Dance
+- Moonblast
+- Thunder Wave
+- Moonlight
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Steel
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Protect
+- Dragon Dance
+- Icicle Spear
+- Substitute
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Curse
+- Protect
+- Wave Crash
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Protect
+- Sludge Bomb
+- Defog
+- Will-O-Wisp
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Sleep Talk
+- Earthquake
+- Payback
+- Rest

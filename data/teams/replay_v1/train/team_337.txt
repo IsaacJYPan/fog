@@ -1,0 +1,59 @@
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Dark Pulse
+- Focus Blast
+- Sludge Bomb
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Toxic
+- Earthquake
+- Protect
+- U-turn
+
+Tinkaton @ airballoon
+Ability: pickpocket
+Tera Type: Water
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Gigaton Hammer
+- Encore
+- Stealth Rock
+- Knock Off
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Iron Defense
+- Ice Fang
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Ghost
+EVs: 212 HP / 44 SpA / 252 Spe
+Timid Nature
+- Hydro Pump
+- Reflect
+- Volt Switch
+- Trick
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Future Sight
+- Psyshock
+- Chilly Reception

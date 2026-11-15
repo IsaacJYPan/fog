@@ -1,0 +1,59 @@
+Articuno @ choicescarf
+Ability: pressure
+Tera Type: Normal
+EVs: 16 Def / 252 SpA / 240 Spe
+Mild Nature
+- U-turn
+- Haze
+- Freeze-Dry
+- Roost
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Sludge Bomb
+- Thunder Wave
+- Chilly Reception
+- Toxic
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 248 HP / 252 Atk / 8 Spe
+Adamant Nature
+- Rapid Spin
+- Stealth Rock
+- Headlong Rush
+- Close Combat
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Poltergeist
+- Shadow Sneak
+- Swords Dance
+- Bitter Blade
+
+Okidogi @ blunderpolicy
+Ability: toxicchain
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Poison Jab
+- Knock Off
+- Gunk Shot
+- Ice Punch
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Draco Meteor
+- Shadow Ball
+- Will-O-Wisp
+- U-turn

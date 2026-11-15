@@ -1,0 +1,59 @@
+Frosmoth @ heavydutyboots
+Ability: icescales
+Tera Type: Electric
+EVs: 100 HP / 156 SpA / 252 Spe
+Timid Nature
+- Giga Drain
+- Defog
+- Ice Beam
+- Quiver Dance
+
+Pincurchin @ terrainextender
+Ability: electricsurge
+Tera Type: Dark
+EVs: 252 HP / 252 Atk / 4 Def
+Brave Nature
+- Supercell Slam
+- Sucker Punch
+- Scald
+- Discharge
+
+Raichu-Alola @ choicespecs
+Ability: surgesurfer
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Psychic Noise
+- Psychic
+- Nasty Plot
+- Volt Switch
+
+Iron Hands @ assaultvest
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 248 HP / 252 Atk / 8 SpD
+Brave Nature
+- Drain Punch
+- Supercell Slam
+- Wild Charge
+- Ice Punch
+
+Rotom-Wash @ lightclay
+Ability: levitate
+Tera Type: Electric
+EVs: 252 HP / 212 Def / 44 Spe
+Bold Nature
+- Volt Switch
+- Reflect
+- Light Screen
+- Hydro Pump
+
+Pawmot @ leppaberry
+Ability: ironfist
+Tera Type: Ghost
+EVs: 104 HP / 4 Atk / 124 Def / 24 SpD / 252 Spe
+Jolly Nature
+- Sleep Talk
+- Nuzzle
+- Revival Blessing
+- Encore

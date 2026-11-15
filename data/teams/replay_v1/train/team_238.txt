@@ -1,0 +1,59 @@
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Ice Beam
+- Knock Off
+- Will-O-Wisp
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Earthquake
+- Swords Dance
+- Protect
+- Knock Off
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Ruination
+- Whirlwind
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Iron Defense
+- Heavy Slam
+- Crunch
+- Body Press
+
+Clefable @ lifeorb
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Stealth Rock
+- Moonblast
+- Thunder Wave
+- Moonlight
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Sludge Bomb
+- Flamethrower
+- Slack Off

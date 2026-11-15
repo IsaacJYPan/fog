@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Steel
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Icicle Spear
+- Earth Power
+- Freeze-Dry
+- Substitute
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Def
+Adamant Nature
+- Swords Dance
+- Smack Down
+- Earth Power
+- Earthquake
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psyshock
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 248 HP / 180 Def / 80 SpD
+Impish Nature
+- Protect
+- Recover
+- Stealth Rock
+- Salt Cure
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Body Press
+- Iron Defense
+- Crunch
+- Heavy Slam
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Will-O-Wisp
+- Pain Split
+- Sludge Bomb
+- Defog

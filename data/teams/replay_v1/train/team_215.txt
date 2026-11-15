@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- U-turn
+- Court Change
+- Pyro Ball
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Encore
+- Power Whip
+- U-turn
+
+Kingambit @ dreadplate
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Low Kick
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Ice Beam
+- Chilly Reception
+- Focus Blast
+- Psychic Noise
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Flying
+EVs: 248 HP / 8 Def / 252 SpD
+Timid Nature
+- U-turn
+- Heat Wave
+- Bleakwind Storm
+- Knock Off
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin

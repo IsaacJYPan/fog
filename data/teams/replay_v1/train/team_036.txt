@@ -1,0 +1,59 @@
+Hydreigon @ choicespecs
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Draco Meteor
+- Flash Cannon
+- Dark Pulse
+- Earth Power
+
+Primarina @ assaultvest
+Ability: liquidvoice
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Ice Beam
+- Moonblast
+- Psychic Noise
+- Flip Turn
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Gunk Shot
+- Pyro Ball
+- Court Change
+- Will-O-Wisp
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Tickle
+- Chilling Water
+- Wish
+- Flip Turn
+
+Keldeo @ leftovers
+Ability: justified
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Surf
+- Pain Split
+- Calm Mind
+- Vacuum Wave
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Shadow Ball
+- Matcha Gotcha
+- Strength Sap
+- Leaf Storm

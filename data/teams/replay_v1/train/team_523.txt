@@ -1,0 +1,59 @@
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Substitute
+- Crunch
+- Iron Defense
+- Close Combat
+
+Latios @ ringtarget
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Draco Meteor
+- Luster Purge
+- Trick
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Defog
+- Toxic
+- Will-O-Wisp
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roost
+- U-turn
+- Roar
+- Flamethrower
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Rest
+- Earthquake
+- Ruination
+- Stealth Rock
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Make It Rain
+- Shadow Ball
+- Recover

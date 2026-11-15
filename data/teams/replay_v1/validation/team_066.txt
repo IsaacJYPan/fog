@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Spikes
+- Facade
+- Swords Dance
+- Earthquake
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Moonlight
+- Fire Blast
+- Thunder Wave
+- Knock Off
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Recover
+- Stealth Rock
+- Salt Cure
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Rapid Spin
+- Headlong Rush
+- Earthquake
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 52 Def / 156 SpA / 40 SpD / 12 Spe
+Modest Nature
+- Roost
+- Flamethrower
+- U-turn
+- Will-O-Wisp

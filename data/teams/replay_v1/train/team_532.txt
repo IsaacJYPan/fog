@@ -1,0 +1,59 @@
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Roar
+- Scorching Sands
+- Roost
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 172 HP / 228 Atk / 108 Spe
+Adamant Nature
+- Earthquake
+- Stealth Rock
+- Protect
+- Swords Dance
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 180 HP / 232 Def / 96 Spe
+Impish Nature
+- Headlong Rush
+- Knock Off
+- Rapid Spin
+- Ice Spinner
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Thunder Wave
+- Sludge Bomb
+- Future Sight
+- Chilly Reception
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- Protect
+- Blizzard
+- Substitute
+- Freeze-Dry
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Iron Defense
+- Close Combat
+- Body Press
+- Crunch

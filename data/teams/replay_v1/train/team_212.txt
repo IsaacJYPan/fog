@@ -1,0 +1,59 @@
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Freeze-Dry
+- Ice Beam
+- Earth Power
+- Icicle Spear
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- U-turn
+- Sucker Punch
+- Gunk Shot
+
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Bleakwind Storm
+- Heat Wave
+- Knock Off
+- U-turn
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Nuzzle
+- Draining Kiss
+- Pain Split
+- Psychic Noise
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+
+Kingambit @ leftovers
+Ability: defiant
+Tera Type: Fire
+EVs: 248 HP / 164 Atk / 96 Spe
+Adamant Nature
+- Low Kick
+- Kowtow Cleave
+- Iron Head
+- Sucker Punch

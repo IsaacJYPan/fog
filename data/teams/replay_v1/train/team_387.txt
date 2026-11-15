@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Brick Break
+- Iron Head
+- Sucker Punch
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 200 Def / 60 Spe
+Bold Nature
+- Heat Wave
+- Hurricane
+- Volt Switch
+- Roost
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Head Smash
+- Rapid Spin
+- Headlong Rush
+- Temper Flare
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Draco Meteor
+- Sucker Punch
+- U-turn
+- Dragon Darts
+
+Latios @ weaknesspolicy
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Agility
+- Draco Meteor
+- Aura Sphere
+- Luster Purge
+
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Ghost
+EVs: 252 HP / 116 Atk / 56 Def / 24 SpD / 60 Spe
+Adamant Nature
+- Parting Shot
+- Light Screen
+- Reflect
+- Thunder Wave

@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Ghost
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Stealth Rock
+- Curse
+- Protect
+- Salt Cure
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Calm Mind
+- Dragon Pulse
+- Thunderclap
+- Draco Meteor
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Grassy Glide
+- U-turn
+- Knock Off
+- Wood Hammer
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Morning Sun
+- Dazzling Gleam
+- Toxic Spikes
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 HP / 176 Def / 80 Spe
+Jolly Nature
+- U-turn
+- Horn Leech
+- Synthesis
+- Swords Dance
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 80 HP / 120 Atk / 116 SpD / 192 Spe
+Jolly Nature
+- Stealth Rock
+- Knock Off
+- Rapid Spin
+- Ice Spinner

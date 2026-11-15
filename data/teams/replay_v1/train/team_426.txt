@@ -1,0 +1,59 @@
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Triple Axel
+- Flower Trick
+- Knock Off
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 72 SpA / 188 Spe
+Modest Nature
+- Shadow Ball
+- Trick
+- Make It Rain
+- Nasty Plot
+
+Rotom-Heat @ heavydutyboots
+Ability: levitate
+Tera Type: Steel
+EVs: 248 HP / 92 SpD / 168 Spe
+Calm Nature
+- Volt Switch
+- Overheat
+- Will-O-Wisp
+- Pain Split
+
+Primarina @ assaultvest
+Ability: liquidvoice
+Tera Type: Poison
+EVs: 216 Def / 208 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Surf
+- Flip Turn
+- Moonblast
+- Psychic Noise
+
+Dragonite @ punchingglove
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 108 Atk / 152 Spe
+Adamant Nature
+- Dragon Dance
+- Roost
+- Earthquake
+- Extreme Speed
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Earthquake
+- Stealth Rock

@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Volt Switch
+- Ice Spinner
+- Steel Beam
+- Stealth Rock
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 108 Def / 152 Spe
+Bold Nature
+- Shadow Ball
+- Malignant Chain
+- Nasty Plot
+- Parting Shot
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Knock Off
+- Ice Punch
+- Moonblast
+
+Deoxys-Speed @ leftovers
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Substitute
+- Nasty Plot
+- Psycho Boost
+- Focus Blast
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Flip Turn
+- Ceaseless Edge
+- Razor Shell
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Roost
+- Earthquake
+- Outrage

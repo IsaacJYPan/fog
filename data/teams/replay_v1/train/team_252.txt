@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Knock Off
+- Toxic Spikes
+- Earthquake
+- Protect
+
+Volcanion @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Fairy
+EVs: 4 HP / 252 Def / 252 SpA
+Modest Nature
+- Steam Eruption
+- Earth Power
+- Sludge Bomb
+- Flamethrower
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Wood Hammer
+- Grassy Glide
+- Swords Dance
+- U-turn
+
+Gholdengo @ leftovers
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Shadow Ball
+- Thunder Wave
+- Nasty Plot
+
+Zamazenta @ expertbelt
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Crunch
+- Body Press
+- Roar
+- Iron Defense
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Knock Off
+- Calm Mind
+- Moonblast
+- Stealth Rock

@@ -1,0 +1,59 @@
+Deoxys-Speed @ lightclay
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Def / 4 SpD / 252 Spe
+Timid Nature
+- Light Screen
+- Spikes
+- Taunt
+- Psycho Boost
+
+Azumarill @ assaultvest
+Ability: hugepower
+Tera Type: Ground
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Liquidation
+- Play Rough
+- Knock Off
+- Aqua Jet
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Hydro Pump
+- Thunder Wave
+- Volt Switch
+- Pain Split
+
+Dragonite @ rockyhelmet
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Tail
+- Dragon Dance
+- Earthquake
+- Extreme Speed
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Stone Edge
+- Protect
+- Rapid Spin
+
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Glare
+- Leaf Storm
+- Substitute
+- Knock Off

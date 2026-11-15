@@ -1,0 +1,59 @@
+Araquanid @ mentalherb
+Ability: waterbubble
+Tera Type: Ghost
+EVs: 248 HP / 40 Def / 220 SpA
+Quiet Nature
+- Surf
+- Sticky Web
+- Endure
+- Lunge
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Psyshock
+- Nasty Plot
+- Make It Rain
+- Shadow Ball
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderclap
+- Calm Mind
+- Dragon Pulse
+- Thunderbolt
+
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Healing Wish
+- Mystical Fire
+- Moonblast
+- Calm Mind
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Whirlwind
+- Energy Ball
+- Fiery Dance
+- Sludge Wave

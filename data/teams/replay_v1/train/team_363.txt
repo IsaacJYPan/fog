@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Liquidation
+- Curse
+- Rest
+
+Muk-Alola @ leftovers
+Ability: poisontouch
+Tera Type: Poison
+EVs: 252 Atk / 252 SpD
+Careful Nature
+- Poison Jab
+- Ice Punch
+- Knock Off
+- Protect
+
+Landorus-Therian @ choiceband
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Grass Knot
+- U-turn
+- Stealth Rock
+- Stone Edge
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Low Kick
+- Sucker Punch
+
+Talonflame @ heavydutyboots
+Ability: galewings
+Tera Type: Fire
+EVs: 248 HP / 228 Def / 32 Spe
+Bold Nature
+- Will-O-Wisp
+- Roost
+- Flamethrower
+- Defog
+
+Umbreon @ leftovers
+Ability: innerfocus
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Toxic
+- Protect
+- Foul Play
+- Wish

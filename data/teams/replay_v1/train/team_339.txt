@@ -1,0 +1,59 @@
+Hydrapple @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Nasty Plot
+- Earth Power
+- Draco Meteor
+- Fickle Beam
+
+Tinkaton @ leftovers
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Thunder Wave
+- Knock Off
+- Gigaton Hammer
+- Stealth Rock
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roar
+- Flamethrower
+- U-turn
+- Roost
+
+Rotom-Wash @ rockyhelmet
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 212 Def / 44 Spe
+Bold Nature
+- Hydro Pump
+- Pain Split
+- Volt Switch
+- Will-O-Wisp
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Knock Off
+- Headlong Rush
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Nasty Plot
+- Thunder Wave
+- Ice Beam

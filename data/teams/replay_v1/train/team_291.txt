@@ -1,0 +1,59 @@
+Dragapult @ choiceband
+Ability: clearbody
+Tera Type: Steel
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- U-turn
+- Draco Meteor
+- Fire Blast
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Iron Defense
+- Defog
+- Brave Bird
+- Roost
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 20 Atk / 236 Spe
+Jolly Nature
+- Stealth Rock
+- Whirlwind
+- Earthquake
+- Ruination
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Trick
+- Sludge Bomb
+- Future Sight
+- Chilly Reception
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Trailblaze
+- Swords Dance
+- Synthesis
+- Ivy Cudgel
+
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Fairy
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Blizzard
+- Earth Power
+- Draco Meteor
+- Ice Beam

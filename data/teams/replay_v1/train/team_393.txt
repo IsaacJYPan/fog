@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Moonblast
+- Encore
+- Shadow Ball
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Ice Beam
+- Sludge Bomb
+- Chilly Reception
+- Future Sight
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Beat Up
+- Ice Shard
+- Swords Dance
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- U-turn
+- Dragon Darts
+- Substitute
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Ice Spinner
+- Bulk Up
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- U-turn
+- Roost
+- Hurricane
+- Discharge

@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Wish
+- Protect
+- Moonblast
+- Calm Mind
+
+Incineroar @ heavydutyboots
+Ability: intimidate
+Tera Type: Bug
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Knock Off
+- Temper Flare
+- Flare Blitz
+- Parting Shot
+
+Clodsire @ blacksludge
+Ability: waterabsorb
+Tera Type: Poison
+EVs: 224 HP / 184 Def / 100 SpD
+Impish Nature
+- Toxic
+- Stealth Rock
+- Earthquake
+- Recover
+
+Zapdos-Galar @ lumberry
+Ability: defiant
+Tera Type: Flying
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Brave Bird
+- U-turn
+- Thunderous Kick
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Make It Rain
+- Nasty Plot
+- Focus Blast
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Dragon Darts
+- Will-O-Wisp
+- U-turn

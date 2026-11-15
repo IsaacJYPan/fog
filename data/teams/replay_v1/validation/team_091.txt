@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Agility
+- Facade
+- Protect
+- Swords Dance
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Rock Tomb
+- Whirlwind
+- Ruination
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Spikes
+- Flower Trick
+- Knock Off
+- U-turn
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Draco Meteor
+- Hex
+- Dragon Darts
+
+Skarmory @ covertcloak
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Roost
+- Body Press
+- Brave Bird
+- Spikes
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Psychic Noise
+- Toxic
+- Sludge Bomb

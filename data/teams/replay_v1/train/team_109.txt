@@ -1,0 +1,59 @@
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpA
+Relaxed Nature
+- Weather Ball
+- Roost
+- U-turn
+- Hurricane
+
+Iron Treads @ ejectbutton
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+- Stealth Rock
+
+Barraskewda @ choiceband
+Ability: swiftswim
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Close Combat
+- Flip Turn
+- Psychic Fangs
+- Liquidation
+
+Overqwil @ lifeorb
+Ability: swiftswim
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Crunch
+- Gunk Shot
+- Swords Dance
+- Liquidation
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Thunderbolt
+- Weather Ball
+- Dragon Pulse
+- Calm Mind
+
+Tornadus-Therian @ choicespecs
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Hurricane
+- Heat Wave
+- U-turn

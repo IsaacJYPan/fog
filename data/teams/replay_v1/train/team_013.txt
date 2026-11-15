@@ -1,0 +1,59 @@
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 Def / 4 SpA / 252 SpD
+Bold Nature
+- Protect
+- Seismic Toss
+- Soft-Boiled
+- Stealth Rock
+
+Cyclizar @ assaultvest
+Ability: regenerator
+Tera Type: Fire
+EVs: 168 HP / 100 SpA / 240 Spe
+Timid Nature
+- Knock Off
+- Draco Meteor
+- Rapid Spin
+- U-turn
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Protect
+- Wish
+- Flip Turn
+- Scald
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Avalanche
+- Rest
+- Curse
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Will-O-Wisp
+- Roost
+- Defog
+- Flamethrower
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Toxic Spikes
+- Will-O-Wisp
+- Defog
+- Pain Split

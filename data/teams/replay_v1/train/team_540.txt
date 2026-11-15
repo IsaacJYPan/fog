@@ -1,0 +1,59 @@
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Weather Ball
+- Discharge
+- Hurricane
+- Volt Switch
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 248 HP / 100 Def / 16 SpA / 144 Spe
+Modest Nature
+- Matcha Gotcha
+- Shadow Ball
+- Calm Mind
+- Strength Sap
+
+Weavile @ lifeorb
+Ability: pickpocket
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Icicle Crash
+- Knock Off
+- Low Kick
+- Ice Shard
+
+Keldeo @ heavydutyboots
+Ability: justified
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Hydro Pump
+- Aura Sphere
+- Flip Turn
+- Surf
+
+Goodra-Hisui @ assaultvest
+Ability: gooey
+Tera Type: Fairy
+EVs: 248 HP / 252 SpA / 8 SpD
+Quiet Nature
+- Dragon Tail
+- Surf
+- Sludge Bomb
+- Knock Off
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 248 HP / 108 Atk / 116 Def / 36 Spe
+Adamant Nature
+- Spikes
+- Ruination
+- Stealth Rock
+- Earthquake

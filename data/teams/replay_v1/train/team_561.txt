@@ -1,0 +1,59 @@
+Zapdos @ choicespecs
+Ability: static
+Tera Type: Ghost
+EVs: 80 HP / 180 SpA / 8 SpD / 240 Spe
+Timid Nature
+- Volt Switch
+- Roost
+- Hurricane
+- Thunder Wave
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Stealth Rock
+- Ice Spinner
+
+Zamazenta @ mirrorherb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Stone Edge
+- Heavy Slam
+- Close Combat
+- Crunch
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 96 HP / 160 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Power Whip
+- Ivy Cudgel
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Psyshock
+- Sludge Bomb
+- Chilly Reception
+- Ice Beam

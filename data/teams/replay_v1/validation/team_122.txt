@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Close Combat
+- Moonblast
+- Thunderbolt
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Volt Switch
+- Will-O-Wisp
+- Pain Split
+- Hydro Pump
+
+Latios @ souldew
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Luster Purge
+- Aura Sphere
+- Trick
+- Stored Power
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Whirlwind
+- Ruination
+- Earthquake
+- Stealth Rock
+
+Hydreigon @ focussash
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Flash Cannon
+- Draco Meteor
+- Dark Pulse
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 76 Def / 184 Spe
+Bold Nature
+- Make It Rain
+- Recover
+- Hex
+- Thunder Wave

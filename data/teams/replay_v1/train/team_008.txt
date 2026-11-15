@@ -1,0 +1,59 @@
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Protect
+- Scald
+- Wish
+- Flip Turn
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Fairy
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Calm Mind
+- Shadow Ball
+- Soft-Boiled
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Sleep Talk
+- Rest
+- Body Press
+- Wave Crash
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Spikes
+- Toxic
+- Poison Jab
+- Amnesia
+
+Goodra-Hisui @ assaultvest
+Ability: gooey
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Heavy Slam
+- Knock Off
+- Acid Armor
+- Ice Beam
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Psyshock
+- Moonblast
+- Substitute
+- Stealth Rock

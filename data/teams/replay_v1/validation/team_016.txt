@@ -1,0 +1,59 @@
+Hatterene @ focussash
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Dazzling Gleam
+- Psychic
+- Healing Wish
+- Trick Room
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Facade
+- Fire Punch
+- Headlong Rush
+
+Torkoal @ heatrock
+Ability: drought
+Tera Type: Fire
+EVs: 72 HP / 252 Def / 184 SpA
+Bold Nature
+- Will-O-Wisp
+- Body Press
+- Eruption
+- Solar Beam
+
+Hawlucha @ psychicseed
+Ability: moldbreaker
+Tera Type: Steel
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- U-turn
+- Encore
+- Close Combat
+- Defog
+
+Indeedee @ focussash
+Ability: psychicsurge
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick Room
+- Healing Wish
+- Encore
+- Expanding Force
+
+Armarouge @ focussash
+Ability: weakarmor
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Aura Sphere
+- Endure
+- Stored Power
+- Armor Cannon

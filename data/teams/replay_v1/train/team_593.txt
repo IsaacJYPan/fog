@@ -1,0 +1,59 @@
+Kyurem @ throatspray
+Ability: pressure
+Tera Type: Ice
+EVs: 220 Atk / 36 SpA / 252 Spe
+Naive Nature
+- Body Press
+- Substitute
+- Earth Power
+- Ice Beam
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 200 Def / 56 SpD / 4 Spe
+Bold Nature
+- Recover
+- Parting Shot
+- Malignant Chain
+- Shadow Ball
+
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- U-turn
+- Grass Knot
+- Knock Off
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Knock Off
+- Psyshock
+- Moonblast
+- Close Combat
+
+Scizor @ heavydutyboots
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- U-turn
+- Bullet Punch
+- Defog
+- Knock Off
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 136 HP / 136 Atk / 48 Def / 52 SpD / 136 Spe
+Adamant Nature
+- Ruination
+- Whirlwind
+- Stealth Rock
+- Earthquake

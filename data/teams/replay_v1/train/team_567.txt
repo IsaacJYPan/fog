@@ -1,0 +1,59 @@
+Indeedee @ terrainextender
+Ability: psychicsurge
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Expanding Force
+- Healing Wish
+- Encore
+- Trick Room
+
+Hatterene @ lifeorb
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 124 Def / 132 Spe
+Bold Nature
+- Nuzzle
+- Psyshock
+- Mystical Fire
+- Draining Kiss
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 248 HP / 252 Atk / 8 Def
+Brave Nature
+- Supercell Slam
+- Fire Punch
+- Headlong Rush
+- Facade
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 40 HP / 252 Atk / 212 SpD / 4 Spe
+Adamant Nature
+- Close Combat
+- Heavy Slam
+- Ice Punch
+- Supercell Slam
+
+Hoopa-Unbound @ psychicseed
+Ability: magician
+Tera Type: Dark
+EVs: 252 HP / 228 SpD / 28 Spe
+Gentle Nature
+- Hyperspace Fury
+- Focus Blast
+- Dark Pulse
+- Thunderbolt
+
+Mimikyu @ redcard
+Ability: disguise
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Protect
+- Curse
+- Shadow Claw
+- Trick Room

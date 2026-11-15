@@ -1,0 +1,59 @@
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpA
+Relaxed Nature
+- Hurricane
+- U-turn
+- Weather Ball
+- Roost
+
+Crawdaunt @ choiceband
+Ability: adaptability
+Tera Type: Dark
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Crabhammer
+- Close Combat
+- Aqua Jet
+- Knock Off
+
+Zapdos @ lifeorb
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- U-turn
+- Hurricane
+- Thunder Wave
+- Roost
+
+Barraskewda @ choiceband
+Ability: swiftswim
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Poison Jab
+- Liquidation
+- Close Combat
+- Flip Turn
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Stealth Rock
+- Knock Off
+- Earthquake
+- Rapid Spin
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Recover
+- Malignant Chain
+- Parting Shot
+- Shadow Ball

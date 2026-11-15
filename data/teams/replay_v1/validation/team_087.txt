@@ -1,0 +1,59 @@
+Glimmora @ focussash
+Ability: toxicdebris
+Tera Type: Rock
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Spikes
+- Earth Power
+- Sludge Wave
+- Stealth Rock
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Lonely Nature
+- Substitute
+- Dragon Darts
+- Dragon Dance
+- Phantom Force
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Dark
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Trick
+- Make It Rain
+- Shadow Ball
+- Focus Blast
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Discharge
+- Overheat
+- Dazzling Gleam
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Knock Off
+- Ivy Cudgel
+- Substitute
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Sucker Punch
+- Low Kick
+- Kowtow Cleave
