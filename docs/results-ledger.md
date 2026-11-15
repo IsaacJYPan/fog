@@ -2729,3 +2729,9 @@ Observed saved blocks: 200 games, 182 wins, 5487 decisions, 13 fallbacks, 0 reje
 ### Partial 3,200 ms / K=1 checkpoint (run continues)
 
 Observed saved blocks: 176 games, 140 wins, 5618 decisions, 9 fallbacks, 0 rejected actions, 0 failed games and 0 truncations. **Partial smoke, not a completed curve cell or gate.** The curve allocation at observation is 30.282541 core-hours. Raw matched-block reports and the allocation checkpoint are pushed for recovery. Source remains `aa38e46`; the command and launch commit are in `11-artifacts/measurement-progress.json`.
+
+### 2026-11-15: budget 3200 ms K=1
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.775 [0.732, 0.813] (310-90-0) | 3.419 | 28/12836 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |

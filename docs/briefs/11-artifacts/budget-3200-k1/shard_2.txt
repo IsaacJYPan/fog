@@ -9,3 +9,37 @@
 [showdown-selection] mcts vs simpleheuristics: 36/100 A=31 B=5 draws=0 failures=0
 [showdown-selection] mcts vs simpleheuristics: 40/100 A=33 B=7 draws=0 failures=0
 [showdown-selection] mcts vs simpleheuristics: 44/100 A=35 B=9 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 48/100 A=39 B=9 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 52/100 A=42 B=10 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 56/100 A=46 B=10 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 60/100 A=50 B=10 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 64/100 A=54 B=10 draws=0 failures=0
+
+thread '<unnamed>' (8006) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread '<unnamed>' (8006) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (8006) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (8006) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+[showdown-selection] mcts vs simpleheuristics: 68/100 A=56 B=12 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 72/100 A=58 B=14 draws=0 failures=0
+
+thread '<unnamed>' (8006) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+[showdown-selection] mcts vs simpleheuristics: 76/100 A=60 B=16 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 80/100 A=61 B=19 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 84/100 A=64 B=20 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 88/100 A=67 B=21 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 92/100 A=71 B=21 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 96/100 A=75 B=21 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 100/100 A=78 B=22 draws=0 failures=0
+[showdown-selection] RESULT mcts vs simpleheuristics: 0.780 [0.689, 0.850] (78-22, draws=0)
+[showdown-selection] FIDELITY mcts vs simpleheuristics (a): {"games": 100, "decisions": 3152, "fallbacks": 5, "fallback_rate": 0.0015862944162436548, "games_with_fallback": 2, "max_fallbacks_in_a_game": 4, "worlds_sampled": 3110, "worlds_dropped": 5, "world_drop_rate": 0.001607717041800643, "rejected": 0, "order_errors": 0, "tera_entries_dropped": 0, "unmapped_visits": 0, "seconds_per_decision": 3.428723450008565, "failure_reasons": {"PanicException: Encore should not be active when last used move is not a move": 5, "ValueError: no world with positive weight and kept visits": 5}}
+[showdown-selection] report -> docs/briefs/11-artifacts/budget-3200-k1/shard_2.json
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 100 | 0.780 [0.689, 0.850] (78-22-0) | 3.429 | 5/3152 | `3cfd7e9+dirty` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4 --games 100 --seed 12002 --out docs/briefs/11-artifacts/budget-3200-k1/shard_2.json` |
