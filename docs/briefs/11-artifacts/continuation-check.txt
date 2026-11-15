@@ -1,0 +1,6 @@
+{
+  "check": "curve deadline terminates only its process group",
+  "passed": true,
+  "wall_seconds": 1.0046951140000147,
+  "budget_core_seconds": 144000.001682392
+}

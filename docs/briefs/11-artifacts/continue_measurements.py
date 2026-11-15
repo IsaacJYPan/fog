@@ -253,9 +253,10 @@ def main():
                  for row in gate['rows']) and len(gate['rows']) == 2
     state['status'] = 'passed' if passed else 'failed; loss and mechanics diagnosis required'
     save()
-    roadmap.write_text(roadmap.read_text().replace('**If it fails:** the cause is reconstruction',
-        f"_Brief 11: G1 {state['status']}; see docs/briefs/11-report.md and the ledger._\n\n"
-        '**If it fails:** the cause is reconstruction', 1))
+    if '_Brief 11: G1 ' not in roadmap.read_text():
+        roadmap.write_text(roadmap.read_text().replace('**If it fails:** the cause is reconstruction',
+            f"_Brief 11: G1 {state['status']}; see docs/briefs/11-report.md and the ledger._\n\n"
+            '**If it fails:** the cause is reconstruction', 1))
     publish('gate G1 measured', f"G1 {state['status']}. Default K=8, 1600 ms, at least "
             '1,000 matched games per opponent on validation; no sequential stopping.', 'gate')
 
