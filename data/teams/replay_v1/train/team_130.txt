@@ -1,0 +1,59 @@
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ice
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- U-turn
+- Body Press
+- Roost
+- Bulk Up
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ground
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Knock Off
+- Spikes
+- Protect
+- Swords Dance
+
+Clefable @ heavydutyboots
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 SpD
+Sassy Nature
+- Moonlight
+- Stealth Rock
+- Moonblast
+- Thunder Wave
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Ghost
+EVs: 244 HP / 172 Def / 88 SpA / 4 Spe
+Bold Nature
+- Hydro Pump
+- Nasty Plot
+- Giga Drain
+- Fickle Beam
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Flamethrower
+- Calm Mind
+- Soft-Boiled
+- Seismic Toss
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Flying
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Torch Song
+- Will-O-Wisp
+- Hex
+- Slack Off

@@ -1,0 +1,59 @@
+Salamence @ leftovers
+Ability: intimidate
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Temper Flare
+- Outrage
+- Dual Wingbeat
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Shadow Sneak
+- Poltergeist
+- Bitter Blade
+- Swords Dance
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Earthquake
+- Ice Spinner
+- Rapid Spin
+- Knock Off
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fire
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Agility
+- Roost
+- U-turn
+- Iron Defense
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Poison
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Knock Off
+- Sludge Bomb
+- Dark Pulse
+- Ice Beam
+
+Bisharp @ eviolite
+Ability: defiant
+Tera Type: Flying
+EVs: 156 HP / 252 Atk / 100 Spe
+Adamant Nature
+- Iron Head
+- Throat Chop
+- Sucker Punch
+- Low Kick

@@ -1,0 +1,59 @@
+Cyclizar @ lifeorb
+Ability: regenerator
+Tera Type: Dragon
+EVs: 152 Atk / 104 SpD / 252 Spe
+Jolly Nature
+- Overheat
+- Knock Off
+- U-turn
+- Draco Meteor
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Dragon
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Psychic
+- Volt Switch
+- Psychic Noise
+- Focus Blast
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Foul Play
+- Parting Shot
+- Malignant Chain
+- Recover
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 120 HP / 152 Atk / 60 SpD / 176 Spe
+Adamant Nature
+- Ceaseless Edge
+- Knock Off
+- Encore
+- Sucker Punch
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Outrage
+- Extreme Speed
+- Dragon Dance
+- Fire Punch

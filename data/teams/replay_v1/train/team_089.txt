@@ -1,0 +1,59 @@
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Dragon Dance
+- Extreme Speed
+- Ice Spinner
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roar
+- Close Combat
+- Crunch
+- Heavy Slam
+
+Araquanid @ custapberry
+Ability: waterbubble
+Tera Type: Ghost
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Surf
+- Sticky Web
+- Endure
+- Endeavor
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Normal
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Earthquake
+- Ice Spinner
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Roost
+- Hurricane
+- Heat Wave
+- Thunderbolt
+
+Hoopa-Unbound @ choiceband
+Ability: magician
+Tera Type: Dark
+EVs: 252 Atk / 4 SpA / 252 Spe
+Hasty Nature
+- Dark Pulse
+- Drain Punch
+- Psychic
+- Thunderbolt

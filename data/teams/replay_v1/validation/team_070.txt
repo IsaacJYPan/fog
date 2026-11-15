@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Swords Dance
+- Sucker Punch
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Recover
+- Earthquake
+- Toxic
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roar
+- Iron Defense
+- Body Press
+- Crunch
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Earth Power
+- Rapid Spin
+- Knock Off
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Ivy Cudgel
+- U-turn
+- Knock Off
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Dragon Pulse
+- Thunderclap
+- Calm Mind
+- Thunderbolt

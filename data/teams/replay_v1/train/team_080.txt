@@ -1,0 +1,59 @@
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Steel
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Calm Mind
+- Seismic Toss
+- Flamethrower
+- Soft-Boiled
+
+Clefable @ heavydutyboots
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Wish
+- Moonlight
+- Moonblast
+- Flamethrower
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Ghost
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Spikes
+- Knock Off
+- Protect
+- Toxic
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Whirlwind
+- Earthquake
+- Stealth Rock
+- Sleep Talk
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Waterfall
+- Curse
+- Sleep Talk
+
+Amoonguss @ ejectpack
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Seed Bomb
+- Toxic
+- Worry Seed
+- Stun Spore

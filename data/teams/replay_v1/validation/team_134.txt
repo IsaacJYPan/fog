@@ -1,0 +1,59 @@
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Bleakwind Storm
+- Taunt
+- U-turn
+- Knock Off
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Spikes
+- Whirlwind
+- Stealth Rock
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Thunder Wave
+- Toxic Spikes
+- Trick
+- Sludge Bomb
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 232 HP / 88 Def / 188 Spe
+Impish Nature
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+- Knock Off
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- U-turn
+- Close Combat
+- Swords Dance
+- Dual Wingbeat
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Shadow Ball
+- Matcha Gotcha
+- Calm Mind
+- Strength Sap

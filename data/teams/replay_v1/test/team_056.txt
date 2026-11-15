@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- U-turn
+- Encore
+- Play Rough
+- Ivy Cudgel
+
+Samurott-Hisui @ blackglasses
+Ability: sharpness
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Flip Turn
+- Taunt
+- Sucker Punch
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Body Press
+- Crunch
+- Iron Defense
+- Heavy Slam
+
+Zoroark-Hisui @ choicespecs
+Ability: illusion
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Poltergeist
+- Swords Dance
+- Giga Impact
+- Low Kick
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Grass
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Earth Power
+- Meteor Beam
+- Mortal Spin
+- Stealth Rock
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin

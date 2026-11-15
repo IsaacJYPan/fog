@@ -1,0 +1,59 @@
+Chesnaught @ rockyhelmet
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Spikes
+- Knock Off
+- Iron Defense
+- Synthesis
+
+Thundurus-Therian @ choicescarf
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Weather Ball
+- Nasty Plot
+- Taunt
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Shadow Ball
+- Dazzling Gleam
+- Make It Rain
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Ruination
+- Earthquake
+- Stealth Rock
+- Whirlwind
+
+Slowking @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 100 Def / 108 SpA / 52 SpD
+Calm Nature
+- Psychic Noise
+- Ice Beam
+- Scald
+- Chilly Reception
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Gunk Shot
+- Pyro Ball
+- Court Change

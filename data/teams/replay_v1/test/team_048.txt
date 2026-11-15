@@ -1,0 +1,59 @@
+Toedscruel @ heavydutyboots
+Ability: myceliummight
+Tera Type: Poison
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Rapid Spin
+- Earth Power
+- Knock Off
+- Giga Drain
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 Spe
+Hardy Nature
+- Magma Storm
+- Earth Power
+- Stealth Rock
+- Taunt
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 Atk / 172 SpD / 84 Spe
+Adamant Nature
+- Drain Punch
+- Wild Charge
+- Close Combat
+- Heavy Slam
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Stellar
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Substitute
+- Mystical Fire
+- Moonblast
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Parting Shot
+- Recover
+- Malignant Chain
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Sucker Punch
+- Sacred Sword
+- Knock Off

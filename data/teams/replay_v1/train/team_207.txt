@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Low Kick
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Iron Defense
+- Salt Cure
+- Recover
+- Curse
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Sucker Punch
+- U-turn
+- Court Change
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- U-turn
+- Will-O-Wisp
+- Roar
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 248 HP / 124 Atk / 68 Def / 68 SpD
+Adamant Nature
+- Ruination
+- Stealth Rock
+- Earthquake
+- Stone Edge
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Ivy Cudgel
+- U-turn
+- Swords Dance

@@ -1,0 +1,59 @@
+Indeedee @ terrainextender
+Ability: psychicsurge
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Expanding Force
+- Encore
+- Dazzling Gleam
+- Healing Wish
+
+Hawlucha @ psychicseed
+Ability: unburden
+Tera Type: Steel
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- Encore
+- Acrobatics
+- Close Combat
+- Swords Dance
+
+Armarouge @ weaknesspolicy
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Expanding Force
+- Stored Power
+- Psychic
+- Armor Cannon
+
+Scizor @ lumberry
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- Knock Off
+- Defog
+- Close Combat
+- U-turn
+
+Polteageist @ focussash
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Shell Smash
+- Giga Drain
+- Shadow Ball
+- Strength Sap
+
+Mamoswine @ focussash
+Ability: oblivious
+Tera Type: Ghost
+EVs: 136 HP / 252 Atk / 120 Def
+Adamant Nature
+- Avalanche
+- Ice Shard
+- Icicle Crash
+- Stealth Rock

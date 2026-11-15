@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Sucker Punch
+- Pyro Ball
+- Court Change
+
+Muk-Alola @ leftovers
+Ability: poisontouch
+Tera Type: Steel
+EVs: 252 Atk / 252 SpD
+Adamant Nature
+- Taunt
+- Protect
+- Knock Off
+- Poison Jab
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Liquidation
+- Sleep Talk
+- Protect
+- Body Press
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Stone Edge
+- Grass Knot
+- Stealth Rock
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Close Combat
+- Crunch
+- Stone Edge
+- Roar
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Knock Off
+- Moonblast
+- Wish
+- Protect

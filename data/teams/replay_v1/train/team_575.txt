@@ -1,0 +1,59 @@
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ground
+EVs: 248 HP / 252 Def / 8 SpA
+Relaxed Nature
+- U-turn
+- Hurricane
+- Roost
+- Weather Ball
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Fairy
+EVs: 76 HP / 252 Atk / 8 SpD / 172 Spe
+Adamant Nature
+- Headlong Rush
+- Earthquake
+- Facade
+- Protect
+
+Porygon2 @ eviolite
+Ability: trace
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Trick Room
+- Ice Beam
+- Discharge
+- Recover
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Healing Wish
+- Pain Split
+- Psychic Noise
+- Draining Kiss
+
+Slowbro @ leftovers
+Ability: regenerator
+Tera Type: Fighting
+EVs: 228 HP / 252 SpA / 28 SpD
+Quiet Nature
+- Body Press
+- Psychic Noise
+- Iron Defense
+- Trick Room

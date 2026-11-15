@@ -1,0 +1,59 @@
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Surf
+- Draco Meteor
+- Phantom Force
+- Hex
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 140 SpD / 116 Spe
+Calm Nature
+- Scorching Sands
+- Taunt
+- Stealth Rock
+- Magma Storm
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Razor Shell
+- Knock Off
+- Ceaseless Edge
+
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Leaf Storm
+- Leech Seed
+- Glare
+- Substitute
+
+Zapdos @ heavydutyboots
+Ability: pressure
+Tera Type: Grass
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Volt Switch
+- Roost
+- Hurricane
+- Thunder Wave
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Headlong Rush
+- Close Combat
+- Rapid Spin
+- Ice Spinner

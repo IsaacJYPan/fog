@@ -1,0 +1,59 @@
+Deoxys-Speed @ ejectpack
+Ability: pressure
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- Spikes
+- Knock Off
+- Superpower
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Close Combat
+- Focus Blast
+- Destiny Bond
+- Moonblast
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Sludge Wave
+- Whirlwind
+- Fiery Dance
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Thunder Wave
+- Hex
+- Make It Rain
+- Recover
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Heavy Slam
+- Body Press
+- Iron Defense
+- Crunch
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Earthquake
+- Extreme Speed
+- Encore

@@ -1,0 +1,59 @@
+Azumarill @ sitrusberry
+Ability: hugepower
+Tera Type: Water
+EVs: 92 HP / 252 Atk / 164 Spe
+Adamant Nature
+- Play Rough
+- Knock Off
+- Liquidation
+- Aqua Jet
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Horn Leech
+- Ivy Cudgel
+- Encore
+- Power Whip
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Court Change
+- Pyro Ball
+- Will-O-Wisp
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Giga Drain
+- Draco Meteor
+- Earth Power
+- Fickle Beam
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Toxic
+- Stealth Rock
+- Recover
+- Earthquake
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Iron Defense
+- Defog
+- Roost

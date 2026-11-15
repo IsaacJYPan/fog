@@ -1,0 +1,59 @@
+Regieleki @ choicespecs
+Ability: transistor
+Tera Type: Electric
+EVs: 184 HP / 252 SpA / 72 Spe
+Modest Nature
+- Ancient Power
+- Reflect
+- Rapid Spin
+- Thunderbolt
+
+Hydrapple @ lifeorb
+Ability: regenerator
+Tera Type: Dragon
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Nasty Plot
+- Earth Power
+- Leaf Storm
+- Fickle Beam
+
+Samurott-Hisui @ rockyhelmet
+Ability: torrent
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Razor Shell
+- Knock Off
+- Flip Turn
+- Ceaseless Edge
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Heavy Slam
+- Earthquake
+- Ruination
+- Stealth Rock
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- U-turn
+- Defog
+- Roost
+- Brave Bird
+
+Pecharunt @ leftovers
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Parting Shot
+- Foul Play
+- Recover
+- Malignant Chain

@@ -1,0 +1,59 @@
+Iron Valiant @ choiceband
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Knock Off
+- Close Combat
+- Shadow Ball
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 208 HP / 216 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Sludge Bomb
+- Chilly Reception
+- Future Sight
+- Slack Off
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Head Smash
+- Close Combat
+- Rapid Spin
+- Headlong Rush
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- U-turn
+- Pyro Ball
+- Court Change
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Mirror Coat
+- Protect
+- Flip Turn
+- Play Rough
+
+Zapdos @ rockyhelmet
+Ability: static
+Tera Type: Flying
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Discharge
+- Hurricane
+- Thunder Wave
+- Volt Switch

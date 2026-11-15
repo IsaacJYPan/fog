@@ -1,0 +1,59 @@
+Hydrapple @ lifeorb
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Draco Meteor
+- Fickle Beam
+- Earth Power
+- Nasty Plot
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Pyro Ball
+- Court Change
+- Will-O-Wisp
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Sleep Talk
+- Spikes
+- Rest
+- Earthquake
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- U-turn
+- Defog
+- Brave Bird
+- Roost
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Thunder Wave
+- Ice Beam
+- Sludge Bomb
+- Flamethrower
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Rest
+- Sleep Talk
+- Avalanche

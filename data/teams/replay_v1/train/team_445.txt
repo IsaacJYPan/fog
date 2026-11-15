@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Encore
+- Ivy Cudgel
+- Swords Dance
+- Horn Leech
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 72 Def / 176 SpD / 12 Spe
+Calm Nature
+- Roar
+- U-turn
+- Roost
+- Flamethrower
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Earthquake
+- Ice Spinner
+- Rapid Spin
+
+Tinkaton @ airballoon
+Ability: pickpocket
+Tera Type: Dark
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Thunder Wave
+- Gigaton Hammer
+- Encore
+- Stealth Rock
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 184 Atk / 52 Def / 24 Spe
+Adamant Nature
+- Encore
+- Dragon Dance
+- Earthquake
+- Extreme Speed
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Sludge Bomb
+- Ice Beam
+- Future Sight

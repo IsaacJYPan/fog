@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Calm Mind
+- Flamethrower
+- Moonlight
+- Moonblast
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 248 HP / 88 Def / 8 SpA / 124 SpD / 40 Spe
+Calm Nature
+- Magma Storm
+- Will-O-Wisp
+- Protect
+- Lava Plume
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 128 HP / 136 Atk / 104 SpD / 140 Spe
+Adamant Nature
+- Knock Off
+- Swords Dance
+- Wood Hammer
+- U-turn
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Horn Leech
+- Play Rough
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Hurricane
+- Roost
+- Heat Wave
+- Volt Switch
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock

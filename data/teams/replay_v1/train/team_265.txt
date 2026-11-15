@@ -1,0 +1,59 @@
+Clodsire @ blacksludge
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Poison Jab
+- Earthquake
+- Amnesia
+- Recover
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 252 HP / 176 Def / 56 SpD / 24 Spe
+Bold Nature
+- Roost
+- Flamethrower
+- U-turn
+- Will-O-Wisp
+
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- Icicle Crash
+- Swords Dance
+
+Sinistcha @ leftovers
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Hex
+- Strength Sap
+- Shadow Ball
+- Matcha Gotcha
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Protect
+- Salt Cure
+- Stealth Rock
+- Recover
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Ceaseless Edge
+- Razor Shell
+- Swords Dance

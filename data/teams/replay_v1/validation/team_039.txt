@@ -1,0 +1,59 @@
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 32 SpA / 152 SpD / 76 Spe
+Modest Nature
+- Make It Rain
+- Trick
+- Psyshock
+- Nasty Plot
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Calm Mind
+- Dragon Pulse
+- Thunderclap
+- Thunderbolt
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Endure
+- Swords Dance
+- Poltergeist
+- Bitter Blade
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Skill Swap
+- Sticky Web
+- Stun Spore
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Horn Leech
+- Swords Dance
+- U-turn
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+- Knock Off

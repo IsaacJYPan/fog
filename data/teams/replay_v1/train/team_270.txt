@@ -1,0 +1,59 @@
+Ninetales @ heatrock
+Ability: drought
+Tera Type: Ghost
+EVs: 192 HP / 72 SpA / 244 Spe
+Timid Nature
+- Flamethrower
+- Weather Ball
+- Will-O-Wisp
+- Encore
+
+Comfey @ lifeorb
+Ability: triage
+Tera Type: Steel
+EVs: 248 HP / 240 SpA / 20 SpD
+Modest Nature
+- Giga Drain
+- Growth
+- Stored Power
+- Substitute
+
+Hatterene @ focussash
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Psyshock
+- Draining Kiss
+- Pain Split
+- Trick Room
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- U-turn
+- Stealth Rock
+- Earthquake
+- Smack Down
+
+Walking Wake @ whiteherb
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Hydro Steam
+- Draco Meteor
+- Weather Ball
+- Substitute
+
+Heatran @ airballoon
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Solar Beam
+- Taunt
+- Stealth Rock
+- Magma Storm

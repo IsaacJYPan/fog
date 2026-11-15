@@ -1,0 +1,59 @@
+Amoonguss @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Foul Play
+- Stomping Tantrum
+- Toxic
+- Seed Bomb
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Curse
+- Sleep Talk
+- Waterfall
+- Rest
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Roost
+- Whirlwind
+- Spikes
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Earthquake
+- Protect
+- Stealth Rock
+- Knock Off
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Calm Mind
+- Soft-Boiled
+- Stealth Rock
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Amnesia
+- Spikes
+- Poison Jab
+- Toxic

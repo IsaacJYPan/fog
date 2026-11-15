@@ -1,0 +1,59 @@
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Ice Beam
+- Knock Off
+- Will-O-Wisp
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Parting Shot
+- Malignant Chain
+- Recover
+- Foul Play
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Toxic
+- Protect
+- Spikes
+- Earthquake
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 248 HP / 28 Def / 232 Spe
+Jolly Nature
+- Thunder Wave
+- Knock Off
+- Stealth Rock
+- Encore
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Roar
+- Roost
+- Will-O-Wisp
+
+Walking Wake @ assaultvest
+Ability: protosynthesis
+Tera Type: Water
+EVs: 168 HP / 252 SpA / 88 Spe
+Modest Nature
+- Surf
+- Draco Meteor
+- Flip Turn
+- Knock Off

@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Temper Flare
+- Ice Spinner
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Roar
+- Stone Edge
+- Crunch
+- Reflect
+
+Scizor @ sitrusberry
+Ability: technician
+Tera Type: Steel
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Knock Off
+- Swords Dance
+- Dual Wingbeat
+- Bullet Punch
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Energy Ball
+- Overheat
+- Fiery Dance
+- Sludge Wave
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Dragon Pulse
+- Thunderbolt
+- Calm Mind
+- Taunt
+
+Enamorus-Therian @ choicespecs
+Ability: overcoat
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Taunt
+- Calm Mind
+- Draining Kiss
+- Moonblast

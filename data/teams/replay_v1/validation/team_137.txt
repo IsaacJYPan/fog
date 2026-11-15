@@ -1,0 +1,59 @@
+Reuniclus @ stickybarb
+Ability: magicguard
+Tera Type: Ice
+EVs: 208 HP / 44 Def / 212 SpA / 44 Spe
+Modest Nature
+- Shadow Ball
+- Psychic Noise
+- Trick Room
+- Trick
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+- Iron Head
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 164 HP / 164 Atk / 180 Spe
+Adamant Nature
+- Grassy Glide
+- High Horsepower
+- U-turn
+- Knock Off
+
+Hawlucha @ grassyseed
+Ability: unburden
+Tera Type: Flying
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- Drain Punch
+- Swords Dance
+- Acrobatics
+- Encore
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fire
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Fiery Dance
+- Energy Ball
+- Sludge Wave
+
+Sandy Shocks @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 48 HP / 208 SpA / 252 Spe
+Timid Nature
+- Spikes
+- Discharge
+- Stealth Rock
+- Earth Power

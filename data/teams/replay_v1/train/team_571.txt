@@ -1,0 +1,59 @@
+Raging Bolt @ lifeorb
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Thunderclap
+- Draco Meteor
+- Dragon Pulse
+- Thunderbolt
+
+Ninetales @ heatrock
+Ability: drought
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Encore
+- Overheat
+- Weather Ball
+
+Walking Wake @ boosterenergy
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Draco Meteor
+- Weather Ball
+- Flamethrower
+- Hydro Steam
+
+Hatterene @ ejectbutton
+Ability: magicbounce
+Tera Type: Dragon
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Psychic Noise
+- Future Sight
+- Dazzling Gleam
+- Psyshock
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Taunt
+- Earth Power
+- U-turn
+- Stealth Rock
+
+Iron Moth @ lifeorb
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Solar Beam
+- Overheat
+- Toxic Spikes
+- Dazzling Gleam

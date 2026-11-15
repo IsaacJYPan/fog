@@ -1,0 +1,59 @@
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 228 Def / 28 SpD
+Relaxed Nature
+- Whirlwind
+- Ruination
+- Stealth Rock
+- Earthquake
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Spinner
+- Earthquake
+- Dragon Dance
+- Roost
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Dark
+EVs: 200 HP / 84 SpA / 224 Spe
+Timid Nature
+- Ice Beam
+- Dark Pulse
+- Focus Blast
+- Will-O-Wisp
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Swords Dance
+- Knock Off
+- Moonblast
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderclap
+- Calm Mind
+- Thunderbolt
+- Dragon Pulse
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Nasty Plot
+- Make It Rain
+- Recover
+- Shadow Ball

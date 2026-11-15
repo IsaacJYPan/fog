@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Roost
+- Earthquake
+- Extreme Speed
+- Dragon Dance
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Ruination
+- Stealth Rock
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 176 Def / 80 SpD
+Calm Nature
+- Moonblast
+- Moonlight
+- Calm Mind
+- Knock Off
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Foul Play
+- Recover
+- Parting Shot
+- Shadow Ball
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Fire
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Taunt
+- Stealth Rock
+- Magma Storm
+- Protect
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Iron Defense
+- Close Combat
+- Heavy Slam
+- Roar

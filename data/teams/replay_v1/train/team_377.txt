@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Close Combat
+- Headlong Rush
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Low Kick
+- Kowtow Cleave
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Steel
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Will-O-Wisp
+- Hex
+- Substitute
+- Dragon Darts
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Shadow Ball
+- Recover
+- Trick
+
+Kyurem @ loadeddice
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Scale Shot
+- Freeze-Dry
+- Ice Beam
+- Earth Power
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ice
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earth Power
+- Taunt
+- Stealth Rock
+- U-turn

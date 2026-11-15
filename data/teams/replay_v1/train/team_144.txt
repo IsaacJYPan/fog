@@ -1,0 +1,59 @@
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Knock Off
+- Ice Punch
+- Stone Edge
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Spikes
+- Night Slash
+- Roost
+
+Excadrill @ lifeorb
+Ability: sandrush
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Iron Head
+- Substitute
+- Rapid Spin
+- Earthquake
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Will-O-Wisp
+- Slack Off
+- Torch Song
+- Alluring Voice
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Earth Power
+- Energy Ball
+- Fickle Beam
+- Leaf Storm
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Ghost
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Thunder Wave
+- Stealth Rock
+- Soft-Boiled

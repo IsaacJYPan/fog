@@ -1,0 +1,59 @@
+Entei @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sacred Fire
+- Substitute
+- Protect
+- Stomping Tantrum
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Icicle Spear
+- Protect
+- Dragon Dance
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 84 HP / 252 Atk / 172 Spe
+Jolly Nature
+- Snarl
+- Iron Defense
+- Body Press
+- Substitute
+
+Tsareena @ heavydutyboots
+Ability: queenlymajesty
+Tera Type: Dark
+EVs: 248 HP / 88 Atk / 72 Def / 88 SpD / 12 Spe
+Adamant Nature
+- Knock Off
+- Rapid Spin
+- Synthesis
+- High Jump Kick
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 136 Def / 124 SpD
+Impish Nature
+- Surf
+- Infestation
+- Haze
+- Toxic
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Bug
+EVs: 232 HP / 252 Atk / 4 Def / 20 Spe
+Adamant Nature
+- Shadow Sneak
+- Bitter Blade
+- Taunt
+- Bulk Up

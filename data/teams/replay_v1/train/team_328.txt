@@ -1,0 +1,59 @@
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Recover
+- Hex
+- Make It Rain
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 Spe
+Naive Nature
+- Dark Pulse
+- Focus Blast
+- Ice Beam
+- Nasty Plot
+
+Zapdos @ choicespecs
+Ability: pressure
+Tera Type: Flying
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Volt Switch
+- Discharge
+- Heat Wave
+- Hurricane
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Swords Dance
+- Shadow Ball
+- Moonblast
+- Calm Mind
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Crunch
+- Light Screen
+- Close Combat
+- Iron Defense
+
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Spikes
+- Earthquake
+- Dragon Tail

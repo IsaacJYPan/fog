@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Defense
+- Close Combat
+- Crunch
+- Body Press
+
+Darkrai @ focussash
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Swords Dance
+- Drain Punch
+- Will-O-Wisp
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Ruination
+- Earthquake
+- Stone Edge
+
+Goodra-Hisui @ assaultvest
+Ability: gooey
+Tera Type: Fairy
+EVs: 252 HP / 160 Def / 96 SpA
+Modest Nature
+- Heavy Slam
+- Flash Cannon
+- Knock Off
+- Rest
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Torch Song
+- Hex
+- Slack Off
+- Will-O-Wisp
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Defog
+- Body Press
+- Iron Defense
+- Roost

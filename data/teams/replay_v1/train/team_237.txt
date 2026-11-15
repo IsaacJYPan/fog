@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Moonlight
+- Moonblast
+- Knock Off
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Icicle Crash
+- Swords Dance
+- Ice Shard
+
+Darkrai @ blackglasses
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Will-O-Wisp
+- Sludge Bomb
+- Dark Pulse
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Whirlwind
+- Spikes
+- Body Press
+- Brave Bird
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Earthquake
+- Protect
+- Toxic
+- Spikes
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Future Sight
+- Thunder Wave
+- Chilly Reception
+- Ice Beam

@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Thunder Punch
+- Dragon Dance
+- Earthquake
+- Roost
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Electric
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Salt Cure
+- Curse
+- Recover
+
+Iron Valiant @ choicespecs
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Shadow Ball
+- Moonblast
+- Close Combat
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Knock Off
+- Ice Spinner
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Recover
+- Shadow Ball
+- Nasty Plot
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Thunder Wave
+- Roost
+- Hurricane

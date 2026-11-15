@@ -1,0 +1,59 @@
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Hex
+- U-turn
+- Fire Blast
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flamethrower
+- Sludge Bomb
+- Chilly Reception
+- Psyshock
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 160 Def / 96 Spe
+Impish Nature
+- Roost
+- Body Press
+- Brave Bird
+- Spikes
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Close Combat
+- Rapid Spin
+- Headlong Rush
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Dark Pulse
+- Focus Blast
+- Sludge Bomb
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Salt Cure
+- Iron Defense
+- Protect

@@ -1,0 +1,59 @@
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Recover
+- Toxic
+- Earthquake
+- Amnesia
+
+Weavile @ heavydutyboots
+Ability: pickpocket
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Protect
+- Knock Off
+- Swords Dance
+- Low Kick
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Steel
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Flamethrower
+- Calm Mind
+- Moonblast
+- Moonlight
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Body Slam
+- Scald
+- Wish
+- Protect
+
+Mandibuzz @ heavydutyboots
+Ability: overcoat
+Tera Type: Steel
+EVs: 252 HP / 100 Def / 140 SpD / 16 Spe
+Careful Nature
+- Roost
+- Toxic
+- Defog
+- U-turn
+
+Chansey @ eviolite
+Ability: naturalcure
+Tera Type: Fairy
+EVs: 128 HP / 128 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Thunder Wave
+- Seismic Toss
+- Soft-Boiled

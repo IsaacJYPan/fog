@@ -1,0 +1,59 @@
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Earthquake
+- Outrage
+- Encore
+- Dragon Dance
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ceaseless Edge
+- Knock Off
+- Razor Shell
+- Aqua Cutter
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Knock Off
+- Moonblast
+- Calm Mind
+- Protect
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Bomb
+- Focus Blast
+- Ice Beam
+- Dark Pulse
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Taunt
+- U-turn
+- Stealth Rock
+- Earthquake
+
+Slowking-Galar @ choicescarf
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Ice Beam
+- Future Sight
+- Chilly Reception
+- Flamethrower

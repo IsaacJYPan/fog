@@ -1,0 +1,59 @@
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Darts
+- Will-O-Wisp
+- U-turn
+- Hex
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 244 Def / 16 Spe
+Bold Nature
+- Thunder Wave
+- U-turn
+- Roost
+- Hurricane
+
+Samurott-Hisui @ blackglasses
+Ability: sharpness
+Tera Type: Normal
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Aqua Jet
+- Sacred Sword
+- Knock Off
+- Razor Shell
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock
+- Headlong Rush
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Psyshock
+- Tachyon Cutter
+- Future Sight
+- Calm Mind
+
+Heatran @ airballoon
+Ability: flamebody
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Taunt
+- Will-O-Wisp
+- Magma Storm
+- Earth Power

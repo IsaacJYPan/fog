@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Liquidation
+- Curse
+- Waterfall
+- Rest
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Soft-Boiled
+- Stealth Rock
+- Thunder Wave
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Earthquake
+- Facade
+- Knock Off
+- Stealth Rock
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fairy
+EVs: 252 HP / 24 Atk / 232 Spe
+Jolly Nature
+- Court Change
+- Pyro Ball
+- Sucker Punch
+- High Jump Kick
+
+Cresselia @ covertcloak
+Ability: levitate
+Tera Type: Fairy
+EVs: 176 HP / 252 SpA / 80 Spe
+Modest Nature
+- Moonblast
+- Moonlight
+- Stored Power
+- Calm Mind
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Ghost
+EVs: 200 HP / 84 SpA / 224 Spe
+Timid Nature
+- Will-O-Wisp
+- Focus Blast
+- Dark Pulse
+- Trick

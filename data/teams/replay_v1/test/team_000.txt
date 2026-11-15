@@ -1,0 +1,59 @@
+Ceruledge @ lifeorb
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 80 HP / 252 Atk / 176 Spe
+Adamant Nature
+- Bitter Blade
+- Shadow Sneak
+- Poltergeist
+- Close Combat
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 164 Def / 92 SpD
+Relaxed Nature
+- Scald
+- Body Slam
+- Wish
+- Flip Turn
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Flying
+EVs: 252 HP / 252 SpA / 4 Spe
+Modest Nature
+- U-turn
+- Hurricane
+- Roost
+- Discharge
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Ice Fang
+- Crunch
+- Close Combat
+- Heavy Slam
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Knock Off
+- Ice Spinner
+- Earthquake
+- Rapid Spin
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 64 HP / 144 Atk / 80 SpA / 220 Spe
+Naughty Nature
+- Earthquake
+- Extreme Speed
+- Scale Shot
+- Ice Spinner

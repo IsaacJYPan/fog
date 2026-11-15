@@ -1,0 +1,59 @@
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Ghost
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Swords Dance
+- Endure
+- Earthquake
+- Dragon Tail
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic
+- Trick
+- Dark Pulse
+- Sludge Bomb
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Superpower
+- Substitute
+- Psycho Boost
+- Psychic Terrain
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 240 HP / 252 SpD / 16 Spe
+Careful Nature
+- Toxic
+- Amnesia
+- Recover
+- Earthquake
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Flying
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Brave Bird
+- Body Press
+- U-turn
+- Roost
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Gunk Shot
+- Pyro Ball
+- U-turn

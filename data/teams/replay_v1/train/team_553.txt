@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Low Kick
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 120 HP / 44 Atk / 248 SpD / 96 Spe
+Adamant Nature
+- Knock Off
+- Rapid Spin
+- Headlong Rush
+- Close Combat
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Ice Beam
+- Future Sight
+- Chilly Reception
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Poison
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Ceaseless Edge
+- Razor Shell
+- Flip Turn
+- Knock Off
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic
+- Overheat
+- Morning Sun
+- Sludge Wave
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Hurricane
+- Roost
+- Thunder Wave

@@ -1,0 +1,59 @@
+Ursaluna @ leftovers
+Ability: guts
+Tera Type: Fairy
+EVs: 76 HP / 252 Atk / 8 SpD / 172 Spe
+Adamant Nature
+- Crunch
+- Earthquake
+- Protect
+- Facade
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Protect
+- Mirror Coat
+- Wish
+- Flip Turn
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Ghost
+EVs: 152 HP / 252 Def / 104 Spe
+Bold Nature
+- Brave Bird
+- Whirlwind
+- Roost
+- Spikes
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Sassy Nature
+- Recover
+- Stealth Rock
+- Toxic
+- Earthquake
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Salt Cure
+- Curse
+- Recover
+- Protect
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strange Steam
+- Defog
+- Will-O-Wisp
+- Pain Split

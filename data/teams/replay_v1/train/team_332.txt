@@ -1,0 +1,59 @@
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Focus Blast
+- Will-O-Wisp
+- Nasty Plot
+
+Kyurem @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Earth Power
+- Scale Shot
+- Ice Beam
+- Freeze-Dry
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Recover
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Toxic
+- Earthquake
+- Spikes
+- Protect
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 44 HP / 128 Atk / 84 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Close Combat
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Steel
+EVs: 216 Def / 208 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Draining Kiss
+- Psychic Noise
+- Sparkling Aria
+- Surf

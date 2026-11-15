@@ -1,0 +1,59 @@
+Kingambit @ lumberry
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Low Kick
+- Sucker Punch
+- Iron Head
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Stun Spore
+- Sticky Web
+- Moonblast
+- Skill Swap
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 120 HP / 44 Atk / 248 SpD / 96 Spe
+Adamant Nature
+- Supercell Slam
+- Head Smash
+- Ice Spinner
+- Headlong Rush
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Spikes
+- Play Rough
+- Swords Dance
+- Ivy Cudgel
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ground
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Earth Power
+- Rock Polish
+- Power Gem
+- Meteor Beam
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Recover
+- Shadow Ball
+- Nasty Plot

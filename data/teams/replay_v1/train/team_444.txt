@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Extreme Speed
+- Dragon Tail
+- Earthquake
+- Roost
+
+Zamazenta @ choiceband
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Crunch
+- Iron Defense
+- Body Press
+- Reflect
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Bug
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Perish Song
+- Moonblast
+- Flip Turn
+- Whirlpool
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Tachyon Cutter
+- Focus Blast
+- Agility
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Water
+EVs: 24 HP / 4 Atk / 252 SpD / 228 Spe
+Jolly Nature
+- Stealth Rock
+- Spikes
+- Ruination
+- Earthquake
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Stealth Rock
+- Knock Off

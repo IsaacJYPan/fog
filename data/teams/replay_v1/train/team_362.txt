@@ -1,0 +1,59 @@
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Body Press
+- Liquidation
+- Rest
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Protect
+- Earth Power
+- Stealth Rock
+- Magma Storm
+
+Latias @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Psyshock
+- Aura Sphere
+- Healing Wish
+- Agility
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Sludge Bomb
+- Ice Beam
+- Future Sight
+
+Landorus-Therian @ choiceband
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earthquake
+- U-turn
+- Stealth Rock
+- Stone Edge
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Low Kick
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head

@@ -1,0 +1,59 @@
+Hydrapple @ lifeorb
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Nasty Plot
+- Earth Power
+- Body Press
+- Giga Drain
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Soft-Boiled
+- Seismic Toss
+- Calm Mind
+- Stealth Rock
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Waterfall
+- Curse
+- Sleep Talk
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 240 HP / 252 SpD / 16 Spe
+Careful Nature
+- Recover
+- Toxic
+- Gunk Shot
+- Earthquake
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Poison
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Wish
+- Flip Turn
+- Protect
+- Scald
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 252 HP / 184 Def / 72 Spe
+Impish Nature
+- Poison Jab
+- Spikes
+- Knock Off
+- Protect

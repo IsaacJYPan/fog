@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Whirlwind
+- Ruination
+- Spikes
+- Stealth Rock
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Swords Dance
+- Facade
+- Earthquake
+- Protect
+
+Zamazenta @ lightclay
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Crunch
+- Heavy Slam
+- Roar
+- Close Combat
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Parting Shot
+- Toxic
+- Shadow Ball
+- Recover
+
+Clefable @ rockyhelmet
+Ability: unaware
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Knock Off
+- Moonlight
+- Moonblast
+
+Dragonite @ silkscarf
+Ability: multiscale
+Tera Type: Normal
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Fire Punch
+- Dragon Tail
+- Earthquake
+- Roost

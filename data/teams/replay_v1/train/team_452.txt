@@ -1,0 +1,59 @@
+Volcanion @ ejectpack
+Ability: waterabsorb
+Tera Type: Water
+EVs: 248 HP / 252 SpA / 8 SpD
+Modest Nature
+- Sludge Bomb
+- Steam Eruption
+- Body Press
+- Overheat
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Draco Meteor
+- Scale Shot
+- Substitute
+- Freeze-Dry
+
+Slither Wing @ assaultvest
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- U-turn
+- Morning Sun
+- First Impression
+- Close Combat
+
+Meowscarada @ choicespecs
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Flower Trick
+- Triple Axel
+- U-turn
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Toxic
+- Future Sight
+- Chilly Reception
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Roost
+- Dragon Dance
+- Earthquake
+- Extreme Speed

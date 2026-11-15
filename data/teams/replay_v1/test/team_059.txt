@@ -1,0 +1,59 @@
+Scream Tail @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 SpA / 252 Spe
+Timid Nature
+- Encore
+- Wish
+- Protect
+- Trick Room
+
+Iron Hands @ leftovers
+Ability: quarkdrive
+Tera Type: Bug
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Heavy Slam
+- Supercell Slam
+- Swords Dance
+- Drain Punch
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Flying
+EVs: 248 HP / 132 Def / 128 Spe
+Timid Nature
+- Defog
+- Flamethrower
+- U-turn
+- Overheat
+
+Latios @ heavydutyboots
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Psyshock
+- Trick
+- Agility
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 248 HP / 252 Atk / 8 Def
+Brave Nature
+- Protect
+- Swords Dance
+- Crunch
+- Facade
+
+Zarude @ leftovers
+Ability: leafguard
+Tera Type: Poison
+EVs: 252 HP / 40 Atk / 216 Spe
+Jolly Nature
+- Bulk Up
+- Jungle Healing
+- Knock Off
+- Trailblaze

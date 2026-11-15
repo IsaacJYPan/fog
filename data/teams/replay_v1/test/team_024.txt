@@ -1,0 +1,59 @@
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Stealth Rock
+- Whirlwind
+- Spikes
+- Roost
+
+Iron Treads @ rockyhelmet
+Ability: quarkdrive
+Tera Type: Ice
+EVs: 80 HP / 120 Atk / 116 SpD / 192 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Stone Edge
+- Earthquake
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Foul Play
+- Parting Shot
+- Malignant Chain
+- Toxic
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 SpD
+Sassy Nature
+- Stealth Rock
+- Knock Off
+- Moonblast
+- Moonlight
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Knock Off
+- Ice Beam
+- Dark Pulse
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Dragon Dance
+- Low Kick
+- Outrage
+- Roost

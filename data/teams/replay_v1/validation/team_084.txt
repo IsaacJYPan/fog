@@ -1,0 +1,59 @@
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Substitute
+- U-turn
+- Whirlwind
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Steel Beam
+- Stealth Rock
+- Rapid Spin
+- Earthquake
+
+Grimmsnarl @ mirrorherb
+Ability: prankster
+Tera Type: Steel
+EVs: 252 HP / 116 Atk / 56 Def / 24 SpD / 60 Spe
+Adamant Nature
+- Parting Shot
+- Taunt
+- Light Screen
+- Reflect
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 236 Atk / 40 Def / 112 SpD / 120 Spe
+Adamant Nature
+- Wild Charge
+- Ice Punch
+- Swords Dance
+- Close Combat
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Taunt
+- Swords Dance
+- Trailblaze
+- Ivy Cudgel
+
+Deoxys-Speed @ leftovers
+Ability: pressure
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Recover
+- Nasty Plot
+- Expanding Force
+- Psycho Boost

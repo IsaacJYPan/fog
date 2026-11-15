@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 248 HP / 156 Def / 104 SpD
+Impish Nature
+- Earthquake
+- Ruination
+- Whirlwind
+- Stone Edge
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Sludge Wave
+- Toxic Spikes
+- Fiery Dance
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Head
+- Kowtow Cleave
+- Low Kick
+- Sucker Punch
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Encore
+- Play Rough
+- Ivy Cudgel
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Dark
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Taunt
+- Headlong Rush
+
+Deoxys-Speed @ colburberry
+Ability: pressure
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Psychic Noise
+- Knock Off
+- Psycho Boost
+- Stealth Rock

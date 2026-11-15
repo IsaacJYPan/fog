@@ -1,0 +1,59 @@
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Nasty Plot
+- Psyshock
+- Dark Pulse
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Healing Wish
+- Psychic Noise
+- Draining Kiss
+- Psyshock
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Recover
+- Parting Shot
+- Shadow Ball
+- Nasty Plot
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Knock Off
+- Stealth Rock
+- Earthquake
+- Rapid Spin
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Low Kick
+- Dragon Tail
+- Body Press
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Defense
+- Crunch
+- Roar
+- Body Press

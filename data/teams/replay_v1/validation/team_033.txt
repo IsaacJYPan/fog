@@ -1,0 +1,59 @@
+Thundurus @ focussash
+Ability: prankster
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Swagger
+- Focus Blast
+- Thunderbolt
+- Thunder Wave
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Shadow Sneak
+- Destiny Bond
+- Bitter Blade
+
+Crawdaunt @ focussash
+Ability: adaptability
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Swords Dance
+- Aqua Jet
+- Knock Off
+- Close Combat
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Earthquake
+- Ice Spinner
+- Rapid Spin
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic
+- Psychic Noise
+- Focus Blast
+- Volt Switch
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Tail
+- Ice Spinner
+- Roost
+- Scale Shot

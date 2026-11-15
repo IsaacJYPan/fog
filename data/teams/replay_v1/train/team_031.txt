@@ -1,0 +1,59 @@
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Body Slam
+- Scald
+- Flip Turn
+- Mirror Coat
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Roost
+- Earthquake
+- Fire Punch
+
+Hoopa-Unbound @ choiceband
+Ability: magician
+Tera Type: Water
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Drain Punch
+- Knock Off
+- Thunderbolt
+- Psychic Noise
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 248 HP / 8 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- Will-O-Wisp
+- Gunk Shot
+
+Kyurem @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 120 HP / 216 SpA / 76 SpD / 96 Spe
+Modest Nature
+- Freeze-Dry
+- Earth Power
+- Ice Beam
+- Blizzard
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Ghost
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Roar
+- Crunch
+- Close Combat
+- Iron Defense

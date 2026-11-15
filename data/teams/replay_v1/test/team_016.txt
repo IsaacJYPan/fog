@@ -1,0 +1,59 @@
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Mortal Spin
+- Spikes
+- Earth Power
+- Power Gem
+
+Ceruledge @ airballoon
+Ability: weakarmor
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Close Combat
+- Destiny Bond
+- Swords Dance
+- Bitter Blade
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Stealth Rock
+- Payback
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 244 Def / 160 SpA / 104 Spe
+Modest Nature
+- Dragon Pulse
+- Calm Mind
+- Thunderbolt
+- Thunderclap
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Heavy Slam
+- Close Combat
+- Crunch
+- Body Press
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Trailblaze
+- Swords Dance
+- Play Rough

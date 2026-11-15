@@ -1,0 +1,59 @@
+Frosmoth @ leftovers
+Ability: icescales
+Tera Type: Electric
+EVs: 244 HP / 252 SpD / 12 Spe
+Calm Nature
+- Substitute
+- Bug Buzz
+- Ice Beam
+- Quiver Dance
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ice
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- U-turn
+- Roost
+- Brave Bird
+- Defog
+
+Dragapult @ airballoon
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Hex
+- U-turn
+- Draco Meteor
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Knock Off
+- Earthquake
+- U-turn
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Head
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Fire
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Ceaseless Edge
+- Knock Off
+- Aqua Jet
+- Sacred Sword

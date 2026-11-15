@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Electric
+EVs: 252 HP / 176 Def / 80 Spe
+Bold Nature
+- Wish
+- Moonblast
+- Protect
+- Stealth Rock
+
+Hoopa-Unbound @ focussash
+Ability: magician
+Tera Type: Dark
+EVs: 248 HP / 252 Atk / 8 SpA
+Brave Nature
+- Trick Room
+- Psychic Noise
+- Hyperspace Fury
+- Knock Off
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Substitute
+- Will-O-Wisp
+- Hex
+- Dragon Darts
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 16 Atk / 104 Def / 36 SpD / 108 Spe
+Impish Nature
+- Spikes
+- Protect
+- Toxic
+- Earthquake
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Chilly Reception
+- Future Sight
+- Psychic Noise
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Curse
+- Rest
+- Sleep Talk
+- Body Press

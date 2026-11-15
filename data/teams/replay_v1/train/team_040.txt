@@ -1,0 +1,59 @@
+Toedscruel @ heavydutyboots
+Ability: myceliummight
+Tera Type: Fairy
+EVs: 252 HP / 252 SpD / 4 Spe
+Careful Nature
+- Rapid Spin
+- Giga Drain
+- Toxic
+- Earth Power
+
+Darkrai @ tangaberry
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Drain Punch
+- Will-O-Wisp
+- Knock Off
+- Ice Beam
+
+Cresselia @ leftovers
+Ability: levitate
+Tera Type: Fairy
+EVs: 252 HP / 180 Def / 56 SpD / 20 Spe
+Calm Nature
+- Calm Mind
+- Moonblast
+- Moonlight
+- Stored Power
+
+Clodsire @ covertcloak
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Recover
+- Poison Jab
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Steel
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Iron Head
+- Roost
+- Earthquake
+- Dragon Dance
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 80 Def / 176 SpD
+Impish Nature
+- Healing Wish
+- Wish
+- Scald
+- Flip Turn

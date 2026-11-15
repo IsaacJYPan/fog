@@ -1,0 +1,59 @@
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Waterfall
+- Body Press
+- Curse
+- Rest
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Protect
+- Nasty Plot
+- Shadow Ball
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Grass
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Spikes
+- Knock Off
+- Earthquake
+- Protect
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Seismic Toss
+- Shadow Ball
+- Stealth Rock
+- Heal Bell
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Mirror Coat
+- Protect
+- Flip Turn
+- Wish
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Fighting
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Giga Drain
+- Body Press
+- Recover
+- Dragon Tail

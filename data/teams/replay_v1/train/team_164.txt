@@ -1,0 +1,59 @@
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Timid Nature
+- Aurora Veil
+- Snowscape
+- Pain Split
+- Encore
+
+Hoopa-Unbound @ assaultvest
+Ability: magician
+Tera Type: Fighting
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Nasty Plot
+- Focus Blast
+- Psychic
+- Trick
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Ground
+EVs: 216 Def / 208 SpA / 80 SpD / 4 Spe
+Modest Nature
+- Substitute
+- Calm Mind
+- Draining Kiss
+- Surf
+
+Ceruledge @ airballoon
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Shadow Sneak
+- Poltergeist
+- Swords Dance
+- Bulk Up
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Iron Defense
+- Crunch
+- Substitute
+- Body Press
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Rapid Spin
+- Stealth Rock
+- Volt Switch
+- Earth Power

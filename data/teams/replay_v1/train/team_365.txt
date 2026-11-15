@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+- Low Kick
+
+Dragapult @ lightclay
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Surf
+- Will-O-Wisp
+- U-turn
+- Thunderbolt
+
+Gholdengo @ leftovers
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Shadow Ball
+- Psyshock
+- Recover
+- Nasty Plot
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+- Stealth Rock
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Salt Cure
+- Recover
+- Iron Defense
+- Body Press
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Electric
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Roost
+- Rock Slide
+- Earthquake
+- Dragon Dance

@@ -1,0 +1,59 @@
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Body Press
+- Ice Fang
+- Close Combat
+- Crunch
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Earth Power
+- Giga Drain
+- Nasty Plot
+- Fickle Beam
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Heavy Slam
+- Ruination
+- Whirlwind
+- Stealth Rock
+
+Gholdengo @ shucaberry
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Recover
+- Nasty Plot
+- Make It Rain
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Ice Punch
+- Encore
+- Moonblast
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Swords Dance
+- Facade
+- Protect
+- Knock Off

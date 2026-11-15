@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Calm Mind
+- Stealth Rock
+- Soft-Boiled
+- Seismic Toss
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Malignant Chain
+- Nasty Plot
+- Recover
+- Parting Shot
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Crunch
+- Body Press
+- Iron Defense
+- Roar
+
+Zapdos @ throatspray
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- U-turn
+- Hurricane
+- Roost
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Rapid Spin
+- Stealth Rock
+- Bulk Up
+- Ice Spinner
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Dance
+- Icicle Spear
+- Earth Power
+- Protect

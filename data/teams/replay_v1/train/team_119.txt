@@ -1,0 +1,59 @@
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Parting Shot
+- Light Screen
+- Low Kick
+- Reflect
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+- Iron Head
+
+Blaziken @ leftovers
+Ability: speedboost
+Tera Type: Fighting
+EVs: 4 Atk / 252 SpA / 252 Spe
+Mild Nature
+- Protect
+- Swords Dance
+- Flare Blitz
+- Close Combat
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Stone Edge
+- Reflect
+- Iron Defense
+- Body Press
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 132 Def / 128 SpD
+Calm Nature
+- Meteor Beam
+- Stealth Rock
+- Earth Power
+- Mortal Spin
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Fighting
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Superpower
+- Shadow Ball
+- Ice Beam
+- Nasty Plot

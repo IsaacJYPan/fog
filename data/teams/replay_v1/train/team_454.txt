@@ -1,0 +1,59 @@
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Recover
+- Shadow Ball
+- Parting Shot
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Taunt
+- Earth Power
+- Moonblast
+- Healing Wish
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Ice Spinner
+- Bulk Up
+- Headlong Rush
+- Earthquake
+
+Empoleon @ shucaberry
+Ability: competitive
+Tera Type: Flying
+EVs: 252 HP / 4 Atk / 252 SpD
+Sassy Nature
+- Stealth Rock
+- Surf
+- Knock Off
+- Roost
+
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Ice Shard
+- Knock Off
+- Icicle Crash
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Ivy Cudgel
+- U-turn
+- Encore

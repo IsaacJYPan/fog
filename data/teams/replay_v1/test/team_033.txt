@@ -1,0 +1,59 @@
+Drifblim @ grassyseed
+Ability: unburden
+Tera Type: Dark
+EVs: 164 HP / 252 Def / 92 Spe
+Bold Nature
+- Strength Sap
+- Will-O-Wisp
+- Calm Mind
+- Shadow Ball
+
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Fire
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Grassy Glide
+- Knock Off
+- Swords Dance
+- Wood Hammer
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Calm Mind
+- Dragon Pulse
+- Thunderbolt
+- Thunderclap
+
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Dance
+- Earth Power
+- Protect
+- Freeze-Dry
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Roost
+- Spite
+- Power Trip
+- Bulk Up
+
+Muk-Alola @ leftovers
+Ability: poisontouch
+Tera Type: Poison
+EVs: 252 HP / 216 SpD
+Careful Nature
+- Knock Off
+- Poison Fang
+- Shadow Sneak
+- Drain Punch

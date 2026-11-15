@@ -1,0 +1,59 @@
+Barraskewda @ lifeorb
+Ability: swiftswim
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Close Combat
+- Liquidation
+- Flip Turn
+- Aqua Jet
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 184 Def / 252 SpA / 72 Spe
+Modest Nature
+- Weather Ball
+- Thunder
+- Dragon Pulse
+- Draco Meteor
+
+Pelipper @ heavydutyboots
+Ability: drizzle
+Tera Type: Ground
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Roost
+- Hydro Pump
+- Hurricane
+- U-turn
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 156 HP / 64 Atk / 96 SpD / 192 Spe
+Jolly Nature
+- Knock Off
+- Volt Switch
+- Rapid Spin
+- Stealth Rock
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- U-turn
+- Swords Dance
+- Taunt
+
+Kingambit @ airballoon
+Ability: pressure
+Tera Type: Fire
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave

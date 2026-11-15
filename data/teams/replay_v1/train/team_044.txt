@@ -1,0 +1,59 @@
+Hoopa-Unbound @ ejectpack
+Ability: magician
+Tera Type: Dark
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Thunderbolt
+- Dark Pulse
+- Trick
+- Zen Headbutt
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Flip Turn
+- Scald
+- Protect
+- Wish
+
+Dragonite @ earthplate
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Extreme Speed
+- Dragon Dance
+- Roost
+- Earthquake
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Body Press
+- Defog
+- Roost
+- U-turn
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Whirlwind
+- Ruination
+- Earthquake
+- Stealth Rock
+
+Iron Valiant @ expertbelt
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Moonblast
+- Spirit Break
+- Close Combat
+- Shadow Ball

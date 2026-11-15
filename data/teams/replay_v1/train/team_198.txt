@@ -1,0 +1,59 @@
+Deoxys-Defense @ leftovers
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Def
+Relaxed Nature
+- Recover
+- Trick Room
+- Teleport
+- Psycho Boost
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Headlong Rush
+- Facade
+- Fire Punch
+- Brick Break
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Court Change
+- Sucker Punch
+- Will-O-Wisp
+- Pyro Ball
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Throat Chop
+- Stealth Rock
+- Earthquake
+- Spikes
+
+Enamorus @ leftovers
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Moonblast
+- Earth Power
+- Substitute
+- Superpower
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Shadow Ball
+- Recover
+- Nasty Plot
+- Make It Rain

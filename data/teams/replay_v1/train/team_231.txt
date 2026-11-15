@@ -1,0 +1,59 @@
+Clefable @ heavydutyboots
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 176 Def / 80 SpD
+Calm Nature
+- Stealth Rock
+- Moonblast
+- Moonlight
+- Thunder Wave
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Brave Bird
+- Roost
+- Body Press
+- U-turn
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 252 HP / 72 Def / 184 SpD
+Careful Nature
+- Protect
+- Facade
+- Knock Off
+- Swords Dance
+
+Slowking-Galar @ blacksludge
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Trick
+- Future Sight
+- Sludge Bomb
+
+Samurott-Hisui @ covertcloak
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Aqua Jet
+- Encore
+- Ceaseless Edge
+- Razor Shell
+
+Rotom-Heat @ heavydutyboots
+Ability: levitate
+Tera Type: Steel
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Pain Split
+- Trick
+- Volt Switch
+- Overheat

@@ -1,0 +1,59 @@
+Bellibolt @ heavydutyboots
+Ability: electromorphosis
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Slack Off
+- Muddy Water
+- Soak
+- Discharge
+
+Rillaboom @ lumberry
+Ability: grassysurge
+Tera Type: Rock
+EVs: 220 HP / 96 Atk / 192 SpD
+Careful Nature
+- High Horsepower
+- Wood Hammer
+- Grassy Glide
+- U-turn
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Aqua Jet
+- Protect
+- Flip Turn
+- Wish
+
+Tinkaton @ airballoon
+Ability: pickpocket
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Encore
+- Thunder Wave
+- Gigaton Hammer
+- Ice Hammer
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Headlong Rush
+- Close Combat
+- Rapid Spin
+- Knock Off
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Steel
+EVs: 8 HP / 100 Def / 148 SpA / 252 Spe
+Timid Nature
+- Hex
+- U-turn
+- Flamethrower
+- Shadow Ball

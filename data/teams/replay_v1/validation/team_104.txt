@@ -1,0 +1,59 @@
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Electric
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Scale Shot
+- Extreme Speed
+- Roost
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Encore
+- Power Whip
+- Ivy Cudgel
+
+Slowking-Galar @ ejectbutton
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Future Sight
+- Slack Off
+- Flamethrower
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+
+Magnezone @ heavydutyboots
+Ability: analytic
+Tera Type: Flying
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Body Press
+- Flash Cannon
+- Thunder
+- Volt Switch
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Low Kick
+- Flower Trick
+- U-turn

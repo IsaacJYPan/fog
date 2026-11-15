@@ -1,0 +1,59 @@
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Poison
+EVs: 112 HP / 48 Def / 252 SpA / 96 Spe
+Modest Nature
+- Scald
+- Acid Armor
+- Tail Glow
+- Take Heart
+
+Metagross @ normalgem
+Ability: clearbody
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Bullet Punch
+- Psychic Fangs
+- Stealth Rock
+- Explosion
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Temper Flare
+- Earthquake
+- Ice Spinner
+
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Ghost
+EVs: 252 HP / 116 Atk / 56 Def / 24 SpD / 60 Spe
+Adamant Nature
+- Spirit Break
+- Thunder Wave
+- Light Screen
+- Reflect
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Scale Shot
+- Roost
+- Fire Punch
+- Dragon Dance
+
+Dragapult @ focussash
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 248 HP / 8 Atk / 252 Def
+Impish Nature
+- U-turn
+- Will-O-Wisp
+- Dragon Darts
+- Draco Meteor

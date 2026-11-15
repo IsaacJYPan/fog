@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 24 HP / 4 Atk / 252 SpD / 228 Spe
+Jolly Nature
+- Stealth Rock
+- Earthquake
+- Payback
+- Ruination
+
+Mandibuzz @ heavydutyboots
+Ability: overcoat
+Tera Type: Water
+EVs: 252 HP / 156 Def / 100 Spe
+Impish Nature
+- Foul Play
+- Roost
+- U-turn
+- Toxic
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Mystical Fire
+- Psyshock
+- Trick Room
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- U-turn
+- Heat Wave
+- Focus Blast
+- Bleakwind Storm
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fire
+EVs: 60 HP / 196 Def / 252 SpD
+Sassy Nature
+- Wish
+- Mirror Coat
+- Aqua Jet
+- Flip Turn
+
+Kingambit @ lumberry
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance

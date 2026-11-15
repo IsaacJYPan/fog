@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Electric
+EVs: 252 HP / 28 Def / 228 SpD
+Impish Nature
+- Salt Cure
+- Protect
+- Stealth Rock
+- Recover
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 HP / 96 Atk / 160 Def
+Adamant Nature
+- Grassy Glide
+- Wood Hammer
+- U-turn
+- Knock Off
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Kowtow Cleave
+- Low Kick
+- Sucker Punch
+- Swords Dance
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Close Combat
+- Ice Spinner
+- Rapid Spin
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Surf
+- Draining Kiss
+- Psychic Noise
+- Moonblast
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 SpD / 12 Spe
+Calm Nature
+- Roost
+- Flamethrower
+- U-turn
+- Will-O-Wisp

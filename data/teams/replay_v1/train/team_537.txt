@@ -1,0 +1,59 @@
+Weavile @ lifeorb
+Ability: pressure
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Swords Dance
+- Triple Axel
+- Knock Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dark
+EVs: 244 HP / 236 Def / 12 SpD / 16 Spe
+Impish Nature
+- Toxic
+- Protect
+- Facade
+- Spikes
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Ruination
+- Whirlwind
+- Stealth Rock
+- Earthquake
+
+Zamazenta @ choiceband
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Howl
+- Crunch
+- Iron Defense
+- Stone Edge
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Chilly Reception
+- Ice Beam
+- Future Sight
+- Sludge Bomb
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Will-O-Wisp
+- Hydro Pump
+- Volt Switch

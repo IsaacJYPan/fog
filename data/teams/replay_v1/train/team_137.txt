@@ -1,0 +1,59 @@
+Trevenant @ sitrusberry
+Ability: harvest
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Substitute
+- Will-O-Wisp
+- Curse
+- Leech Seed
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Avalanche
+- Curse
+- Sleep Talk
+- Rest
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Roost
+- Iron Defense
+- Brave Bird
+- Body Press
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Toxic
+- Recover
+- Baneful Bunker
+- Haze
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 20 HP / 252 Def / 236 SpD
+Calm Nature
+- Thunderbolt
+- Stealth Rock
+- Soft-Boiled
+- Seismic Toss
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Facade
+- Spikes
+- Knock Off

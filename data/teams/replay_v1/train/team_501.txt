@@ -1,0 +1,59 @@
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Bleakwind Storm
+- Knock Off
+- Taunt
+- U-turn
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Shadow Ball
+- Matcha Gotcha
+- Calm Mind
+- Strength Sap
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Iron Defense
+- Spikes
+- Body Press
+- Roost
+
+Garganacl @ heavydutyboots
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Salt Cure
+- Iron Defense
+- Stealth Rock
+- Body Press
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Will-O-Wisp
+- Hex
+- Slack Off
+- Torch Song
+
+Ting-Lu @ redcard
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Sleep Talk
+- Ruination
+- Rest
+- Throat Chop

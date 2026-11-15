@@ -1,0 +1,59 @@
+Tinkaton @ leftovers
+Ability: moldbreaker
+Tera Type: Water
+EVs: 160 HP / 116 Atk / 232 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Hammer
+- Encore
+- Gigaton Hammer
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Earth Power
+- Slack Off
+- Torch Song
+- Will-O-Wisp
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Swords Dance
+- Spikes
+- Facade
+- Protect
+
+Slither Wing @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Morning Sun
+- Will-O-Wisp
+- U-turn
+- First Impression
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rapid Spin
+- Ice Spinner
+- Headlong Rush
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Encore
+- U-turn
+- Knock Off

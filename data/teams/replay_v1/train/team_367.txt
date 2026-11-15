@@ -1,0 +1,59 @@
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Will-O-Wisp
+- Hex
+- Dragon Darts
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Energy Ball
+- Fiery Dance
+- Morning Sun
+- Dazzling Gleam
+
+Serperior @ custapberry
+Ability: contrary
+Tera Type: Ghost
+EVs: 56 HP / 212 SpA / 240 Spe
+Timid Nature
+- Leaf Storm
+- Glare
+- Dragon Pulse
+- Knock Off
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Water
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Ice Spinner
+- Earthquake
+- Stealth Rock
+- Rapid Spin
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Roost
+- Scale Shot
+- Dragon Dance
+
+Greninja @ lifeorb
+Ability: battlebond
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Wave
+- Water Shuriken
+- Spikes
+- Dark Pulse

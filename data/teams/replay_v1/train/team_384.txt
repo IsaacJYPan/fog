@@ -1,0 +1,59 @@
+Vileplume @ rockyhelmet
+Ability: chlorophyll
+Tera Type: Fairy
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Strength Sap
+- Giga Drain
+- Sludge Bomb
+- Leech Seed
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 252 SpA / 4 Spe
+Hardy Nature
+- Earth Power
+- Taunt
+- Stealth Rock
+- Magma Storm
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Knock Off
+- Spikes
+- Protect
+- Toxic
+
+Quaquaval @ heavydutyboots
+Ability: moxie
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Aqua Jet
+- Close Combat
+- Roost
+- Rapid Spin
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Steel
+EVs: 132 HP / 252 Atk / 124 Spe
+Adamant Nature
+- Draco Meteor
+- Sucker Punch
+- Flamethrower
+- Shadow Ball
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Bleakwind Storm
+- Heat Wave
+- Knock Off
+- U-turn

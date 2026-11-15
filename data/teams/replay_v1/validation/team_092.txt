@@ -1,0 +1,59 @@
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- U-turn
+- Wood Hammer
+- Knock Off
+- Grassy Glide
+
+Hawlucha @ grassyseed
+Ability: moldbreaker
+Tera Type: Steel
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- Swords Dance
+- Acrobatics
+- Close Combat
+- Low Kick
+
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Normal
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Will-O-Wisp
+- Draco Meteor
+- U-turn
+
+Heatran @ airballoon
+Ability: flashfire
+Tera Type: Flying
+EVs: 248 HP / 140 Def / 120 Spe
+Bold Nature
+- Will-O-Wisp
+- Stealth Rock
+- Magma Storm
+- Taunt
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Headlong Rush
+- Bulk Up
+- Head Smash
+
+Mimikyu @ lifeorb
+Ability: disguise
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Play Rough
+- Shadow Sneak
+- Swords Dance
+- Shadow Claw

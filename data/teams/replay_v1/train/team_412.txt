@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Spikes
+- Whirlwind
+- Ruination
+- Stealth Rock
+
+Kingambit @ heavydutyboots
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Iron Head
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Substitute
+- Draco Meteor
+- Dragon Darts
+- Fire Blast
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Hex
+- Slack Off
+- Torch Song
+- Will-O-Wisp
+
+Iron Valiant @ airballoon
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Vacuum Wave
+- Aura Sphere
+- Trick
+- Shadow Ball
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Ghost
+EVs: 252 HP / 176 Def / 80 Spe
+Bold Nature
+- Hydro Pump
+- Volt Switch
+- Thunder Wave
+- Nasty Plot

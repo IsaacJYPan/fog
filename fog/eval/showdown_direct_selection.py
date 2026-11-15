@@ -18,6 +18,8 @@ method returning a FOG action index or an order. Optional hooks: ``take_game_cou
 counters, recorded after every game), ``discard_last_uncommitted_decision(battle)`` (Showdown
 rejected the last choice) and ``_battle_finished(battle)``. A controller label named in
 ``--opponent`` is an opponent; any other controller is a candidate like a checkpoint.
+The ``scripted_controller`` factory returns a baseline name and preserves the runner's existing
+seeded baseline behavior, including during resume.
 
 ``--sequential`` stops each row at the first ``BlockSPRT`` decision on per-block mean scores.
 Each finished row prints one Markdown results-ledger row.
@@ -373,6 +375,13 @@ class ChooseAdapter:
         raise AttributeError(name)
 
 
+def scripted_controller(name: str) -> str:
+    """Expose the runner's seeded baselines as named round-robin entrants."""
+    if name not in ("random", "maxdamage", "simpleheuristics"):
+        raise ValueError(f"unknown scripted controller: {name!r}")
+    return name
+
+
 def load_controller_factory(spec: str, kwargs: dict[str, Any] | None = None) -> Callable[[], Any]:
     """``module:factory`` -> a zero-argument maker of local-runner controllers."""
     module_name, separator, attr = spec.partition(":")
@@ -383,6 +392,8 @@ def load_controller_factory(spec: str, kwargs: dict[str, Any] | None = None) -> 
 
     def make() -> Any:
         controller = factory(**options)
+        if isinstance(controller, str):
+            return scripted_controller(controller)
         if not hasattr(controller, "act") and hasattr(controller, "choose"):
             controller = ChooseAdapter(controller)
         if not (hasattr(controller, "act") or callable(controller)):

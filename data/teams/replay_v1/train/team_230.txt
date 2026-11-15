@@ -1,0 +1,59 @@
+Landorus-Therian @ leftovers
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Earthquake
+- U-turn
+- Stealth Rock
+- Taunt
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Sassy Nature
+- Salt Cure
+- Recover
+- Iron Defense
+- Body Press
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Horn Leech
+- Trailblaze
+- Ivy Cudgel
+- Knock Off
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ice
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Ice Beam
+- Flash Cannon
+- Dragon Dance
+- Earth Power
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Water
+EVs: 248 HP / 200 Def / 60 SpD
+Impish Nature
+- Roost
+- Defog
+- Brave Bird
+- U-turn
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Stealth Rock
+- Knock Off
+- Moonblast

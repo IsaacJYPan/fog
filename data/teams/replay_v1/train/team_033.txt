@@ -1,0 +1,59 @@
+Hoopa-Unbound @ assaultvest
+Ability: magician
+Tera Type: Dark
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Drain Punch
+- Hyperspace Fury
+- Knock Off
+- Zen Headbutt
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Flip Turn
+- Protect
+- Mirror Coat
+- Wish
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Body Press
+- Crunch
+- Substitute
+- Iron Defense
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 248 HP / 60 SpD / 200 Spe
+Calm Nature
+- Earthquake
+- Swords Dance
+- Protect
+- Facade
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Make It Rain
+- Thunder Wave
+- Focus Blast
+
+Cinderace @ choiceband
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- Will-O-Wisp
+- Sucker Punch

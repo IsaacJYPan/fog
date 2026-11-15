@@ -1,0 +1,59 @@
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+- Knock Off
+
+Greninja @ lifeorb
+Ability: battlebond
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Punch
+- Grass Knot
+- Dark Pulse
+- Water Shuriken
+
+Deoxys-Speed @ ejectpack
+Ability: pressure
+Tera Type: Psychic
+EVs: 200 Atk / 252 SpA / 56 Spe
+Naive Nature
+- Stealth Rock
+- Knock Off
+- Taunt
+- Superpower
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Nasty Plot
+- Recover
+- Make It Rain
+- Shadow Ball
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Vacuum Wave
+- Shadow Ball
+- Moonblast
+- Calm Mind
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ice Spinner
+- Dragon Dance
+- Outrage
+- Encore

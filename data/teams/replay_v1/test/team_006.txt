@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Sleep Talk
+- Body Press
+- Avalanche
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Soft-Boiled
+- Seismic Toss
+- Light Screen
+- Calm Mind
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Fighting
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- U-turn
+- Iron Defense
+- Defog
+- Roost
+
+Weezing-Galar @ blacksludge
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Toxic Spikes
+- Pain Split
+- Will-O-Wisp
+- Sludge Bomb
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Earthquake
+- Spikes
+- Knock Off
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Crunch
+- Body Press
+- Heavy Slam
+- Close Combat

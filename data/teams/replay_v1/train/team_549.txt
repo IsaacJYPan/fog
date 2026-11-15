@@ -1,0 +1,59 @@
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Recover
+- Parting Shot
+- Foul Play
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Rapid Spin
+- Headlong Rush
+- Knock Off
+- Stealth Rock
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 96 HP / 160 Atk / 252 Spe
+Jolly Nature
+- Swords Dance
+- Synthesis
+- Ivy Cudgel
+- Trailblaze
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Tachyon Cutter
+- Volt Switch
+- Stored Power
+- Calm Mind
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earthquake
+- U-turn
+- Grass Knot
+- Rock Tomb
+
+Samurott-Hisui @ mysticwater
+Ability: sharpness
+Tera Type: Dark
+EVs: 200 HP / 116 Atk / 192 Spe
+Adamant Nature
+- Knock Off
+- Sucker Punch
+- Ceaseless Edge
+- Flip Turn

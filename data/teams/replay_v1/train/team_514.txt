@@ -1,0 +1,59 @@
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Fairy
+EVs: 240 HP / 16 SpA / 252 Spe
+Timid Nature
+- Tail Glow
+- Alluring Voice
+- Energy Ball
+- Scald
+
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Rock
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Swords Dance
+- Knock Off
+- Grassy Glide
+- Drain Punch
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Skill Swap
+- Sticky Web
+- Stun Spore
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Make It Rain
+- Nasty Plot
+- Shadow Ball
+
+Latios @ weaknesspolicy
+Ability: levitate
+Tera Type: Steel
+EVs: 248 HP / 116 Def / 16 SpA / 128 Spe
+Modest Nature
+- Agility
+- Draco Meteor
+- Trick
+- Psyshock
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Knock Off
+- Close Combat

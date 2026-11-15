@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Rapid Spin
+- Knock Off
+- Ice Spinner
+- Stealth Rock
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Hex
+- U-turn
+- Phantom Force
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Electric
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Thunder
+- Heat Wave
+- Volt Switch
+- Roost
+
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ground
+EVs: 248 HP / 252 Def / 8 SpA
+Relaxed Nature
+- Weather Ball
+- Hurricane
+- U-turn
+- Roost
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Trailblaze
+- Swords Dance
+- Horn Leech
+- U-turn
+
+Overqwil @ lifeorb
+Ability: swiftswim
+Tera Type: Water
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Crunch
+- Liquidation
+- Swords Dance
+- Gunk Shot

@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Iron Defense
+- Close Combat
+- Crunch
+- Ice Fang
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Nasty Plot
+- Sludge Bomb
+- Trick
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Trick
+- Future Sight
+- Sludge Bomb
+- Slack Off
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Salt Cure
+- Body Press
+- Recover
+- Stealth Rock
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Stone Edge
+- Earthquake
+- U-turn
+
+Iron Valiant @ choicescarf
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Knock Off
+- Trick
+- Close Combat

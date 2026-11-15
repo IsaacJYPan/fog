@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- U-turn
+- Stealth Rock
+- Earthquake
+- Taunt
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Sucker Punch
+- Aqua Jet
+- Ceaseless Edge
+- Razor Shell
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Shadow Ball
+- Make It Rain
+- Trick
+
+Thundurus-Therian @ choicescarf
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Dark Pulse
+- Psychic
+- Focus Blast
+- Knock Off
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Close Combat
+- Bullet Punch
+- Swords Dance
+- Brick Break
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Close Combat
+- Roar
+- Body Press
+- Iron Defense

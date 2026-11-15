@@ -1,0 +1,59 @@
+Rillaboom @ leftovers
+Ability: grassysurge
+Tera Type: Grass
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Grassy Glide
+- Knock Off
+- Wood Hammer
+- Swords Dance
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 Spe
+Hardy Nature
+- Earth Power
+- Lava Plume
+- Magma Storm
+- Stealth Rock
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Power Whip
+- Swords Dance
+- Ivy Cudgel
+- Synthesis
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 8 HP / 108 Atk / 140 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Close Combat
+- Rapid Spin
+- Head Smash
+
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- U-turn
+- Draco Meteor
+- Shadow Ball
+- Dragon Darts
+
+Okidogi @ leftovers
+Ability: toxicchain
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Gunk Shot
+- Drain Punch
+- Close Combat
+- Knock Off

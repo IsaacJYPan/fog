@@ -1,0 +1,59 @@
+Blaziken @ lifeorb
+Ability: speedboost
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Overheat
+- Scorching Sands
+- Close Combat
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Fighting
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Taunt
+- Stealth Rock
+- Psycho Boost
+- Ice Beam
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Water
+EVs: 248 HP / 72 SpA / 188 Spe
+Modest Nature
+- Hex
+- Thunder Wave
+- Recover
+- Make It Rain
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Horn Leech
+- U-turn
+- Knock Off
+- Ivy Cudgel
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Close Combat
+- Stealth Rock
+- Headlong Rush
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Malignant Chain
+- Hex
+- Recover
+- Parting Shot

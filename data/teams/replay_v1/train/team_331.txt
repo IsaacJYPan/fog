@@ -1,0 +1,59 @@
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Dark Pulse
+- Will-O-Wisp
+- Sludge Bomb
+
+Lokix @ choiceband
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- First Impression
+- U-turn
+- Leech Life
+- Swords Dance
+
+Glimmora @ focussash
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 252 HP / 40 Def / 160 SpD / 56 Spe
+Calm Nature
+- Sludge Wave
+- Earth Power
+- Stealth Rock
+- Mortal Spin
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 104 HP / 152 Atk / 252 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Heavy Slam
+- Body Press
+- Iron Defense
+- Close Combat
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Trick
+- Shadow Ball
+- Make It Rain
+- Nasty Plot

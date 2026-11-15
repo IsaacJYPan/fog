@@ -1,0 +1,59 @@
+Probopass @ rockyhelmet
+Ability: magnetpull
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Body Press
+- Flash Cannon
+- Stealth Rock
+- Thunder Wave
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Encore
+- Freeze-Dry
+- Aurora Veil
+- Blizzard
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Darts
+- Phantom Force
+- Draco Meteor
+- Substitute
+
+Pecharunt @ leftovers
+Ability: poisonpuppeteer
+Tera Type: Fairy
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Recover
+- Nasty Plot
+- Malignant Chain
+- Shadow Ball
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Trailblaze
+- Play Rough
+- Swords Dance
+- Power Whip
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 56 HP / 200 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Stealth Rock
+- Close Combat

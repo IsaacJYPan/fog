@@ -1,0 +1,59 @@
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Dark
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- Grassy Glide
+- Drain Punch
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Ivy Cudgel
+- Grassy Glide
+
+Hawlucha @ redcard
+Ability: unburden
+Tera Type: Fairy
+EVs: 72 HP / 252 Atk / 60 SpD / 124 Spe
+Adamant Nature
+- Acrobatics
+- Encore
+- Close Combat
+- Swords Dance
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Shadow Ball
+- Recover
+- Parting Shot
+- Malignant Chain
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 52 HP / 252 Atk / 204 Spe
+Adamant Nature
+- Stealth Rock
+- Head Smash
+- Knock Off
+- Headlong Rush
+
+Hoopa-Unbound @ ejectpack
+Ability: magician
+Tera Type: Fighting
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Psychic Noise
+- Trick Room
+- Knock Off
+- Drain Punch

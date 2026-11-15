@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 248 HP / 60 SpD / 200 Spe
+Calm Nature
+- Spikes
+- Toxic
+- Earthquake
+- Protect
+
+Volcanion @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Ghost
+EVs: 48 HP / 252 SpA / 208 Spe
+Modest Nature
+- Flamethrower
+- Steam Eruption
+- Earth Power
+- Taunt
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Trick
+- Future Sight
+- Chilly Reception
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Shadow Ball
+- Make It Rain
+- Recover
+- Nasty Plot
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- Ice Shard
+- Swords Dance
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Low Kick
+- Ice Beam
+- Scale Shot

@@ -1,0 +1,59 @@
+Tinkaton @ leftovers
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Knock Off
+- Gigaton Hammer
+- Stealth Rock
+- Thunder Wave
+
+Walking Wake @ choicespecs
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Agility
+- Surf
+- Draco Meteor
+- Flip Turn
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 244 Def / 16 Spe
+Bold Nature
+- Discharge
+- U-turn
+- Roost
+- Hurricane
+
+Okidogi @ leftovers
+Ability: guarddog
+Tera Type: Flying
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Poison Jab
+- Bulk Up
+- Ice Punch
+- Drain Punch
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flower Trick
+- Triple Axel
+- U-turn
+- Knock Off
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Stealth Rock
+- Calm Mind
+- Heal Bell
+- Seismic Toss

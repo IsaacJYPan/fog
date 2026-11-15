@@ -1,0 +1,59 @@
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Lava Plume
+- Protect
+- Stealth Rock
+- Rest
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Draco Meteor
+- Nasty Plot
+- Giga Drain
+- Earth Power
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Stealth Rock
+- Heal Bell
+- Soft-Boiled
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Curse
+- Avalanche
+- Body Press
+- Rest
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dark
+EVs: 244 HP / 236 Def / 12 SpD / 16 Spe
+Impish Nature
+- Knock Off
+- Spikes
+- Protect
+- Toxic
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Protect
+- Wish
+- Knock Off

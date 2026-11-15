@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Extreme Speed
+- Earthquake
+- Iron Head
+- Outrage
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Taunt
+- Earthquake
+- Stealth Rock
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Dazzling Gleam
+- Sludge Wave
+- Energy Ball
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Moonblast
+- Close Combat
+- Encore
+- Knock Off
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Fire
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Dragon Dance
+- Icicle Spear
+- Ice Beam
+- Substitute
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 72 HP / 252 SpA / 184 Spe
+Modest Nature
+- Psyshock
+- Make It Rain
+- Trick
+- Thunder Wave

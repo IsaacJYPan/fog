@@ -1,0 +1,59 @@
+Rotom-Wash @ terrainextender
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Hex
+- Hydro Pump
+- Discharge
+- Volt Switch
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Calm Mind
+- Stealth Rock
+- Wish
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Spikes
+- Earthquake
+- Toxic
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Will-O-Wisp
+- Roost
+- Flamethrower
+- U-turn
+
+Latios @ souldew
+Ability: levitate
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Draco Meteor
+- Aura Sphere
+- Calm Mind
+- Agility
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Steel
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Hex
+- U-turn
+- Substitute

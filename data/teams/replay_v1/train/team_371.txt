@@ -1,0 +1,59 @@
+Gallade @ choiceband
+Ability: sharpness
+Tera Type: Steel
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Sacred Sword
+- Leaf Blade
+- Swords Dance
+- Psycho Cut
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Shadow Ball
+- Will-O-Wisp
+- U-turn
+- Draco Meteor
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Water
+EVs: 124 HP / 252 Def / 132 SpD
+Calm Nature
+- Future Sight
+- Psychic Noise
+- Draining Kiss
+- Mystical Fire
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Sludge Wave
+- U-turn
+- Stealth Rock
+- Earth Power
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Ice Fang
+- Reflect
+- Body Press
+- Close Combat

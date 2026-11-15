@@ -1,0 +1,59 @@
+Chesnaught @ heavydutyboots
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Synthesis
+- Spikes
+- Iron Defense
+- Body Press
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Knock Off
+- Moonlight
+- Moonblast
+- Stealth Rock
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Liquidation
+- Body Press
+- Rest
+- Avalanche
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Fairy
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Heal Bell
+- Seismic Toss
+- Calm Mind
+- Soft-Boiled
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Steel
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Knock Off
+- Toxic
+- Earthquake
+- Protect
+
+Cresselia @ covertcloak
+Ability: levitate
+Tera Type: Steel
+EVs: 248 HP / 200 Def / 60 SpD
+Relaxed Nature
+- Calm Mind
+- Stored Power
+- Moonlight
+- Moonblast

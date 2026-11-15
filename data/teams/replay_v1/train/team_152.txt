@@ -1,0 +1,59 @@
+Deoxys-Speed @ redcard
+Ability: pressure
+Tera Type: Psychic
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Stealth Rock
+- Light Screen
+- Taunt
+- Spikes
+
+Comfey @ grassyseed
+Ability: triage
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpA
+Modest Nature
+- Calm Mind
+- Stored Power
+- Synthesis
+- Draining Kiss
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Stone Edge
+- Dragon Dance
+- Roost
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Electric
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Destiny Bond
+- Swords Dance
+- Bitter Blade
+- Poltergeist
+
+Slowking-Galar @ leftovers
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Chilly Reception
+- Psychic Noise
+- Calm Mind
+- Slack Off

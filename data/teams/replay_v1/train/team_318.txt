@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Electric
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Recover
+- Protect
+- Salt Cure
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Poison
+EVs: 44 Def / 212 SpA / 252 Spe
+Timid Nature
+- Dark Pulse
+- Will-O-Wisp
+- Ice Beam
+- Trick
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Ice Spinner
+- Close Combat
+
+Hatterene @ rockyhelmet
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Psychic Noise
+- Healing Wish
+- Pain Split
+- Psyshock
+
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Heat Wave
+- Focus Blast
+- U-turn
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Dragon Dance
+- Extreme Speed
+- Earthquake
+- Dragon Tail

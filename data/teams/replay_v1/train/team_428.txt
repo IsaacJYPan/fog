@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Outrage
+- Dragon Dance
+- Encore
+- Earthquake
+
+Ting-Lu @ heavydutyboots
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Whirlwind
+- Earthquake
+- Ruination
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Nasty Plot
+- Make It Rain
+- Shadow Ball
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Flying
+EVs: 252 HP / 4 Def / 252 SpA
+Quiet Nature
+- Mystical Fire
+- Calm Mind
+- Draining Kiss
+- Stored Power
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Ice Fang
+- Crunch
+- Heavy Slam
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Power Whip
+- Swords Dance
+- Taunt
+- Ivy Cudgel

@@ -1,0 +1,59 @@
+Glimmora @ focussash
+Ability: toxicdebris
+Tera Type: Ground
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Energy Ball
+- Earth Power
+- Spikes
+- Stealth Rock
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 80 HP / 252 Atk / 176 Spe
+Adamant Nature
+- Destiny Bond
+- Swords Dance
+- Bitter Blade
+- Poltergeist
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Swords Dance
+- Kowtow Cleave
+- Iron Head
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Shadow Ball
+- Encore
+- Calm Mind
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 HP / 240 Atk / 16 Spe
+Adamant Nature
+- Roost
+- Earthquake
+- Dragon Dance
+- Extreme Speed
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Calm Mind
+- Thunderclap
+- Dragon Pulse
+- Thunderbolt

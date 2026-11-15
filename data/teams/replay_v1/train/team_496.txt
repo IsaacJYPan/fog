@@ -1,0 +1,59 @@
+Scizor @ sitrusberry
+Ability: technician
+Tera Type: Fire
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Knock Off
+- Dual Wingbeat
+- Bullet Punch
+- U-turn
+
+Meowscarada @ focussash
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flower Trick
+- Trick
+- U-turn
+- Knock Off
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Impish Nature
+- Recover
+- Protect
+- Salt Cure
+- Stealth Rock
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 252 HP / 176 Def / 56 SpD / 24 Spe
+Bold Nature
+- Roost
+- Will-O-Wisp
+- Flamethrower
+- Roar
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Headlong Rush
+- Ice Spinner
+- Rapid Spin
+- Earthquake
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Icicle Spear
+- Dragon Dance
+- Earth Power
+- Freeze-Dry

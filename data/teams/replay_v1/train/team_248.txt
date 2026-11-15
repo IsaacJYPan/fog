@@ -1,0 +1,59 @@
+Meowscarada @ heavydutyboots
+Ability: protean
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- Flower Trick
+- U-turn
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 140 HP / 252 Atk / 112 SpD / 4 Spe
+Adamant Nature
+- Earthquake
+- Taunt
+- Ruination
+- Spikes
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Nasty Plot
+- Recover
+- Substitute
+- Thunder Wave
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 HP / 128 Def / 68 SpD / 60 Spe
+Impish Nature
+- Outrage
+- Earthquake
+- Fire Punch
+- Dragon Tail
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- Heavy Slam
+- Body Press
+- Close Combat
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Ice
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Stealth Rock
+- Encore
+- Moonblast

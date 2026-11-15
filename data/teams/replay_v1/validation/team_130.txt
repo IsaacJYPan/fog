@@ -1,0 +1,59 @@
+Quaquaval @ leftovers
+Ability: moxie
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Bulk Up
+- Knock Off
+- Aqua Step
+- Encore
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Parting Shot
+- Toxic
+- Shadow Ball
+- Recover
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Headlong Rush
+- Knock Off
+- Ice Spinner
+
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Focus Blast
+- Volt Switch
+- Psyshock
+- Tachyon Cutter
+
+Lokix @ lifeorb
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Leech Life
+- First Impression
+- Sucker Punch
+- Knock Off
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Iron Head
+- Thief
+- Stealth Rock

@@ -1,0 +1,59 @@
+Excadrill @ airballoon
+Ability: sandrush
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Rock Slide
+- Rapid Spin
+- Earthquake
+- Swords Dance
+
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Dark
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Knock Off
+- Low Kick
+- Stealth Rock
+- Ice Beam
+
+Gholdengo @ custapberry
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Thunderbolt
+- Make It Rain
+- Nasty Plot
+
+Chesnaught @ salacberry
+Ability: bulletproof
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Spikes
+- Iron Defense
+- Knock Off
+- Synthesis
+
+Tornadus-Therian @ covertcloak
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- U-turn
+- Taunt
+- Bleakwind Storm
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Dark
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Encore
+- Calm Mind
+- Moonblast
+- Shadow Ball

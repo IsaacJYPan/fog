@@ -1,0 +1,59 @@
+Lokix @ choiceband
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- U-turn
+- First Impression
+- Knock Off
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Court Change
+- U-turn
+- Sucker Punch
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Earthquake
+- Rapid Spin
+- Bulk Up
+- Knock Off
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Dark
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Protect
+- Flip Turn
+- Wish
+- Mirror Coat
+
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Mystical Fire
+- Healing Wish
+- Earth Power
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Future Sight
+- Ice Beam
+- Chilly Reception

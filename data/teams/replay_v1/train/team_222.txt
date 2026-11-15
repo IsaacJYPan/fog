@@ -1,0 +1,59 @@
+Scyther @ choiceband
+Ability: technician
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Quick Attack
+- U-turn
+- Bug Bite
+- Dual Wingbeat
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Pyro Ball
+- High Jump Kick
+- U-turn
+
+Weezing-Galar @ shucaberry
+Ability: neutralizinggas
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Toxic Spikes
+- Will-O-Wisp
+- Toxic
+- Pain Split
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 248 HP / 124 Atk / 68 Def / 68 SpD
+Adamant Nature
+- Sleep Talk
+- Earthquake
+- Stealth Rock
+- Rest
+
+Jirachi @ heavydutyboots
+Ability: serenegrace
+Tera Type: Water
+EVs: 248 HP / 44 SpA / 216 Spe
+Timid Nature
+- U-turn
+- Iron Head
+- Body Slam
+- Psychic Noise
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- U-turn
+- Spikes
+- Swords Dance

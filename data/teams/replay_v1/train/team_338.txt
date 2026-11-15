@@ -1,0 +1,59 @@
+Kommo-o @ leftovers
+Ability: soundproof
+Tera Type: Poison
+EVs: 80 HP / 176 Atk / 252 Spe
+Jolly Nature
+- Drain Punch
+- Shadow Claw
+- Boomburst
+- Clangorous Soul
+
+Rillaboom @ choiceband
+Ability: grassysurge
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- Swords Dance
+- Grassy Glide
+- U-turn
+
+Hatterene @ grassyseed
+Ability: magicbounce
+Tera Type: Flying
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Calm Mind
+- Mystical Fire
+- Psyshock
+- Draining Kiss
+
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 Atk / 4 SpA / 252 Spe
+Hasty Nature
+- Focus Blast
+- Thunder Wave
+- Trick
+- Ice Beam
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Ivy Cudgel
+- Trailblaze
+- Encore
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Bulk Up
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner

@@ -1,0 +1,59 @@
+Pawmot @ leppaberry
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 176 Atk / 80 SpD / 252 Spe
+Jolly Nature
+- Revival Blessing
+- Sleep Talk
+- Rest
+- Focus Punch
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Low Kick
+- Sucker Punch
+- Iron Head
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Flip Turn
+- Protect
+- Chilling Water
+- Wish
+
+Toxapex @ ejectbutton
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Bold Nature
+- Baneful Bunker
+- Surf
+- Toxic
+- Infestation
+
+Corviknight @ covertcloak
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Light Screen
+- Roost
+- Iron Defense
+- U-turn
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Steel
+EVs: 212 HP / 252 Def / 44 Spe
+Bold Nature
+- Stealth Rock
+- Seismic Toss
+- Soft-Boiled
+- Shadow Ball

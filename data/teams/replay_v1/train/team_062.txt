@@ -1,0 +1,59 @@
+Iron Valiant @ choicespecs
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Thunderbolt
+- Psyshock
+- Aura Sphere
+- Close Combat
+
+Muk-Alola @ assaultvest
+Ability: poisontouch
+Tera Type: Poison
+EVs: 252 Atk / 252 SpD
+Careful Nature
+- Protect
+- Poison Fang
+- Poison Jab
+- Brick Break
+
+Hawlucha @ rockyhelmet
+Ability: moldbreaker
+Tera Type: Electric
+EVs: 128 HP / 252 Atk / 4 SpD / 124 Spe
+Adamant Nature
+- U-turn
+- Drain Punch
+- Roost
+- Defog
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Ghost
+EVs: 60 HP / 196 Def / 252 SpD
+Sassy Nature
+- Wish
+- Play Rough
+- Chilling Water
+- Flip Turn
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- Knock Off
+- Protect
+- Swords Dance
+
+Electrode-Hisui @ miracleseed
+Ability: aftermath
+Tera Type: Water
+EVs: 40 HP / 4 Def / 252 SpA / 212 Spe
+Timid Nature
+- Foul Play
+- Volt Switch
+- Leech Seed
+- Thunderbolt

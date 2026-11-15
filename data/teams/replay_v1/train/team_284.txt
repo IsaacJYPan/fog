@@ -1,0 +1,59 @@
+Iron Valiant @ heavydutyboots
+Ability: quarkdrive
+Tera Type: Dark
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Swords Dance
+- Knock Off
+- Moonblast
+- Encore
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Brave Bird
+- Defog
+- Roost
+- Iron Defense
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Substitute
+- Freeze-Dry
+- Ice Beam
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Earthquake
+- Protect
+- Stealth Rock
+- Toxic
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Dragon Darts
+- Dragon Dance
+- U-turn
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Headlong Rush
+- Knock Off
+- Taunt
+- Rapid Spin

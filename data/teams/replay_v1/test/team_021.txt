@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Trailblaze
+- Encore
+
+Cinderace @ choicescarf
+Ability: libero
+Tera Type: Normal
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Court Change
+- Pyro Ball
+- Will-O-Wisp
+- U-turn
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 248 HP / 76 Def / 184 Spe
+Bold Nature
+- Trick
+- Shadow Ball
+- Nasty Plot
+- Recover
+
+Polteageist @ whiteherb
+Ability: cursedbody
+Tera Type: Grass
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Giga Drain
+- Shadow Ball
+- Shell Smash
+- Strength Sap
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 104 Def / 144 SpD / 12 Spe
+Bold Nature
+- Roost
+- Roar
+- Will-O-Wisp
+- Flamethrower
+
+Quagsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 128 Def / 128 SpD
+Adamant Nature
+- Toxic
+- Encore
+- Recover
+- Earthquake

@@ -1,0 +1,59 @@
+Tornadus-Therian @ assaultvest
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Bleakwind Storm
+- U-turn
+- Knock Off
+- Heat Wave
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Dark
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Knock Off
+
+Kyurem @ choicescarf
+Ability: pressure
+Tera Type: Ice
+EVs: 52 HP / 204 SpA / 252 Spe
+Timid Nature
+- Draco Meteor
+- Dragon Dance
+- Blizzard
+- Protect
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Thunder Wave
+- Future Sight
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Close Combat
+- Crunch
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Earthquake
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock

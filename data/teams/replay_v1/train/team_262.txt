@@ -1,0 +1,59 @@
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Disable
+- Phantom Force
+- Hex
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Knock Off
+- Swords Dance
+- Close Combat
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Play Rough
+- Swords Dance
+- Taunt
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Electric
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Salt Cure
+- Stealth Rock
+- Protect
+- Recover
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Brave Bird
+- Roost
+- U-turn
+- Body Press
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 116 HP / 148 Def / 244 SpD
+Careful Nature
+- Recover
+- Toxic Spikes
+- Spikes
+- Earthquake

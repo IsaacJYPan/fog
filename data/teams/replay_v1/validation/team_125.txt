@@ -1,0 +1,59 @@
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Bullet Punch
+- Counter
+- Fury Cutter
+- Swords Dance
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Spikes
+- Ivy Cudgel
+- Play Rough
+- Swords Dance
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 132 Def / 128 SpD
+Calm Nature
+- Spikes
+- Stealth Rock
+- Earth Power
+- Power Gem
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Thunderbolt
+- Volt Switch
+- Thunderclap
+- Draco Meteor
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Destiny Bond
+- Close Combat
+- Trick
+- Knock Off
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Rest
+- Body Press
+- Iron Defense
+- Crunch

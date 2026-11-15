@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Roar
+- Stone Edge
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Toxic
+- Sludge Bomb
+- Trick
+- Chilly Reception
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Discharge
+- Hurricane
+- Volt Switch
+- Roost
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Flip Turn
+- Aqua Cutter
+- Encore
+- Ceaseless Edge
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Swords Dance
+- Iron Head
+- Kowtow Cleave
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Earth Power
+- Stone Edge
+- Earthquake
+- U-turn

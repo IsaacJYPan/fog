@@ -1,0 +1,59 @@
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- U-turn
+- Roost
+- Power Trip
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Low Kick
+- Court Change
+- Pyro Ball
+
+Whimsicott @ lifeorb
+Ability: chlorophyll
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Switcheroo
+- Moonblast
+- Solar Beam
+- Memento
+
+Walking Wake @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Draco Meteor
+- Knock Off
+- Flip Turn
+- Hydro Steam
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Stealth Rock
+- Headlong Rush
+- Knock Off
+
+Ninetales @ heatrock
+Ability: drought
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Healing Wish
+- Encore
+- Scorching Sands

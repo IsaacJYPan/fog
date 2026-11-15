@@ -1,0 +1,59 @@
+Bellibolt @ heavydutyboots
+Ability: electromorphosis
+Tera Type: Flying
+EVs: 252 HP / 252 Def / 4 SpA
+Bold Nature
+- Toxic
+- Soak
+- Volt Switch
+- Slack Off
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Scald
+- Wish
+- Flip Turn
+- Mirror Coat
+
+Darkrai @ blackglasses
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sludge Bomb
+- Dark Pulse
+- Focus Blast
+- Knock Off
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Thunder Wave
+- Gigaton Hammer
+- Encore
+- Stealth Rock
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Headlong Rush
+- Knock Off
+- Ice Spinner
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Fire Punch
+- Dragon Dance
+- Earthquake
+- Extreme Speed

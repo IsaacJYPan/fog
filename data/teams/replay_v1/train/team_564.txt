@@ -1,0 +1,59 @@
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Icicle Crash
+- Ice Shard
+- Knock Off
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Poison
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Moonblast
+- Psychic Noise
+- Whirlpool
+- Draining Kiss
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 104 Def / 144 SpD / 12 Spe
+Bold Nature
+- Roost
+- Hurricane
+- Scorching Sands
+- Will-O-Wisp
+
+Great Tusk @ choicescarf
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stone Edge
+- Rapid Spin
+- Stealth Rock
+- Ice Spinner
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Heavy Slam
+- Stealth Rock
+- Spikes
+- Earthquake
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Recover
+- Parting Shot
+- Foul Play

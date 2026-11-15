@@ -1,0 +1,59 @@
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Iron Defense
+- Crunch
+- Stone Edge
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Ice
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Flamethrower
+- Thunder Wave
+- Chilly Reception
+- Future Sight
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 104 Def / 144 SpD / 12 Spe
+Bold Nature
+- Flamethrower
+- Hurricane
+- U-turn
+- Roost
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Low Kick
+
+Hydrapple @ rockyhelmet
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Earth Power
+- Nasty Plot
+- Giga Drain
+- Fickle Beam
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Rapid Spin
+- Stealth Rock
+- Ice Spinner
+- Rock Tomb

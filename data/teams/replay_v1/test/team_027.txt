@@ -1,0 +1,59 @@
+Wo-Chien @ leftovers
+Ability: tabletsofruin
+Tera Type: Poison
+EVs: 252 HP / 156 Def / 100 Spe
+Bold Nature
+- Foul Play
+- Protect
+- Leech Seed
+- Stun Spore
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Knock Off
+- Moonblast
+- Alluring Voice
+- Calm Mind
+
+Gholdengo @ covertcloak
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Thunder Wave
+- Make It Rain
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 64 HP / 4 Def / 188 SpD / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+- Knock Off
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 108 Atk / 152 Spe
+Adamant Nature
+- Roost
+- Extreme Speed
+- Earthquake
+- Dragon Dance
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Protect
+- Recover
+- Salt Cure
+- Stealth Rock

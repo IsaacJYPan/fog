@@ -1,0 +1,59 @@
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Normal
+EVs: 248 HP / 140 Def / 120 Spe
+Bold Nature
+- Magma Storm
+- Earth Power
+- Protect
+- Stealth Rock
+
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- Grassy Glide
+- Wood Hammer
+- U-turn
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Play Rough
+- Ivy Cudgel
+- Substitute
+- Swords Dance
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Aurora Veil
+- Moonblast
+- Blizzard
+- Freeze-Dry
+
+Hatterene @ grassyseed
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Stored Power
+- Trick Room
+- Calm Mind
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Dazzling Gleam
+- Recover
+- Make It Rain

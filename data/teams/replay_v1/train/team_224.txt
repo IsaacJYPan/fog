@@ -1,0 +1,59 @@
+Sinistcha @ leftovers
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Shadow Ball
+- Strength Sap
+- Matcha Gotcha
+- Calm Mind
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- Ice Shard
+- Beat Up
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Rest
+- Ruination
+- Whirlwind
+- Stealth Rock
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Flying
+EVs: 40 HP / 64 Def / 200 SpA / 64 SpD / 140 Spe
+Modest Nature
+- Thunderbolt
+- Calm Mind
+- Thunderclap
+- Dragon Pulse
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Low Kick
+- Court Change
+- Pyro Ball

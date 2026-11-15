@@ -1,0 +1,59 @@
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Tickle
+- Mirror Coat
+- Wish
+- Flip Turn
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Toxic
+- Protect
+- Earthquake
+- U-turn
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 104 HP / 252 Def / 152 Spe
+Bold Nature
+- Strange Steam
+- Pain Split
+- Protect
+- Sludge Bomb
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Thunderbolt
+- Nasty Plot
+- Pain Split
+- Ice Beam
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Normal
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Stealth Rock
+- Flash Cannon
+- Magma Storm
+- Protect
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Dragon Pulse
+- Calm Mind
+- Thunderclap
+- Volt Switch

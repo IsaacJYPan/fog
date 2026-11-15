@@ -1,0 +1,59 @@
+Latios @ souldew
+Ability: levitate
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Calm Mind
+- Thunderbolt
+- Draco Meteor
+- Luster Purge
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Will-O-Wisp
+- Pyro Ball
+- Court Change
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dark
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- U-turn
+- Toxic
+- Knock Off
+- Protect
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Fairy
+EVs: 236 HP / 64 Def / 124 SpA / 84 Spe
+Modest Nature
+- Moonblast
+- Surf
+- Flip Turn
+- Psychic Noise
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Ice Beam
+- Dark Pulse
+- Nasty Plot
+- Sludge Bomb

@@ -1,0 +1,59 @@
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- Roost
+- Defog
+- U-turn
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Head Smash
+- Knock Off
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Poison
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Poison Jab
+- Liquidation
+- Stealth Rock
+- Toxic
+
+Weavile @ focussash
+Ability: pressure
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Beat Up
+- Swords Dance
+- Low Kick
+
+Dondozo @ rockyhelmet
+Ability: unaware
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Rest
+- Curse
+- Liquidation
+
+Typhlosion-Hisui @ choicescarf
+Ability: blaze
+Tera Type: Fire
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Eruption
+- Infernal Parade
+- Flamethrower

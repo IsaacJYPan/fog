@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Body Press
+- Crunch
+- Substitute
+- Iron Defense
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Calm Mind
+- Psychic Noise
+- Healing Wish
+- Stored Power
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Calm Mind
+- Thunderclap
+- Weather Ball
+- Dragon Pulse
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Facade
+- Toxic
+- Earthquake
+- Knock Off
+
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Fire
+EVs: 228 Def / 28 SpD / 252 Spe
+Timid Nature
+- Snowscape
+- Freeze-Dry
+- Aurora Veil
+- Roar
+
+Gholdengo @ leftovers
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Focus Blast
+- Shadow Ball
+- Make It Rain
+- Nasty Plot

@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Protect
+- Earthquake
+- Swords Dance
+- Facade
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Rest
+- Ruination
+- Earthquake
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Scald
+- Wish
+- Tickle
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Thunder Wave
+- Will-O-Wisp
+- Flamethrower
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Thunder Wave
+- Knock Off
+- Gigaton Hammer
+- Stealth Rock
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Close Combat
+- Roar

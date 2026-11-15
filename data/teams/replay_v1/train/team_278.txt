@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Impish Nature
+- Recover
+- Protect
+- Salt Cure
+- Stealth Rock
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Defog
+- Roost
+- Iron Defense
+- Brave Bird
+
+Deoxys-Defense @ leftovers
+Ability: pressure
+Tera Type: Steel
+EVs: 252 HP / 240 Def / 16 Spe
+Impish Nature
+- Stored Power
+- Spikes
+- Recover
+- Knock Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Facade
+- Earthquake
+- Protect
+- Swords Dance
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 20 HP / 252 Def / 236 Spe
+Impish Nature
+- Iron Defense
+- Body Press
+- Crunch
+- Heavy Slam
+
+Zarude @ heavydutyboots
+Ability: leafguard
+Tera Type: Poison
+EVs: 252 HP / 136 Atk / 120 Spe
+Jolly Nature
+- Trailblaze
+- Power Whip
+- Swords Dance
+- Knock Off

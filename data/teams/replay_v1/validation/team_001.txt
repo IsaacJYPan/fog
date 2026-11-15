@@ -1,0 +1,59 @@
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Flying
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Tickle
+- Wish
+- Flip Turn
+- Scald
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Poison
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Soft-Boiled
+- Seismic Toss
+- Calm Mind
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Counter
+- Recover
+- Chilling Water
+- Toxic
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- Defog
+- Roost
+- Iron Defense
+
+Avalugg @ heavydutyboots
+Ability: sturdy
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Rapid Spin
+- Body Press
+- Recover
+- Ice Spinner
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Whirlpool
+- Future Sight
+- Chilly Reception
+- Toxic

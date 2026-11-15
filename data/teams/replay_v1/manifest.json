@@ -1,0 +1,46 @@
+{
+  "before_caps": {
+    "test": 62,
+    "train": 796,
+    "validation": 141
+  },
+  "caps": {
+    "test": 150,
+    "train": 600,
+    "validation": 150
+  },
+  "deduplicated_sides": 440,
+  "filter_counts": {
+    "at_least_14_moves": 1839,
+    "below_rating": 34150,
+    "fewer_than_14_moves": 8010,
+    "games": 22000,
+    "incomplete_or_unknown_preview": 1,
+    "known_six_species": 9849,
+    "rated_sides": 9850,
+    "sides": 44000,
+    "unrenderable_completion": 2,
+    "validator_accepted": 1439,
+    "validator_rejected": 398
+  },
+  "format": "gen9ou",
+  "holdout_games": 2000,
+  "holdout_ids": "data/replay_splits/p2_holdout_2000_ids.txt",
+  "limits": "Unrevealed items, moves, abilities, Tera and all spreads are usage samples; teams may be less coherent than human-built teams.",
+  "minimum_revealed_moves": 14,
+  "rating_floor": 1700,
+  "raw": "data/metamon_gen9ou_r1500",
+  "seed": 0,
+  "split_manifest_sha256": {
+    "test": "eddd528afe9581d1f0b4a56a0b66041f2fd4ab19bcec8870be9a1e768d2a8eca",
+    "train": "35e839989802d031120cf0aff2f5b8b632cd5087ba3d02b902cdda7750fda925",
+    "validation": "fa8588caad7cc52a628da650b25ca2176865afe81ca680b0fe010f1744a8badd"
+  },
+  "split_sizes": {
+    "test": 62,
+    "train": 600,
+    "validation": 141
+  },
+  "unique_valid_compositions": 999,
+  "validation_fraction": 0.15
+}

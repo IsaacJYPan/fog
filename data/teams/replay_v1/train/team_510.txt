@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Steel Beam
+- Earthquake
+- Stealth Rock
+- Earth Power
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Bulk Up
+- Headlong Rush
+- Stone Edge
+- Ice Spinner
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Recover
+- Dazzling Gleam
+- Shadow Ball
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Thunderbolt
+- Calm Mind
+- Dragon Pulse
+- Volt Switch
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Swords Dance
+- Ivy Cudgel
+- Play Rough
+
+Ribombee @ lightclay
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psychic Noise
+- Moonblast
+- Stun Spore
+- Sticky Web

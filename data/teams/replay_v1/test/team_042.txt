@@ -1,0 +1,59 @@
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Flip Turn
+- Sucker Punch
+- Brick Break
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earthquake
+- Earth Power
+- U-turn
+- Stealth Rock
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Poison
+EVs: 60 Atk / 196 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- U-turn
+- Will-O-Wisp
+- Phantom Force
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Water
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Focus Blast
+- Volt Switch
+- Tachyon Cutter
+- Future Sight
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Recover
+- Shadow Ball
+- Parting Shot
+- Malignant Chain
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Poison
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Flip Turn
+- Psychic Noise
+- Surf
+- Moonblast

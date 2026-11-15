@@ -1,0 +1,59 @@
+Meowscarada @ heavydutyboots
+Ability: protean
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Flower Trick
+- Knock Off
+- Triple Axel
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dragon
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Protect
+- Toxic
+- Spikes
+- Earthquake
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Wish
+- Stealth Rock
+- Protect
+- Moonblast
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 72 SpA / 176 SpD
+Calm Nature
+- Toxic Spikes
+- Toxic
+- Chilly Reception
+- Future Sight
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 240 HP / 252 SpD / 16 Spe
+Careful Nature
+- Poison Sting
+- Amnesia
+- Recover
+- Bulldoze
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Waterfall
+- Sleep Talk
+- Body Press
+- Rest

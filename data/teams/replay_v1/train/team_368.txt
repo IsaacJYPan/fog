@@ -1,0 +1,59 @@
+Dragapult @ lifeorb
+Ability: cursedbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Phantom Force
+- Dragon Darts
+- U-turn
+- Will-O-Wisp
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 184 Atk / 52 Def / 24 Spe
+Adamant Nature
+- Roost
+- Dragon Dance
+- Earthquake
+- Outrage
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Stealth Rock
+- Spikes
+- Ruination
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Will-O-Wisp
+- Defog
+- Toxic Spikes
+- Pain Split
+
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Psyshock
+- Volt Switch
+- Tachyon Cutter
+- Focus Blast
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Hurricane
+- Heat Wave
+- Volt Switch
+- Roost

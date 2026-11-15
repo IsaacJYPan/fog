@@ -1,0 +1,59 @@
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Poison
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Sludge Bomb
+- Ice Beam
+- Nasty Plot
+- Dark Pulse
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Shadow Ball
+- Nasty Plot
+- Make It Rain
+- Thunderbolt
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earthquake
+- Rapid Spin
+- Stealth Rock
+- Knock Off
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Knock Off
+- Ivy Cudgel
+- Power Whip
+
+Dragonite @ lumberry
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Fire Punch
+- Extreme Speed
+- Dragon Dance
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Calm Mind
+- Moonblast
+- Vacuum Wave

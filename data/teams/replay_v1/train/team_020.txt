@@ -1,0 +1,59 @@
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Grass
+EVs: 140 HP / 128 SpA / 240 Spe
+Timid Nature
+- Glare
+- Leaf Storm
+- Knock Off
+- Leech Seed
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Seismic Toss
+- Stealth Rock
+- Calm Mind
+- Thunder
+
+Klefki @ rockyhelmet
+Ability: prankster
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Play Rough
+- Thunder Wave
+- Magnet Rise
+- Spikes
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Wish
+- Flip Turn
+- Scald
+- Protect
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Recover
+- Foul Play
+- Parting Shot
+- Hex
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 176 Def / 84 SpA
+Modest Nature
+- Sludge Bomb
+- Chilly Reception
+- Toxic
+- Future Sight

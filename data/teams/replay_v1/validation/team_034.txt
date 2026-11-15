@@ -1,0 +1,59 @@
+Grimmsnarl @ lightclay
+Ability: prankster
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Taunt
+- Spirit Break
+- Reflect
+- Light Screen
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Psycho Boost
+- Ice Beam
+- Superpower
+- Stealth Rock
+
+Moltres-Galar @ sitrusberry
+Ability: berserk
+Tera Type: Poison
+EVs: 12 HP / 12 Def / 252 SpA / 232 Spe
+Modest Nature
+- Nasty Plot
+- Fiery Wrath
+- Agility
+- Hurricane
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Play Rough
+- Knock Off
+- Ivy Cudgel
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Iron Defense
+- Rest
+- Body Press
+- Crunch
+
+Ceruledge @ airballoon
+Ability: weakarmor
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Shadow Sneak
+- Swords Dance
+- Close Combat
+- Poltergeist

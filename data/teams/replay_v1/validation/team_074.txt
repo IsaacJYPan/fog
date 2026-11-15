@@ -1,0 +1,59 @@
+Hoopa-Unbound @ choiceband
+Ability: magician
+Tera Type: Fairy
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Substitute
+- Trick Room
+- Drain Punch
+- Hyperspace Fury
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Facade
+- Swords Dance
+- Fire Punch
+- Earthquake
+
+Hatterene @ ejectbutton
+Ability: magicbounce
+Tera Type: Fire
+EVs: 252 HP / 100 SpA / 104 SpD / 52 Spe
+Modest Nature
+- Dazzling Gleam
+- Healing Wish
+- Trick Room
+- Psychic Noise
+
+Cresselia @ leftovers
+Ability: levitate
+Tera Type: Fairy
+EVs: 252 HP / 176 Def / 80 SpD
+Calm Nature
+- Lunar Dance
+- Moonblast
+- Calm Mind
+- Trick Room
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+
+Diancie @ powerherb
+Ability: clearbody
+Tera Type: Ground
+EVs: 248 HP / 4 Def / 252 SpA / 4 SpD
+Quiet Nature
+- Earth Power
+- Trick Room
+- Meteor Beam
+- Moonblast

@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Stealth Rock
+- Taunt
+- Protect
+- Spikes
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Sleep Talk
+- Waterfall
+- Body Press
+- Rest
+
+Amoonguss @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Seed Bomb
+- Synthesis
+- Foul Play
+- Grass Knot
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 212 HP / 252 Def / 44 Spe
+Bold Nature
+- Shadow Ball
+- Calm Mind
+- Seismic Toss
+- Soft-Boiled
+
+Clefable @ heavydutyboots
+Ability: magicguard
+Tera Type: Poison
+EVs: 240 HP / 112 Def / 152 SpA / 4 SpD
+Modest Nature
+- Encore
+- Knock Off
+- Moonlight
+- Trick
+
+Zapdos @ heavydutyboots
+Ability: pressure
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Thunder Wave
+- Substitute
+- Thunderbolt
+- Hurricane

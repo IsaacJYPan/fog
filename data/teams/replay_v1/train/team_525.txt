@@ -1,0 +1,59 @@
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Ice
+EVs: 4 HP / 252 SpD / 252 Spe
+Timid Nature
+- Aurora Veil
+- Blizzard
+- Moonblast
+- Freeze-Dry
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Rock Polish
+- Sludge Wave
+- Mortal Spin
+- Meteor Beam
+
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Grass
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- Swords Dance
+- Grassy Glide
+- Knock Off
+- High Horsepower
+
+Raging Bolt @ grassyseed
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Draco Meteor
+- Dragon Pulse
+- Calm Mind
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Low Kick
+- Sucker Punch
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 100 SpA / 104 SpD / 52 Spe
+Modest Nature
+- Calm Mind
+- Nuzzle
+- Psyshock
+- Draining Kiss

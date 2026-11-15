@@ -1,0 +1,59 @@
+Gholdengo @ quickclaw
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+- Dazzling Gleam
+
+Kingambit @ quickclaw
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Low Kick
+- Swords Dance
+
+Enamorus-Therian @ leftovers
+Ability: overcoat
+Tera Type: Poison
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Moonblast
+- Earth Power
+- Healing Wish
+- Calm Mind
+
+Garchomp @ quickclaw
+Ability: roughskin
+Tera Type: Ghost
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Swords Dance
+- Scale Shot
+- Spikes
+- Rest
+
+Primarina @ heavydutyboots
+Ability: torrent
+Tera Type: Poison
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Hydro Pump
+- Ice Beam
+- Calm Mind
+- Moonblast
+
+Mew @ weaknesspolicy
+Ability: synchronize
+Tera Type: Fairy
+EVs: 252 SpA / 252 Spe
+Timid Nature
+- Swords Dance
+- Psychic Fangs
+- Flare Blitz
+- Leech Life

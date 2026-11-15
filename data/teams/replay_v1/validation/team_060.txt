@@ -1,0 +1,59 @@
+Greninja @ lifeorb
+Ability: protean
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hydro Pump
+- Taunt
+- Ice Beam
+- Water Shuriken
+
+Tyranitar @ heavydutyboots
+Ability: sandstream
+Tera Type: Ghost
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Low Kick
+- Knock Off
+- Stone Edge
+- Ice Punch
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Wish
+- Moonblast
+- Moonlight
+- Thunder Wave
+
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Grassy Glide
+- U-turn
+- Swords Dance
+- Knock Off
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Stealth Rock
+- Protect
+- Magma Storm
+- Power Gem
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Roost
+- U-turn
+- Iron Defense
+- Brave Bird

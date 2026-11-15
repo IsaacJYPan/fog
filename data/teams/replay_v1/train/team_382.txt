@@ -1,0 +1,59 @@
+Dragapult @ choiceband
+Ability: clearbody
+Tera Type: Fairy
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Hex
+- Will-O-Wisp
+- Thunder Wave
+- Draco Meteor
+
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Power Gem
+- Earth Power
+- Stealth Rock
+- Meteor Beam
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance
+- Iron Head
+
+Serperior @ leftovers
+Ability: contrary
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Glare
+- Leaf Storm
+- Substitute
+- Leech Seed
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Crunch
+- Body Press
+- Stone Edge
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Psyshock
+- Focus Blast
+- Future Sight
+- Ice Beam

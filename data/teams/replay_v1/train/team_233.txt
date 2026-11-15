@@ -1,0 +1,59 @@
+Toxapex @ rockyhelmet
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Bold Nature
+- Haze
+- Infestation
+- Recover
+- Toxic
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Crunch
+- Close Combat
+- Body Press
+- Iron Defense
+
+Skarmory @ heavydutyboots
+Ability: sturdy
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Iron Defense
+- Roost
+- Spikes
+- Body Press
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Protect
+- Moonlight
+- Wish
+- Moonblast
+
+Cyclizar @ assaultvest
+Ability: regenerator
+Tera Type: Fire
+EVs: 104 HP / 152 SpD / 252 Spe
+Timid Nature
+- Overheat
+- Thunderbolt
+- U-turn
+- Draco Meteor
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Whirlwind
+- Spikes
+- Stealth Rock

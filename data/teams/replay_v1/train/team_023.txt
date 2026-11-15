@@ -1,0 +1,59 @@
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Protect
+- Wish
+- Flip Turn
+- Scald
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Sleep Talk
+- Rest
+- Curse
+- Liquidation
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Sludge Bomb
+- Pain Split
+- Defog
+- Will-O-Wisp
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Bulldoze
+- Earthquake
+- Amnesia
+- Recover
+
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Water
+EVs: 252 HP / 100 Def / 140 SpD / 16 Spe
+Careful Nature
+- Foul Play
+- Roost
+- Defog
+- Knock Off
+
+Chansey @ eviolite
+Ability: naturalcure
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Seismic Toss
+- Calm Mind
+- Stealth Rock
+- Soft-Boiled

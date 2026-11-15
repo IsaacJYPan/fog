@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Low Kick
+- Sucker Punch
+- U-turn
+- Court Change
+
+Ninetales @ heatrock
+Ability: drought
+Tera Type: Flying
+EVs: 248 HP / 20 Def / 240 Spe
+Timid Nature
+- Will-O-Wisp
+- Encore
+- Weather Ball
+- Healing Wish
+
+Walking Wake @ ejectpack
+Ability: protosynthesis
+Tera Type: Water
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Draco Meteor
+- Hydro Steam
+- Dragon Pulse
+- Knock Off
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Flying
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Calm Mind
+- Thunderclap
+- Thunderbolt
+- Dragon Pulse
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Close Combat
+- Ice Spinner
+- Rapid Spin
+
+Ceruledge @ leftovers
+Ability: weakarmor
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Bitter Blade
+- Close Combat
+- Swords Dance
+- Poltergeist

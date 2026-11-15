@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Synthesis
+- Swords Dance
+- Ivy Cudgel
+- Play Rough
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Stun Spore
+- Switcheroo
+- Sticky Web
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Hex
+- Focus Blast
+- Dazzling Gleam
+
+Enamorus @ lifeorb
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Healing Wish
+- Moonblast
+- Earth Power
+- Mystical Fire
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 216 Def / 8 SpA / 172 Spe
+Modest Nature
+- Thunderbolt
+- Dragon Pulse
+- Calm Mind
+- Substitute
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 108 Atk / 152 Spe
+Adamant Nature
+- Roost
+- Dragon Dance
+- Outrage
+- Ice Spinner

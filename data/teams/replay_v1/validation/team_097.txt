@@ -1,0 +1,59 @@
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Morning Sun
+- Fiery Dance
+- Substitute
+
+Umbreon @ leftovers
+Ability: synchronize
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Wish
+- Foul Play
+- Protect
+- Thunder Wave
+
+Garchomp @ leftovers
+Ability: roughskin
+Tera Type: Ground
+EVs: 120 HP / 252 Def / 136 Spe
+Impish Nature
+- Earthquake
+- Scale Shot
+- Spikes
+- Swords Dance
+
+Glimmora @ choicescarf
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Earth Power
+- Stealth Rock
+- Sludge Wave
+- Mortal Spin
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Nasty Plot
+- Recover
+- Make It Rain
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Tail
+- Ice Spinner
+- Dragon Dance
+- Earthquake

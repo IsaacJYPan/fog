@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Seismic Toss
+- Calm Mind
+- Heal Bell
+- Stealth Rock
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Sleep Talk
+- Protect
+- Waterfall
+- Rest
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Knock Off
+- Swords Dance
+- Earthquake
+- Protect
+
+Toxapex @ leftovers
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 136 Def / 124 SpD
+Impish Nature
+- Poison Jab
+- Infestation
+- Toxic Spikes
+- Baneful Bunker
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 176 Def / 80 Spe
+Bold Nature
+- Moonblast
+- Moonlight
+- Calm Mind
+- Knock Off
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Impish Nature
+- Earthquake
+- Stealth Rock
+- Amnesia
+- Spikes

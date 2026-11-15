@@ -1,0 +1,59 @@
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ground
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Wish
+- Flip Turn
+- Protect
+- Mirror Coat
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Waterfall
+- Rest
+- Curse
+- Sleep Talk
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Will-O-Wisp
+- Sludge Bomb
+- Strange Steam
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 252 HP / 192 Def / 64 Spe
+Timid Nature
+- Defog
+- U-turn
+- Will-O-Wisp
+- Roost
+
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Fairy
+EVs: 248 HP / 216 Def / 16 SpD / 28 Spe
+Bold Nature
+- Roost
+- Knock Off
+- Defog
+- Foul Play
+
+Chansey @ eviolite
+Ability: naturalcure
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Seismic Toss
+- Calm Mind
+- Soft-Boiled
+- Thunder Wave

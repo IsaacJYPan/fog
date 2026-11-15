@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Stealth Rock
+- Earth Power
+- Knock Off
+- Rapid Spin
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Poison
+EVs: 100 Atk / 156 SpA / 252 Spe
+Naive Nature
+- Dark Pulse
+- Focus Blast
+- Ice Beam
+- Sludge Bomb
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Heavy Slam
+- Body Press
+- Roar
+
+Enamorus @ lifeorb
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Substitute
+- Moonblast
+- Draining Kiss
+- Earth Power
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Recover
+- Curse
+- Salt Cure
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Hex
+- Fire Blast
+- Will-O-Wisp
+- Thunderbolt

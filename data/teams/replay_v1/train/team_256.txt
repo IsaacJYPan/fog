@@ -1,0 +1,59 @@
+Umbreon @ leftovers
+Ability: synchronize
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Calm Nature
+- Protect
+- Foul Play
+- Toxic
+- Wish
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 104 HP / 152 Atk / 252 Spe
+Adamant Nature
+- Low Kick
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Power Whip
+- Spikes
+- Play Rough
+- U-turn
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Ice
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Stealth Rock
+- Thunder Wave
+- Knock Off
+- Calm Mind
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Ice Spinner
+- Knock Off
+- Rapid Spin
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 244 Def / 16 Spe
+Bold Nature
+- Volt Switch
+- Thunder
+- Thunder Wave
+- Hurricane

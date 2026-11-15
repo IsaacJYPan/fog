@@ -1,0 +1,59 @@
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Moonblast
+- Surf
+- Substitute
+- Psychic Noise
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Iron Defense
+- Defog
+- Roost
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- U-turn
+- Ivy Cudgel
+- Rock Tomb
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Sleep Talk
+- Spikes
+- Earthquake
+- Rest
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- High Jump Kick
+- U-turn
+- Court Change
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 252 Atk / 252 Spe
+Jolly Nature
+- Shadow Ball
+- Parting Shot
+- Malignant Chain
+- Recover

@@ -1,0 +1,59 @@
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 248 HP / 4 SpA / 252 Spe
+Timid Nature
+- Psychic Noise
+- Psyshock
+- Tachyon Cutter
+- Expanding Force
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Rapid Spin
+- Earthquake
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Low Kick
+- Ice Shard
+- Knock Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Earthquake
+- Swords Dance
+- Facade
+- Protect
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Chilly Reception
+- Thunder Wave
+- Future Sight
+- Flamethrower
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Spikes
+- Swords Dance
+- Knock Off

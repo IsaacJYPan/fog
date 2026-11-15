@@ -1,0 +1,59 @@
+Volcanion @ choicespecs
+Ability: waterabsorb
+Tera Type: Ground
+EVs: 48 HP / 252 SpA / 208 Spe
+Modest Nature
+- Body Press
+- Taunt
+- Steam Eruption
+- Earth Power
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Thunderbolt
+- Vacuum Wave
+- Moonblast
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 248 HP / 116 Def / 144 Spe
+Impish Nature
+- Earthquake
+- Stone Edge
+- U-turn
+- Stealth Rock
+
+Rillaboom @ heavydutyboots
+Ability: grassysurge
+Tera Type: Fire
+EVs: 204 HP / 252 Atk / 52 Spe
+Adamant Nature
+- U-turn
+- Grassy Glide
+- Knock Off
+- Low Kick
+
+Dragapult @ focussash
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Will-O-Wisp
+- Hex
+- Draco Meteor
+- Shadow Ball
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance

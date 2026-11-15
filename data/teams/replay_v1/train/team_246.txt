@@ -1,0 +1,59 @@
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Triple Axel
+- Swords Dance
+- Ice Shard
+- Knock Off
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Hex
+- Draco Meteor
+- U-turn
+- Will-O-Wisp
+
+Volcanion @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpA
+Quiet Nature
+- Flamethrower
+- Earth Power
+- Fire Spin
+- Taunt
+
+Clefable @ rockyhelmet
+Ability: unaware
+Tera Type: Electric
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Moonblast
+- Moonlight
+- Knock Off
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Fairy
+EVs: 200 HP / 72 SpA / 236 Spe
+Timid Nature
+- Stealth Rock
+- U-turn
+- Taunt
+- Earth Power
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Psyshock
+- Chilly Reception
+- Toxic
+- Sludge Bomb

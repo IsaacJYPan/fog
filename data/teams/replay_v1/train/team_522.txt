@@ -1,0 +1,59 @@
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Psychic
+- Sticky Web
+- Stun Spore
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Body Press
+- Iron Defense
+- Roar
+- Crunch
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Power Whip
+- Protect
+- Encore
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 120 HP / 192 SpA / 196 Spe
+Modest Nature
+- Make It Rain
+- Nasty Plot
+- Trick
+- Shadow Ball
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Dragon Pulse
+- Thunderclap
+- Calm Mind
+- Draco Meteor

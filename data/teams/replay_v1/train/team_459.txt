@@ -1,0 +1,59 @@
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Skill Swap
+- Psychic Noise
+- Stun Spore
+- Moonblast
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Hex
+- Make It Rain
+- Shadow Ball
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Calm Mind
+- Dragon Pulse
+- Thunderclap
+- Thunderbolt
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Moonblast
+- Aura Sphere
+- Knock Off
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Light Screen
+- Body Press
+- Close Combat
+- Moonblast
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Mystical Fire
+- Moonblast
+- Earth Power
+- Healing Wish

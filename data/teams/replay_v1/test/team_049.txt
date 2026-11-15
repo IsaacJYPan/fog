@@ -1,0 +1,59 @@
+Weavile @ lifeorb
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Icicle Crash
+- Swords Dance
+- Triple Axel
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Flamethrower
+- Roost
+- Will-O-Wisp
+
+Hoopa-Unbound @ lifeorb
+Ability: magician
+Tera Type: Fairy
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Focus Blast
+- Knock Off
+- Psychic
+- Drain Punch
+
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Moonblast
+- Earth Power
+- Healing Wish
+- Mystical Fire
+
+Iron Treads @ heavydutyboots
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Rapid Spin
+- Earthquake
+- Stealth Rock
+- High Horsepower
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 20 HP / 252 Def / 236 Spe
+Impish Nature
+- Body Press
+- Stone Edge
+- Roar
+- Iron Defense

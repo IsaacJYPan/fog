@@ -1,0 +1,59 @@
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Body Press
+- Iron Defense
+- Defog
+- Roost
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Soft-Boiled
+- Calm Mind
+- Stealth Rock
+- Seismic Toss
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Sleep Talk
+- Waterfall
+- Avalanche
+
+Toxapex @ leftovers
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Recover
+- Haze
+- Toxic Spikes
+- Toxic
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Protect
+- Swords Dance
+- Knock Off
+- Earthquake
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 104 HP / 252 Def / 152 Spe
+Bold Nature
+- Strange Steam
+- Defog
+- Pain Split
+- Will-O-Wisp

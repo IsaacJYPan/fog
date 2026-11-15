@@ -1,0 +1,59 @@
+Armarouge @ powerherb
+Ability: weakarmor
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Armor Cannon
+- Meteor Beam
+- Trick Room
+- Psyshock
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Ivy Cudgel
+- Power Whip
+- Encore
+- U-turn
+
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Meteor Beam
+- Mortal Spin
+- Earth Power
+- Stealth Rock
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Earthquake
+- Stone Edge
+- Stealth Rock
+- U-turn
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Ghost
+EVs: 132 HP / 252 Atk / 124 Spe
+Adamant Nature
+- U-turn
+- Draco Meteor
+- Shadow Ball
+- Double-Edge

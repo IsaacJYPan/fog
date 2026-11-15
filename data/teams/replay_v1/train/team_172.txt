@@ -1,0 +1,59 @@
+Rotom-Heat @ heavydutyboots
+Ability: levitate
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Nasty Plot
+- Pain Split
+- Will-O-Wisp
+- Thunderbolt
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Normal
+EVs: 196 HP / 204 Atk / 108 Spe
+Adamant Nature
+- Dragon Claw
+- Earthquake
+- Dragon Dance
+- Extreme Speed
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Thunder Wave
+- Recover
+- Make It Rain
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 40 HP / 64 Def / 200 SpA / 64 SpD / 140 Spe
+Modest Nature
+- Dragon Pulse
+- Thunderclap
+- Thunderbolt
+- Volt Switch
+
+Mamoswine @ choiceband
+Ability: thickfat
+Tera Type: Poison
+EVs: 252 Atk / 220 Def / 36 Spe
+Adamant Nature
+- Stealth Rock
+- Ice Shard
+- Icicle Crash
+- Earthquake
+
+Chesnaught @ rockyhelmet
+Ability: bulletproof
+Tera Type: Fire
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Synthesis
+- Body Press
+- Spikes
+- Knock Off

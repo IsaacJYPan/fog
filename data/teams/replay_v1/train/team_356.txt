@@ -1,0 +1,59 @@
+Diancie @ powerherb
+Ability: clearbody
+Tera Type: Ground
+EVs: 248 HP / 4 Def / 252 SpA / 4 SpD
+Quiet Nature
+- Meteor Beam
+- Trick Room
+- Moonblast
+- Earth Power
+
+Necrozma @ powerherb
+Ability: prismarmor
+Tera Type: Fairy
+EVs: 252 Atk / 252 Spe
+Adamant Nature
+- Heat Wave
+- Brick Break
+- Dragon Dance
+- Photon Geyser
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Thunder Punch
+- Drain Punch
+- Earthquake
+- Swords Dance
+
+Gyarados @ lifeorb
+Ability: moxie
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Stone Edge
+- Dragon Dance
+- Waterfall
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Iron Head
+- Scale Shot
+- Icicle Spear
+- Dragon Dance
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Extreme Speed
+- Dragon Dance
+- Outrage
+- Ice Spinner

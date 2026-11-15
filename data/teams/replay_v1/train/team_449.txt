@@ -1,0 +1,59 @@
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Ghost
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Razor Shell
+- Ceaseless Edge
+- Knock Off
+- Sucker Punch
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Extreme Speed
+- Earthquake
+- Dragon Dance
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Low Kick
+- Sucker Punch
+- Stealth Rock
+- Iron Head
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Toxic
+- Fiery Dance
+- Dazzling Gleam
+- Sludge Wave
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Trick
+- Moonblast
+- Close Combat
+- Vacuum Wave
+
+Moltres-Galar @ sitrusberry
+Ability: berserk
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Hurricane
+- Fiery Wrath
+- Agility
+- Nasty Plot

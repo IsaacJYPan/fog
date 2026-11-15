@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Stone Edge
+- Earthquake
+- U-turn
+- Taunt
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Body Press
+- Stone Edge
+- Iron Defense
+- Rest
+
+Hatterene @ focussash
+Ability: magicbounce
+Tera Type: Normal
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Nuzzle
+- Swords Dance
+- Mystical Fire
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Protect
+- Icicle Spear
+- Scale Shot
+- Substitute
+
+Samurott-Hisui @ lifeorb
+Ability: sharpness
+Tera Type: Ghost
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Knock Off
+- Swords Dance
+- Ceaseless Edge
+- Razor Shell
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 244 HP / 12 SpA / 252 Spe
+Timid Nature
+- Recover
+- Nasty Plot
+- Dazzling Gleam
+- Shadow Ball

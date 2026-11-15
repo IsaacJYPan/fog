@@ -1,0 +1,59 @@
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Shard
+- Icicle Crash
+- Knock Off
+- Triple Axel
+
+Rotom-Wash @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Pain Split
+- Hydro Pump
+- Will-O-Wisp
+- Volt Switch
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Ruination
+- Whirlwind
+- Stealth Rock
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Court Change
+- Pyro Ball
+- Will-O-Wisp
+- U-turn
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ice
+EVs: 136 HP / 252 Def / 120 Spe
+Bold Nature
+- U-turn
+- Iron Defense
+- Brave Bird
+- Roost
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Matcha Gotcha
+- Hex
+- Shadow Ball
+- Strength Sap

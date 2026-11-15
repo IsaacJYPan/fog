@@ -1,0 +1,59 @@
+Reuniclus @ lifeorb
+Ability: magicguard
+Tera Type: Ice
+EVs: 252 HP / 252 SpD
+Sassy Nature
+- Focus Blast
+- Shadow Ball
+- Expanding Force
+- Trick Room
+
+Kingambit @ lumberry
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Substitute
+- Play Rough
+- Horn Leech
+- Ivy Cudgel
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 248 HP / 124 Def / 8 SpD / 128 Spe
+Bold Nature
+- Earthquake
+- Taunt
+- Stealth Rock
+- U-turn
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Encore
+- Taunt
+- Knock Off
+- Moonblast
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Sucker Punch
+- Pyro Ball
+- Will-O-Wisp

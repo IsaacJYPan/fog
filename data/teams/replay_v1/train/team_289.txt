@@ -1,0 +1,59 @@
+Hoopa-Unbound @ assaultvest
+Ability: magician
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Knock Off
+- Psychic Noise
+- Thunderbolt
+- Drain Punch
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- U-turn
+- Brave Bird
+- Defog
+- Iron Defense
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Hex
+- U-turn
+- Shadow Ball
+- Draco Meteor
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Ice Beam
+- Future Sight
+- Chilly Reception
+- Psychic Noise
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- Fling
+- Stone Edge
+- Taunt
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Ice Fang
+- Crunch
+- Iron Defense
+- Body Press

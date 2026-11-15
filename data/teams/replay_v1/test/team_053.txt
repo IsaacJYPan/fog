@@ -1,0 +1,59 @@
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Stun Spore
+- Skill Swap
+- Moonblast
+- Sticky Web
+
+Lokix @ choiceband
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Agility
+- Leech Life
+- Swords Dance
+- Knock Off
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Headlong Rush
+- Supercell Slam
+- Rapid Spin
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Thunderbolt
+- Draco Meteor
+- Thunderclap
+- Calm Mind
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Nasty Plot
+- Shadow Ball
+- Make It Rain
+- Psyshock
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Sludge Wave
+- Fiery Dance
+- Discharge
+- Energy Ball

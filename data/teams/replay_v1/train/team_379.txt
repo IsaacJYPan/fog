@@ -1,0 +1,59 @@
+Necrozma @ leftovers
+Ability: prismarmor
+Tera Type: Ground
+EVs: 248 HP / 252 Atk / 8 SpA
+Brave Nature
+- Moonlight
+- Heat Wave
+- Brick Break
+- Photon Geyser
+
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Psychic Noise
+- Skill Swap
+- Sticky Web
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Make It Rain
+- Focus Blast
+- Nasty Plot
+
+Walking Wake @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Dragon Pulse
+- Surf
+- Draco Meteor
+- Hydro Steam
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Earthquake
+- Headlong Rush
+- Bulk Up
+- Ice Spinner
+
+Dragapult @ focussash
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Dragon Darts
+- Sucker Punch
+- Hex
+- Substitute

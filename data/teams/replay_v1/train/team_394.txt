@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Stealth Rock
+- Taunt
+- Stone Edge
+- U-turn
+
+Scizor @ lifeorb
+Ability: technician
+Tera Type: Steel
+EVs: 148 HP / 252 Atk / 8 Def / 96 Spe
+Adamant Nature
+- Close Combat
+- Dual Wingbeat
+- U-turn
+- Swords Dance
+
+Primarina @ custapberry
+Ability: torrent
+Tera Type: Poison
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Psychic Noise
+- Flip Turn
+- Moonblast
+- Ice Beam
+
+Kingambit @ heavydutyboots
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Kowtow Cleave
+- Low Kick
+- Swords Dance
+- Sucker Punch
+
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Shadow Ball
+- U-turn
+- Thunder Wave
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Headlong Rush
+- Bulk Up

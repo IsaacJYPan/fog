@@ -1,0 +1,59 @@
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Knock Off
+- Swords Dance
+- Icicle Spear
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 84 Atk / 124 SpD / 52 Spe
+Adamant Nature
+- Surf
+- Ceaseless Edge
+- Aqua Jet
+- Knock Off
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Shadow Ball
+- Nasty Plot
+- Thunderbolt
+- Make It Rain
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+- Stealth Rock
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Malignant Chain
+- Parting Shot
+- Mean Look
+- Recover
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Low Kick
+- Sucker Punch

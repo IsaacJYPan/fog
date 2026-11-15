@@ -1,0 +1,59 @@
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sticky Web
+- Reflect
+- Light Screen
+- Stun Spore
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Hex
+- Nasty Plot
+- Make It Rain
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Dark Pulse
+- Substitute
+- Thunder Wave
+
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Mortal Spin
+- Stealth Rock
+- Meteor Beam
+- Power Gem
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Future Sight
+- Focus Blast
+- Psychic Noise
+- Calm Mind
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Calm Mind
+- Healing Wish
+- Moonblast
+- Substitute

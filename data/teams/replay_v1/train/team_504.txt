@@ -1,0 +1,59 @@
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Stealth Rock
+- Bulk Up
+- Temper Flare
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Sludge Bomb
+- Psychic Noise
+- Chilly Reception
+- Future Sight
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- U-turn
+- Toxic
+- Protect
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Shadow Ball
+- Nasty Plot
+- Recover
+
+Samurott-Hisui @ choiceband
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Knock Off
+- Aqua Cutter
+- Razor Shell
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Crunch
+- Roar

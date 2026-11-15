@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Encore
+- Power Whip
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Stone Edge
+- Light Screen
+- Body Press
+- Rest
+
+Hatterene @ ejectbutton
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Draining Kiss
+- Nuzzle
+- Pain Split
+- Future Sight
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Earth Power
+- Stealth Rock
+- Taunt
+- U-turn
+
+Gholdengo @ colburberry
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Dazzling Gleam
+- Nasty Plot
+- Recover
+- Shadow Ball

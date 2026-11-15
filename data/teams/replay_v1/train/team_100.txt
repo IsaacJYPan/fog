@@ -1,0 +1,59 @@
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Chilly Reception
+- Trick
+- Sludge Bomb
+- Flamethrower
+
+Azumarill @ sitrusberry
+Ability: hugepower
+Tera Type: Water
+EVs: 252 Atk / 248 SpD / 8 Spe
+Adamant Nature
+- Liquidation
+- Aqua Jet
+- Play Rough
+- Belly Drum
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Earth Power
+- Ice Beam
+- Blizzard
+- Freeze-Dry
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- U-turn
+- Pyro Ball
+- Court Change
+- Gunk Shot
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 172 HP / 228 Atk / 108 Spe
+Adamant Nature
+- Substitute
+- Toxic
+- Earthquake
+- Protect
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Encore
+- Swords Dance
+- Spirit Break

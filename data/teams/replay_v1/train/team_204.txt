@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Taunt
+- U-turn
+
+Enamorus @ leftovers
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Earth Power
+- Moonblast
+- Substitute
+- Mystical Fire
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Recover
+- Curse
+- Salt Cure
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- Gunk Shot
+- U-turn
+
+Raging Bolt @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Weather Ball
+- Volt Switch
+- Draco Meteor
+- Dragon Pulse
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 40 HP / 216 Def / 252 SpD
+Relaxed Nature
+- Stealth Rock
+- Ruination
+- Whirlwind
+- Earthquake

@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Knock Off
+- Moonblast
+- Fire Blast
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Fighting
+EVs: 252 HP / 160 Def / 96 Spe
+Impish Nature
+- Body Press
+- Whirlwind
+- Roost
+- Spikes
+
+Ting-Lu @ weaknesspolicy
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Earthquake
+- Rest
+- Stealth Rock
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Swords Dance
+- Knock Off
+- Facade
+- Protect
+
+Amoonguss @ heavydutyboots
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Foul Play
+- Sludge Bomb
+- Clear Smog
+- Giga Drain
+
+Zamazenta @ chestoberry
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 128 Atk / 128 Def / 252 Spe
+Jolly Nature
+- Light Screen
+- Close Combat
+- Stone Edge
+- Roar

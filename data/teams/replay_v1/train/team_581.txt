@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Fairy
+EVs: 248 HP / 116 Def / 144 Spe
+Impish Nature
+- Stealth Rock
+- U-turn
+- Earthquake
+- Stone Edge
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Electric
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Close Combat
+- Stone Edge
+- Body Press
+- Roar
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+- Low Kick
+
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Water
+EVs: 200 HP / 252 Atk / 56 Spe
+Adamant Nature
+- Flip Turn
+- Razor Shell
+- Ceaseless Edge
+- Knock Off
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Parting Shot
+- Shadow Ball
+- Recover
+- Malignant Chain
+
+Hydreigon @ leftovers
+Ability: levitate
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Flash Cannon
+- Draco Meteor
+- Nasty Plot
+- Substitute

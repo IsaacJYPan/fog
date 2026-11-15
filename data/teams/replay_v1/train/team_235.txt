@@ -1,0 +1,59 @@
+Zapdos-Galar @ choicescarf
+Ability: defiant
+Tera Type: Flying
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- U-turn
+- Drill Peck
+- Thunderous Kick
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Will-O-Wisp
+- Ice Beam
+- Focus Blast
+- Dark Pulse
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 176 Def / 80 SpD
+Modest Nature
+- Stealth Rock
+- Moonblast
+- Cosmic Power
+- Moonlight
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Earthquake
+- Toxic
+- Spikes
+- Protect
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Draco Meteor
+- Dragon Darts
+- Hex
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Ground
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Iron Head
+- Low Kick
+- Sucker Punch
+- Swords Dance

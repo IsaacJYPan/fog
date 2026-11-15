@@ -1,0 +1,59 @@
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Focus Blast
+- Shadow Ball
+- Make It Rain
+- Recover
+
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Bug
+EVs: 120 HP / 152 Atk / 60 SpD / 176 Spe
+Adamant Nature
+- Flip Turn
+- Sucker Punch
+- Sacred Sword
+- Ceaseless Edge
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Kowtow Cleave
+- Sucker Punch
+- Swords Dance
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Discharge
+- Thunder Wave
+- Volt Switch
+- Hurricane
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Future Sight
+- Psychic Noise
+- Chilly Reception
+- Ice Beam

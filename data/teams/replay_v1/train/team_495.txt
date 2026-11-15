@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Salt Cure
+- Body Press
+- Recover
+- Iron Defense
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Encore
+- Power Whip
+- Synthesis
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Sludge Bomb
+- Psychic Noise
+- Flamethrower
+- Ice Beam
+
+Great Tusk @ choiceband
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Taunt
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 104 HP / 152 Atk / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Swords Dance
+- Low Kick
+- Iron Head
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Electric
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Thunder Wave
+- Roost
+- Hurricane

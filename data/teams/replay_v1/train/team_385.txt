@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Blizzard
+- Earth Power
+- Ice Beam
+- Freeze-Dry
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Toxic
+- Psychic Noise
+- Chilly Reception
+- Slack Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 12 Def / 252 SpD
+Careful Nature
+- Toxic
+- Protect
+- Earthquake
+- Knock Off
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Roost
+- Stealth Rock
+- Spikes
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Light Screen
+- Hex
+- Dragon Darts
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Kowtow Cleave
+- Iron Head
+- Swords Dance
+- Sucker Punch

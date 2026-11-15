@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Encore
+- Horn Leech
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 128 Atk / 128 Def / 252 Spe
+Jolly Nature
+- Iron Defense
+- Body Press
+- Crunch
+- Close Combat
+
+Pecharunt @ leftovers
+Ability: poisonpuppeteer
+Tera Type: Fairy
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Toxic
+- Shadow Ball
+- Parting Shot
+- Recover
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Dragon Pulse
+- Volt Switch
+- Calm Mind
+- Thunderclap
+
+Scizor @ metalcoat
+Ability: technician
+Tera Type: Flying
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Knock Off
+- Swords Dance
+- U-turn
+- Bullet Punch
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Earthquake
+- Stealth Rock

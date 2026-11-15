@@ -1,0 +1,59 @@
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ground
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Substitute
+- Ice Beam
+- Freeze-Dry
+- Earth Power
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Dark
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Bomb
+- Chilly Reception
+- Toxic
+- Future Sight
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+
+Hydrapple @ rockyhelmet
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Nasty Plot
+- Giga Drain
+- Fickle Beam
+- Earth Power
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Water
+EVs: 44 HP / 128 Atk / 84 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Stealth Rock
+- Close Combat
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- Court Change
+- U-turn
+- Pyro Ball

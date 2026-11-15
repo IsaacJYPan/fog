@@ -1,0 +1,59 @@
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Normal
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Body Slam
+- Play Rough
+- Wish
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Knock Off
+- Swords Dance
+- Protect
+- Earthquake
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Sucker Punch
+- Swords Dance
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Recover
+- Salt Cure
+- Stealth Rock
+- Protect
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 132 HP / 252 Atk / 124 Spe
+Adamant Nature
+- U-turn
+- Will-O-Wisp
+- Hex
+- Draco Meteor
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Strange Steam
+- Sludge Bomb
+- Toxic

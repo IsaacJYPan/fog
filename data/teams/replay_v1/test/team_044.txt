@@ -1,0 +1,59 @@
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Body Press
+- Heavy Slam
+- Close Combat
+- Crunch
+
+Walking Wake @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Surf
+- Flip Turn
+- Hydro Steam
+- Knock Off
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 108 Def / 152 Spe
+Bold Nature
+- Shadow Ball
+- Recover
+- Malignant Chain
+- Nasty Plot
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Recover
+- Make It Rain
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Roost
+- Extreme Speed
+- Earthquake
+- Dragon Tail
+
+Ting-Lu @ rockyhelmet
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Spikes
+- Stealth Rock
+- Ruination
+- Whirlwind

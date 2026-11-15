@@ -1,0 +1,59 @@
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Wave Crash
+- Body Press
+- Waterfall
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Seismic Toss
+- Calm Mind
+- Light Screen
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roar
+- U-turn
+- Roost
+- Flamethrower
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Protect
+- Spikes
+- Toxic
+- Knock Off
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Knock Off
+- Ice Beam
+- Dark Pulse
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush

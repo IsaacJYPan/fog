@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Recover
+- Salt Cure
+- Curse
+- Stealth Rock
+
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Grass
+EVs: 248 HP / 252 Atk / 8 Def
+Adamant Nature
+- Wood Hammer
+- Knock Off
+- Swords Dance
+- Grassy Glide
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Ice Spinner
+- Bulk Up
+- Headlong Rush
+- Rapid Spin
+
+Hawlucha @ grassyseed
+Ability: unburden
+Tera Type: Flying
+EVs: 72 HP / 252 Atk / 60 SpD / 124 Spe
+Adamant Nature
+- Close Combat
+- Acrobatics
+- Defog
+- Swords Dance
+
+Gholdengo @ grassyseed
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Nasty Plot
+- Dazzling Gleam
+- Make It Rain
+- Shadow Ball
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Play Rough
+- Swords Dance
+- Trailblaze

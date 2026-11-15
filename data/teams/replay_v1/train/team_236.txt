@@ -1,0 +1,59 @@
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 248 HP / 104 SpD / 156 Spe
+Jolly Nature
+- Heavy Slam
+- Stone Edge
+- Iron Defense
+- Close Combat
+
+Clefable @ rockyhelmet
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 80 Def / 176 Spe
+Bold Nature
+- Moonblast
+- Stealth Rock
+- Thunder Wave
+- Moonlight
+
+Darkrai @ leftovers
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Will-O-Wisp
+- Ice Beam
+- Knock Off
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Toxic
+- Protect
+- Swords Dance
+- Earthquake
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 248 HP / 16 Atk / 228 Def / 16 Spe
+Adamant Nature
+- Encore
+- Dragon Dance
+- Dragon Tail
+- Earthquake
+
+Slowking-Galar @ shucaberry
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 184 Def / 28 SpA / 48 Spe
+Bold Nature
+- Chilly Reception
+- Psychic Noise
+- Toxic Spikes
+- Flamethrower

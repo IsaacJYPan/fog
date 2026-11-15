@@ -1,0 +1,59 @@
+Quaquaval @ mysticwater
+Ability: moxie
+Tera Type: Water
+EVs: 80 HP / 252 Atk / 176 Spe
+Adamant Nature
+- Rapid Spin
+- Aqua Step
+- Close Combat
+- Brave Bird
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 248 HP / 124 Atk / 68 Def / 68 SpD
+Adamant Nature
+- Stealth Rock
+- Earthquake
+- Whirlwind
+- Spikes
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Shadow Ball
+- Calm Mind
+- Matcha Gotcha
+- Strength Sap
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Knock Off
+- Calm Mind
+- Shadow Ball
+- Trick
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dark
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Fire Blast
+- U-turn
+- Brave Bird
+- Roost
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Recover
+- Earthquake
+- Protect
+- Salt Cure

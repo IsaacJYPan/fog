@@ -1,0 +1,59 @@
+Hoopa-Unbound @ choiceband
+Ability: magician
+Tera Type: Dark
+EVs: 224 HP / 12 Atk / 76 Def / 76 SpA / 24 SpD / 96 Spe
+Mild Nature
+- Gunk Shot
+- Drain Punch
+- Zen Headbutt
+- Knock Off
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Hurricane
+- Volt Switch
+- U-turn
+- Roost
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Future Sight
+- Psychic Noise
+- Flamethrower
+- Sludge Bomb
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 148 HP / 252 Atk / 108 Spe
+Adamant Nature
+- Gunk Shot
+- Pyro Ball
+- U-turn
+- Court Change
+
+Dragapult @ choiceband
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 132 HP / 252 Atk / 124 Spe
+Adamant Nature
+- Will-O-Wisp
+- U-turn
+- Draco Meteor
+- Hex
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Whirlwind
+- Ruination
+- Earthquake

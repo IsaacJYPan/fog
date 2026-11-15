@@ -1,0 +1,59 @@
+Deoxys-Speed @ lightclay
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 232 Def / 28 Spe
+Timid Nature
+- Reflect
+- Nasty Plot
+- Stealth Rock
+- Ice Beam
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- U-turn
+- Smack Down
+- Earthquake
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Pyro Ball
+- High Jump Kick
+- Taunt
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Stealth Rock
+- Magma Storm
+- Taunt
+- Earth Power
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Rapid Spin
+- Close Combat
+- Ice Spinner
+
+Armarouge @ weaknesspolicy
+Ability: weakarmor
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Armor Cannon
+- Stored Power
+- Disable
+- Endure

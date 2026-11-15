@@ -1,0 +1,59 @@
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Substitute
+- U-turn
+- Hex
+- Draco Meteor
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Horn Leech
+- Swords Dance
+- Ivy Cudgel
+
+Weavile @ heavydutyboots
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Swords Dance
+- Triple Axel
+- Ice Shard
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Payback
+- Earthquake
+- Stone Edge
+- Stealth Rock
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Spikes
+- Iron Defense
+- Body Press
+- Roost
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 4 Def / 212 SpD / 40 Spe
+Calm Nature
+- Stealth Rock
+- Taunt
+- Overheat
+- Magma Storm

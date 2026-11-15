@@ -1,0 +1,59 @@
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 16 Def / 52 SpD / 188 Spe
+Adamant Nature
+- Rapid Spin
+- Close Combat
+- Bulk Up
+- Earthquake
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Flip Turn
+- Knock Off
+- Ceaseless Edge
+
+Okidogi @ leftovers
+Ability: guarddog
+Tera Type: Dark
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Ice Punch
+- Bulk Up
+- Drain Punch
+- Knock Off
+
+Ogerpon @ heavydutyboots
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Encore
+- Ivy Cudgel
+- Knock Off
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Roost
+- Volt Switch
+- Thunderbolt
+- Hurricane
+
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Volt Switch
+- Tachyon Cutter
+- Focus Blast

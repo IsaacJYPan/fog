@@ -1,0 +1,59 @@
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Electric
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Psycho Boost
+- Stealth Rock
+- Focus Blast
+- Nasty Plot
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Ice Spinner
+- Close Combat
+- Roar
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Dragon Dance
+- Fire Punch
+- Outrage
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Sludge Wave
+- Whirlwind
+- Toxic Spikes
+- Fiery Dance
+
+Primarina @ assaultvest
+Ability: liquidvoice
+Tera Type: Poison
+EVs: 176 HP / 68 Def / 252 SpA / 12 Spe
+Modest Nature
+- Psychic Noise
+- Moonblast
+- Whirlpool
+- Substitute

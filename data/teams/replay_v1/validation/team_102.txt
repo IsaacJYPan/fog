@@ -1,0 +1,59 @@
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 172 Def / 84 SpA
+Bold Nature
+- Matcha Gotcha
+- Shadow Ball
+- Calm Mind
+- Strength Sap
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Steel
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Knock Off
+- Facade
+- Protect
+- Spikes
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Thunder Wave
+- Gigaton Hammer
+- Encore
+- Stealth Rock
+
+Keldeo @ choicespecs
+Ability: justified
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Aura Sphere
+- Surf
+- Secret Sword
+- Flip Turn
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Ruination
+- Spikes
+- Whirlwind
+- Earthquake
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Head
+- Dragon Dance
+- Extreme Speed
+- Earthquake

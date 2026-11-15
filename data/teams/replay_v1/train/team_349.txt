@@ -1,0 +1,59 @@
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Ghost
+EVs: 200 Atk / 252 SpA / 56 Spe
+Naive Nature
+- Light Screen
+- Ice Beam
+- Dark Pulse
+- Nasty Plot
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 248 HP / 28 Def / 232 Spe
+Jolly Nature
+- Knock Off
+- Gigaton Hammer
+- Stealth Rock
+- Thunder Wave
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Knock Off
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Extreme Speed
+- Fire Punch
+- Thunder Wave
+- Dragon Dance
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Matcha Gotcha
+- Shadow Ball
+- Strength Sap
+
+Ting-Lu @ custapberry
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Heavy Slam
+- Spikes
+- Earthquake

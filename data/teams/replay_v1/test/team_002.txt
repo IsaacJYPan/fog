@@ -1,0 +1,59 @@
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Bitter Blade
+- Shadow Sneak
+- Poltergeist
+
+Araquanid @ custapberry
+Ability: waterbubble
+Tera Type: Ghost
+EVs: 200 HP / 76 Def / 200 SpA / 32 Spe
+Bold Nature
+- Lunge
+- Endeavor
+- Surf
+- Leech Life
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Psyshock
+- Nasty Plot
+- Shadow Ball
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Supercell Slam
+- Rapid Spin
+- Earthquake
+- Ice Spinner
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Encore
+- Fire Punch
+- Scale Shot
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Spirit Break
+- Moonblast
+- Thunderbolt

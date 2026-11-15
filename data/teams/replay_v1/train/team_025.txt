@@ -1,0 +1,59 @@
+Frosmoth @ leftovers
+Ability: icescales
+Tera Type: Electric
+EVs: 252 HP / 72 SpA / 172 SpD / 12 Spe
+Modest Nature
+- Substitute
+- Ice Beam
+- Rest
+- Bug Buzz
+
+Cinccino @ loadeddice
+Ability: technician
+Tera Type: Electric
+EVs: 4 HP / 252 Atk / 252 Spe
+Jolly Nature
+- Knock Off
+- Tidy Up
+- Encore
+- Rock Blast
+
+Heatran @ airballoon
+Ability: flashfire
+Tera Type: Ghost
+EVs: 252 HP / 252 SpA / 4 Spe
+Hardy Nature
+- Flash Cannon
+- Will-O-Wisp
+- Magma Storm
+- Taunt
+
+Sinistcha @ colburberry
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strength Sap
+- Matcha Gotcha
+- Shadow Ball
+- Calm Mind
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Wish
+- Mirror Coat
+- Scald
+- Flip Turn
+
+Weezing-Galar @ shucaberry
+Ability: neutralizinggas
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strange Steam
+- Toxic
+- Defog
+- Will-O-Wisp

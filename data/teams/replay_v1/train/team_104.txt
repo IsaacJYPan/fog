@@ -1,0 +1,59 @@
+Rabsca @ leppaberry
+Ability: synchronize
+Tera Type: Dragon
+EVs: 252 HP / 56 Def / 200 SpD
+Calm Nature
+- Revival Blessing
+- Trick Room
+- Future Sight
+- Memento
+
+Slowking-Galar @ lifeorb
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Sludge Wave
+- Psychic Noise
+- Trick Room
+- Sludge Bomb
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Fighting
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Headlong Rush
+- Facade
+- Crunch
+- Ice Punch
+
+Azumarill @ assaultvest
+Ability: hugepower
+Tera Type: Ground
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Liquidation
+- Play Rough
+- Knock Off
+- Aqua Jet
+
+Mimikyu @ redcard
+Ability: disguise
+Tera Type: Ghost
+EVs: 228 HP / 252 Atk / 28 Def
+Brave Nature
+- Shadow Claw
+- Swords Dance
+- Destiny Bond
+- Trick Room
+
+Kingambit @ choiceband
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 160 HP / 252 Atk / 96 Spe
+Adamant Nature
+- Kowtow Cleave
+- Sucker Punch
+- Iron Head
+- Swords Dance

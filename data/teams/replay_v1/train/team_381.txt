@@ -1,0 +1,59 @@
+Glimmora @ powerherb
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Stealth Rock
+- Spikes
+- Earth Power
+- Meteor Beam
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Swords Dance
+- Kowtow Cleave
+
+Dragapult @ choicespecs
+Ability: cursedbody
+Tera Type: Dragon
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Light Screen
+- Thunder Wave
+- Curse
+- Shadow Ball
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 248 HP / 252 Atk / 8 Def
+Brave Nature
+- Earthquake
+- Swords Dance
+- Facade
+- Fire Punch
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Energy Ball
+- Dazzling Gleam
+- Fiery Dance
+- Psychic
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 96 HP / 160 Atk / 252 Spe
+Jolly Nature
+- Trailblaze
+- Swords Dance
+- Ivy Cudgel
+- Horn Leech

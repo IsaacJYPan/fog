@@ -1,0 +1,59 @@
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ghost
+EVs: 248 HP / 168 Def / 92 SpA
+Relaxed Nature
+- Weather Ball
+- U-turn
+- Knock Off
+- Hurricane
+
+Basculegion @ choiceband
+Ability: swiftswim
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Aqua Jet
+- Ice Fang
+- Flip Turn
+- Wave Crash
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 44 HP / 252 Atk / 96 Def / 116 Spe
+Adamant Nature
+- Power Whip
+- Swords Dance
+- Encore
+- Ivy Cudgel
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Stealth Rock
+- Rapid Spin
+- Steel Beam
+- Knock Off
+
+Goodra-Hisui @ ejectpack
+Ability: sapsipper
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Draco Meteor
+- Ice Beam
+- Iron Head
+- Earthquake
+
+Iron Jugulis @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hurricane
+- Dark Pulse
+- Earth Power
+- Taunt

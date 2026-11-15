@@ -1,0 +1,59 @@
+Ninetales-Alola @ lightclay
+Ability: snowwarning
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Pain Split
+- Aurora Veil
+- Roar
+
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 44 HP / 252 Atk / 180 Def / 28 SpD / 4 Spe
+Adamant Nature
+- Close Combat
+- Thunder Punch
+- Swords Dance
+- Drain Punch
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Icicle Spear
+- Ice Beam
+- Substitute
+- Freeze-Dry
+
+Zapdos @ heavydutyboots
+Ability: pressure
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Heat Wave
+- Roost
+- Hurricane
+- Volt Switch
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Dark
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Wish
+- Protect
+- Scald
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Knock Off
+- Volt Switch
+- Stealth Rock

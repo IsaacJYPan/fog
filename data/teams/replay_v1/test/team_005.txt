@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 32 Def / 224 SpD / 8 Spe
+Jolly Nature
+- Earthquake
+- Toxic
+- Spikes
+- Protect
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonlight
+- Trick
+- Moonblast
+- Thunder Wave
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Spikes
+- Thief
+- Roost
+- Body Press
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Shadow Ball
+- Soft-Boiled
+- Ice Beam
+- Calm Mind
+
+Skeledirge @ leftovers
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 132 Def / 128 Spe
+Bold Nature
+- Will-O-Wisp
+- Slack Off
+- Hex
+- Torch Song
+
+Ogerpon @ choiceband
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rock Tomb
+- Encore
+- Swords Dance
+- Ivy Cudgel

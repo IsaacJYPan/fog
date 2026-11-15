@@ -1,0 +1,59 @@
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Fairy
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Torch Song
+- Slack Off
+- Will-O-Wisp
+- Alluring Voice
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Salt Cure
+- Curse
+- Block
+- Body Press
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+
+Clefable @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Trick
+- Wish
+- Stealth Rock
+- Moonblast
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Head Smash
+- Ice Spinner
+- Supercell Slam
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Moonblast
+- Vacuum Wave
+- Shadow Ball

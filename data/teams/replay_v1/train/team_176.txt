@@ -1,0 +1,59 @@
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- U-turn
+- High Jump Kick
+- Court Change
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Future Sight
+- Ice Beam
+- Chilly Reception
+- Toxic
+
+Kyurem @ choicespecs
+Ability: pressure
+Tera Type: Ground
+EVs: 56 HP / 252 SpA / 200 Spe
+Rash Nature
+- Draco Meteor
+- Freeze-Dry
+- Ice Beam
+- Icicle Spear
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Thunderbolt
+- Thunder Wave
+- U-turn
+- Hurricane
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Dragon
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Draco Meteor
+- U-turn
+- Dragon Darts
+- Hex
+
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Moonlight
+- Knock Off
+- Calm Mind

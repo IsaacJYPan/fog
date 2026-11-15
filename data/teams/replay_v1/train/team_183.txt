@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Earth Power
+- Protect
+- Freeze-Dry
+- Substitute
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Ground
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- U-turn
+- Roost
+- Brave Bird
+- Defog
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Sleep Talk
+- Payback
+- Rest
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Waterfall
+- Rest
+- Avalanche
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Future Sight
+- Ice Beam
+- Flamethrower
+- Chilly Reception
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- U-turn
+- Will-O-Wisp

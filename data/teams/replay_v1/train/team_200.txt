@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Horn Leech
+- Ivy Cudgel
+- Knock Off
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Earthquake
+- Sleep Talk
+- Curse
+
+Cinderace @ choiceband
+Ability: blaze
+Tera Type: Fire
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Gunk Shot
+- Low Kick
+- Pyro Ball
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earth Power
+- Grass Knot
+- U-turn
+- Earthquake
+
+Slowking-Galar @ rockyhelmet
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Sludge Bomb
+- Eerie Spell
+- Thunder Wave
+- Chilly Reception
+
+Tyranitar @ assaultvest
+Ability: sandstream
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Low Kick
+- Ice Beam
+- Dark Pulse
+- Knock Off

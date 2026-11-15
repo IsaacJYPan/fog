@@ -1,0 +1,59 @@
+Glimmora @ focussash
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 208 Def / 52 Spe
+Bold Nature
+- Earth Power
+- Stealth Rock
+- Power Gem
+- Mortal Spin
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 HP / 120 Atk / 136 Spe
+Jolly Nature
+- Knock Off
+- Ivy Cudgel
+- U-turn
+- Taunt
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Mystical Fire
+- Draining Kiss
+- Calm Mind
+- Psychic Noise
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 Def / 132 SpA / 252 Spe
+Timid Nature
+- Substitute
+- Sludge Wave
+- Fiery Dance
+- Dazzling Gleam
+
+Dragonite @ weaknesspolicy
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earthquake
+- Ice Spinner
+- Dragon Dance
+- Encore
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Low Kick
+- Swords Dance
+- Iron Head

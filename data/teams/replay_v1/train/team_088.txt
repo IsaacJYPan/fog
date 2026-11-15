@@ -1,0 +1,59 @@
+Araquanid @ custapberry
+Ability: waterbubble
+Tera Type: Steel
+EVs: 248 HP / 40 Def / 220 SpA
+Quiet Nature
+- Endeavor
+- Surf
+- Sticky Web
+- Endure
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 HP / 196 Def / 60 Spe
+Bold Nature
+- Recover
+- Shadow Ball
+- Dazzling Gleam
+- Make It Rain
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 64 HP / 4 Def / 188 SpD / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+
+Dragonite @ leftovers
+Ability: multiscale
+Tera Type: Ground
+EVs: 196 HP / 204 Atk / 108 Spe
+Adamant Nature
+- Roost
+- Extreme Speed
+- Outrage
+- Earthquake
+
+Sandy Shocks @ boosterenergy
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 HP / 88 SpA / 120 SpD / 48 Spe
+Modest Nature
+- Stealth Rock
+- Earth Power
+- Flash Cannon
+- Thunderbolt
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Aqua Cutter
+- Swords Dance
+- Sucker Punch
+- Knock Off

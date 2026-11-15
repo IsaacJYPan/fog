@@ -1,0 +1,59 @@
+Slowking-Galar @ choicespecs
+Ability: regenerator
+Tera Type: Dragon
+EVs: 252 HP / 68 Def / 188 SpD
+Sassy Nature
+- Sludge Bomb
+- Future Sight
+- Psyshock
+- Chilly Reception
+
+Zamazenta @ assaultvest
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Roar
+- Crunch
+- Body Press
+- Close Combat
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Volt Switch
+- Hurricane
+- Roost
+- U-turn
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Earthquake
+- Ruination
+- Spikes
+- Whirlwind
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Dazzling Gleam
+- Trick
+- Shadow Ball
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 176 Def / 80 Spe
+Bold Nature
+- Moonblast
+- Moonlight
+- Stealth Rock
+- Knock Off

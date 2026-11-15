@@ -1,0 +1,59 @@
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- U-turn
+- Roost
+- Iron Defense
+- Body Press
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Sucker Punch
+- Pyro Ball
+- Court Change
+- U-turn
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 248 HP / 156 Def / 104 SpD
+Impish Nature
+- Stealth Rock
+- Earthquake
+- Whirlwind
+- Spikes
+
+Dragapult @ choiceband
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Sucker Punch
+- Dragon Darts
+- Will-O-Wisp
+- Hex
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Triple Axel
+- Trick
+- U-turn
+- Dark Pulse
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Ghost
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Psychic Noise
+- Surf
+- Whirlpool
+- Moonblast

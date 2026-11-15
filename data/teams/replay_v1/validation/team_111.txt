@@ -1,0 +1,59 @@
+Tyranitar @ ejectbutton
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Taunt
+- Ice Punch
+- Thunder Wave
+- Knock Off
+
+Excadrill @ leftovers
+Ability: sandrush
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Swords Dance
+- Earthquake
+- Iron Head
+- Rock Blast
+
+Mandibuzz @ heavydutyboots
+Ability: overcoat
+Tera Type: Dragon
+EVs: 252 HP / 156 Def / 100 Spe
+Impish Nature
+- Roost
+- Iron Defense
+- Toxic
+- Foul Play
+
+Skarmory @ leftovers
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Spikes
+- Whirlwind
+- Roost
+- Iron Defense
+
+Tornadus-Therian @ heavydutyboots
+Ability: regenerator
+Tera Type: Flying
+EVs: 176 HP / 92 SpD / 240 Spe
+Timid Nature
+- Grass Knot
+- Heat Wave
+- U-turn
+- Bleakwind Storm
+
+Keldeo @ heavydutyboots
+Ability: justified
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Icy Wind
+- Aura Sphere
+- Surf
+- Calm Mind

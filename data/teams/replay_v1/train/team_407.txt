@@ -1,0 +1,59 @@
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Draco Meteor
+- Thunderbolt
+- U-turn
+- Dragon Darts
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Steel
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Moonblast
+- Calm Mind
+- Surf
+- Psychic Noise
+
+Iron Crown @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Calm Mind
+- Future Sight
+- Tachyon Cutter
+- Volt Switch
+
+Samurott-Hisui @ heavydutyboots
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Razor Shell
+- Knock Off
+- Ceaseless Edge
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 112 HP / 252 Atk / 140 Def / 4 Spe
+Adamant Nature
+- Kowtow Cleave
+- Swords Dance
+- Iron Head
+- Sucker Punch
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Stealth Rock
+- U-turn
+- Earth Power

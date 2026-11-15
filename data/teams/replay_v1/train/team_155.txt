@@ -1,0 +1,59 @@
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Poltergeist
+- Destiny Bond
+- Swords Dance
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 216 Def / 40 SpD
+Relaxed Nature
+- Stealth Rock
+- U-turn
+- Taunt
+- Earth Power
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Encore
+- Horn Leech
+- Ivy Cudgel
+
+Dragapult @ leftovers
+Ability: infiltrator
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- U-turn
+- Draco Meteor
+- Will-O-Wisp
+- Dragon Darts
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+
+Raging Bolt @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Weather Ball
+- Thunderclap
+- Calm Mind
+- Dragon Pulse

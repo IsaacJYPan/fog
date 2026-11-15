@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Moonblast
+- Fire Blast
+- Knock Off
+- Moonlight
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Fighting
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Waterfall
+- Sleep Talk
+- Liquidation
+- Rest
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Water
+EVs: 212 HP / 252 Def / 44 Spe
+Bold Nature
+- Calm Mind
+- Soft-Boiled
+- Seismic Toss
+- Shadow Ball
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Toxic
+- Stealth Rock
+- Recover
+- Earthquake
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Roost
+- Body Press
+- U-turn
+- Protect
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 172 HP / 228 Atk / 108 Spe
+Adamant Nature
+- Knock Off
+- Earthquake
+- Protect
+- Toxic

@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Protect
+- Swords Dance
+- Earthquake
+- Knock Off
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Calm Mind
+- Seismic Toss
+- Soft-Boiled
+- Stealth Rock
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Spikes
+- Recover
+- Amnesia
+- Bulldoze
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 48 HP / 252 Atk / 208 Spe
+Adamant Nature
+- Rest
+- Avalanche
+- Body Press
+- Sleep Talk
+
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Toxic
+- Sludge Bomb
+- Will-O-Wisp
+- Pain Split
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Iron Defense
+- Body Press
+- Roost
+- U-turn

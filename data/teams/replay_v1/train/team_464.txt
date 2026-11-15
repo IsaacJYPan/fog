@@ -1,0 +1,59 @@
+Iron Hands @ shucaberry
+Ability: quarkdrive
+Tera Type: Bug
+EVs: 136 HP / 48 Atk / 252 SpD
+Adamant Nature
+- Swords Dance
+- Ice Punch
+- Drain Punch
+- Thunder Punch
+
+Kingambit @ lumberry
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Kowtow Cleave
+- Iron Head
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Draco Meteor
+- Volt Switch
+- Dragon Pulse
+- Thunderbolt
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Stealth Rock
+- Rapid Spin
+- Ice Spinner
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Fairy
+EVs: 208 HP / 8 Def / 252 SpD / 40 Spe
+Bold Nature
+- Recover
+- Parting Shot
+- Shadow Ball
+- Malignant Chain
+
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Healing Wish
+- Earth Power
+- Moonblast
+- Mystical Fire

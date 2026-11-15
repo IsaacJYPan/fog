@@ -1,0 +1,59 @@
+Meowscarada @ heavydutyboots
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Taunt
+- Flower Trick
+- U-turn
+- Triple Axel
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+- Low Kick
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Normal
+EVs: 20 HP / 236 Def / 252 SpD
+Sassy Nature
+- Flip Turn
+- Protect
+- Wish
+- Chilling Water
+
+Raging Bolt @ assaultvest
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Draco Meteor
+- Volt Switch
+- Thunderclap
+- Dragon Pulse
+
+Scizor @ lifeorb
+Ability: technician
+Tera Type: Fire
+EVs: 248 HP / 252 Atk / 8 SpD
+Adamant Nature
+- Defog
+- U-turn
+- Knock Off
+- Bullet Punch
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Fire Punch
+- Protect
+- Headlong Rush
+- Swords Dance

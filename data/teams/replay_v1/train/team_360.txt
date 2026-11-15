@@ -1,0 +1,59 @@
+Dragapult @ choicespecs
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Dragon Darts
+- Psychic Fangs
+- U-turn
+- Substitute
+
+Toxapex @ assaultvest
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 244 Def / 12 Spe
+Impish Nature
+- Infestation
+- Surf
+- Toxic Spikes
+- Sludge Bomb
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Trick
+- Thunderbolt
+- Moonblast
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 112 Def / 144 SpD
+Careful Nature
+- Ruination
+- Stealth Rock
+- Earthquake
+- Spikes
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Earthquake
+- Knock Off
+- Ice Spinner
+
+Dondozo @ rockyhelmet
+Ability: unaware
+Tera Type: Fighting
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Curse
+- Rest
+- Waterfall
+- Sleep Talk

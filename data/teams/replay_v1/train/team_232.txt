@@ -1,0 +1,59 @@
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Water
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Freeze-Dry
+- Protect
+- Substitute
+- Earth Power
+
+Hoopa-Unbound @ choiceband
+Ability: magician
+Tera Type: Dark
+EVs: 252 HP / 180 Def / 76 SpA
+Quiet Nature
+- Psychic Noise
+- Trick Room
+- Hyperspace Fury
+- Knock Off
+
+Rotom-Wash @ rockyhelmet
+Ability: levitate
+Tera Type: Ghost
+EVs: 252 HP / 212 Def / 44 Spe
+Bold Nature
+- Hydro Pump
+- Volt Switch
+- Will-O-Wisp
+- Pain Split
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 176 Def / 80 SpD
+Calm Nature
+- Trick
+- Moonblast
+- Moonlight
+- Calm Mind
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Brave Bird
+- U-turn
+- Roost
+- Defog

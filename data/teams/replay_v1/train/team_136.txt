@@ -1,0 +1,59 @@
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Rest
+- Body Press
+- Sleep Talk
+- Waterfall
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 36 Def / 228 SpD
+Careful Nature
+- Earthquake
+- Protect
+- Spikes
+- Knock Off
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Roost
+- Body Press
+- Defog
+- Protect
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Steel
+EVs: 20 HP / 252 Def / 236 SpD
+Calm Nature
+- Stealth Rock
+- Seismic Toss
+- Soft-Boiled
+- Calm Mind
+
+Talonflame @ heavydutyboots
+Ability: flamebody
+Tera Type: Flying
+EVs: 4 Atk / 252 SpA / 252 Spe
+Rash Nature
+- Roost
+- Flamethrower
+- U-turn
+- Brave Bird
+
+Toxapex @ ejectbutton
+Ability: merciless
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpD
+Bold Nature
+- Baneful Bunker
+- Toxic
+- Recover
+- Haze

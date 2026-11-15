@@ -1,0 +1,59 @@
+Thundurus @ focussash
+Ability: defiant
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Nasty Plot
+- Taunt
+- Focus Blast
+
+Blaziken @ focussash
+Ability: speedboost
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Lonely Nature
+- Flare Blitz
+- Swords Dance
+- Stone Edge
+- Close Combat
+
+Glimmora @ redcard
+Ability: toxicdebris
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Stealth Rock
+- Mortal Spin
+- Power Gem
+- Earth Power
+
+Rillaboom @ lifeorb
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- High Horsepower
+- Swords Dance
+
+Ting-Lu @ redcard
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Stealth Rock
+- Spikes
+- Ruination
+- Whirlwind
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Hex
+- Thunder Wave
+- Make It Rain

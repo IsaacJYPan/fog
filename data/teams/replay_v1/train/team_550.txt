@@ -1,0 +1,59 @@
+Meowscarada @ choicescarf
+Ability: protean
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Flower Trick
+- Spikes
+- U-turn
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Body Press
+- Stealth Rock
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Whirlwind
+- Earthquake
+- Ruination
+- Spikes
+
+Iron Crown @ assaultvest
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Psyshock
+- Future Sight
+- Tachyon Cutter
+- Volt Switch
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Nasty Plot
+- Recover
+- Shadow Ball
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Spikes
+- Substitute
+- Horn Leech
+- Encore

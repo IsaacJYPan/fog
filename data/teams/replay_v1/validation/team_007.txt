@@ -1,0 +1,59 @@
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Mirror Coat
+- Flip Turn
+- Aqua Jet
+- Protect
+
+Mandibuzz @ heavydutyboots
+Ability: bigpecks
+Tera Type: Water
+EVs: 248 HP / 160 Def / 100 Spe
+Bold Nature
+- Foul Play
+- Iron Defense
+- Roost
+- Defog
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 116 HP / 148 Def / 244 SpD
+Careful Nature
+- Poison Jab
+- Stealth Rock
+- Earthquake
+- Recover
+
+Clefable @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Calm Nature
+- Moonlight
+- Stealth Rock
+- Flamethrower
+- Knock Off
+
+Sinistcha @ heavydutyboots
+Ability: heatproof
+Tera Type: Poison
+EVs: 248 HP / 100 Def / 16 SpA / 144 Spe
+Modest Nature
+- Matcha Gotcha
+- Scald
+- Shadow Ball
+- Strength Sap
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 HP / 24 SpD / 232 Spe
+Jolly Nature
+- Encore
+- Swords Dance
+- Gigaton Hammer
+- Stealth Rock

@@ -1,0 +1,59 @@
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Shadow Ball
+- Seismic Toss
+- Metronome
+- Soft-Boiled
+
+Hoopa-Unbound @ assaultvest
+Ability: magician
+Tera Type: Dark
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Drain Punch
+- Zen Headbutt
+- Knock Off
+- Psychic Noise
+
+Quagsire @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Stealth Rock
+- Counter
+- Spikes
+- Toxic
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Wish
+- Protect
+- Scald
+- Flip Turn
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 240 HP / 116 Def / 32 SpD / 120 Spe
+Impish Nature
+- Roost
+- Brave Bird
+- Iron Defense
+- U-turn
+
+Weezing-Galar @ airballoon
+Ability: neutralizinggas
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Pain Split
+- Protect
+- Defog
+- Will-O-Wisp

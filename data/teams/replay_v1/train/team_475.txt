@@ -1,0 +1,59 @@
+Tyranitar @ leftovers
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 HP / 80 Def / 176 Spe
+Impish Nature
+- Knock Off
+- Stealth Rock
+- Ice Punch
+- Ice Beam
+
+Excadrill @ airballoon
+Ability: sandrush
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Stealth Rock
+- Iron Head
+- Rapid Spin
+- Earthquake
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Crunch
+- Close Combat
+- Iron Defense
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Play Rough
+- Power Whip
+- Knock Off
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Roost
+- Roar
+- Flamethrower
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Grass
+EVs: 252 HP / 248 Def / 8 SpA
+Modest Nature
+- Calm Mind
+- Substitute
+- Psychic Noise
+- Draining Kiss

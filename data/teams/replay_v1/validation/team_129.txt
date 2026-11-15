@@ -1,0 +1,59 @@
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Def / 144 SpA / 112 Spe
+Modest Nature
+- Earth Power
+- Freeze-Dry
+- Icicle Spear
+- Dragon Dance
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Close Combat
+- Headlong Rush
+- Rapid Spin
+- Ice Spinner
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Iron Head
+- Kowtow Cleave
+
+Latias @ souldew
+Ability: levitate
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Trick
+- Healing Wish
+- Recover
+- Psychic
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Parting Shot
+- Malignant Chain
+- Hex
+- Recover
+
+Heatran @ leftovers
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Stealth Rock
+- Taunt
+- Magma Storm
+- Earth Power

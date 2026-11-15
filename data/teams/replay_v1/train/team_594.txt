@@ -1,0 +1,59 @@
+Tyranitar @ weaknesspolicy
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Knock Off
+- Ice Beam
+- Heavy Slam
+- Ice Punch
+
+Zapdos @ heavydutyboots
+Ability: pressure
+Tera Type: Water
+EVs: 248 HP / 244 Def / 16 Spe
+Bold Nature
+- U-turn
+- Hurricane
+- Volt Switch
+- Weather Ball
+
+Pelipper @ heavydutyboots
+Ability: drizzle
+Tera Type: Normal
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Hurricane
+- Roost
+- Weather Ball
+- U-turn
+
+Quaquaval @ lifeorb
+Ability: moxie
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Triple Axel
+- Aqua Step
+- Close Combat
+- Aqua Jet
+
+Overqwil @ lifeorb
+Ability: swiftswim
+Tera Type: Water
+EVs: 28 HP / 252 Atk / 228 Spe
+Adamant Nature
+- Spikes
+- Liquidation
+- Destiny Bond
+- Crunch
+
+Jolteon @ flameorb
+Ability: voltabsorb
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder
+- Volt Switch
+- Alluring Voice
+- Shadow Ball

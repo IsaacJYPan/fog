@@ -1,0 +1,59 @@
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Make It Rain
+- Thunder Wave
+- Hex
+- Recover
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Poison
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Bulk Up
+- Taunt
+- Headlong Rush
+- Ice Spinner
+
+Primarina @ assaultvest
+Ability: liquidvoice
+Tera Type: Steel
+EVs: 248 HP / 132 Def / 64 SpA / 64 Spe
+Modest Nature
+- Surf
+- Whirlpool
+- Psychic Noise
+- Moonblast
+
+Muk-Alola @ leftovers
+Ability: poisontouch
+Tera Type: Poison
+EVs: 252 Atk / 252 SpD
+Adamant Nature
+- Brick Break
+- Knock Off
+- Poison Jab
+- Protect
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Discharge
+- Volt Switch
+- Dragon Pulse
+- Draco Meteor
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Earthquake
+- Taunt
+- Stealth Rock
+- U-turn

@@ -1,0 +1,59 @@
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 240 HP / 52 Def / 24 SpD / 192 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- Earthquake
+- Stealth Rock
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Moonblast
+- Calm Mind
+- Thunderbolt
+- Vacuum Wave
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Spikes
+- Encore
+- Synthesis
+- Play Rough
+
+Iron Hands @ grassyseed
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 136 HP / 120 Atk / 252 SpD
+Adamant Nature
+- Earthquake
+- Swords Dance
+- Ice Punch
+- Wild Charge
+
+Pincurchin @ terrainextender
+Ability: electricsurge
+Tera Type: Water
+EVs: 252 HP / 252 Atk / 4 Def
+Brave Nature
+- Toxic Spikes
+- Sucker Punch
+- Discharge
+- Scald
+
+Iron Jugulis @ powerherb
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Air Slash
+- Meteor Beam
+- Earth Power
+- Dark Pulse

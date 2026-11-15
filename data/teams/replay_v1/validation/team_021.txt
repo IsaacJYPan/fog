@@ -1,0 +1,59 @@
+Ogerpon @ scopelens
+Ability: defiant
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Knock Off
+- Play Rough
+- Swords Dance
+
+Ceruledge @ airballoon
+Ability: flashfire
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Shadow Sneak
+- Bitter Blade
+- Poltergeist
+- Swords Dance
+
+Dragonite @ flameorb
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Facade
+- Flamethrower
+- Roost
+- Dragon Dance
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roost
+- Flamethrower
+- U-turn
+- Roar
+
+Iron Treads @ redcard
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Volt Switch
+- Rapid Spin
+- Earthquake
+- Ice Spinner
+
+Blaziken @ leftovers
+Ability: speedboost
+Tera Type: Fighting
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Flare Blitz
+- Swords Dance
+- Close Combat
+- Reversal

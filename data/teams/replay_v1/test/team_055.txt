@@ -1,0 +1,59 @@
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 112 HP / 144 SpA / 252 Spe
+Timid Nature
+- Shadow Ball
+- Malignant Chain
+- Recover
+- Foul Play
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Poison
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Stealth Rock
+- Whirlwind
+- Earthquake
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Calm Mind
+- Thunderbolt
+- Moonblast
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- U-turn
+- Roost
+- Hurricane
+- Discharge
+
+Zarude @ leftovers
+Ability: leafguard
+Tera Type: Fire
+EVs: 252 HP / 40 Atk / 216 Spe
+Jolly Nature
+- Swords Dance
+- Knock Off
+- Power Whip
+- Trailblaze
+
+Gholdengo @ choicescarf
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Thunderbolt
+- Substitute

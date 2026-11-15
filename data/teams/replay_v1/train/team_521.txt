@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Trailblaze
+- Ivy Cudgel
+- Play Rough
+- Swords Dance
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Swords Dance
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Flying
+EVs: 248 HP / 176 Def / 72 SpA / 12 Spe
+Modest Nature
+- Make It Rain
+- Trick
+- Shadow Ball
+- Recover
+
+Iron Valiant @ lifeorb
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Close Combat
+- Calm Mind
+- Knock Off
+- Moonblast
+
+Primarina @ leftovers
+Ability: torrent
+Tera Type: Poison
+EVs: 80 HP / 252 SpA / 176 Spe
+Modest Nature
+- Draining Kiss
+- Moonblast
+- Sparkling Aria
+- Surf
+
+Landorus-Therian @ choicescarf
+Ability: intimidate
+Tera Type: Bug
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earth Power
+- Grass Knot
+- Taunt
+- Stealth Rock

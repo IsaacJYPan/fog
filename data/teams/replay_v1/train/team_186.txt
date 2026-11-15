@@ -1,0 +1,59 @@
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Poison
+EVs: 252 HP / 216 Def / 40 Spe
+Impish Nature
+- Earthquake
+- Stealth Rock
+- Fire Blast
+- Fire Fang
+
+Tyranitar @ choiceband
+Ability: sandstream
+Tera Type: Fighting
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Power Gem
+- Ice Beam
+- Knock Off
+- Ice Punch
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Pyro Ball
+- U-turn
+- Will-O-Wisp
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Sassy Nature
+- Bulk Up
+- U-turn
+- Brave Bird
+- Roost
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Calm Mind
+- Thunderclap
+- Dragon Pulse
+- Thunderbolt
+
+Zapdos @ heavydutyboots
+Ability: static
+Tera Type: Electric
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Roost
+- Discharge
+- Volt Switch
+- Hurricane

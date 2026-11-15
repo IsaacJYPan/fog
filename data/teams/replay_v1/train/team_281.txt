@@ -1,0 +1,59 @@
+Volcanion @ heavydutyboots
+Ability: waterabsorb
+Tera Type: Grass
+EVs: 252 HP / 152 SpA / 104 Spe
+Modest Nature
+- Sludge Bomb
+- Steam Eruption
+- Will-O-Wisp
+- Flamethrower
+
+Excadrill @ lifeorb
+Ability: sandrush
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Rock Slide
+- Rock Tomb
+- Iron Head
+- Rapid Spin
+
+Tyranitar @ smoothrock
+Ability: sandstream
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Low Kick
+- Stealth Rock
+- Knock Off
+- Ice Punch
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- U-turn
+- Body Press
+- Defog
+- Roost
+
+Dragapult @ leftovers
+Ability: cursedbody
+Tera Type: Ghost
+EVs: 248 HP / 8 Atk / 252 Def
+Impish Nature
+- Will-O-Wisp
+- Hex
+- Substitute
+- Dragon Darts
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Trailblaze
+- Ivy Cudgel
+- Swords Dance
+- Power Whip

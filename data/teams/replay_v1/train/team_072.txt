@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Knock Off
+- Toxic
+- Protect
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Steel
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- Head Smash
+- Headlong Rush
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Chilly Reception
+- Sludge Bomb
+- Future Sight
+- Flamethrower
+
+Zamazenta @ assaultvest
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Crunch
+- Heavy Slam
+- Body Press
+- Close Combat
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 252 HP / 184 Def / 72 Spe
+Bold Nature
+- Parting Shot
+- Hex
+- Recover
+- Malignant Chain
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Protect
+- Flip Turn
+- Play Rough
+- Scald

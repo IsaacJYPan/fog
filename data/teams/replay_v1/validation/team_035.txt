@@ -1,0 +1,59 @@
+Deoxys-Speed @ ejectpack
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Spikes
+- Knock Off
+- Superpower
+- Psycho Boost
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 248 HP / 8 Atk / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Swords Dance
+- Trailblaze
+- Synthesis
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Kowtow Cleave
+- Swords Dance
+- Sucker Punch
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- U-turn
+- Earth Power
+- Taunt
+
+Ceruledge @ airballoon
+Ability: weakarmor
+Tera Type: Grass
+EVs: 80 HP / 252 Atk / 176 Spe
+Adamant Nature
+- Bitter Blade
+- Shadow Sneak
+- Swords Dance
+- Poltergeist
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Moonblast
+- Shadow Ball
+- Calm Mind

@@ -1,0 +1,59 @@
+Weavile @ focussash
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Ice Shard
+- Triple Axel
+- Icicle Crash
+
+Dragonite @ covertcloak
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Dragon Dance
+- Roost
+- Extreme Speed
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 236 Def / 12 SpD / 16 Spe
+Impish Nature
+- Stealth Rock
+- Protect
+- Toxic
+- Knock Off
+
+Samurott-Hisui @ choicescarf
+Ability: sharpness
+Tera Type: Poison
+EVs: 248 HP / 144 Atk / 56 SpD / 60 Spe
+Adamant Nature
+- Aqua Jet
+- Sucker Punch
+- Razor Shell
+- Ceaseless Edge
+
+Clefable @ stickybarb
+Ability: magicguard
+Tera Type: Water
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Moonlight
+- Thunder Wave
+- Moonblast
+- Calm Mind
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Roost
+- U-turn
+- Iron Defense

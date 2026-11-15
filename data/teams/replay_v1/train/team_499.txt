@@ -1,0 +1,59 @@
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- U-turn
+- Horn Leech
+- Ivy Cudgel
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ground
+EVs: 120 HP / 216 SpA / 76 SpD / 96 Spe
+Modest Nature
+- Scale Shot
+- Earth Power
+- Draco Meteor
+- Freeze-Dry
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Ice Fang
+- Crunch
+- Iron Defense
+- Light Screen
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Recover
+- Salt Cure
+- Protect
+- Stealth Rock
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- Roost
+- U-turn
+- Roar
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Supercell Slam
+- Ice Spinner
+- Earthquake

@@ -1,0 +1,59 @@
+Clefable @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 252 HP / 232 Def / 24 SpD
+Calm Nature
+- Moonlight
+- Cosmic Power
+- Moonblast
+- Calm Mind
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Protect
+- Earthquake
+- Knock Off
+- Toxic
+
+Dragapult @ lifeorb
+Ability: clearbody
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Hex
+- Shadow Ball
+- Draco Meteor
+- Phantom Force
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Close Combat
+- Snarl
+- Roar
+- Body Press
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Stealth Rock
+- Soft-Boiled
+- Ice Beam
+- Thunder Wave
+
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Grass
+EVs: 112 HP / 48 Def / 252 SpA / 96 Spe
+Modest Nature
+- Take Heart
+- Substitute
+- Stored Power
+- Acid Armor

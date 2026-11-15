@@ -1,0 +1,59 @@
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 188 HP / 252 SpA / 68 Spe
+Modest Nature
+- Draco Meteor
+- Volt Switch
+- Weather Ball
+- Dragon Pulse
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 124 Def / 124 SpD / 12 Spe
+Calm Nature
+- Flamethrower
+- U-turn
+- Roar
+- Roost
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 176 HP / 68 Atk / 12 SpD / 252 Spe
+Adamant Nature
+- Encore
+- Trailblaze
+- Ivy Cudgel
+- Knock Off
+
+Great Tusk @ assaultvest
+Ability: protosynthesis
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Ice Spinner
+- Headlong Rush
+- Rapid Spin
+
+Scizor @ metalcoat
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- U-turn
+- Close Combat
+- Knock Off
+- Bullet Punch
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Hex
+- Parting Shot
+- Malignant Chain
+- Recover

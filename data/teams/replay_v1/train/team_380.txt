@@ -1,0 +1,59 @@
+Iron Hands @ boosterenergy
+Ability: quarkdrive
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Close Combat
+- Earthquake
+- Wild Charge
+- Supercell Slam
+
+Glimmora @ focussash
+Ability: toxicdebris
+Tera Type: Ground
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Earth Power
+- Dazzling Gleam
+- Mortal Spin
+- Sludge Wave
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Stone Edge
+- U-turn
+- Earthquake
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 208 HP / 252 Atk / 48 Spe
+Jolly Nature
+- Flamethrower
+- Dragon Darts
+- U-turn
+- Curse
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Poison
+EVs: 236 HP / 64 Def / 124 SpA / 84 Spe
+Modest Nature
+- Flip Turn
+- Aqua Jet
+- Moonblast
+- Psychic Noise
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Iron Head
+- Sucker Punch
+- Swords Dance

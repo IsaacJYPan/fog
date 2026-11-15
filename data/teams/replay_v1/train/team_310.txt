@@ -1,0 +1,59 @@
+Deoxys-Speed @ focussash
+Ability: pressure
+Tera Type: Ghost
+EVs: 200 Atk / 252 SpA / 56 Spe
+Naive Nature
+- Psycho Boost
+- Stealth Rock
+- Taunt
+- Ice Beam
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Low Kick
+- Encore
+- Earthquake
+- Dragon Dance
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Sucker Punch
+- Dark Pulse
+- Ice Beam
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Bug Buzz
+- Sludge Wave
+- Energy Ball
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- Bullet Punch
+- Close Combat
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Electric
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush
+- Bulk Up

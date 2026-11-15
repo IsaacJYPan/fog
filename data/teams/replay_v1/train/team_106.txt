@@ -1,0 +1,59 @@
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Normal
+EVs: 248 HP / 252 Def / 8 SpA
+Relaxed Nature
+- Roost
+- U-turn
+- Weather Ball
+- Hurricane
+
+Barraskewda @ choiceband
+Ability: swiftswim
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Close Combat
+- Waterfall
+- Poison Jab
+- Liquidation
+
+Volcanion @ choicespecs
+Ability: waterabsorb
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Earth Power
+- Taunt
+- Steam Eruption
+- Sludge Bomb
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Bug
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Dragon Pulse
+- Draco Meteor
+- Calm Mind
+- Thunder
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Electric
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Make It Rain
+- Nasty Plot
+- Shadow Ball
+- Thunder
+
+Ting-Lu @ redcard
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Stealth Rock
+- Ruination
+- Earthquake
+- Spikes

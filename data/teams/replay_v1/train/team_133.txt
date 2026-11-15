@@ -1,0 +1,59 @@
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Fairy
+EVs: 4 HP / 252 Def / 252 SpD
+Calm Nature
+- Thunder Wave
+- Seismic Toss
+- Shadow Ball
+- Soft-Boiled
+
+Dondozo @ leftovers
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Waterfall
+- Curse
+- Sleep Talk
+- Rest
+
+Clodsire @ heavydutyboots
+Ability: unaware
+Tera Type: Steel
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Recover
+- Stealth Rock
+- Poison Jab
+- Amnesia
+
+Toxapex @ heavydutyboots
+Ability: regenerator
+Tera Type: Steel
+EVs: 248 HP / 4 Def / 252 SpA / 4 Spe
+Modest Nature
+- Toxic
+- Surf
+- Poison Jab
+- Recover
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Defog
+- Roost
+- Iron Defense
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Fairy
+EVs: 244 HP / 168 SpD / 96 Spe
+Careful Nature
+- Protect
+- Toxic
+- Spikes
+- Knock Off

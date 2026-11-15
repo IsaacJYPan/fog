@@ -1,0 +1,59 @@
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ground
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Fiery Dance
+- Morning Sun
+- Substitute
+- Dazzling Gleam
+
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Trick
+- Nasty Plot
+- Memento
+
+Raging Bolt @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 112 HP / 252 SpA / 144 Spe
+Modest Nature
+- Dragon Pulse
+- Calm Mind
+- Thunderbolt
+- Draco Meteor
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Headlong Rush
+- Head Smash
+- Ice Spinner
+
+Araquanid @ custapberry
+Ability: waterbubble
+Tera Type: Ghost
+EVs: 8 HP / 252 Atk / 48 Def / 12 SpA / 188 Spe
+Naughty Nature
+- Liquidation
+- Lunge
+- Endeavor
+- Sticky Web
+
+Kingambit @ blackglasses
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Swords Dance
+- Sucker Punch
+- Low Kick
+- Kowtow Cleave

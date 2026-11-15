@@ -1,0 +1,59 @@
+Tyranitar @ choiceband
+Ability: sandstream
+Tera Type: Dark
+EVs: 252 HP / 16 Def / 240 SpD
+Sassy Nature
+- Stealth Rock
+- Ice Beam
+- Thunder Wave
+- Knock Off
+
+Excadrill @ airballoon
+Ability: sandrush
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Earthquake
+- Swords Dance
+- Rapid Spin
+- Rock Slide
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roost
+- Will-O-Wisp
+- Flamethrower
+- Roar
+
+Zamazenta @ lightclay
+Ability: dauntlessshield
+Tera Type: Steel
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Close Combat
+- Reflect
+- Crunch
+- Body Press
+
+Latios @ leftovers
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Draco Meteor
+- Psychic Noise
+- Substitute
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Encore
+- Horn Leech
+- Swords Dance

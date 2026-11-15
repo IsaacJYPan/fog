@@ -1,0 +1,59 @@
+Empoleon @ leftovers
+Ability: competitive
+Tera Type: Ghost
+EVs: 252 HP / 4 SpA / 252 SpD
+Calm Nature
+- Stealth Rock
+- Agility
+- Surf
+- Roost
+
+Weavile @ lifeorb
+Ability: pressure
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Knock Off
+- Triple Axel
+- Ice Shard
+
+Muk-Alola @ custapberry
+Ability: poisontouch
+Tera Type: Water
+EVs: 252 Atk / 252 SpD
+Adamant Nature
+- Poison Jab
+- Knock Off
+- Drain Punch
+- Ice Punch
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flip Turn
+- Knock Off
+- Ceaseless Edge
+- Encore
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Steel
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Shadow Ball
+- Drain Punch
+- Swords Dance
+
+Houndstone @ rockyhelmet
+Ability: fluffy
+Tera Type: Ghost
+EVs: 252 HP / 4 Atk / 252 Def
+Impish Nature
+- Roar
+- Sleep Talk
+- Poltergeist
+- Will-O-Wisp

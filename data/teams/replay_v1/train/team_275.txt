@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Focus Blast
+- Moonblast
+- Close Combat
+- Shadow Ball
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Extreme Speed
+- Earthquake
+- Roost
+- Dragon Dance
+
+Darkrai @ lifeorb
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Focus Blast
+- Dark Pulse
+- Ice Beam
+- Nasty Plot
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Flying
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Brave Bird
+- Defog
+- Roost
+- U-turn
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 248 HP / 8 Def / 252 SpD
+Impish Nature
+- Salt Cure
+- Recover
+- Protect
+- Stealth Rock
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Parting Shot
+- Shadow Ball
+- Recover
+- Malignant Chain

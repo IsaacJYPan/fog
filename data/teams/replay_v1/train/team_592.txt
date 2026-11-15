@@ -1,0 +1,59 @@
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 40 HP / 216 Def / 252 SpD
+Relaxed Nature
+- Ruination
+- Stealth Rock
+- Earthquake
+- Whirlwind
+
+Latios @ weaknesspolicy
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Draco Meteor
+- Aura Sphere
+- Calm Mind
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 252 HP / 88 Def / 168 Spe
+Jolly Nature
+- Ice Fang
+- Body Press
+- Iron Defense
+- Crunch
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Close Combat
+- Thunderbolt
+- Knock Off
+- Moonblast
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Dragon
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- U-turn
+- Roar
+- Flamethrower
+- Roost
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 140 HP / 252 Atk / 116 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Iron Head
+- Sucker Punch

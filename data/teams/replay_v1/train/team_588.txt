@@ -1,0 +1,59 @@
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Endeavor
+- Ice Spinner
+- Rapid Spin
+- Earthquake
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Earth Power
+- Taunt
+- U-turn
+- Stealth Rock
+
+Iron Valiant @ lifeorb
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunderbolt
+- Close Combat
+- Knock Off
+- Moonblast
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 112 HP / 252 Atk / 144 Spe
+Adamant Nature
+- Swords Dance
+- Kowtow Cleave
+- Sucker Punch
+- Low Kick
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 4 Atk / 252 Def / 252 Spe
+Jolly Nature
+- Body Press
+- Iron Defense
+- Roar
+- Crunch
+
+Primarina @ leftovers
+Ability: liquidvoice
+Tera Type: Poison
+EVs: 176 HP / 68 Def / 252 SpA / 12 Spe
+Modest Nature
+- Surf
+- Flip Turn
+- Psychic Noise
+- Draining Kiss

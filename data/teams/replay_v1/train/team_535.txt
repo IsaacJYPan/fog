@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 172 HP / 228 Atk / 108 Spe
+Adamant Nature
+- Protect
+- Earthquake
+- Knock Off
+- Swords Dance
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Dark
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Light Screen
+- Crunch
+- Stone Edge
+- Close Combat
+
+Meowscarada @ choiceband
+Ability: protean
+Tera Type: Grass
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Flower Trick
+- Knock Off
+- U-turn
+- Triple Axel
+
+Slowking-Galar @ colburberry
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Chilly Reception
+- Sludge Bomb
+- Future Sight
+- Toxic
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Fighting
+EVs: 248 HP / 252 Def / 8 Spe
+Bold Nature
+- Roost
+- Stealth Rock
+- Body Press
+- Whirlwind
+
+Skeledirge @ heavydutyboots
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 24 Def / 216 SpD / 20 Spe
+Calm Nature
+- Will-O-Wisp
+- Slack Off
+- Hex
+- Torch Song

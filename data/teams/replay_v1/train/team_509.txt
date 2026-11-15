@@ -1,0 +1,59 @@
+Ribombee @ focussash
+Ability: shielddust
+Tera Type: Ghost
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Moonblast
+- Sticky Web
+- Skill Swap
+- Stun Spore
+
+Gholdengo @ covertcloak
+Ability: goodasgold
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Trick
+- Make It Rain
+- Shadow Ball
+- Nasty Plot
+
+Iron Moth @ boosterenergy
+Ability: quarkdrive
+Tera Type: Fairy
+EVs: 124 HP / 132 SpA / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Fiery Dance
+- Psychic
+- Sludge Wave
+
+Kingambit @ airballoon
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 240 HP / 252 Atk / 16 Spe
+Adamant Nature
+- Kowtow Cleave
+- Iron Head
+- Sucker Punch
+- Swords Dance
+
+Manaphy @ leftovers
+Ability: hydration
+Tera Type: Fairy
+EVs: 112 HP / 48 Def / 252 SpA / 96 Spe
+Modest Nature
+- Acid Armor
+- Take Heart
+- Surf
+- Tail Glow
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 232 HP / 88 Def / 188 Spe
+Impish Nature
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+- Headlong Rush

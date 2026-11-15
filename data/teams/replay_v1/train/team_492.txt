@@ -1,0 +1,59 @@
+Rotom-Wash @ lightclay
+Ability: levitate
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Pain Split
+- Will-O-Wisp
+- Hydro Pump
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 248 HP / 180 Def / 80 SpD
+Impish Nature
+- Recover
+- Stealth Rock
+- Salt Cure
+- Protect
+
+Slither Wing @ assaultvest
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- First Impression
+- U-turn
+- Earthquake
+
+Great Tusk @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Stone Edge
+- Ice Spinner
+- Close Combat
+- Headlong Rush
+
+Pecharunt @ rockyhelmet
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 248 HP / 8 SpA / 252 Spe
+Timid Nature
+- Recover
+- Malignant Chain
+- Parting Shot
+- Hex
+
+Hoopa-Unbound @ ejectpack
+Ability: magician
+Tera Type: Dark
+EVs: 252 Atk / 4 SpA / 252 Spe
+Hasty Nature
+- Drain Punch
+- Knock Off
+- Hyperspace Fury
+- Zen Headbutt

@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 Spe
+Jolly Nature
+- Smack Down
+- Earthquake
+- Stealth Rock
+- U-turn
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Electric
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Moonblast
+- Shadow Ball
+- Encore
+- Calm Mind
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fairy
+EVs: 212 HP / 252 Atk / 44 Spe
+Adamant Nature
+- Sucker Punch
+- Iron Head
+- Swords Dance
+- Kowtow Cleave
+
+Iron Crown @ weaknesspolicy
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 84 HP / 172 SpA / 252 Spe
+Timid Nature
+- Psyshock
+- Tachyon Cutter
+- Volt Switch
+- Focus Blast
+
+Dragapult @ airballoon
+Ability: infiltrator
+Tera Type: Dragon
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dragon Darts
+- U-turn
+- Draco Meteor
+- Thunder Wave
+
+Samurott-Hisui @ focussash
+Ability: sharpness
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Aqua Jet
+- Razor Shell
+- Aqua Cutter
+- Ceaseless Edge

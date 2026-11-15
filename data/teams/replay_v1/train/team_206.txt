@@ -1,0 +1,59 @@
+Hatterene @ lifeorb
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 Spe
+Bold Nature
+- Draining Kiss
+- Nuzzle
+- Trick Room
+- Psyshock
+
+Ursaluna @ flameorb
+Ability: guts
+Tera Type: Normal
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Headlong Rush
+- Play Rough
+- Protect
+- Facade
+
+Cinderace @ focussash
+Ability: libero
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Pyro Ball
+- Court Change
+- U-turn
+- Will-O-Wisp
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Body Press
+- Crunch
+- Roar
+- Close Combat
+
+Tornadus-Therian @ lifeorb
+Ability: regenerator
+Tera Type: Steel
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- U-turn
+- Heat Wave
+- Bleakwind Storm
+
+Fezandipiti @ leftovers
+Ability: toxicchain
+Tera Type: Steel
+EVs: 248 HP / 152 Atk / 44 SpD / 64 Spe
+Careful Nature
+- Calm Mind
+- Moonblast
+- Taunt
+- Roost

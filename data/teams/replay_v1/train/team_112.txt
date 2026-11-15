@@ -1,0 +1,59 @@
+Samurott-Hisui @ rockyhelmet
+Ability: sharpness
+Tera Type: Poison
+EVs: 120 HP / 152 Atk / 60 SpD / 176 Spe
+Adamant Nature
+- Rest
+- Razor Shell
+- Ceaseless Edge
+- Sleep Talk
+
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Steel
+EVs: 248 HP / 252 Def / 8 SpA
+Relaxed Nature
+- Roost
+- U-turn
+- Surf
+- Hurricane
+
+Basculegion-F @ assaultvest
+Ability: swiftswim
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Surf
+- Endeavor
+- Ice Beam
+- Substitute
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Stealth Rock
+- Headlong Rush
+- Rapid Spin
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Flying
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Kowtow Cleave
+- Sucker Punch
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Water
+EVs: 252 HP / 152 Def / 104 SpD
+Sassy Nature
+- Future Sight
+- Toxic
+- Toxic Spikes
+- Sludge Bomb

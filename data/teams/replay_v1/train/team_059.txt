@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Ground
+EVs: 64 HP / 144 Atk / 80 SpA / 220 Spe
+Naughty Nature
+- Ice Spinner
+- Extreme Speed
+- Earthquake
+- Dragon Dance
+
+Gholdengo @ ejectpack
+Ability: goodasgold
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dazzling Gleam
+- Shadow Ball
+- Trick
+- Recover
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Grass
+EVs: 252 HP / 252 Def / 4 SpD
+Sassy Nature
+- Thunder Wave
+- Chilly Reception
+- Future Sight
+- Ice Beam
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ceaseless Edge
+- Knock Off
+- Sacred Sword
+- Razor Shell
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Stealth Rock
+- Earthquake
+- Taunt
+
+Alomomola @ heavydutyboots
+Ability: regenerator
+Tera Type: Dragon
+EVs: 252 HP / 80 Def / 176 SpD
+Impish Nature
+- Flip Turn
+- Scald
+- Wish
+- Play Rough

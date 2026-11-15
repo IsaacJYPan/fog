@@ -1,0 +1,59 @@
+Mienshao @ choicescarf
+Ability: regenerator
+Tera Type: Fighting
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- U-turn
+- Fake Out
+- Knock Off
+- Low Kick
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Normal
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Mirror Coat
+- Wish
+- Scald
+- Flip Turn
+
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Play Rough
+- Thunder Wave
+- Encore
+
+Blissey @ leftovers
+Ability: naturalcure
+Tera Type: Dark
+EVs: 20 HP / 252 Def / 236 SpD
+Calm Nature
+- Seismic Toss
+- Soft-Boiled
+- Thunder Wave
+- Stealth Rock
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dragon
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Toxic
+- Knock Off
+- Protect
+- U-turn
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Water
+EVs: 144 HP / 112 Def / 252 Spe
+Timid Nature
+- Shadow Ball
+- Parting Shot
+- Recover
+- Malignant Chain

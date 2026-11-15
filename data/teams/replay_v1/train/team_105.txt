@@ -1,0 +1,59 @@
+Clodsire @ leftovers
+Ability: waterabsorb
+Tera Type: Dark
+EVs: 116 HP / 148 Def / 244 SpD
+Careful Nature
+- Toxic
+- Earthquake
+- Recover
+- Gunk Shot
+
+Incineroar @ heavydutyboots
+Ability: intimidate
+Tera Type: Fairy
+EVs: 252 HP / 240 SpD / 16 Spe
+Careful Nature
+- Parting Shot
+- Will-O-Wisp
+- Knock Off
+- Drain Punch
+
+Pelipper @ damprock
+Ability: drizzle
+Tera Type: Ground
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Hurricane
+- Weather Ball
+- U-turn
+- Roost
+
+Barraskewda @ choiceband
+Ability: swiftswim
+Tera Type: Water
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Flip Turn
+- Liquidation
+- Aqua Jet
+- Close Combat
+
+Zapdos @ choicespecs
+Ability: static
+Tera Type: Fairy
+EVs: 248 HP / 252 Def / 8 SpA
+Bold Nature
+- Volt Switch
+- Roost
+- Thunder
+- Hurricane
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Dragon
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Brave Bird
+- Body Press
+- U-turn
+- Roost

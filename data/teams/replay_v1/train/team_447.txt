@@ -1,0 +1,59 @@
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Earth Power
+- Taunt
+- Stealth Rock
+- U-turn
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Poison
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Encore
+- Knock Off
+- Sucker Punch
+- Ceaseless Edge
+
+Iron Crown @ choicespecs
+Ability: quarkdrive
+Tera Type: Water
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Psyshock
+- Stored Power
+- Tachyon Cutter
+
+Primarina @ assaultvest
+Ability: torrent
+Tera Type: Steel
+EVs: 176 HP / 68 Def / 252 SpA / 12 Spe
+Modest Nature
+- Calm Mind
+- Draining Kiss
+- Moonblast
+- Surf
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Knock Off
+- Ivy Cudgel
+- Trailblaze
+- Play Rough
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Scale Shot
+- Encore
+- Earthquake
+- Extreme Speed

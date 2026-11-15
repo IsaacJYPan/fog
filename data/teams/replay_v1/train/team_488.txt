@@ -1,0 +1,59 @@
+Weavile @ choiceband
+Ability: pressure
+Tera Type: Ice
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Low Kick
+- Swords Dance
+- Triple Axel
+- Knock Off
+
+Slither Wing @ heavydutyboots
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 248 HP / 252 Atk / 8 Spe
+Adamant Nature
+- Morning Sun
+- U-turn
+- Close Combat
+- Will-O-Wisp
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Stealth Rock
+- Protect
+- Recover
+- Salt Cure
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Ivy Cudgel
+- Encore
+- Synthesis
+- Play Rough
+
+Heatran @ leftovers
+Ability: flamebody
+Tera Type: Fairy
+EVs: 248 HP / 88 Def / 8 SpA / 124 SpD / 40 Spe
+Calm Nature
+- Magma Storm
+- Power Gem
+- Protect
+- Stealth Rock
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Swords Dance
+- Earthquake
+- Facade
+- Protect

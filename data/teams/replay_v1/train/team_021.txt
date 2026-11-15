@@ -1,0 +1,59 @@
+Ceruledge @ airballoon
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Poltergeist
+- Bitter Blade
+- Swords Dance
+- Bulk Up
+
+Alomomola @ assaultvest
+Ability: regenerator
+Tera Type: Fairy
+EVs: 12 HP / 244 Def / 252 SpD
+Relaxed Nature
+- Tickle
+- Flip Turn
+- Protect
+- Wish
+
+Tornadus-Therian @ lifeorb
+Ability: regenerator
+Tera Type: Flying
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Heat Wave
+- Nasty Plot
+- Grass Knot
+- Bleakwind Storm
+
+Weezing-Galar @ leftovers
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 248 HP / 240 Def / 20 Spe
+Bold Nature
+- Defog
+- Pain Split
+- Will-O-Wisp
+- Protect
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Steel
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Earthquake
+- Stealth Rock
+- Rest
+- Ruination
+
+Iron Crown @ choicescarf
+Ability: quarkdrive
+Tera Type: Fighting
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Volt Switch
+- Focus Blast
+- Tachyon Cutter
+- Psychic Noise

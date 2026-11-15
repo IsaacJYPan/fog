@@ -1,0 +1,59 @@
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Electric
+EVs: 104 HP / 252 Atk / 152 Spe
+Adamant Nature
+- Fire Punch
+- Dragon Tail
+- Outrage
+- Roost
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Iron Head
+- Swords Dance
+- Low Kick
+- Kowtow Cleave
+
+Enamorus @ choicespecs
+Ability: contrary
+Tera Type: Ghost
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Earth Power
+- Healing Wish
+- Moonblast
+- Weather Ball
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Bulk Up
+- Ice Spinner
+- Rapid Spin
+- Stealth Rock
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Dark
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Ice Beam
+- Dark Pulse
+- Trick
+- Nasty Plot
+
+Dragapult @ choiceband
+Ability: clearbody
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Shadow Ball
+- Substitute
+- Dragon Darts
+- U-turn

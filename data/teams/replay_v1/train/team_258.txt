@@ -1,0 +1,59 @@
+Keldeo @ heavydutyboots
+Ability: justified
+Tera Type: Water
+EVs: 4 Def / 252 SpA / 252 Spe
+Timid Nature
+- Secret Sword
+- Substitute
+- Surf
+- Flip Turn
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Thunder Wave
+- Moonlight
+- Moonblast
+- Stealth Rock
+
+Iron Treads @ leftovers
+Ability: quarkdrive
+Tera Type: Grass
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Rapid Spin
+- Earthquake
+- Knock Off
+- Ice Spinner
+
+Hydrapple @ heavydutyboots
+Ability: regenerator
+Tera Type: Poison
+EVs: 248 HP / 248 Def / 12 SpD
+Bold Nature
+- Giga Drain
+- Earth Power
+- Nasty Plot
+- Fickle Beam
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Flamethrower
+- U-turn
+- Roost
+- Roar
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Water
+EVs: 24 HP / 4 Atk / 252 SpD / 228 Spe
+Jolly Nature
+- Spikes
+- Earthquake
+- Whirlwind
+- Heavy Slam

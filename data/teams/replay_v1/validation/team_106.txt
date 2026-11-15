@@ -1,0 +1,59 @@
+Tinkaton @ airballoon
+Ability: moldbreaker
+Tera Type: Water
+EVs: 248 HP / 28 Def / 232 Spe
+Jolly Nature
+- Thunder Wave
+- Gigaton Hammer
+- Encore
+- Stealth Rock
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Ruination
+- Stealth Rock
+- Whirlwind
+- Earthquake
+
+Zamazenta @ heavydutyboots
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 80 HP / 124 Atk / 152 Def / 152 Spe
+Jolly Nature
+- Close Combat
+- Roar
+- Iron Defense
+- Heavy Slam
+
+Dragonite @ loadeddice
+Ability: multiscale
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Roost
+- Dragon Tail
+- Earthquake
+- Dragon Dance
+
+Sinistcha @ colburberry
+Ability: heatproof
+Tera Type: Fairy
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Strength Sap
+- Matcha Gotcha
+- Calm Mind
+- Stun Spore
+
+Infernape @ heavydutyboots
+Ability: blaze
+Tera Type: Fire
+EVs: 4 HP / 252 SpA / 252 Spe
+Modest Nature
+- Stone Edge
+- Overheat
+- U-turn
+- Knock Off

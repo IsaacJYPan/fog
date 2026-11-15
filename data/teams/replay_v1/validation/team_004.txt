@@ -1,0 +1,59 @@
+Torkoal @ heatrock
+Ability: drought
+Tera Type: Grass
+EVs: 248 HP / 252 Def / 8 SpD
+Bold Nature
+- Stealth Rock
+- Will-O-Wisp
+- Earthquake
+- Overheat
+
+Ceruledge @ lifeorb
+Ability: weakarmor
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Poltergeist
+- Close Combat
+- Bitter Blade
+- Shadow Sneak
+
+Alomomola @ ejectbutton
+Ability: regenerator
+Tera Type: Dark
+EVs: 248 HP / 8 Def / 252 SpD
+Relaxed Nature
+- Protect
+- Tickle
+- Wish
+- Flip Turn
+
+Walking Wake @ mysticwater
+Ability: protosynthesis
+Tera Type: Water
+EVs: 12 HP / 244 SpA / 252 Spe
+Timid Nature
+- Draco Meteor
+- Hydro Steam
+- Surf
+- Flamethrower
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 44 HP / 128 Atk / 84 Def / 252 Spe
+Jolly Nature
+- Close Combat
+- Taunt
+- Rapid Spin
+- Headlong Rush
+
+Hatterene @ ejectbutton
+Ability: magicbounce
+Tera Type: Steel
+EVs: 252 HP / 204 Def / 52 Spe
+Bold Nature
+- Future Sight
+- Calm Mind
+- Draining Kiss
+- Psychic Noise

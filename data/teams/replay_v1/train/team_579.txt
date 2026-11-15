@@ -1,0 +1,59 @@
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Grass
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- U-turn
+- Grassy Glide
+- Swords Dance
+
+Ogerpon-Cornerstone @ cornerstonemask
+Ability: sturdy
+Tera Type: Rock
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Swords Dance
+- Ivy Cudgel
+- Low Kick
+- Power Whip
+
+Raging Bolt @ grassyseed
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Calm Mind
+- Draco Meteor
+- Dragon Pulse
+- Thunderbolt
+
+Zamazenta @ lifeorb
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 104 HP / 248 Def / 156 Spe
+Jolly Nature
+- Ice Fang
+- Crunch
+- Stone Edge
+- Body Press
+
+Hawlucha @ grassyseed
+Ability: unburden
+Tera Type: Flying
+EVs: 192 HP / 252 Atk / 64 Spe
+Adamant Nature
+- Acrobatics
+- Roost
+- Swords Dance
+- Encore
+
+Iron Treads @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Steel Beam
+- Ice Spinner
+- Earth Power

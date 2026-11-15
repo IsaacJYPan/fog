@@ -1,0 +1,59 @@
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Fairy
+EVs: 252 HP / 52 Def / 204 SpD
+Careful Nature
+- Body Press
+- Salt Cure
+- Recover
+- Iron Defense
+
+Corviknight @ leftovers
+Ability: pressure
+Tera Type: Ghost
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- U-turn
+- Iron Head
+- Roost
+- Defog
+
+Blissey @ heavydutyboots
+Ability: naturalcure
+Tera Type: Dark
+EVs: 20 HP / 252 Def / 236 SpD
+Calm Nature
+- Stealth Rock
+- Thunder Wave
+- Soft-Boiled
+- Seismic Toss
+
+Dondozo @ heavydutyboots
+Ability: unaware
+Tera Type: Dark
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- Body Press
+- Rest
+- Avalanche
+- Curse
+
+Clodsire @ leftovers
+Ability: waterabsorb
+Tera Type: Grass
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Toxic
+- Amnesia
+- Recover
+- Earthquake
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 12 Atk / 252 Spe
+Jolly Nature
+- Earthquake
+- Protect
+- Spikes
+- Knock Off

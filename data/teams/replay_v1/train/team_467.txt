@@ -1,0 +1,59 @@
+Enamorus @ choicescarf
+Ability: contrary
+Tera Type: Fairy
+EVs: 4 Atk / 252 SpA / 252 Spe
+Hasty Nature
+- Mystical Fire
+- Healing Wish
+- Earth Power
+- Moonblast
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 120 HP / 44 Atk / 248 SpD / 96 Spe
+Adamant Nature
+- Stealth Rock
+- Rapid Spin
+- Head Smash
+- Ice Spinner
+
+Raging Bolt @ choicespecs
+Ability: protosynthesis
+Tera Type: Flying
+EVs: 64 HP / 28 Def / 252 SpA / 164 Spe
+Modest Nature
+- Draco Meteor
+- Thunderbolt
+- Volt Switch
+- Calm Mind
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Ghost
+EVs: 160 HP / 32 Atk / 248 SpD / 68 Spe
+Adamant Nature
+- Sacred Sword
+- Aqua Cutter
+- Sucker Punch
+- Ceaseless Edge
+
+Scizor @ sitrusberry
+Ability: technician
+Tera Type: Steel
+EVs: 252 HP / 4 Atk / 252 SpD
+Careful Nature
+- Knock Off
+- U-turn
+- Quick Attack
+- Bullet Punch
+
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Thunder Wave
+- Flamethrower
+- Psyshock
+- Sludge Bomb

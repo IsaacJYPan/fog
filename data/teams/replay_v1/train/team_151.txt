@@ -1,0 +1,59 @@
+Sinistcha @ leftovers
+Ability: heatproof
+Tera Type: Poison
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Calm Mind
+- Strength Sap
+- Matcha Gotcha
+- Shadow Ball
+
+Ceruledge @ lifeorb
+Ability: weakarmor
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Bitter Blade
+- Shadow Sneak
+- Swords Dance
+- Poltergeist
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Calm Mind
+- Moonblast
+- Shadow Ball
+- Knock Off
+
+Lokix @ choiceband
+Ability: tintedlens
+Tera Type: Bug
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Knock Off
+- Leech Life
+- First Impression
+- U-turn
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Flying
+EVs: 248 HP / 252 Def / 8 SpD
+Impish Nature
+- U-turn
+- Defog
+- Roost
+- Brave Bird
+
+Clodsire @ leftovers
+Ability: unaware
+Tera Type: Water
+EVs: 248 HP / 8 Def / 252 SpD
+Careful Nature
+- Spikes
+- Earthquake
+- Toxic
+- Stealth Rock

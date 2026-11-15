@@ -1,0 +1,59 @@
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpA / 252 Spe
+Naive Nature
+- Knock Off
+- Encore
+- Shadow Ball
+- Moonblast
+
+Scizor @ lumberry
+Ability: technician
+Tera Type: Steel
+EVs: 120 HP / 252 Atk / 136 Spe
+Adamant Nature
+- U-turn
+- Dual Wingbeat
+- Bullet Punch
+- Defog
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Earthquake
+- Taunt
+- Stone Edge
+- U-turn
+
+Kyurem @ assaultvest
+Ability: pressure
+Tera Type: Ice
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Freeze-Dry
+- Icicle Spear
+- Scale Shot
+- Earth Power
+
+Cinderace @ heavydutyboots
+Ability: blaze
+Tera Type: Bug
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Court Change
+- Will-O-Wisp
+- Sucker Punch
+- Pyro Ball
+
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Normal
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Fire Punch
+- Extreme Speed
+- Encore
+- Earthquake

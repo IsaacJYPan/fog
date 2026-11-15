@@ -1,0 +1,59 @@
+Darkrai @ heavydutyboots
+Ability: baddreams
+Tera Type: Dark
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Knock Off
+- Dark Pulse
+- Will-O-Wisp
+- Focus Blast
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Dark
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Earthquake
+- Protect
+- Toxic
+- Spikes
+
+Dragapult @ lifeorb
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Thunder Wave
+- U-turn
+- Hex
+- Dragon Darts
+
+Clefable @ leftovers
+Ability: magicguard
+Tera Type: Steel
+EVs: 252 HP / 240 Def / 16 Spe
+Bold Nature
+- Moonblast
+- Stealth Rock
+- Knock Off
+- Moonlight
+
+Primarina @ choicespecs
+Ability: torrent
+Tera Type: Grass
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Moonblast
+- Calm Mind
+- Flip Turn
+- Psychic Noise
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Ghost
+EVs: 8 HP / 108 Atk / 140 SpD / 252 Spe
+Jolly Nature
+- Ice Spinner
+- Taunt
+- Earthquake
+- Bulk Up

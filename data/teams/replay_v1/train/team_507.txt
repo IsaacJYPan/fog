@@ -1,0 +1,59 @@
+Slowking-Galar @ assaultvest
+Ability: regenerator
+Tera Type: Water
+EVs: 248 HP / 252 Def / 8 SpD
+Relaxed Nature
+- Chilly Reception
+- Thunder Wave
+- Eerie Spell
+- Future Sight
+
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ice
+EVs: 56 Atk / 200 SpA / 252 Spe
+Naive Nature
+- Freeze-Dry
+- Substitute
+- Scale Shot
+- Draco Meteor
+
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Normal
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Knock Off
+- Swords Dance
+- Spikes
+- Protect
+
+Gholdengo @ colburberry
+Ability: goodasgold
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Nasty Plot
+- Make It Rain
+- Hex
+
+Iron Valiant @ boosterenergy
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Shadow Ball
+- Calm Mind
+- Focus Blast
+- Moonblast
+
+Mandibuzz @ heavydutyboots
+Ability: overcoat
+Tera Type: Water
+EVs: 248 HP / 244 Def / 16 Spe
+Impish Nature
+- Defog
+- U-turn
+- Roost
+- Knock Off

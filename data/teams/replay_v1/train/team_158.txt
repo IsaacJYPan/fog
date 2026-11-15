@@ -1,0 +1,59 @@
+Empoleon @ shucaberry
+Ability: competitive
+Tera Type: Fighting
+EVs: 252 HP / 4 Atk / 252 SpD
+Sassy Nature
+- Stealth Rock
+- Roost
+- Flash Cannon
+- Flip Turn
+
+Raging Bolt @ leftovers
+Ability: protosynthesis
+Tera Type: Fairy
+EVs: 4 Def / 252 SpA / 252 Spe
+Modest Nature
+- Thunderbolt
+- Thunderclap
+- Volt Switch
+- Calm Mind
+
+Enamorus @ choicescarf
+Ability: cutecharm
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Moonblast
+- Mystical Fire
+- Earth Power
+- Healing Wish
+
+Iron Treads @ airballoon
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 HP / 232 SpD / 24 Spe
+Careful Nature
+- Ice Spinner
+- Stealth Rock
+- Earthquake
+- Knock Off
+
+Ceruledge @ focussash
+Ability: weakarmor
+Tera Type: Fairy
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Shadow Sneak
+- Bulk Up
+- Bitter Blade
+- Swords Dance
+
+Meowscarada @ rockyhelmet
+Ability: protean
+Tera Type: Grass
+EVs: 4 HP / 252 SpA / 252 Spe
+Timid Nature
+- Spikes
+- U-turn
+- Low Kick
+- Knock Off

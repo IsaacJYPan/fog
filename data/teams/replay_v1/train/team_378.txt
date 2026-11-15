@@ -1,0 +1,59 @@
+Gholdengo @ airballoon
+Ability: goodasgold
+Tera Type: Steel
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Thunder Wave
+- Make It Rain
+- Shadow Ball
+- Nasty Plot
+
+Ting-Lu @ leftovers
+Ability: vesselofruin
+Tera Type: Ghost
+EVs: 248 HP / 156 Def / 104 SpD
+Impish Nature
+- Ruination
+- Stealth Rock
+- Earthquake
+- Spikes
+
+Great Tusk @ leftovers
+Ability: protosynthesis
+Tera Type: Fire
+EVs: 104 HP / 144 Atk / 64 Def / 12 SpD / 184 Spe
+Adamant Nature
+- Ice Spinner
+- Headlong Rush
+- Head Smash
+- Rapid Spin
+
+Dragapult @ heavydutyboots
+Ability: clearbody
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Hex
+- Draco Meteor
+- U-turn
+- Shadow Ball
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Dark
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Iron Head
+- Sucker Punch
+- Kowtow Cleave
+- Swords Dance
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Fire
+EVs: 248 HP / 248 Def / 12 Spe
+Bold Nature
+- Roost
+- Flamethrower
+- U-turn
+- Will-O-Wisp

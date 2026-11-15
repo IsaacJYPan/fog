@@ -1,0 +1,59 @@
+Excadrill @ airballoon
+Ability: sandrush
+Tera Type: Flying
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- Rapid Spin
+- Earthquake
+- Rock Slide
+- Iron Head
+
+Tyranitar @ choiceband
+Ability: sandstream
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Knock Off
+- Ice Beam
+- Ice Punch
+- Stealth Rock
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Protect
+- Salt Cure
+- Recover
+- Earthquake
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Spikes
+- Roost
+- Iron Defense
+- Body Press
+
+Dragapult @ heavydutyboots
+Ability: infiltrator
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Adamant Nature
+- Will-O-Wisp
+- Flamethrower
+- Dragon Darts
+- U-turn
+
+Alomomola @ rockyhelmet
+Ability: regenerator
+Tera Type: Ghost
+EVs: 252 HP / 252 Def / 4 SpD
+Relaxed Nature
+- Protect
+- Wish
+- Flip Turn
+- Scald

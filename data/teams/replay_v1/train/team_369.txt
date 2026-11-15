@@ -1,0 +1,59 @@
+Gliscor @ toxicorb
+Ability: poisonheal
+Tera Type: Water
+EVs: 244 HP / 252 Def / 12 SpD
+Impish Nature
+- Knock Off
+- Swords Dance
+- Earthquake
+- Stealth Rock
+
+Skarmory @ rockyhelmet
+Ability: sturdy
+Tera Type: Dragon
+EVs: 252 HP / 252 Def / 4 Spe
+Impish Nature
+- Body Press
+- Stealth Rock
+- Brave Bird
+- Roost
+
+Fezandipiti @ heavydutyboots
+Ability: toxicchain
+Tera Type: Water
+EVs: 248 HP / 196 SpD / 64 Spe
+Careful Nature
+- U-turn
+- Play Rough
+- Beat Up
+- Roost
+
+Moltres @ heavydutyboots
+Ability: flamebody
+Tera Type: Grass
+EVs: 248 HP / 72 Def / 176 SpD / 12 Spe
+Calm Nature
+- Will-O-Wisp
+- Scorching Sands
+- Roost
+- U-turn
+
+Samurott-Hisui @ assaultvest
+Ability: sharpness
+Tera Type: Dark
+EVs: 200 HP / 116 Atk / 192 Spe
+Adamant Nature
+- Razor Shell
+- Ceaseless Edge
+- Sucker Punch
+- Knock Off
+
+Dragapult @ choicespecs
+Ability: clearbody
+Tera Type: Dragon
+EVs: 4 Atk / 252 SpA / 252 Spe
+Naive Nature
+- Will-O-Wisp
+- Dragon Darts
+- Hex
+- U-turn

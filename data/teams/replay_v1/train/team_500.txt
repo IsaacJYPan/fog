@@ -1,0 +1,59 @@
+Kyurem @ leftovers
+Ability: pressure
+Tera Type: Ground
+EVs: 168 Atk / 88 SpA / 252 Spe
+Hasty Nature
+- Earth Power
+- Substitute
+- Freeze-Dry
+- Protect
+
+Rillaboom @ terrainextender
+Ability: grassysurge
+Tera Type: Fighting
+EVs: 252 Atk / 4 Def / 252 Spe
+Adamant Nature
+- High Horsepower
+- Knock Off
+- Grassy Glide
+- Wood Hammer
+
+Garganacl @ leftovers
+Ability: purifyingsalt
+Tera Type: Water
+EVs: 252 HP / 4 Def / 252 SpD
+Careful Nature
+- Salt Cure
+- Stealth Rock
+- Recover
+- Protect
+
+Pecharunt @ heavydutyboots
+Ability: poisonpuppeteer
+Tera Type: Dark
+EVs: 252 HP / 228 Def / 28 Spe
+Bold Nature
+- Malignant Chain
+- Recover
+- Foul Play
+- Parting Shot
+
+Iron Treads @ assaultvest
+Ability: quarkdrive
+Tera Type: Ghost
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Rapid Spin
+- Knock Off
+- High Horsepower
+- Stealth Rock
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 216 HP / 40 Atk / 252 Spe
+Jolly Nature
+- Psychic Fangs
+- Reflect
+- Close Combat
+- Roar

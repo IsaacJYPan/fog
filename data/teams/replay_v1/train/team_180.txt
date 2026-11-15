@@ -1,0 +1,59 @@
+Garchomp @ rockyhelmet
+Ability: roughskin
+Tera Type: Ghost
+EVs: 4 HP / 252 Atk / 252 Spe
+Naive Nature
+- Scale Shot
+- Earthquake
+- Stealth Rock
+- Draco Meteor
+
+Darkrai @ choicespecs
+Ability: baddreams
+Tera Type: Ghost
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Dark Pulse
+- Ice Beam
+- Focus Blast
+- Sludge Bomb
+
+Deoxys-Speed @ lifeorb
+Ability: pressure
+Tera Type: Fighting
+EVs: 248 HP / 8 Def / 252 Spe
+Timid Nature
+- Ice Beam
+- Stealth Rock
+- Psycho Boost
+- Reflect
+
+Great Tusk @ boosterenergy
+Ability: protosynthesis
+Tera Type: Ground
+EVs: 252 Atk / 4 Def / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Ice Spinner
+- Close Combat
+- Earthquake
+
+Corviknight @ rockyhelmet
+Ability: pressure
+Tera Type: Dragon
+EVs: 60 HP / 252 Def / 196 Spe
+Bold Nature
+- Roost
+- U-turn
+- Body Press
+- Brave Bird
+
+Cinderace @ heavydutyboots
+Ability: libero
+Tera Type: Flying
+EVs: 224 HP / 32 Atk / 252 Spe
+Jolly Nature
+- Will-O-Wisp
+- U-turn
+- Sucker Punch
+- Pyro Ball

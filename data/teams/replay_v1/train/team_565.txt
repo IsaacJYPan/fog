@@ -1,0 +1,59 @@
+Raging Bolt @ choicespecs
+Ability: protosynthesis
+Tera Type: Dragon
+EVs: 252 HP / 252 SpA / 4 SpD
+Modest Nature
+- Dragon Pulse
+- Volt Switch
+- Thunderclap
+- Draco Meteor
+
+Ogerpon-Wellspring @ wellspringmask
+Ability: waterabsorb
+Tera Type: Water
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- U-turn
+- Ivy Cudgel
+- Knock Off
+- Swords Dance
+
+Scizor @ choiceband
+Ability: technician
+Tera Type: Steel
+EVs: 40 HP / 252 Atk / 216 Spe
+Adamant Nature
+- Bullet Punch
+- Knock Off
+- U-turn
+- Swords Dance
+
+Great Tusk @ rockyhelmet
+Ability: protosynthesis
+Tera Type: Ice
+EVs: 252 HP / 4 Atk / 252 Spe
+Jolly Nature
+- Headlong Rush
+- Knock Off
+- Ice Spinner
+- Rapid Spin
+
+Ting-Lu @ heavydutyboots
+Ability: vesselofruin
+Tera Type: Water
+EVs: 252 HP / 228 Def / 28 SpD
+Relaxed Nature
+- Earthquake
+- Ruination
+- Spikes
+- Protect
+
+Pecharunt @ airballoon
+Ability: poisonpuppeteer
+Tera Type: Fairy
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Recover
+- Malignant Chain
+- Shadow Ball
+- Parting Shot

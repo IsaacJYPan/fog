@@ -1,0 +1,59 @@
+Dragonite @ heavydutyboots
+Ability: multiscale
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Adamant Nature
+- Dragon Dance
+- Scale Shot
+- Fire Punch
+- Encore
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ghost
+EVs: 252 HP / 4 Def / 252 Spe
+Timid Nature
+- Stealth Rock
+- U-turn
+- Earthquake
+- Earth Power
+
+Hatterene @ leftovers
+Ability: magicbounce
+Tera Type: Water
+EVs: 252 HP / 124 Def / 132 Spe
+Bold Nature
+- Dazzling Gleam
+- Draining Kiss
+- Psychic Noise
+- Nuzzle
+
+Volcanion @ shucaberry
+Ability: waterabsorb
+Tera Type: Ground
+EVs: 160 HP / 252 SpA / 96 Spe
+Modest Nature
+- Steam Eruption
+- Sludge Bomb
+- Earth Power
+- Will-O-Wisp
+
+Kingambit @ leftovers
+Ability: supremeoverlord
+Tera Type: Ghost
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Swords Dance
+- Iron Head
+- Sucker Punch
+- Low Kick
+
+Zamazenta @ leftovers
+Ability: dauntlessshield
+Tera Type: Fire
+EVs: 168 HP / 88 Def / 252 Spe
+Jolly Nature
+- Ice Fang
+- Iron Defense
+- Body Press
+- Crunch

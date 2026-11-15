@@ -1,0 +1,59 @@
+Weezing-Galar @ heavydutyboots
+Ability: neutralizinggas
+Tera Type: Water
+EVs: 252 HP / 252 Def / 4 SpD
+Bold Nature
+- Defog
+- Strange Steam
+- Will-O-Wisp
+- Taunt
+
+Landorus-Therian @ rockyhelmet
+Ability: intimidate
+Tera Type: Ground
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Stealth Rock
+- Rock Tomb
+- U-turn
+- Earthquake
+
+Primarina @ choicespecs
+Ability: torrent
+Tera Type: Ground
+EVs: 236 HP / 64 Def / 124 SpA / 84 Spe
+Modest Nature
+- Moonblast
+- Surf
+- Encore
+- Flip Turn
+
+Porygon-Z @ heavydutyboots
+Ability: download
+Tera Type: Normal
+EVs: 252 SpA / 4 SpD / 252 Spe
+Modest Nature
+- Thunderbolt
+- Ice Beam
+- Tri Attack
+- Shadow Ball
+
+Slowking-Galar @ heavydutyboots
+Ability: regenerator
+Tera Type: Fairy
+EVs: 252 HP / 8 Def / 152 SpA / 96 SpD
+Modest Nature
+- Chilly Reception
+- Psyshock
+- Ice Beam
+- Toxic
+
+Darkrai @ choicescarf
+Ability: baddreams
+Tera Type: Poison
+EVs: 252 SpA / 4 SpD / 252 Spe
+Timid Nature
+- Trick
+- Dark Pulse
+- Sludge Bomb
+- Ice Beam
