@@ -1,0 +1,7 @@
+{
+  "label": "CPU engineering smoke; no GPU performance claim",
+  "metrics_identical": true,
+  "parameters_identical": true,
+  "rng_identical": true,
+  "timing_partition_complete": true
+}
