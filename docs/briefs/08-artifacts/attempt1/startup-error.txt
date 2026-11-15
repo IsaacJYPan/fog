@@ -1,0 +1,14 @@
+[{"stream_name":"stderr","time":1.507174064,"data":"Traceback (most recent call last):\n"}
+,{"stream_name":"stderr","time":1.510436598,"data":"  File \"/kaggle/src/script.py\", line 178, in \u003cmodule\u003e\n"}
+,{"stream_name":"stderr","time":1.510459046,"data":"    main()\n"}
+,{"stream_name":"stderr","time":1.5104642830000001,"data":"    ~~~~^^\n"}
+,{"stream_name":"stderr","time":1.510468521,"data":"  File \"/kaggle/src/script.py\", line 70, in main\n"}
+,{"stream_name":"stderr","time":1.510472681,"data":"    raise RuntimeError('Expected exactly one allocated GPU; release immediately')\n"}
+,{"stream_name":"stderr","time":1.510476769,"data":"RuntimeError: Expected exactly one allocated GPU; release immediately\n"}
+,{"stream_name":"stderr","time":4.626018099,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":4.626063227,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":5.182437312,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":5.182465888,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":7.968204481,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":9.466477938,"data":"[NbConvertApp] Writing 315487 bytes to __results__.html\n"}
+]

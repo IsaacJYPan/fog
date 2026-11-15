@@ -1,0 +1,12 @@
+{
+  "label": "smoke",
+  "first_attempt": "startup guard aborted before clone or training; two T4s returned for NvidiaTeslaT4 request",
+  "first_attempt_quota_delta_seconds": 11.160000000003492,
+  "first_attempt_job_body_gpu_seconds": 0.07823970999993435,
+  "first_attempt_single_job_allocation_upper_bound_field": "requested single-GPU planning assumption, invalidated by observed hardware; use quota delta for this terminal attempt",
+  "next_job_platform_timeout_seconds": 1740,
+  "next_job_max_allocated_gpus": 2,
+  "next_job_max_allocation_gpu_seconds": 3480,
+  "combined_terminal_attempt_plus_next_cap_gpu_hours": 0.9697666666666677,
+  "unused_margin_seconds": 108.83999999999651
+}

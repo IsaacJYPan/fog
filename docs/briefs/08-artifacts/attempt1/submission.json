@@ -1,0 +1,35 @@
+{
+  "label": "smoke",
+  "source_commit": "43d48b5d643421d6ee14f5789027f50f1ddb64ad",
+  "private_requested": true,
+  "accelerator": "NvidiaTeslaT4",
+  "platform_timeout_seconds": 3300,
+  "gpu_jobs_submitted": 1,
+  "submitted_utc": "2026-11-15T05:29:27.902738+00:00",
+  "quota_before": {
+    "quotaRefreshTime": "2026-11-21T00:00:00.000Z",
+    "gpuQuota": {
+      "timeUsed": "61482.770.0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "75600s",
+      "minimumTimeAllowed": "21600s",
+      "isPayToScaleEnabled": true,
+      "hasEverRun": true
+    },
+    "tpuQuota": {
+      "timeUsed": "0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "72000s",
+      "minimumTimeAllowed": "72000s",
+      "isPayToScaleEnabled": false,
+      "hasEverRun": false
+    }
+  },
+  "input_games": 1000,
+  "input_rows": 49478,
+  "command": "KaggleApi.kernels_push(private_folder, timeout=\"3300\", acc=\"NvidiaTeslaT4\")",
+  "version": 1,
+  "error": "",
+  "invalid_dataset_sources": [],
+  "invalid_kernel_sources": []
+}

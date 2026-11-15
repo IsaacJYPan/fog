@@ -1,8 +1,8 @@
-"""Bounded single-T4 brief 08 job; inject FOG_COMMIT in the private submission.
+"""Bounded T4 brief 08 job; inject FOG_COMMIT in the private submission.
 
-Submit with platform timeout 3300 s and NvidiaTeslaT4, with the private converted
-replay input attached. Reuses brief 06's bootstrap and native training command.
-The internal deadline is 2900 s from job entry, including setup, reserving export.
+Submit with platform timeout 1740 s and NvidiaTeslaT4, with the private converted
+replay input attached. Count both allocated T4s; the learner uses cuda:0. Reuses brief 06's bootstrap and native training command.
+The internal deadline is 1440 s from job entry, including setup, reserving export.
 """
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ def main():
     root = Path('/kaggle/temp/fog')
     output = Path('/kaggle/working/08-artifacts')
     output.mkdir(parents=True, exist_ok=True)
-    deadline = started + 2900
+    deadline = started + 1440
     commit = os.environ['FOG_COMMIT']
     env = dict(os.environ, OMP_NUM_THREADS='1', MKL_NUM_THREADS='1', OPENBLAS_NUM_THREADS='1',
                FOG08_OUTPUT=str(output))
@@ -65,8 +65,8 @@ def main():
         gpu = subprocess.check_output(['nvidia-smi', '--query-gpu=name,memory.total',
                                        '--format=csv,noheader'], text=True).strip().splitlines()
         gpu_count = len(gpu)
-        if gpu_count != 1:
-            raise RuntimeError('Expected exactly one allocated GPU; release immediately')
+        if gpu_count not in (1, 2):
+            raise RuntimeError('Unexpected GPU count; release immediately')
         with (output / 'gpu-memory.csv').open('w') as stream:
             monitor = subprocess.Popen(['nvidia-smi', '--query-gpu=timestamp,index,name,memory.used,utilization.gpu',
                                         '--format=csv', '--loop=1'], stdout=stream)
@@ -132,8 +132,8 @@ print(m.select(pl.len(),pl.col("n_rows").sum()))
         seconds = time.monotonic() - started
         write('budget.json', {'status': status, 'allocated_gpus': gpu_count, 'job_seconds': seconds,
                               'gpu_hours': gpu_count * seconds / 3600 if gpu_count else None,
-                              'platform_timeout_seconds': 3300,
-                              'single_job_allocation_upper_bound_gpu_hours': 3300 / 3600,
+                              'platform_timeout_seconds': 1740,
+                              'allocation_upper_bound_gpu_hours': gpu_count * 1740 / 3600 if gpu_count else None,
                               'records': records})
 
 
