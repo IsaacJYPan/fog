@@ -80,6 +80,13 @@
       "status": "stopped_at_40_core_hours",
       "pid": 9987,
       "wall_seconds_this_attempt": 2339.8158316420013
+    },
+    "gate": {
+      "command": "/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":8,\"budget_ms\":1600,\"threads\":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4",
+      "fog_commit": "391211c8f171701b8296f15dc12952bb3896b157",
+      "status": "running",
+      "pid": 10462,
+      "wall_seconds_this_attempt": 8050.664949238999
     }
   },
   "published": [
