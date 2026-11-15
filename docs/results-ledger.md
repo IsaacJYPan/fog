@@ -2753,3 +2753,9 @@ Stopped at 40.0000 allocated core-hours as required by brief 11. This is a parti
 Saved whole matched blocks only; these rows are partial and do not establish G1. The literal shard reports and allocation state are committed for recovery; `gate-partial-summary.json` holds derived totals from the staged checkpoint. Native evaluations continue to the fixed 1,008 games per opponent; no sequential stopping.
 
 | 2026-11-15 | mcts | simpleheuristics | showdown_direct (partial) | 604 | 0.935 [0.913, 0.952] (565-39-0) | 1.813 | 31/17443 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
+
+### Default-budget SimpleHeuristics gate opponent complete
+
+All four shards completed 252 games against SimpleHeuristics, for 1,008 matched games. This opponent meets its G1 rate and fidelity requirements. MaxDamage is still running, so G1 is not yet established. `gate-simpleheuristics-summary.json` contains derived totals from the committed shard rows.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 1008 | 0.929 [0.911, 0.943] (936-72-0) | 1.801 | 53/28020 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
