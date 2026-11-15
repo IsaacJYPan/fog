@@ -2630,3 +2630,96 @@ missing; what a row lacks or gets wrong compared with play is the more likely li
 (briefs 09 and 12), which is a hypothesis until brief 13 measures it.
 
 The hosted account's meter stood at 17.1 GPU-hours when the work ended.
+
+## 2026-11-14: PPO update speed on a GPU after the belief-loop fix (smoke)
+
+Brief 08, `work/update-speed`. Every result here is smoke. The primary measurement ran at
+`e23682f`; production files under `fog/`, configs and tests are identical to `work/roadmap`
+`f36bc11`. Machine: four logical Intel Xeon 2.00 GHz CPUs (CPU quota 4), two 15,360 MiB T4s
+allocated, model work on `cuda:0`, PyTorch 2.11.0+cu130. Brief 06 used two CPUs, one T4 and
+PyTorch 2.14.1+cu130. Thus these are measured before/after observations, not an isolated causal
+ablation of the vectorisation fix. No learning or strength gate is claimed.
+
+Primary entry: `FOG_COMMIT=e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f python
+ docs/briefs/08-artifacts/gpu_job.py` on the GPU platform, with the converted replay input
+attached. It reuses brief 06's installer, timing shim and effective training command:
+`python -m fog.train --config configs/collect_gpu_check.yaml --trainer ppo --set
+log.dir=runs/collect_gpu league.snapshot_every_decisions=8000 env.rollout_workers=4`.
+`measure.py ppo` installs the timing hooks before executing that command and returns the
+trainer's normal halt signal after two completed, saved updates. No model, loss or trainer
+source changed. Exact effective config/commands are in `08-artifacts/ppo-config.json`,
+`gpu_job.py`, `measure.py` and the execution JSON records.
+
+| PPO smoke metric | Brief 06 before | After fix | Evidence under `docs/briefs/08-artifacts/` |
+| --- | ---: | ---: | --- |
+| Mean optimizer-step seconds | 6.084865 | 1.314772 | `baseline-ppo.json`, `ppo-summary.json` |
+| Processed optimizer rows/s | 159.886676 | 770.241811 | same |
+| Collection decisions/s | 144.979601 | 293.829273 | same |
+| End-to-end decisions/s, through saved checkpoint | 37.504858 | 122.802031 | same |
+| Collection / update / other wall share | 25.869 / 71.897 / 2.234% | 41.794 / 52.320 / 5.887% | same |
+| Sampled peak device memory, MiB | 11,561 | 11,333 | same; old whole attempt versus new prefix through PPO |
+
+The completed primary prefix contains two PPO updates, 26,330 learner decisions from 1,024
+training games, 78 optimizer steps and 78,990 processed rows in 214.410135 s. Means include
+partial minibatches; the separately profiled minibatch has exactly 1,024 rows. Its synchronized
+parts total 1.350055 s: trunk 0.139314, opponent belief 0.217050, self-belief 0.204925,
+policy/value 0.003880, other forward 0.016592, loss assembly 0.023661, backward 0.734500,
+gradient clipping/metrics 0.004789, optimizer 0.005344. **Backward is the largest component,
+54.4052% of this sampled step.** The two perspectives' backbone and shared latent are counted
+in trunk. Evidence: `ppo-parts.json`; each part is synchronized before and after. Primary
+optimizer timings include part hooks on one minibatch and the failed stack-attempt overhead.
+
+Replay entry: the same job invokes `python docs/briefs/08-artifacts/measure.py replay` with
+`configs/replay_blueprint_cpu.yaml`, `device=cuda`, batch 1,024 and random initial weights.
+The current importer/converter prepared 1,000 qualifying games (49,478 accepted rows; no
+quarantines), using the pinned import and `--imputations 1 --workers 4 --resume` command in
+`preparation.json`. This is an allowed small replay corpus, not the canonical brief 09 split.
+The measurement reproduces `bc.py`'s full-scope CUDA loss, autocast, GradScaler, clipping,
+AdamW and cosine schedule. That CUDA branch uses autocast even though the recipe says
+`mixed_precision: false`. Partial epoch tails are skipped so all measured batches have 1,024
+rows; there is no warmup and no skipped nonfinite optimizer step.
+
+| Replay smoke metric | Brief 05 before | After fix | Evidence |
+| --- | ---: | ---: | --- |
+| Processed rows/s | 583.241649 | 1850.260853 | `baseline-replay.json`, `replay-summary.json` |
+| Measured optimizer steps / row-visits | longer epoch run | 200 / 204,800 | `replay-summary.json`, `replay-metrics.csv` |
+| Seconds per step / total measured seconds | not separately measured there | 0.553435 / 110.687096 | same |
+
+Replay's measured wall includes batch building and checkpoints every 20 steps; model/dataset
+loading is excluded. The synchronized sample is 0.417411 s, so it is not the aggregate step
+average: trunk 0.029940, opponent belief 0.164006, policy/value 0.001942, other forward
+0.004942, loss 0.012858, backward 0.196528, clipping/metrics 0.003561, optimizer 0.003636.
+Self-belief is absent because replay rows have no mirror input. Evidence: `replay-parts.json`.
+The 3.1724× replay comparison also changes corpus and runtime; it is not a learning result.
+
+Stack recovery and GPU budget: the first startup aborted when a requested T4 runtime actually
+allocated two devices; no training ran. The primary job completed every timing stage, but all
+three `py-spy dump` attempts were denied permission. Both failures remain in the artifacts.
+A CPU-only platform check verified a per-process grant to the exact profiler child, revoked
+after each dump, without changing host policy. A final bounded PPO-only GPU run at `ee058d8`
+then captured three successful main-process stacks during update two:
+`08-artifacts/profiling-followup/update-stack-{1,2,3}.{txt,json}`. Their main threads were in
+opponent belief heads, the history transformer, and the self-belief chain, respectively;
+these three snapshots do not quantify time shares. Their separate timing files do not replace
+the primary results above. First/main/follow-up GPU jobs used hard limits 3,300/1,740/900 s;
+finished attempts were charged by their observed terminal cost before reserving the next.
+All jobs were serial. Counting both allocated T4s and platform overhead conservatively gives
+**0.468986 GPU-hours total**, below the one-hour budget (`gpu-budget.json`). The final job is
+complete and quota reservation is zero.
+
+Recovery: private notebook `fog-update-speed-20261114`, version 2, retains `checkpoints.zip`
+with native PPO weights/state pairs and replay optimizer/RNG state. A local copy passed ZIP
+integrity checking; the public record is `primary-checkpoints.json`. Actual runtime-drop
+recovery was not exercised. Only text/JSON is committed; attached-input paths are normalized,
+and no private account name, token or private input name is committed.
+
+Validation: 30 focused PPO, measurement, belief-permutation, rollout-probe and GPU-job tests
+passed; repository and artifact Ruff checks pass. The CPU timing-hook check preserves native
+metrics, parameters and RNG exactly; arithmetic checks reconcile rows, steps, shares and both
+sampled timing partitions. Commands/results: `preparation.json`, `timing-equivalence.json`,
+`profiler-child-check.json`, `validation.txt`. Full suite and strength evaluation were not run.
+
+Reading for the next brief: the update still consumes more of the measured PPO wall than
+collection (52.3% versus 41.8%); backward, rather than forward Python, is now the largest
+sampled step component. This meets brief 14's numerical condition in a short smoke, subject to
+review of brief 08. No phase gate or P0.5 completion is claimed, and no later brief was started.
