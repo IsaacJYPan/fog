@@ -1,14 +1,14 @@
 # Replay blueprint scale run
 
-**Hosted GPU measured; G20 is complete.** Full G20 (20k games / 18 epochs, batch 1,024)
-runs at **583.24 training rows/s** (580–586 by epoch), with **161–166 s** validation and
-**2.44 GiB** peak PyTorch allocation on Tesla T4. Its own hosted session is at most
-**9.840590 quota-hours**, including setup, both CPU holdout reports and export. Two T4s
-were visible; CUDA device 0 was used. G3's two-epoch calibration/resume smoke ran at
-604–622 rows/s, but its full schedule and batch comparison did not fit the one-hour cap.
-G100's measured-budget fallback was submitted at **40,955 games / six epochs**, **6.881063 h**;
-full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
-[brief 05 report](briefs/05-report.md) and `briefs/05-artifacts/G100-plan.json`.
+**Hosted GPU measured; both scale schedules completed (smoke).** G20 (20k games / 18 epochs,
+batch 1,024) trained at **583.24 rows/s**; the budget fallback (40,955 games / six epochs)
+at **643.92 rows/s** on Tesla T4. Validation: **161–166 / 144–147 s**; peak allocation
+**2.44 GiB** each. Two T4s were visible, CUDA device 0 used. G20's own-session bound is
+**9.840590 quota-hours**; G100's account-delta charge bound is **5.959728 h**, excluding
+its uncharged queue. The conservative account meter ended at **17.078547/20 h**. G3's two-epoch
+calibration/resume proof is retained; its full schedule and batch comparison did not fit
+one hour. Full 101,928 games / six epochs projected to 15.865326 h and did not fit, so
+both exact 100k readings remain unverified. See [brief 05 report](briefs/05-report.md).
 
 1. **Use the CPU-prepared private inputs.** Both exist under the configured owner's account:
 
@@ -81,7 +81,8 @@ full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
 
    The final-slot source is [fog-p2-g100-20261114.py](briefs/05-artifacts/fog-p2-g100-20261114.py),
    frozen at `46e9c0da2c1b6caa01ab3da0b5bba2e103029662`: 40,955 nested games, six epochs,
-   batch 1,024. It uses large-input version 2 and projects to 6.881063 quota-hours. For that
+   batch 1,024. It used large-input version 2, completed all six epochs, and consumed at most 5.959728
+   quota-hours versus its 6.881063-hour forecast. For that
    reproduction, copy this source, use `fog-p2-gpu-112000-20261114` as the private dataset,
    choose a fresh job slug, and set platform timeout **28200** (7h50m); its internal export
    deadline is **27000** (7h30m). The account-wide check found all 20 owned jobs terminal
@@ -99,8 +100,9 @@ full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
    exactly as the prefix of `[0,1,2]`.
 
 5. **Download and verify the selected weights.** The single private dataset is
-   `fog-p2-gpu-checkpoints-20261114`; version 2 contains partial G3 and full G20 selections (four files), retaining the earlier
-   version. G100 will be added there. This command was tested on all four current files:
+   `fog-p2-gpu-checkpoints-20261114`; version 3 contains all six G3/G20/G100 policy/value selections, retaining older versions.
+   G3 is partial (2/18); G20 and the 40,955-game fallback completed their schedules.
+   This command was executed and all six file sizes/hashes matched:
 
    ```bash
    uv run --no-project --with kaggle==2.2.5 --with six python -c 'from kaggle.api.kaggle_api_extended import KaggleApi; a=KaggleApi(); a.authenticate(); a.dataset_download_files(a.config_values["username"]+"/fog-p2-gpu-checkpoints-20261114", path="checkpoints", unzip=True, quiet=True)'
@@ -113,5 +115,5 @@ full 101,928 games / six epochs projects to 15.865326 h and does not fit. See
 
 The unchanged `replay_holdout_report` scorer runs on CPU, including inside the hosted job:
 its implementation does not use the config's device override. Its two report passes still
-consume hosted session quota (about 208 s each in resumed G3; 443.788 s total for G20). The measured validation
+consume hosted session quota (about 208 s each in resumed G3; 443.788 / 417.246 s total for G20 / G100). The measured validation
 passes during training use CUDA. Include both kinds of overhead when selecting the next run.

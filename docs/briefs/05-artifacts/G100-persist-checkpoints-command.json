@@ -1,0 +1,11 @@
+{
+  "label": "smoke",
+  "command": [
+    "/home/agent/.local/share/uv/tools/kaggle/bin/python",
+    "/tmp/fog_update_checkpoints.py",
+    "G100"
+  ],
+  "source_commit": "20fbada8f3cf6307262b9ba314c29ea81087cf55",
+  "wall_seconds": 105.4930115340103,
+  "exit_code": 0
+}

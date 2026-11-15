@@ -348,6 +348,122 @@
         ]
       },
       "source": "G20-holdout-best.json"
+    },
+    {
+      "run": "G100",
+      "status": "smoke, complete training schedule",
+      "training_games": 40955,
+      "policy_epoch": 6,
+      "policy": {
+        "rows": 103981,
+        "top1": 0.5454746540233312,
+        "nll": 1.2634368950146473,
+        "avg_legal_actions": 10.464161721853031,
+        "top1_lift": 5.707934994871968,
+        "move": {
+          "rows": 74874,
+          "top1": 0.638365787856933,
+          "nll": 1.032195536579634,
+          "avg_legal_actions": 10.32029810080936,
+          "top1_lift": 6.5881252280415765
+        },
+        "switch": {
+          "rows": 29107,
+          "top1": 0.30652420379977324,
+          "nll": 1.8582754380270898,
+          "avg_legal_actions": 10.834232315250627,
+          "top1_lift": 3.3209544342139723
+        }
+      },
+      "value": {
+        "rows": 104037,
+        "value_mse": 0.8439572913684429,
+        "brier": 0.21098932284211072,
+        "ece": 0.024287479513263627,
+        "reliability": [
+          {
+            "bin": 0,
+            "lo": 0.0,
+            "hi": 0.1,
+            "count": 3521,
+            "mean_predicted": 0.06657824340072487,
+            "observed_win_rate": 0.09400738426583358
+          },
+          {
+            "bin": 1,
+            "lo": 0.1,
+            "hi": 0.2,
+            "count": 7033,
+            "mean_predicted": 0.1529150530537009,
+            "observed_win_rate": 0.18626475188397554
+          },
+          {
+            "bin": 2,
+            "lo": 0.2,
+            "hi": 0.3,
+            "count": 9439,
+            "mean_predicted": 0.2517867275028363,
+            "observed_win_rate": 0.2813857400148321
+          },
+          {
+            "bin": 3,
+            "lo": 0.3,
+            "hi": 0.4,
+            "count": 12087,
+            "mean_predicted": 0.3524746555396431,
+            "observed_win_rate": 0.3714734839083313
+          },
+          {
+            "bin": 4,
+            "lo": 0.4,
+            "hi": 0.5,
+            "count": 17933,
+            "mean_predicted": 0.45431975577831013,
+            "observed_win_rate": 0.46233201360620085
+          },
+          {
+            "bin": 5,
+            "lo": 0.5,
+            "hi": 0.6,
+            "count": 18615,
+            "mean_predicted": 0.5462705866839899,
+            "observed_win_rate": 0.5363953800698361
+          },
+          {
+            "bin": 6,
+            "lo": 0.6,
+            "hi": 0.7,
+            "count": 12540,
+            "mean_predicted": 0.6479046761912355,
+            "observed_win_rate": 0.6058213716108453
+          },
+          {
+            "bin": 7,
+            "lo": 0.7,
+            "hi": 0.8,
+            "count": 10472,
+            "mean_predicted": 0.7492413242967234,
+            "observed_win_rate": 0.7064553093964858
+          },
+          {
+            "bin": 8,
+            "lo": 0.8,
+            "hi": 0.9,
+            "count": 8054,
+            "mean_predicted": 0.8471451442043924,
+            "observed_win_rate": 0.8102806059101068
+          },
+          {
+            "bin": 9,
+            "lo": 0.9,
+            "hi": 1.0,
+            "count": 4343,
+            "mean_predicted": 0.9342501915780295,
+            "observed_win_rate": 0.9143449228643794
+          }
+        ]
+      },
+      "source": "G100-holdout-best.json"
     }
   ],
   "value": [
@@ -631,9 +747,132 @@
       },
       "extreme_share": 0.03713102069456059,
       "extreme_observed_win_rate": 0.42738804038312195
+    },
+    {
+      "run": "G100",
+      "selection": "policy",
+      "epoch": 6,
+      "training_value_mse": 0.7940772771632341,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.8439572913684429,
+        "brier": 0.21098932284211072,
+        "ece": 0.024287479513263627
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.2454287299401799,
+          "value_mse": 0.9817149197607196,
+          "ece": 0.032740623428409374
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.21872690133832476,
+          "value_mse": 0.874907605353299,
+          "ece": 0.03623412715321665
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.169516808841161,
+          "value_mse": 0.678067235364644,
+          "ece": 0.008662165709104457
+        }
+      },
+      "source": "G100-holdout-best.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 3521,
+        "mean_predicted": 0.06657824340072487,
+        "observed_win_rate": 0.09400738426583358,
+        "share": 0.033843728673452714
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 4343,
+        "mean_predicted": 0.9342501915780295,
+        "observed_win_rate": 0.9143449228643794,
+        "share": 0.04174476388208041
+      },
+      "extreme_share": 0.07558849255553313,
+      "extreme_observed_win_rate": 0.5470498474059003
+    },
+    {
+      "run": "G100",
+      "selection": "value",
+      "epoch": 5,
+      "training_value_mse": 0.8008614949933437,
+      "overall": {
+        "rows": 104037,
+        "value_mse": 0.8356347121122167,
+        "brier": 0.20890867802805418,
+        "ece": 0.009065196062646169
+      },
+      "by_phase": {
+        "early": {
+          "rows": 34997,
+          "brier": 0.24359555623942017,
+          "value_mse": 0.9743822249576807,
+          "ece": 0.021997963117434786
+        },
+        "middle": {
+          "rows": 33692,
+          "brier": 0.21614708729019314,
+          "value_mse": 0.8645883491607725,
+          "ece": 0.01829611443133428
+        },
+        "late": {
+          "rows": 35348,
+          "brier": 0.16766693417767628,
+          "value_mse": 0.6706677367107051,
+          "ece": 0.014700517131490228
+        }
+      },
+      "source": "G100-holdout-best-value.json",
+      "low_probability": {
+        "bin": 0,
+        "lo": 0.0,
+        "hi": 0.1,
+        "count": 2775,
+        "mean_predicted": 0.06834508828214697,
+        "observed_win_rate": 0.0781981981981982,
+        "share": 0.026673202802848985
+      },
+      "high_probability": {
+        "bin": 9,
+        "lo": 0.9,
+        "hi": 1.0,
+        "count": 3777,
+        "mean_predicted": 0.9333710090363502,
+        "observed_win_rate": 0.9301032565528197,
+        "share": 0.03630439170679662
+      },
+      "extreme_share": 0.0629775945096456,
+      "extreme_observed_win_rate": 0.5692918192918193
     }
   ],
   "high_bin_boundary": "The saved reports use [0.9,1]. Their float32 values, converted to float64 probabilities as (v+1)/2, cannot map exactly to 0.9, so this also counts strict >0.9.",
-  "p2_4": "unverified until a completed 100k point exists",
-  "value_reading": "unverified until a completed 100k own-best value point exists"
+  "p2_4": {
+    "status": "unverified at 100k; budget fallback only",
+    "training_games": [
+      20000,
+      40955
+    ],
+    "observed_nll_improvement": 0.015168162780821781,
+    "larger_point_training_nll": 1.2258381841123642,
+    "larger_point_holdout_nll": 1.2634368950146473,
+    "exact_100k_point_present": false
+  },
+  "value_reading": {
+    "status": "strict 100k reading unverified",
+    "actual_training_games": 40955,
+    "required_training_games": 100000,
+    "own_best_brier": 0.20890867802805418,
+    "early_minus_late_brier": 0.07592862206174389,
+    "satisfies_numerical_thresholds_at_fallback": true
+  }
 }

@@ -1,9 +1,9 @@
 {
   "slug": "fog-p2-g100-20261114",
-  "status": "QUEUED",
+  "status": "COMPLETE",
   "failure_message": "",
   "is_private": true,
   "machine_shape": "NvidiaTeslaT4",
-  "total_quota_hours_used": 11.118818888888889,
-  "total_quota_seconds_used": 40027.748
+  "total_quota_hours_used": 17.07854722222222,
+  "total_quota_seconds_used": 61482.77
 }

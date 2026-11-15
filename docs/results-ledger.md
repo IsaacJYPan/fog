@@ -1345,3 +1345,72 @@ logs, verified alive after detachment. On completion the collector downloads raw
 and both reports, versions the same private checkpoint dataset and tests all six hashes,
 then runs the specified CPU diagnostics and 400-game/opponent smoke. These final G100
 results remain pending; this entry makes no completed-run or gate claim.
+
+### 2026-11-15: final fallback and all follow-up evidence complete (smoke)
+
+Private `fog-p2-g100-20261114` completed and exported by **00:33:06 UTC**; the detached
+collector finished checkpoint persistence, diagnostics and CPU play by **00:40:56 UTC**.
+No further GPU allocation was made. Actual source is `46e9c0da2c1b6caa01ab3da0b5bba2e103029662`;
+`fog-p2-g100-20261114.py` calls unchanged `bc.train`, CUDA, `train_40955.parquet`, fixed
+2k holdout, batch1024, six epochs, resume, policy-CE selection, independently saved best
+value, streaming, early stopping off. Submission command was
+`KaggleApi.kernels_push(acc="NvidiaTeslaT4", timeout="28200")`; the full resolved config
+command is retained in `G100-training-runtime.json`.
+
+| Run (smoke) | Games / rows | Epochs / batch | Policy / value epochs | Train rows/s | Top-1 / NLL | Policy value Brier / ECE | Own-best value MSE / Brier / ECE | Commit |
+| --- | --- | --- | --- | ---: | --- | --- | --- | --- |
+| G100 fallback, complete | 40,955 / 2,090,705 | 6 /1024 | 6 / 5 | 643.919560 | 0.545474654 / 1.263436895 | 0.210989323 / 0.024287480 | 0.835634712 / 0.208908678 / 0.009065196 | `46e9c0d` |
+
+CSV contains exactly epochs0–6, with 2,090,705 rows per training epoch and
+runtime status complete. Rates are 641.717205–646.036499 rows/s;
+validation 144.275986–147.351477 s; peak
+2,621,156,352 bytes. Training/validation wall is
+20507.284637 s; installation 90.763706 s;
+the two CPU holdout reports total 417.246273 s. The per-epoch CSV, last log lines,
+runtime metadata and both reports are retained without changing raw metric bytes.
+
+Own-best value epoch5 is one before policy epoch6. Its early/middle/late Brier is
+0.243595556 / 0.216147087 / 0.167666934, gap **0.075928622**; train MSE 0.800861495,
+holdout MSE 0.835634712, ECE 0.009065196. Low/high shares are 0.026673203 / 0.036304392,
+observed win rates 0.078198198 / 0.930103257. Both numerical value thresholds are met
+at **40,955**, not at the required 100k point. Strict 100k learning remains unverified.
+The observed 20k→40,955 NLL gain is **0.015168163**; train/holdout NLL at the larger point
+is 1.225838184 / 1.263436895. Neither exact 100k P2.4 branch is established; no wide model,
+loss, schedule or data-filter change was made. `curve-value-tables.json` and `reliability.csv`
+contain the complete available diagnostics. B's historical own-best weights remain absent.
+
+Final G100 label/oracle perturbation on 256 holdout rows has identical policy/value tensors
+in evaluation and matched-RNG training modes (`G100-label-perturbation.json`). Earlier
+full-manifest winner and sampled per-side/prefix checks apply to this nested subset;
+these are bounded smoke checks, not exhaustive isolation proof. The named leakage module's
+readability-only limitation remains recorded. No new loss or architecture was introduced.
+
+CPU play command, unchanged application at `20fbada8f3cf6307262b9ba314c29ea81087cf55`; model source `46e9c0d`:
+
+```sh
+/workspace/fog/.venv/bin/python -m fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_blueprint_cpu.yaml --checkpoint blueprint=runs/p2_gpu_checkpoints/G100-bc_best.pt --checkpoint-config blueprint=configs/replay_blueprint_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --temperature 0 --action-stats --resume --out /workspace/fog/runs/p2_gpu_play/G100-play.json
+```
+
+| Candidate (smoke) | Opponent | Games | W-L-D | Win rate [95% Wilson] | Failures / truncations | Seconds/decision / fallbacks | Commit |
+| --- | --- | ---: | --- | --- | --- | --- | --- |
+| G100 fallback policy epoch6 | simpleheuristics | 400 | 209-191-0 | 0.5225 [0.473569, 0.571003] | 0 / 0 | not emitted / not emitted | `20fbada` |
+| G100 fallback policy epoch6 | maxdamage | 400 | 343-57-0 | 0.8575 [0.819837, 0.888362] | 0 / 0 | not emitted / not emitted | `20fbada` |
+
+Total CPU play command wall: **324.211583 s**. Separate output `G100-play.json`;
+pinned Showdown `e440c4a`, same pool_b matched recipe, greedy. G20 was 0.520/0.8675 and B
+0.360/0.7725; the two larger models' intervals overlap. No play-strength gate is claimed.
+
+Private checkpoint dataset **version3** retains all **six** selected files and earlier
+versions. The literal portable owner command was executed in a fresh directory; all sizes
+and SHA-256 values match `checkpoints.json` (`checkpoint-version-G100.json`,
+`checkpoint-portable-download-G100.json`). No weights, account identity or token are committed.
+
+GPU accounting uses Kaggle quota-hours. Calibration used **0.879015278 h**; G20's own-session
+bound is **9.840590008 h**. The final account delta from its immediate pre-submission meter
+is **5.959728333 h**, a conservative G100 charge bound excluding its uncharged queue and
+including any unrelated account activity. The submission-wall bound is 9.835289352 h and
+must not be treated as a GPU charge. Replay-job bounds sum to **16.679333619 h**; the
+conservative whole-account meter is **17.078547222 h**, below 20 with **2.921452778 h** left.
+`gpu-hours.json` preserves each scope, including failed calibration attempts and the earlier
+shared-account overlap. All P2 boxes stay unchecked; the exact100k point and full G3/batch
+calibration remain the next missing evidence, with every original threshold unchanged.

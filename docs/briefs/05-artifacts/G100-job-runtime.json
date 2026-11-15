@@ -1,0 +1,15 @@
+{
+  "spec": {
+    "commit": "46e9c0da2c1b6caa01ab3da0b5bba2e103029662",
+    "run": "G100",
+    "games": 40955,
+    "epochs": 6,
+    "batch_size": 1024,
+    "stop_after_epoch": null,
+    "job_seconds": 27000
+  },
+  "status": "returned",
+  "install_seconds": 90.76370581199998,
+  "job_wall_seconds_before_export": 21141.682146943,
+  "note": "Add export and platform session overhead from the returned session status."
+}

@@ -1,0 +1,14 @@
+{
+  "label": "smoke",
+  "command": [
+    "/home/agent/.local/share/uv/tools/kaggle/bin/python",
+    "/tmp/fog_collect_completed.py",
+    "G100",
+    "fog-p2-g100-20261114",
+    "40955",
+    "6"
+  ],
+  "source_commit": "20fbada8f3cf6307262b9ba314c29ea81087cf55",
+  "wall_seconds": 20.14614848898782,
+  "exit_code": 0
+}
