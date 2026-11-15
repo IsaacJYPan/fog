@@ -1,0 +1,19 @@
+# Brief 09: warm-start R4, then learn only the preview path from one row/player/game.
+extends: replay_mechanical_cpu.yaml
+model:
+  order_blind_preview: true
+loss:
+  preview_coef: 1.0
+bc:
+  preview_only: true
+  scope: preview
+  init_ckpt: runs/order_blind_model/R4/checkpoints/bc_best.pt
+  save_best_value: false
+  manifest: runs/order_blind_model/preview_split/train_1000.parquet
+  holdout_manifest: runs/order_blind_model/preview_split/holdout_manifest.parquet
+  epochs: 8
+  early_stopping_patience: 0
+  resume: true
+  selection_metric: action_ce
+log:
+  dir: runs/order_blind_model/R5

@@ -73,6 +73,15 @@ def bc_loss(
     retention_coef: float = 0.0,
     return_components: bool = False,
 ):
+    if loss_cfg.get("_preview_only", False):
+        logits = agent.preview_logits(batch)
+        ce = torch.nn.functional.cross_entropy(logits, batch["preview_action"])
+        total = float(loss_cfg["preview_coef"]) * ce
+        metrics = {"loss": float(total.detach()), "preview_ce": float(ce.detach()),
+                   "action_ce": float(ce.detach()),
+                   "preview_top1": float((logits.argmax(-1) == batch["preview_action"]).float().mean()),
+                   "preview_rows_count": len(logits)}
+        return (total, metrics, {"preview": total}) if return_components else (total, metrics)
     out = agent(batch)
     policy_valid = _policy_supervision_mask(batch, loss_cfg)
     chosen_nll = -out.log_probs.gather(-1, batch["action"].unsqueeze(-1)).squeeze(-1)
@@ -244,6 +253,8 @@ def _average_metrics(weighted: list[tuple[int, dict]]) -> dict[str, float]:
             result[key] = float(
                 sum(rows * value for rows, value in values) / max(1, denominator)
             )
+    if "preview_ce" in result:
+        return result
     if "value_rows_count" in result:
         result["value_ece"] = sum(abs(result[f"value_pred_bin{i}_count"] -
                                       result[f"value_target_bin{i}_count"]) for i in range(10)) / max(1, result["value_rows_count"])
@@ -522,6 +533,14 @@ def _select_trainable_parameters(agent, scope: str) -> list[torch.nn.Parameter]:
         return [parameter for parameter in agent.parameters() if parameter.requires_grad]
     for parameter in agent.parameters():
         parameter.requires_grad_(False)
+    if scope == "preview":
+        modules = [agent.backbone.embeds, agent.backbone.current_state_encoder,
+                   agent.backbone.private_state_encoder, agent.backbone.preview_context,
+                   agent.preview]
+        for selected in modules:
+            for parameter in selected.parameters():
+                parameter.requires_grad_(True)
+        return [parameter for selected in modules for parameter in selected.parameters()]
     if scope == "belief":
         module = agent.belief
     elif scope == "belief_shared":
@@ -663,7 +682,7 @@ def _select_trainable_parameters(agent, scope: str) -> list[torch.nn.Parameter]:
         ]
     else:
         raise ValueError(
-            "bc.scope must be 'full', 'belief', 'belief_shared', 'belief_value_shared', "
+            "bc.scope must be 'full', 'preview', 'belief', 'belief_shared', 'belief_value_shared', "
             "'belief_structured', 'belief_value_prior_shared', "
             "'policy_belief_value_prior_shared', 'value', 'value_prior', "
             "'value_shared', 'value_structured', 'policy', 'policy_shared', "
@@ -718,7 +737,7 @@ def _split_replay_manifest(
 
 def train(cfg: dict) -> dict:
     from fog.models.agent import FogAgent
-    from fog.training.dataset import ReplayDataset, StreamingReplayDataset
+    from fog.training.dataset import PreviewDataset, ReplayDataset, StreamingReplayDataset
     from fog.training.preflight import require_preflight
 
     require_preflight(cfg)
@@ -760,6 +779,16 @@ def train(cfg: dict) -> dict:
             manifest, ckpt_dir.parent, holdout_fraction, seed
         )
 
+    preview_only = bool(bc_cfg.get("preview_only", False))
+    if preview_only:
+        if bc_cfg.get("save_best_value", False) or bc_cfg.get("scope") != "preview":
+            raise ValueError("preview_only requires scope=preview and save_best_value=false")
+        if float(loss_cfg.get("preview_coef", 0.0)) <= 0:
+            raise ValueError("preview_only requires positive loss.preview_coef")
+        if any(bc_cfg.get(k) for k in ("auxiliary_manifest", "guard_train_manifest", "guard_holdout_manifest")):
+            raise ValueError("preview_only uses a single preview training/holdout source")
+        loss_cfg = {**loss_cfg, "_preview_only": True}
+
     resume = bool(bc_cfg.get("resume", False))
     state_path = ckpt_dir / "bc_state.pt"
     resume_settings = _resume_settings(cfg, manifest, eval_manifest) if resume else None
@@ -777,6 +806,8 @@ def train(cfg: dict) -> dict:
     shard_buffer = int(bc_cfg.get("shard_buffer", 64))
 
     def make_dataset(path, *, training: bool, force_policy_valid: bool = False):
+        if preview_only:
+            return PreviewDataset(path, limit_rows=limit if training else None)
         if streaming:  # 150k-game corpora: shard-streaming, no full concat
             return StreamingReplayDataset(
                 path,
@@ -882,7 +913,7 @@ def train(cfg: dict) -> dict:
         f"; holdout={len(eval_ds)} rows" if eval_manifest is not None else "; eval=train subset"
     )
     print(
-        f"BC dataset: train={len(ds)} decision rows{split_note}  "
+        f"BC dataset: train={len(ds)} {'preview' if preview_only else 'decision'} rows{split_note}  "
         f"(config_hash={config_hash(cfg)}, torch_threads={torch.get_num_threads()})"
     )
     agent = FogAgent.from_tables(cfg).to(device)
@@ -1203,11 +1234,15 @@ def train(cfg: dict) -> dict:
     if resumed is None:
         history.append(baseline_row)
         _write_metrics(metrics_path, history)
-    print(
-        f"[bc] baseline  loss={baseline['loss']:.3f}  "
-        f"belief={baseline['belief']:.3f}  chain={baseline['belief_chain']:.3f}",
-        flush=True,
-    )
+    if preview_only:
+        print(f"[bc] preview baseline CE={baseline['preview_ce']:.3f} "
+              f"top1={baseline['preview_top1']:.3f}", flush=True)
+    else:
+        print(
+            f"[bc] baseline  loss={baseline['loss']:.3f}  "
+            f"belief={baseline['belief']:.3f}  chain={baseline['belief_chain']:.3f}",
+            flush=True,
+        )
     if auxiliary_baseline is not None:
         print(
             f"[bc] auxiliary baseline loss={auxiliary_baseline['loss']:.3f}  "
@@ -1686,15 +1721,21 @@ def train(cfg: dict) -> dict:
             epochs_without_improvement = 0
         else:
             epochs_without_improvement += 1
-        print(
-            f"[bc] epoch {epoch+1}/{epochs}  train_loss={train_metrics['loss']:.3f}  "
-            f"eval_loss={eval_metrics['loss']:.3f}  "
-            f"belief={eval_metrics['belief']:.3f}  chain={eval_metrics['belief_chain']:.3f}  "
-            f"value={eval_metrics['value']:.3f}  "
-            f"query_p={eval_metrics.get('belief_chain_true_prob', 0.0):.3f}  "
-            f"dropped={eval_metrics['belief_chain_dropped_rate']:.3%}",
-            flush=True,
-        )
+        if preview_only:
+            print(f"[bc] preview epoch {epoch+1}/{epochs} "
+                  f"train_CE={train_metrics['preview_ce']:.3f} "
+                  f"eval_CE={eval_metrics['preview_ce']:.3f} "
+                  f"top1={eval_metrics['preview_top1']:.3f}", flush=True)
+        else:
+            print(
+                f"[bc] epoch {epoch+1}/{epochs}  train_loss={train_metrics['loss']:.3f}  "
+                f"eval_loss={eval_metrics['loss']:.3f}  "
+                f"belief={eval_metrics['belief']:.3f}  chain={eval_metrics['belief_chain']:.3f}  "
+                f"value={eval_metrics['value']:.3f}  "
+                f"query_p={eval_metrics.get('belief_chain_true_prob', 0.0):.3f}  "
+                f"dropped={eval_metrics['belief_chain_dropped_rate']:.3%}",
+                flush=True,
+            )
         if auxiliary_eval_metrics is not None:
             print(
                 f"[bc] auxiliary eval loss={auxiliary_eval_metrics['loss']:.3f}  "

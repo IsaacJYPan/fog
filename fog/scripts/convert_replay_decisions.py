@@ -48,6 +48,7 @@ def _convert_one(path: Path, *, shard_dir: Path, min_rating: int, imputations: i
             output["quarantine"] = {"id": path.stem, "reason": "no accepted policy decisions"}
             return output
         arrays = rows_to_arrays(rows)
+        arrays.update(result["preview_arrays"])
         if not np.isfinite(arrays["action_features"]).all():
             raise ValueError("non-finite reconstructed action features")
         if not arrays["policy_valid"].all():
@@ -64,6 +65,8 @@ def _convert_one(path: Path, *, shard_dir: Path, min_rating: int, imputations: i
             "private_truth": False,
             "imputation_method": "replay_candidates_v1" if _BANK else "usage_baseline",
             "candidate_bank_sha256": _BANK.sha256 if _BANK else "",
+            "n_preview_rows": len(arrays["preview_label"]),
+            "n_preview_valid": int(arrays["preview_valid"].sum()),
             "lead_p1": result["lead_positions"]["p1"],
             "lead_p2": result["lead_positions"]["p2"],
         }
@@ -97,7 +100,7 @@ def _resume_settings(args) -> Path | None:
     if not args.resume:
         return None
     settings = {
-        "version": 8,
+        "version": 9,
         "raw": str(args.raw.resolve()), "limit": args.limit, "min_rating": args.min_rating,
         "imputations": args.imputations, "seed": args.seed,
         "candidate_bank": str(args.candidate_bank.resolve()) if args.candidate_bank else None,
@@ -184,6 +187,8 @@ def main() -> None:
         "source_replays_considered": len(replay_files(args.raw, args.limit)),
         "parsed_replays": len(manifest),
         "quarantined_replays": len(quarantine),
+        "preview_rows": sum(row["n_preview_rows"] for row in manifest),
+        "preview_valid_rows": sum(row["n_preview_valid"] for row in manifest),
         "accepted_decision_versions": accepted,
         "all_decision_versions": total_source_rows,
         "accepted_fraction": accepted / max(1, total_source_rows),

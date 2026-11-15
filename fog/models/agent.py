@@ -396,8 +396,7 @@ class FogAgent(nn.Module):
                 model_cfg.get("simple_rule_prior_strength", 0.0)
             ),
         )
-        # Team-preview lead selection — used by FogPlayer.teampreview and trained by the
-        # REINFORCE-style preview term in ppo_update (game outcome as the bandit reward).
+        # Team-preview lead selection: replay lead CE or the existing preview bandit term.
         from fog.models.heads import TeamPreviewHead
 
         self.preview = TeamPreviewHead(d=(cfg.get("encoding", {}) | model_cfg).get("entity_hidden", 128))

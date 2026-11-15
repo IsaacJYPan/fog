@@ -632,6 +632,7 @@ def parse_replay_policy_versions(
     replay_json = permute_replay_preview(replay_json, replay_id=replay_id, seed=seed)
     lead_positions = replay_lead_positions(replay_json)
     accepted: list[dict] = []
+    previews = None
     filters: Counter[str] = Counter()
     imputation_report: dict = {}
     for imputation in range(imputations):
@@ -655,6 +656,10 @@ def parse_replay_policy_versions(
             private_sets=private_sets,
             private_provenance=provenance,
         )
+        if imputation == 0:
+            from fog.training.replay_preview import preview_arrays
+
+            previews = preview_arrays(replay_json, private_sets)
         for row in version["rows"]:
             reason = str(row.get("filter_reason", "unresolved"))
             if not row.get("policy_valid", False):
@@ -669,7 +674,7 @@ def parse_replay_policy_versions(
             accepted.append(row)
             filters["accepted"] += 1
     return {"rows": accepted, "p1_win": baseline["p1_win"], "filter_counts": dict(filters),
-            "lead_positions": lead_positions,
+            "lead_positions": lead_positions, "preview_arrays": previews,
             "imputation_report": imputation_report}
 
 

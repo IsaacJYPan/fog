@@ -272,6 +272,8 @@ class CurrentStateEncoder(nn.Module):
         field: torch.Tensor,
         active_idx: torch.Tensor,
         embeds: EntityEmbeddings,
+        *,
+        preview: bool = False,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         public_entities, public_ids = self.public_inputs(
             entities, entity_ids, embeds
@@ -284,8 +286,12 @@ class CurrentStateEncoder(nn.Module):
             )
         )
         rows = torch.arange(entities.shape[0], device=entities.device)
-        active_mine = tokens[rows, active_idx[:, 0]]
-        active_opp = tokens[rows, active_idx[:, 1]]
+        if preview:
+            active_mine = tokens[:, :6].mean(dim=1)
+            active_opp = tokens[:, 6:].mean(dim=1)
+        else:
+            active_mine = tokens[rows, active_idx[:, 0]]
+            active_opp = tokens[rows, active_idx[:, 1]]
         field_token = self.field_in(field)
         current = self.head(
             torch.cat(
@@ -608,6 +614,9 @@ class Backbone(nn.Module):
             nn.Linear(self.dyn_dim, self.dyn_dim),
         )
         self.preview_context = nn.Linear(self.current_dim, hidden, bias=False)
+        self.order_blind_preview = bool(cfg.get("order_blind_preview", False))
+        if self.order_blind_preview and not self.embeds.order_blind:
+            raise ValueError("order_blind_preview requires order_blind_entities")
 
     @property
     def history_encoder(self) -> str:
@@ -679,7 +688,8 @@ class Backbone(nn.Module):
             [[0, 6]], dtype=torch.long, device=entities.device
         ).expand(entities.shape[0], -1)
         current, current_tokens = self.current_state_encoder(
-            entities, entity_ids, field, active_idx, self.embeds
+            entities, entity_ids, field, active_idx, self.embeds,
+            preview=self.order_blind_preview,
         )
         _, private_tokens = self.private_state_encoder(
             entities, entity_ids, active_idx, self.embeds
