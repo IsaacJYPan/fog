@@ -25,7 +25,7 @@ in different rows of the "touches" column.
 | 09 | `09-order-blind-model.md` | CPU | now | model, converter | `work/order-blind-model` | not started |
 | 10 | `10-replay-team-pool.md` | CPU | now | team data, evaluation | `work/replay-team-pool` | not started |
 | 08 | `08-update-speed-gpu.md` | GPU, 1 h | brief 05 has released the GPU | nothing (measures) | `work/update-speed` | not started |
-| 11 | `11-engine-mcts-gate.md` | CPU, about 3 days of 4 cores | 10 merged | search reconstruction | `work/g1` | waiting |
+| 11 | `11-engine-mcts-gate.md` | CPU, 1 to 2 days on 4 cores (estimate) | 10 merged | search reconstruction | `work/g1` | waiting |
 | 12 | `12-replay-live-parity.md` | CPU | 09 merged | converter, parser | `work/replay-parity` | waiting |
 | 13 | `13-replay-scale-corrected.md` | GPU, 20 h | 08 and 09 merged (12 too if it is done) | training only | `work/p2-scale-corrected` | waiting |
 | 14 | `14-ppo-update-levers.md` | GPU, 2 h | review of 08 says the update is still over half the wall time | PPO update | `work/ppo-update` | conditional |
