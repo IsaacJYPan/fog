@@ -137,7 +137,8 @@ class PolicyValueHead(nn.Module):
         policy_shared_context: torch.Tensor | None = None,  # [B,T] policy read of all tokens
         value_shared_context: torch.Tensor | None = None,  # [B,T] value read of all tokens
         value_logit_bias: torch.Tensor | None = None,  # [B] optional matchup prior
-    ) -> tuple[torch.Tensor, torch.Tensor]:
+        return_value_logit: bool = False,
+    ) -> tuple[torch.Tensor, torch.Tensor] | tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         if self.shared_state_dim:
             if shared_state is None or tuple(shared_state.shape[1:]) != (self.shared_state_dim,):
                 raise ValueError(
@@ -265,6 +266,8 @@ class PolicyValueHead(nn.Module):
                 raise ValueError("value_logit_bias must have shape [batch]")
             value_logit = value_logit + value_logit_bias
         value = torch.tanh(value_logit)
+        if return_value_logit:
+            return log_probs, value, value_logit
         return log_probs, value
 
 

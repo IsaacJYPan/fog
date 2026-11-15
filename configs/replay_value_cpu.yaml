@@ -1,0 +1,9 @@
+# Brief 09 R3: order-blind entities, stable logistic value and dense public outcomes.
+extends: replay_order_blind_cpu.yaml
+loss:
+  value_loss: logistic
+  outcome_aux_coef: 0.1
+bc:
+  save_best_value: true
+log:
+  dir: runs/order_blind_model/R3

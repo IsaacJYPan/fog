@@ -286,3 +286,49 @@ def test_thread_option_leaves_runtime_setting_unchanged_by_default(tiny_training
     monkeypatch.setattr(torch, "set_num_threads", calls.append)
     bc.train(tiny_training)
     assert calls == []
+
+
+def test_best_value_checkpoint_is_independent_and_survives_resume(tiny_training, monkeypatch):
+    real_eval = bc._fixed_eval
+    cursor = [0]
+
+    def scheduled_eval(*args, **kwargs):
+        metrics = real_eval(*args, **kwargs)
+        index = cursor[0]
+        cursor[0] += 1
+        metrics['action_ce'] = [2., 1.5, 1., .8, .6][index]
+        metrics['value'] = [1., .5, .4, .8, 1.][index]
+        return metrics
+
+    monkeypatch.setattr(bc, '_fixed_eval', scheduled_eval)
+    full = copy.deepcopy(tiny_training)
+    full['bc'].update(save_best_value=True, selection_metric='action_ce')
+    full['log']['dir'] += '-value-full'
+    _seed_external()
+    bc.train(full)
+    reference = _state(full)
+    assert reference['best_epoch'] == 4 and reference['best_value_epoch'] == 2
+    selected = torch.load(Path(full['log']['dir'])/'checkpoints/bc_best_value.pt', weights_only=False)
+    epoch_two = torch.load(Path(full['log']['dir'])/'checkpoints/bc_epoch2.pt', weights_only=False)
+    _assert_state_equal(selected, epoch_two)
+    for row in reference['history']:
+        assert 'eval_value_brier' in row and 'eval_value_ece' in row
+    split = copy.deepcopy(full)
+    split['log']['dir'] += '-resumed'
+    original = bc._atomic_save
+    cursor[0] = 0
+    _seed_external()
+    _interrupt_after_epoch(monkeypatch, 2)
+    with pytest.raises(KeyboardInterrupt):
+        bc.train(split)
+    # Simulate an interrupted later epoch overwriting the selected file before state commit.
+    torch.save({'stale_partial_epoch': torch.zeros(1)},
+               Path(split['log']['dir'])/'checkpoints/bc_best_value.pt')
+    monkeypatch.setattr(bc, '_atomic_save', original)
+    bc.train(split)
+    restored = _state(split)
+    for key in ('model', 'optimizer', 'scheduler', 'rng', 'best_value_model',
+                'best_value_epoch', 'best_value_loss'):
+        _assert_state_equal(reference[key], restored[key])
+    selected = torch.load(Path(split['log']['dir'])/'checkpoints/bc_best_value.pt', weights_only=False)
+    _assert_state_equal(selected, epoch_two)

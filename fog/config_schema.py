@@ -56,7 +56,7 @@ _SECTION_KEYS = {
         "action_coef", "belief_chain_coef", "belief_coef", "preview_coef",
         "require_exact_chosen_action_features", "require_exact_chosen_legality",
         "require_belief_labels",
-        "self_belief_chain_coef", "self_belief_coef", "value_coef",
+        "self_belief_chain_coef", "self_belief_coef", "value_coef", "value_loss", "outcome_aux_coef",
     },
     "log": {"checkpoint_every_decisions", "dir", "halt_on_regression_sigma", "tensorboard"},
     "ppo": {
@@ -105,7 +105,7 @@ _SECTION_KEYS = {
         "primary_selection_metrics",
         "reconstruction_coef", "reconstruction_decoder", "reconstruction_slot_dim", "scope",
         "shared_lr_scale", "shard_buffer", "streaming", "resume", "selection_metric",
-        "torch_threads",
+        "torch_threads", "save_best_value",
     },
     "eval": {
         "closure_games", "closure_opponent", "games_per", "include_reading_opponent",

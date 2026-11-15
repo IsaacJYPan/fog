@@ -407,6 +407,33 @@ def replay_player_names(replay_json: dict) -> dict[str, str]:
     return names
 
 
+def _terminal_targets(st) -> dict:
+    from fog.encoding.entities import L, encode_entities
+    from fog.encoding.reveals import build_belief_input, opponent_slots, opponent_views_from_battle
+
+    opponent = opponent_slots(st.battle)
+    tokens = build_belief_input(opponent_views_from_battle(st.battle, TABLES), TABLES)["tokens"]
+    raw, _, _ = encode_entities(st.battle, TABLES, opp_tokens=tokens,
+                                perspective=st.role, tracker=st.tracker)
+    own_count = len(team_order(st.battle)[:6])
+    present = np.asarray([i < own_count for i in range(6)] +
+                         [sid is not None for sid, _ in opponent], dtype=bool)
+    hp = raw[:, L.hp].copy()
+    for index, mon in enumerate(team_order(st.battle)[:6]):
+        if not getattr(mon, "max_hp", None) and not getattr(mon, "fainted", False):
+            hp[index] = 1.0  # no public HP condition was ever recorded for this preview member
+    for index, (sid, mon) in enumerate(opponent):
+        if sid is not None and mon is None:
+            hp[6 + index] = 1.0  # publicly unused preview member
+    hp = np.where(present, hp, 0.0)
+    return {
+        "terminal_alive": np.where(present, 1.0 - raw[:, L.fainted], 0.0).astype(np.float32),
+        "terminal_alive_mask": present,
+        "terminal_hp_difference": float((hp[:6].sum() - hp[6:].sum()) / 6),
+        "terminal_valid": True,
+    }
+
+
 def parse_replay(
     replay_json: dict,
     *,
@@ -506,6 +533,7 @@ def parse_replay(
         # public self-belief target should contain, including original-vs-current semantics.
         self_belief = belief_by_role[other]
         outcome = 0.0 if won is None else (1.0 if won else -1.0)
+        terminal = _terminal_targets(st)
         for r in st.rows:
             out_rows.append(
                 {
@@ -515,6 +543,7 @@ def parse_replay(
                     "belief": belief,
                     "self_belief": self_belief,
                     "outcome": outcome,
+                    **terminal,
                     "policy_valid": r["policy_valid"],
                     "filter_reason": r.get("filter_reason", "unresolved"),
                     "own_set_provenance": r.get("own_set_provenance"),
@@ -634,6 +663,10 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
     belief = np.zeros((n, 6, SET_N_ATTRS), dtype=np.int64)
     self_belief = np.zeros((n, 6, SET_N_ATTRS), dtype=np.int64)
     outcome = np.zeros(n, dtype=np.float32)
+    terminal_alive = np.zeros((n, 12), dtype=np.float32)
+    terminal_alive_mask = np.zeros((n, 12), dtype=bool)
+    terminal_hp_difference = np.zeros(n, dtype=np.float32)
+    terminal_valid = np.zeros(n, dtype=bool)
     from fog.encoding.action_features import ACTION_FEATURE_DIM
 
     action_features = np.zeros((n, 14, ACTION_FEATURE_DIM), dtype=np.float32)
@@ -665,6 +698,11 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
         belief[i] = r["belief"]
         self_belief[i] = r["self_belief"]
         outcome[i] = r["outcome"]
+        if r.get("terminal_valid", False):
+            terminal_alive[i] = r["terminal_alive"]
+            terminal_alive_mask[i] = r["terminal_alive_mask"]
+            terminal_hp_difference[i] = r["terminal_hp_difference"]
+            terminal_valid[i] = True
         if o.action_features is not None:
             from fog.encoding.public_action_features import public_action_features
 
@@ -693,6 +731,10 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
         "belief_targets": belief,
         "self_belief_targets": self_belief,
         "outcome": outcome,
+        "terminal_alive": terminal_alive,
+        "terminal_alive_mask": terminal_alive_mask,
+        "terminal_hp_difference": terminal_hp_difference,
+        "terminal_valid": terminal_valid,
         "action_features": action_features,
         "policy_valid": policy_valid,
         "own_set_provenance": own_set_provenance,

@@ -31,7 +31,17 @@ _ARRAYS = (
     "action_features", "policy_valid",
     "own_set_provenance", "opponent_set_provenance", "legal_provenance",
     "action_feature_provenance", "imputation_id",
+    "terminal_alive", "terminal_alive_mask", "terminal_hp_difference", "terminal_valid",
 )
+
+
+_TERMINAL_ARRAYS = ("terminal_alive", "terminal_alive_mask", "terminal_hp_difference", "terminal_valid")
+
+
+def _terminal_default(key: str, n: int) -> np.ndarray:
+    shape = (n, 12) if key in {"terminal_alive", "terminal_alive_mask"} else (n,)
+    dtype = bool if key in {"terminal_valid", "terminal_alive_mask"} else np.float32
+    return np.zeros(shape, dtype=dtype)
 
 
 def _build_batch(d: dict[str, np.ndarray], idx: np.ndarray, tables, device=None) -> dict:
@@ -63,6 +73,10 @@ def _build_batch(d: dict[str, np.ndarray], idx: np.ndarray, tables, device=None)
         ),
         "imputation_id": _t(d["imputation_id"][idx], torch.long, device),
     }
+    for key in _TERMINAL_ARRAYS:
+        if key in d:
+            dtype = torch.bool if key in {"terminal_valid", "terminal_alive_mask"} else torch.float32
+            batch[key] = _t(d[key][idx], dtype, device)
     # Belief targets are stored in paste order; the chain input (opp_tokens) packs revealed moves
     # into the earliest subslots, so align per row before splitting into label dicts.
     aligned, _ = align_truth_to_views(d["belief_targets"][idx], opp_tokens)
@@ -127,6 +141,8 @@ class ReplayDataset:
                     buf[k].append(np.zeros((n, 6, 15), dtype=np.uint8))
                 elif k in ("legal_provenance", "action_feature_provenance") and k not in z:
                     buf[k].append(np.zeros((n, 14), dtype=np.uint8))
+                elif k in _TERMINAL_ARRAYS and k not in z:
+                    buf[k].append(_terminal_default(k, len(z["action"])))
                 elif k == "imputation_id" and k not in z:
                     buf[k].append(np.full(n, -1, dtype=np.int16))
                 else:
@@ -217,6 +233,8 @@ class StreamingReplayDataset:
                         buf[k].append(np.zeros((len(z["action"]), 6, 15), dtype=np.uint8))
                     elif k in ("legal_provenance", "action_feature_provenance") and k not in z:
                         buf[k].append(np.zeros((len(z["action"]), 14), dtype=np.uint8))
+                    elif k in _TERMINAL_ARRAYS and k not in z:
+                        buf[k].append(_terminal_default(k, len(z["action"])))
                     elif k == "imputation_id" and k not in z:
                         buf[k].append(np.full(len(z["action"]), -1, dtype=np.int16))
                     else:

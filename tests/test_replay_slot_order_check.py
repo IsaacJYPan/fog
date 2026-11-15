@@ -142,3 +142,18 @@ def test_lead_summary_counts_games_and_explicitly_reports_missing_leads():
     assert summary["games_with_both_leads_known"] == 2
     assert summary["share_games_both_leads_position0"] == 0.5
     assert summary["share_games_either_lead_position0"] == 1
+
+
+def test_extreme_value_predictions_report_prevalence_and_observed_outcomes():
+    totals = np.zeros(36)
+    totals[0] = 3
+    totals[32], totals[33] = 1, 1
+    totals[34], totals[35] = 1, 0
+    result = _value_statistic(totals)
+    assert result['share_below_0_1'] == 1/3
+    assert result['observed_win_rate_below_0_1'] == 1
+    assert result['share_above_0_9'] == 1/3
+    assert result['observed_win_rate_above_0_9'] == 0
+    empty = _value_statistic(np.zeros(36))
+    assert empty['observed_win_rate_below_0_1'] is None
+    assert empty['observed_win_rate_above_0_9'] is None

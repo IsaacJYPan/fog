@@ -82,7 +82,32 @@ def bc_loss(
         if bool(finite_policy.any())
         else out.log_probs.new_zeros(())
     )
-    value = losses.value_loss(out.value, batch["outcome"])
+    if loss_cfg.get("value_loss", "mse") == "logistic":
+        if out.value_logit is None:
+            raise ValueError("logistic value loss requires the model's unsaturated value logit")
+        value = torch.nn.functional.binary_cross_entropy_with_logits(
+            2.0 * out.value_logit, (batch["outcome"] + 1.0) / 2.0
+        )
+    else:
+        value = losses.value_loss(out.value, batch["outcome"])
+    auxiliary_coef = float(loss_cfg.get("outcome_aux_coef", 0.0))
+    alive_aux = out.value.new_zeros(())
+    hp_aux = out.value.new_zeros(())
+    if auxiliary_coef > 0:
+        if "terminal_valid" not in batch or not bool(batch["terminal_valid"].all()):
+            raise ValueError("outcome_aux_coef needs terminal targets; reconvert this corpus")
+        if out.terminal_alive_logits is None or out.terminal_hp_difference is None:
+            raise ValueError("outcome_aux_coef requires the outcome auxiliary heads")
+        valid_alive = batch["terminal_alive_mask"]
+        if not bool(valid_alive.any()):
+            raise ValueError("outcome auxiliary labels contain no public Pokemon targets")
+        alive_terms = torch.nn.functional.binary_cross_entropy_with_logits(
+            out.terminal_alive_logits, batch["terminal_alive"], reduction="none"
+        )
+        alive_aux = alive_terms[valid_alive].mean()
+        hp_aux = torch.nn.functional.mse_loss(
+            out.terminal_hp_difference, batch["terminal_hp_difference"]
+        )
     belief = out.log_probs.new_zeros(())
     belief_stats: dict[str, int] = {}
     if out.belief is not None and loss_cfg.get("belief_coef", 1.0) > 0:
@@ -136,6 +161,8 @@ def bc_loss(
         "self_belief": loss_cfg.get("self_belief_coef", 0.0) * self_belief,
         "retention": retention_coef * retention,
     }
+    if auxiliary_coef > 0:
+        components["outcome_aux"] = auxiliary_coef * (alive_aux + hp_aux)
     total = sum(components.values())
     with torch.no_grad():
         correct = out.log_probs.argmax(-1) == batch["action"]
@@ -156,6 +183,20 @@ def bc_loss(
         "policy_valid_count": float(finite_policy.sum().item()),
         "policy_total_count": float(policy_valid.numel()),
     }
+    if loss_cfg.get("_value_diagnostics", False) or loss_cfg.get("value_loss", "mse") == "logistic" or auxiliary_coef > 0:
+        with torch.no_grad():
+            probability = ((out.value.detach().double() + 1) / 2).clamp(0, 1)
+            target = (batch["outcome"].double() + 1) / 2
+            metrics["value_brier"] = float(((probability - target) ** 2).mean())
+            metrics["value_rows_count"] = float(probability.numel())
+            bins = (probability * 10).long().clamp(0, 9)
+            predicted = torch.bincount(bins, weights=probability, minlength=10)
+            observed = torch.bincount(bins, weights=target, minlength=10)
+            for index in range(10):
+                metrics[f"value_pred_bin{index}_count"] = float(predicted[index])
+                metrics[f"value_target_bin{index}_count"] = float(observed[index])
+        metrics["outcome_alive"] = float(alive_aux.detach())
+        metrics["outcome_hp"] = float(hp_aux.detach())
     if "imputation_id" in batch:
         for imputation in batch["imputation_id"].unique().tolist():
             imputation = int(imputation)
@@ -203,6 +244,9 @@ def _average_metrics(weighted: list[tuple[int, dict]]) -> dict[str, float]:
             result[key] = float(
                 sum(rows * value for rows, value in values) / max(1, denominator)
             )
+    if "value_rows_count" in result:
+        result["value_ece"] = sum(abs(result[f"value_pred_bin{i}_count"] -
+                                      result[f"value_target_bin{i}_count"]) for i in range(10)) / max(1, result["value_rows_count"])
     valid = result.get("belief_valid_count", 0.0)
     dropped = result.get("belief_dropped_count", 0.0)
     result["belief_dropped_rate"] = dropped / max(1.0, valid + dropped)
@@ -726,6 +770,9 @@ def train(cfg: dict) -> dict:
             raise ValueError("cannot resume: unsupported bc_state.pt version")
         _check_resume_settings(resumed["settings"], resume_settings)
 
+    save_best_value = bool(bc_cfg.get("save_best_value", False))
+    if save_best_value:
+        loss_cfg = {**loss_cfg, "_value_diagnostics": True}
     streaming = bool(bc_cfg.get("streaming", False))
     shard_buffer = int(bc_cfg.get("shard_buffer", 64))
 
@@ -1097,6 +1144,8 @@ def train(cfg: dict) -> dict:
         # was committed. Restore both to the last complete epoch before replaying that epoch.
         _write_metrics(metrics_path, history)
         torch.save(resumed["best_model"], ckpt_dir / "bc_best.pt")
+        if save_best_value:
+            torch.save(resumed["best_value_model"], ckpt_dir / "bc_best_value.pt")
         _restore_rng_state(resumed["rng"])
         print(f"[bc] resume: completed epoch {resumed['epoch']}/{epochs}", flush=True)
     if guard_baseline is not None and guard_metric not in guard_baseline:
@@ -1194,9 +1243,16 @@ def train(cfg: dict) -> dict:
     epochs_without_improvement = 0
     step = 0
     start_epoch = 0
+    best_value_loss = baseline["value"] if save_best_value else float("inf")
+    best_value_epoch = 0
     if resumed is None:
         torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
+        if save_best_value:
+            torch.save(agent.state_dict(), ckpt_dir / "bc_best_value.pt")
     else:
+        if save_best_value:
+            best_value_loss = resumed["best_value_loss"]
+            best_value_epoch = resumed["best_value_epoch"]
         best_eval_loss = resumed["best_eval_loss"]
         best_meaningful_eval_loss = resumed["best_meaningful_eval_loss"]
         best_epoch = resumed["best_epoch"]
@@ -1621,6 +1677,10 @@ def train(cfg: dict) -> dict:
             best_epoch = epoch + 1
             torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
 
+        if save_best_value and eval_metrics["value"] < best_value_loss:
+            best_value_loss = eval_metrics["value"]
+            best_value_epoch = epoch + 1
+            torch.save(agent.state_dict(), ckpt_dir / "bc_best_value.pt")
         if selection_loss < best_meaningful_eval_loss - early_stopping_min_delta:
             best_meaningful_eval_loss = selection_loss
             epochs_without_improvement = 0
@@ -1671,6 +1731,11 @@ def train(cfg: dict) -> dict:
                     "best_model": torch.load(
                         ckpt_dir / "bc_best.pt", map_location="cpu", weights_only=False
                     ),
+                    **({
+                        "best_value_model": torch.load(ckpt_dir / "bc_best_value.pt", map_location="cpu", weights_only=False),
+                        "best_value_loss": best_value_loss,
+                        "best_value_epoch": best_value_epoch,
+                    } if save_best_value else {}),
                     "best_eval_loss": best_eval_loss,
                     "best_meaningful_eval_loss": best_meaningful_eval_loss,
                     "best_epoch": best_epoch,
@@ -1696,6 +1761,11 @@ def train(cfg: dict) -> dict:
 
     final = ckpt_dir / "bc_final.pt"
     torch.save(agent.state_dict(), final)
+    if save_best_value:
+        (ckpt_dir.parent / "value_selection.json").write_text(json.dumps({
+            "best_value_epoch": best_value_epoch, "best_value_loss": best_value_loss,
+            "best_policy_epoch": best_epoch,
+        }, indent=2) + "\n", encoding="utf-8")
     best_path = ckpt_dir / "bc_best.pt"
     best_state = torch.load(best_path, map_location="cpu", weights_only=False)
     changed_names = sorted(

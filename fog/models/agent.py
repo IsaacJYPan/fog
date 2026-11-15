@@ -49,6 +49,9 @@ class AgentOutput:
     # Returned batch diagnostic used by reconstruction retention losses.  Keeping it in the
     # output avoids recomputing the shared trunk and does not retain mutable state on the module.
     shared_state: torch.Tensor | None = None
+    value_logit: torch.Tensor | None = None
+    terminal_alive_logits: torch.Tensor | None = None
+    terminal_hp_difference: torch.Tensor | None = None
 
 
 class TypedMatchupPrior(nn.Module):
@@ -106,6 +109,9 @@ class FogAgent(nn.Module):
                     "order_blind_entities requires typed contextual readers and action queries "
                     "without ordered exact/action-feature inputs"
                 )
+        self.logistic_value = cfg.get("loss", {}).get("value_loss", "mse") == "logistic"
+        if cfg.get("loss", {}).get("value_loss", "mse") not in {"mse", "logistic"}:
+            raise ValueError("loss.value_loss must be mse or logistic")
         self.aux_into_trunk = model_cfg.get("aux_into_trunk", True)
         self.oracle = model_cfg.get("oracle", "none")  # {none, set, action} evaluation ceilings
         # blind_reactive baseline: force history to 0 and zero the belief conditioning,
@@ -380,6 +386,14 @@ class FogAgent(nn.Module):
         from fog.models.heads import TeamPreviewHead
 
         self.preview = TeamPreviewHead(d=(cfg.get("encoding", {}) | model_cfg).get("entity_hidden", 128))
+        self.outcome_alive = None
+        self.outcome_hp = None
+        if float(cfg.get("loss", {}).get("outcome_aux_coef", 0.0)) > 0:
+            if self.shared_latent is None or not self.shared_latent.typed_world_tokens or self.shared_to_value is None:
+                raise ValueError("outcome auxiliary heads require typed tokens and a value reader")
+            width = self.shared_latent.token_dim
+            self.outcome_alive = nn.Linear(width, 1)
+            self.outcome_hp = nn.Linear(width, 1)
 
     def preview_logits(self, batch: dict) -> torch.Tensor:
         """Lead logits [B, 6] over my six preview mons. `batch` needs entities/entity_ids/field."""
@@ -682,7 +696,7 @@ class FogAgent(nn.Module):
             action_features = action_features * self._public_action_feature_mask.to(
                 dtype=action_features.dtype, device=action_features.device
             )
-        log_probs, value = self.policy_value(
+        head_result = self.policy_value(
             policy_private, batch["legality_mask"], public_context,
             posterior_features=batch.get("posterior_features"),
             action_features=action_features,
@@ -693,7 +707,25 @@ class FogAgent(nn.Module):
             policy_shared_context=policy_shared_context,
             value_shared_context=value_shared_context,
             value_logit_bias=matchup_value_logit,
+            return_value_logit=self.logistic_value,
         )
+        if self.logistic_value:
+            log_probs, value, value_logit = head_result
+        else:
+            log_probs, value = head_result
+            value_logit = None
+        terminal_alive_logits = None
+        terminal_hp_difference = None
+        # These heads are training/evaluation targets only. The targets' values never feed
+        # any encoder or reader, and ordinary play/search does not compute the heads.
+        if self.outcome_alive is not None and "terminal_alive" in batch:
+            outcome_tokens = self.shared_latent.tokens(shared_state)[:, :12]
+            outcome_summary = value_shared_context
+            if not self.aux_into_trunk:
+                outcome_tokens = outcome_tokens.detach()
+                outcome_summary = outcome_summary.detach()
+            terminal_alive_logits = self.outcome_alive(outcome_tokens).squeeze(-1)
+            terminal_hp_difference = torch.tanh(self.outcome_hp(outcome_summary)).squeeze(-1)
 
         self_belief_out: BeliefOutput | None = None
         self_belief_chain: BeliefOutput | None = None
@@ -734,6 +766,9 @@ class FogAgent(nn.Module):
             log_probs=log_probs, value=value, belief=belief_out, self_belief=self_belief_out,
             belief_chain=belief_chain, self_belief_chain=self_belief_chain,
             shared_state=shared_state,
+            value_logit=value_logit,
+            terminal_alive_logits=terminal_alive_logits,
+            terminal_hp_difference=terminal_hp_difference,
         )
 
     def head_inputs(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor]:
