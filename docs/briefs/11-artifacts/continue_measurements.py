@@ -97,13 +97,18 @@ def run(name, games, shards, seed, budget, k, opponents, capped=False):
                     save()
                     return None
                 try:
-                    process.wait(timeout=10)
+                    remaining = ((40 * 3600 - state['budget_core_seconds']) / shards
+                                 if capped else 10.0)
+                    process.wait(timeout=max(0.01, min(10.0, remaining)))
                 except sp.TimeoutExpired:
                     pass
         finally:
             if process.poll() is None:
                 os.killpg(process.pid, signal.SIGTERM)
                 process.wait()
+    job['wall_seconds_this_attempt'] = time.monotonic() - started
+    if capped:
+        state['budget_core_seconds'] = before + shards * job['wall_seconds_this_attempt']
     after = resource.getrusage(resource.RUSAGE_CHILDREN)
     job['child_cpu_seconds_this_attempt'] = (after.ru_utime + after.ru_stime
                                            - cpu_start.ru_utime - cpu_start.ru_stime)
