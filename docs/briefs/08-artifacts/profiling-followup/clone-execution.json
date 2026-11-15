@@ -1,0 +1,13 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "clone",
+  "command": [
+    "git",
+    "clone",
+    "https://github.com/IsaacJYPan/fog.git",
+    "/kaggle/temp/fog"
+  ],
+  "exit_code": 0,
+  "seconds": 2.0235100479999915
+}

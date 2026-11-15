@@ -1,0 +1,8 @@
+{
+  "label": "smoke",
+  "updates": 2,
+  "decisions": 26326,
+  "wall_seconds_through_checkpoint": 240.50759267807007,
+  "checkpoint": "runs/collect_gpu/checkpoints/ppo_short.state.pt",
+  "reason": "brief requires exactly two complete updates"
+}

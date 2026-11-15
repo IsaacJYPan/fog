@@ -1,0 +1,39 @@
+{
+  "label": "smoke, all attempts counted",
+  "gpu_jobs": 3,
+  "cpu_only_profiler_preflight_jobs": 1,
+  "one_job_at_a_time": true,
+  "allocated_gpus_each_gpu_job": 2,
+  "quota_seconds_before_all_jobs": 61482.77,
+  "quota_seconds_after_all_jobs": 62326.945,
+  "quota_seconds_used_all_jobs": 844.1750000000029,
+  "conservative_gpu_hours_including_platform_overhead": 0.4689861111111127,
+  "job_body_device_gpu_hours": 0.45697026479,
+  "accounting": "Conservatively multiply the account-meter delta by two to count both allocated T4s, including the unused device and terminal startup/export overhead. The initial startup abort, primary measurement and profiling follow-up are all included; job-body device time is reported separately.",
+  "final_gpu_job_status": {
+    "status": "COMPLETE",
+    "failureMessage": null
+  },
+  "final_quota": {
+    "quotaRefreshTime": "2026-11-21T00:00:00.000Z",
+    "gpuQuota": {
+      "timeUsed": "62326.945.0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "75600s",
+      "minimumTimeAllowed": "21600s",
+      "isPayToScaleEnabled": true,
+      "hasEverRun": true
+    },
+    "tpuQuota": {
+      "timeUsed": "0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "72000s",
+      "minimumTimeAllowed": "72000s",
+      "isPayToScaleEnabled": false,
+      "hasEverRun": false
+    }
+  },
+  "three_successful_stack_dumps": true,
+  "primary_timing_commit": "e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f",
+  "stack_timing_commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1"
+}

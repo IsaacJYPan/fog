@@ -1,0 +1,19 @@
+{
+  "label": "smoke; comparison across runtimes and replay corpora, not an isolated ablation",
+  "ppo_step_speedup": 4.6280767042862765,
+  "end_to_end_speedup": 3.2742966592367764,
+  "replay_speedup": 3.1723743600054433,
+  "ppo_training_games": 1024,
+  "largest_sampled_ppo_part": "backward",
+  "largest_sampled_ppo_part_share": 0.5440521362867855,
+  "brief14_condition_update_over_half_smoke": true,
+  "primary_source_commit": "e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f",
+  "production_source_commit": "f36bc11d2b5390419f5b4fc805cdaa8487adea12",
+  "config_difference_from_brief06": {
+    "env.rollout_workers": {
+      "before": 2,
+      "after": 4
+    }
+  },
+  "hardware_limit": "before: two CPU cores and one T4, torch 2.14.1+cu130; after: four CPU cores, two T4s allocated, cuda:0 used, torch 2.11.0+cu130; replay rows also differ"
+}
