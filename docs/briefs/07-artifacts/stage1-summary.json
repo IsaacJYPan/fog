@@ -1,0 +1,782 @@
+{
+  "smoke": true,
+  "runs": {
+    "R0": {
+      "seed": 20261201,
+      "best_policy_epoch": 7,
+      "completed_epochs": 8,
+      "policy": {
+        "all": {
+          "rows": 103981,
+          "nll_stored": 1.771681816951996,
+          "nll_shuffled": 2.2134624948263335,
+          "top1_stored": 0.3651532491512873,
+          "top1_shuffled": 0.2269453073157596,
+          "interval95": {
+            "nll_stored": [
+              1.7633331215601853,
+              1.7802210924038115
+            ],
+            "nll_shuffled": [
+              2.203961930761907,
+              2.222826071201589
+            ],
+            "top1_stored": [
+              0.3612742098447823,
+              0.3690684439505152
+            ],
+            "top1_shuffled": [
+              0.22401632926348367,
+              0.22976694107739842
+            ]
+          }
+        },
+        "move": {
+          "rows": 74874,
+          "nll_stored": 1.5418991942135412,
+          "nll_shuffled": 2.1601295349199394,
+          "top1_stored": 0.43457007773058737,
+          "top1_shuffled": 0.24093810935705318,
+          "interval95": {
+            "nll_stored": [
+              1.5333765338459597,
+              1.5505787091356087
+            ],
+            "nll_shuffled": [
+              2.1484513220305512,
+              2.171826931253187
+            ],
+            "top1_stored": [
+              0.4297544643386815,
+              0.43945026063126186
+            ],
+            "top1_shuffled": [
+              0.23767348004546188,
+              0.2442302431491871
+            ]
+          }
+        },
+        "not_yet_moved": {
+          "rows": 20311,
+          "nll_stored": 0.8328141521906848,
+          "nll_shuffled": 2.507744513694341,
+          "top1_stored": 0.790999950765595,
+          "top1_shuffled": 0.2543449362414455,
+          "interval95": {
+            "nll_stored": [
+              0.8216663327518738,
+              0.8451709358138132
+            ],
+            "nll_shuffled": [
+              2.4841784592582488,
+              2.532009955032278
+            ],
+            "top1_stored": [
+              0.7854844324784309,
+              0.7964223599240513
+            ],
+            "top1_shuffled": [
+              0.24818593010862172,
+              0.2603582682258612
+            ]
+          },
+          "favourite_move_in_slot0_stored": 0.8587957264536458,
+          "favourite_move_in_slot0_shuffled": 0.8207867657919354
+        }
+      },
+      "value": {
+        "rows": 104037,
+        "brier": 0.3905466769302726,
+        "ece": 0.36043637077365775,
+        "interval95": {
+          "brier": [
+            0.37614459918442966,
+            0.40437663379801453
+          ],
+          "ece": [
+            0.34491624077332866,
+            0.3754617963601033
+          ]
+        }
+      },
+      "checkpoint": {
+        "path": "/workspace/fog/runs/order_blind/R0/checkpoints/bc_best.pt",
+        "bytes": 23548503,
+        "sha256": "136fa2bfeaff160fd3aa2e1a8de1bed339a7b82bfb33ee3ef5af60f40247db3b"
+      },
+      "metric_source": "R0-metrics.csv",
+      "slot_source": "R0-slot-check-extended.json",
+      "epoch_train_rows_per_second": [
+        224.09135973130756,
+        82.43544525187495,
+        229.78278212486933,
+        233.53821137276222,
+        236.51613589247438,
+        232.00449870513725,
+        81.70933489538247,
+        205.54554609767808
+      ]
+    },
+    "R1": {
+      "seed": 20261201,
+      "best_policy_epoch": 8,
+      "completed_epochs": 8,
+      "policy": {
+        "all": {
+          "rows": 103933,
+          "nll_stored": 1.9239320126389878,
+          "nll_shuffled": 1.923912915852292,
+          "top1_stored": 0.2647763463000202,
+          "top1_shuffled": 0.26411245706368525,
+          "interval95": {
+            "nll_stored": [
+              1.917740640187925,
+              1.9303365115862567
+            ],
+            "nll_shuffled": [
+              1.917804673848206,
+              1.9303807904511054
+            ],
+            "top1_stored": [
+              0.2618437826280752,
+              0.2678785666723055
+            ],
+            "top1_shuffled": [
+              0.26115964995429886,
+              0.26724306752209437
+            ]
+          }
+        },
+        "move": {
+          "rows": 74853,
+          "nll_stored": 1.7657119594839354,
+          "nll_shuffled": 1.766042526037816,
+          "top1_stored": 0.2913577278131805,
+          "top1_shuffled": 0.28979466420851535,
+          "interval95": {
+            "nll_stored": [
+              1.759971565663721,
+              1.7711657095943154
+            ],
+            "nll_shuffled": [
+              1.7605035323595182,
+              1.7714164183819274
+            ],
+            "top1_stored": [
+              0.28768047357073173,
+              0.29522827106798427
+            ],
+            "top1_shuffled": [
+              0.2861408573081933,
+              0.2935750893929043
+            ]
+          }
+        },
+        "not_yet_moved": {
+          "rows": 20309,
+          "nll_stored": 1.673311274117349,
+          "nll_shuffled": 1.673343889814042,
+          "top1_stored": 0.3371411689398789,
+          "top1_shuffled": 0.33517159879856223,
+          "interval95": {
+            "nll_stored": [
+              1.6634846936445182,
+              1.6839106774360155
+            ],
+            "nll_shuffled": [
+              1.6634056687169652,
+              1.6839587571331314
+            ],
+            "top1_stored": [
+              0.33039343759942985,
+              0.3434824005975572
+            ],
+            "top1_shuffled": [
+              0.3284159611789211,
+              0.34166787492943734
+            ]
+          },
+          "favourite_move_in_slot0_stored": 0.25742281747008716,
+          "favourite_move_in_slot0_shuffled": 0.2539268304692501
+        }
+      },
+      "value": {
+        "rows": 103944,
+        "brier": 0.3920299916012676,
+        "ece": 0.3660428326160618,
+        "interval95": {
+          "brier": [
+            0.3773108063529328,
+            0.40575623300997476
+          ],
+          "ece": [
+            0.35071106943644054,
+            0.3806763822831755
+          ]
+        }
+      },
+      "checkpoint": {
+        "path": "/workspace/fog/runs/order_blind/R1/checkpoints/bc_best.pt",
+        "bytes": 23548503,
+        "sha256": "f9ddac4541432295d3fdf16ca79220de8529854cebd0b07d317aab5557842b20"
+      },
+      "metric_source": "R1-metrics.csv",
+      "slot_source": "R1-slot-check.json",
+      "epoch_train_rows_per_second": [
+        220.59362860936494,
+        226.11638990053737,
+        216.93524808342164,
+        225.1251347731077,
+        226.89249337376717,
+        229.86147904706456,
+        228.53859617952003,
+        221.68950660005845
+      ]
+    },
+    "R1-seed2": {
+      "seed": 20261202,
+      "best_policy_epoch": 7,
+      "completed_epochs": 8,
+      "policy": {
+        "all": {
+          "rows": 103933,
+          "nll_stored": 1.9292583359403623,
+          "nll_shuffled": 1.9290049573535775,
+          "top1_stored": 0.26668141976080745,
+          "top1_shuffled": 0.26683536509097205,
+          "interval95": {
+            "nll_stored": [
+              1.9228407269956334,
+              1.9358956113578198
+            ],
+            "nll_shuffled": [
+              1.9228107172393134,
+              1.9356184332366673
+            ],
+            "top1_stored": [
+              0.263367291246929,
+              0.2700013293818241
+            ],
+            "top1_shuffled": [
+              0.26361827220256845,
+              0.27004123397423735
+            ]
+          }
+        },
+        "move": {
+          "rows": 74853,
+          "nll_stored": 1.7886175848521249,
+          "nll_shuffled": 1.7876780988909593,
+          "top1_stored": 0.2911573350433516,
+          "top1_shuffled": 0.29153140154703217,
+          "interval95": {
+            "nll_stored": [
+              1.7831757382696565,
+              1.794245090865778
+            ],
+            "nll_shuffled": [
+              1.7821035149471534,
+              1.793382202516333
+            ],
+            "top1_stored": [
+              0.28724676695654805,
+              0.29496991377250154
+            ],
+            "top1_shuffled": [
+              0.2877336498337181,
+              0.29528285553161276
+            ]
+          }
+        },
+        "not_yet_moved": {
+          "rows": 20309,
+          "nll_stored": 1.7021722739899996,
+          "nll_shuffled": 1.7023504216665473,
+          "top1_stored": 0.3296568024028756,
+          "top1_shuffled": 0.32768723226155894,
+          "interval95": {
+            "nll_stored": [
+              1.6918850294396202,
+              1.7132876118671299
+            ],
+            "nll_shuffled": [
+              1.6920559624294407,
+              1.7131928464354793
+            ],
+            "top1_stored": [
+              0.32261014652082165,
+              0.3362692431370541
+            ],
+            "top1_shuffled": [
+              0.32069563452694283,
+              0.33432651752133213
+            ]
+          },
+          "favourite_move_in_slot0_stored": 0.255157811807573,
+          "favourite_move_in_slot0_shuffled": 0.2500369294401497
+        }
+      },
+      "value": {
+        "rows": 103944,
+        "brier": 0.39746081369380987,
+        "ece": 0.37117186630763577,
+        "interval95": {
+          "brier": [
+            0.3827531685021764,
+            0.41183882164633523
+          ],
+          "ece": [
+            0.3557686720386074,
+            0.38646786801056693
+          ]
+        }
+      },
+      "checkpoint": {
+        "path": "/workspace/fog/runs/order_blind/R1-seed2/checkpoints/bc_best.pt",
+        "bytes": 23548503,
+        "sha256": "1bfcc050caa836a92873233d7468dade983d4217e1b73eb262e0c61fd9071765"
+      },
+      "metric_source": "R1-seed2-metrics.csv",
+      "slot_source": "R1-seed2-slot-check.json",
+      "epoch_train_rows_per_second": [
+        224.17025008324887,
+        224.81192961386122,
+        228.36872564355448,
+        213.0967644267676,
+        228.29460670753315,
+        226.39027784619026,
+        226.29441544220282,
+        217.44790821653507
+      ]
+    }
+  },
+  "fixed_split": {
+    "smoke": true,
+    "holdout_ids_equal": true,
+    "holdout_games": 2000,
+    "training_ids_equal": true,
+    "training_games": 1000,
+    "before_holdout_rows": 104037,
+    "after_holdout_rows": 103944,
+    "before_train_rows": 52983,
+    "after_train_rows": 52955
+  },
+  "row_checks": {
+    "before": {
+      "smoke": true,
+      "manifest": "runs/order_blind/leaky_split/holdout_manifest.parquet",
+      "checkpoint": null,
+      "rows": 103981,
+      "move_rows": 74874,
+      "label_share_by_move_slot": [
+        0.4814755455832465,
+        0.31671875417367845,
+        0.1544862034885274,
+        0.04731949675454764
+      ],
+      "not_yet_moved_rows": 20311,
+      "not_yet_moved_label_is_slot0": 0.9839988183742799,
+      "switch_only_rows": 2,
+      "largest_own_pp": 0.0,
+      "switch_rows": 29107,
+      "switch_label_counts_by_bench_position": [
+        5762,
+        5823,
+        5926,
+        5814,
+        5782
+      ],
+      "label_share_by_bench_position": [
+        0.19795925378774865,
+        0.2000549695949428,
+        0.20359363726938537,
+        0.19974576562338955,
+        0.19864637372453361
+      ],
+      "lead_order": {
+        "games": 2000,
+        "p1": {
+          "known_leads": 1999,
+          "unknown_leads": 1,
+          "counts_by_team_position": [
+            474,
+            356,
+            244,
+            285,
+            312,
+            328
+          ],
+          "share_by_team_position": [
+            0.23711855927963982,
+            0.17808904452226113,
+            0.12206103051525763,
+            0.1425712856428214,
+            0.15607803901950976,
+            0.16408204102051024
+          ],
+          "share_position0": 0.23711855927963982
+        },
+        "p2": {
+          "known_leads": 1998,
+          "unknown_leads": 2,
+          "counts_by_team_position": [
+            456,
+            356,
+            292,
+            299,
+            290,
+            305
+          ],
+          "share_by_team_position": [
+            0.22822822822822822,
+            0.1781781781781782,
+            0.14614614614614616,
+            0.14964964964964966,
+            0.14514514514514515,
+            0.15265265265265265
+          ],
+          "share_position0": 0.22822822822822822
+        },
+        "games_with_both_leads_known": 1997,
+        "share_games_either_lead_position0": 0.4186279419128693,
+        "share_games_both_leads_position0": 0.04707060590886329,
+        "source": "raw public logs"
+      },
+      "not_yet_moved_definition": "no move by the acting species in the stored history window"
+    },
+    "after": {
+      "smoke": true,
+      "manifest": "runs/blueprint/split/holdout_manifest.parquet",
+      "checkpoint": null,
+      "rows": 103933,
+      "move_rows": 74853,
+      "label_share_by_move_slot": [
+        0.2509451858976928,
+        0.24834007988991758,
+        0.24817976567405448,
+        0.2525349685383351
+      ],
+      "not_yet_moved_rows": 20309,
+      "not_yet_moved_label_is_slot0": 0.24698409572110888,
+      "switch_only_rows": 2,
+      "largest_own_pp": 0.0,
+      "switch_rows": 29080,
+      "switch_label_counts_by_bench_position": [
+        5846,
+        5768,
+        5757,
+        5854,
+        5855
+      ],
+      "label_share_by_bench_position": [
+        0.20103163686382394,
+        0.19834938101788172,
+        0.19797111416781293,
+        0.2013067400275103,
+        0.20134112792297112
+      ],
+      "lead_order": {
+        "games": 2000,
+        "p1": {
+          "known_leads": 1999,
+          "unknown_leads": 1,
+          "counts_by_team_position": [
+            345,
+            305,
+            350,
+            338,
+            309,
+            352
+          ],
+          "share_by_team_position": [
+            0.17258629314657328,
+            0.15257628814407204,
+            0.17508754377188596,
+            0.16908454227113556,
+            0.15457728864432216,
+            0.176088044022011
+          ],
+          "share_position0": 0.17258629314657328
+        },
+        "p2": {
+          "known_leads": 1998,
+          "unknown_leads": 2,
+          "counts_by_team_position": [
+            346,
+            315,
+            365,
+            320,
+            320,
+            332
+          ],
+          "share_by_team_position": [
+            0.17317317317317318,
+            0.15765765765765766,
+            0.18268268268268267,
+            0.16016016016016016,
+            0.16016016016016016,
+            0.16616616616616617
+          ],
+          "share_position0": 0.17317317317317318
+        },
+        "games_with_both_leads_known": 1997,
+        "share_games_either_lead_position0": 0.314471707561342,
+        "share_games_both_leads_position0": 0.03104656985478217,
+        "source": "converter metadata"
+      },
+      "not_yet_moved_definition": "no move by the acting species in the stored history window"
+    }
+  },
+  "digests": {
+    "smoke": true,
+    "new_model_keys": "none introduced in stage 1; model source unchanged",
+    "runs": [
+      {
+        "name": "sequential",
+        "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+        "historical": "23405989f4665988",
+        "before": "0d026fed7728c0c4",
+        "after": "0d026fed7728c0c4",
+        "same_runtime_equal": true,
+        "historical_reproduced": false,
+        "before_file": "digest-sequential-default.txt",
+        "after_file": "digest-sequential-after.txt",
+        "final": {
+          "command": [
+            ".venv/bin/python",
+            "-m",
+            "fog.eval.showdown_rollout_probe",
+            "--games",
+            "6"
+          ],
+          "commit": "d2089c3a833e3f775e2fe1898b04952b38ef1a83",
+          "exit_code": 0,
+          "seconds": 10.871545851001429,
+          "output": "digest-sequential-final.txt",
+          "digest": "0d026fed7728c0c4",
+          "matches_before": true
+        }
+      },
+      {
+        "name": "batched",
+        "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --batch 32 --games 64 --threads 2",
+        "historical": "0efd4319547a4b3b",
+        "before": "ef414aee0fe96bad",
+        "after": "ef414aee0fe96bad",
+        "same_runtime_equal": true,
+        "historical_reproduced": false,
+        "before_file": "digest-batched-before.txt",
+        "after_file": "digest-batched-after.txt",
+        "final": {
+          "command": [
+            ".venv/bin/python",
+            "-m",
+            "fog.eval.showdown_rollout_probe",
+            "--batch",
+            "32",
+            "--games",
+            "64",
+            "--threads",
+            "2"
+          ],
+          "commit": "d2089c3a833e3f775e2fe1898b04952b38ef1a83",
+          "exit_code": 0,
+          "seconds": 32.36628352700063,
+          "output": "digest-batched-final.txt",
+          "digest": "ef414aee0fe96bad",
+          "matches_before": true
+        }
+      },
+      {
+        "name": "maxdamage",
+        "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --batch 32 --games 96 --opponent MaxDamage --pool data/teams/pool_a",
+        "historical": "338cfca82f31b181",
+        "before": "40644081cca71ebe",
+        "after": "40644081cca71ebe",
+        "same_runtime_equal": true,
+        "historical_reproduced": false,
+        "before_file": "digest-maxdamage-before.txt",
+        "after_file": "digest-maxdamage-after.txt",
+        "final": {
+          "command": [
+            ".venv/bin/python",
+            "-m",
+            "fog.eval.showdown_rollout_probe",
+            "--batch",
+            "32",
+            "--games",
+            "96",
+            "--opponent",
+            "MaxDamage",
+            "--pool",
+            "data/teams/pool_a"
+          ],
+          "commit": "d2089c3a833e3f775e2fe1898b04952b38ef1a83",
+          "exit_code": 0,
+          "seconds": 17.485882565000793,
+          "output": "digest-maxdamage-final.txt",
+          "digest": "40644081cca71ebe",
+          "matches_before": true
+        }
+      }
+    ],
+    "cpu_build_diagnostic": {
+      "torch": "2.13.0+cpu",
+      "command": "PYTHONPATH=/workspace/fog/runs/order_blind/cpu-torch .venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+      "output": "digest-sequential-cpu-build.txt",
+      "digest": "0d026fed7728c0c4",
+      "historical_reproduced": false
+    },
+    "historical_source_repeat": {
+      "commit": "21e57fa",
+      "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+      "cwd": "/workspace/fog-order-reference",
+      "output": "reference-source-digest-sequential.txt",
+      "digest": "0d026fed7728c0c4",
+      "recorded_reference": "23405989f4665988",
+      "historical_reproduced": false
+    },
+    "cpu_kernel_diagnostics": [
+      {
+        "commit": "21e57fa",
+        "environment": {
+          "ATEN_CPU_CAPABILITY": "avx2"
+        },
+        "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+        "output": "reference-avx2-digest.txt",
+        "digest": "18e06350fb04d3c7",
+        "historical_reproduced": false
+      },
+      {
+        "commit": "21e57fa",
+        "environment": {
+          "ATEN_CPU_CAPABILITY": "default"
+        },
+        "command": ".venv/bin/python -m fog.eval.showdown_rollout_probe --games 6",
+        "output": "reference-default-cpu-digest.txt",
+        "digest": "abf191dddfec40a0",
+        "historical_reproduced": false
+      }
+    ]
+  },
+  "tests": {
+    "tests-final.txt": 84,
+    "tests-shared-imputer.txt": 15,
+    "total": 99
+  },
+  "R1_seed_noise": {
+    "all": {
+      "nll_stored": {
+        "absolute_seed_difference": 0.005326323301374503,
+        "twice_difference": 0.010652646602749005
+      },
+      "top1_stored": {
+        "absolute_seed_difference": 0.001905073460787221,
+        "twice_difference": 0.003810146921574442
+      },
+      "nll_shuffled": {
+        "absolute_seed_difference": 0.005092041501285394,
+        "twice_difference": 0.010184083002570787
+      },
+      "top1_shuffled": {
+        "absolute_seed_difference": 0.002722908027286808,
+        "twice_difference": 0.005445816054573616
+      }
+    },
+    "move": {
+      "nll_stored": {
+        "absolute_seed_difference": 0.02290562536818941,
+        "twice_difference": 0.04581125073637882
+      },
+      "top1_stored": {
+        "absolute_seed_difference": 0.000200392769828861,
+        "twice_difference": 0.000400785539657722
+      },
+      "nll_shuffled": {
+        "absolute_seed_difference": 0.021635572853143215,
+        "twice_difference": 0.04327114570628643
+      },
+      "top1_shuffled": {
+        "absolute_seed_difference": 0.0017367373385168139,
+        "twice_difference": 0.0034734746770336278
+      }
+    },
+    "not_yet_moved": {
+      "nll_stored": {
+        "absolute_seed_difference": 0.02886099987265056,
+        "twice_difference": 0.05772199974530112
+      },
+      "top1_stored": {
+        "absolute_seed_difference": 0.007484366537003295,
+        "twice_difference": 0.01496873307400659
+      },
+      "nll_shuffled": {
+        "absolute_seed_difference": 0.029006531852505235,
+        "twice_difference": 0.05801306370501047
+      },
+      "top1_shuffled": {
+        "absolute_seed_difference": 0.007484366537003295,
+        "twice_difference": 0.01496873307400659
+      }
+    }
+  },
+  "shuffled_comparison": {
+    "all": {
+      "nll_shuffled": {
+        "R1_minus_R0": -0.28954957897404143,
+        "exceeds_twice_R1_seed_difference": true
+      },
+      "top1_shuffled": {
+        "R1_minus_R0": 0.03716714974792565,
+        "exceeds_twice_R1_seed_difference": true
+      }
+    },
+    "move": {
+      "nll_shuffled": {
+        "R1_minus_R0": -0.39408700888212334,
+        "exceeds_twice_R1_seed_difference": true
+      },
+      "top1_shuffled": {
+        "R1_minus_R0": 0.048856554851462175,
+        "exceeds_twice_R1_seed_difference": true
+      }
+    },
+    "not_yet_moved": {
+      "nll_shuffled": {
+        "R1_minus_R0": -0.834400623880299,
+        "exceeds_twice_R1_seed_difference": true
+      },
+      "top1_shuffled": {
+        "R1_minus_R0": 0.08082666255711674,
+        "exceeds_twice_R1_seed_difference": true
+      }
+    }
+  },
+  "value_seed_noise": {
+    "brier": {
+      "absolute_seed_difference": 0.0054308220925422535,
+      "twice_difference": 0.010861644185084507
+    },
+    "ece": {
+      "absolute_seed_difference": 0.00512903369157397,
+      "twice_difference": 0.01025806738314794
+    }
+  },
+  "stored_minus_shuffled_top1": {
+    "R0": {
+      "all": 0.13820794183552768,
+      "move": 0.1936319683735342,
+      "not_yet_moved": 0.5366550145241495
+    },
+    "R1": {
+      "all": 0.0006638892363349802,
+      "move": 0.001563063604665127,
+      "not_yet_moved": 0.0019695701413166566
+    },
+    "R1-seed2": {
+      "all": -0.00015394533016460654,
+      "move": -0.00037406650368054795,
+      "not_yet_moved": 0.0019695701413166566
+    }
+  }
+}

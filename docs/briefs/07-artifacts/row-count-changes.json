@@ -1,0 +1,526 @@
+{
+  "smoke": true,
+  "games_with_row_count_changes": [
+    {
+      "id": "gen9ou-2076930900",
+      "n_rows": 50,
+      "n_rows_after": 49,
+      "removed_rows": [
+        [
+          1.0,
+          17,
+          "cinderace",
+          2,
+          "zoroarkhisui",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2090774033",
+      "n_rows": 44,
+      "n_rows_after": 43,
+      "removed_rows": [
+        [
+          -1.0,
+          25,
+          "ninetalesalola",
+          2,
+          "zoroarkhisui",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2180362155",
+      "n_rows": 51,
+      "n_rows_after": 52,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          1.0,
+          22,
+          "tornadustherian",
+          0,
+          "nastyplot",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2180862285",
+      "n_rows": 50,
+      "n_rows_after": 51,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          -1.0,
+          16,
+          "lokix",
+          2,
+          "dragapult",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2270833625",
+      "n_rows": 72,
+      "n_rows_after": 73,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          1.0,
+          29,
+          "swampert",
+          2,
+          "clefable",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2354814706",
+      "n_rows": 28,
+      "n_rows_after": 26,
+      "removed_rows": [
+        [
+          1.0,
+          6,
+          "ogerpon",
+          0,
+          "ivycudgel",
+          1
+        ],
+        [
+          1.0,
+          7,
+          "ogerpon",
+          0,
+          "ivycudgel",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": false
+    },
+    {
+      "id": "gen9ou-2385891158",
+      "n_rows": 113,
+      "n_rows_after": 114,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          -1.0,
+          50,
+          "pecharunt",
+          0,
+          "shadowball",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2403743088",
+      "n_rows": 26,
+      "n_rows_after": 24,
+      "removed_rows": [
+        [
+          -1.0,
+          1,
+          "dudunsparcethreesegment",
+          0,
+          "boomburst",
+          1
+        ],
+        [
+          -1.0,
+          2,
+          "dudunsparcethreesegment",
+          0,
+          "boomburst",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": false
+    },
+    {
+      "id": "gen9ou-2404307520",
+      "n_rows": 30,
+      "n_rows_after": 31,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          -1.0,
+          11,
+          "hoopaunbound",
+          2,
+          "slowkinggalar",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2410840743",
+      "n_rows": 36,
+      "n_rows_after": 39,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          1.0,
+          1,
+          "dudunsparcethreesegment",
+          0,
+          "boomburst",
+          1
+        ],
+        [
+          1.0,
+          2,
+          "dudunsparcethreesegment",
+          0,
+          "boomburst",
+          1
+        ],
+        [
+          1.0,
+          3,
+          "dudunsparcethreesegment",
+          0,
+          "boomburst",
+          1
+        ]
+      ],
+      "has_illusion_species": false
+    },
+    {
+      "id": "gen9ou-2411010714",
+      "n_rows": 38,
+      "n_rows_after": 36,
+      "removed_rows": [
+        [
+          1.0,
+          2,
+          "dudunsparcethreesegment",
+          0,
+          "flamethrower",
+          1
+        ],
+        [
+          1.0,
+          3,
+          "dudunsparcethreesegment",
+          0,
+          "flamethrower",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": false
+    },
+    {
+      "id": "gen9ou-2411057117",
+      "n_rows": 55,
+      "n_rows_after": 53,
+      "removed_rows": [
+        [
+          -1.0,
+          1,
+          "dudunsparcethreesegment",
+          0,
+          "stealthrock",
+          1
+        ],
+        [
+          -1.0,
+          3,
+          "dudunsparcethreesegment",
+          0,
+          "glare",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": false
+    },
+    {
+      "id": "gen9ou-2411434140",
+      "n_rows": 25,
+      "n_rows_after": 24,
+      "removed_rows": [
+        [
+          -1.0,
+          12,
+          "cloyster",
+          2,
+          "ninetalesalola",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2412975224",
+      "n_rows": 46,
+      "n_rows_after": 47,
+      "removed_rows": [
+        [
+          -1.0,
+          14,
+          "hoopaunbound",
+          0,
+          "knockoff",
+          1
+        ]
+      ],
+      "added_rows": [
+        [
+          -1.0,
+          14,
+          "hoopaunbound",
+          0,
+          "hyperspacefury",
+          1
+        ],
+        [
+          -1.0,
+          21,
+          "slowkinggalar",
+          0,
+          "flamethrower",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2434415677",
+      "n_rows": 29,
+      "n_rows_after": 28,
+      "removed_rows": [
+        [
+          -1.0,
+          11,
+          "greattusk",
+          2,
+          "ninetalesalola",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2447450107",
+      "n_rows": 42,
+      "n_rows_after": 43,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          -1.0,
+          20,
+          "hoopaunbound",
+          2,
+          "slowkinggalar",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2461437462",
+      "n_rows": 62,
+      "n_rows_after": 63,
+      "removed_rows": [],
+      "added_rows": [
+        [
+          -1.0,
+          33,
+          "haxorus",
+          2,
+          "zoroarkhisui",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2487580092",
+      "n_rows": 42,
+      "n_rows_after": 41,
+      "removed_rows": [
+        [
+          1.0,
+          20,
+          "greattusk",
+          2,
+          "haxorus",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2498164550",
+      "n_rows": 38,
+      "n_rows_after": 35,
+      "removed_rows": [
+        [
+          1.0,
+          1,
+          "hoopaunbound",
+          0,
+          "knockoff",
+          1
+        ],
+        [
+          1.0,
+          2,
+          "hoopaunbound",
+          0,
+          "knockoff",
+          1
+        ],
+        [
+          1.0,
+          3,
+          "hoopaunbound",
+          0,
+          "knockoff",
+          1
+        ],
+        [
+          1.0,
+          7,
+          "hoopaunbound",
+          2,
+          "cloyster",
+          1
+        ]
+      ],
+      "added_rows": [
+        [
+          1.0,
+          7,
+          "hoopaunbound",
+          2,
+          "zoroark",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2558179609",
+      "n_rows": 58,
+      "n_rows_after": 56,
+      "removed_rows": [
+        [
+          -1.0,
+          16,
+          "dudunsparcethreesegment",
+          0,
+          "glare",
+          1
+        ],
+        [
+          -1.0,
+          31,
+          "dudunsparcethreesegment",
+          0,
+          "glare",
+          1
+        ]
+      ],
+      "added_rows": [],
+      "has_illusion_species": false
+    },
+    {
+      "id": "gen9ou-2570029167",
+      "n_rows": 82,
+      "n_rows_after": 81,
+      "removed_rows": [
+        [
+          -1.0,
+          1,
+          "ribombee",
+          0,
+          "switcheroo",
+          1
+        ],
+        [
+          -1.0,
+          29,
+          "milotic",
+          2,
+          "dondozo",
+          1
+        ]
+      ],
+      "added_rows": [
+        [
+          -1.0,
+          1,
+          "ribombee",
+          0,
+          "moonblast",
+          1
+        ]
+      ],
+      "has_illusion_species": true
+    },
+    {
+      "id": "gen9ou-2591044934",
+      "n_rows": 46,
+      "n_rows_after": 47,
+      "removed_rows": [
+        [
+          1.0,
+          8,
+          "dudunsparcethreesegment",
+          0,
+          "boomburst",
+          1
+        ]
+      ],
+      "added_rows": [
+        [
+          1.0,
+          2,
+          "dudunsparcethreesegment",
+          0,
+          "glare",
+          1
+        ],
+        [
+          1.0,
+          9,
+          "dudunsparcethreesegment",
+          0,
+          "glare",
+          1
+        ]
+      ],
+      "has_illusion_species": false
+    }
+  ],
+  "original_rows": 1127562,
+  "corrected_rows": 1127555,
+  "original_games": 22000,
+  "corrected_games": 22000,
+  "source_commit": "e195b26",
+  "corrected_conversion": "data/metamon_gen9ou_r1500_order_blind_decisions",
+  "stage": "before snapshot identity guard"
+}

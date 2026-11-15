@@ -1,0 +1,15 @@
+{
+  "smoke": true,
+  "rows": 32,
+  "parameters_perturbed": true,
+  "torch_threads": 5,
+  "default_environment": "inherited",
+  "comparison_environment": {
+    "OMP_WAIT_POLICY": "PASSIVE",
+    "KMP_BLOCKTIME": "0"
+  },
+  "outputs_and_gradient_tensors": 241,
+  "different_tensors": [],
+  "bit_identical": true,
+  "source": "runtime-equivalence-driver.txt"
+}

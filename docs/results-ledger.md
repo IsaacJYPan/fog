@@ -1718,3 +1718,146 @@ What the profile also shows: the two belief models are 59% of the forward on the
 fix and the trunk that serves policy and value is 20%. The PPO update does not use mixed
 precision (`fog/training/bc.py` does; `fog/training/ppo.py` has no autocast). Both are levers
 only if a GPU profile shows the same split.
+
+## 2026-11-14: move-order leak removed and order-blind encoder (smoke)
+
+Brief 07, branch `work/order-blind`; stage 1 preparation at `e195b26` from `d603920`.
+All results in this section are smoke. No strength gate or roadmap task is complete.
+
+| Run / check | Status and evidence | Command and producing commit |
+| --- | --- | --- |
+| Import | 22,000 games; pinned release; `07-artifacts/import-output.txt` | `python -m fog.scripts.import_metamon_replays --out data/metamon_gen9ou_r1500 --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 22000 --max-shards 4 --max-download-mb 600`, `d603920` |
+| Converter tests | 79 pass; Ruff clean; `07-artifacts/tests-stage1.txt`, `ruff-stage1.txt` | `.venv/bin/python -m pytest -q tests/test_replay_conversion_resume.py tests/test_replay_order.py tests/test_replay_slot_order_check.py tests/test_replay_parser.py tests/test_replay_candidates.py tests/test_split_replay_manifest.py tests/test_engine_mcts.py tests/test_replay_holdout_report.py tests/test_run_replay_blueprint.py`; `.venv/bin/ruff check fog tests`, `e195b26` |
+| R0 / R1 | Pending: preserved original source and corrected corpus conversion; no training metrics claimed | Fixed recipe in brief 07; completed commands recorded in `07-artifacts/R0-execution.json` |
+
+The correction permutes finalized moves and their provenance in independent per-slot seed
+streams. Measured lead-position bias also calls for shuffling public preview order before
+reconstructing either side; no hidden opponent information is introduced. Candidate-bank
+duplicate detection continues to use the original log digest. Completed corrected conversions
+can resume per game. The expanded slot diagnostic reports bench and lead positions, value
+Brier/ECE, and intervals that resample games. See `docs/briefs/07-report.md` for limits and
+pending comparisons. Stages 2–5 are not started; search, PPO and belief code are unchanged.
+
+Stage 1 continuation, application commits `ef7c5c4` and `e691661`: a real-corpus comparison
+exposed stale action-to-snapshot identity around Illusion and form changes. Candidate identity
+is now checked before accepting policy labels, and rejected stale slots do not enter own-action
+history. The final corpus is being rebuilt; the initial corrected corpus and partial rebuild
+are explicitly superseded (`row-count-changes.json`, `guarded-partial-attempt.json`).
+81 focused tests pass and Ruff is clean (`tests-identity-history.txt`, `ruff-identity-history.txt`).
+
+The default-wait-policy R0 attempt was interrupted before completing an epoch; command,
+elapsed time and exit are in `R0-default-attempt-execution.json`. Completed fixed-recipe runs
+use `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0`, five torch threads. On recorded inputs and
+perturbed parameters, all 241 output/gradient tensors match bit-for-bit between scheduling
+settings (`runtime-equivalence.json`). No model, loss, batch size, seed or epoch count changed.
+The three historical rollout digests fail already on the unchanged checkout; every corresponding
+before/after digest matches on this runtime. A separate CPU-only build repeat also fails the
+historical sequential reference (`digests-summary.json`). No cause is claimed.
+
+Further converter checks before any R1 training: empty move columns now remain trailing for
+species unable to fill four slots (`7890d3a`), and private-set completion runs in original
+preview slots before sheets/provenance are shuffled (`531f29d`). This keeps imputation draws
+paired with R0 instead of changing sampled attributes alongside order. 84 focused tests pass,
+including installed Ditto move order, original-slot imputation pairing and full-converter
+opponent-information isolation (`tests-final.txt`, `ruff-final.txt`). Earlier corrected-corpus
+files marked `pre-guard` or `pre-empty-packing`, and the partial-attempt JSONs, are superseded;
+no R1 model was trained on them. The paired corpus is being rebuilt.
+
+### Completed original baseline (smoke)
+
+R0 ran on the isolated original source at `d603920`, with the original rows. Eight epochs completed; the lowest holdout policy NLL selected epoch 7. All policy groups and game-resampled 95% intervals are in `07-artifacts/R0-slot-check-extended.json`; the original diagnostic output is retained separately. The retained-history group means no earlier move by the acting species in the stored history window, not necessarily its first move ever.
+
+| Run | Training / holdout games | All stored NLL / top-1 | All shuffled NLL / top-1 | Retained-history top-1 stored → shuffled | Value Brier / ECE | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| R0 (smoke, best epoch 7) | 1,000 / 2,000 | 1.7717 / 0.3652 | 2.2135 / 0.2269 | 0.7910 → 0.2543 | 0.3905 / 0.3604 | `d603920` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/order_blind/leaky_split/train_1000.parquet bc.holdout_manifest=runs/order_blind/leaky_split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R0` (cwd `/workspace/fog-order-baseline`) |
+
+Value Brier 95% interval: [0.3761, 0.4044]; ECE: [0.3449, 0.3755]. The unchanged value head fails the constant-0.5 Brier reference of 0.25. No value repair has been attempted. The paired converter retains all 22,000 games with zero quarantines and the same fixed 2,000 holdout / 1,000 training IDs; raw rows are 103,944 / 52,955. R1 and its second seed are pending; no cross-run effect is claimed yet.
+
+### Completed corrected-corpus comparison (smoke)
+
+The paired conversion at `531f29d` and all fixed-recipe runs are complete. R0's
+original rows and checkpoint are preserved. Both R1 seeds completed eight epochs; policy NLL
+selects the checkpoints below. Every result remains smoke. Intervals resample entire games,
+with both perspectives together. The H group is defined by the retained history window,
+not lifetime first use. Complete group metrics and intervals are in the per-run slot checks.
+
+| Run / seed | Best policy epoch | All shuffled NLL / top-1 | H stored → shuffled top-1 | Value Brier / ECE | Producing commit | Command |
+| --- | --- | --- | --- | --- | --- | --- |
+| R1 / 20261201 | 8 | 1.9239 / 0.2641 | 0.3371 → 0.3352 | 0.3920 / 0.3660 | `531f29d` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R1 seed=20261201` (cwd `/workspace/fog`) |
+| R1-seed2 / 20261202 | 7 | 1.9290 / 0.2668 | 0.3297 → 0.3277 | 0.3975 / 0.3712 | `531f29d` | `OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 /workspace/fog/.venv/bin/python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set bc.manifest=runs/blueprint/split/train_1000.parquet bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8 bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce log.dir=runs/order_blind/R1-seed2 seed=20261202` (cwd `/workspace/fog`) |
+
+R1 value Brier 95% interval [0.3773, 0.4058]; ECE [0.3507, 0.3807]. R1-seed2 value Brier 95% interval [0.3828, 0.4118]; ECE [0.3558, 0.3865].
+
+All-row nll_shuffled: R1−R0 = -0.289550; R1 absolute two-seed gap 0.005092, twice that gap 0.010184; effect exceeds twice the gap: True. All-row top1_shuffled: R1−R0 = 0.037167; R1 absolute two-seed gap 0.002723, twice that gap 0.005446; effect exceeds twice the gap: True. Only shuffled columns support this comparison; the original stored holdout is leaky.
+The identity guards change the retained rows as well as order. The unchanged value head still
+fails the constant-prediction Brier reference of 0.25; no repair is claimed.
+
+Final conversion: all 22,000 games, no quarantines, 1,126,792 accepted rows; same 1,000 training
+and 2,000 holdout game IDs. The H slot-zero label share is 0.246984 (95% game interval
+[0.240865, 0.253005]), just below the brief's expected 0.25 lower point bound; the interval
+includes one quarter and the seed was not retuned. Source commands, row counts, checkpoints
+and every measured group are in `docs/briefs/07-artifacts/stage1-summary.json`,
+`stage1-execution.json`, `row-intervals.json` and the per-run CSV/JSON.
+
+Final validation: 84 focused tests plus 15 additional tests pass; the latter command is
+`OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 .venv/bin/python -m pytest -q tests/test_metamon_native_comparison.py tests/test_replay_supervision.py`
+(`tests-shared-imputer.txt`). `.venv/bin/ruff check fog tests` is clean. Both an
+untrained original checkpoint and the original trained epoch-1 checkpoint load strictly;
+trained policy/value outputs are finite on recorded rows. Model, encoding, loss, search,
+PPO and belief source are unchanged. Final sequential / batched / MaxDamage digests are
+`0d026fed7728c0c4` / `ef414aee0fe96bad` / `40644081cca71ebe`, matching before-change runs on
+this runtime. The required historical references remain **unreproduced**. Negative repeats
+include unchanged reference commit `21e57fa`, CPU-only Torch and alternate CPU kernels;
+`digests-summary.json` has exact commands, exits and hashes. The discrepancy is unisolated;
+the historical constants were not changed.
+
+This handoff ends after the standalone converter stage. R2, R3, R4 and its second seed,
+order-blind permutation acceptance tests, logistic and auxiliary value targets, mechanical
+features, rare-move groups, trained leads and play were **not run or implemented**. Own replay
+PP remains zero. Full Illusion/Transform reconstruction beyond identity guards and lifetime
+first-move statistics remain unverified. No phase task or strength gate is completed.
+
+## 2026-11-15: review of brief 07, stage 1
+
+The branch `work/order-blind` (head `e92a565`) was reviewed and merged into `work/roadmap`. The
+worker stopped after stage 1 (the converter); stages 2 to 5 of the brief were not started and
+are carried into `docs/briefs/09-order-blind-model.md`. Everything is smoke. Checked in review:
+
+- Every number in the two tables of `docs/briefs/07-report.md`, the value intervals, the seed
+  gaps and the row counts against `docs/briefs/07-artifacts/stage1-summary.json`,
+  `rows-before.json`, `rows-after.json` and `lead-order-after.json`. All agree.
+- The converter, parser and slot-check diffs, read line by line. The move shuffle draws from
+  its own stream, so every other imputed field is the same draw as before; empty move columns
+  stay last; team order is shuffled by permuting the public preview lines, so sheets, both
+  views, switch labels and history follow one order; a move or switch label is rejected when
+  the slot it names no longer holds that move or species in the encoded observation.
+- On the merged tree, on the reviewer's machine: the six test files covering the change pass
+  (43), `ruff check fog tests` is clean, and **all three historical rollout digests are
+  reproduced** (`23405989f4665988`, `0efd4319547a4b3b`, `338cfca82f31b181`).
+- Not re-run in review: the conversion of 22,000 games and the three trainings.
+
+On the digests. The worker could not reproduce the historical values even with unchanged
+source and reported that as open. It is the machine: the worker ran the same PyTorch version
+(2.13.0) on an AMD EPYC, the reviewer on an Intel Xeon, and the digest hashes floating-point
+outputs. From now on a digest is a before-and-after check on one machine; the historical
+values are valid only on the reviewer's kind of CPU. No code defect is indicated.
+
+What the review takes from it (1,000 training games, 2,000 holdout games, 8 epochs):
+
+| Finding | Evidence |
+| --- | --- |
+| The leak was most of what the old model knew about unmoved Pokémon | Old rows, old model, rows where the acting Pokémon has no earlier move in the kept history: top-1 79.1% as stored, 25.4% with the four slots shuffled |
+| Old holdout accuracy was inflated by about ten points overall | Top-1 on all rows 36.5% (old rows, stored) against 26.5% and 26.7% (corrected rows, two seeds) |
+| Training on corrected rows gives a better policy where it counts | Scored with shuffled slots, which is what live play resembles: NLL 2.2135 (old) to 1.9239 and 1.9290 (corrected); top-1 22.7% to 26.4% and 26.7%. Twice the seed gap is 0.010 NLL |
+| The corrected rows no longer carry the bias | Label share per move slot 25.1 / 24.8 / 24.8 / 25.3%; unmoved rows with the label in slot 0: 98.4% before, 24.7% after; corrected models score the same stored and shuffled (differences of 0.2 points or less) |
+| Team order carried a smaller bias too | The lead was team position 0 in 24.5% and 25.0% of games (p1, p2); 16.8% and 17.3% after the preview shuffle |
+| The value head is unchanged and still worse than a constant | Brier 0.39 in all three runs against 0.25 for a constant |
+
+Two cautions the report states and the review repeats: the corrected conversion also drops 93
+holdout rows through the new identity guard, so old against new is not a pure ordering
+comparison; and "has not moved yet" means within the kept history window, not in the game.
+
+Consequence for brief 05. Its G20 and G100 runs trained on the old rows, so their holdout
+accuracy (G20: NLL 1.279, top-1 54.4%) is inflated and is not comparable with any number on
+corrected rows. Their timing, value and play measurements stand as measured. The next replay
+run on a GPU should use the corrected converter and the belief-loop fix of 2026-11-14.

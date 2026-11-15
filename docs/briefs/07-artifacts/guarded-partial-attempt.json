@@ -1,0 +1,7 @@
+{
+  "smoke": true,
+  "command": "OMP_WAIT_POLICY=PASSIVE KMP_BLOCKTIME=0 python -m fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/metamon_gen9ou_r1500_order_guarded_decisions --imputations 1 --workers 4 --resume",
+  "commit": "ef7c5c4",
+  "status": "interrupted to also suppress stale slot history when identity alignment fails",
+  "completed_replay_checkpoints": 3443
+}

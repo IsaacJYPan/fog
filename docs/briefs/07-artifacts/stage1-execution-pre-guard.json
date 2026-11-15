@@ -1,0 +1,63 @@
+[
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.scripts.split_replay_manifest",
+      "--manifest",
+      "data/metamon_gen9ou_r1500_order_blind_decisions/manifest.parquet",
+      "--out",
+      "runs/blueprint/split",
+      "--holdout-ids",
+      "data/replay_splits/p2_holdout_2000_ids.txt",
+      "--train-sizes",
+      "1000"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "9b1093111400314443a0c922e8b9e0608b95fce8",
+    "smoke": true,
+    "seconds": 1.6648434769999767,
+    "exit_code": 0,
+    "output": "runs/order_blind/split-R1-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/order_blind/leaky_split/holdout_manifest.parquet",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/rows-before-extended.json",
+      "--raw",
+      "data/metamon_gen9ou_r1500"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "9b1093111400314443a0c922e8b9e0608b95fce8",
+    "smoke": true,
+    "seconds": 13.287385631000234,
+    "exit_code": 0,
+    "output": "runs/order_blind/rows-before-extended-output.txt"
+  },
+  {
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_blueprint_cpu.yaml",
+      "--manifest",
+      "runs/blueprint/split/holdout_manifest.parquet",
+      "--out",
+      "/workspace/fog/docs/briefs/07-artifacts/rows-after.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "9b1093111400314443a0c922e8b9e0608b95fce8",
+    "smoke": true,
+    "seconds": 12.832595933999983,
+    "exit_code": 0,
+    "output": "runs/order_blind/rows-after-output.txt"
+  }
+]

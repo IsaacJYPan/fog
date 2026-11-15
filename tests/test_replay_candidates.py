@@ -51,7 +51,8 @@ def test_joint_donor_preserves_correlated_set_and_inferred_provenance(tmp_path):
     for seed in range(12):
         completed, provenance = complete_private_team(revealed, seed=seed, candidate_bank=bank,
                                                        timestamp=200)
-        assert any(np.array_equal(completed[0, :7], donor[:7]) for donor in (a, b))
+        assert any(np.array_equal(completed[0, :3], donor[:3])
+                   and set(completed[0, 3:7]) == set(donor[3:7]) for donor in (a, b))
         assert provenance[0, 0] == EXACT
         assert (provenance[0, 1:] == INFERRED).all()
         assert (completed[1:] == -1).all()
@@ -65,11 +66,12 @@ def test_donor_cannot_contradict_scalar_or_moves(tmp_path):
     bank = _bank(tmp_path, [a, b])
     revealed = _team(np.full(15, -1))
     revealed[0, 0] = a[0]
-    # A revealed move in a nonpacked position is still preserved and not duplicated.
+    # A revealed move in a nonpacked position survives by identity, without duplication.
     revealed[0, 5] = TABLES.move_index("protect")
-    out, _ = complete_private_team(revealed, seed=3, candidate_bank=bank, timestamp=200)
+    out, provenance = complete_private_team(revealed, seed=3, candidate_bank=bank, timestamp=200)
     assert out[0, 1] == a[1]
-    assert out[0, 5] == revealed[0, 5]
+    column = 3 + list(out[0, 3:7]).index(revealed[0, 5])
+    assert provenance[0, column] == EXACT
     assert set(out[0, 3:7]) == set(a[3:7])
     assert len(set(out[0, 3:7])) == 4
     revealed[0, 1] = b[1]

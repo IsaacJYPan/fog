@@ -125,9 +125,9 @@ def test_private_set_imputation_retains_exact_fields_and_marks_every_field():
     revealed[0, 3] = TABLES.move_index("earthquake")
     completed, provenance = complete_private_team(revealed, seed=7)
 
-    assert completed[0, 3] == revealed[0, 3]
+    move_column = 3 + list(completed[0, 3:7]).index(revealed[0, 3])
     assert provenance[0, 0] == EXACT
-    assert provenance[0, 3] == EXACT
+    assert provenance[0, move_column] == EXACT
     assert np.all(provenance[0, 1:] > 0)
     assert np.any(provenance[0] == INFERRED)
     assert np.all(provenance[1:] == 0)

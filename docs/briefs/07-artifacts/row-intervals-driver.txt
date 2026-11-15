@@ -1,0 +1,39 @@
+import json
+from pathlib import Path
+
+import numpy as np
+import polars as pl
+import torch
+
+from fog.constants.tables import TABLES
+from fog.eval.replay_slot_order_check import game_resampled_intervals, not_yet_moved
+
+artifacts = Path('docs/briefs/07-artifacts')
+result = {'smoke': True, 'method': 'percentile bootstrap of games, both perspectives together',
+          'samples': 2000, 'seed': 0, 'definition': 'no move by the acting species in retained history'}
+for name, manifest in [
+    ('before', 'runs/order_blind/leaky_split/holdout_manifest.parquet'),
+    ('after', 'runs/blueprint/split/holdout_manifest.parquet'),
+]:
+    totals = []
+    for shard in pl.read_parquet(manifest)['shard']:
+        with np.load(shard) as z:
+            action = z['action'].astype(int)
+            rows = np.arange(len(action))
+            valid = z['policy_valid'] & (z['legal_provenance'][rows, action] == 2)
+            valid &= z['action_feature_provenance'][rows, action] == 2
+            batch = {key: torch.as_tensor(z[key].astype(np.int64))
+                     for key in ('entity_ids', 'history_ids', 'history_len', 'active_idx')}
+            first = valid & (action < 8) & not_yet_moved(batch, TABLES.n_moves).numpy()
+            totals.append([first.sum(), (first & (action % 4 == 0)).sum()])
+    totals = np.asarray(totals, dtype=float)
+    statistic = lambda total: {'slot0_share': float(total[1]/total[0]) if total[0] else None}
+    point = statistic(totals.sum(0))['slot0_share']
+    row_check = json.loads((artifacts / ('rows-before-extended.json' if name == 'before'
+                                       else 'rows-after.json')).read_text())
+    assert point == row_check['not_yet_moved_label_is_slot0']
+    result[name] = {'games': len(totals), 'rows': int(totals[:, 0].sum()), 'slot0_share': point,
+                    'interval95': game_resampled_intervals(totals, statistic, samples=2000,
+                                                          seed=0)['slot0_share']}
+(artifacts / 'row-intervals.json').write_text(json.dumps(result, indent=2)+'\n')
+print(json.dumps(result, indent=2))

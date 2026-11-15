@@ -1,0 +1,1 @@
+SMOKE, non-idle, warmed evaluation: 84 rows; 0.562394205000146 seconds; threads 1

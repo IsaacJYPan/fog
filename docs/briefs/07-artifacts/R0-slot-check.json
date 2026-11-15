@@ -1,0 +1,41 @@
+{
+  "manifest": "runs/order_blind/leaky_split/holdout_manifest.parquet",
+  "checkpoint": "runs/order_blind/R0/checkpoints/bc_best.pt",
+  "rows": 103981,
+  "move_rows": 74874,
+  "label_share_by_move_slot": [
+    0.4814755455832465,
+    0.31671875417367845,
+    0.1544862034885274,
+    0.04731949675454764
+  ],
+  "not_yet_moved_rows": 20311,
+  "not_yet_moved_label_is_slot0": 0.9839988183742799,
+  "switch_only_rows": 2,
+  "largest_own_pp": 0.0,
+  "policy": {
+    "all": {
+      "rows": 103981,
+      "top1_stored": 0.3651532491512873,
+      "top1_shuffled": 0.2269453073157596,
+      "nll_stored": 1.7716818213619894,
+      "nll_shuffled": 2.2134604617708105
+    },
+    "move": {
+      "rows": 74874,
+      "top1_stored": 0.43457007773058737,
+      "top1_shuffled": 0.24093810935705318,
+      "nll_stored": 1.5418991931347006,
+      "nll_shuffled": 2.160129535604842
+    },
+    "not_yet_moved": {
+      "rows": 20311,
+      "top1_stored": 0.790999950765595,
+      "top1_shuffled": 0.2543449362414455,
+      "nll_stored": 0.8328141529916584,
+      "nll_shuffled": 2.507744517778753,
+      "favourite_move_in_slot0_stored": 0.8587957264536458,
+      "favourite_move_in_slot0_shuffled": 0.8207867657919354
+    }
+  }
+}

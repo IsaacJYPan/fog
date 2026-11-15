@@ -240,6 +240,10 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-12, at 22,000 games: converted in 28.5 min on 4 cores (12.9 games/s, 1,127,562
       rows, 624 MB, ~580 bytes per decision); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
+      _2026-11-14: brief 07's standalone converter stage rebuilt the same 22,000 games with
+      seeded move and preview order, paired imputation draws, identity guards and per-game
+      recovery. See "move-order leak removed and order-blind encoder (smoke)" in the ledger
+      and `docs/briefs/07-report.md`; P2.2 remains open._
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
@@ -254,6 +258,11 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-13: brief 03 completed CPU profiling, R/A/S/B and real replay recovery;
       training is compute-bound and the longer schedules overfit. See "replay trainer profile
       and the data-or-steps runs" in the ledger and `docs/briefs/03-report.md`; P2.3 remains open._
+      _2026-11-14: brief 07 measured the original baseline and two seeds on corrected rows;
+      compare shuffled holdout columns because the original stored holdout is leaky. The
+      unchanged value head still fails the constant reference. Model/value/features/lead
+      stages and historical digest reproduction remain open; see `docs/briefs/07-report.md`.
+      P2.3 and G2 remain open._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before

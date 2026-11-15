@@ -1,0 +1,40 @@
+import json
+import os
+import subprocess
+import time
+from pathlib import Path
+
+root = Path('/workspace/fog')
+baseline = Path('/workspace/fog-order-baseline')
+artifacts = root / 'docs/briefs/07-artifacts'
+records = json.loads((artifacts / 'R0-execution.json').read_text())
+
+def run(args, output):
+    started = time.monotonic()
+    command = [str(root / '.venv/bin/python'), '-m', *args]
+    record = {'command': command, 'cwd': str(baseline), 'commit': 'd60392080f10894aa216ed7faf561e791922c9f8',
+              'smoke': True, 'environment': {'OMP_WAIT_POLICY': 'PASSIVE', 'KMP_BLOCKTIME': '0'}}
+    with open(root / output, 'w') as stream:
+        result = subprocess.run(command, cwd=baseline, stdout=stream, stderr=subprocess.STDOUT,
+                                env=dict(os.environ, PYTHONPATH=str(baseline),
+                                         OMP_WAIT_POLICY='PASSIVE', KMP_BLOCKTIME='0'))
+    record.update(seconds=time.monotonic()-started, exit_code=result.returncode, output=output)
+    records.append(record)
+    (artifacts / 'R0-execution.json').write_text(json.dumps(records, indent=2)+'\n')
+    if result.returncode:
+        raise SystemExit(result.returncode)
+
+run(['fog.training.bc', '--config', 'configs/replay_blueprint_cpu.yaml', '--set',
+     'bc.manifest=runs/order_blind/leaky_split/train_1000.parquet',
+     'bc.holdout_manifest=runs/order_blind/leaky_split/holdout_manifest.parquet',
+     'bc.epochs=8', 'bc.early_stopping_patience=0', 'bc.resume=true',
+     'bc.selection_metric=action_ce', 'log.dir=runs/order_blind/R0'],
+    'runs/order_blind/R0-output.txt')
+run(['fog.eval.replay_slot_order_check', '--config', 'configs/replay_blueprint_cpu.yaml',
+     '--manifest', 'runs/order_blind/leaky_split/holdout_manifest.parquet', '--checkpoint',
+     'runs/order_blind/R0/checkpoints/bc_best.pt', '--out', str(artifacts / 'R0-slot-check.json')],
+    'runs/order_blind/R0-slot-check-output.txt')
+run(['fog.eval.replay_holdout_report', '--config', 'configs/replay_blueprint_cpu.yaml',
+     '--manifest', 'runs/order_blind/leaky_split/holdout_manifest.parquet', '--checkpoint',
+     'runs/order_blind/R0/checkpoints/bc_best.pt', '--out', str(artifacts / 'R0-holdout.json')],
+    'runs/order_blind/R0-holdout-output.txt')

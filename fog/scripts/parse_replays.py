@@ -256,8 +256,17 @@ class _PerspectiveState:
                 for part in parts[4:]
             )
             self._pending_action = (4 + slot) if tera else slot
+            # Illusion/Transform can replace a Pokemon object after the snapshot. Its current
+            # move dictionary is then not the installed order represented by that snapshot.
+            # Never let an index label a different move in the encoded observation.
+            aligned = True
+            if self.private_set is not None:
+                mine = int(self._pending_obs.active_idx[0])
+                encoded = int(self._pending_obs.entity_ids[mine, 3 + slot])
+                aligned = encoded == TABLES.move_index(move_id, default=-1)
             self._pending_policy_valid = bool(
                 found
+                and aligned
                 and not called
                 and self._pending_filter_reason == "awaiting_action"
                 and self._pending_mask is not None
@@ -277,8 +286,15 @@ class _PerspectiveState:
                     found = True
                     break
             self._pending_action = 8 + slot
+            aligned = True
+            if self.private_set is not None and found:
+                active_slot = int(self._pending_obs.active_idx[0])
+                bench_slots = [i for i in range(6) if i != active_slot]
+                encoded = int(self._pending_obs.entity_ids[bench_slots[slot], 0])
+                aligned = encoded == TABLES.species_index(target_species)
             self._pending_policy_valid = bool(
                 found
+                and aligned
                 and self._pending_filter_reason == "awaiting_action"
                 and self._pending_mask is not None
                 and self._pending_mask[self._pending_action]
@@ -286,7 +302,9 @@ class _PerspectiveState:
             self._pending_filter_reason = (
                 "accepted" if self._pending_policy_valid else "forced_or_unaligned_switch"
             )
-        if self._pending_action is not None:  # history retro-fidelity: my action per turn
+        if self._pending_action is not None and (self.private_set is None or aligned):
+            # Let public identity history handle a replaced actor; do not preserve a slot
+            # number that was just found to name a different encoded move or switch target.
             self.tracker.my_actions[int(getattr(battle, "turn", 0) or 0)] = self._pending_action
 
     def record_tera(self, parts: list[str]) -> None:
@@ -526,6 +544,16 @@ def parse_replay_policy_versions(
     """
     if imputations < 1:
         raise ValueError("imputations must be positive")
+    from fog.training.replay_policy_data import (
+        permute_replay_preview,
+        replay_lead_positions,
+        replay_preview_permutation,
+    )
+    from fog.training.replay_candidates import replay_digest
+
+    source_log_hash = replay_digest(replay_json)
+    # Complete sets in original preview slots to keep imputation draws paired with the legacy
+    # corpus. Shuffle the resulting sheets and provenance together with the public preview.
     baseline = parse_replay(replay_json)
     revealed: dict[str, np.ndarray] = {}
     for role in ("p1", "p2"):
@@ -538,8 +566,13 @@ def parse_replay_policy_versions(
     from collections import Counter
 
     from fog.training.replay_policy_data import complete_private_team, stable_replay_seed
-    from fog.training.replay_candidates import replay_digest
 
+    orders = {}
+    for role in ("p1", "p2"):
+        order = replay_preview_permutation(replay_json, replay_id=replay_id, role=role, seed=seed)
+        orders[role] = np.concatenate([order, np.arange(len(order), 6)])
+    replay_json = permute_replay_preview(replay_json, replay_id=replay_id, seed=seed)
+    lead_positions = replay_lead_positions(replay_json)
     accepted: list[dict] = []
     filters: Counter[str] = Counter()
     imputation_report: dict = {}
@@ -552,11 +585,13 @@ def parse_replay_policy_versions(
                 seed=stable_replay_seed(replay_id, role, imputation, seed),
                 candidate_bank=candidate_bank,
                 replay_id=replay_id,
-                log_hash=replay_digest(replay_json),
+                log_hash=source_log_hash,
                 timestamp=int(replay_json.get("uploadtime") or 0),
                 rating=int(replay_json.get("rating") or 0),
                 diagnostics=imputation_report,
             )
+            private_sets[role] = private_sets[role][orders[role]]
+            provenance[role] = provenance[role][orders[role]]
         version = parse_replay(
             replay_json,
             private_sets=private_sets,
@@ -576,6 +611,7 @@ def parse_replay_policy_versions(
             accepted.append(row)
             filters["accepted"] += 1
     return {"rows": accepted, "p1_win": baseline["p1_win"], "filter_counts": dict(filters),
+            "lead_positions": lead_positions,
             "imputation_report": imputation_report}
 
 

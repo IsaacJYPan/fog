@@ -1,0 +1,54 @@
+{
+  "smoke": true,
+  "commit": "531f29d",
+  "command": "lead_order_summary(pl.read_parquet(\"data/metamon_gen9ou_r1500_order_paired_decisions/manifest.parquet\"))",
+  "lead_order": {
+    "games": 22000,
+    "p1": {
+      "known_leads": 21995,
+      "unknown_leads": 5,
+      "counts_by_team_position": [
+        3685,
+        3725,
+        3560,
+        3727,
+        3656,
+        3642
+      ],
+      "share_by_team_position": [
+        0.16753807683564448,
+        0.16935667197090248,
+        0.16185496703796318,
+        0.16944760172766538,
+        0.1662195953625824,
+        0.1655830870652421
+      ],
+      "share_position0": 0.16753807683564448
+    },
+    "p2": {
+      "known_leads": 21991,
+      "unknown_leads": 9,
+      "counts_by_team_position": [
+        3813,
+        3678,
+        3604,
+        3608,
+        3654,
+        3634
+      ],
+      "share_by_team_position": [
+        0.17338911372834342,
+        0.16725023873402756,
+        0.16388522577418035,
+        0.1640671183666045,
+        0.16615888317948252,
+        0.16524942021736164
+      ],
+      "share_position0": 0.17338911372834342
+    },
+    "games_with_both_leads_known": 21986,
+    "share_games_either_lead_position0": 0.3121077049031202,
+    "share_games_both_leads_position0": 0.02870008187028109,
+    "source": "converter metadata"
+  }
+}

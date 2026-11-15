@@ -1,0 +1,32 @@
+{
+  "status": "complete",
+  "source_replays_considered": 22000,
+  "parsed_replays": 22000,
+  "quarantined_replays": 0,
+  "accepted_decision_versions": 1126783,
+  "all_decision_versions": 1130482,
+  "accepted_fraction": 0.9967279443635546,
+  "imputations_per_replay": 1,
+  "min_rating": 0,
+  "provenance_codes": {
+    "unknown": 0,
+    "inferred": 1,
+    "exact": 2
+  },
+  "public_state_reconstruction": "chronological_prefix_only",
+  "future_opponent_fields_used": false,
+  "private_truth": false,
+  "move_order": "seeded_permutation_after_completion",
+  "team_order": "seeded_public_preview_permutation",
+  "source_providers": [
+    "metamon_raw_replays"
+  ],
+  "filter_counts": {
+    "accepted": 1126783,
+    "called_or_unaligned_move": 2923,
+    "forced_or_unaligned_switch": 776
+  },
+  "imputation_method": "usage_baseline",
+  "candidate_bank_sha256": null,
+  "imputation_report": {}
+}
