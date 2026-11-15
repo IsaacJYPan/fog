@@ -1,0 +1,62 @@
+[
+  {
+    "smoke": true,
+    "name": "R5-training",
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_preview_cpu.yaml",
+      "--set",
+      "seed=20261201",
+      "log.dir=runs/order_blind_model/R5"
+    ],
+    "seconds": 15.641484083003888,
+    "exit_code": 0
+  },
+  {
+    "smoke": true,
+    "name": "R5-seed2-training",
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_preview_cpu.yaml",
+      "--set",
+      "seed=20261202",
+      "log.dir=runs/order_blind_model/R5-seed2"
+    ],
+    "seconds": 14.428296284997487,
+    "exit_code": 0
+  },
+  {
+    "smoke": true,
+    "name": "preview-holdout",
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_preview_report",
+      "--config",
+      "configs/replay_preview_cpu.yaml",
+      "--checkpoint",
+      "initial-preview=runs/order_blind_model/R4/checkpoints/bc_best.pt",
+      "--checkpoint",
+      "R5=runs/order_blind_model/R5/checkpoints/bc_best.pt",
+      "--checkpoint",
+      "R5-seed2=runs/order_blind_model/R5-seed2/checkpoints/bc_best.pt",
+      "--train-manifest",
+      "runs/order_blind_model/preview_split/train_1000.parquet",
+      "--holdout-manifest",
+      "runs/order_blind_model/preview_split/holdout_manifest.parquet",
+      "--out",
+      "docs/briefs/09-artifacts/preview-holdout.json"
+    ],
+    "seconds": 5.867183321999619,
+    "exit_code": 0
+  }
+]

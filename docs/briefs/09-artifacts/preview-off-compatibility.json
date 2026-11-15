@@ -1,0 +1,8 @@
+{
+  "observations": 64,
+  "checkpoint": "R4/bc_best.pt",
+  "reference_model_source": "9e285f2",
+  "strict_load": true,
+  "preview_flag_off_bit_identical": true,
+  "max_error": 0.0
+}

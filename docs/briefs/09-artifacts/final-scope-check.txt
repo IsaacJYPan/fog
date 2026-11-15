@@ -1,0 +1,4 @@
+Source c87b519. Compared with 70cc5eda12345edffe11a998e2c4782f4ed7b161.
+Ledger starts with the previous committed ledger byte-for-byte. All JSON artifacts contain valid finite JSON values.
+No search, belief-package, PPO, hosted-workflow or QUEUE changes. All 10 new commits are owner-authored and carry [skip ci].
+Application/config/test source is unchanged since qualified commit c87b519.

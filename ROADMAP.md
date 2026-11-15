@@ -291,6 +291,10 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       report the two checkpoints separately. Denser value targets, a logistic value loss, move
       features and a trained lead head are in brief 09; the run at scale on corrected rows is
       `docs/briefs/13-replay-scale-corrected.md`._
+      _2026-11-15: brief 09 stages 2–5 complete on CPU: order-blind, value-target, move-feature
+      and supervised-lead paths have smoke measurements and default-off compatibility checks.
+      See `docs/briefs/09-report.md` and the ledger. Value still fails the constant reference;
+      P2.3 and G2 remain open._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
