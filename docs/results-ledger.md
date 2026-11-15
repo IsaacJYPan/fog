@@ -2630,3 +2630,56 @@ missing; what a row lacks or gets wrong compared with play is the more likely li
 (briefs 09 and 12), which is a hypothesis until brief 13 measures it.
 
 The hosted account's meter stood at 17.1 GPU-hours when the work ended.
+
+## 2026-11-15: the policy-only training step (ROADMAP P2.3)
+
+Asked for by the owner: find what makes training slow that a profile alone does not show.
+Branch `work/policy-only-step`. Machine: 4 CPU cores, no GPU, PyTorch 2.13.0 CPU. Smoke.
+
+**What the profile says once it is read by purpose.** In one PPO update on the CPU
+(2026-11-14 profile, after the loop fix; 20.3 s of forward passes over 10 optimizer steps):
+
+| Part of the forward | Seconds | Needed for |
+| --- | ---: | --- |
+| Opponent-belief and self-belief models, four passes per forward | 12.1 | belief losses only |
+| History encoder, own view and opponent view | 3.7 | half for policy and value, half only for self-belief |
+| Shared trunk, own view and opponent view | 3.7 | half for policy and value, half only for self-belief |
+| Policy and value heads | 0.3 | policy and value |
+
+About 80% of the self-play update's forward and about 60% of the replay trainer's (which has
+no opponent view) is spent on belief models that the policy and value never read. The replay
+trainer could not avoid it: `bc_loss` ran every belief pass even with all belief weights at
+zero.
+
+**What changed.** `loss.skip_unweighted_belief` (default false). When it is true and every
+belief weight is zero, `bc_loss` calls the model with `need_belief=False`. With the key off
+the call is unchanged. `tests/test_bc_skip_belief.py` covers both.
+
+**Does the policy lose anything without the belief losses?** Brief 07's recipe exactly:
+corrected rows, the same 1,000 training games (52,955 rows) and 2,000 holdout games
+(103,944 rows), 8 epochs, seed 20261201, `configs/replay_blueprint_cpu.yaml`, plus
+`loss.belief_coef=0 loss.belief_chain_coef=0 loss.skip_unweighted_belief=true`
+(`python -m fog.training.bc --config configs/replay_blueprint_cpu.yaml --set
+bc.manifest=runs/blueprint/split/train_1000.parquet
+bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet bc.epochs=8
+bc.early_stopping_patience=0 bc.resume=true bc.selection_metric=action_ce seed=20261201 ...`).
+
+| Run | Belief losses | Best holdout NLL (epoch) | Top-1 at that epoch | NLL at epoch 8 | Value MSE at epoch 8 | Train rows/s | Whole run |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Brief 07 R1 (another machine, 5 threads) | 0.05 and 0.05 | 1.9239 (8) | 26.48% | 1.9239 | about 1.57 (Brier 0.392) | 205 to 236 | 3,134 s |
+| Brief 07 R1, second seed | 0.05 and 0.05 | 1.9293 (7) | 26.67% | | about 1.59 | | 3,144 s |
+| Policy-only, this section | none, passes skipped | 1.9248 (6) | 26.15% | 1.9274 | 1.58 | 412 to 436 | 1,481 s |
+
+Per-epoch numbers are in `docs/notes/policy-only-step/B-metrics.csv`.
+
+**Reading.** The policy-only run is inside the gap between brief 07's two seeds (0.0053 NLL):
+on 1,000 games the belief losses do not help the policy or the value head. Training is about
+twice as fast. The two rows come from different machines, so the speed ratio is approximate;
+a control on this machine with the belief losses on follows in the next section. Not shown:
+the same at 20,000 games or more, where an auxiliary loss could matter differently, and
+anything on a GPU, where the belief passes are many small operations and the saving should be
+larger than on the CPU.
+
+**What follows.** Train the replay policy and value without belief passes (brief 13 now does).
+The opponent-team model is not needed until P4.1; train it then, on its own, with the trunk
+frozen. For self-play the same skip is in brief 14.

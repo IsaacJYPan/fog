@@ -14,7 +14,12 @@ the wall time**, or the owner asks for it.
 Known from reading the code and one CPU profile (ledger, 2026-11-14):
 
 - The two belief models are about 60% of the update's forward pass on the CPU. They are
-  auxiliary: the policy does not read them when acting.
+  auxiliary: the policy does not read them when acting. Counting what only they need (the
+  opponent-view pass through the history encoder and the trunk, which feeds the self-belief
+  model), **about 80% of the update's forward is spent on beliefs and 20% on policy and
+  value** (ledger, "the policy-only training step", from the profile of 2026-11-14: belief
+  passes 12.1 s, two trunk passes 3.7 s and two history passes 3.7 s of a 20.3 s forward,
+  heads 0.3 s).
 - `fog/training/ppo.py` does not use mixed precision; `fog/training/bc.py` does.
 - When one minibatch exceeds `target_kl`, the update stops altogether, so the value head
   stops training too (1.39 of 3 epochs in brief 04).
@@ -40,12 +45,15 @@ Known from reading the code and one CPU profile (ledger, 2026-11-14):
    a loss or a win, report it and add a key that scores it as a draw; do not change the default.
 2. **`ppo.belief_row_fraction`** (default 1.0): compute the belief and self-belief losses on a
    random fraction of each minibatch's rows and scale the loss so its expectation is the same.
+   At 0, skip the belief passes and the opponent-view pass altogether (`need_belief=False`,
+   as `loss.skip_unweighted_belief` does in `fog/training/bc.py`) and guard the belief
+   diagnostics the update prints.
 3. **`ppo.mixed_precision`** (default false): autocast and a gradient scaler in the update,
    as `bc.py` does it.
 4. **`ppo.value_after_kl_stop`** (default false): after the KL stop, the remaining
    minibatches of that update still train the value head (and nothing else).
 5. **Measure.** Brief 06's short run (two complete updates, `configs/collect_gpu_check.yaml`)
-   on a T4: all keys off; fraction 0.25; fraction 0.25 with mixed precision. Report seconds
+   on a T4: all keys off; fraction 0.25; fraction 0; fraction 0 with mixed precision. Report seconds
    per optimizer step, rows per second, end-to-end decisions per second and peak memory.
    Then on the CPU, brief 04's fixed-team run for 100,000 decisions with keys off and with
    fraction 0.25 and `value_after_kl_stop`: the win-rate curve against MaxDamage must not be

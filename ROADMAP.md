@@ -299,6 +299,11 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       report the two checkpoints separately. Denser value targets, a logistic value loss, move
       features and a trained lead head are in brief 09; the run at scale on corrected rows is
       `docs/briefs/13-replay-scale-corrected.md`._
+      _2026-11-15: "Belief losses stay at their current small coefficients" is superseded for
+      policy and value training: with `loss.skip_unweighted_belief` and zero belief weights the
+      step is about twice as fast on the CPU and the policy is unchanged within seed noise on
+      1,000 games (ledger, "the policy-only training step"). Train the opponent-team model
+      separately before P4.1._
       _2026-11-15: brief 05 completed G20 (20k/18 epochs, 583 rows/s) and the budget fallback (40,955 games/6 epochs, 644 rows/s), both with independent policy/value selections. G100 best value/policy epochs are 5/6, own-best Brier 0.208909. Full G3 calibration remains partial; total account meter 17.078547/20 quota-hours. No box or gate claimed._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.

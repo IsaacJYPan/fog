@@ -56,7 +56,7 @@ _SECTION_KEYS = {
         "action_coef", "belief_chain_coef", "belief_coef", "preview_coef",
         "require_exact_chosen_action_features", "require_exact_chosen_legality",
         "require_belief_labels",
-        "self_belief_chain_coef", "self_belief_coef", "value_coef",
+        "self_belief_chain_coef", "self_belief_coef", "skip_unweighted_belief", "value_coef",
     },
     "log": {"checkpoint_every_decisions", "dir", "halt_on_regression_sigma", "tensorboard"},
     "ppo": {

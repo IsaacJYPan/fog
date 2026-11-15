@@ -28,6 +28,11 @@ to switch on; use exactly those. If it names none, use the current model.
   run on the CPU.
 - This repository is public: commit no account name, token or private dataset name.
 - Change no model, loss or trainer code. If something must change, stop and report.
+- **Train without belief passes**: add `loss.belief_coef=0 loss.belief_chain_coef=0
+  loss.skip_unweighted_belief=true` to every training command. On 1,000 games this cost the
+  policy nothing and roughly doubled CPU training speed (ledger, "the policy-only training
+  step"). If GPU budget remains at the end, repeat the 20,000-game run for the same number of
+  epochs with the belief losses at their config values, as a control at scale.
 - Every number is smoke unless it meets the roadmap's 1,000-game rule.
 
 ## 3. Stage 1: data

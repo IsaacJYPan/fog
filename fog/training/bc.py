@@ -64,6 +64,21 @@ def _policy_supervision_mask(batch: dict, loss_cfg: dict) -> torch.Tensor:
     return valid
 
 
+_BELIEF_WEIGHTS = (
+    ("belief_coef", 1.0),
+    ("belief_chain_coef", 0.0),
+    ("self_belief_coef", 0.0),
+    ("self_belief_chain_coef", 0.0),
+)
+
+
+def belief_forward_needed(loss_cfg: dict) -> bool:
+    """False only when the config asks to skip belief passes and every belief weight is zero."""
+    if not loss_cfg.get("skip_unweighted_belief", False):
+        return True
+    return any(float(loss_cfg.get(key, default)) > 0 for key, default in _BELIEF_WEIGHTS)
+
+
 def bc_loss(
     agent,
     batch,
@@ -73,7 +88,14 @@ def bc_loss(
     retention_coef: float = 0.0,
     return_components: bool = False,
 ):
-    out = agent(batch)
+    # The belief passes are most of a training step and the policy and value never read them.
+    # With `loss.skip_unweighted_belief` they are not computed when no belief loss has weight.
+    if belief_forward_needed(loss_cfg):
+        out = agent(batch)
+    else:
+        # Evaluation asks for the belief chain; without belief passes there is none to compute.
+        batch = {key: value for key, value in batch.items() if key != "compute_belief_chain"}
+        out = agent(batch, need_belief=False)
     policy_valid = _policy_supervision_mask(batch, loss_cfg)
     chosen_nll = -out.log_probs.gather(-1, batch["action"].unsqueeze(-1)).squeeze(-1)
     finite_policy = policy_valid & torch.isfinite(chosen_nll)
