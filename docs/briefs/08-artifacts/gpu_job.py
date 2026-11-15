@@ -167,6 +167,9 @@ def summarize(out, commit):
               'other_wall_share': (wall - collection - update) / wall,
               'peak_learner_allocated_bytes': max(e['peak_learner_allocated_bytes'] for e in updates),
               'timing_caveat': 'One minibatch in update 2 has synchronized part hooks and three concurrent py-spy dumps; includes their overhead. Native config and schedules unchanged except rollout_workers; stops after checkpoint 2.'}
+    samples = list(csv.reader((out / 'gpu-memory.csv').open()))
+    result['sampled_peak_all_process_gpu_mib_through_ppo'] = max(
+        float(row[3].split()[0]) for row in samples[1:] if len(row) >= 4)
     (out / 'ppo-summary.json').write_text(json.dumps(result, indent=2) + '\n')
 
 
