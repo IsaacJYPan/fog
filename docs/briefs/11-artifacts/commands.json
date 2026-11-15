@@ -12,5 +12,8 @@
     "OMP_NUM_THREADS": "1",
     "MKL_NUM_THREADS": "1",
     "OPENBLAS_NUM_THREADS": "1"
-  }
+  },
+  "fuzz_engine_final": "uv run --no-sync python -m fog.scripts.fuzz_recon --pool data/teams/replay_v1/validation --games 2000 --max-turns 40 --extended --seed 0",
+  "fuzz_engine_final_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
+  "timing_context": "The final engine fuzzer briefly used a spare core during the two-shard fidelity smoke; the quota is four cores. Budget and gate shards run without another simulator job."
 }

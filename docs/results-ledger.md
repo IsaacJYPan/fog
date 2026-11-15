@@ -2660,3 +2660,16 @@ captured results retained). A 200-game default-budget validation smoke is now ru
 100-game matched-block shards, seeds 11000/11001, K=8, 1600 ms, one search thread, no SPRT,
 max turns 800. No match result yet. P1.3/P1.4 remain unchecked, G1 open; budget curve and
 1,000-game/opponent gate rows have not started. See `docs/briefs/11-report.md`.
+
+### Partial smoke checkpoint (run continues)
+
+At the saved 80/56-game blocks: 136 games, 127 wins, 3,516 decisions, zero fallbacks,
+rejected actions, failed games or truncations; 1.7555 / 1.7516 seconds per decision in the
+individual shards. **Partial smoke, not a gate or completed Stage 1.** The per-game JSON
+checkpoints and captured shard progress are pushed so another runtime can resume the same
+`fidelity_smoke` command. Source remains `aa38e46`; no measurement code changed.
+
+The engine round-trip was also repeated at `aa38e46` using the command in
+`11-artifacts/commands.json`: 3,526 positions, 11 core mismatches and 2,229 extended mismatches
+(`fuzz-engine-final.txt`). This briefly used a spare core during the two-shard smoke on the
+four-core quota; budget/gate jobs will run without another simulator job.
