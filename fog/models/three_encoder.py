@@ -53,6 +53,7 @@ class EntityEmbeddings(nn.Module):
         n_ev_units: int = N_EV_UNITS + 1,
         species_dim: int = 64,
         small_dim: int = 24,
+        order_blind: bool = False,
     ) -> None:
         super().__init__()
         self.species = nn.Embedding(n_species, species_dim)
@@ -69,14 +70,44 @@ class EntityEmbeddings(nn.Module):
         nn.init.zeros_(self.native_stats[-1].weight)
         nn.init.zeros_(self.native_stats[-1].bias)
         # species, item, ability, move0..3, last move, compressed native nature/EV block
-        self.out_dim = species_dim + small_dim * (2 + DIMS.n_move_slots + 1 + 1)
+        self.order_blind = bool(order_blind)
+        self.raw_dim = ENTITY_RAW_DIM - (8 if self.order_blind else 0)
+        self.move_encoder = (
+            nn.Sequential(nn.Linear(small_dim + 2, 48), nn.GELU(), nn.Linear(48, small_dim))
+            if self.order_blind else None
+        )
+        self.out_dim = species_dim + small_dim * (2 + (1 if self.order_blind else 4) + 1 + 1)
 
-    def forward(self, entity_ids: torch.Tensor) -> torch.Tensor:
+    def entity_raw(self, raw: torch.Tensor) -> torch.Tensor:
+        """Remove ordered PP/flags; retain them only inside each shared move vector."""
+        if not self.order_blind:
+            return raw
+        raw = raw.clone()
+        raw[..., L.party_slot : L.party_slot + DIMS.party_slot] = 0
+        return torch.cat([
+            raw[..., :L.move_pp], raw[..., L.move_pp + 4 : L.epistemic + 2],
+            raw[..., L.epistemic + 6 :],
+        ], dim=-1)
+
+    def move_vectors(self, move_ids: torch.Tensor, raw: torch.Tensor) -> torch.Tensor:
+        embedded = self.move(move_ids)
+        if self.move_encoder is None:
+            return embedded
+        pp = raw[..., L.move_pp : L.move_pp + 4].unsqueeze(-1)
+        known = raw[..., L.epistemic + 2 : L.epistemic + 6].unsqueeze(-1)
+        return self.move_encoder(torch.cat([embedded, pp, known], dim=-1))
+
+    def forward(self, entity_ids: torch.Tensor, raw: torch.Tensor | None = None) -> torch.Tensor:
         assert entity_ids.shape[-1] >= BASE_ID_FIELDS
         species = self.species(entity_ids[..., 0])
         item = self.item(entity_ids[..., 1])
         ability = self.ability(entity_ids[..., 2])
-        moves = self.move(entity_ids[..., 3 : 3 + DIMS.n_move_slots]).flatten(-2)
+        if self.order_blind:
+            if raw is None:
+                raise ValueError("order-blind move embeddings require aligned PP and known flags")
+            moves = self.move_vectors(entity_ids[..., 3:7], raw).mean(dim=-2)
+        else:
+            moves = self.move(entity_ids[..., 3 : 3 + DIMS.n_move_slots]).flatten(-2)
         last_move = self.move(entity_ids[..., 3 + DIMS.n_move_slots])
         nature = self.nature(entity_ids[..., NATURE_ID_FIELD])
         evs = self.ev(entity_ids[..., list(EV_ID_FIELDS)]).flatten(-2)
@@ -161,9 +192,12 @@ class EncoderContexts:
 class CurrentStateEncoder(nn.Module):
     """Embed the volatile public board with per-entity MLPs and pooling."""
 
-    def __init__(self, embedded_dim: int, d: int, out_dim: int, dropout: float) -> None:
+    def __init__(
+        self, embedded_dim: int, d: int, out_dim: int, dropout: float,
+        raw_dim: int = ENTITY_RAW_DIM,
+    ) -> None:
         super().__init__()
-        self.entity_in = nn.Linear(ENTITY_RAW_DIM + embedded_dim, d)
+        self.entity_in = nn.Linear(raw_dim + embedded_dim, d)
         self.field_in = nn.Linear(DIMS.field_dim, d)
         # Preserve a short, directly learnable route for volatile field facts instead of forcing
         # them through the same pooled bottleneck as twelve entity records.
@@ -228,7 +262,9 @@ class CurrentStateEncoder(nn.Module):
         )
         tokens = self.entity_mlp(
             self.entity_in(
-                torch.cat([public_entities, embeds(public_ids)], dim=-1)
+                torch.cat(
+                    [embeds.entity_raw(public_entities), embeds(public_ids, public_entities)], dim=-1
+                )
             )
         )
         rows = torch.arange(entities.shape[0], device=entities.device)
@@ -253,9 +289,10 @@ class PrivateStateEncoder(nn.Module):
         d: int,
         out_dim: int,
         dropout: float,
+        raw_dim: int = ENTITY_RAW_DIM,
     ) -> None:
         super().__init__()
-        self.entity_in = nn.Linear(ENTITY_RAW_DIM + embedded_dim, d)
+        self.entity_in = nn.Linear(raw_dim + embedded_dim, d)
         self.original_in = nn.Linear(original_dim, d, bias=False)
         self.entity_mlp = nn.Sequential(
             nn.LayerNorm(d),
@@ -311,7 +348,9 @@ class PrivateStateEncoder(nn.Module):
             dim=-1,
         )
         tokens = self.entity_mlp(
-            self.entity_in(torch.cat([private_raw, embeds(own_ids)], dim=-1))
+            self.entity_in(torch.cat(
+                [embeds.entity_raw(private_raw), embeds(own_ids, entities[:, :6])], dim=-1
+            ))
             + self.original_in(original)
         )
         rows = torch.arange(entities.shape[0], device=entities.device)
@@ -368,6 +407,9 @@ class TurnHistoryEncoder(nn.Module):
                 enable_nested_tensor=False,
             )
             sequence_dim = d
+        self.action_kind = (
+            nn.Linear(4, d, bias=False) if cfg.get("order_blind_entities", False) else None
+        )
         self.head = nn.Sequential(
             nn.Linear(sequence_dim, out_dim),
             nn.GELU(),
@@ -414,7 +456,18 @@ class TurnHistoryEncoder(nn.Module):
         )
         real = positions < lengths.unsqueeze(1)
         history_right = self._right_pack(history, source, real)
+        action_kind = None
+        if self.action_kind is not None:
+            action = history_right[..., DIMS.hist_snapshot : DIMS.hist_snapshot + 14]
+            action_kind = torch.stack([
+                action[..., :4].sum(-1), action[..., 4:8].sum(-1),
+                action[..., 8:13].sum(-1), action[..., 13],
+            ], dim=-1)
+            history_right = history_right.clone()
+            history_right[..., DIMS.hist_snapshot : DIMS.hist_snapshot + 14] = 0
         encoded_input = self.hist_in(history_right)
+        if action_kind is not None:
+            encoded_input = encoded_input + self.action_kind(action_kind)
 
         if history_ids is not None:
             if history_ids.shape[:2] != history.shape[:2]:
@@ -509,12 +562,13 @@ class Backbone(nn.Module):
                 n_moves=sizes["n_moves"] + 1,
                 n_natures=sizes["n_natures"] + 1,
                 n_ev_units=sizes["n_ev_units"] + 1,
+                order_blind=bool(cfg.get("order_blind_entities", False)),
             )
         else:
-            self.embeds = EntityEmbeddings()
+            self.embeds = EntityEmbeddings(order_blind=bool(cfg.get("order_blind_entities", False)))
 
         self.current_state_encoder = CurrentStateEncoder(
-            self.embeds.out_dim, hidden, self.current_dim, dropout
+            self.embeds.out_dim, hidden, self.current_dim, dropout, self.embeds.raw_dim
         )
         self.turn_history_encoder = TurnHistoryEncoder(
             self.embeds, hidden, self.history_dim, cfg, dropout
@@ -525,6 +579,7 @@ class Backbone(nn.Module):
             hidden,
             self.state_dim,
             dropout,
+            self.embeds.raw_dim,
         )
         self.public_fusion = nn.Sequential(
             nn.Linear(self.current_dim + self.history_dim, self.dyn_dim),

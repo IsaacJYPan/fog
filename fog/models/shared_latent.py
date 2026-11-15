@@ -6,7 +6,6 @@ from torch import nn
 
 from fog.encoding.dims import DIMS
 from fog.encoding.entities import (
-    ENTITY_RAW_DIM,
     EV_ID_FIELDS,
     N_ID_FIELDS,
     ORIGINAL_ABILITY_ID_FIELD,
@@ -155,6 +154,7 @@ class SharedBattleLatent(nn.Module):
         flat_layers: int = 2,
     ) -> None:
         super().__init__()
+        self.order_blind = embeds.order_blind
         self.latent_dim = int(latent_dim)
         self.entity_dim = int(entity_dim)
         self.field_dim = int(field_dim)
@@ -166,7 +166,8 @@ class SharedBattleLatent(nn.Module):
         self.typed_world_tokens = bool(typed_world_tokens)
         self.flat_autoencoder = bool(flat_autoencoder)
         semantic_dim = embeds.out_dim + embeds.item.embedding_dim + embeds.ability.embedding_dim
-        exact_input_dim = ENTITY_RAW_DIM + N_ID_FIELDS
+        raw_dim = embeds.raw_dim
+        exact_input_dim = raw_dim + (0 if self.order_blind else N_ID_FIELDS)
         if self.flat_autoencoder:
             if not self.learned_only:
                 raise ValueError("flat shared autoencoder requires learned_only=true")
@@ -234,7 +235,7 @@ class SharedBattleLatent(nn.Module):
             # one projection. This is a learned nonlinear residual, never a raw-value bypass.
             self.dynamic_entity_encoder = (
                 nn.Sequential(
-                    nn.Linear(ENTITY_RAW_DIM, hidden),
+                    nn.Linear(raw_dim, hidden),
                     nn.GELU(),
                     nn.Linear(hidden, self.token_dim),
                 )
@@ -263,8 +264,9 @@ class SharedBattleLatent(nn.Module):
                 if self.typed_world_tokens
                 else None
             )
+            control_dim = 4 if self.order_blind else 12 + 14
             self.control_encoder = nn.Sequential(
-                nn.Linear(12 + 14 + (6 if self.typed_world_tokens else 0), hidden),
+                nn.Linear(control_dim + (6 if self.typed_world_tokens else 0), hidden),
                 nn.GELU(),
                 nn.Linear(hidden, self.token_dim),
             )
@@ -272,7 +274,9 @@ class SharedBattleLatent(nn.Module):
             self.metadata_encoder = self.control_encoder
             self.global_token = nn.Parameter(torch.empty(1, 1, self.token_dim))
             nn.init.normal_(self.global_token, std=0.02)
-            exact_current_dim = 12 * exact_input_dim + DIMS.field_dim + 12 + 14
+            exact_current_dim = (
+                (2 if self.order_blind else 12) * exact_input_dim + DIMS.field_dim + control_dim
+            )
             self.global_state_encoder = (
                 nn.Sequential(
                     nn.Linear(exact_current_dim, hidden),
@@ -433,11 +437,12 @@ class SharedBattleLatent(nn.Module):
         original_ability = embeds.ability(
             ids[..., ORIGINAL_ABILITY_ID_FIELD].clamp(0, embeds.ability.num_embeddings - 1)
         )
-        exact_input = torch.cat(
-            [batch["entities"], self.normalized_ids(ids, embeds)], dim=-1
+        raw = embeds.entity_raw(batch["entities"])
+        exact_input = raw if self.order_blind else torch.cat(
+            [raw, self.normalized_ids(ids, embeds)], dim=-1
         )
         semantic_input = torch.cat(
-            [embeds(ids), original_item, original_ability], dim=-1
+            [embeds(ids, batch["entities"]), original_item, original_ability], dim=-1
         )
         active = torch.zeros(
             ids.shape[0], 12, dtype=batch["field"].dtype, device=batch["field"].device
@@ -469,24 +474,36 @@ class SharedBattleLatent(nn.Module):
             entity_input = torch.cat([exact_input, semantic_input], dim=-1)
             entity = self.entity_encoder(entity_input)
             if self.dynamic_entity_encoder is not None:
-                entity = entity + self.dynamic_entity_encoder(batch["entities"])
+                entity = entity + self.dynamic_entity_encoder(raw)
             field = self.field_encoder(batch["field"]).unsqueeze(1)
             history = self.history_encoder(contexts.history).unsqueeze(1)
+            control_input = torch.cat([active, legality], dim=-1)
+            if self.order_blind:
+                # Active identity travels on the entity token. Only symmetric request facts
+                # belong in a global token: raw active indices and ordered legality leak slots.
+                control_input = torch.stack([
+                    legality[:, :4].mean(-1), legality[:, 4:8].mean(-1),
+                    legality[:, 8:13].mean(-1), legality[:, 13],
+                ], dim=-1)
             if self.typed_world_tokens:
                 phase = self._decision_phase(batch, legality)
                 control = self.control_encoder(
-                    torch.cat([active, legality, phase], dim=-1)
+                    torch.cat([control_input, phase], dim=-1)
                 ).unsqueeze(1)
                 recent = self._recent_history(contexts)
                 recent = self.history_event_encoder(recent)
             else:
                 control = self.control_encoder(
-                    torch.cat([active, legality], dim=-1)
+                    control_input
                 ).unsqueeze(1)
             global_token = self.global_token.expand(ids.shape[0], -1, -1)
             if self.global_state_encoder is not None:
+                exact_entities = (
+                    torch.stack([exact_input[:, :6].mean(1), exact_input[:, 6:].mean(1)], dim=1)
+                    if self.order_blind else exact_input
+                )
                 exact_current = torch.cat(
-                    [exact_input.flatten(1), batch["field"], active, legality], dim=-1
+                    [exact_entities.flatten(1), batch["field"], control_input], dim=-1
                 )
                 global_token = global_token + self.global_state_encoder(
                     exact_current
@@ -499,12 +516,18 @@ class SharedBattleLatent(nn.Module):
                 else torch.cat([entity, field, history, control, global_token], dim=1)
             )
             positions = torch.arange(self.token_count, device=tokens.device)
+            position = self.token_position(positions)
+            party = self.party_position(self.contextual_party_ids)
+            if self.order_blind:
+                mask = (positions >= 12).unsqueeze(-1)
+                position = position * mask
+                party = party * mask
             tokens = (
                 tokens
-                + self.token_position(positions).unsqueeze(0)
+                + position.unsqueeze(0)
                 + self.token_kind(self.contextual_kind_ids).unsqueeze(0)
                 + self.token_side(self.contextual_side_ids).unsqueeze(0)
-                + self.party_position(self.contextual_party_ids).unsqueeze(0)
+                + party.unsqueeze(0)
             )
             latent = self.contextual_encoder(tokens).flatten(1)
             if return_precontext:

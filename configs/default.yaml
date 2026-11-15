@@ -51,6 +51,7 @@ encoding:
 
 # --- Model ------------------------------------------------------------------------------------
 model:
+  order_blind_entities: false  # symmetric move sets, identity history and unpositioned creature tokens
   history_transformer_layers: 2
   history_heads: 4
   history_gru_hidden: 256

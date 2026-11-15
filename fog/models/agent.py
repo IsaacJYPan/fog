@@ -92,6 +92,20 @@ class FogAgent(nn.Module):
         super().__init__()
         cfg = cfg or {}
         model_cfg = cfg.get("model", {})
+        self.order_blind_entities = bool(model_cfg.get("order_blind_entities", False))
+        if self.order_blind_entities:
+            required = (
+                "shared_latent_trunk", "shared_latent_contextual", "shared_typed_world_tokens",
+                "shared_contextual_head_readers", "token_action_policy", "action_query_policy",
+            )
+            forbidden = ("structured_memory", "exact_action_context", "use_action_features")
+            if any(not model_cfg.get(k, False) for k in required) or any(
+                model_cfg.get(k, False) for k in forbidden
+            ):
+                raise ValueError(
+                    "order_blind_entities requires typed contextual readers and action queries "
+                    "without ordered exact/action-feature inputs"
+                )
         self.aux_into_trunk = model_cfg.get("aux_into_trunk", True)
         self.oracle = model_cfg.get("oracle", "none")  # {none, set, action} evaluation ceilings
         # blind_reactive baseline: force history to 0 and zero the belief conditioning,
@@ -507,7 +521,10 @@ class FogAgent(nn.Module):
             1, bench.unsqueeze(-1).expand(-1, -1, private_memory.shape[-1])
         )
         move_ids = entity_ids[rows, mine, 3 : 3 + 4]
-        move_tokens = self.backbone.embeds.move(move_ids)
+        move_tokens = (
+            self.backbone.embeds.move_vectors(move_ids, batch["entities"][rows, mine])
+            if self.order_blind_entities else self.backbone.embeds.move(move_ids)
+        )
         action_moves = move_tokens.new_zeros(batch_size, 14, move_tokens.shape[-1])
         action_moves[:, :4] = move_tokens
         action_moves[:, 4:8] = move_tokens

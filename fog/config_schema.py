@@ -50,7 +50,7 @@ _SECTION_KEYS = {
         "simple_rule_prior_strength", "simple_rule_prior_strength_final", "structured_memory",
         "structured_token_dim", "token_action_policy", "action_query_policy",
         "action_query_heads", "use_action_features",
-        "use_posterior_features",
+        "use_posterior_features", "order_blind_entities",
     },
     "loss": {
         "action_coef", "belief_chain_coef", "belief_coef", "preview_coef",

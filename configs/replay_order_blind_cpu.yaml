@@ -1,0 +1,14 @@
+# Brief 09 R2: the corrected replay recipe with slot-order inputs removed.
+extends: replay_blueprint_cpu.yaml
+
+model:
+  order_blind_entities: true
+
+bc:
+  epochs: 8
+  early_stopping_patience: 0
+  resume: true
+  selection_metric: action_ce
+
+log:
+  dir: runs/order_blind_model/R2
