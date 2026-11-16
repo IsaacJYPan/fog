@@ -56,3 +56,22 @@ def test_forward_hook_copies_actual_model_tensors():
         assert (seat.pending["opp_tokens"] == -1).all()
     finally:
         seat.hook.remove()
+
+
+def test_raw_feature_explanation_recognizes_special_attack_drop():
+    from fog.encoding.action_features import ACTION_FEATURE_DIM, ACTION_FEATURE_NAMES
+    from fog.encoding.entities import L
+    from fog.eval.replay_live_parity import explain_difference
+
+    a = np.zeros((14, ACTION_FEATURE_DIM), np.float32)
+    b = a.copy()
+    ratios = [ACTION_FEATURE_NAMES.index(n) for n in ('physical_stat_ratio', 'special_stat_ratio')]
+    a[0, ratios] = 0.1
+    b[0, ratios] = 0.25
+    fields = {'legality_mask': np.ones(14, bool), 'active_idx': np.asarray([0, 6]),
+              'entities': np.zeros((12, ENTITY_RAW_DIM), np.float32)}
+    fields['entities'][0, L.boosts + 2] = -0.5  # SpA is the third boost column.
+    key = ('p1', 1, 0, 0)
+    rows = {key: {'fields': fields}}
+    reason = explain_difference('action_features', a, b, key, rows, rows)
+    assert reason is not None and 'missing replay request stats' in reason

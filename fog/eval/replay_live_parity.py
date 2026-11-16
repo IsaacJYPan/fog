@@ -120,7 +120,7 @@ def explain_difference(name, a, b, key, left, right) -> str | None:
                   ("physical_stat_ratio", "special_stat_ratio")]
         populated = np.any(b[:, ratios] != 0, axis=1)
         boosts = second["entities"][active, L.boosts:L.boosts + 7]
-        if (min(boosts[0], boosts[3]) <= -0.5 and populated.any()
+        if (min(boosts[0], boosts[2]) <= -0.5 and populated.any()
                 and np.all(b[populated][:, ratios] == 0.25)):
             return ("at an offensive boost <= -3, missing replay request stats cause the feature "
                     "helper to use its unit-stat-ratio fallback")
