@@ -2894,3 +2894,104 @@ Frequency uses the most-led training species present with alphabetical ties; no 
 | Final maxdamage digest | `40644081cca71ebe` → `40644081cca71ebe`; all new keys absent/off | `c87b5198b5b48c9c9e4b24e586e8ab174bd343fa`; `.venv/bin/python -m fog.eval.showdown_rollout_probe --batch 32 --games 96 --opponent MaxDamage --pool data/teams/pool_a`; `09-artifacts/digest-maxdamage-final.txt`, `digests-final-summary.json`; deterministic regression, intervals n/a |
 
 All stages complete; only P2.2a acceptance is closed. P2.3 and every phase gate stay open. No search, PPO or belief source was changed; no playing-strength gate claimed.
+
+## 2026-11-16: review of brief 08
+
+The branch `work/update-speed` (head `d0efe84`) was reviewed and merged into `work/roadmap`
+(merge `2be53f3`). Everything in it is smoke. Checked in review:
+
+- Every number in `docs/briefs/08-report.md` against `docs/briefs/08-artifacts/ppo-summary.json`,
+  `replay-summary.json`, `ppo-parts.json` and `replay-parts.json`. All agree.
+- The claim that production code equals `f36bc11`: `git diff f36bc11 e23682f -- fog tests configs`
+  is empty, and outside `docs/` the branch changes only `ROADMAP.md`.
+- No account name or token in the artifacts; all eight commits are authored as the owner.
+- Not re-run: any GPU measurement.
+
+| Question | Answer | Evidence |
+| --- | --- | --- |
+| How fast is the PPO update on a T4 after the belief-loop fix? | 1.315 s per 1,024-row optimizer step (6.085 before), 122.80 decisions/s end to end (37.50 before) | `ppo-summary.json`: two updates, 26,330 decisions, 78 steps, 214.4 s. Four CPU cores against two before, and a different PyTorch, so this is not an isolated ablation of the fix |
+| Is the update still most of the wall time? | Narrowly: 52.3% update, 41.8% collection | Same file. Two updates only |
+| Where does a PPO step go? | Backward 0.735 s (54%); of the 0.582 s forward, the two belief models are 0.422 s (73%) | `ppo-parts.json`. **The measured step still ran every belief pass**: the code is from before `loss.skip_unweighted_belief`, and PPO has no such switch yet |
+| How fast is replay training on a T4? | 1,850 rows/s (583 in brief 05) | `replay-summary.json`: 200 steps of 1,024 rows on random weights, belief passes on, 0.553 s a step |
+| How much hosted GPU time is left? | **3.69 hours until the meter resets on 2026-11-21 00:00 UTC** | `gpu-budget.json`: 62,326.9 s used of 75,600 s when the last job ended. Nothing in the repository records a later job |
+
+What follows.
+
+- Brief 14's start condition ("the update still takes more than half the wall time") is met,
+  narrowly and on a two-update smoke. Because belief passes are most of the forward, brief 14
+  is worth running, but self-play is frozen until G3 and the remaining GPU time this week is
+  3.69 hours. **Brief 14 waits for the meter reset; the remaining time goes to brief 13**
+  (queue).
+- Brief 13 was written for 20 GPU-hours. That is not available before 2026-11-21. Brief 13 is
+  split into a part that fits now (20,000 games) and a part for after the reset (all prepared
+  games); see the brief.
+
+## 2026-11-16: review of brief 09
+
+The branch `work/order-blind-model` (head `54d2418`) was reviewed and merged into
+`work/roadmap` (merge `a40aa54`). Everything in it is smoke: 1,000 training games, 400 play
+games a cell on `pool_b`.
+
+Checked in review, on an Intel Xeon 2.10 GHz, four cores, PyTorch 2.13.0, Python 3.13:
+
+- Headline numbers in `docs/briefs/09-report.md` against `09-artifacts/R{1,2,3,4,4-seed2}-best-policy-slot-check.json`,
+  `stage4-summary.json`, `stage5-summary.json` and `play.json` (59, 159, 154 and 308 wins of
+  400). All agree.
+- The code diff outside `docs/`, read in full. Every new behaviour is behind a key that
+  defaults to off. Terminal targets are labels only; no opponent truth enters a policy or
+  value input.
+- **Permutation test** (`tests/test_order_blind_model.py`): it perturbs every parameter, checks
+  five permutations (acting moves, another own Pokémon's moves, an opponent's moves, own team,
+  opponent team) and has a key-off control that must fail. On this machine the synthetic and
+  live-Showdown cases pass; the replay-holdout case was skipped (no replay data here) and is
+  the worker's claim.
+- **Defaults unchanged.** With every new key off, the model built from
+  `configs/gen9ou_typed_token_trunk.yaml` has the same 376 state tensors, 5,853,084 parameters
+  and seeded initial values before and after the merge (one hash over names, shapes and
+  values), so old checkpoints load strictly. The three rollout digests are equal before
+  (`824a5f5`) and after the merge: `23405989f4665988`, `0efd4319547a4b3b`, `338cfca82f31b181`.
+- 81 tests in the ten covering files pass (5 skipped for missing replay data);
+  `.venv/bin/ruff check fog tests` is clean. Commits are authored as the owner; no account
+  name or token in the artifacts.
+- Not re-run: any training, the holdout permutation case, the play smoke.
+
+Merge conflicts and how they were resolved (the only code written in review):
+
+| Conflict | Resolution |
+| --- | --- |
+| `bc_loss`: brief 09's preview-only path against `loss.skip_unweighted_belief` | Both kept: preview-only returns first, then the belief skip decides how the model is called |
+| `bc.keep_best_value` (brief 05) and `bc.save_best_value` (brief 09): two keys, two state layouts, one file `bc_best_value.pt` | One tracker. Either key keeps the best-value checkpoint; `save_best_value` also adds the value Brier and calibration columns and writes `value_selection.json`. The state file stores the score under both old names, and a state file from either branch still resumes. Both branches' tests pass unchanged |
+| `loss` and `bc` key lists in `fog/config_schema.py` | Union |
+
+One new test, `tests/test_bc_skip_belief.py::test_outcome_auxiliary_heads_survive_the_belief_skip`:
+with `loss.skip_unweighted_belief` on and `loss.outcome_aux_coef` 0.1, the real model is called
+with `need_belief=False`, the auxiliary loss is positive and equal to the loss without the
+skip, and both auxiliary heads receive gradient. Brief 13 trains with both keys.
+
+| Question | Answer | Evidence |
+| --- | --- | --- |
+| Can the model still read slot order? | No, with `model.order_blind_entities` | Permutation test above; R2 stored and shuffled metrics equal to four decimals |
+| Does that help the policy? | Yes: shuffled NLL 1.9253 to 1.8799, top-1 26.64% to 28.24% | R1 against R2; larger than twice the seed gap |
+| Do logistic value loss and dense outcome targets help at 1,000 games? | No measurable effect | R3 against R2: NLL 1.8806 against 1.8799. The best-value checkpoint is the untrained epoch 0 in every run, as expected from brief 05 (the value head needs about 20,000 games) |
+| Do mechanical move features help? | Yes: NLL 1.8806 to 1.8041 (second seed 1.8139), top-1 28.5% to 33.3% | R4 against R3. Moves seen 1 to 19 times improve most; the 130 rows with never-seen moves get worse (1.884 to 2.016, wide intervals, cause unknown) |
+| Does it change play? | R1 14.75% and 39.75%, R4 38.50% and 77.00% against SimpleHeuristics and MaxDamage | `play.json`, 400 greedy games a cell on `pool_b`, smoke |
+| Can the lead head learn human leads? | 34.9% top-1 against 16.7% chance and 23.9% for the most-led species | R5, R5b |
+
+**A gap the report does not mention.** The lead stage (`bc.scope=preview`) also trains the
+shared embeddings and the private and current-state encoders, which the policy reads
+(`09-artifacts/R5-scope.json`: `"policy_frozen": false`, 39 changed tensors including
+`backbone.embeds.*`). R5 was never scored on the policy holdout and never played, so whether
+lead training damages the policy is unknown. Brief 13 measures it before any lead-trained
+checkpoint is used in play.
+
+Decisions for other briefs.
+
+- **Model keys for brief 13:** `configs/replay_mechanical_cpu.yaml`, that is R4:
+  `model.order_blind_entities`, `model.mechanical_features`, `loss.value_loss=logistic`,
+  `loss.outcome_aux_coef=0.1`, `bc.save_best_value`. The two value keys showed no benefit at
+  1,000 games and none was expected there; R4 is the only configuration with a play result,
+  and 20,000 games is where the value head can be judged (reference: Brier 0.215 on the old
+  rows with the old loss).
+- P2.2a is ticked: rows no longer carry the answer in their order, and the model cannot read
+  order. P2.3 and G2 stay open.
+- Brief 12 can start (it needed this merge).
