@@ -3607,3 +3607,23 @@ Command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.e
 
 On corrected normal inputs the new model improves both metrics; on old inputs it worsens (NLL 1.7803→1.9013), so it is not input-version interchangeable. Added one-option replacements have zero policy CE; both all/nontrivial replacement aggregates are reported to avoid hiding this. These are imitation diagnostics, not strength gates. The four 400-game play rows are running; no play effect is claimed yet.
 
+
+### Stage 3 greedy play and completion (smoke)
+
+All four rows completed, **400 games each / 1,600 total**, with zero draws, truncations or failures. Both policies use the corrected live history implementation, the same `pool_b`, seed-0 greedy schedule, and both team assignments crossed with both player positions. The producing play commit is `6b5086c`; the policy hashes are in `holdout-comparison.json`. This tests training-row changes under the same actor, not an old/new actor intervention.
+
+| Policy / opponent (smoke) | W–L | Score % [95% matched-block bootstrap] |
+| --- | --- | --- |
+| old vs simpleheuristics | 156–244 | 39.00 [34.50, 43.75] |
+| old vs maxdamage | 303–97 | 75.75 [70.75, 80.75] |
+| new vs simpleheuristics | 180–220 | 45.00 [41.00, 49.26] |
+| new vs maxdamage | 318–82 | 79.50 [75.25, 83.50] |
+
+Paired new-minus-old score differences: SimpleHeuristics **+6.00 percentage points [0.74, 11.25]**; MaxDamage **+3.75 [−2.00, 9.76]**. The MaxDamage interval includes zero. Intervals resample 100 matched four-game blocks together across policies, 1,000 draws, seed 12000.
+
+On the same corrected normal inputs, paired new-minus-old holdout differences are NLL **−0.0585 [−0.0624, −0.0545]**, top-1 **+2.26 points [1.96, 2.53]**. Nontrivial replacement differences are NLL **−0.0583 [−0.0657, −0.0515]**, top-1 **+4.58 points [3.74, 5.53]**. Full old-input/all-replacement differences are retained in `comparison-summary.json`. Holdout intervals resample entire games, separately from play blocks.
+
+Play command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_mechanical_cpu.yaml --checkpoint old=runs/replay-parity/train-old/checkpoints/bc_best.pt --checkpoint new=runs/replay-parity/train-new/checkpoints/bc_best.pt --checkpoint-config old=configs/replay_mechanical_cpu.yaml --checkpoint-config new=configs/replay_mechanical_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --seed 0 --max-turns 300 --progress-every 40 --resume --out docs/briefs/12-artifacts/play.json`. Analysis: `.venv/bin/python docs/briefs/12-artifacts/comparison-summary.txt`; evidence: `play.json`, `comparison-summary.{txt,json}`, `stage3-complete.json`.
+
+Brief 12 is complete, pending review: parity tool/fixes/tests, full reconversion, both eight-epoch trainings, matched holdout and all requested play rows. The report is 481 words. P2.2b remains checked; no other gate or threshold changes. The prior “running” notes are superseded by these completed measurements. Additional seeds, imputation accuracy and held-out strength remain unverified; pool B and all these results are smoke.
+

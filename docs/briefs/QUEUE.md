@@ -26,7 +26,7 @@ in different rows of the "touches" column.
 | 08 | `08-update-speed-gpu.md` | GPU, 1 h | done | nothing (measures) | `work/update-speed` | **merged 2026-11-16** |
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
 | 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
-| 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | stages 1–2 complete; stage 3 running |
+| 12 | `12-replay-live-parity.md` | CPU | done | converter, parser | `work/replay-parity` | **complete; pending review** |
 | 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | not started |
 | 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds: see the note under this table |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | not started |

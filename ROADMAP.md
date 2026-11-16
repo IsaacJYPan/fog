@@ -295,8 +295,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       was played, then own PP, forced replacement decisions and the history record brought
       into line.
       _2026-11-16: brief 12 stages 1–2 meet the parity criterion on 200 games (smoke);
-      exact own HP and undisclosed choices are explained per row. Training/play comparison
-      remains running. See `docs/briefs/12-report.md` and the ledger._
+      exact own HP and undisclosed choices are explained per row. Both eight-epoch trainings,
+      paired holdout and four 400-game play rows are complete (smoke); no strength gate is
+      claimed. See `docs/briefs/12-report.md` and the ledger._
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule

@@ -1,0 +1,3 @@
+Command: .venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt pytest -q tests/test_replay_parity_training.py
+..                                                                       [100%]
+2 passed in 3.35s
