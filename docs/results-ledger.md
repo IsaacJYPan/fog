@@ -3535,3 +3535,37 @@ Agreement with the teacher's top move on held-out rows still rose (58.8% to 61.7
 Brief 17's stopping rule needs two such rounds; this is one. What is being tried next, each
 as its own row: a network on every stored row (about 450,000, the hosted folders included)
 at the same number of training steps, and sharper targets (`--target-power`).
+
+## 2026-11-16: where network 2 and the teacher differ (diagnostic)
+
+From the rows stored when network 2 acted on this machine (`round3` and `round3d`, 76,304
+labelled decisions; the network's own distribution at the moment of play is in each row, so
+no forward pass is involved). "Network's choice" is its most probable action; the 1,008-game
+play rows use that choice. A one-off pass over the arrays; nothing here is a gate.
+
+| Quantity | Value |
+| --- | --- |
+| Same top choice as the teacher | 58.8% |
+| Teacher's visit share on its own top choice, mean | 0.40 (entropy 1.61 nats over 7.6 legal actions; the network's 1.72) |
+| Visits on the network's choice as a share of the visits on the teacher's top choice, mean | 0.84; below 0.10 on 1.3% of decisions |
+| Agreement where the teacher's top share is under 0.3 (34% of rows), 0.3 to 0.5 (42%), 0.5 to 0.7 (16%), over 0.7 (7%) | 46.2%, 61.2%, 70.9%, **77.3%** |
+| Teacher's top choice is a move, a switch, a Tera move | 74.8%, 24.8%, 0.4% of rows |
+| Agreement when it is a move, a switch, a Tera move | 65.2%, **40.4%**, 3.3% |
+| Network's top choice is a switch, a Tera move | 19.6%, never |
+| Agreement by quarter of the game | 61.5%, 58.7%, 58.6%, 56.9% |
+
+Reading, to be tested and not yet evidence about strength:
+
+- The teacher's visit distribution is nearly flat, and by that distribution the network's
+  choice is almost as good as the teacher's on nearly every decision. Yet the teacher wins
+  93% against SimpleHeuristics and the network 68%. So visit shares say little about how much
+  worse the second choice is, and a network fitted to them learns weak preferences. The
+  network misses the teacher's choice on 23% of the decisions where the teacher is surest.
+  Sharper targets (`--target-power`) weight exactly those decisions; two trainings with powers
+  2 and 8 on rounds 0 and 1 are running on hosted CPU machines.
+- Switching is where they differ most: the teacher switches on a quarter of its decisions
+  and the network follows on 40% of them.
+- The search itself rarely terastallizes: a Tera move is its first choice on 0.4% of
+  decisions, about one game in six for a side. The network never does. Whether that is right
+  play or a weakness of the engine's handling (HANDOFF section 10 lists it as unverified) is
+  a question for P1, not for distillation.
