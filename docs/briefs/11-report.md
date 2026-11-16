@@ -1,5 +1,14 @@
 # Brief 11: EngineMCTS gate G1
 
+**Completed in review, 2026-11-16.** The worker's session ended with the MaxDamage half of
+the gate at 504 of 1,008 games. The reviewer re-ran the recorded gate command, which resumed
+each shard from its last complete block, on a different machine (Intel Xeon 2.10 GHz, four
+cores). **G1 passes: 936 of 1,008 against SimpleHeuristics (0.9286 [0.9110, 0.9429]) and 981
+of 1,008 against MaxDamage (0.9732 [0.9613, 0.9815]); fallbacks 53 of 28,020 and 41 of 24,112
+decisions; no rejected action, failure or truncation.** MaxDamage by machine: 490 of 504 and
+491 of 504. Files: `11-artifacts/gate/merged.json`, `gate-complete-summary.json`. The text
+below is the worker's report as it stood.
+
 **Answer:** G1 not yet measured; gate matches running. Gate: not measured. Budget curve: best observed complete cell: 800 ms, K=8, 91.750%; intervals overlap, so this does not rank close cells.
 
 **Defects fixed.** Teal-Tera Ogerpon matches its submitted-world slot after re-entry;
