@@ -20,6 +20,7 @@
 #   hosted.sh round-collect <round> <seconds> [letters]      one round's collection, here and hosted
 #   hosted.sh round-train <round> ['<extra RUNS entries>']   train on the GPU, then play here
 #
+# The host runs at most five CPU jobs at once; a sixth submission is refused and reported.
 # Run round-collect and round-train from a job runner that keeps the session alive; each can
 # take up to two hours. Collected rounds live in runs/distill/round<N>[<letter>], networks in
 # runs/distill/net<N>, play results in runs/distill/eval/.
@@ -54,6 +55,12 @@ json.dump({"id": f"{user}/{slug}", "title": slug, "code_file": "job.py", "langua
 E
 }
 
+pushed() {  # pushed <the client's last line>: fail unless the host accepted the job
+  echo "$1"
+  case "$1" in *"successfully pushed"*) return 0 ;; esac
+  return 1          # the host runs at most five CPU jobs at once and refuses the sixth
+}
+
 wait_for() {  # wait_for <slug>: print the final status line
   local status
   while true; do
@@ -69,7 +76,7 @@ cpu_job() {
   mkdir -p "$folder"
   fill "$R/docs/briefs/15-artifacts/hosted_cpu_job.py" STEPS "$steps" "$folder" \
     "fog-distill-collect-$letter" false || return 1
-  $K kernels push -p "$folder" --timeout "$timeout" 2>&1 | hide | tail -1
+  pushed "$($K kernels push -p "$folder" --timeout "$timeout" 2>&1 | hide | tail -1)"
 }
 
 fetch() {
@@ -90,7 +97,8 @@ gpu_train() {
   if [ ! -f "$W/markers/gpu-$tag.pushed" ]; then
     fill "$R/docs/briefs/15-artifacts/gpu_train_job.py" RUNS "$runs" "$folder" "$slug" true || return 1
     $K quota --format json > "$W/quota-before-$tag.json" 2>/dev/null
-    $K kernels push -p "$folder" --accelerator NvidiaTeslaT4 --timeout 3600 2>&1 | hide | tail -1
+    pushed "$($K kernels push -p "$folder" --accelerator NvidiaTeslaT4 --timeout 3600 2>&1 \
+      | hide | tail -1)" || return 1
     touch "$W/markers/gpu-$tag.pushed"
     sleep 20
   fi
@@ -127,10 +135,10 @@ round_collect() {
   for letter in $letters; do          # hosted machine <letter> writes round<N><letter>
     index=$((index + 1)); name=round$round$letter
     if [ ! -f "$W/markers/r$round.pushed_$letter" ]; then
-      cpu_job "$letter" $((seconds + 3000)) \
-        "$(collect_step "$name" $(((15 + index) * 1000 + round)) "net$previous.pt" "$seconds")" \
-        && touch "$W/markers/r$round.pushed_$letter"
-      say "round $round: hosted machine $letter submitted"
+      if cpu_job "$letter" $((seconds + 3000)) \
+        "$(collect_step "$name" $(((15 + index) * 1000 + round)) "net$previous.pt" "$seconds")"
+      then touch "$W/markers/r$round.pushed_$letter"; say "round $round: hosted machine $letter submitted"
+      else say "round $round: hosted machine $letter was refused"; fi
     fi
   done
   if [ -z "${FOG_HOSTED_NO_LOCAL:-}" ] && [ ! -f "$W/markers/r$round.local_done" ]; then
@@ -145,7 +153,8 @@ round_collect() {
   local archives=()
   for letter in "" $letters; do
     name=round$round$letter
-    if [ -n "$letter" ] && [ ! -f "runs/distill/$name/summary.json" ]; then
+    if [ -n "$letter" ] && [ -f "$W/markers/r$round.pushed_$letter" ] \
+        && [ ! -f "runs/distill/$name/summary.json" ]; then
       fetch "$letter" "$name" > "$W/fetch-$name.log" 2>&1
       say "round $round: hosted machine $letter: $(head -1 "$W/fetch-$name.log")"
     fi
