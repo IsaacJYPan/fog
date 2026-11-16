@@ -1,0 +1,15 @@
+{
+  "source_commit": "79283c9d780448edfc1938aa90642fb87a211bbe",
+  "import_command": "uv run --no-sync python -m fog.scripts.import_metamon_replays --out runs/brief13/raw --cache runs/brief13/cache --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 24000 --max-shards 2 --max-download-mb 6000",
+  "convert_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 uv run --no-sync python -m fog.scripts.convert_replay_decisions --raw runs/brief13/raw --out runs/brief13/decisions --imputations 1 --workers 4 --resume",
+  "status": "conversion running; no training",
+  "test_command": "uv run --no-sync python -m pytest -q tests/test_bc_skip_belief.py tests/test_replay_conversion_resume.py tests/test_order_blind_model.py tests/test_replay_slot_order_check.py",
+  "test_result": {
+    "passed": 24,
+    "skipped": 4
+  },
+  "filter_test_command": "PYTHONPATH=. uv run --no-sync python -m pytest -q docs/briefs/13-artifacts/test_prepare_split.py",
+  "filter_test_result": {
+    "passed": 2
+  }
+}

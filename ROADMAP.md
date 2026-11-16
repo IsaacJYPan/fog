@@ -299,6 +299,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
       (start `lr 3e-4` cosine, batch ≥ 1,024, until holdout loss stops improving), not the PPO
       continuation settings.
+      _2026-11-16: brief 13 started with merged R4 and fresh resumable CPU conversion;
+      the initial quota reads 27.52 h remaining. No GPU training or new gate result yet.
+      See `docs/briefs/13-report.md`; P2.1–P2.5 remain open._
       _2026-11-12: trained from scratch on 1,000 and 3,000 games on CPU at batch 256 (not ≥ 1,024);
       10,000 and 20,000 not run (over 6 h on 4 cores); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._

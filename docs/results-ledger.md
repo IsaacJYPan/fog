@@ -3403,3 +3403,29 @@ source `94cbb98`. One game in each row reached the 300-turn limit and is not cou
 The learning curve against SimpleHeuristics is 0.448, 0.615, 0.682 at 58k, 119k and 178k
 training rows: the third round added 6.7 points, the second 16.7. Against MaxDamage: 0.815,
 0.909, 0.923. Still rising, more slowly. Rounds 3 and 4 follow the same recipe.
+
+## 2026-11-16: replay blueprint at scale on corrected rows
+
+Brief 13, branch `work/p2-scale-corrected`, source `79283c9`. **In progress;
+no training or strength result.** Briefs 08 and 09 are merged. Model, loss and
+trainer source are unchanged. Preparation uses the merged terminal-target converter.
+
+| Measurement | Result | Command/evidence |
+| --- | --- | --- |
+| Initial GPU quota | 17.48 h used, 27.52 h remaining of 45.00; reset 2026-11-21 00:00 UTC | `kaggle quota --format json`; `13-artifacts/quota-initial.json` |
+| First CPU import | 24,000 games, rating ≥1500, after 2024-02-01, pinned source | Full command in `13-artifacts/preparation.json`; `first-import.json` |
+| Source checks | 24 passed, 4 skipped for absent replay fixtures; Ruff passed | `13-artifacts/source-tests.txt`, `ruff.txt` |
+| Composition-filter checks | 2 passed: acting side only, multiset/order invariance, aligned arrays, preview masking, no-exclusion equality | `13-artifacts/test_prepare_split.py`, `split-tests.txt` |
+
+The resumable CPU split helper writes separate filtered shards. It compares the
+acting submitted species multiset against `replay_v1/validation`; matching preview
+records are masked while retaining the two-slot format the existing lead loader
+requires. Holdout rows are unchanged. The first GPU job template reuses brief 05's
+resume/export logic, selects R4, batch 1,024 and the required zero-belief overrides.
+It stops after one trained epoch of an 18-epoch schedule to measure throughput.
+Checkpoint scoring is kept off the metered GPU session. No job submitted yet;
+the 20-hour budget, two-hour reserve and first-stage-before-larger ordering hold.
+
+Conversion/split totals, slot diagnostics, GPU throughput, the larger-set forecast,
+training, lead retention, checkpoint export and play are pending. No P2 box ticked;
+P2.4 and all G2 clauses are not measurable from this preparation checkpoint.

@@ -1,0 +1,11 @@
+{
+  "status": "target_reached",
+  "revision": "792a86b5cdbcab9696032e947483b218453a0d4f",
+  "kept_games": 24000,
+  "filter_counts": {
+    "below_rating": 84083,
+    "invalid_metadata": 4607,
+    "outside_dates": 523,
+    "other_format": 913
+  }
+}
