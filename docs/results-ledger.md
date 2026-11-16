@@ -3520,3 +3520,25 @@ Validation: 52 covering tests pass (`tests-stage2.txt`), `ruff check fog tests` 
 | MaxDamage, 96 games | `40644081cca71ebe` | `d3c6b556c8a03d0b` |
 
 P2.2b is complete under its parity criterion. Stage 3 remains running: clean v12 conversion of 22,000 games, old/new eight-epoch R4 training at seed 20261201, paired holdout and greedy play. The old-data split reproduces 52,955 training and 103,944 holdout rows; independently reparsing all 2,000 old holdout games reproduces every stored array exactly (`old-metadata-summary.json`). No trained-play effect is claimed yet.
+
+### Stage 3 preparation (smoke)
+
+The clean v12 reconversion completed: **22,000 games, 1,244,604 rows, zero quarantines**
+(`12-artifacts/conversion-quality.json`, converter tree `87e85e6`). Command:
+`FOG_REPLAY_PRIORITY=/tmp/parity-priority.json python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/parity-new-decisions --imputations 1 --workers 2 --resume`.
+The optional priority list changes visitation order only; omitting it produces the same shards.
+The canonical splitter reproduces the selected training order and fixed holdout IDs exactly
+(`split-validation.json`). Old/new row counts for the same 1,000 training games are
+52,955/58,396; for the same 2,000 holdout games, 103,944/115,599 (`training-split.json`).
+
+Before model scoring, the paired holdout join was checked on every game: **95,988 common
+normal rows, zero label disagreements**, and **19,514 new replacement rows**, of which 17,941
+have multiple legal switches (`alignment-preflight.json`, all smoke). The remaining 1,573
+one-option replacements will be reported separately through the all/nontrivial aggregates.
+Metadata for the old rows was independently rebuilt with every stored array asserted identical.
+The existing noisy-weight permutation test also passes on 64 corrected holdout rows, including
+nonzero PP (`new-rows-permutations.json`, `tests-new-row-permutations.txt`).
+
+The two eight-epoch trainings and their play comparison remain running; there is no stage-3
+strength or NLL result yet. They use identical R4 keys, seed 20261201 and two CPU threads,
+sequentially to stay within the machine's 16 GB memory limit.
