@@ -1,17 +1,17 @@
 # Handoff
 
-Written 2026-11-16 for a fresh coding session. It replaces the 2026-11-15 handoff (git history) and
-restores the architecture-review material that version dropped (the 2026-11-14 file is `7dc34ec`).
-The planner who ran this project through 2026-11-15 will not be available; everything needed to
-continue is here or in the files named here. Facts are marked **[verified]** (measured, or read in the
+Written 2026-11-16 (second version of that day, about 05:30 UTC) for a fresh coding session.
+It replaces the earlier 2026-11-16 handoff (`824a5f5`); sections 5 to 7 and 9 are carried over
+unchanged because they still hold. Facts are marked **[verified]** (measured, or read in the
 code or an artifact, evidence named) or **[assumed]**. Unmeasured numbers are never filled in.
 
 ## 0. Start here
 
 1. Read this file, then `AGENTS.md`, `ROADMAP.md`, `docs/briefs/QUEUE.md`, `docs/briefs/REVIEW.md`, and
-   the newest sections of `docs/results-ledger.md`.
-2. **Three worker branches are pushed and unreviewed.** Reviewing them is the first job (section 8).
-   Nothing else in the queue can start until 08 and 09 are merged.
+   the newest sections of `docs/results-ledger.md` (from "review of brief 08" down).
+2. **What changed on 2026-11-16:** briefs 08, 09 and 11 are reviewed and merged; **gate G1
+   passed**; the search-distillation code exists and its pilot has started (section 4).
+   Workers may be running briefs 12, 13 (part A) and 16; their branches are the next reviews.
 3. Set the git identity before any commit: `git config user.name "Isaac Pan"` and
    `git config user.email "154495180+IsaacJYPan@users.noreply.github.com"`. A fresh container has
    another identity.
@@ -37,7 +37,7 @@ the planner: that is why the queue, the review procedure and briefs 10 to 14 exi
 - **No assistant or vendor attributions anywhere on remotes**: no co-author lines, session links, "generated
   with" lines, in commits, branch names, PRs or files.
 - Neutral branch names. Integrate on `work/roadmap` in `fog`; briefs use `work/<topic>`. The harness
-  assigns `dev/nice-johnson-ovzvy2` in both repos; the owner's rule wins. No pull requests unless asked.
+  assigns a `dev/...` branch in both repos; the owner's rule wins. No pull requests unless asked.
   Never trigger hosted CI. The private simulator repo wants `[skip ci]` in commit messages.
 - `fog` is **public**: commit no account name, token, private dataset name, player name or
   `configs/kaggle_results.json`; keep private-repo numbers out. `fog-jax-simulator` is **private** and
@@ -54,7 +54,7 @@ the planner: that is why the queue, the review procedure and briefs 10 to 14 exi
 
 | Repo | Visibility | Path in this container | State |
 | --- | --- | --- | --- |
-| `IsaacJYPan/fog` | public | `/home/user/fog` | `origin/work/roadmap` at `8476493` (pushed); this handoff is the next commit |
+| `IsaacJYPan/fog` | public | `/home/user/fog` | `origin/work/roadmap` carries everything below; `git log` is the record |
 | `IsaacJYPan/fog-jax-simulator` | private | `/home/user/fog-jax-simulator` | paused (section 5); trunk `f1b8041` as of 2026-11-14; ~20 `work/*` claim branches from old workers |
 
 Other remote branches in `fog` (`kakuna-experiments`, `showdown-training-handoff`, old `work/*` already
@@ -79,6 +79,12 @@ checkpoints are git-ignored and will not exist in a fresh session. Rebuild (sect
 | `docs/equilibrium-training.md`, `docs/notes/kuhn_anchor.py` | Design note (section 6) and the Kuhn poker script |
 | Queue, review procedure, briefs 10 to 14 | `docs/briefs/QUEUE.md`, `REVIEW.md`, `10`..`14-*.md` |
 
+| Brief 08: GPU update speed (merged 2026-11-16) | T4, four CPU cores: PPO optimizer step 6.085 to 1.315 s, 122.8 decisions/s end to end, update still 52.3% of wall time; replay trainer 1,850 rows/s. The measured step still ran all belief passes (73% of its forward). **Hosted GPU meter: 3.69 hours left until it resets on 2026-11-21 00:00 UTC** |
+| Brief 09: order-blind model (merged 2026-11-16) | Review confirmed: permutation test (all parameters perturbed, five permutations, key-off control), defaults bit-compatible (same state tensors and seeded values; three digests equal before and after on an Intel Xeon). R4 (`configs/replay_mechanical_cpu.yaml`) is the configuration brief 13 uses. Merge unified `bc.keep_best_value` and `bc.save_best_value`; a test shows the outcome auxiliary heads survive `loss.skip_unweighted_belief`. **Gap found in review:** the lead stage also trains weights the policy reads and nobody measured the effect (brief 13 does) |
+| Brief 11: gate G1 (merged 2026-11-16, run completed in review) | **G1 passed.** EngineMCTS, K = 8, 1,600 ms, validation teams: 936 of 1,008 against SimpleHeuristics (0.9286 [0.9110, 0.9429]), 981 of 1,008 against MaxDamage (0.9732 [0.9613, 0.9815]); fallbacks 0.19% and 0.17%; no rejected action. The last 504 MaxDamage games ran on a different machine (490 and 491 wins in the two halves). Budget curve: K = 8 beats K = 1 by 7 to 13 points at every budget; 200, 800 and 3,200 ms at K = 8 score 91.0, 91.75 and 90.5% (400 games each), so search time is not the limit |
+| `fog/training/search_distill.py` (planner's own work, P3.1) | The network plays on pinned Showdown, EngineMCTS labels every decision of a recorded side from that side's own view and plays its own move with probability `beta`; one file a game, resumable; soft-target training without belief passes. Tests `tests/test_search_distill.py`. Config `configs/search_distill_cpu.yaml` |
+| Briefs 15 and 16 written; brief 13 split | 15: distillation pilot (section 4). 16: EngineMCTS once on the test teams for tier T1. 13: part A (3 GPU-hours, 20,000 games) now, part B after the meter reset |
+
 ### Why brief 07's finding matters (do not lose this)
 
 `complete_private_team` (`fog/training/replay_policy_data.py`) filled the acting side's moveset in order of
@@ -91,74 +97,39 @@ whose slot no longer names the encoded move or species, and resumes per game (`c
 --resume`). **Consequence: every replay number from briefs 01 to 05 has inflated accuracy and models that
 lean on a shortcut that does not exist in play.** Their timing, value and play numbers stand.
 
-## 4. Unmerged worker branches [all unreviewed; numbers below are the workers' own claims unless marked]
+## 4. Work in flight
 
-| Brief | Branch @ head | State | What it claims |
-| --- | --- | --- | --- |
-| 08 GPU update speed | `work/update-speed` @ `d0efe84` | finished | Four logical Xeon cores, two T4s (all work on `cuda:0`), PyTorch 2.11.0, measurement commit `e23682f`, production code identical to `f36bc11` (so **before my `skip_unweighted_belief`**, and the PPO step still runs belief passes). PPO two updates: mean optimizer step 6.085 to 1.315 s; collection 144.98 to 293.83 decisions/s; **end to end 37.50 to 122.80 decisions/s**; shares collection / update / other 41.8 / 52.3 / 5.9%. Replay trainer on random weights, 200 steps: **1,850 rows/s against 583** (3.17x), 0.553 s a step. Per 1,024-row PPO step (1.35 s): trunk 0.139, opponent belief 0.217, self-belief 0.205, heads 0.004, backward 0.735 (54%). **Not an isolated ablation**: CPU count, PyTorch version and replay rows differ from brief 06. GPU use at most 0.469 hours |
-| 09 order-blind model | `work/order-blind-model` @ `54d2418` | complete, all five stages | See below |
-| 11 EngineMCTS gate G1 | `work/g1` @ `1bfdef6` | **still running** | See below |
+### Worker briefs handed out on 2026-11-16 [the owner starts workers; whether each started is not known here]
 
-### Brief 09 claims (`docs/briefs/09-report.md` on the branch)
+| Brief | Branch | What it will hand back |
+| --- | --- | --- |
+| 12 replay and live parity (CPU) | `work/replay-parity` | A parity check between replay rows and live observations, then own PP, forced replacements and the history record fixed in the converter |
+| 13 part A (GPU, at most 3.0 hours) | `work/p2-scale-corrected` | R4 keys on 20,000 corrected games with the belief skip, value at both checkpoints, the lead-stage check, 400 games on `pool_b` and 1,000-game rows on validation teams; each G2 clause |
+| 16 EngineMCTS on the test teams (CPU, about 8 hours) | `work/t1-search` | One run, 1,008 games an opponent; tier T1 clauses met or not |
 
-Same 1,000-game recipe, eight epochs, scored with slots shuffled (shuffled NLL / top-1):
+Review each with `docs/briefs/REVIEW.md` when its branch appears (`git ls-remote --heads origin`).
 
-| Run | Keys | All rows | Note |
-| --- | --- | --- | --- |
-| R1 | current model, corrected rows | 1.9253 / 26.64% | reproduces brief 07 (guard 0.01 NLL) |
-| R2 | `model.order_blind_entities` | 1.8799 / 28.24% | stored equals shuffled to four decimals |
-| R3 | R2 + `loss.value_loss=logistic`, `loss.outcome_aux_coef=0.1`, `bc.save_best_value` | 1.8806 / 28.51% | |
-| R4 / R4b (two seeds) | R3 + `model.mechanical_features` | 1.8041 / 33.25% and 1.8139 / 32.80% | |
-| R5 | R4 warm start, `model.order_blind_preview`, `loss.preview_coef=1`, `bc.preview_only` | lead top-1 34.90%, 34.95% | chance 16.67%, training-frequency baseline 23.93% |
+### The distillation pilot (brief 15), run by the planner [verified; ledger "search distillation pilot"]
 
-- Value **still fails** the constant reference: policy-epoch Brier 0.39 to 0.41; the best-value checkpoint is
-  **epoch 0** (the untrained head: Brier 0.2500, ECE 0.0015), i.e. at 1,000 games no epoch beats a constant.
-  Brief 05 shows the head needs about 20,000 games (best epoch 4). Do not expect value repair at 1,000.
-- Mechanical features help moves seen 1 to 19 times (NLL 2.0192 to 1.8193) and **hurt never-seen moves**
-  (1.884 to 2.016; only 130 rows, broad intervals; cause not investigated).
-- Play smoke, `pool_b` (not held out; 400 greedy games a cell): **R1 14.75% vs SimpleHeuristics and 39.75%
-  vs MaxDamage; R4 38.50% and 77.00%.** Large, but R1 at 1,000 games on corrected rows plays far worse
-  than brief 05's old-row models (0.36 at 3,000 games) because data and rows differ; do not read it as
-  "the leak helped".
-- Configs: `configs/replay_order_blind_cpu.yaml`, `replay_value_cpu.yaml`, `replay_mechanical_cpu.yaml`,
-  `replay_preview_cpu.yaml`. All new behaviour defaults off; noisy-weight permutation tests cover four
-  permutations on 64 rows and key-off negative controls; the three historical digests match on the worker's
-  machine; 166 affected tests and ruff pass (worker's claim).
-- Code touched: `fog/models/{agent,heads,shared_latent,three_encoder,mechanical_features}.py`,
-  `fog/training/{bc,dataset,replay_preview}.py`, `fog/scripts/{parse_replays,convert_replay_decisions}.py`,
-  `fog/config_schema.py`, new eval scripts and tests (`tests/test_order_blind_model.py`,
-  `test_mechanical_features.py`, `test_value_targets.py`, `test_replay_preview.py`).
+Three rounds were planned: round 0 the teacher plays; rounds 1 and 2 the previous network
+plays with the teacher's move one time in four; each network is trained from random weights
+on all rounds so far. Teacher: EngineMCTS, K = 8, 200 ms (0.32 s a labelled row on four cores
+including the label check).
 
-### Brief 11 claims (`docs/briefs/11-report.md` and `11-artifacts/` on the branch)
+| Round | Rows | Result |
+| --- | --- | --- |
+| 0 | 60,862 from 1,211 games | Label check: the 200 ms teacher picks the 1,600 ms teacher's action on 73.8% of 542 checked decisions (late-game positions only), its own second seed's on 86.5%. Network 0 (58,160 rows, 8 epochs, 28 minutes on four cores): top-1 agreement with the teacher 49.3%; **without search 0.450 against SimpleHeuristics and 0.815 against MaxDamage** (400 games each, validation teams, smoke); the untrained network scores 0.0075 and 0.0475 |
+| 1, 2 | see the ledger section | If the ledger section stops at round 0 or 1, the session ended there |
 
-- Fixes in `fog/env/state_recon.py` with tests: Teal-Tera Ogerpon re-entry identity, and pending public charge
-  turns (Power Herb respected). Showdown fuzzer on 200 games: 14,362 positions, zero exceptions, 1,214 to
-  1,043 mismatching positions; 821 of the rest are hidden Regenerator healing.
-- Budget curve vs SimpleHeuristics, 400 games a cell: best complete cell **800 ms, K=8, 91.75%**; intervals
-  overlap so close cells are not ranked; the 40 core-hour cap stopped the last cell (3200, K=32).
-- **Gate row, SimpleHeuristics, validation split, default budget (K=8, 1600 ms), 1,008 games:
-  936 wins, 0.9286 [0.9110, 0.9429]; fallbacks 53 of 28,020 decisions (0.19%); 0 rejected; 0 failures.**
-  That clears the 85% bar. **The MaxDamage half (95% bar) is running and only partly saved.** Resume with
-  `.venv/bin/python docs/briefs/11-artifacts/continue_measurements.py` from the repo root. Known failure
-  reasons in the smoke: an Encore panic in the engine (16 games), "no world with positive weight" (2).
-- Residual reconstruction approximations the worker lists: Flash Fire, Unburden, locked moves, screen/item
-  bookkeeping, last-move, Wish, Future Sight, toxic counters and timers; engine chance approximations.
+**Data and checkpoints are not in the repository** (`runs/` is ignored and the container is
+ephemeral). The ledger records every command and seed; collection of a round costs about 80
+minutes on four cores, training 30 to 60. A session that continues the pilot regenerates
+what it needs.
 
-### Merge conflicts found in a dry run on 2026-11-16 [verified; merges aborted, tree clean]
-
-| Branch | Conflicts |
-| --- | --- |
-| `work/update-speed` | `docs/results-ledger.md` only (keep both blocks, older first) |
-| `work/g1` | `docs/results-ledger.md` only |
-| `work/order-blind-model` | `ROADMAP.md`, `docs/results-ledger.md` (keep both), and **real code conflicts** in `fog/config_schema.py` (loss key list: keep both `skip_unweighted_belief` and brief 09's `value_loss`, `outcome_aux_coef`), `fog/training/bc.py` (regions near lines 91, 1205, 1318, 1755) and `tests/test_bc_resume.py`. Brief 09 was branched before `ce4a043`. Resolve by hand, keeping both behaviours, then run `tests/test_bc_skip_belief.py`, `test_bc_metrics.py`, `test_bc_resume.py`, `test_value_targets.py` |
-
-Two things the merge must check, because nobody has:
-
-1. **Do brief 09's outcome-aux heads still get computed when `need_belief=False`?** If they live inside the
-   `need_belief` branch of `FogAgent.forward`, then `skip_unweighted_belief` silently drops them. Brief 13
-   trains with both. Write a test that fails if the aux loss is zero while the skip is on.
-2. Brief 05 added `bc.keep_best_value`; brief 09 added `bc.save_best_value`. Two keys for one idea.
-   Pick one, keep the other as an alias or remove it, and keep old config files loading.
+Open questions the pilot has raised [assumed until measured]: the teacher's visit
+distributions are flat (about 1.77 nats), so a network that fits them is diffuse, and
+sharper targets might play better; mirror games give 72% of round 0's rows; the lead is
+chosen by an untrained head.
 
 ## 5. Decisions made and why (do not reopen without new evidence)
 
@@ -333,39 +304,26 @@ team (reported, not fixed).
 
 ## 8. Next steps, in priority order
 
-1. **Review brief 09** (`docs/briefs/REVIEW.md`, branch `work/order-blind-model`). Resolve the code conflicts in
-   section 4 by hand. Verify: the permutation test perturbs the weights, covers all four permutations and
-   fails with the key off; the three rollout digests before and after on **your** machine (they depend on
-   the CPU model, section 9); that outcome-aux heads survive `need_belief=False` (section 4, item 1);
-   old checkpoints load strictly. Decide **which model keys brief 13 uses** and write them into
-   `docs/briefs/13-replay-scale-corrected.md` (the brief says "use exactly the keys the review names; if it
-   names none, the current model"). Candidates: R4's keys (`order_blind_entities`, logistic value,
-   `outcome_aux_coef`, `mechanical_features`, `save_best_value`); caution that the value changes showed no
-   benefit at 1,000 games.
-2. **Review brief 08.** Check the numbers against `docs/briefs/08-artifacts/*-summary.json`,
-   `ppo-parts.json`, `replay-parts.json`; read the claim that production bytes equal `f36bc11`. Record
-   that its PPO step still included belief passes. Apply brief 14's start condition ("update still takes more
-   than half the wall time"): the claimed 52.3% meets it narrowly; since belief passes are 72% of the
-   forward, start brief 14 (it already contains the full-skip option and a measurement list).
-3. **Brief 11 is still running** (MaxDamage half of the gate). Review it when its worker reports. If
-   MaxDamage reaches 95% with fallbacks under 5% and zero rejected actions, G1 passes: tick P1.3, P1.4,
-   write the G1 line under the gate. If it fails, do exactly what ROADMAP's G1 "if it fails" line says
-   (search traces, cross-sim, chance fidelity); add no search variant. G1 on the validation split is a
-   gate row; tier claims need the test split.
-4. **Start brief 12** (replay and live parity, CPU) as soon as 09 is merged; it touches the converter and
-   parser. Start **brief 13** (20 GPU-hours, all prepared games) when 08 and 09 are merged (12 too, if
-   done). **Check the account's remaining GPU quota first** (the meter read 17.1 hours when brief 05 ended;
-   brief 06 used 2.44, brief 08 at most 0.469; whether and when the quota resets is not recorded here).
-   Brief 13 trains with `loss.skip_unweighted_belief` and drops training rows whose side has a validation
-   composition; put a 20,000-game control with belief losses on if budget remains.
-5. **Start brief 14** per step 2.
-6. After G1 and G2 have results, **write the brief for P3** (distil EngineMCTS into the policy) from ROADMAP
-   P3.1 to P3.4 and the numbers those gates produced. If G2 fails on play strength with good offline
-   numbers, the roadmap says to go to P3 with the P2 model as the initial weights.
-7. Self-play stays frozen until G3. When it opens, use the anchored update in `docs/equilibrium-training.md`
-   (its last section lists what a brief for it needs), with a kill rule of 20 million decisions without a
+1. **Finish the distillation pilot** if the ledger section "search distillation pilot" does
+   not report rounds 1 and 2, the 1,000-game rows for the best network, and 400 games against
+   EngineMCTS (`docs/briefs/15-distil-engine-mcts.md`, sections 5 and 6). Then write the full
+   P3 brief (one million decisions, P3.2 to P3.4, gate G3) from what the pilot showed: how
+   strength grows with rows, whether sharper targets are needed, and which initial weights
+   (the brief 13 blueprint when it exists).
+2. **Review brief 13 part A** when it appears. It decides G2's measurable clauses (65% against
+   SimpleHeuristics; value ECE below 0.05 and Brier below 0.24). Part B waits for the GPU
+   meter reset on 2026-11-21; if brief 12 is merged by then, part B uses its rows.
+3. **Review brief 12**, then brief 16. Brief 16's result goes under the tier table in
+   `ROADMAP.md` section 1.
+4. **Brief 14** (PPO update levers, GPU 2 hours) after the meter reset; self-play stays frozen
+   until G3, so it is the lowest priority.
+5. After G3: P4 (learned parts inside search). The budget curve says the search is limited
+   by what it assumes about the opponent's team, not by search time, which is what P4.1's
+   learned world sampler addresses; read `docs/search-and-belief-design.md` first.
+6. Self-play stays frozen until G3. When it opens, use the anchored update in
+   `docs/equilibrium-training.md`, with a kill rule of 20 million decisions without a
    promotion (P5.4).
-8. Keep `docs/briefs/QUEUE.md` status current after every review.
+7. Keep `docs/briefs/QUEUE.md` status current after every review.
 
 ## 9. Gotchas
 
@@ -407,15 +365,16 @@ team (reported, not fixed).
 
 | Claim | State |
 | --- | --- |
-| `work/roadmap` at `8476493`: affected tests pass, `ruff check fog tests` clean | [verified] on the planner's machine at each merge |
-| Brief 10 pool rebuilt byte for byte; 15 tests pass | [verified] |
-| Belief-loop fix: 59 belief tests and 52 trainer tests pass; digest `23405989f4665988` unchanged | [verified] |
-| Policy-only control: A (belief on) and B (skipped) run back to back on one machine | [verified], one seed, 1,000 games, CPU |
-| Briefs 08, 09, 11 | **unreviewed**; every number in section 4 is the worker's claim |
-| Anything about the belief-loop fix or `skip_unweighted_belief` at scale or on a GPU | **not verified** (08 measures the loop fix only, on different hardware) |
+| Briefs 08, 09, 11: numbers against artifacts, code diffs, covering tests, `ruff`, digests before and after each code merge | [verified] in review on 2026-11-16 (ledger sections "review of brief 08", "09", "11 and gate G1") |
+| Brief 09's permutation test on replay holdout rows; its trainings and play smoke | not re-run (no replay data in the review container); the worker's claim |
+| Gate G1 rows | [verified]: `docs/briefs/11-artifacts/gate/merged.json`; MaxDamage row played on two machines |
+| `search_distill`: stored rows reproduce live log-probabilities; targets valid; resume | [verified] by `tests/test_search_distill.py` on pinned Showdown |
+| Pilot round 0 and network 0 | [verified], smoke (400 games a cell), one seed |
+| Full test suite | last run 2026-11-14 (1,017 passed, 3 skipped, 3 expected failures, 1 failed); reviews since ran covering files only |
+| Belief-loop fix and `skip_unweighted_belief` at scale or on a GPU | not verified (brief 13 uses the skip on a GPU) |
 | Replay models at scale on corrected rows | not run (brief 13) |
-| Whether the leak helped or hurt play | not measured on equal data |
-| Rust engine vs Showdown on terastallized Pokémon; Tera Stellar (not modelled); engine averaged damage roll | not verified |
+| Whether lead training damages the policy | not measured (brief 13) |
+| Rust engine vs Showdown on terastallized Pokémon; Tera Stellar (not modelled); engine averaged damage roll; the Encore panic | not verified or not fixed; worlds that panic are dropped (0.17% of sampled worlds in the gate) |
 | Truncated-game scoring in PPO; information-isolation tests of the design doc | not verified |
 | The roadmap's gate thresholds | estimates [assumed] |
 
@@ -429,5 +388,5 @@ team (reported, not fixed).
    `python -m fog.scripts.build_public_team_splits --bank data/teams/public_gen9ou --out
    data/teams/gen9ou_public_v1`, and decide whether to track the three split packages. Tier claims should use
    them when they exist.
-4. GPU budget approvals (brief 13 asks for 20 hours), ladder account and team choices, where long CPU jobs
-   run (`ROADMAP.md` section 8).
+4. GPU time: 3.69 hours were left on the hosted meter on 2026-11-15, reset on 2026-11-21 (brief 13 part B
+   asks for 17 hours after it); ladder account and team choices; where long CPU jobs run (`ROADMAP.md` section 8).
