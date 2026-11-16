@@ -3215,7 +3215,7 @@ ninth). EngineMCTS is anchor `A4`. P3 may start: brief 15 (pilot) is the next st
 
 Brief 15, run in the planner's session on `work/roadmap`. Intel Xeon 2.10 GHz, four cores,
 no GPU. Everything here is smoke (400 games a cell). Rounds are appended below as they
-finish; **rounds done so far: 0.**
+finish (one subsection a round).
 
 Code: `fog/training/search_distill.py` (`e68f22a`, `5cf0780`, `e6ef687`), tests
 `tests/test_search_distill.py` (a stored row replayed through the network reproduces the
@@ -3278,3 +3278,75 @@ brief 09's R4, trained on 52,955 human replay rows, scored 0.385 and 0.770 on `p
 Checkpoint `runs/distill/net0/policy_best.pt` is not in the repository (SHA-256
 `5ed3c3ae8c326495cfaede9e1c0b92a275df278e5939c639d789324045a8d4ad`); the commands above
 regenerate it.
+
+### Round 1: network 0 plays, the teacher labels
+
+`python -m fog.training.search_distill collect --pool data/teams/replay_v1/train --out runs/distill/round1 --checkpoint runs/distill/net0/policy_best.pt --games 1300 --beta 0.25 --seed 15001 --agreement-every 40 --workers 4`
+(source `e6ef687`), stopped by hand once 60,000 rows were stored; games in progress were
+discarded.
+
+| Quantity | Value |
+| --- | --- |
+| Games | 1,058: 528 mirror (network 0 with the teacher's move one time in four, on both sides), 265 against SimpleHeuristics, 265 against MaxDamage; train teams only; none truncated |
+| Labelled decisions | 63,785 rows, 62,080 with a search distribution; the teacher's move was the one played on 15,826 (24.8%) |
+| Cost | 22,443 core-seconds, 0.35 s a row |
+| Teacher fallbacks | 175 of 63,786 decisions (0.27%; 0.08% in round 0, so positions the network reaches are a little harder to rebuild) |
+| Network 0 against the teacher on its own positions | same top choice on 47.3% of labelled rows (49.3% on held-out teacher positions) |
+| Results while collecting (sampled play at temperature 1 with teacher moves mixed in; diagnostic only) | 83 of 265 against SimpleHeuristics, 156 of 265 against MaxDamage |
+
+**Label check, now on decisions sampled at random over the whole game** (1,552 decisions,
+median turn 18): the 200 ms teacher's choice equals its second seed's on 87.8% and the 1,600 ms
+teacher's on **75.7%**. Above the roadmap's 70%. `15-artifacts/round1-summary.json`.
+
+### Network 1: trained on rounds 0 and 1
+
+`python -m fog.training.search_distill train --data runs/distill/round0 runs/distill/round1 --out runs/distill/net1 --threads 4`
+(source `e6ef687`): random initial weights, 118,518 training rows, 6,129 held out by game (113
+games), 8 epochs, about 7.3 minutes an epoch on four cores. `15-artifacts/net1-metrics.json`.
+
+| Epoch | Held-out cross-entropy | KL to the teacher | Top-1 agreement with the teacher | Value MSE to outcome |
+| --- | --- | --- | --- | --- |
+| 0 (untrained) | 2.038 | 0.341 | 9.3% | 1.045 |
+| 1 | 1.880 | 0.183 | 46.3% | 0.797 |
+| 4 | 1.842 | 0.146 | 53.8% | 0.969 |
+| 8 (best) | 1.829 | 0.132 | 56.7% | 0.974 |
+
+The held-out sets of networks 0 and 1 differ, so compare the play rows, not these columns.
+The value head is no better than a constant on held-out outcomes after the first epoch
+(a constant scores 1.0 on this scale); it needs its own checkpoint or its own targets, as
+the replay trainer did. Nothing below uses it.
+
+### Play, gate-size rows: the network alone, no search
+
+Greedy, lead from the untrained lead head, validation teams of `data/teams/replay_v1`,
+matched four-game blocks, no sequential stop, seed 15200 (shards 15200 to 15203):
+`python -m fog.eval.run_shards --shards 4 --games 1008 --seed 15200 --out-dir runs/distill/eval/<net>-1008 -- --pool data/teams/replay_v1/validation --device cpu --config configs/search_distill_cpu.yaml --checkpoint <net>=runs/distill/<net>/policy_best.pt --opponent simpleheuristics --opponent maxdamage --max-turns 300 --progress-every 40`
+(`fog` commit `06a4615`).
+
+| Date | Agent | Training rows | Opponent | Games | Score [95% Wilson] | W-L-D | File |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | Network 0 | 58,160 (teacher positions) | SimpleHeuristics | 1,008 | 0.448 [0.418, 0.479] | 452-556-0 | `15-artifacts/net0-play-1008.json` |
+| 2026-11-16 | Network 0 | | MaxDamage | 1,008 | 0.815 [0.790, 0.838] | 822-186-0 | |
+| 2026-11-16 | Network 1 | 118,518 (teacher positions and network 0's own) | SimpleHeuristics | 1,008 | **0.615 [0.585, 0.645]** | 620-388-0 | `15-artifacts/net1-play-1008.json` |
+| 2026-11-16 | Network 1 | | MaxDamage | 1,008 | **0.909 [0.889, 0.925]** | 916-92-0 | |
+
+No truncated or failed games. Policy play costs about 0.2 s a game on four cores.
+
+Reading. Doubling the rows, with the second half taken from positions the network itself
+reaches, moved the network from 44.8% to 61.5% against SimpleHeuristics and from 81.5% to
+90.9% against MaxDamage; the intervals are far apart. One seed, and the two effects (more
+rows; on-policy rows) are not separated. Network 1 is the strongest policy without search
+in the repository: the replay models of brief 05 scored 0.52 and 0.86 on another pool, and
+gate G2 asks a replay blueprint for 0.65 against SimpleHeuristics. It is still far below its
+teacher (0.929 and 0.973) and below tier T1 (0.90 and 0.97). Strength is rising steeply with
+rows at 120,000, so the run at scale (P3.2) is worth its cost. Checkpoint SHA-256
+`f729ac9684bbc25f98d55a24e6c7ea7a785451f462ba5c1b938b25eb68246c59` (not in the repository).
+
+## 2026-11-16: hosted GPU time, corrected
+
+The review of brief 08 read 3.69 hours of GPU time left from
+`docs/briefs/08-artifacts/gpu-budget.json` (62,326.9 s used of 75,600 s). The account's quota
+endpoint, read on 2026-11-16 08:15 UTC, says otherwise: **17.31 hours used, 27.69 hours
+remaining of 45.00, reset 2026-11-21 00:00 UTC**. The used time agrees with the artifact
+(62,327 s is 17.31 h); the total is 45 hours, not 21. Brief 13 no longer needs to be split:
+its 20 hours fit this week. Brief 14 (2 hours) fits too.
