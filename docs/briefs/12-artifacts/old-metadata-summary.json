@@ -1,0 +1,7 @@
+{
+  "kind": "smoke",
+  "games": 2000,
+  "rows": 103944,
+  "all_stored_arrays_identical": true,
+  "source": "79283c9"
+}

@@ -3434,3 +3434,89 @@ Baseline: 24,149 aligned rows, 3,195 live decisions without a replay row, no rev
 All other named entity blocks, field vector, active index and decision phase match on every aligned row. Item masks are all-true live and omitted by the loader; the zero numerical difference is a representation difference. Detailed per-game/per-row mismatches are in `12-artifacts/parity-before.json`.
 
 Checks: `12-artifacts/tests-stage1.txt` (three tests pass), `ruff-stage1.txt` (clean). Same-machine baseline digests are in `digest-*-before.txt`. Stages 2 and 3 remain open.
+
+### Stage 2: parity fixes (smoke)
+
+Code source `9e3f579` (the substantive converter/history changes are `1d8a7fc`, `76af82e` and `87e85e6`). Fresh live reference recordings use the corrected first-action history helper; random R4 weights, seed 12000 and the same 200-game schedule. All 200 games completed.
+
+Commands: the stage-1 command with `--out runs/replay-parity/after --report docs/briefs/12-artifacts/parity-after.json`, then `python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.replay_live_parity --games 200 --workers 2 --compare-only --out runs/replay-parity/after --report docs/briefs/12-artifacts/parity-final.json`.
+
+Own PP is retained from chronological poke-env move bookkeeping, including revealed Pressure; sampled own state is no longer passed through a public-mirror downgrade. Unused own Pokemon start full, original items follow nickname aliases, public Trick item reveals refresh current items, and the pre-activation Tera representation matches live requests. Request inference handles PP exhaustion, choice locks, Encore, Taunt and Assault Vest. Every replacement is retained, including one-legal-switch rows (zero policy CE, valid outcome target). Tera Ogerpon send-outs use submitted species identity.
+
+The only live behavior change is `record_history_decision`: a later forced switch preserves the first submitted action, while normal unavailable-choice retries can still update it. Replay and live both retain one history record per turn and exclude the current turn at replacements. Serialized history now keeps the live 60-turn window; explicit request phase survives both loaders, including normal Struggle requests that also offer switches. The conversion resume version is 12.
+
+Final: 26,143 aligned rows, 1,201 live normal decisions without an accepted public replay label, no reverse omissions; all 2,566 replacement requests align. Overwritten-history rows fall from 21,107 to zero. Every requested field exceeds 99.5% exact matches except own HP and history, whose differences are explained per row. Raw action-feature and explicit/implicit item-mask differences are also explained per row. The eleven R4 candidate columns match on 99.904372% of rows.
+
+| Field (smoke) | Exact before (24,149 aligned) | Exact after (26,143 aligned) | Max difference after |
+| --- | ---: | ---: | ---: |
+| `action_features` | 0.000000 | 0.000000 | 1.3 |
+| `action_features.mechanical` | not measured | 0.999044 | 1 |
+| `active_idx` | 1.000000 | 0.998126 | 4 |
+| `decision_phase` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.base_stats` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.booster` | 1.000000 | 0.999962 | 1 |
+| `entities.opponent.boosts` | 1.000000 | 0.999809 | 0.333333 |
+| `entities.opponent.counters` | 1.000000 | 0.999923 | 0.125 |
+| `entities.opponent.epistemic` | 0.996936 | 0.999962 | 1 |
+| `entities.opponent.fainted` | 1.000000 | 0.999962 | 1 |
+| `entities.opponent.fallen` | 1.000000 | 0.999350 | 0.6 |
+| `entities.opponent.hp` | 1.000000 | 0.999197 | 0.33 |
+| `entities.opponent.is_active` | 1.000000 | 0.998126 | 1 |
+| `entities.opponent.is_mine` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.move_pp` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.paradox` | 1.000000 | 0.999962 | 1 |
+| `entities.opponent.party_slot` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.status` | 1.000000 | 0.999885 | 1 |
+| `entities.opponent.tera_type` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.tera_used` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.typing` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.vol_counters` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.volatiles` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.weight` | 1.000000 | 1.000000 | 0 |
+| `entities.own.base_stats` | 1.000000 | 1.000000 | 0 |
+| `entities.own.booster` | 1.000000 | 1.000000 | 0 |
+| `entities.own.boosts` | 1.000000 | 1.000000 | 0 |
+| `entities.own.counters` | 1.000000 | 1.000000 | 0 |
+| `entities.own.epistemic` | 1.000000 | 1.000000 | 0 |
+| `entities.own.fainted` | 1.000000 | 1.000000 | 0 |
+| `entities.own.fallen` | 1.000000 | 1.000000 | 0 |
+| `entities.own.hp` | 0.037641 | 0.109207 | 0.00997543 |
+| `entities.own.is_active` | 1.000000 | 1.000000 | 0 |
+| `entities.own.is_mine` | 1.000000 | 1.000000 | 0 |
+| `entities.own.move_pp` | 0.000000 | 1.000000 | 0 |
+| `entities.own.paradox` | 1.000000 | 0.999809 | 1 |
+| `entities.own.party_slot` | 1.000000 | 1.000000 | 0 |
+| `entities.own.status` | 1.000000 | 1.000000 | 0 |
+| `entities.own.tera_type` | 0.000000 | 1.000000 | 0 |
+| `entities.own.tera_used` | 1.000000 | 1.000000 | 0 |
+| `entities.own.typing` | 1.000000 | 1.000000 | 0 |
+| `entities.own.vol_counters` | 1.000000 | 1.000000 | 0 |
+| `entities.own.volatiles` | 1.000000 | 1.000000 | 0 |
+| `entities.own.weight` | 1.000000 | 1.000000 | 0 |
+| `entity_ids` | 0.000000 | 0.998126 | 598 |
+| `field` | 1.000000 | 0.999541 | 1 |
+| `history` | 0.047662 | 0.051333 | 1 |
+| `history_ids` | 0.408920 | 1.000000 | 0 |
+| `history_len` | 0.408920 | 1.000000 | 0 |
+| `history_state` | 0.458942 | 1.000000 | 0 |
+| `label` | 0.979419 | 0.999962 | 2 |
+| `legality_mask` | 0.943683 | 0.996366 | 1 |
+| `opp_mask.ability` | 1.000000 | 1.000000 | 0 |
+| `opp_mask.item` | 0.000000 | 0.000000 | 0 |
+| `opp_mask.move` | 1.000000 | 1.000000 | 0 |
+| `opp_mask.species` | 1.000000 | 1.000000 | 0 |
+| `opp_tokens` | 0.095780 | 0.999962 | 251 |
+
+Residuals. Public percentages cannot recover exact own HP (largest difference below 0.01); the same quantization affects snapshots/damage history. Some requested actions never execute (sleep, pre-emption) or execute a different move after faster Encore. `unrecoverable-choices.txt` gives actual live/log examples from game 107. Small replacement-prefix/request-inference differences remain within the 99.5% allowance, with coordinates and values in `parity-final.json`. Missing request stats at large offensive drops explain a few candidate-stat-ratio fallbacks. No opponent truth is added to training inputs.
+
+Intermediate tables: `parity-own-private.json`, `parity-replacements.json`, `parity-after.json`; these are parser decision diagnostics before the final shared retention filter. Baseline and final tables use the complete retained-decision contract. The initial v10/v11 reconversions were interrupted and superseded when further label/phase/one-switch retention fixes were found; no result is attributed to those incomplete conversions. `conversion-migration.json` records an intermediate schema migration, superseded by the clean v12 reconversion.
+
+Validation: 52 covering tests pass (`tests-stage2.txt`), `ruff check fog tests` is clean (`ruff-stage2.txt`). Baseline and final same-machine rollout digests (smoke) change solely because forced replacements no longer overwrite the turn's chosen move:
+
+| Probe | Before | After |
+| --- | --- | --- |
+| Sequential, 6 games | `0d026fed7728c0c4` | `9b4306f80e4ba17c` |
+| Batched, 64 games | `ef414aee0fe96bad` | `96e90a93f89931f5` |
+| MaxDamage, 96 games | `40644081cca71ebe` | `d3c6b556c8a03d0b` |
+
+P2.2b is complete under its parity criterion. Stage 3 remains running: clean v12 conversion of 22,000 games, old/new eight-epoch R4 training at seed 20261201, paired holdout and greedy play. The old-data split reproduces 52,955 training and 103,944 holdout rows; independently reparsing all 2,000 old holdout games reproduces every stored array exactly (`old-metadata-summary.json`). No trained-play effect is claimed yet.

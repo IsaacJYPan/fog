@@ -1,0 +1,16 @@
+{
+  "kind": "smoke",
+  "train_games": 1000,
+  "holdout_games": 2000,
+  "seed": 20261201,
+  "model": "configs/replay_mechanical_cpu.yaml",
+  "conversion_version": 12,
+  "train_1000.parquet": {
+    "old_rows": 52955,
+    "new_rows": 58396
+  },
+  "holdout_manifest.parquet": {
+    "old_rows": 103944,
+    "new_rows": 115599
+  }
+}

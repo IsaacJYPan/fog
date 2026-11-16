@@ -1,0 +1,36 @@
+Unrecoverable submitted choices: smoke examples from game 107, p2.
+All names are local synthetic battle aliases.
+
+Turn 27: live submitted action 1, move bodypress.
+|turn|27
+|
+|move|p1a: Ogerpon|Power Whip|p2a: Dondozo|[miss]
+|-miss|p1a: Ogerpon|p2a: Dondozo
+|cant|p2a: Dondozo|slp
+|
+|upkeep
+
+Turn 47: live submitted action 0, move earthquake.
+|turn|47
+|
+|move|p1a: Ogerpon|Ivy Cudgel|p2a: Great Tusk|[anim] Ivy Cudgel Water
+|-supereffective|p2a: Great Tusk
+|-crit|p2a: Great Tusk
+|-damage|p2a: Great Tusk|0 fnt
+|faint|p2a: Great Tusk
+|-end|p2a: Great Tusk|Protosynthesis|[silent]
+|
+|upkeep
+|
+|switch|p2a: Slowking|Slowking-Galar, F, tera:Fairy|100/100
+
+Turn 63: live submitted action 3, move thunderwave.
+|turn|63
+|
+|move|p1a: Ogerpon|Encore|p2a: Slowking
+|-start|p2a: Slowking|Encore
+|move|p2a: Slowking|Future Sight||[still]
+|-fail|p2a: Slowking
+|
+|upkeep
+

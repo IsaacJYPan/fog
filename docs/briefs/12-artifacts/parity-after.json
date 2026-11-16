@@ -1,0 +1,352 @@
+{
+  "kind": "smoke",
+  "games": 200,
+  "commit": "a9b746fa9981ac3882cb16f57a0606b63f6b723e",
+  "aligned": 26118,
+  "missing_replay": 1226,
+  "missing_live": 1,
+  "fields": {
+    "action_features": {
+      "rows": 26118,
+      "exact": 0,
+      "max_difference": 1.2999999821186066,
+      "exact_share": 0.0
+    },
+    "active_idx": {
+      "rows": 26118,
+      "exact": 26068,
+      "max_difference": 4.0,
+      "exact_share": 0.9980856114557011
+    },
+    "decision_phase": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.base_stats": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.booster": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 1.0,
+      "exact_share": 0.999961712229114
+    },
+    "entities.opponent.boosts": {
+      "rows": 26118,
+      "exact": 26113,
+      "max_difference": 0.3333333432674408,
+      "exact_share": 0.9998085611455702
+    },
+    "entities.opponent.counters": {
+      "rows": 26118,
+      "exact": 26116,
+      "max_difference": 0.125,
+      "exact_share": 0.999923424458228
+    },
+    "entities.opponent.epistemic": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 1.0,
+      "exact_share": 0.999961712229114
+    },
+    "entities.opponent.fainted": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 1.0,
+      "exact_share": 0.999961712229114
+    },
+    "entities.opponent.fallen": {
+      "rows": 26118,
+      "exact": 26101,
+      "max_difference": 0.6000000089406967,
+      "exact_share": 0.9993491078949384
+    },
+    "entities.opponent.hp": {
+      "rows": 26118,
+      "exact": 26097,
+      "max_difference": 0.33000004291534424,
+      "exact_share": 0.9991959568113944
+    },
+    "entities.opponent.is_active": {
+      "rows": 26118,
+      "exact": 26069,
+      "max_difference": 1.0,
+      "exact_share": 0.9981238992265871
+    },
+    "entities.opponent.is_mine": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.move_pp": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.paradox": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 1.0,
+      "exact_share": 0.999961712229114
+    },
+    "entities.opponent.party_slot": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.status": {
+      "rows": 26118,
+      "exact": 26115,
+      "max_difference": 1.0,
+      "exact_share": 0.999885136687342
+    },
+    "entities.opponent.tera_type": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.tera_used": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.typing": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.vol_counters": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.volatiles": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.weight": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.base_stats": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.booster": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.boosts": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.counters": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.epistemic": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.fainted": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 1.0,
+      "exact_share": 0.999961712229114
+    },
+    "entities.own.fallen": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 0.6000000238418579,
+      "exact_share": 0.999961712229114
+    },
+    "entities.own.hp": {
+      "rows": 26118,
+      "exact": 2855,
+      "max_difference": 0.009975433349609375,
+      "exact_share": 0.1093115858794701
+    },
+    "entities.own.is_active": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 1.0,
+      "exact_share": 0.999961712229114
+    },
+    "entities.own.is_mine": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.move_pp": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.paradox": {
+      "rows": 26118,
+      "exact": 26113,
+      "max_difference": 1.0,
+      "exact_share": 0.9998085611455702
+    },
+    "entities.own.party_slot": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.status": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.tera_type": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.tera_used": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.typing": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.vol_counters": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.volatiles": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.weight": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entity_ids": {
+      "rows": 26118,
+      "exact": 25638,
+      "max_difference": 598.0,
+      "exact_share": 0.9816218699747301
+    },
+    "field": {
+      "rows": 26118,
+      "exact": 26106,
+      "max_difference": 1.0,
+      "exact_share": 0.9995405467493682
+    },
+    "history": {
+      "rows": 26118,
+      "exact": 1342,
+      "max_difference": 1.0,
+      "exact_share": 0.051382188528983845
+    },
+    "history_ids": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "history_len": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "history_state": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "label": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 2.0,
+      "exact_share": 0.999961712229114
+    },
+    "legality_mask": {
+      "rows": 26118,
+      "exact": 26021,
+      "max_difference": 1.0,
+      "exact_share": 0.99628608622406
+    },
+    "opp_mask.ability": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "opp_mask.item": {
+      "rows": 26118,
+      "exact": 0,
+      "max_difference": 0.0,
+      "exact_share": 0.0
+    },
+    "opp_mask.move": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "opp_mask.species": {
+      "rows": 26118,
+      "exact": 26118,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "opp_tokens": {
+      "rows": 26118,
+      "exact": 26117,
+      "max_difference": 251.0,
+      "exact_share": 0.999961712229114
+    }
+  },
+  "live_history": {
+    "forced_decisions": 2566,
+    "turns_with_multiple_decisions": 2503,
+    "rows_with_overwritten_first_action": 0,
+    "current_turn_excluded_at_replacement": 2566
+  }
+}

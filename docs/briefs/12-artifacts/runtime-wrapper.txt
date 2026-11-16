@@ -4,6 +4,16 @@ import sys
 import os
 sys.path.insert(0, os.environ.get('FOG_SOURCE', os.getcwd()))
 module = sys.argv.pop(1)
+if os.environ.get('FOG_REPLAY_PRIORITY'):
+    import json
+    from fog.scripts import parse_replays
+    original = parse_replays.replay_files
+    with open(os.environ['FOG_REPLAY_PRIORITY']) as stream:
+        priority = {key: i for i, key in enumerate(json.load(stream))}
+    def replay_files(raw, limit):
+        return sorted(original(raw, limit),
+                      key=lambda path: (priority.get(path.stem, len(priority)), path.stem))
+    parse_replays.replay_files = replay_files
 try:
     runpy.run_module(module, run_name='__main__', alter_sys=True)
 finally:

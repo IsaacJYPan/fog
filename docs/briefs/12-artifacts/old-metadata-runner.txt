@@ -1,0 +1,54 @@
+"""Recover turn/role sidecars using the unchanged pre-brief converter; assert shard equality."""
+import argparse
+import atexit
+from concurrent.futures import ProcessPoolExecutor
+import json
+import os
+from pathlib import Path
+import sys
+sys.path.insert(0, os.environ['FOG_SOURCE'])
+import numpy as np
+from fog.scripts.parse_replays import parse_replay_policy_versions, rows_to_arrays
+
+
+def annotate(task):
+    row, raw, out = task
+    path = out / (row['id'] + '.npz')
+    if path.exists():
+        return {'id': row['id'], 'rows': row['n_rows'], 'resumed': True}
+    replay = json.loads((raw / (row['id'] + '.json')).read_text())
+    result = parse_replay_policy_versions(replay, replay_id=row['id'], imputations=1, seed=20260804)
+    arrays = rows_to_arrays(result['rows'])
+    with np.load(row['shard']) as saved:
+        for key, value in arrays.items():
+            np.testing.assert_array_equal(value, saved[key], err_msg=row['id'] + ':' + key)
+    with path.with_suffix('.tmp').open('wb') as stream:
+        np.savez_compressed(stream,
+                            row_turn=np.asarray([r['turn'] for r in result['rows']], dtype=np.int32),
+                            row_role=np.asarray([1 if r['role']=='p1' else 2 for r in result['rows']], dtype=np.int8))
+    path.with_suffix('.tmp').replace(path)
+    return {'id': row['id'], 'rows': len(result['rows']), 'resumed': False}
+
+
+if __name__ == '__main__':
+    import polars as pl
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--manifest', type=Path, required=True)
+    parser.add_argument('--raw', type=Path, required=True)
+    parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--workers', type=int, default=2)
+    args=parser.parse_args()
+    args.out.mkdir(parents=True, exist_ok=True)
+    rows=pl.read_parquet(args.manifest).to_dicts()
+    results=[]
+    with ProcessPoolExecutor(max_workers=args.workers) as pool:
+        for i, result in enumerate(pool.map(annotate, [(row,args.raw,args.out) for row in rows]),1):
+            results.append(result)
+            if i%100==0:
+                print(f'metadata {i}/{len(rows)}',flush=True)
+    summary={'kind':'smoke','games':len(results),'rows':sum(r['rows'] for r in results),
+             'all_stored_arrays_identical':True,'source':'79283c9','results':results}
+    (args.out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+    concurrency=sys.modules.get('poke_env.concurrency')
+    if concurrency is not None:
+        atexit.unregister(concurrency.__clear_loop)
