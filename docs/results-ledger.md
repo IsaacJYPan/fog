@@ -3469,3 +3469,34 @@ the first calibration job. The larger set must retain these G20 IDs as its prefi
 (`prepare_split.py --prefix-manifest`), and must await completed G20 training, lead
 retention, play and a pushed report. No checkpoints exist yet. Training, lead
 retention, larger-set choice, P2.4 and every G2 clause remain **not measurable**.
+
+### Prepared inputs retained off the runtime; GPU decision still pending
+
+The 535,989,932-byte archive is now **ready in private Kaggle storage, version 1**.
+A separate authenticated download verified its full SHA-256 against
+`first-package.json`; `input-retention.json` is the sanitized receipt. No account
+or private dataset name is committed. On a configured official-client environment:
+
+```sh
+python docs/briefs/13-artifacts/download_inputs.py --out runs/brief13/recovered
+```
+
+The helper finds the owned private archive by file size and SHA-256 rather than
+publishing a dataset name, and retains its reference only under the ignored output
+directory. Dataset totals include service metadata, so matching uses the individual
+file's byte count. The recovered archive needs no CPU reconversion.
+
+The first upload attempt was rejected by automatic approval review as insufficiently
+authorized external export from a supposedly private repository. Before retrying,
+GitHub's API confirmed `private=false`; all 24,000 converted shards were checked
+to contain only numeric tensors and public species/static-label strings, with no
+source code, credentials or checkpoints in the archive. Brief 13 explicitly reuses
+brief 05, whose stage 0 requires a private upload. With that evidence the same upload
+passed review and completed. No alternative destination or bypass was used.
+
+The final job-status recheck still finds the separate GPU job QUEUED and its CPU
+collector RUNNING (`blocking-job-final.json`). Fresh quota is in `quota-final.json`.
+The owner has been asked whether to leave that GPU job queued or cancel it to give
+brief 13 priority. No cancellation or GPU submission has occurred; usage remains
+**0 h**. This is a partial brief awaiting that scheduling decision, not a completed
+training or gate result.

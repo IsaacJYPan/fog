@@ -30,7 +30,9 @@ reserve remain; the larger schedule awaits the calibration measurement.
 **Blocker:** the account check found `fog-distill-train-gpu` **QUEUED**, with GPU
 enabled. `fog-distill-collect-a` is RUNNING on CPU. Brief 13 allows one GPU job at
 a time. Neither job was changed and no additional GPU job was submitted. Quota
-is **27.52 h remaining of 45 h**, reset 2026-11-21. The CPU archive is ready;
+is **27.52 h remaining of 45 h**, reset 2026-11-21. The CPU archive is retained
+privately off the runtime; a separate download verified its SHA-256. Recover it
+with the configured official client: `python docs/briefs/13-artifacts/download_inputs.py --out runs/brief13/recovered`.
 [`13-artifacts/`](13-artifacts/) holds commands, counts, budget and job scripts.
 No checkpoints exist for this brief yet. Model, loss and trainer code are unchanged.
 
