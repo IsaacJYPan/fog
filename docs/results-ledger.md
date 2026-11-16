@@ -3429,3 +3429,43 @@ the 20-hour budget, two-hour reserve and first-stage-before-larger ordering hold
 Conversion/split totals, slot diagnostics, GPU throughput, the larger-set forecast,
 training, lead retention, checkpoint export and play are pending. No P2 box ticked;
 P2.4 and all G2 clauses are not measurable from this preparation checkpoint.
+
+### CPU stage complete; first GPU submission blocked
+
+Application bytes remain `79283c9` / pushed `7d17e1a` (no changes under `fog`,
+`configs` or `tests`). Conversion completed with `--resume` on four CPU cores.
+No GPU job was submitted; brief usage is **0 h**, with its 20 h cap and 2 h reserve intact.
+
+| Measurement | Result | Evidence / command |
+| --- | --- | --- |
+| Corrected conversion | 24,000 games; 1,229,877 decision rows; zero quarantines; 48,000 preview records | `13-artifacts/first-conversion.json`; preparation command above |
+| Fixed holdout | Exact 2,000 IDs; 103,944 stored rows; 103,933 policy-eligible rows | `first-split.json`, `holdout-rows.json`; `data-commands.json` |
+| Composition exclusion, before nested selection | 36,563 acting rows removed across 1,120 games; 28 whole games removed; 141 forbidden validation compositions | `first-split.json`; `prepare_split.py` |
+| Remaining eligible training | 21,769 games / 1,078,795 rows; 203 newer games excluded before filtering | `first-split.json` |
+| First nested subset | 20,000 games / 989,494 rows | `first-split.json` |
+| Holdout move-slot labels | 25.0945 / 24.8340 / 24.8180 / 25.2535%; unmoved slot 0: 24.6984% | `holdout-rows.json`; `fog.eval.replay_slot_order_check`, full command in `data-commands.json` |
+| Per-side outcome signs | All 103,944 holdout rows agree with protocol winners | `holdout-signs.json`; full command in `data-commands.json` |
+| CPU archive | 535,989,932 bytes; SHA-256 in file; no raw logs or checkpoints | `first-package.json`; reproducible `prepare_package.py` |
+| Split helper tests | 3 passed, including real G20-prefix preservation when the import grows | `split-tests.txt`, `test_prepare_split.py` |
+| Account-wide scheduling check | 99 jobs: 1 RUNNING, 1 QUEUED, 65 COMPLETE, 29 ERROR, 2 CANCEL_ACKNOWLEDGED, 1 version-zero draft with no session | `initial-job-status.json`; `account_guard.py` |
+
+The sign check first rejected a valid five-member-team preview. The diagnostic was
+corrected to retain absent slots as -1; its retry passes all 2,000 games, including
+two with fewer than six members. No converter, model, loss or trainer change was
+needed. The failed command and traceback remain in `data-commands.json` and
+`holdout-signs-initial-error.txt`. No threshold or row comparison was relaxed.
+
+The account's **`fog-distill-train-gpu` is QUEUED and GPU-enabled**;
+**`fog-distill-collect-a` is RUNNING and CPU-only** (`active-jobs.json`, with a later
+status recheck). The GPU quota is still **27.52 h remaining of 45 h**, reset
+2026-11-21 00:00 UTC. Neither existing job was changed. The one-GPU-job rule prevents
+a second submission while the separate GPU job is queued. Calibration is concretely
+prepared in `calibration-plan.json`: R4, 1,024 batch, zero belief weights/skip, one
+trained epoch of an 18-epoch resumable schedule, estimated 0.35 h from brief 08's
+different-recipe rate, hard cap 1 h. This is a forecast, not a throughput result.
+
+Continue by resolving that occupied GPU slot, reading fresh quota, and submitting
+the first calibration job. The larger set must retain these G20 IDs as its prefix
+(`prepare_split.py --prefix-manifest`), and must await completed G20 training, lead
+retention, play and a pushed report. No checkpoints exist yet. Training, lead
+retention, larger-set choice, P2.4 and every G2 clause remain **not measurable**.

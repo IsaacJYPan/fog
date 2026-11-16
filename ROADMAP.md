@@ -268,6 +268,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       newer than all training games; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
       _2026-11-14: brief 05 prepared 20,000 and 101,928 training games with the fixed 2,000-game holdout; rating floor remains 1500. Private upload/report in `docs/briefs/05-report.md`; no box checked._
+      _2026-11-16: brief 13 freshly imported 24,000 games; its first filtered subset has
+      20,000 games / 989,494 rows and the fixed 2,000-game holdout / 103,944 rows.
+      Larger data remains pending; see `docs/briefs/13-report.md`._
 
 - [ ] **P2.2 Convert** with `fog/scripts/convert_replay_decisions.py` (one imputation per game is
       enough at this scale; three triples storage for correlated rows). Time the conversion on
@@ -285,6 +288,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       recovery. See "move-order leak removed and order-blind encoder (smoke)" in the ledger
       and `docs/briefs/07-report.md`; P2.2 remains open._
       _2026-11-14: brief 05 converted both corpora; 1,023,525 / 5,217,022 training rows, and 104,037 holdout rows with all 2,000 shards byte-identical. See the brief 05 artifacts; task remains open._
+      _2026-11-16: brief 13 accepted 24,000 corrected games with dense targets and no
+      quarantines. Validation compositions removed 36,563 acting rows; holdout move-slot
+      shares are 25.09/24.83/24.82/25.25%. Full larger conversion remains pending._
 - [x] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
       1, ledger "review of brief 07, stage 1"): the converter shuffles both with seeded streams.
       Brief 09 stage 2 completes the model side: every parameter perturbed, all four required
@@ -299,9 +305,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
       (start `lr 3e-4` cosine, batch ≥ 1,024, until holdout loss stops improving), not the PPO
       continuation settings.
-      _2026-11-16: brief 13 started with merged R4 and fresh resumable CPU conversion;
-      the initial quota reads 27.52 h remaining. No GPU training or new gate result yet.
-      See `docs/briefs/13-report.md`; P2.1–P2.5 remain open._
+      _2026-11-16: brief 13 CPU preparation is complete; its first GPU submission is
+      blocked by an existing queued GPU job. R4 calibration is prepared, no GPU time
+      spent or model trained. See `docs/briefs/13-report.md`; P2 tasks remain open._
       _2026-11-12: trained from scratch on 1,000 and 3,000 games on CPU at batch 256 (not ≥ 1,024);
       10,000 and 20,000 not run (over 6 h on 4 cores); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
@@ -348,6 +354,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       "replay trainer profile and the data-or-steps runs" in the ledger and
       `docs/briefs/03-report.md`; P2.4 remains open._
       _2026-11-15: brief 05 NLL B 1.579018 → G20 1.278605 → 40,955-game fallback 1.263437; full reliability/value tables retained. The exact 20k-to-100k decision and strict 100k value reading remain unverified. Obtain that exact point before choosing the prescribed branch; no threshold changed._
+      _2026-11-16: brief 13 has no trained point; its P2.4 decision is not measurable._
 
 - [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
@@ -356,6 +363,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       "replay blueprint learning curve at 1k–20k games"._
 
       _2026-11-15: brief 05 CPU smoke (400 games/opponent, pool_b, greedy): G20 0.520/0.8675 and G100 0.5225/0.8575 vs SimpleHeuristics/MaxDamage, no failures/truncations; intervals overlap. See `docs/briefs/05-report.md`; no gate claimed._
+      _2026-11-16: brief 13 play and lead-retention comparison await training. All G2
+      clauses are not measurable for this partial run; no new gate result claimed._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 **and Brier score

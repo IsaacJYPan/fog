@@ -11,5 +11,6 @@
     "G20 epoch 1 calibration with resumable 18-epoch schedule",
     "G20 continuation, offline metrics, lead comparison and play, then push",
     "check brief 12 merge status; larger corrected conversion and budgeted run"
-  ]
+  ],
+  "status": "blocked before first GPU submission by an existing queued GPU job"
 }

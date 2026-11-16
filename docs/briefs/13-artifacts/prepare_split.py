@@ -17,6 +17,23 @@ from fog.constants.tables import TABLES
 from fog.scripts.split_replay_manifest import _fixed_holdout_split, _nested_training_sets
 
 
+def nested_sets(training, sizes, seed, prefix_ids):
+    if not prefix_ids:
+        return _nested_training_sets(training, sizes, seed)
+    if len(prefix_ids) != len(set(prefix_ids)) or not set(prefix_ids) <= set(training["id"]):
+        raise ValueError("the prior G20 prefix must survive in the larger corrected corpus")
+    if sizes and min(sizes) < len(prefix_ids):
+        raise ValueError("requested subset is smaller than the fixed prior prefix")
+    prefix = training.filter(pl.col("id").is_in(prefix_ids)).with_columns(
+        pl.col("id").replace_strict({key: i for i, key in enumerate(prefix_ids)}).alias("_order")
+    ).sort("_order").drop("_order")
+    other = training.filter(~pl.col("id").is_in(prefix_ids))
+    if len(other):
+        other = _nested_training_sets(other, [len(other)], seed)[len(other)]
+    ordered = pl.concat([prefix, other])
+    return {size: ordered.head(size) for size in sizes}
+
+
 def filter_arrays(arrays, forbidden):
     """Use submitted own species, including fainted members, rather than battle forms."""
     own = np.sort(arrays["self_belief_targets"][:, :, 0], axis=1)
@@ -47,11 +64,15 @@ def main():
     parser.add_argument("--validation", type=Path,
                         default=Path("data/teams/replay_v1/validation/manifest.json"))
     parser.add_argument("--sizes", type=int, nargs="+", default=[20000, 100000])
+    parser.add_argument("--prefix-manifest", type=Path,
+                        help="larger-set preparation: preserve the prior G20 games as its prefix")
     args = parser.parse_args()
     teams = json.loads(args.validation.read_text())["teams"]
     forbidden = {tuple(sorted(TABLES.species_index(s) for s in t["composition"]))
                  for t in teams}
-    settings = {"manifest": str(args.manifest.resolve()),
+    prefix_ids = (pl.read_parquet(args.prefix_manifest)["id"].to_list()
+                  if args.prefix_manifest else [])
+    settings = {"manifest": str(args.manifest.resolve()), "prefix_ids": prefix_ids,
                 "holdout_ids": args.holdout_ids.read_text(),
                 "validation": json.loads(args.validation.read_text()), "sizes": args.sizes}
     args.out.mkdir(parents=True, exist_ok=True)
@@ -112,7 +133,7 @@ def main():
     splits = {"train_manifest": clean, "holdout_manifest": holdout}
     sizes = [size for size in args.sizes if size <= len(clean)]
     splits.update({f"train_{size}": frame for size, frame in
-                   _nested_training_sets(clean, sizes, 20260804).items()})
+                   nested_sets(clean, sizes, 20260804, prefix_ids).items()})
     counts["splits"] = {}
     for name, frame in splits.items():
         temporary = args.out / f"{name}.parquet.tmp"

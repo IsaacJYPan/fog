@@ -3,6 +3,8 @@ import importlib.util
 from pathlib import Path
 
 import numpy as np
+import polars as pl
+import pytest
 
 from fog.constants.tables import TABLES
 
@@ -40,3 +42,15 @@ def test_no_exclusions_preserve_every_array():
     assert removed == 0
     for key in arrays:
         np.testing.assert_array_equal(arrays[key], filtered[key])
+
+
+def test_growing_the_import_preserves_the_actual_previous_training_games():
+    small = pl.DataFrame({"id": [f"game{i}" for i in range(30)], "n_rows": [10] * 30})
+    old = module.nested_sets(small, [20], 1, [])[20]
+    larger = pl.DataFrame({"id": [f"game{i}" for i in range(100)], "n_rows": [10] * 100})
+    sets = module.nested_sets(larger, [20, 90], 1, old["id"].to_list())
+    assert sets[20]["id"].to_list() == old["id"].to_list()
+    assert sets[90].head(20)["id"].to_list() == old["id"].to_list()
+    assert sets[90]["id"].n_unique() == 90
+    with pytest.raises(ValueError, match="must survive"):
+        module.nested_sets(larger, [20], 1, ["missing-game"])

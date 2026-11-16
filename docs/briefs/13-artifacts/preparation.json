@@ -10,6 +10,7 @@
   },
   "filter_test_command": "PYTHONPATH=. uv run --no-sync python -m pytest -q docs/briefs/13-artifacts/test_prepare_split.py",
   "filter_test_result": {
-    "passed": 2
-  }
+    "passed": 3
+  },
+  "execution_status": "CPU data complete; GPU submission blocked by existing queued GPU job"
 }
