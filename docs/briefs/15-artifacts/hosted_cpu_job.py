@@ -3,7 +3,8 @@
 A script kernel with internet and no GPU, and one private dataset attached that holds the
 network weights the commands need. It builds the pinned Showdown and the Gen 9 engine, then
 runs each of `STEPS` from the repository root with one math thread a process. In a command,
-`{out}` is the output folder and `{input:NAME}` the path of the file `NAME` in the dataset.
+`{out}` is the output folder, `{input:NAME}` the path of the file `NAME` in the dataset and
+`{round:NAME}` the folder of the uploaded collection `NAME` (the host unpacks `NAME.tar`).
 Every folder a step leaves in the output folder is stored as `<folder>.tar`; `job.json`
 records times and exit statuses.
 
@@ -81,6 +82,14 @@ def resolve(argument: str) -> str:
             raise SystemExit(f"{match.group(1)} is not in the attached dataset")
         return str(found[0])
 
+    def collection(match):
+        found = sorted(path.parent for path in Path("/kaggle/input").rglob("game_0000000.npz")
+                       if path.parent.name == match.group(1))
+        if not found:
+            raise SystemExit(f"collection {match.group(1)} is not in the attached dataset")
+        return str(found[0])
+
+    argument = re.sub(r"\{round:([^}]+)\}", collection, argument)
     return re.sub(r"\{input:([^}]+)\}", dataset_file, argument).replace("{out}", str(out))
 
 

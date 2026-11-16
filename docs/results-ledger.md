@@ -3499,3 +3499,39 @@ What this says:
 
 The first hosted GPU job of the day (12:58 UTC, re-submitted 14:23) waited in the host's
 queue and had not started by 15:55; network 3 is being trained on this machine instead.
+
+## 2026-11-16: search distillation, network 3
+
+`python -m fog.training.search_distill train --data runs/distill/round0 runs/distill/round1 runs/distill/round2 runs/distill/round3 --out runs/distill/net3cpu --threads 4`
+(source `a8c9555`), on this machine because the hosted GPU job never left the host's queue:
+random initial weights, 233,895 training rows, 13,370 held out by game, 8 epochs,
+about 14.0 minutes an epoch on four cores. The hosted round-3 folders are not in it, so
+it is the same recipe as networks 0 to 2 with one more round. `15-artifacts/net3-metrics.json`.
+`policy_best.pt` SHA-256 `b1549dffda3ef95991912582c530a44a295b13c7acd5e6af5620e4ac35c20fcd`.
+
+| Epoch | Held-out cross-entropy | KL to the teacher | Top-1 agreement with the teacher | Value MSE to outcome |
+| --- | --- | --- | --- | --- |
+| 0 (untrained) | 1.952 | 0.337 | 10.7% | 1.029 |
+| 1 | 1.795 | 0.180 | 49.8% | 0.866 |
+| 4 | 1.745 | 0.130 | 59.2% | 0.929 |
+| 8 (best) | 1.734 | 0.120 | 61.7% | 0.923 |
+
+### Play: network 3 alone, no search
+
+`python -m fog.eval.run_shards --shards 4 --games 1008 --seed 15200 --out-dir runs/distill/eval/net3-1008 -- --pool data/teams/replay_v1/validation --device cpu --config configs/search_distill_cpu.yaml --checkpoint net3=runs/distill/net3/policy_best.pt --opponent simpleheuristics --opponent maxdamage --max-turns 300 --progress-every 40`
+(source `1d770c4`; the same games as networks 0 to 2). One game against MaxDamage reached
+the 300-turn limit and is not counted.
+
+| Date | Policy | Training rows | Opponent | Games | Win rate [95% interval] | W-L-D | File |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | Network 3 | 233,895 (rounds 0 to 3) | SimpleHeuristics | 1,008 | **0.685 [0.655, 0.712]** | 690-318-0 | `15-artifacts/net3-play-1008.json` |
+| 2026-11-16 | Network 3 | | MaxDamage | 1,008 | **0.925 [0.907, 0.939]** | 931-76-0 | |
+
+**The learning curve has flattened.** Against SimpleHeuristics: 0.448, 0.615, 0.682, 0.685 at
+58k, 119k, 178k and 234k training rows. Against MaxDamage: 0.815, 0.909, 0.923, 0.925. The
+fourth round added 0.3 points where the third added 6.7, and the interval is 2.9 points wide,
+so the gain from the last 56,000 rows is somewhere between nothing and about three points.
+Agreement with the teacher's top move on held-out rows still rose (58.8% to 61.7%).
+Brief 17's stopping rule needs two such rounds; this is one. What is being tried next, each
+as its own row: a network on every stored row (about 450,000, the hosted folders included)
+at the same number of training steps, and sharper targets (`--target-power`).

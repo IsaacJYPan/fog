@@ -10,6 +10,7 @@
 #   FOG_HOSTED_DATASET  name of the private dataset that holds rounds and weights
 #   FOG_HOSTED_WORK     a scratch folder outside the repository (job folders, downloads, markers)
 #   FOG_HOSTED_CLI      the host's command-line client (default: kaggle)
+#   FOG_HOSTED_NO_LOCAL set to 1 when this machine is busy: round-collect then uses hosted machines only
 #
 # Commands:
 #   hosted.sh cpu-job <letter> <timeout_s> '<STEPS json>'   submit job fog-distill-collect-<letter>
@@ -132,7 +133,7 @@ round_collect() {
       say "round $round: hosted machine $letter submitted"
     fi
   done
-  if [ ! -f "$W/markers/r$round.local_done" ]; then
+  if [ -z "${FOG_HOSTED_NO_LOCAL:-}" ] && [ ! -f "$W/markers/r$round.local_done" ]; then
     say "round $round: local collection for $seconds s"
     OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 "$PY" -m fog.training.search_distill \
       collect --pool data/teams/replay_v1/train --out "runs/distill/round$round" \
