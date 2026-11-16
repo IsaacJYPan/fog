@@ -451,7 +451,7 @@ class DistillData:
         self.train_rows = np.flatnonzero(~is_held)
         self.n_games, self.n_holdout_games = len(paths), held
 
-    def batch(self, rows: np.ndarray) -> tuple[dict, dict]:
+    def batch(self, rows: np.ndarray, device=None) -> tuple[dict, dict]:
         """(model inputs, targets) for some row numbers, as the live path would stack them."""
         import torch
 
@@ -469,12 +469,13 @@ class DistillData:
                 frag[key] = value
             frags.append(frag)
             picked.append((arrays, row))
-        inputs = _stack_frags(frags)
+        inputs = _stack_frags(frags, device=device)
         inputs["legality_mask"] = inputs["legality_mask"].bool()
 
         def column(key, dtype):
-            return torch.as_tensor(np.stack([arrays[key][row] for arrays, row in picked]),
-                                   dtype=dtype)
+            column = torch.as_tensor(np.stack([arrays[key][row] for arrays, row in picked]),
+                                     dtype=dtype)
+            return column.to(device) if device is not None else column
 
         targets = {
             "policy": column("teacher_policy", torch.float32),
@@ -543,18 +544,24 @@ def _weighted_mean(rows: list[dict]) -> dict:
     return out
 
 
-def evaluate(agent, data: DistillData, rows: np.ndarray, batch_size: int, loss_kwargs: dict) -> dict:
+def evaluate(agent, data: DistillData, rows: np.ndarray, batch_size: int, loss_kwargs: dict,
+             device=None) -> dict:
     import torch
 
     agent.eval()
     results = []
     with torch.no_grad():
         for start in range(0, len(rows), batch_size):
-            inputs, targets = data.batch(rows[start:start + batch_size])
+            inputs, targets = data.batch(rows[start:start + batch_size], device)
             out = agent(inputs, need_belief=False)
             results.append(distill_loss(out.log_probs, out.value, out.value_logit, targets,
                                         **loss_kwargs)[1])
     return _weighted_mean(results)
+
+
+def _cpu_state(agent) -> dict:
+    """Weights on the CPU, so a checkpoint written on a GPU loads anywhere."""
+    return {key: value.detach().cpu() for key, value in agent.state_dict().items()}
 
 
 def train(args) -> dict:
@@ -570,9 +577,11 @@ def train(args) -> dict:
     data = DistillData(args.data, holdout_fraction=args.holdout_fraction, seed=args.seed,
                        limit_games=args.limit_games)
     torch.manual_seed(args.seed)
+    device = torch.device(args.device)
     agent = FogAgent.from_tables(cfg).cpu()
     if args.init:
         agent.load_state_dict(torch.load(args.init, map_location="cpu", weights_only=False))
+    agent.to(device)
     loss_kwargs = {"value_mix": args.value_mix,
                    "value_coef": float(cfg.get("loss", {}).get("value_coef", 0.5))}
     steps_per_epoch = math.ceil(len(data.train_rows) / args.batch_size)
@@ -597,9 +606,9 @@ def train(args) -> dict:
         history, start_epoch, best = state["history"], state["epoch"], state["best"]
         print(f"[distill-train] resume after epoch {start_epoch}", flush=True)
     else:
-        baseline = evaluate(agent, data, data.holdout_rows, args.batch_size, loss_kwargs)
+        baseline = evaluate(agent, data, data.holdout_rows, args.batch_size, loss_kwargs, device)
         history.append({"epoch": 0, **{f"holdout_{k}": v for k, v in baseline.items()}})
-        torch.save(agent.state_dict(), out_dir / "policy_best.pt")
+        torch.save(_cpu_state(agent), out_dir / "policy_best.pt")
         best = baseline["policy_ce"]
     print(f"[distill-train] games={data.n_games} train_rows={len(data.train_rows)} "
           f"holdout_rows={len(data.holdout_rows)} steps/epoch={steps_per_epoch}", flush=True)
@@ -608,7 +617,7 @@ def train(args) -> dict:
         order = np.random.default_rng(args.seed * 1000 + epoch).permutation(data.train_rows)
         started, seen, running = time.perf_counter(), 0, []
         for start in range(0, len(order), args.batch_size):
-            inputs, targets = data.batch(order[start:start + args.batch_size])
+            inputs, targets = data.batch(order[start:start + args.batch_size], device)
             out = agent(inputs, need_belief=False)
             loss, metrics = distill_loss(out.log_probs, out.value, out.value_logit, targets,
                                          **loss_kwargs)
@@ -620,7 +629,7 @@ def train(args) -> dict:
             running.append(metrics)
             seen += len(targets["outcome"])
         seconds = time.perf_counter() - started
-        holdout = evaluate(agent, data, data.holdout_rows, args.batch_size, loss_kwargs)
+        holdout = evaluate(agent, data, data.holdout_rows, args.batch_size, loss_kwargs, device)
         row = {"epoch": epoch + 1, "train_rows_per_second": seen / seconds,
                "seconds": seconds,
                **{f"train_{k}": v for k, v in _weighted_mean(running).items()},
@@ -628,7 +637,7 @@ def train(args) -> dict:
         history.append(row)
         if holdout["policy_ce"] < best:
             best = holdout["policy_ce"]
-            torch.save(agent.state_dict(), out_dir / "policy_best.pt")
+            torch.save(_cpu_state(agent), out_dir / "policy_best.pt")
             row["best"] = True
         print(f"[distill-train] epoch {epoch + 1}/{args.epochs} "
               f"train_ce={row['train_policy_ce']:.4f} holdout_ce={holdout['policy_ce']:.4f} "
@@ -643,7 +652,7 @@ def train(args) -> dict:
         (out_dir / "metrics.json").write_text(
             json.dumps({"settings": settings, "history": history}, indent=2) + "\n",
             encoding="utf-8")
-    torch.save(agent.state_dict(), out_dir / "policy_final.pt")
+    torch.save(_cpu_state(agent), out_dir / "policy_final.pt")
     return {"settings": settings, "history": history}
 
 
@@ -687,6 +696,7 @@ def main() -> None:
     t.add_argument("--value-mix", type=float, default=0.5)
     t.add_argument("--seed", type=int, default=20261201)
     t.add_argument("--threads", type=int, default=4)
+    t.add_argument("--device", default="cpu", help="cpu or cuda; checkpoints load on either")
     t.add_argument("--limit-games", type=int, default=None)
 
     a = commands.add_parser("agreement", help="summarise a collection directory")
