@@ -1,0 +1,32 @@
+{
+  "label": "smoke",
+  "purpose": "profiling follow-up; two PPO updates only",
+  "source_commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "version": 3,
+  "private_requested": true,
+  "platform_timeout_seconds": 900,
+  "max_gpus": 2,
+  "submitted_utc": "2026-11-15T05:46:16.958103+00:00",
+  "quota_before": {
+    "quotaRefreshTime": "2026-11-21T00:00:00.000Z",
+    "gpuQuota": {
+      "timeUsed": "61965.155.0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "75600s",
+      "minimumTimeAllowed": "21600s",
+      "isPayToScaleEnabled": true,
+      "hasEverRun": true
+    },
+    "tpuQuota": {
+      "timeUsed": "0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "72000s",
+      "minimumTimeAllowed": "72000s",
+      "isPayToScaleEnabled": false,
+      "hasEverRun": false
+    }
+  },
+  "error": "",
+  "invalid_dataset_sources": [],
+  "invalid_kernel_sources": []
+}

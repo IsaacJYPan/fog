@@ -1,0 +1,13 @@
+{
+  "label": "CPU preparation smoke; GPU stages not yet run",
+  "source_commit": "f36bc11d2b5390419f5b4fc805cdaa8487adea12",
+  "replay_games": 1000,
+  "import_command": ".venv/bin/python -m fog.scripts.import_metamon_replays --out runs/update-speed/raw --revision 792a86b5cdbcab9696032e947483b218453a0d4f --min-rating 1500 --after 2024-02-01 --max-games 1000 --max-shards 4 --max-download-mb 600",
+  "convert_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m fog.scripts.convert_replay_decisions --raw runs/update-speed/raw --out runs/update-speed/converted --imputations 1 --workers 4 --resume",
+  "platform_timeout_seconds": 3300,
+  "requested_allocated_gpus": 1,
+  "max_allocation_gpu_hours": 0.9166666666666666,
+  "gpu_jobs_submitted": 0,
+  "validation": "30 focused tests passed in 5.15s; measurement shim PPO metrics, parameters and RNG identical on CPU; artifact scripts pass Ruff",
+  "gpu_validation": "pending"
+}

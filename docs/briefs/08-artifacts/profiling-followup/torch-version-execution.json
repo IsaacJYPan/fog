@@ -1,0 +1,12 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "torch-version",
+  "command": [
+    "/kaggle/temp/fog/.venv/bin/python",
+    "-c",
+    "import json,torch; print(json.dumps({\"torch\":torch.__version__,\"cuda\":torch.version.cuda,\"gpu\":torch.cuda.get_device_name(0)}))"
+  ],
+  "exit_code": 0,
+  "seconds": 2.6230948070000295
+}

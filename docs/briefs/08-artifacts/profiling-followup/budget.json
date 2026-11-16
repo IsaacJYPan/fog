@@ -1,0 +1,128 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "status": "complete",
+  "allocated_gpus": 2,
+  "job_seconds": 355.0409775300001,
+  "gpu_hours": 0.19724498751666672,
+  "platform_timeout_seconds": 900,
+  "allocation_upper_bound_gpu_hours": 0.5,
+  "records": [
+    {
+      "name": "clone",
+      "command": [
+        "git",
+        "clone",
+        "https://github.com/IsaacJYPan/fog.git",
+        "/kaggle/temp/fog"
+      ],
+      "exit_code": 0,
+      "seconds": 2.0235100479999915
+    },
+    {
+      "name": "checkout",
+      "command": [
+        "git",
+        "checkout",
+        "--detach",
+        "ee058d81e2af1f6fefff08d11d86326b8ebfecc1"
+      ],
+      "exit_code": 0,
+      "seconds": 0.21495541900000603
+    },
+    {
+      "name": "submodule",
+      "command": [
+        "git",
+        "submodule",
+        "update",
+        "--init",
+        "--recursive",
+        "--depth",
+        "1"
+      ],
+      "exit_code": 0,
+      "seconds": 4.127148625000018
+    },
+    {
+      "name": "showdown-install",
+      "command": [
+        "npm",
+        "--prefix",
+        "server/pokemon-showdown",
+        "ci",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ],
+      "exit_code": 0,
+      "seconds": 7.655143175000006
+    },
+    {
+      "name": "showdown-build",
+      "command": [
+        "npm",
+        "--prefix",
+        "server/pokemon-showdown",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "seconds": 3.431842222
+    },
+    {
+      "name": "setup",
+      "command": [
+        "/usr/bin/python3",
+        "-m",
+        "fog.scripts.kaggle_setup"
+      ],
+      "exit_code": 0,
+      "seconds": 85.959920818
+    },
+    {
+      "name": "py-spy-install",
+      "command": [
+        "/kaggle/temp/fog/.venv/bin/python",
+        "-m",
+        "pip",
+        "install",
+        "py-spy==0.4.3"
+      ],
+      "exit_code": 0,
+      "seconds": 2.4721028639999645
+    },
+    {
+      "name": "torch-version",
+      "command": [
+        "/kaggle/temp/fog/.venv/bin/python",
+        "-c",
+        "import json,torch; print(json.dumps({\"torch\":torch.__version__,\"cuda\":torch.version.cuda,\"gpu\":torch.cuda.get_device_name(0)}))"
+      ],
+      "exit_code": 0,
+      "seconds": 2.6230948070000295
+    },
+    {
+      "name": "replay-manifest",
+      "command": [
+        "/kaggle/temp/fog/.venv/bin/python",
+        "-c",
+        "import polars as pl,sys\nfrom pathlib import Path\nsource=Path(sys.argv[1]); root=source.parent\nm=pl.read_parquet(source)\nm=m.with_columns(pl.col(\"shard\").map_elements(lambda s: str(root / \"shards\" / Path(s).name), return_dtype=pl.String))\nassert all(Path(p).exists() for p in m[\"shard\"])\nm.write_parquet(sys.argv[2])\nprint(m.select(pl.len(),pl.col(\"n_rows\").sum()))\n",
+        "/kaggle/input/<attached-replays>/manifest.parquet",
+        "/kaggle/temp/fog/runs/update-speed/manifest.parquet"
+      ],
+      "exit_code": 0,
+      "seconds": 0.5658722040000157
+    },
+    {
+      "name": "ppo",
+      "command": [
+        "/kaggle/temp/fog/.venv/bin/python",
+        "docs/briefs/08-artifacts/measure.py",
+        "ppo"
+      ],
+      "exit_code": 0,
+      "seconds": 244.668983621
+    }
+  ]
+}

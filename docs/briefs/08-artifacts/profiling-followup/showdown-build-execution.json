@@ -1,0 +1,14 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "showdown-build",
+  "command": [
+    "npm",
+    "--prefix",
+    "server/pokemon-showdown",
+    "run",
+    "build"
+  ],
+  "exit_code": 0,
+  "seconds": 3.431842222
+}

@@ -1,0 +1,8 @@
+{"kind": "collection", "seconds": 29.149789464000037, "rows": 6505, "games": 256}
+{"kind": "collection", "seconds": 22.32221570400003, "rows": 6561, "games": 256}
+{"kind": "update", "seconds": 53.60729924200001, "rows": 13066, "forward_seconds": 22.384698512, "loss_backward_optimizer_seconds": 31.22260073000001, "rows_per_second": 243.73546484809867, "optimized_rows": 39198, "optimized_rows_per_second": 731.206394544296, "optimizer_steps": 39.0, "peak_learner_allocated_bytes": 10455752192}
+{"kind": "update_phase", "seconds": 59.701209887999994, "rows": 13066}
+{"kind": "collection", "seconds": 24.58681804400004, "rows": 6576, "games": 256}
+{"kind": "collection", "seconds": 21.752612045999967, "rows": 6684, "games": 256}
+{"kind": "update", "seconds": 52.572614176, "rows": 13260, "forward_seconds": 21.979294891000336, "loss_backward_optimizer_seconds": 30.593319284999666, "rows_per_second": 252.22257268030893, "optimized_rows": 39780, "optimized_rows_per_second": 756.6677180409268, "optimizer_steps": 39.0, "peak_learner_allocated_bytes": 10455752192}
+{"kind": "update_phase", "seconds": 58.67062632400007, "rows": 13260}

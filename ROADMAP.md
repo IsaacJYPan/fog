@@ -126,6 +126,12 @@ cites the `fog` commit that produced the result.
       unverified, so P0.5 stays open. See `docs/briefs/06-report.md` and the latest ledger section._
       _2026-11-14: a per-row Python loop in the belief training path was removed (CPU: 230 ms to
       1.4 ms per 1,024 rows; GPU effect unmeasured). Briefs 08 and 14 measure and continue._
+      _2026-11-14: brief 08 measured the fixed training path on four Xeon cores and a T4
+      (two allocated, one used): 1.315 s/optimizer step, 770.24 processed rows/s and 122.80
+      decisions/s end to end. Update/collection wall shares are 52.3%/41.8%; backward is
+      54.4% of one sampled 1,024-row optimizer step. Replay training measured 1,850.26 rows/s.
+      All are smoke; runtime/corpus differences and limits are in `docs/briefs/08-report.md`.
+      Brief 14's numerical condition is met, pending review of 08. P0.5 remains open._
 
 - [x] **P0.6 One evaluation command.** Done (`fog` commit `ef773aa`). Part (b), `BlockSPRT` in `fog/eval/stats.py`, is done
       (`fog` commit `d3d0bef`); parts (a) and (c) remain. Extend `fog/eval/showdown_direct_selection.py` (it already

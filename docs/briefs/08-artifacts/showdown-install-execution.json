@@ -1,0 +1,16 @@
+{
+  "label": "smoke",
+  "commit": "e23682fd9dbf8f9f13c20cd2fbdfb4dcfb8ba47f",
+  "name": "showdown-install",
+  "command": [
+    "npm",
+    "--prefix",
+    "server/pokemon-showdown",
+    "ci",
+    "--ignore-scripts",
+    "--no-audit",
+    "--no-fund"
+  ],
+  "exit_code": 0,
+  "seconds": 5.383229903
+}

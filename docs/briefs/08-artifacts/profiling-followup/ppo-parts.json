@@ -1,0 +1,36 @@
+{
+  "label": "smoke",
+  "rows": 1024,
+  "seconds": {
+    "shared_trunk": 0.1484139229999073,
+    "opponent_belief": 0.2557517010000083,
+    "policy_value_heads": 0.004346580000060385,
+    "self_belief": 0.23699953400000595,
+    "forward_other": 0.017956929999968452,
+    "loss_assembly": 0.026804291000075864,
+    "backward": 0.7346021239999345,
+    "gradient_clip_and_metrics": 0.006164239999975507,
+    "optimizer_step": 0.006005773000083536
+  },
+  "shares": {
+    "shared_trunk": 0.10327715074009428,
+    "opponent_belief": 0.17797054644414917,
+    "policy_value_heads": 0.0030246649963588373,
+    "self_belief": 0.16492143124783515,
+    "forward_other": 0.012495731727522769,
+    "loss_assembly": 0.018652365938052296,
+    "backward": 0.5111893329198101,
+    "gradient_clip_and_metrics": 0.004289524397761434,
+    "optimizer_step": 0.004179251588416021
+  },
+  "total_seconds": 1.4370450960000198,
+  "forward_seconds": 0.6634686679999504,
+  "calls": {
+    "shared_trunk": 4,
+    "opponent_belief": 2,
+    "policy_value_heads": 1,
+    "self_belief": 2
+  },
+  "partition_seconds": 1.4370450960000198,
+  "scope": "one native minibatch; synchronized before and after every part; shared_trunk includes both perspectives' backbone and shared_latent; forward_other contains projections, context assembly and timing-hook overhead"
+}

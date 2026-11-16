@@ -1,0 +1,14 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "py-spy-install",
+  "command": [
+    "/kaggle/temp/fog/.venv/bin/python",
+    "-m",
+    "pip",
+    "install",
+    "py-spy==0.4.3"
+  ],
+  "exit_code": 0,
+  "seconds": 2.4721028639999645
+}

@@ -1,0 +1,22 @@
+{
+  "label": "smoke",
+  "quota": {
+    "quotaRefreshTime": "2026-11-21T00:00:00.000Z",
+    "gpuQuota": {
+      "timeUsed": "61965.155.0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "75600s",
+      "minimumTimeAllowed": "21600s",
+      "isPayToScaleEnabled": true,
+      "hasEverRun": true
+    },
+    "tpuQuota": {
+      "timeUsed": "0s",
+      "timeReserved": "0s",
+      "totalTimeAllowed": "72000s",
+      "minimumTimeAllowed": "72000s",
+      "isPayToScaleEnabled": false,
+      "hasEverRun": false
+    }
+  }
+}

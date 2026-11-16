@@ -1,0 +1,18 @@
+{
+  "label": "smoke",
+  "private_notebook_slug": "fog-update-speed-20261114",
+  "version": 2,
+  "output_file": "checkpoints.zip",
+  "zip_integrity_ok": true,
+  "bytes": 310106349,
+  "members": [
+    "runs/collect_gpu/checkpoints/ppo_26330.state.pt",
+    "runs/collect_gpu/checkpoints/ppo_26330.pt",
+    "runs/collect_gpu/checkpoints/ppo_short.pt",
+    "runs/collect_gpu/checkpoints/ppo_short.state.pt",
+    "runs/collect_gpu/checkpoints/ppo_13066.pt",
+    "runs/collect_gpu/checkpoints/ppo_13066.state.pt",
+    "runs/update-speed/replay.state.pt"
+  ],
+  "local_copy": "runs/update-speed/recovery/primary-checkpoints.zip"
+}

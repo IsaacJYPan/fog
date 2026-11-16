@@ -1,0 +1,14 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "replay-manifest",
+  "command": [
+    "/kaggle/temp/fog/.venv/bin/python",
+    "-c",
+    "import polars as pl,sys\nfrom pathlib import Path\nsource=Path(sys.argv[1]); root=source.parent\nm=pl.read_parquet(source)\nm=m.with_columns(pl.col(\"shard\").map_elements(lambda s: str(root / \"shards\" / Path(s).name), return_dtype=pl.String))\nassert all(Path(p).exists() for p in m[\"shard\"])\nm.write_parquet(sys.argv[2])\nprint(m.select(pl.len(),pl.col(\"n_rows\").sum()))\n",
+    "/kaggle/input/<attached-replays>/manifest.parquet",
+    "/kaggle/temp/fog/runs/update-speed/manifest.parquet"
+  ],
+  "exit_code": 0,
+  "seconds": 0.5658722040000157
+}

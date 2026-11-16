@@ -1,0 +1,11 @@
+{
+  "label": "smoke",
+  "command": [
+    "/kaggle/temp/fog/.venv/bin/py-spy",
+    "dump",
+    "--pid",
+    "272"
+  ],
+  "exit_code": 1,
+  "update": 2
+}

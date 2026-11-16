@@ -1,0 +1,12 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "setup",
+  "command": [
+    "/usr/bin/python3",
+    "-m",
+    "fog.scripts.kaggle_setup"
+  ],
+  "exit_code": 0,
+  "seconds": 85.959920818
+}

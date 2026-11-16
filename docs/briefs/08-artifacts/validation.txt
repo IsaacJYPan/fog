@@ -1,0 +1,25 @@
+CPU engineering checks and arithmetic smoke; no strength claims.
+
+Focused command:
+.venv/bin/python -m pytest -q tests/test_ppo_update.py tests/test_ppo_measurements.py tests/test_belief_move_permutation.py tests/test_rollout_probe_memory.py tests/test_collection_gpu_job.py
+Result: 30 passed in 5.15s. Full suite not run.
+
+Lint command:
+.venv/bin/ruff check --no-cache fog tests docs/briefs/08-artifacts
+Result: All checks passed.
+
+Timing hook check:
+.venv/bin/python docs/briefs/08-artifacts/check_measurement.py
+Native PPO metrics, parameters and RNG identical on CPU; timing partition complete.
+The exact profiler-child grant/revoke approach passed on the platform's CPU-only runtime,
+then produced three successful GPU update-two py-spy dumps.
+
+Arithmetic checks:
+Two primary PPO rows; 26,330 collected decisions; 78 steps; 78,990 optimizer rows.
+Replay: 200 steps times 1,024 rows equals 204,800 row-visits.
+Both sample partitions sum to their total seconds, and their shares sum to one.
+PPO collection/update/other wall shares sum to one.
+
+Scope: git diff f36bc11 -- fog configs tests is empty.
+Native model, loss, trainer, config and test files were not edited.
+Report comparisons include different CPU counts, runtime versions and replay corpora.

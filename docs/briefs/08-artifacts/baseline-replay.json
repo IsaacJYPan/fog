@@ -1,0 +1,9 @@
+{
+  "label": "smoke, baseline from brief 05",
+  "source": "docs/briefs/05-artifacts/G20-summary.json",
+  "source_commit": "7a234972abf8d4c6dde8629353588aa2558f1fd0",
+  "training_rows_per_second_aggregate": 583.241649017001,
+  "training_games": 20000,
+  "training_rows": 1023525,
+  "completed_epochs": 18
+}

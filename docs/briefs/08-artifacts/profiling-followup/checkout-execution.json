@@ -1,0 +1,13 @@
+{
+  "label": "smoke",
+  "commit": "ee058d81e2af1f6fefff08d11d86326b8ebfecc1",
+  "name": "checkout",
+  "command": [
+    "git",
+    "checkout",
+    "--detach",
+    "ee058d81e2af1f6fefff08d11d86326b8ebfecc1"
+  ],
+  "exit_code": 0,
+  "seconds": 0.21495541900000603
+}
