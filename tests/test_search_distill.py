@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 import torch
 
+from fog.encoding.action_features import ACTION_FEATURE_DIM
 from fog.encoding.dims import DIMS
 from fog.encoding.entities import ENTITY_RAW_DIM, N_ID_FIELDS
 from fog.training import search_distill as sd
@@ -234,3 +235,31 @@ def test_target_power_one_is_the_identity_and_two_sharpens_without_moving_the_pe
     plain = sd.distill_loss(log_probs, value, None, targets)[1]
     same = sd.distill_loss(log_probs, value, None, targets, target_power=1.0)[1]
     assert plain == same and plain["value_brier"] == pytest.approx(0.25)
+
+
+def test_training_stops_before_an_epoch_it_has_no_time_for_and_a_rerun_finishes(tmp_path):
+    generator = np.random.default_rng(5)
+    for game in range(3):
+        frags = [_fragment(generator, turns) for turns in (0, 1, 2)]
+        for frag in frags:
+            legal = frag["legality_mask"].astype(np.float32)
+            frag["teacher_policy"] = legal / legal.sum()
+            frag["action_features"] = np.zeros((14, ACTION_FEATURE_DIM), dtype=np.float32)
+        sd.save_game(sd.game_path(tmp_path / "rows", game),
+                     sd.merge_seats([sd.pack_rows(frags, [0, 1, 2], 1.0, 0)]), {"game": game})
+    threads = torch.get_num_threads()
+    args = Namespace(config="configs/search_distill_cpu.yaml", data=[tmp_path / "rows"],
+                     out=tmp_path / "net", init=None, epochs=2, batch_size=4, lr=3e-4,
+                     lr_final=3e-5, holdout_fraction=0.34, value_mix=0.5, target_power=1.0,
+                     seed=3, threads=1, device="cpu", limit_games=None, max_seconds=1e-9)
+    try:
+        stopped = sd.train(args)
+        assert [row["epoch"] for row in stopped["history"]] == [0]
+        assert not (tmp_path / "net" / "policy_final.pt").exists()
+        args.max_seconds = 0.0
+        finished = sd.train(args)
+        assert [row["epoch"] for row in finished["history"]] == [0, 1, 2]
+        assert (tmp_path / "net" / "policy_final.pt").exists()
+        assert np.isfinite(finished["history"][-1]["holdout_policy_ce"])
+    finally:
+        torch.set_num_threads(threads)

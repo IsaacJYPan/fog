@@ -703,7 +703,14 @@ def train(args) -> dict:
         best, best_value = baseline["policy_ce"], baseline["value_brier"]
     print(f"[distill-train] games={data.n_games} train_rows={len(data.train_rows)} "
           f"holdout_rows={len(data.holdout_rows)} steps/epoch={steps_per_epoch}", flush=True)
+    began, slowest = time.monotonic(), 0.0
     for epoch in range(start_epoch, args.epochs):
+        if args.max_seconds and time.monotonic() - began + slowest > args.max_seconds:
+            # The next epoch would overrun; its checkpoint is what a re-run resumes from.
+            print(f"[distill-train] stopped at the time limit after epoch {epoch}; "
+                  "run the same command again to continue", flush=True)
+            return {"settings": settings, "history": history}
+        epoch_began = time.monotonic()
         agent.train()
         order = np.random.default_rng(args.seed * 1000 + epoch).permutation(data.train_rows)
         started, seen, running = time.perf_counter(), 0, []
@@ -749,6 +756,7 @@ def train(args) -> dict:
         (out_dir / "metrics.json").write_text(
             json.dumps({"settings": settings, "history": history}, indent=2) + "\n",
             encoding="utf-8")
+        slowest = max(slowest, time.monotonic() - epoch_began)
     torch.save(_cpu_state(agent), out_dir / "policy_final.pt")
     return {"settings": settings, "history": history}
 
@@ -799,6 +807,9 @@ def main() -> None:
     t.add_argument("--threads", type=int, default=4)
     t.add_argument("--device", default="cpu", help="cpu or cuda; checkpoints load on either")
     t.add_argument("--limit-games", type=int, default=None)
+    t.add_argument("--max-seconds", type=float, default=0.0,
+                   help="start no epoch that would end after this long; 0 for no limit. "
+                        "policy_final.pt is written only by the run that finishes")
 
     a = commands.add_parser("agreement", help="summarise a collection directory")
     a.add_argument("--data", type=Path, required=True)
