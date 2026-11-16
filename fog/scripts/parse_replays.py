@@ -666,6 +666,17 @@ def parse_replay(
     return {"rows": out_rows, "p1_win": p1_win}
 
 
+def policy_filter_reason(row: dict) -> str:
+    """Use the same retained-decision contract in training and exact-sheet diagnostics."""
+    if not row.get("policy_valid", False):
+        return str(row.get("filter_reason", "unresolved"))
+    # Retain every forced replacement, including its outcome/value target when only one
+    # switch remains. Its policy cross-entropy is correctly zero on that one-choice mask.
+    if int(np.asarray(row["mask"], dtype=bool).sum()) < 2 and row["obs"].decision_phase != 1:
+        return "forced_single_choice"
+    return "accepted"
+
+
 def parse_replay_policy_versions(
     replay_json: dict,
     *,
@@ -742,13 +753,9 @@ def parse_replay_policy_versions(
 
             previews = preview_arrays(replay_json, private_sets)
         for row in version["rows"]:
-            reason = str(row.get("filter_reason", "unresolved"))
-            if not row.get("policy_valid", False):
+            reason = policy_filter_reason(row)
+            if reason != "accepted":
                 filters[reason] += 1
-                continue
-            # A legal list containing only the demonstrated action conveys no preference.
-            if int(np.asarray(row["mask"], dtype=bool).sum()) < 2:
-                filters["forced_single_choice"] += 1
                 continue
             row["imputation_id"] = imputation
             row["replay_id"] = replay_id

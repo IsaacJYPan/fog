@@ -110,6 +110,20 @@ def explain_difference(name, a, b, key, left, right) -> str | None:
         allowed = [ACTION_FEATURE_NAMES.index(n) for n in MECHANICAL_ACTION_FEATURE_NAMES]
         if np.array_equal(a[:, allowed], b[:, allowed]):
             return "all differences are outside the eleven candidate columns read by R4"
+        first, second = left[key]["fields"], right[key]["fields"]
+        if not np.array_equal(first["legality_mask"], second["legality_mask"]):
+            return "live request and replay infer different legal candidate sets; see legality_mask"
+        from fog.encoding.entities import L
+
+        active = int(second["active_idx"][0])
+        ratios = [ACTION_FEATURE_NAMES.index(n) for n in
+                  ("physical_stat_ratio", "special_stat_ratio")]
+        populated = np.any(b[:, ratios] != 0, axis=1)
+        boosts = second["entities"][active, L.boosts:L.boosts + 7]
+        if (min(boosts[0], boosts[3]) <= -0.5 and populated.any()
+                and np.all(b[populated][:, ratios] == 0.25)):
+            return ("at an offensive boost <= -3, missing replay request stats cause the feature "
+                    "helper to use its unit-stat-ratio fallback")
     if name == "history":
         from fog.encoding.dims import DIMS
         from fog.encoding.events import _OFF_RES, _R_DMG_DEALT, _R_DMG_TAKEN, _R_EXACT
@@ -272,12 +286,12 @@ def load_game(path: Path) -> tuple:
 def replay_rows(replay: dict) -> list:
     from fog.constants.tables import TABLES
     from fog.models.shared_latent import SharedBattleLatent
-    from fog.scripts.parse_replays import parse_replay, rows_to_arrays
+    from fog.scripts.parse_replays import parse_replay, policy_filter_reason, rows_to_arrays
     from fog.training.dataset import _build_batch
 
     result = parse_replay(replay, private_sets={role: np.asarray(sheet)
                                                for role, sheet in replay["sheets"].items()})
-    rows = [row for row in result["rows"] if row["policy_valid"]]
+    rows = [row for row in result["rows"] if policy_filter_reason(row) == "accepted"]
     if not rows:
         return []
     arrays = rows_to_arrays(rows)

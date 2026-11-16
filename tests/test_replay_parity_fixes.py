@@ -228,3 +228,11 @@ def test_normal_struggle_phase_survives_both_dataset_loaders(tmp_path):
     np.savez_compressed(shard, **arrays)
     legacy = next(ReplayDataset(manifest).batches(1, shuffle=False))
     assert torch.equal(legacy['decision_phase'], torch.tensor([1]))
+
+
+def test_training_retains_a_replacement_with_only_one_legal_switch():
+    from fog.scripts.parse_replays import policy_filter_reason
+
+    forced = next(r for r in own_rows() if r['obs'].decision_phase == 1)
+    assert forced['mask'].sum() == 1
+    assert policy_filter_reason(forced) == 'accepted'
