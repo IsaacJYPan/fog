@@ -14,6 +14,10 @@ is split across shards in whole four-game blocks. Re-running the same command re
 unfinished shard from its last complete block and skips finished ones, so an interrupted run
 loses at most a few games.
 
+``--only 0,1`` runs just those shards, so one row can be played on several machines: copy
+the ``shard_*.json`` files into one folder and run the command once more without ``--only``
+to merge.
+
 A searcher's time budget is wall-clock: keep ``--shards`` at or below the number of idle cores
 minus one, or the search gets fewer iterations than its budget says.
 """
@@ -59,18 +63,33 @@ def shard_commands(passthrough: list[str], out_dir: Path, games: int, shards: in
     return commands
 
 
+def only_shards(commands: list[tuple[Path, list[str]]], only: str,
+                shards: int) -> list[tuple[Path, list[str]]]:
+    """The commands of the shard numbers listed in ``only`` (comma-separated)."""
+    wanted = {int(item) for item in only.split(",")}
+    if not wanted or not wanted <= set(range(shards)):
+        raise ValueError(f"--only takes shard numbers from 0 to {shards - 1}")
+    return [(report, argv) for report, argv in commands
+            if int(report.stem.rsplit("_", 1)[1]) in wanted]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--shards", type=int, required=True)
     parser.add_argument("--games", type=int, required=True, help="total games per row")
     parser.add_argument("--out-dir", type=Path, required=True)
     parser.add_argument("--seed", type=int, default=1000, help="seed of the first shard")
+    parser.add_argument("--only", default=None, metavar="I,J",
+                        help="run only these shard numbers here, for a row split across "
+                             "machines; the merge happens once every shard's report exists")
     parser.add_argument("passthrough", nargs=argparse.REMAINDER,
                         help="arguments for showdown_direct_selection, after --")
     args = parser.parse_args()
     passthrough = args.passthrough[1:] if args.passthrough[:1] == ["--"] else args.passthrough
     args.out_dir.mkdir(parents=True, exist_ok=True)
     commands = shard_commands(passthrough, args.out_dir, args.games, args.shards, args.seed)
+    if args.only is not None:
+        commands = only_shards(commands, args.only, args.shards)
     running = []
     for report, argv in commands:
         log = report.with_suffix(".log").open("a", encoding="utf-8")
@@ -90,6 +109,10 @@ def main() -> None:
     from fog.eval.merge_selection_reports import main as merge_main
 
     reports = [str(args.out_dir / f"shard_{index}.json") for index in range(args.shards)]
+    absent = [Path(report).name for report in reports if not Path(report).exists()]
+    if args.only is not None and absent:
+        print(f"[run-shards] not merged; reports still to come: {', '.join(absent)}", flush=True)
+        return
     shard_command = ("python -m fog.eval.run_shards "
                      + shlex.join(sys.argv[1:]))
     sys.argv = ["merge_selection_reports", *reports, "--out", str(args.out_dir / "merged.json"),

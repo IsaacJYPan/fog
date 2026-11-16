@@ -62,3 +62,15 @@ def test_run_shards_splits_whole_blocks_and_resumes(tmp_path):
     assert fresh[fresh.index("--seed") + 1] == "52" and fresh[fresh.index("--games") + 1] == "8"
     with pytest.raises(ValueError, match="--seed"):
         shard_commands(["--seed", "3"], tmp_path, 24, 3, 50)
+
+
+def test_only_keeps_the_listed_shards_with_their_own_seeds(tmp_path):
+    from fog.eval.run_shards import only_shards, shard_commands
+
+    commands = shard_commands(["--pool", "p", "--opponent", "random"], tmp_path, 32, 4, 70)
+    kept = only_shards(commands, "2,3", 4)
+    assert [report.name for report, _ in kept] == ["shard_2.json", "shard_3.json"]
+    assert [argv[argv.index("--seed") + 1] for _, argv in kept] == ["72", "73"]
+    assert only_shards(commands, "0", 4)[0][1] == commands[0][1]
+    with pytest.raises(ValueError):
+        only_shards(commands, "4", 4)
