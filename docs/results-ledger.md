@@ -3403,3 +3403,33 @@ source `94cbb98`. One game in each row reached the 300-turn limit and is not cou
 The learning curve against SimpleHeuristics is 0.448, 0.615, 0.682 at 58k, 119k and 178k
 training rows: the third round added 6.7 points, the second 16.7. Against MaxDamage: 0.815,
 0.909, 0.923. Still rising, more slowly. Rounds 3 and 4 follow the same recipe.
+
+## 2026-11-16: what the teacher's value is worth (distillation pilot, rounds 0 to 2)
+
+Measured on the stored rows, no training involved. The teacher's root value (EngineMCTS,
+K = 8, 200 ms, mapped to [-1, 1]) against the result of the game the row came from, for the
+side that searched. A constant 0 scores 1.0 on this scale.
+
+| Round | Rows with a value | MSE to the result | Sign agrees with the result | Correlation |
+| --- | --- | --- | --- | --- |
+| 0 | 59,706 | 0.923 | 58.6% | 0.277 |
+| 1 | 62,080 | 0.918 | 58.6% | 0.290 |
+| 2 | 60,056 | 0.907 | 59.7% | 0.306 |
+
+By quarter of the game (round 2; rounds 0 and 1 are within 0.03): MSE 1.004, 0.996, 0.977 in
+the first three quarters and 0.668 in the last; the value's standard deviation is 0.18, 0.21,
+0.22 and 0.52. The search value says almost nothing about who wins until the last quarter.
+
+Reading. The network's value head scores 0.776 on held-out results after one epoch (network
+2), so it is already a better predictor of the result than the search that labels it; what
+it does after that epoch is memorise which games were won (training error 0.29, held-out
+0.87 at epoch 8, from 3,290 games). Mixing the search value into the value target
+(`--value-mix 0.5`, the pilot's setting) therefore pulls the head toward a weaker signal.
+The earlier ledger sentences calling the head "no better than a constant" describe the last
+epoch, not the best one. `value_best.pt` keeps the best epoch. Consequence for P4: leaf
+values from this head are worth trying against the engine's evaluation; the number of games
+(about 3,300), not rows, is what limits it.
+
+Figures: `summarize` in `fog/training/search_distill.py` now writes the MSE and the sign
+agreement into each round's `summary.json` (source `887bf60`); the quarters and correlations
+came from a one-off pass over the same arrays (`teacher_value`, `outcome`, `turn`).
