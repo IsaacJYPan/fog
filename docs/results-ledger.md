@@ -3433,3 +3433,25 @@ values from this head are worth trying against the engine's evaluation; the numb
 Figures: `summarize` in `fog/training/search_distill.py` now writes the MSE and the sign
 agreement into each round's `summary.json` (source `887bf60`); the quarters and correlations
 came from a one-off pass over the same arrays (`teacher_value`, `outcome`, `turn`).
+
+## 2026-11-16: search distillation, round 3 on this machine
+
+Continues the pilot sections above with the same recipe.
+
+`python -m fog.training.search_distill collect --pool data/teams/replay_v1/train --out runs/distill/round3 --checkpoint runs/distill/net2/policy_best.pt --games 1000 --beta 0.25 --seed 15003 --agreement-every 40 --workers 4`
+(source `79283c9`). The run was interrupted once: the container was suspended 63 games in
+and the command was restarted (it resumes; the games in flight were replayed). While it ran,
+the test file `tests/test_search_distill.py` was run three times at low priority (about half
+a minute each) and a pass over the stored rounds once; labels made in those minutes had less
+than a full core.
+
+| Quantity | Value |
+| --- | --- |
+| Games | 1,000: 500 mirror, 250 against SimpleHeuristics, 250 against MaxDamage; train teams only; none truncated |
+| Labelled decisions | 60,938 rows, 59,265 with a search distribution; teacher's move played on 15,198 (24.9%) |
+| Cost | 21,874 core-seconds, 0.36 s a row |
+| Teacher fallbacks | 142 of 60,939 (0.23%) |
+| Network 2 against the teacher on its own positions | same top choice on 58.7% of labelled rows (network 1 in round 2: 55.8%) |
+| Label check (1,556 decisions) | second seed 87.9%, 1,600 ms **76.2%** |
+
+`docs/briefs/15-artifacts/round3-summary.json`.
