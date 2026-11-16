@@ -3403,3 +3403,26 @@ source `94cbb98`. One game in each row reached the 300-turn limit and is not cou
 The learning curve against SimpleHeuristics is 0.448, 0.615, 0.682 at 58k, 119k and 178k
 training rows: the third round added 6.7 points, the second 16.7. Against MaxDamage: 0.815,
 0.909, 0.923. Still rising, more slowly. Rounds 3 and 4 follow the same recipe.
+
+
+## 2026-11-16: EngineMCTS on the test teams (tier T1)
+
+Brief 16, branch `work/t1-search`, source `79283c9d780448edfc1938aa90642fb87a211bbe`.
+CPU only, AMD EPYC 9V74 with a four-core quota, Python 3.12.14, locked dependencies,
+pinned Showdown `e440c4a18385274f10c405d0b158b6a962ce6d94`. No code changes.
+The prescribed one-attempt measurement started at about 12:52 UTC and is still running.
+The first checkpoint is partial smoke, not a T1 result; no opponent has completed.
+Shard JSONs save complete four-game blocks; re-run the exact command to resume, never
+restart with different settings. No other workload runs during the matches.
+
+Command:
+
+```sh
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4
+```
+
+Environment and the preflight result (15 tests passed) are in
+`docs/briefs/16-artifacts/environment.json`. Per-opponent results will be appended below
+when complete. The teams are the replay-derived pool with usage-sampled sets, subject
+to the limits in "review of brief 10"; any tier claim must be repeated on the forum
+bank's test split if it is ever collected.
