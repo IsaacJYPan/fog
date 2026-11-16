@@ -1,0 +1,17 @@
+# The search-distillation network at twice the width (ROADMAP gate G3, "if it fails": when
+# strength is flat in data, widen the model). Same inputs, layers and heads as
+# search_distill_cpu.yaml; entity tokens 256 wide instead of 128, with the latent and the
+# feed-forward size scaled to match. Rows collected for the narrow network train this one
+# unchanged. Meant for a GPU.
+#
+#   python -m fog.training.search_distill train --config configs/search_distill_wide.yaml \
+#       --data runs/distill/round0 ... --out runs/distill/net-wide --device cuda
+extends: search_distill_cpu.yaml
+
+experiment: search_distill_wide
+
+model:
+  shared_entity_dim: 256
+  shared_latent_dim: 6144
+  shared_contextual_heads: 8
+  shared_contextual_ff_dim: 1024
