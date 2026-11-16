@@ -455,6 +455,53 @@ def summarize(directory: Path) -> dict:
 
 
 # ------------------------------------------------------------------------------------ training
+def share_history(arrays: dict) -> dict:
+    """Keep one history sequence a seat instead of one padded copy a row.
+
+    A decision's history is the same seat's previous history plus the turns since, so the
+    copies are slices of one sequence; stored a row each, they are most of the memory. Each
+    row gets ``history_start`` and ``history_end`` into the shared arrays. Nothing is assumed:
+    a row whose history does not continue the previous one is appended whole.
+    """
+    seats, lengths = arrays["seat"], arrays["history_rows"]
+    width = arrays[_HISTORY_KEYS[0]].shape[1]
+    tapes: dict[int, dict[str, list[np.ndarray]]] = {}
+    tails: dict[int, dict[str, np.ndarray]] = {}       # the previous row's history, per seat
+    sizes: dict[int, int] = {}
+    spans = []
+    for row in range(len(seats)):
+        seat, length = int(seats[row]), int(lengths[row])
+        own = {key: arrays[key][row][width - length:] for key in _HISTORY_KEYS}
+        tape = tapes.setdefault(seat, {key: [] for key in _HISTORY_KEYS})
+        tail = tails.get(seat)
+        keep = 0
+        if tail is not None:
+            previous = len(tail[_HISTORY_KEYS[0]])
+            for keep in range(min(length, previous), -1, -1):
+                if all(np.array_equal(own[key][:keep], tail[key][previous - keep:])
+                       for key in _HISTORY_KEYS):
+                    break
+        for key in _HISTORY_KEYS:
+            tape[key].append(own[key][keep:])
+        sizes[seat] = sizes.get(seat, 0) + length - keep
+        spans.append((seat, sizes[seat] - length, sizes[seat]))
+        tails[seat] = own
+    offsets, total = {}, 0
+    for seat in sorted(tapes):
+        offsets[seat] = total
+        total += sizes[seat]
+    shared = {key: value for key, value in arrays.items() if key not in _HISTORY_KEYS}
+    for key in _HISTORY_KEYS:
+        parts = [part for seat in sorted(tapes) for part in tapes[seat][key]]
+        shared[key] = (np.concatenate(parts) if parts
+                       else arrays[key][:0].reshape(0, *arrays[key].shape[2:]))
+    shared["history_start"] = np.asarray([offsets[seat] + start for seat, start, _ in spans],
+                                         dtype=np.int64)
+    shared["history_end"] = np.asarray([offsets[seat] + end for seat, _, end in spans],
+                                       dtype=np.int64)
+    return shared
+
+
 class DistillData:
     """All rows of some collection directories in memory, split by game."""
 
@@ -470,6 +517,7 @@ class DistillData:
         index: list[tuple[int, int]] = []
         for number, path in enumerate(paths):
             arrays, _meta = load_game(path)
+            arrays = share_history(arrays)
             self.games.append(arrays)
             index.extend((number, row) for row in range(len(arrays["executed"])))
         self.index = np.asarray(index, dtype=np.int64)
@@ -490,13 +538,9 @@ class DistillData:
         frags, picked = [], []
         for game, row in self.index[rows]:
             arrays = self.games[game]
-            length = int(arrays["history_rows"][row])
-            frag = {}
-            for key in MODEL_KEYS:
-                value = arrays[key][row]
-                if key in _HISTORY_KEYS:
-                    value = value[value.shape[0] - length:] if length else value[:0]
-                frag[key] = value
+            start, end = int(arrays["history_start"][row]), int(arrays["history_end"][row])
+            frag = {key: (arrays[key][start:end] if key in _HISTORY_KEYS else arrays[key][row])
+                    for key in MODEL_KEYS}
             frags.append(frag)
             picked.append((arrays, row))
         inputs = _stack_frags(frags, device=device)

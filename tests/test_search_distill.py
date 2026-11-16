@@ -113,6 +113,34 @@ def test_stored_rows_come_back_as_the_live_path_would_stack_them(tmp_path):
         assert targets["outcome"].tolist() == [1.0 if row < 3 else -1.0 for row in rows]
 
 
+def test_shared_history_gives_back_every_row_and_stores_a_growing_history_once():
+    generator = np.random.default_rng(11)
+    turns = generator.random((9, DIMS.turn_dim), dtype=np.float32)
+    ids = generator.integers(0, 5, (9, DIMS.hist_id_fields))
+    state = generator.random((9, DIMS.hist_state), dtype=np.float32)
+    frags = []
+    # A seat whose history grows, then slides (a window), then is rewritten.
+    for start, end in ((0, 0), (0, 1), (0, 3), (0, 3), (1, 5), (2, 9)):
+        frag = _fragment(generator, 0)
+        frag.update(history=turns[start:end], history_ids=ids[start:end],
+                    history_state=state[start:end], history_len=np.int64(end - start))
+        frags.append(frag)
+    frags.append(_fragment(generator, 4))               # unrelated history: stored whole
+    packed = sd.merge_seats([sd.pack_rows(frags, list(range(7)), 1.0, 0),
+                             sd.pack_rows(frags[:3], [0, 1, 2], -1.0, 1)])
+    shared = sd.share_history(packed)
+    width = packed["history"].shape[1]
+    for row in range(10):
+        length = int(packed["history_rows"][row])
+        start, end = int(shared["history_start"][row]), int(shared["history_end"][row])
+        assert end - start == length
+        for key in ("history", "history_ids", "history_state"):
+            np.testing.assert_array_equal(shared[key][start:end],
+                                          packed[key][row][width - length:])
+    # Seat 0 stores turns 0 to 8 once and the unrelated four; seat 1 stores turns 0 to 2.
+    assert len(shared["history"]) == 9 + 4 + 3
+
+
 def _collect_args(out: Path, **changes) -> Namespace:
     values = dict(config="configs/search_distill_cpu.yaml", checkpoint=None,
                   pool=Path("data/teams/replay_v1/train"), out=out, games=3, beta=1.0,
