@@ -180,3 +180,20 @@ def test_live_collection_labels_every_decision_and_resumes(tmp_path):
     finally:
         torch.set_grad_enabled(grad_enabled)
         torch.set_num_threads(threads)
+
+
+def test_target_power_one_is_the_identity_and_two_sharpens_without_moving_the_peak():
+    policy = torch.tensor([[0.5, 0.3, 0.2, 0.0], [0.0, 0.0, 0.0, 0.0]])
+    assert sd.sharpen(policy, 1.0) is policy
+    sharp = sd.sharpen(policy, 2.0)
+    torch.testing.assert_close(sharp[0], torch.tensor([0.25, 0.09, 0.04, 0.0]) / 0.38)
+    assert sharp[0].argmax() == policy[0].argmax() and float(sharp[1].sum()) == 0.0
+    with pytest.raises(ValueError):
+        sd.sharpen(policy, 0.0)
+    log_probs = torch.log_softmax(torch.zeros(2, 4), dim=-1)
+    targets = {"policy": policy, "has_policy": torch.tensor([True, False]),
+               "teacher_value": torch.tensor([0.0, 0.0]), "outcome": torch.tensor([1.0, -1.0])}
+    value = torch.zeros(2)
+    plain = sd.distill_loss(log_probs, value, None, targets)[1]
+    same = sd.distill_loss(log_probs, value, None, targets, target_power=1.0)[1]
+    assert plain == same and plain["value_brier"] == pytest.approx(0.25)

@@ -486,8 +486,18 @@ class DistillData:
         return inputs, targets
 
 
+def sharpen(policy, power: float):
+    """Visit shares raised to ``power`` and renormalised; ``power`` 1 leaves them unchanged."""
+    if power == 1.0:
+        return policy
+    if power <= 0:
+        raise ValueError("target power must be positive")
+    raised = policy.clamp_min(0).pow(power)
+    return raised / raised.sum(-1, keepdim=True).clamp_min(1e-12)
+
+
 def distill_loss(log_probs, value, value_logit, targets: dict, *, value_mix: float = 0.5,
-                 value_coef: float = 0.5):
+                 value_coef: float = 0.5, target_power: float = 1.0):
     """Cross-entropy to the visit distribution plus value regression to outcome and search.
 
     ``log_probs`` is the masked policy ([B, 14], ``-inf`` on illegal actions). Rows without a
@@ -498,7 +508,7 @@ def distill_loss(log_probs, value, value_logit, targets: dict, *, value_mix: flo
     import torch
     import torch.nn.functional as F
 
-    policy_target = targets["policy"]
+    policy_target = sharpen(targets["policy"], target_power)
     has_policy = targets["has_policy"]
     supported = policy_target > 0
     row_ce = -(policy_target * torch.where(supported, log_probs, torch.zeros_like(log_probs))
@@ -519,12 +529,16 @@ def distill_loss(log_probs, value, value_logit, targets: dict, *, value_mix: flo
         entropy = -(policy_target * torch.where(supported, policy_target.clamp_min(1e-12).log(),
                                                 torch.zeros_like(policy_target))).sum(-1)
         agree = (log_probs.argmax(-1) == policy_target.argmax(-1)) & has_policy
+        probability = ((value.double() + 1) / 2).clamp(0, 1)
+        won = (targets["outcome"].double() + 1) / 2
         metrics = {
             "loss": float(total), "policy_ce": float(policy),
             "policy_kl": float(((row_ce - entropy) * has_policy).sum() / count.clamp(min=1)),
             "teacher_top1": float(agree.sum() / count.clamp(min=1)),
             "value_loss": float(value_loss),
             "value_outcome_mse": float(F.mse_loss(value, targets["outcome"])),
+            # Probability scale, as the replay trainer reports it: a constant 0.5 scores 0.25.
+            "value_brier": float(((probability - won) ** 2).mean()),
             "policy_rows": float(count), "rows": float(len(log_probs)),
         }
     return total, metrics
@@ -582,7 +596,7 @@ def train(args) -> dict:
     if args.init:
         agent.load_state_dict(torch.load(args.init, map_location="cpu", weights_only=False))
     agent.to(device)
-    loss_kwargs = {"value_mix": args.value_mix,
+    loss_kwargs = {"value_mix": args.value_mix, "target_power": args.target_power,
                    "value_coef": float(cfg.get("loss", {}).get("value_coef", 0.5))}
     steps_per_epoch = math.ceil(len(data.train_rows) / args.batch_size)
     optimizer = torch.optim.AdamW([p for p in agent.parameters() if p.requires_grad], lr=args.lr)
@@ -590,12 +604,13 @@ def train(args) -> dict:
         optimizer, T_max=max(1, steps_per_epoch * args.epochs), eta_min=args.lr_final)
     state_path = out_dir / "state.pt"
     history: list[dict] = []
-    start_epoch, best = 0, float("inf")
+    start_epoch, best, best_value = 0, float("inf"), float("inf")
     settings = {"data": [str(path) for path in args.data], "games": data.n_games,
                 "train_rows": len(data.train_rows), "holdout_rows": len(data.holdout_rows),
                 "epochs": args.epochs, "batch_size": args.batch_size, "lr": args.lr,
                 "lr_final": args.lr_final, "seed": args.seed, "value_mix": args.value_mix,
-                "config": args.config, "init": args.init}
+                "config": args.config, "init": args.init,
+                "target_power": args.target_power}
     if state_path.exists():
         state = torch.load(state_path, map_location="cpu", weights_only=False)
         if state["settings"] != settings:
@@ -604,12 +619,14 @@ def train(args) -> dict:
         optimizer.load_state_dict(state["optimizer"])
         scheduler.load_state_dict(state["scheduler"])
         history, start_epoch, best = state["history"], state["epoch"], state["best"]
+        best_value = state.get("best_value", float("inf"))
         print(f"[distill-train] resume after epoch {start_epoch}", flush=True)
     else:
         baseline = evaluate(agent, data, data.holdout_rows, args.batch_size, loss_kwargs, device)
         history.append({"epoch": 0, **{f"holdout_{k}": v for k, v in baseline.items()}})
         torch.save(_cpu_state(agent), out_dir / "policy_best.pt")
-        best = baseline["policy_ce"]
+        torch.save(_cpu_state(agent), out_dir / "value_best.pt")
+        best, best_value = baseline["policy_ce"], baseline["value_brier"]
     print(f"[distill-train] games={data.n_games} train_rows={len(data.train_rows)} "
           f"holdout_rows={len(data.holdout_rows)} steps/epoch={steps_per_epoch}", flush=True)
     for epoch in range(start_epoch, args.epochs):
@@ -639,15 +656,21 @@ def train(args) -> dict:
             best = holdout["policy_ce"]
             torch.save(_cpu_state(agent), out_dir / "policy_best.pt")
             row["best"] = True
+        # The value head peaks earlier than the policy; keep its best epoch separately.
+        if holdout["value_brier"] < best_value:
+            best_value = holdout["value_brier"]
+            torch.save(_cpu_state(agent), out_dir / "value_best.pt")
+            row["best_value"] = True
         print(f"[distill-train] epoch {epoch + 1}/{args.epochs} "
               f"train_ce={row['train_policy_ce']:.4f} holdout_ce={holdout['policy_ce']:.4f} "
               f"kl={holdout['policy_kl']:.4f} top1={holdout['teacher_top1']:.4f} "
-              f"value_mse={holdout['value_outcome_mse']:.4f} rows/s={row['train_rows_per_second']:.0f}",
+              f"value_brier={holdout['value_brier']:.4f} rows/s={row['train_rows_per_second']:.0f}",
               flush=True)
         temporary = state_path.with_suffix(".tmp")
         torch.save({"settings": settings, "model": agent.state_dict(),
                     "optimizer": optimizer.state_dict(), "scheduler": scheduler.state_dict(),
-                    "history": history, "epoch": epoch + 1, "best": best}, temporary)
+                    "history": history, "epoch": epoch + 1, "best": best,
+                    "best_value": best_value}, temporary)
         temporary.replace(state_path)
         (out_dir / "metrics.json").write_text(
             json.dumps({"settings": settings, "history": history}, indent=2) + "\n",
@@ -694,6 +717,8 @@ def main() -> None:
     t.add_argument("--lr-final", type=float, default=3e-5)
     t.add_argument("--holdout-fraction", type=float, default=0.05)
     t.add_argument("--value-mix", type=float, default=0.5)
+    t.add_argument("--target-power", type=float, default=1.0,
+                   help="raise teacher visit shares to this power and renormalise; 1 = as stored")
     t.add_argument("--seed", type=int, default=20261201)
     t.add_argument("--threads", type=int, default=4)
     t.add_argument("--device", default="cpu", help="cpu or cuda; checkpoints load on either")
