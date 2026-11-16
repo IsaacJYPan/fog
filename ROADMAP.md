@@ -237,10 +237,20 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       equal-time comparison.
       _Brief 11: eight cells complete; 3,200 ms / K=32 stopped after 96 games at the
       prescribed 40 core-hour cap. See the ledger and `docs/briefs/11-report.md`._
+      _2026-11-16: left unticked because the ninth cell has 96 games, not 400. No decision
+      waits on it: K = 8 is at least as good as K = 1 and K = 32 at every budget measured, and
+      200, 800 and 3,200 ms at K = 8 scored 91.0%, 91.75% and 90.5% (400 games each, intervals
+      overlap), so the cheap budget is the one to use for labelling (P3.2)._
 
 **Gate G1:** EngineMCTS at the default budget scores ≥ 85% vs SimpleHeuristics and ≥ 95% vs
 MaxDamage on pinned Showdown over ≥ 1,000 matched games each, with fallbacks on < 5% of
 decisions and zero rejected actions.
+_2026-11-16: **G1 passed** on the validation teams of `data/teams/replay_v1` at the default
+budget (K = 8, 1,600 ms; 1.80 and 1.81 s per decision as run): 936 of 1,008 against
+SimpleHeuristics (0.9286 [0.9110, 0.9429]) and 981 of 1,008 against MaxDamage (0.9732
+[0.9613, 0.9815]); fallbacks on 0.19% and 0.17% of decisions; no rejected action, failure or
+truncation. `fog` source `aa38e46`; ledger, "review of brief 11". EngineMCTS is anchor `A4`._
+
 **If it fails:** the cause is reconstruction fidelity or action mapping, not missing learning.
 Inspect losses with `fog/eval/search_trace.py`, compare engine and Showdown outcomes with
 `fog/eval/cross_sim.py` and `fog/eval/chance_fidelity.py`, and fix the largest mechanical

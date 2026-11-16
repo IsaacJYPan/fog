@@ -25,15 +25,20 @@ in different rows of the "touches" column.
 | 10 | `10-replay-team-pool.md` | CPU | done | team data, evaluation | `work/replay-team-pool` | **merged 2026-11-15** |
 | 08 | `08-update-speed-gpu.md` | GPU, 1 h | done | nothing (measures) | `work/update-speed` | **merged 2026-11-16** |
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
-| 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | see the line under this table |
+| 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
 | 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | not started |
 | 13 | `13-replay-scale-corrected.md` | GPU: part A 3 h now, part B 17 h after 2026-11-21 | **part A now**; part B after the meter reset | training only | `work/p2-scale-corrected` | not started |
-| 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | gate G1 passed (line under this table) | new training script, small trainer switch | `work/distil-g0` | waiting on G1 |
-| 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | gate G1 passed | nothing (measures) | `work/t1-search` | waiting on G1 |
+| 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds: see the note under this table |
+| 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | not started |
 | 14 | `14-ppo-update-levers.md` | GPU, 2 h | after 2026-11-21 (GPU meter reset) | PPO update | `work/ppo-update` | waiting on GPU time |
 
-**Gate G1 (brief 11):** not decided yet when this table was written; the reviewer replaces
-this line with the result. Briefs 15 and 16 start only on "passed".
+**Gate G1 (brief 11): passed** on 2026-11-16 (ledger, "review of brief 11"): 92.9% against
+SimpleHeuristics and 97.3% against MaxDamage over 1,008 games each.
+
+**Brief 15:** the collection and training code is merged, and the planner's session started
+round 0 on 2026-11-16. The ledger section "search distillation pilot" says which rounds are
+done. Give brief 15 to a worker only if that section is missing or says rounds remain; the
+worker continues from the first round it does not report.
 
 GPU: one job at a time on the account. **The hosted meter had 3.69 hours left on 2026-11-15
 and resets on 2026-11-21 00:00 UTC** (ledger, "review of brief 08"). Until then the GPU is for

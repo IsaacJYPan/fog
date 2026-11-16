@@ -3130,3 +3130,83 @@ Decisions for other briefs.
 - P2.2a is ticked: rows no longer carry the answer in their order, and the model cannot read
   order. P2.3 and G2 stay open.
 - Brief 12 can start (it needed this merge).
+
+## 2026-11-16: review of brief 11 and gate G1
+
+The branch `work/g1` (head `1bfdef6`) was reviewed, its gate run completed in review, and
+the result merged into `work/roadmap` (merge `194f534`).
+
+**Gate G1 passes.** Validation teams of `data/teams/replay_v1` (141), pinned Showdown
+`e440c4a`, default budget (K = 8, `budget_ms` 1,600, one search thread), matched four-game
+blocks, no sequential stop, four shards with seeds 13000 to 13003, `fog` source `aa38e46`
+(the merged tree has the same `fog/` search and reconstruction code).
+
+| Date | Agent | Opponent | Games | Score [95% Wilson] | W-L-D | s per decision | Fallbacks | Rejected | Failed or truncated games |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-15 | EngineMCTS | SimpleHeuristics | 1,008 | 0.9286 [0.9110, 0.9429] | 936-72-0 | 1.801 | 53 of 28,020 (0.19%) | 0 | 0 |
+| 2026-11-15 and 16 | EngineMCTS | MaxDamage | 1,008 | 0.9732 [0.9613, 0.9815] | 981-27-0 | 1.814 | 41 of 24,112 (0.17%) | 0 | 0 |
+
+Command (both rows):
+`python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4`.
+Files: `docs/briefs/11-artifacts/gate/merged.json`, `gate/shard_{0..3}.json`,
+`gate-complete-summary.json`.
+
+Gate clauses: at least 85% against SimpleHeuristics, met; at least 95% against MaxDamage,
+met (the lower end of the interval, 96.1%, is above the bar); fallbacks under 5% of
+decisions, met; zero rejected actions, met.
+
+**How the run was completed.** The worker's session ended with the MaxDamage row at 504 of
+1,008 games (490 wins) and the shard files committed. In review the same command was run
+again; each shard resumed from its last complete block. So the MaxDamage row was played on
+two machines:
+
+| Part | Machine | Games | Wins | Score | s per decision |
+| --- | --- | --- | --- | --- | --- |
+| SimpleHeuristics, all | AMD EPYC 9V74, four-core quota | 1,008 | 936 | 0.9286 | 1.801 |
+| MaxDamage, first half | the same | 504 | 490 | 0.9722 | 1.830 |
+| MaxDamage, second half | Intel Xeon 2.10 GHz, four cores | 504 | 491 | 0.9742 | 1.797 |
+
+The search budget is wall-clock, so a different processor is a different number of search
+iterations. The two halves agree (490 and 491 wins), and the budget curve is flat from 200 ms
+up, so the change of machine is recorded and not treated as a defect. During the second half
+the reviewer ran test files and three short rollout probes at the lowest scheduling priority
+for a few minutes in total; that can only have taken time from the search.
+
+Checked in review:
+
+- Every budget-curve cell and the SimpleHeuristics gate row in `docs/briefs/11-report.md`
+  against `11-artifacts/budget-*/merged.json` and `gate-simpleheuristics-summary.json`; the
+  fuzzer counts (14,362 positions, 1,214 to 1,043 with a mismatch, 821 of them hidden
+  Regenerator healing) against `fuzz-showdown-{before,final}.json`. All agree.
+- The code diff (`fog/env/state_recon.py`: pending charge turns from the public log, and the
+  Teal-Tera Ogerpon identity) and its two test files. No search variant was added and no
+  threshold changed. `git diff aa38e46 1bfdef6 -- fog tests` is empty, so the gate ran on the
+  reviewed source.
+- On the merged tree: 49 tests in six covering files pass, `ruff` is clean, and the three
+  rollout digests are unchanged (`23405989f4665988`, `0efd4319547a4b3b`, `338cfca82f31b181`).
+- All 23 commits are authored as the owner; no account name or token in the artifacts.
+- Not re-run: the fuzzers, the budget curve, the SimpleHeuristics row.
+
+Budget curve against SimpleHeuristics (400 games a cell, smoke; `11-artifacts/budget-*/merged.json`):
+
+| `budget_ms` | K = 1 | K = 8 | K = 32 |
+| --- | --- | --- | --- |
+| 200 | 0.840 (0.23 s) | 0.910 (0.26 s) | 0.865 (0.41 s) |
+| 800 | 0.783 (0.90 s) | 0.9175 (0.90 s) | 0.915 (1.03 s) |
+| 3,200 | 0.775 (3.42 s) | 0.905 (3.64 s) | 96 games only: 0.927 |
+
+Reading. Sampling several opponent teams matters (K = 8 beats K = 1 at every budget by 7 to
+13 points); more search time does not, between 200 ms and 3,200 ms. One world searched for
+longer gets worse, not better, which is what over-fitting a single guessed team looks like.
+The agent is limited by what it assumes about the opponent and by the engine's fidelity, not
+by search depth. Two consequences: labels for distillation can be bought at 200 ms (P3.2), and
+P4's learned world sampler is aimed at the right thing.
+
+Known failures inside the search, all handled by dropping the world or falling back: an engine
+panic on Encore (424 and 320 dropped worlds in the two gate rows) and "no world with positive
+weight and kept visits" (53 and 41 fallbacks). Residual reconstruction approximations are
+listed in `docs/briefs/11-report.md`.
+
+What follows. P1.3 is ticked. P1.4 stays unticked (eight of nine cells; nothing waits on the
+ninth). EngineMCTS is anchor `A4`. P3 may start: brief 15 (pilot) is the next step, and brief
+16 measures the agent once on the test teams for tier T1.
