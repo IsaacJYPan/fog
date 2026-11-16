@@ -3403,3 +3403,34 @@ source `94cbb98`. One game in each row reached the 300-turn limit and is not cou
 The learning curve against SimpleHeuristics is 0.448, 0.615, 0.682 at 58k, 119k and 178k
 training rows: the third round added 6.7 points, the second 16.7. Against MaxDamage: 0.815,
 0.909, 0.923. Still rising, more slowly. Rounds 3 and 4 follow the same recipe.
+
+## 2026-11-16: replay rows against live observations (smoke)
+
+Brief 12, stage 1, source `79283c9`. CPU only, pinned Showdown `e440c4a`; random R4 weights, seed 12000, `data/teams/pool_b`. All numbers in this section are smoke.
+
+Command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.replay_live_parity --games 200 --out runs/replay-parity/baseline --report docs/briefs/12-artifacts/parity-before.json`. The wrapper avoids a local poke-env exit-callback hang; it changes no model input or action. Completed games resume individually.
+
+The tool captures actual forward-call tensors, reconstructs with true own sheets in played order, then uses `rows_to_arrays` and the training batch loader. Alignment uses side, turn, request phase and decision ordinal; histories are front-padded to a common window for comparison, without restoring records truncated by training. True sheets are confined to this diagnostic.
+
+Baseline: 24,149 aligned rows, 3,195 live decisions without a replay row, no reverse omissions; all 200 games completed. 2,566 live replacement requests; 21,107 live rows contain a first action overwritten by a later replacement. Both paths exclude current-turn history at replacements; preserving that live rule is deliberate.
+
+| Field (smoke) | Exact row share before | Largest difference |
+| --- | ---: | ---: |
+| `action_features` | 0.000000 | 2 |
+| `entities.opponent.epistemic` | 0.996936 | 1 |
+| `entities.own.hp` | 0.037641 | 1 |
+| `entities.own.move_pp` | 0.000000 | 1 |
+| `entities.own.tera_type` | 0.000000 | 1 |
+| `entity_ids` | 0.000000 | 674 |
+| `history` | 0.047662 | 1 |
+| `history_ids` | 0.408920 | 912 |
+| `history_len` | 0.408920 | 36 |
+| `history_state` | 0.458942 | 1 |
+| `label` | 0.979419 | 12 |
+| `legality_mask` | 0.943683 | 1 |
+| `opp_mask.item` | 0.000000 | 0 |
+| `opp_tokens` | 0.095780 | 663 |
+
+All other named entity blocks, field vector, active index and decision phase match on every aligned row. Item masks are all-true live and omitted by the loader; the zero numerical difference is a representation difference. Detailed per-game/per-row mismatches are in `12-artifacts/parity-before.json`.
+
+Checks: `12-artifacts/tests-stage1.txt` (three tests pass), `ruff-stage1.txt` (clean). Same-machine baseline digests are in `digest-*-before.txt`. Stages 2 and 3 remain open.

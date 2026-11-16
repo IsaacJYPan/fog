@@ -1,0 +1,12 @@
+import atexit
+import runpy
+import sys
+import os
+sys.path.insert(0, os.environ.get('FOG_SOURCE', os.getcwd()))
+module = sys.argv.pop(1)
+try:
+    runpy.run_module(module, run_name='__main__', alter_sys=True)
+finally:
+    concurrency = sys.modules.get('poke_env.concurrency')
+    if concurrency is not None:
+        atexit.unregister(concurrency.__clear_loop)
