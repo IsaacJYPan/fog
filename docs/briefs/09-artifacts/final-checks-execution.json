@@ -1,0 +1,65 @@
+[
+  {
+    "name": "compatibility-final",
+    "command": [
+      ".venv/bin/python",
+      "runs/order_blind_model/check_compatibility.py"
+    ],
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "seconds": 2.7394625050001196,
+    "exit_code": 0,
+    "smoke": true
+  },
+  {
+    "name": "digest-sequential-final",
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "fog.eval.showdown_rollout_probe",
+      "--games",
+      "6"
+    ],
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "seconds": 12.50975272100186,
+    "exit_code": 0,
+    "smoke": true
+  },
+  {
+    "name": "digest-batched-final",
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "fog.eval.showdown_rollout_probe",
+      "--batch",
+      "32",
+      "--games",
+      "64",
+      "--threads",
+      "2"
+    ],
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "seconds": 42.61361417199805,
+    "exit_code": 0,
+    "smoke": true
+  },
+  {
+    "name": "digest-maxdamage-final",
+    "command": [
+      ".venv/bin/python",
+      "-m",
+      "fog.eval.showdown_rollout_probe",
+      "--batch",
+      "32",
+      "--games",
+      "96",
+      "--opponent",
+      "MaxDamage",
+      "--pool",
+      "data/teams/pool_a"
+    ],
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "seconds": 20.380165561997273,
+    "exit_code": 0,
+    "smoke": true
+  }
+]

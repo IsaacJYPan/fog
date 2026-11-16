@@ -1,0 +1,30 @@
+[
+  {
+    "name": "R3-training",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_value_cpu.yaml",
+      "--set",
+      "bc.manifest=runs/order_blind_model/value_split/train_1000.parquet",
+      "bc.holdout_manifest=runs/order_blind_model/value_split/holdout_manifest.parquet",
+      "bc.epochs=8",
+      "bc.early_stopping_patience=0",
+      "bc.resume=true",
+      "bc.selection_metric=action_ce",
+      "log.dir=/workspace/fog/runs/order_blind_model/R3",
+      "seed=20261201"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "d86caf1d5911fee6974201bcbc4a8356e4fcec0f",
+    "seconds": 1795.405032236,
+    "exit_code": -15,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "smoke": true
+  }
+]

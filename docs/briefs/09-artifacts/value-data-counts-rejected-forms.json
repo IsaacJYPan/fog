@@ -1,0 +1,52 @@
+{
+  "smoke": true,
+  "commit": "d86caf1d5911fee6974201bcbc4a8356e4fcec0f",
+  "ordinary_arrays_bit_identical": true,
+  "terminal_targets_valid": true,
+  "terminal_label_source": "public opponent views only; stable preview identities; no imputed private abilities",
+  "public_terminal_cross_view_check": {
+    "corpus_games": 22000,
+    "games_with_both_outcomes": 22000,
+    "maximum_hp_antisymmetry_error": 0.0
+  },
+  "train_1000": {
+    "games": 1000,
+    "rows": 52955
+  },
+  "holdout_manifest": {
+    "games": 2000,
+    "rows": 103944
+  },
+  "corpus": {
+    "status": "complete",
+    "source_replays_considered": 22000,
+    "parsed_replays": 22000,
+    "quarantined_replays": 0,
+    "accepted_decision_versions": 1126792,
+    "all_decision_versions": 1130482,
+    "accepted_fraction": 0.9967359055694828,
+    "imputations_per_replay": 1,
+    "min_rating": 0,
+    "provenance_codes": {
+      "unknown": 0,
+      "inferred": 1,
+      "exact": 2
+    },
+    "public_state_reconstruction": "chronological_prefix_only",
+    "future_opponent_fields_used": false,
+    "private_truth": false,
+    "move_order": "seeded_permutation_after_completion",
+    "team_order": "seeded_public_preview_permutation",
+    "source_providers": [
+      "metamon_raw_replays"
+    ],
+    "filter_counts": {
+      "accepted": 1126792,
+      "called_or_unaligned_move": 2914,
+      "forced_or_unaligned_switch": 776
+    },
+    "imputation_method": "usage_baseline",
+    "candidate_bank_sha256": null,
+    "imputation_report": {}
+  }
+}

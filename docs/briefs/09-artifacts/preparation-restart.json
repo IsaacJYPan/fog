@@ -1,0 +1,8 @@
+{
+  "smoke": true,
+  "status": "conversion interrupted and resumed per game",
+  "reason": "Corrected baseline subprocess working directory; ending the original dispatcher also ended its converter child",
+  "completed_game_checkpoints": 9227,
+  "source_commit": "70cc5eda12345edffe11a998e2c4782f4ed7b161",
+  "resumption": "same converter command with --resume; fixed recipe unchanged"
+}

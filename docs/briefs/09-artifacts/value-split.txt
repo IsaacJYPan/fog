@@ -1,0 +1,8 @@
+dropped_newer_games=0
+runs/order_blind_model/value_split/train_manifest.parquet
+runs/order_blind_model/value_split/holdout_manifest.parquet
+runs/order_blind_model/value_split/train_1000.parquet
+dropped_newer_games=0
+runs/order_blind_model/terminal_split/train_manifest.parquet
+runs/order_blind_model/terminal_split/holdout_manifest.parquet
+runs/order_blind_model/terminal_split/train_1000.parquet

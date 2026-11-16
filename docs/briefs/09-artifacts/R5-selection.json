@@ -1,0 +1,31 @@
+{
+  "smoke": true,
+  "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+  "seed": 20261201,
+  "best_preview_epoch": 8,
+  "selection": "full holdout preview CE, includes epoch 0",
+  "initial_checkpoint": "R4/bc_best.pt",
+  "epoch_metrics": {
+    "epoch": "8",
+    "eval_action_ce": "1.6031230928547349",
+    "eval_loss": "1.6031230928547349",
+    "eval_loss_relative": "0.8949662111268237",
+    "eval_preview_ce": "1.6031230928547349",
+    "eval_preview_rows_count": "3986.0",
+    "eval_preview_top1": "0.3489713994061833",
+    "primary_train_action_ce": "1.520287518777535",
+    "primary_train_loss": "1.520287518777535",
+    "primary_train_preview_ce": "1.520287518777535",
+    "primary_train_preview_rows_count": "1985.0",
+    "primary_train_preview_top1": "0.3828715363888056",
+    "seconds_per_epoch": "0.8060140250017866",
+    "train_action_ce": "1.520287518777535",
+    "train_loss": "1.520287518777535",
+    "train_preview_ce": "1.520287518777535",
+    "train_preview_rows_count": "1985.0",
+    "train_preview_top1": "0.3828715363888056",
+    "train_rows_per_second": "3784.9765969078776"
+  },
+  "training_games": 1000,
+  "holdout_games": 2000
+}

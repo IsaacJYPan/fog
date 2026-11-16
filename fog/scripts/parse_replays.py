@@ -69,6 +69,7 @@ class _PerspectiveState:
         if self.private_set is not None:
             self.tracker.record_exact_private_truth(self.private_set)
         self._preview_slot = 0
+        self._preview_species: list[str] = []
         self.move_order: dict[str, list[str]] = {}   # mon-key -> discovered move ids (slot order)
         self.rows: list[dict] = []
         self._pending_obs = None
@@ -86,6 +87,7 @@ class _PerspectiveState:
         if player != self.role:
             return
         species = details.split(",")[0].strip()
+        self._preview_species.append(_to_id(species))
         mon = self.battle.get_pokemon(
             f"{player}: {species}",
             force_self_team=True,
@@ -407,6 +409,54 @@ def replay_player_names(replay_json: dict) -> dict[str, str]:
     return names
 
 
+def _public_terminal_state(battle, preview_species: list[str]) -> dict:
+    """Read one side only through its opponent's public battle, never its imputed sheet.
+
+    A request-side Pokemon can infer Regenerator healing from an imputed private ability.
+    Opponent-side Pokemon contain public evidence only. Match battle forms to the original
+    preview identity using public base-species metadata; unmatched identities are errors.
+    """
+    from poke_env.data import GenData
+
+    from fog.encoding.events import submitted_species_id
+
+    dex = GenData.from_gen(9).pokedex
+    preview_base = {sid: _to_id(dex.get(sid, {}).get("baseSpecies", sid))
+                    for sid in preview_species}
+    health = {species: 1.0 for species in preview_species}
+    alive = {species: 1.0 for species in preview_species}
+    for mon in (getattr(battle, "opponent_team", None) or {}).values():
+        species = submitted_species_id(mon.species)
+        if species not in health:
+            matches = [sid for sid in preview_species if preview_base[sid] == mon.base_species]
+            if len(matches) != 1:
+                raise ValueError(f"cannot map public terminal species {mon.species!r} to preview")
+            species = matches[0]
+        fainted = bool(getattr(mon, "fainted", False))
+        hp = getattr(mon, "current_hp_fraction", None)
+        health[species] = (0.0 if fainted else 1.0) if not getattr(mon, "max_hp", None) else float(hp)
+        alive[species] = float(not fainted)
+    count = len(preview_species)
+    return {
+        "hp": np.asarray([health[x] for x in preview_species] + [0.] * (6-count), dtype=np.float32),
+        "alive": np.asarray([alive[x] for x in preview_species] + [0.] * (6-count), dtype=np.float32),
+        "mask": np.asarray([True] * count + [False] * (6-count)),
+    }
+
+
+def _terminal_targets(st, public_end: dict[str, dict] | None) -> dict:
+    if public_end is None:
+        return {"terminal_valid": False}
+    own = public_end[st.role]
+    opponent = public_end["p2" if st.role == "p1" else "p1"]
+    return {
+        "terminal_alive": np.concatenate([own["alive"], opponent["alive"]]),
+        "terminal_alive_mask": np.concatenate([own["mask"], opponent["mask"]]),
+        "terminal_hp_difference": float((own["hp"].sum() - opponent["hp"].sum()) / 6),
+        "terminal_valid": True,
+    }
+
+
 def parse_replay(
     replay_json: dict,
     *,
@@ -498,6 +548,12 @@ def parse_replay(
         "p1": _censored_truth(p1.battle),
         "p2": _censored_truth(p2.battle),
     }
+    public_end = None
+    if p1._preview_species and p2._preview_species:
+        public_end = {
+            "p1": _public_terminal_state(p2.battle, p1._preview_species),
+            "p2": _public_terminal_state(p1.battle, p2._preview_species),
+        }
     out_rows = []
     for st, won in ((p1, p1_win), (p2, None if p1_win is None else not p1_win)):
         belief = belief_by_role[st.role]
@@ -506,6 +562,7 @@ def parse_replay(
         # public self-belief target should contain, including original-vs-current semantics.
         self_belief = belief_by_role[other]
         outcome = 0.0 if won is None else (1.0 if won else -1.0)
+        terminal = _terminal_targets(st, public_end)
         for r in st.rows:
             out_rows.append(
                 {
@@ -515,6 +572,7 @@ def parse_replay(
                     "belief": belief,
                     "self_belief": self_belief,
                     "outcome": outcome,
+                    **terminal,
                     "policy_valid": r["policy_valid"],
                     "filter_reason": r.get("filter_reason", "unresolved"),
                     "own_set_provenance": r.get("own_set_provenance"),
@@ -574,6 +632,7 @@ def parse_replay_policy_versions(
     replay_json = permute_replay_preview(replay_json, replay_id=replay_id, seed=seed)
     lead_positions = replay_lead_positions(replay_json)
     accepted: list[dict] = []
+    previews = None
     filters: Counter[str] = Counter()
     imputation_report: dict = {}
     for imputation in range(imputations):
@@ -597,6 +656,10 @@ def parse_replay_policy_versions(
             private_sets=private_sets,
             private_provenance=provenance,
         )
+        if imputation == 0:
+            from fog.training.replay_preview import preview_arrays
+
+            previews = preview_arrays(replay_json, private_sets)
         for row in version["rows"]:
             reason = str(row.get("filter_reason", "unresolved"))
             if not row.get("policy_valid", False):
@@ -611,7 +674,7 @@ def parse_replay_policy_versions(
             accepted.append(row)
             filters["accepted"] += 1
     return {"rows": accepted, "p1_win": baseline["p1_win"], "filter_counts": dict(filters),
-            "lead_positions": lead_positions,
+            "lead_positions": lead_positions, "preview_arrays": previews,
             "imputation_report": imputation_report}
 
 
@@ -634,6 +697,10 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
     belief = np.zeros((n, 6, SET_N_ATTRS), dtype=np.int64)
     self_belief = np.zeros((n, 6, SET_N_ATTRS), dtype=np.int64)
     outcome = np.zeros(n, dtype=np.float32)
+    terminal_alive = np.zeros((n, 12), dtype=np.float32)
+    terminal_alive_mask = np.zeros((n, 12), dtype=bool)
+    terminal_hp_difference = np.zeros(n, dtype=np.float32)
+    terminal_valid = np.zeros(n, dtype=bool)
     from fog.encoding.action_features import ACTION_FEATURE_DIM
 
     action_features = np.zeros((n, 14, ACTION_FEATURE_DIM), dtype=np.float32)
@@ -665,6 +732,11 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
         belief[i] = r["belief"]
         self_belief[i] = r["self_belief"]
         outcome[i] = r["outcome"]
+        if r.get("terminal_valid", False):
+            terminal_alive[i] = r["terminal_alive"]
+            terminal_alive_mask[i] = r["terminal_alive_mask"]
+            terminal_hp_difference[i] = r["terminal_hp_difference"]
+            terminal_valid[i] = True
         if o.action_features is not None:
             from fog.encoding.public_action_features import public_action_features
 
@@ -693,6 +765,10 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
         "belief_targets": belief,
         "self_belief_targets": self_belief,
         "outcome": outcome,
+        "terminal_alive": terminal_alive,
+        "terminal_alive_mask": terminal_alive_mask,
+        "terminal_hp_difference": terminal_hp_difference,
+        "terminal_valid": terminal_valid,
         "action_features": action_features,
         "policy_valid": policy_valid,
         "own_set_provenance": own_set_provenance,

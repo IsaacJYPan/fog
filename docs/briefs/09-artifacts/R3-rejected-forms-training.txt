@@ -1,0 +1,4 @@
+BC dataset: train=52955 decision rows; holdout=103944 rows  (config_hash=d9d475fd74ca, torch_threads=5)
+[bc] baseline  loss=3.593  belief=13.125  chain=4.000
+[bc] epoch 1/8  train_loss=2.990  eval_loss=2.879  belief=7.203  chain=2.357  value=0.697  query_p=0.215  dropped=0.000%
+[bc] epoch 2/8  train_loss=2.649  eval_loss=2.983  belief=6.478  chain=2.128  value=1.071  query_p=0.263  dropped=0.000%

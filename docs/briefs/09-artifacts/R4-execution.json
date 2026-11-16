@@ -1,0 +1,80 @@
+[
+  {
+    "name": "R4-training",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.training.bc",
+      "--config",
+      "configs/replay_mechanical_cpu.yaml",
+      "--set",
+      "bc.manifest=runs/order_blind_model/terminal_split/train_1000.parquet",
+      "bc.holdout_manifest=runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+      "bc.epochs=8",
+      "bc.early_stopping_patience=0",
+      "bc.resume=true",
+      "bc.selection_metric=action_ce",
+      "log.dir=/workspace/fog/runs/order_blind_model/R4",
+      "seed=20261201"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "4066edc1d756e41a28b136156daba5f57060fdae",
+    "seconds": 4842.597644452002,
+    "exit_code": 0,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "smoke": true
+  },
+  {
+    "name": "R4-best-policy-slot-check",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_mechanical_cpu.yaml",
+      "--manifest",
+      "runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+      "--checkpoint",
+      "/workspace/fog/runs/order_blind_model/R4/checkpoints/bc_best.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/09-artifacts/R4-best-policy-slot-check.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "4066edc1d756e41a28b136156daba5f57060fdae",
+    "seconds": 132.39381037000203,
+    "exit_code": 0,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "smoke": true
+  },
+  {
+    "name": "R4-best-value-slot-check",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_mechanical_cpu.yaml",
+      "--manifest",
+      "runs/order_blind_model/terminal_split/holdout_manifest.parquet",
+      "--checkpoint",
+      "/workspace/fog/runs/order_blind_model/R4/checkpoints/bc_best_value.pt",
+      "--out",
+      "/workspace/fog/docs/briefs/09-artifacts/R4-best-value-slot-check.json"
+    ],
+    "cwd": "/workspace/fog",
+    "commit": "4066edc1d756e41a28b136156daba5f57060fdae",
+    "seconds": 133.640722963999,
+    "exit_code": 0,
+    "environment": {
+      "OMP_WAIT_POLICY": "PASSIVE",
+      "KMP_BLOCKTIME": "0"
+    },
+    "smoke": true
+  }
+]

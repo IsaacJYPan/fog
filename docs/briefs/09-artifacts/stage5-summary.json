@@ -1,0 +1,184 @@
+{
+  "smoke": true,
+  "stages_complete": [
+    2,
+    3,
+    4,
+    5
+  ],
+  "source": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+  "lead_comparisons": {
+    "chance": {
+      "R5_minus_baseline": 0.1823047332329821,
+      "twice_R5_seed_gap": 0.0010035122930256435,
+      "positive_gain_exceeds_noise": true
+    },
+    "frequency": {
+      "R5_minus_baseline": 0.10963371801304564,
+      "twice_R5_seed_gap": 0.0010035122930256435,
+      "positive_gain_exceeds_noise": true
+    },
+    "initial-preview": {
+      "R5_minus_baseline": 0.18740592072252885,
+      "twice_R5_seed_gap": 0.0010035122930256435,
+      "positive_gain_exceeds_noise": true
+    }
+  },
+  "lead_selection": {
+    "R5": {
+      "smoke": true,
+      "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+      "seed": 20261201,
+      "best_preview_epoch": 8,
+      "selection": "full holdout preview CE, includes epoch 0",
+      "initial_checkpoint": "R4/bc_best.pt",
+      "epoch_metrics": {
+        "epoch": "8",
+        "eval_action_ce": "1.6031230928547349",
+        "eval_loss": "1.6031230928547349",
+        "eval_loss_relative": "0.8949662111268237",
+        "eval_preview_ce": "1.6031230928547349",
+        "eval_preview_rows_count": "3986.0",
+        "eval_preview_top1": "0.3489713994061833",
+        "primary_train_action_ce": "1.520287518777535",
+        "primary_train_loss": "1.520287518777535",
+        "primary_train_preview_ce": "1.520287518777535",
+        "primary_train_preview_rows_count": "1985.0",
+        "primary_train_preview_top1": "0.3828715363888056",
+        "seconds_per_epoch": "0.8060140250017866",
+        "train_action_ce": "1.520287518777535",
+        "train_loss": "1.520287518777535",
+        "train_preview_ce": "1.520287518777535",
+        "train_preview_rows_count": "1985.0",
+        "train_preview_top1": "0.3828715363888056",
+        "train_rows_per_second": "3784.9765969078776"
+      },
+      "training_games": 1000,
+      "holdout_games": 2000
+    },
+    "R5-seed2": {
+      "smoke": true,
+      "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+      "seed": 20261202,
+      "best_preview_epoch": 8,
+      "selection": "full holdout preview CE, includes epoch 0",
+      "initial_checkpoint": "R4/bc_best.pt",
+      "epoch_metrics": {
+        "epoch": "8",
+        "eval_action_ce": "1.6025122511763699",
+        "eval_loss": "1.6025122511763699",
+        "eval_loss_relative": "0.8946252000934718",
+        "eval_preview_ce": "1.6025122511763699",
+        "eval_preview_rows_count": "3986.0",
+        "eval_preview_top1": "0.3494731555526961",
+        "primary_train_action_ce": "1.5204993454575237",
+        "primary_train_loss": "1.5204993454575237",
+        "primary_train_preview_ce": "1.5204993454575237",
+        "primary_train_preview_rows_count": "1985.0",
+        "primary_train_preview_top1": "0.38337531529686014",
+        "seconds_per_epoch": "0.8338477780052926",
+        "train_action_ce": "1.5204993454575237",
+        "train_loss": "1.5204993454575237",
+        "train_preview_ce": "1.5204993454575237",
+        "train_preview_rows_count": "1985.0",
+        "train_preview_top1": "0.38337531529686014",
+        "train_rows_per_second": "3776.9963621198626"
+      },
+      "training_games": 1000,
+      "holdout_games": 2000
+    }
+  },
+  "preview_data": {
+    "smoke": true,
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "ordinary_arrays_bit_identical": true,
+    "preview_records_per_game": 2,
+    "preview_imputation_id": 0,
+    "corpus": {
+      "status": "complete",
+      "source_replays_considered": 22000,
+      "parsed_replays": 22000,
+      "quarantined_replays": 0,
+      "preview_rows": 44000,
+      "preview_valid_rows": 43772,
+      "accepted_decision_versions": 1126792,
+      "all_decision_versions": 1130482,
+      "accepted_fraction": 0.9967359055694828,
+      "imputations_per_replay": 1,
+      "min_rating": 0,
+      "provenance_codes": {
+        "unknown": 0,
+        "inferred": 1,
+        "exact": 2
+      },
+      "public_state_reconstruction": "chronological_prefix_only",
+      "future_opponent_fields_used": false,
+      "private_truth": false,
+      "move_order": "seeded_permutation_after_completion",
+      "team_order": "seeded_public_preview_permutation",
+      "source_providers": [
+        "metamon_raw_replays"
+      ],
+      "filter_counts": {
+        "accepted": 1126792,
+        "called_or_unaligned_move": 2914,
+        "forced_or_unaligned_switch": 776
+      },
+      "imputation_method": "usage_baseline",
+      "candidate_bank_sha256": null,
+      "imputation_report": {}
+    },
+    "label_reasons": {
+      "public_lead": 43772,
+      "unresolved_illusion": 216,
+      "incomplete_preview": 12
+    },
+    "public_prefix_checks": true,
+    "corpus_valid_label_share": [
+      0.17038289317371835,
+      0.16828109293612356,
+      0.1631179749611624,
+      0.1667961253769533,
+      0.1661336013890158,
+      0.16528831216302659
+    ],
+    "train_1000": {
+      "games": 1000,
+      "ordinary_rows": 52955,
+      "preview_rows": 2000,
+      "valid_preview_rows": 1985,
+      "excluded": {
+        "unresolved_illusion": 15
+      },
+      "label_share": [
+        0.17682619647355163,
+        0.1712846347607053,
+        0.16120906801007556,
+        0.16070528967254408,
+        0.1632241813602015,
+        0.16675062972292193
+      ]
+    },
+    "holdout_manifest": {
+      "games": 2000,
+      "ordinary_rows": 103944,
+      "preview_rows": 4000,
+      "valid_preview_rows": 3986,
+      "excluded": {
+        "incomplete_preview": 4,
+        "unresolved_illusion": 10
+      },
+      "label_share": [
+        0.1726041144004014,
+        0.15554440541896639,
+        0.17837431008529855,
+        0.16457601605619668,
+        0.15755143000501756,
+        0.1713497240341194
+      ]
+    }
+  },
+  "default_off_checks": "passed",
+  "no_R5_play": true,
+  "phase_gates_passed": false
+}

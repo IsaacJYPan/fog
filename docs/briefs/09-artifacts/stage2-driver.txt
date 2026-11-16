@@ -1,0 +1,58 @@
+import csv, json, os, shutil, subprocess, time
+from pathlib import Path
+import torch
+from fog.config import load_config
+from fog.models.agent import FogAgent
+from fog.training.bc import _tensor_digest
+root=Path('/workspace/fog')
+art=root/'docs/briefs/09-artifacts'
+py=str(root/'.venv/bin/python')
+env=dict(os.environ,OMP_WAIT_POLICY='PASSIVE',KMP_BLOCKTIME='0')
+records=[]
+def run(name,args,**kwargs):
+    started=time.monotonic()
+    with (art/(name+'.txt')).open('w') as log:
+        result=subprocess.run(args,stdout=log,stderr=subprocess.STDOUT,env=env,**kwargs)
+    records.append(dict(name=name,command=args,cwd=str(root),commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),seconds=time.monotonic()-started,exit_code=result.returncode,smoke=True,environment={'OMP_WAIT_POLICY':'PASSIVE','KMP_BLOCKTIME':'0'}))
+    (art/'stage2-execution.json').write_text(json.dumps(records,indent=2)+'\n')
+    if result.returncode: raise SystemExit(result.returncode)
+
+def diagnose(name,config,commit):
+    runroot=root/'runs/order_blind_model'/name
+    shutil.copyfile(runroot/'metrics.csv',art/(name+'-metrics.csv'))
+    rows=list(csv.DictReader((runroot/'metrics.csv').open()))
+    policy=min(rows,key=lambda x:float(x['eval_action_ce']))
+    value=min(rows,key=lambda x:float(x['eval_value']))
+    info=dict(smoke=True,commit=commit,seed=20261201,best_policy_epoch=int(policy['epoch']),best_value_epoch=int(value['epoch']),policy_epoch_metrics=policy,value_epoch_metrics=value)
+    (art/(name+'-selection.json')).write_text(json.dumps(info,indent=2)+'\n')
+    if name=='R1':
+        gap=abs(float(policy['eval_action_ce'])-1.9239)
+        info['baseline_nll_absolute_gap']=gap
+        (art/(name+'-selection.json')).write_text(json.dumps(info,indent=2)+'\n')
+        if gap>.01:
+            raise SystemExit('R1 differs from the required reference by >0.01 NLL; stopping')
+    for label,row in [('policy',policy),('value',value)]:
+        epoch=int(row['epoch'])
+        checkpoint=runroot/'checkpoints'/f'bc_epoch{epoch}.pt'
+        if epoch==0 and not checkpoint.exists():
+            cfg=load_config(config)
+            torch.manual_seed(int(cfg.get('seed',0)))
+            agent=FogAgent.from_tables(cfg)
+            state=torch.load(runroot/'checkpoints/bc_state.pt',weights_only=False,map_location='cpu')
+            assert all(_tensor_digest(t)==state['initial_digests'][n] for n,t in agent.state_dict().items())
+            torch.save(agent.state_dict(),checkpoint)
+        run(name+'-best-'+label+'-slot-check',[py,'-m','fog.eval.replay_slot_order_check','--config',config,'--manifest','runs/blueprint/split/holdout_manifest.parquet','--checkpoint',str(checkpoint),'--out',str(art/(name+'-best-'+label+'-slot-check.json'))])
+
+while not (root/'runs/order_blind_model/R1/checkpoints/bc_final.pt').exists():
+    if (art/'preparation-execution.json').exists():
+        stages=json.loads((art/'preparation-execution.json').read_text())
+        if stages and stages[-1]['exit_code']: raise SystemExit('Preparation failed')
+    time.sleep(5)
+diagnose('R1','configs/replay_blueprint_cpu.yaml','70cc5eda12345edffe11a998e2c4782f4ed7b161')
+assert '10 passed' in (art/'tests-stage2-acceptance.txt').read_text()
+checks=json.loads((art/'permutations-holdout.json').read_text())
+assert {row['source'] for row in checks} == {'synthetic','holdout','live'}
+shutil.copyfile(art/'permutations-holdout.json',art/'permutations.json')
+run('R2-training',[py,'-m','fog.training.bc','--config','configs/replay_order_blind_cpu.yaml','--set','bc.manifest=runs/blueprint/split/train_1000.parquet','bc.holdout_manifest=runs/blueprint/split/holdout_manifest.parquet','bc.epochs=8','bc.early_stopping_patience=0','bc.resume=true','bc.selection_metric=action_ce','log.dir=runs/order_blind_model/R2','seed=20261201'])
+diagnose('R2','configs/replay_order_blind_cpu.yaml',subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip())
+print('Stage 2 measurements complete',flush=True)

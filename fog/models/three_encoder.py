@@ -53,6 +53,9 @@ class EntityEmbeddings(nn.Module):
         n_ev_units: int = N_EV_UNITS + 1,
         species_dim: int = 64,
         small_dim: int = 24,
+        order_blind: bool = False,
+        mechanical_features: bool = False,
+        move_tables=None,
     ) -> None:
         super().__init__()
         self.species = nn.Embedding(n_species, species_dim)
@@ -69,14 +72,58 @@ class EntityEmbeddings(nn.Module):
         nn.init.zeros_(self.native_stats[-1].weight)
         nn.init.zeros_(self.native_stats[-1].bias)
         # species, item, ability, move0..3, last move, compressed native nature/EV block
-        self.out_dim = species_dim + small_dim * (2 + DIMS.n_move_slots + 1 + 1)
+        self.order_blind = bool(order_blind)
+        self.raw_dim = ENTITY_RAW_DIM - (8 if self.order_blind else 0)
+        self.mechanical = None
+        if mechanical_features:
+            from fog.constants.tables import TABLES
+            from fog.models.mechanical_features import MechanicalMoveFeatures
 
-    def forward(self, entity_ids: torch.Tensor) -> torch.Tensor:
+            if not self.order_blind:
+                raise ValueError("mechanical_features requires order_blind_entities")
+            self.mechanical = MechanicalMoveFeatures(move_tables if move_tables is not None else TABLES)
+            if self.mechanical.values.shape[0] != n_moves:
+                raise ValueError("mechanical move tables must match embedding cardinalities")
+        mechanical_dim = self.mechanical.out_dim if self.mechanical is not None else 0
+        self.move_encoder = (
+            nn.Sequential(nn.Linear(small_dim + 2 + mechanical_dim, 48), nn.GELU(), nn.Linear(48, small_dim))
+            if self.order_blind else None
+        )
+        self.out_dim = species_dim + small_dim * (2 + (1 if self.order_blind else 4) + 1 + 1)
+
+    def entity_raw(self, raw: torch.Tensor) -> torch.Tensor:
+        """Remove ordered PP/flags; retain them only inside each shared move vector."""
+        if not self.order_blind:
+            return raw
+        raw = raw.clone()
+        raw[..., L.party_slot : L.party_slot + DIMS.party_slot] = 0
+        return torch.cat([
+            raw[..., :L.move_pp], raw[..., L.move_pp + 4 : L.epistemic + 2],
+            raw[..., L.epistemic + 6 :],
+        ], dim=-1)
+
+    def move_vectors(self, move_ids: torch.Tensor, raw: torch.Tensor) -> torch.Tensor:
+        embedded = self.move(move_ids)
+        if self.move_encoder is None:
+            return embedded
+        pp = raw[..., L.move_pp : L.move_pp + 4].unsqueeze(-1)
+        known = raw[..., L.epistemic + 2 : L.epistemic + 6].unsqueeze(-1)
+        pieces = [embedded, pp, known]
+        if self.mechanical is not None:
+            pieces.append(self.mechanical(move_ids).to(embedded.dtype))
+        return self.move_encoder(torch.cat(pieces, dim=-1))
+
+    def forward(self, entity_ids: torch.Tensor, raw: torch.Tensor | None = None) -> torch.Tensor:
         assert entity_ids.shape[-1] >= BASE_ID_FIELDS
         species = self.species(entity_ids[..., 0])
         item = self.item(entity_ids[..., 1])
         ability = self.ability(entity_ids[..., 2])
-        moves = self.move(entity_ids[..., 3 : 3 + DIMS.n_move_slots]).flatten(-2)
+        if self.order_blind:
+            if raw is None:
+                raise ValueError("order-blind move embeddings require aligned PP and known flags")
+            moves = self.move_vectors(entity_ids[..., 3:7], raw).mean(dim=-2)
+        else:
+            moves = self.move(entity_ids[..., 3 : 3 + DIMS.n_move_slots]).flatten(-2)
         last_move = self.move(entity_ids[..., 3 + DIMS.n_move_slots])
         nature = self.nature(entity_ids[..., NATURE_ID_FIELD])
         evs = self.ev(entity_ids[..., list(EV_ID_FIELDS)]).flatten(-2)
@@ -161,9 +208,12 @@ class EncoderContexts:
 class CurrentStateEncoder(nn.Module):
     """Embed the volatile public board with per-entity MLPs and pooling."""
 
-    def __init__(self, embedded_dim: int, d: int, out_dim: int, dropout: float) -> None:
+    def __init__(
+        self, embedded_dim: int, d: int, out_dim: int, dropout: float,
+        raw_dim: int = ENTITY_RAW_DIM,
+    ) -> None:
         super().__init__()
-        self.entity_in = nn.Linear(ENTITY_RAW_DIM + embedded_dim, d)
+        self.entity_in = nn.Linear(raw_dim + embedded_dim, d)
         self.field_in = nn.Linear(DIMS.field_dim, d)
         # Preserve a short, directly learnable route for volatile field facts instead of forcing
         # them through the same pooled bottleneck as twelve entity records.
@@ -222,18 +272,26 @@ class CurrentStateEncoder(nn.Module):
         field: torch.Tensor,
         active_idx: torch.Tensor,
         embeds: EntityEmbeddings,
+        *,
+        preview: bool = False,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         public_entities, public_ids = self.public_inputs(
             entities, entity_ids, embeds
         )
         tokens = self.entity_mlp(
             self.entity_in(
-                torch.cat([public_entities, embeds(public_ids)], dim=-1)
+                torch.cat(
+                    [embeds.entity_raw(public_entities), embeds(public_ids, public_entities)], dim=-1
+                )
             )
         )
         rows = torch.arange(entities.shape[0], device=entities.device)
-        active_mine = tokens[rows, active_idx[:, 0]]
-        active_opp = tokens[rows, active_idx[:, 1]]
+        if preview:
+            active_mine = tokens[:, :6].mean(dim=1)
+            active_opp = tokens[:, 6:].mean(dim=1)
+        else:
+            active_mine = tokens[rows, active_idx[:, 0]]
+            active_opp = tokens[rows, active_idx[:, 1]]
         field_token = self.field_in(field)
         current = self.head(
             torch.cat(
@@ -253,9 +311,10 @@ class PrivateStateEncoder(nn.Module):
         d: int,
         out_dim: int,
         dropout: float,
+        raw_dim: int = ENTITY_RAW_DIM,
     ) -> None:
         super().__init__()
-        self.entity_in = nn.Linear(ENTITY_RAW_DIM + embedded_dim, d)
+        self.entity_in = nn.Linear(raw_dim + embedded_dim, d)
         self.original_in = nn.Linear(original_dim, d, bias=False)
         self.entity_mlp = nn.Sequential(
             nn.LayerNorm(d),
@@ -311,7 +370,9 @@ class PrivateStateEncoder(nn.Module):
             dim=-1,
         )
         tokens = self.entity_mlp(
-            self.entity_in(torch.cat([private_raw, embeds(own_ids)], dim=-1))
+            self.entity_in(torch.cat(
+                [embeds.entity_raw(private_raw), embeds(own_ids, entities[:, :6])], dim=-1
+            ))
             + self.original_in(original)
         )
         rows = torch.arange(entities.shape[0], device=entities.device)
@@ -368,6 +429,9 @@ class TurnHistoryEncoder(nn.Module):
                 enable_nested_tensor=False,
             )
             sequence_dim = d
+        self.action_kind = (
+            nn.Linear(4, d, bias=False) if cfg.get("order_blind_entities", False) else None
+        )
         self.head = nn.Sequential(
             nn.Linear(sequence_dim, out_dim),
             nn.GELU(),
@@ -414,7 +478,18 @@ class TurnHistoryEncoder(nn.Module):
         )
         real = positions < lengths.unsqueeze(1)
         history_right = self._right_pack(history, source, real)
+        action_kind = None
+        if self.action_kind is not None:
+            action = history_right[..., DIMS.hist_snapshot : DIMS.hist_snapshot + 14]
+            action_kind = torch.stack([
+                action[..., :4].sum(-1), action[..., 4:8].sum(-1),
+                action[..., 8:13].sum(-1), action[..., 13],
+            ], dim=-1)
+            history_right = history_right.clone()
+            history_right[..., DIMS.hist_snapshot : DIMS.hist_snapshot + 14] = 0
         encoded_input = self.hist_in(history_right)
+        if action_kind is not None:
+            encoded_input = encoded_input + self.action_kind(action_kind)
 
         if history_ids is not None:
             if history_ids.shape[:2] != history.shape[:2]:
@@ -490,7 +565,7 @@ class TurnHistoryEncoder(nn.Module):
 class Backbone(nn.Module):
     """Three explicit encoders: private, public state, and public history."""
 
-    def __init__(self, cfg: dict | None = None, sizes: dict | None = None) -> None:
+    def __init__(self, cfg: dict | None = None, sizes: dict | None = None, *, tables=None) -> None:
         super().__init__()
         cfg = cfg or {}
         hidden = int(cfg.get("entity_hidden", 128))
@@ -509,12 +584,18 @@ class Backbone(nn.Module):
                 n_moves=sizes["n_moves"] + 1,
                 n_natures=sizes["n_natures"] + 1,
                 n_ev_units=sizes["n_ev_units"] + 1,
+                order_blind=bool(cfg.get("order_blind_entities", False)),
+                mechanical_features=bool(cfg.get("mechanical_features", False)),
+                move_tables=tables,
             )
         else:
-            self.embeds = EntityEmbeddings()
+            self.embeds = EntityEmbeddings(
+                order_blind=bool(cfg.get("order_blind_entities", False)),
+                mechanical_features=bool(cfg.get("mechanical_features", False)), move_tables=tables,
+            )
 
         self.current_state_encoder = CurrentStateEncoder(
-            self.embeds.out_dim, hidden, self.current_dim, dropout
+            self.embeds.out_dim, hidden, self.current_dim, dropout, self.embeds.raw_dim
         )
         self.turn_history_encoder = TurnHistoryEncoder(
             self.embeds, hidden, self.history_dim, cfg, dropout
@@ -525,6 +606,7 @@ class Backbone(nn.Module):
             hidden,
             self.state_dim,
             dropout,
+            self.embeds.raw_dim,
         )
         self.public_fusion = nn.Sequential(
             nn.Linear(self.current_dim + self.history_dim, self.dyn_dim),
@@ -532,6 +614,9 @@ class Backbone(nn.Module):
             nn.Linear(self.dyn_dim, self.dyn_dim),
         )
         self.preview_context = nn.Linear(self.current_dim, hidden, bias=False)
+        self.order_blind_preview = bool(cfg.get("order_blind_preview", False))
+        if self.order_blind_preview and not self.embeds.order_blind:
+            raise ValueError("order_blind_preview requires order_blind_entities")
 
     @property
     def history_encoder(self) -> str:
@@ -603,7 +688,8 @@ class Backbone(nn.Module):
             [[0, 6]], dtype=torch.long, device=entities.device
         ).expand(entities.shape[0], -1)
         current, current_tokens = self.current_state_encoder(
-            entities, entity_ids, field, active_idx, self.embeds
+            entities, entity_ids, field, active_idx, self.embeds,
+            preview=self.order_blind_preview,
         )
         _, private_tokens = self.private_state_encoder(
             entities, entity_ids, active_idx, self.embeds

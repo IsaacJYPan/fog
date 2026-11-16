@@ -49,6 +49,9 @@ class AgentOutput:
     # Returned batch diagnostic used by reconstruction retention losses.  Keeping it in the
     # output avoids recomputing the shared trunk and does not retain mutable state on the module.
     shared_state: torch.Tensor | None = None
+    value_logit: torch.Tensor | None = None
+    terminal_alive_logits: torch.Tensor | None = None
+    terminal_hp_difference: torch.Tensor | None = None
 
 
 class TypedMatchupPrior(nn.Module):
@@ -83,7 +86,7 @@ class TypedMatchupPrior(nn.Module):
 
 
 class FogAgent(nn.Module):
-    def __init__(self, cfg: dict | None = None, sizes: dict | None = None) -> None:
+    def __init__(self, cfg: dict | None = None, sizes: dict | None = None, *, tables=None) -> None:
         """Build from table cardinalities, excluding the unknown-token row.
 
         Use ``from_tables`` for battles. The default sizes support small unit-test fixtures
@@ -92,6 +95,36 @@ class FogAgent(nn.Module):
         super().__init__()
         cfg = cfg or {}
         model_cfg = cfg.get("model", {})
+        self.order_blind_entities = bool(model_cfg.get("order_blind_entities", False))
+        if self.order_blind_entities:
+            required = (
+                "shared_latent_trunk", "shared_latent_contextual", "shared_typed_world_tokens",
+                "shared_contextual_head_readers", "token_action_policy", "action_query_policy",
+            )
+            forbidden = ("structured_memory", "exact_action_context", "use_action_features")
+            if any(not model_cfg.get(k, False) for k in required) or any(
+                model_cfg.get(k, False) for k in forbidden
+            ):
+                raise ValueError(
+                    "order_blind_entities requires typed contextual readers and action queries "
+                    "without ordered exact/action-feature inputs"
+                )
+        self.mechanical_features = bool(model_cfg.get("mechanical_features", False))
+        mechanical_indices = None
+        if self.mechanical_features:
+            from fog.encoding.action_features import ACTION_FEATURE_NAMES
+            from fog.models.mechanical_features import MECHANICAL_ACTION_FEATURE_NAMES
+
+            if not self.order_blind_entities:
+                raise ValueError("mechanical_features requires order_blind_entities")
+            mechanical_indices = torch.tensor(
+                [ACTION_FEATURE_NAMES.index(name) for name in MECHANICAL_ACTION_FEATURE_NAMES],
+                dtype=torch.long,
+            )
+        self.register_buffer('_mechanical_action_indices', mechanical_indices, persistent=False)
+        self.logistic_value = cfg.get("loss", {}).get("value_loss", "mse") == "logistic"
+        if cfg.get("loss", {}).get("value_loss", "mse") not in {"mse", "logistic"}:
+            raise ValueError("loss.value_loss must be mse or logistic")
         self.aux_into_trunk = model_cfg.get("aux_into_trunk", True)
         self.oracle = model_cfg.get("oracle", "none")  # {none, set, action} evaluation ceilings
         # blind_reactive baseline: force history to 0 and zero the belief conditioning,
@@ -118,7 +151,7 @@ class FogAgent(nn.Module):
             else {}
         )
 
-        self.backbone = Backbone(cfg.get("encoding", {}) | model_cfg, sizes=sizes)
+        self.backbone = Backbone(cfg.get("encoding", {}) | model_cfg, sizes=sizes, tables=tables)
         self.shared_latent_enabled = bool(model_cfg.get("shared_latent_trunk", False))
         self.shared_latent = None
         self.shared_to_belief = None
@@ -342,6 +375,8 @@ class FogAgent(nn.Module):
             # Candidate semantics travel with the candidate, so permuting candidates and these
             # descriptors permutes logits.  No learned absolute action-index embedding is used.
             action_context_dim += 4
+            if self._mechanical_action_indices is not None:
+                action_context_dim += self._mechanical_action_indices.numel()
         self.policy_value = PolicyValueHead(
             state_dim=self.backbone.state_dim + extra,
             dyn_dim=self.backbone.dyn_dim,
@@ -361,11 +396,18 @@ class FogAgent(nn.Module):
                 model_cfg.get("simple_rule_prior_strength", 0.0)
             ),
         )
-        # Team-preview lead selection — used by FogPlayer.teampreview and trained by the
-        # REINFORCE-style preview term in ppo_update (game outcome as the bandit reward).
+        # Team-preview lead selection: replay lead CE or the existing preview bandit term.
         from fog.models.heads import TeamPreviewHead
 
         self.preview = TeamPreviewHead(d=(cfg.get("encoding", {}) | model_cfg).get("entity_hidden", 128))
+        self.outcome_alive = None
+        self.outcome_hp = None
+        if float(cfg.get("loss", {}).get("outcome_aux_coef", 0.0)) > 0:
+            if self.shared_latent is None or not self.shared_latent.typed_world_tokens or self.shared_to_value is None:
+                raise ValueError("outcome auxiliary heads require typed tokens and a value reader")
+            width = self.shared_latent.token_dim
+            self.outcome_alive = nn.Linear(width, 1)
+            self.outcome_hp = nn.Linear(width, 1)
 
     def preview_logits(self, batch: dict) -> torch.Tensor:
         """Lead logits [B, 6] over my six preview mons. `batch` needs entities/entity_ids/field."""
@@ -391,7 +433,7 @@ class FogAgent(nn.Module):
             "n_natures": N_NATURES,
             "n_ev_units": N_EV_UNITS,
         }
-        agent = cls(cfg, sizes=sizes)
+        agent = cls(cfg, sizes=sizes, tables=tables)
         agent.assert_within_budget()
         return agent
 
@@ -507,7 +549,10 @@ class FogAgent(nn.Module):
             1, bench.unsqueeze(-1).expand(-1, -1, private_memory.shape[-1])
         )
         move_ids = entity_ids[rows, mine, 3 : 3 + 4]
-        move_tokens = self.backbone.embeds.move(move_ids)
+        move_tokens = (
+            self.backbone.embeds.move_vectors(move_ids, batch["entities"][rows, mine])
+            if self.order_blind_entities else self.backbone.embeds.move(move_ids)
+        )
         action_moves = move_tokens.new_zeros(batch_size, 14, move_tokens.shape[-1])
         action_moves[:, :4] = move_tokens
         action_moves[:, 4:8] = move_tokens
@@ -516,15 +561,24 @@ class FogAgent(nn.Module):
         action_type[:, 4:8, 1] = 1.0
         action_type[:, 8:13, 2] = 1.0
         action_type[:, 13, 3] = 1.0
-        return torch.cat(
-            [
-                candidate,
-                opponent_token.unsqueeze(1).expand(-1, 14, -1),
-                action_moves,
-                action_type,
-            ],
-            dim=-1,
-        )
+        pieces = [candidate, opponent_token.unsqueeze(1).expand(-1, 14, -1),
+                  action_moves, action_type]
+        if self._mechanical_action_indices is not None:
+            from fog.encoding.action_features import ACTION_FEATURE_DIM
+
+            features = batch.get('action_features')
+            if features is None:
+                allowed = action_moves.new_zeros(batch_size, 14, self._mechanical_action_indices.numel())
+            else:
+                if tuple(features.shape) != (batch_size, 14, ACTION_FEATURE_DIM):
+                    raise ValueError('mechanical action features must match the named column schema')
+                allowed = features.index_select(-1, self._mechanical_action_indices).to(action_moves.dtype)
+                # The contract describes move candidates only. Switch/forced candidates add
+                # no new state-dependent table facts.
+                nonmove = torch.arange(14, device=allowed.device) >= 8
+                allowed = allowed.masked_fill(nonmove.view(1, 14, 1), 0.0)
+            pieces.append(allowed)
+        return torch.cat(pieces, dim=-1)
 
     def forward(self, batch: dict, *, need_belief: bool = True) -> AgentOutput:
         """`batch` holds the stacked Observation tensors + auxiliary inputs.
@@ -665,7 +719,10 @@ class FogAgent(nn.Module):
             action_features = action_features * self._public_action_feature_mask.to(
                 dtype=action_features.dtype, device=action_features.device
             )
-        log_probs, value = self.policy_value(
+        if self.mechanical_features:
+            # Only the selected descriptors in action_context may reach a neural scorer.
+            action_features = None
+        head_result = self.policy_value(
             policy_private, batch["legality_mask"], public_context,
             posterior_features=batch.get("posterior_features"),
             action_features=action_features,
@@ -676,7 +733,25 @@ class FogAgent(nn.Module):
             policy_shared_context=policy_shared_context,
             value_shared_context=value_shared_context,
             value_logit_bias=matchup_value_logit,
+            return_value_logit=self.logistic_value,
         )
+        if self.logistic_value:
+            log_probs, value, value_logit = head_result
+        else:
+            log_probs, value = head_result
+            value_logit = None
+        terminal_alive_logits = None
+        terminal_hp_difference = None
+        # These heads are training/evaluation targets only. The targets' values never feed
+        # any encoder or reader, and ordinary play/search does not compute the heads.
+        if self.outcome_alive is not None and "terminal_alive" in batch:
+            outcome_tokens = self.shared_latent.tokens(shared_state)[:, :12]
+            outcome_summary = value_shared_context
+            if not self.aux_into_trunk:
+                outcome_tokens = outcome_tokens.detach()
+                outcome_summary = outcome_summary.detach()
+            terminal_alive_logits = self.outcome_alive(outcome_tokens).squeeze(-1)
+            terminal_hp_difference = torch.tanh(self.outcome_hp(outcome_summary)).squeeze(-1)
 
         self_belief_out: BeliefOutput | None = None
         self_belief_chain: BeliefOutput | None = None
@@ -717,6 +792,9 @@ class FogAgent(nn.Module):
             log_probs=log_probs, value=value, belief=belief_out, self_belief=self_belief_out,
             belief_chain=belief_chain, self_belief_chain=self_belief_chain,
             shared_state=shared_state,
+            value_logit=value_logit,
+            terminal_alive_logits=terminal_alive_logits,
+            terminal_hp_difference=terminal_hp_difference,
         )
 
     def head_inputs(self, batch: dict) -> tuple[torch.Tensor, torch.Tensor]:

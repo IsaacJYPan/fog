@@ -1,0 +1,11 @@
+BC dataset: train=1985 preview rows; holdout=3986 rows  (config_hash=c05351072a9e, torch_threads=5)
+[bc] preview baseline CE=1.791 top1=0.162
+[bc] preview epoch 1/8 train_CE=1.763 eval_CE=1.733 top1=0.308
+[bc] preview epoch 2/8 train_CE=1.691 eval_CE=1.677 top1=0.324
+[bc] preview epoch 3/8 train_CE=1.623 eval_CE=1.636 top1=0.328
+[bc] preview epoch 4/8 train_CE=1.576 eval_CE=1.622 top1=0.334
+[bc] preview epoch 5/8 train_CE=1.550 eval_CE=1.614 top1=0.339
+[bc] preview epoch 6/8 train_CE=1.533 eval_CE=1.608 top1=0.343
+[bc] preview epoch 7/8 train_CE=1.524 eval_CE=1.605 top1=0.346
+[bc] preview epoch 8/8 train_CE=1.520 eval_CE=1.603 top1=0.349
+[bc] done -> runs/order_blind_model/R5/checkpoints/bc_final.pt  (best eval epoch=8, loss=1.603)

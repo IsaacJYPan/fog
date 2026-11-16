@@ -31,7 +31,17 @@ _ARRAYS = (
     "action_features", "policy_valid",
     "own_set_provenance", "opponent_set_provenance", "legal_provenance",
     "action_feature_provenance", "imputation_id",
+    "terminal_alive", "terminal_alive_mask", "terminal_hp_difference", "terminal_valid",
 )
+
+
+_TERMINAL_ARRAYS = ("terminal_alive", "terminal_alive_mask", "terminal_hp_difference", "terminal_valid")
+
+
+def _terminal_default(key: str, n: int) -> np.ndarray:
+    shape = (n, 12) if key in {"terminal_alive", "terminal_alive_mask"} else (n,)
+    dtype = bool if key in {"terminal_valid", "terminal_alive_mask"} else np.float32
+    return np.zeros(shape, dtype=dtype)
 
 
 def _build_batch(d: dict[str, np.ndarray], idx: np.ndarray, tables, device=None) -> dict:
@@ -63,6 +73,10 @@ def _build_batch(d: dict[str, np.ndarray], idx: np.ndarray, tables, device=None)
         ),
         "imputation_id": _t(d["imputation_id"][idx], torch.long, device),
     }
+    for key in _TERMINAL_ARRAYS:
+        if key in d:
+            dtype = torch.bool if key in {"terminal_valid", "terminal_alive_mask"} else torch.float32
+            batch[key] = _t(d[key][idx], dtype, device)
     # Belief targets are stored in paste order; the chain input (opp_tokens) packs revealed moves
     # into the earliest subslots, so align per row before splitting into label dicts.
     aligned, _ = align_truth_to_views(d["belief_targets"][idx], opp_tokens)
@@ -127,6 +141,8 @@ class ReplayDataset:
                     buf[k].append(np.zeros((n, 6, 15), dtype=np.uint8))
                 elif k in ("legal_provenance", "action_feature_provenance") and k not in z:
                     buf[k].append(np.zeros((n, 14), dtype=np.uint8))
+                elif k in _TERMINAL_ARRAYS and k not in z:
+                    buf[k].append(_terminal_default(k, len(z["action"])))
                 elif k == "imputation_id" and k not in z:
                     buf[k].append(np.full(n, -1, dtype=np.int16))
                 else:
@@ -217,6 +233,8 @@ class StreamingReplayDataset:
                         buf[k].append(np.zeros((len(z["action"]), 6, 15), dtype=np.uint8))
                     elif k in ("legal_provenance", "action_feature_provenance") and k not in z:
                         buf[k].append(np.zeros((len(z["action"]), 14), dtype=np.uint8))
+                    elif k in _TERMINAL_ARRAYS and k not in z:
+                        buf[k].append(_terminal_default(k, len(z["action"])))
                     elif k == "imputation_id" and k not in z:
                         buf[k].append(np.full(len(z["action"]), -1, dtype=np.int16))
                     else:
@@ -314,3 +332,47 @@ def _batched_masks(opp_tokens: np.ndarray, tables, device=None) -> dict:
         t = torch.as_tensor(np.stack([m[fam] for m in per]), dtype=torch.bool)
         out[fam] = t.to(device) if device is not None else t
     return out
+
+
+class PreviewDataset:
+    """One preview per player/game, independent of ordinary decision multiplicity."""
+
+    def __init__(self, manifest_path: str | Path, limit_rows: int | None = None):
+        import polars as pl
+
+        keys = ('entities', 'entity_ids', 'field', 'label', 'species', 'role', 'imputation_id')
+        chunks = {k: [] for k in keys}
+        self.game_index = []
+        manifest = pl.read_parquet(manifest_path)
+        self.game_ids = manifest['id'].to_list()
+        for game, shard in enumerate(manifest['shard'].to_list()):
+            with np.load(shard) as z:
+                if 'preview_valid' not in z:
+                    raise ValueError('preview training needs preview records; reconvert this corpus')
+                if len(z['preview_valid']) != 2 or not np.all(z['preview_imputation_id'] == 0):
+                    raise ValueError('preview records must contain two players, imputation zero only')
+                valid = z['preview_valid'].astype(bool)
+                for k in keys:
+                    chunks[k].append(z['preview_'+k][valid])
+                self.game_index.extend([game]*int(valid.sum()))
+        self.data = {k: np.concatenate(v)[:limit_rows] for k, v in chunks.items()}
+        self.game_index = np.asarray(self.game_index, dtype=np.int64)[:limit_rows]
+        self.n = len(self.data['label'])
+        if self.n == 0:
+            raise ValueError('no valid public lead labels in this preview dataset')
+
+    def __len__(self):
+        return self.n
+
+    def batches(self, batch_size: int, shuffle: bool = True, seed: int = 0, device=None):
+        rng = np.random.default_rng(seed)
+        order = rng.permutation(self.n) if shuffle else np.arange(self.n)
+        for start in range(0, self.n, batch_size):
+            idx = order[start:start+batch_size]
+            yield {
+                'entities': _t(self.data['entities'][idx], torch.float32, device),
+                'entity_ids': _t(self.data['entity_ids'][idx], torch.long, device),
+                'field': _t(self.data['field'][idx], torch.float32, device),
+                'action': _t(self.data['label'][idx], torch.long, device),
+                'preview_action': _t(self.data['label'][idx], torch.long, device),
+            }

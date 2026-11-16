@@ -1,0 +1,128 @@
+"""Write the completed brief report and append final measured evidence once."""
+import json
+from pathlib import Path
+import shlex
+import shutil
+import subprocess
+
+root=Path.cwd();art=root/'docs/briefs/09-artifacts'
+source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+data=json.loads((art/'preview-data-counts.json').read_text())
+leads=json.loads((art/'preview-holdout.json').read_text())
+checks=json.loads((art/'final-checks-execution.json').read_text())
+digests=json.loads((art/'digests-final-summary.json').read_text())
+compat=json.loads((art/'compatibility-final.json').read_text())
+assert data['commit']==leads['commit']==digests['after_commit']==compat['current_commit']==source
+assert all(x['exit_code']==0 for x in checks) and len(checks)==4
+assert all(x['matches'] for x in digests['runs']) and compat['strict_load']
+assert data['ordinary_arrays_bit_identical'] and data['public_prefix_checks']
+selections={n:json.loads((art/(n+'-selection.json')).read_text()) for n in ('R5','R5-seed2')}
+a=leads['models']['R5'];b=leads['models']['R5-seed2']
+noise=2*abs(a['top1']-b['top1'])
+comparison={}
+for name,baseline in [('chance',1/6),('frequency',a['frequency_top1']),('initial-preview',leads['models']['initial-preview']['top1'])]:
+    effect=a['top1']-baseline
+    comparison[name]={'R5_minus_baseline':effect,'twice_R5_seed_gap':noise,'positive_gain_exceeds_noise':effect>noise}
+summary={'smoke':True,'stages_complete':[2,3,4,5],'source':source,'lead_comparisons':comparison,'lead_selection':selections,'preview_data':data,'default_off_checks':'passed','no_R5_play':True,'phase_gates_passed':False}
+(art/'stage5-summary.json').write_text(json.dumps(summary,indent=2)+'\n')
+def ci(value,bounds,scale=1,n=4):
+    return f'{value*scale:.{n}f} [{bounds[0]*scale:.{n}f}, {bounds[1]*scale:.{n}f}]'
+answer=("The order-blind model passes perturbed-weight permutation checks and improves shuffled NLL/top-1 from R1’s 1.9253/26.64% to R2’s 1.8799/28.24%. Value still fails the constant-0.5 Brier reference. Mechanics improve moves seen 1–19 times (NLL 2.0192→1.8193), with no unseen-move gain. R4’s play scores were 38.50%/77.00% against SimpleHeuristics/MaxDamage versus R1’s 14.75%/39.75%. "
+        f"Lead top-1 is {100*a['top1']:.2f}% versus 16.67% chance and {100*a['frequency_top1']:.2f}% for training frequency. All stages are complete; all results are smoke.")
+names=('R1','R2','R3','R4','R4-seed2')
+diags={n:{k:json.loads((art/f'{n}-best-{k}-slot-check.json').read_text()) for k in ('policy','value')} for n in names}
+select={n:json.loads((art/f'{n}-selection.json').read_text()) for n in names}
+rare=json.loads((art/'rare-moves.json').read_text());play=json.loads((art/'play.json').read_text());pi=json.loads((art/'play-block-intervals.json').read_text())
+lines=['# Brief 09: order-blind model — complete','', '**Answer.** '+answer,'',
+'AMD EPYC 9V74, four-core quota; PyTorch 2.13.0+cu130, CPU only. Showdown `e440c4a`.',
+f'Sources: R1 `70cc5ed`, R2 `c7007c8`, R3 `69b9d19`, R4/R4b `4066edc`, leads `{source[:7]}`.',
+'22,000 games, zero quarantines, 1,126,792 decisions. Fixed train: 1,000 games/52,955 rows;',
+'holdout: 2,000/103,944 (103,933 policy-valid). Eight epochs, batch 256, cosine 3e-4→3e-5,',
+'no early stop. Seeds 20261201 and 20261202 (b). R1 passes the reference 0.01-NLL guard.','',
+'## Policy and value','',
+'Policy cells: shuffled NLL / top-1 %. Unmoved refers to retained history. All intervals',
+'resample whole games, both perspectives together; full group intervals: `R*-best-policy-slot-check.json`.','',
+'| Run / epoch | All | Move | Unmoved |','| --- | --- | --- | --- |']
+for name in names:
+    cells=[]
+    for group in ('all','move','not_yet_moved'):
+        r=diags[name]['policy']['policy'][group];cells.append(f'{r["nll_shuffled"]:.4f} / {100*r["top1_shuffled"]:.2f}')
+    lines.append(f'| {name.replace("-seed2","b")} / {select[name]["best_policy_epoch"]} | '+' | '.join(cells)+' |')
+lines += ['', 'R2/R3/both R4 seeds match stored/shuffled metrics to four decimals. R2’s all-row gains',
+'exceed twice historical R1 seed gaps; R4’s all/move/unmoved gains exceed twice its seed gaps',
+'(`stage2-summary.json`, `stage4-summary.json`).','',
+'| Run / selector / epoch | Brier [95%] | ECE [95%] |','| --- | --- | --- |']
+for name in names:
+    for kind in ('policy','value'):
+        r=diags[name][kind]['value'];lines.append(f'| {name.replace("-seed2","b")} / {kind} / {select[name]["best_"+kind+"_epoch"]} | '+ci(r['brier'],r['interval95']['brier'])+' | '+ci(r['ece'],r['interval95']['ece'])+' |')
+lines += ['', 'Brier ≥0.25 carries no useful outcome information here. Independent value selection includes',
+'epoch 0; R1/R2 initial weights were reconstructed and verified. Per-epoch metrics and both',
+'checkpoint JSONs contain calibration/extreme-probability shares, conditional wins and intervals.',
+'R3 policy: p<0.1 share 39.24%, wins 44.51%; p>0.9 share 41.12%, wins 56.46%.',
+'Its best-value checkpoint has no extreme predictions.','',
+'## Move frequency and play','',
+'Groups count training labels, merging ordinary/Tera identity; cells: NLL / top-1 %.','',
+'| Training count / rows | R3 | R4 | R4b |','| --- | --- | --- | --- |']
+for group in ('never','1_to_19','20_or_more'):
+    cells=[]
+    for name in ('R3','R4','R4-seed2'):
+        r=rare['models'][name]['groups'][group];cells.append(f'{r["nll"]:.4f} / {100*r["top1"]:.2f}')
+    lines.append(f'| {group} / {r["rows"]} | '+' | '.join(cells)+' |')
+lines += ['', 'The 1–19 and 20+ gains exceed twice their R4 seed gaps. Unseen NLL worsens; its 130-row',
+'game intervals are broad (`rare-moves.json`).','',
+'Greedy play: brief 03’s `pool_b`, 400 games/cell, shared seed-0 matched teams/sides.',
+'Only primary-seed best-policy weights play. No draws, truncations or failures.','',
+'| Policy / opponent | W–L | Score % [95% matched-block bootstrap] |','| --- | --- | --- |']
+for row in play['rows']:
+    lines.append(f'| {row["label"]} | {row["a_wins"]}–{row["b_wins"]} | '+ci(row['a_score'],pi['rows'][row['label']]['interval95'],100,2)+' |')
+lines += ['', '`play.json` retains action statistics; `play-block-intervals.json` includes paired differences.',
+'Pool B is not held out. Play overlapped training; no isolated timing claim.','',
+'## Leads','',
+f'Conversion emits 44,000 separate previews. Fixed train/holdout contain {leads["train_valid_preview_rows"]}/',
+f'{leads["holdout_valid_preview_rows"]} valid labels; exclusions/reasons: `preview-data-counts.json`.',
+'Positions remain near one sixth (`preview-holdout.json`). Each player receives only its own',
+'private sheet and the public preview, before any send-out. Ambiguous Illusion identities are',
+'excluded. R5 warms R4 and trains the preview path for eight epochs; no play.','',
+'| Preview checkpoint / epoch | Top-1 % [95% game bootstrap] |','| --- | --- |']
+for name in ('R5','R5-seed2'):
+    r=leads['models'][name];lines.append(f'| {name.replace("-seed2","b")} / {selections[name]["best_preview_epoch"]} | '+ci(r['top1'],r['interval95']['top1'],100,2)+' |')
+lines += ['| Chance | 16.67 |','| Training-frequency baseline | '+ci(a['frequency_top1'],a['interval95']['frequency_top1'],100,2)+' |','',
+'Frequency chooses the most-led training species present, breaking ties alphabetically.',
+f'Twice the lead seed gap is {100*noise:.2f} points; `stage5-summary.json` qualifies comparisons.',
+'The initial pooled-preview checkpoint and all paired baseline intervals are also recorded.','',
+'## Defects and checks','',
+'Two dense-label attempts were rejected: 84/500 cross-view mismatches, then missed forms and a',
+'two-epoch discarded R3. Final labels use public views and unique base-species matching.',
+'All 22,000 games pass coherence; all old arrays, including terminal targets, match in all',
+'3,000 fixed-split games after preview conversion. Initial conversion resumed 9,227 games.',
+'Preview checking resumed after correcting an empty-slot assertion; converted data were retained.','',
+'All new behavior defaults off. Public history keeps identity (`hist_opp_action` is a global',
+'move ID); belief decoders/queries are unchanged. Only eleven allowed candidate columns enter',
+'mechanics. Perturbed-weight tests cover all four permutations on 64 holdout/live/synthetic',
+'rows, with key-off negative controls; preview tests also cover isolation and exact resume.',
+'166 affected tests and Ruff pass. Old checkpoint loads strictly with identical policy/value',
+'on 64 live rows; all three original same-machine digests match (`compatibility-final.json`,',
+'`digests-final-summary.json`). All commands/results are under `09-artifacts/`.','',
+'**Not verified:** held-out playing strength or phase gates. P2.3/G2 remain open.',
+'No search, PPO or belief source changed.']
+(root/'docs/briefs/09-report.md').write_text('\n'.join(lines)+'\n')
+records=json.loads((art/'preview-training-execution.json').read_text());assert all(x['exit_code']==0 for x in records)
+with (root/'docs/results-ledger.md').open('a') as stream:
+    stream.write('\nStage 5 and brief 09 completed (smoke). Preview records are separate from decisions, two per game from imputation zero. Inputs stop at public preview; labels use public physical identities, masking unresolved Illusion. No R5 play.\n\n')
+    stream.write(f'`{source}`: `python -m fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/metamon_gen9ou_r1500_preview_decisions --imputations 1 --workers 4 --resume`; same fixed split. All 22,000 games, no quarantines, 1,126,792 ordinary rows and 44,000 preview records. Old arrays including terminal labels are bit-identical in all 3,000 fixed-split games. `09-artifacts/preview-data-{{counts,execution}}.json`, `preview-conversion-quality.json` record commands/checks/eligible counts.\n\n')
+    stream.write('The initial full conversion completed successfully, but its integrity driver incorrectly required HP=1 in empty slots of incomplete previews. Validation was resumed with present HP=1 / empty HP=0; no source or data changed, and training waited for all checks. `09-artifacts/preview-checker-restart.json` and `preview-data-execution-initial.json` retain the failed check and original full-conversion command/timing.\n\n')
+    stream.write('| Run | Result (smoke; 95% whole-game intervals) | Source, command and evidence |\n| --- | --- | --- |\n')
+    for name in ('R5','R5-seed2'):
+        r=leads['models'][name];command=next(x['command'] for x in records if x['name']==name+'-training');command[0]='python'
+        stream.write(f'| {name} | Preview CE-selected epoch {selections[name]["best_preview_epoch"]}; top-1 '+ci(r['top1'],r['interval95']['top1'],100,2)+'%; NLL '+ci(r['nll'],r['interval95']['nll'])+f' | `{source}`; `{shlex.join(command)}`; 1,000 train / 2,000 holdout games, {leads["train_valid_preview_rows"]} / {leads["holdout_valid_preview_rows"]} valid previews; `09-artifacts/{name}-{{metrics.csv,selection.json,scope.json}}` |\n')
+    stream.write('| Lead baselines | Chance 16.6667%; training-frequency top-1 '+ci(a['frequency_top1'],a['interval95']['frequency_top1'],100,2)+'%; R5−frequency '+ci(a['top1_minus_frequency'],a['interval95']['top1_minus_frequency'],100,2)+' points | `'+source+'`; `'+leads['command']+'`; 2,000 holdout games; `09-artifacts/preview-holdout.json` |\n')
+    stream.write(f'\nFrequency uses the most-led training species present with alphabetical ties; no holdout outcomes. The initial-preview comparator uses R4 weights with the new pooled preview path, not the old R4 preview math used in play. Twice the R5 seed gap is {100*noise:.6f} points; qualified effects are in `stage5-summary.json`. Counts, label shares and exclusions: `preview-data-counts.json`, `preview-holdout.json`.\n\n')
+    stream.write('166 affected tests and Ruff pass. Native preview resume preserves model/optimizer/scheduler/RNG/best checkpoint after interruption. Initial development tests corrected a too-strict public single-ability assertion and moved invalid-option validation before manifest reads (`tests-stage5-preview-initial.txt`, `checks-stage5.txt`).\n\n')
+    stream.write('| Check | Result | Source, command and evidence |\n| --- | --- | --- |\n')
+    stream.write('| Final compatibility | Strict original checkpoint load; policy/value bit-identical on 64 frozen live observations. R4 preview math also bit-identical on 64 prefix observations with the new preview flag off | `'+source+'`; `python runs/order_blind_model/check_compatibility.py`; `09-artifacts/compatibility-final.json`, `preview-off-compatibility.json`; deterministic checks, intervals n/a |\n')
+    for row in digests['runs']:
+        stream.write(f'| Final {row["name"]} digest | `{row["before"]}` → `{row["after"]}`; all new keys absent/off | `{source}`; `{shlex.join(row["command"])}`; `09-artifacts/{row["after_file"]}`, `digests-final-summary.json`; deterministic regression, intervals n/a |\n')
+    stream.write('\nAll stages complete; only P2.2a acceptance is closed. P2.3 and every phase gate stay open. No search, PPO or belief source was changed; no playing-strength gate claimed.\n')
+shutil.copyfile(__file__,art/'stage5-summary-driver.txt')
+print(answer)
+print('Report words:',len(' '.join(lines).split()))

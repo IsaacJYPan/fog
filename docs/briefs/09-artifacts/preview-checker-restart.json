@@ -1,0 +1,10 @@
+{
+  "smoke": true,
+  "commit": "c87b519",
+  "conversion_completed": true,
+  "games": 22000,
+  "quarantines": 0,
+  "preview_records": 44000,
+  "driver_check_failed": "Required HP=1 for empty team slots in incomplete previews. Example public team sizes 6/1; both preview_valid already false.",
+  "correction": "Require HP=1 in present slots and 0 in empty slots; retain all converted shards and resume validation. No source or data changes; no training started."
+}

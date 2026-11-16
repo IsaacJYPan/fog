@@ -273,10 +273,11 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       recovery. See "move-order leak removed and order-blind encoder (smoke)" in the ledger
       and `docs/briefs/07-report.md`; P2.2 remains open._
       _2026-11-14: brief 05 converted both corpora; 1,023,525 / 5,217,022 training rows, and 104,037 holdout rows with all 2,000 shards byte-identical. See the brief 05 artifacts; task remains open._
-- [ ] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
+- [x] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
       1, ledger "review of brief 07, stage 1"): the converter shuffles both with seeded streams.
-      Remaining, `docs/briefs/09-order-blind-model.md`: a model that cannot read slot order, shown
-      by a permutation test.
+      Brief 09 stage 2 completes the model side: every parameter perturbed, all four required
+      permutations on 64 holdout and 64 live rows, key-off negative controls; R2 stored/shuffled
+      metrics match to four decimals. See the ledger and `docs/briefs/09-report.md`.
 - [ ] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
       parity check between a converted log and the observations recorded while the same game
       was played, then own PP, forced replacement decisions and the history record brought
@@ -311,6 +312,11 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       1,000 games (ledger, "the policy-only training step"). Train the opponent-team model
       separately before P4.1._
       _2026-11-15: brief 05 completed G20 (20k/18 epochs, 583 rows/s) and the budget fallback (40,955 games/6 epochs, 644 rows/s), both with independent policy/value selections. G100 best value/policy epochs are 5/6, own-best Brier 0.208909. Full G3 calibration remains partial; total account meter 17.078547/20 quota-hours. No box or gate claimed._
+
+      _2026-11-15: brief 09 stages 2–5 complete on CPU: order-blind, value-target, move-feature
+      and supervised-lead paths have smoke measurements and default-off compatibility checks.
+      See `docs/briefs/09-report.md` and the ledger. Value still fails the constant reference;
+      P2.3 and G2 remain open._
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before

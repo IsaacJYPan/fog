@@ -88,6 +88,15 @@ def bc_loss(
     retention_coef: float = 0.0,
     return_components: bool = False,
 ):
+    if loss_cfg.get("_preview_only", False):
+        logits = agent.preview_logits(batch)
+        ce = torch.nn.functional.cross_entropy(logits, batch["preview_action"])
+        total = float(loss_cfg["preview_coef"]) * ce
+        metrics = {"loss": float(total.detach()), "preview_ce": float(ce.detach()),
+                   "action_ce": float(ce.detach()),
+                   "preview_top1": float((logits.argmax(-1) == batch["preview_action"]).float().mean()),
+                   "preview_rows_count": len(logits)}
+        return (total, metrics, {"preview": total}) if return_components else (total, metrics)
     # The belief passes are most of a training step and the policy and value never read them.
     # With `loss.skip_unweighted_belief` they are not computed when no belief loss has weight.
     if belief_forward_needed(loss_cfg):
@@ -104,7 +113,32 @@ def bc_loss(
         if bool(finite_policy.any())
         else out.log_probs.new_zeros(())
     )
-    value = losses.value_loss(out.value, batch["outcome"])
+    if loss_cfg.get("value_loss", "mse") == "logistic":
+        if out.value_logit is None:
+            raise ValueError("logistic value loss requires the model's unsaturated value logit")
+        value = torch.nn.functional.binary_cross_entropy_with_logits(
+            2.0 * out.value_logit, (batch["outcome"] + 1.0) / 2.0
+        )
+    else:
+        value = losses.value_loss(out.value, batch["outcome"])
+    auxiliary_coef = float(loss_cfg.get("outcome_aux_coef", 0.0))
+    alive_aux = out.value.new_zeros(())
+    hp_aux = out.value.new_zeros(())
+    if auxiliary_coef > 0:
+        if "terminal_valid" not in batch or not bool(batch["terminal_valid"].all()):
+            raise ValueError("outcome_aux_coef needs terminal targets; reconvert this corpus")
+        if out.terminal_alive_logits is None or out.terminal_hp_difference is None:
+            raise ValueError("outcome_aux_coef requires the outcome auxiliary heads")
+        valid_alive = batch["terminal_alive_mask"]
+        if not bool(valid_alive.any()):
+            raise ValueError("outcome auxiliary labels contain no public Pokemon targets")
+        alive_terms = torch.nn.functional.binary_cross_entropy_with_logits(
+            out.terminal_alive_logits, batch["terminal_alive"], reduction="none"
+        )
+        alive_aux = alive_terms[valid_alive].mean()
+        hp_aux = torch.nn.functional.mse_loss(
+            out.terminal_hp_difference, batch["terminal_hp_difference"]
+        )
     belief = out.log_probs.new_zeros(())
     belief_stats: dict[str, int] = {}
     if out.belief is not None and loss_cfg.get("belief_coef", 1.0) > 0:
@@ -158,6 +192,8 @@ def bc_loss(
         "self_belief": loss_cfg.get("self_belief_coef", 0.0) * self_belief,
         "retention": retention_coef * retention,
     }
+    if auxiliary_coef > 0:
+        components["outcome_aux"] = auxiliary_coef * (alive_aux + hp_aux)
     total = sum(components.values())
     with torch.no_grad():
         correct = out.log_probs.argmax(-1) == batch["action"]
@@ -178,6 +214,20 @@ def bc_loss(
         "policy_valid_count": float(finite_policy.sum().item()),
         "policy_total_count": float(policy_valid.numel()),
     }
+    if loss_cfg.get("_value_diagnostics", False) or loss_cfg.get("value_loss", "mse") == "logistic" or auxiliary_coef > 0:
+        with torch.no_grad():
+            probability = ((out.value.detach().double() + 1) / 2).clamp(0, 1)
+            target = (batch["outcome"].double() + 1) / 2
+            metrics["value_brier"] = float(((probability - target) ** 2).mean())
+            metrics["value_rows_count"] = float(probability.numel())
+            bins = (probability * 10).long().clamp(0, 9)
+            predicted = torch.bincount(bins, weights=probability, minlength=10)
+            observed = torch.bincount(bins, weights=target, minlength=10)
+            for index in range(10):
+                metrics[f"value_pred_bin{index}_count"] = float(predicted[index])
+                metrics[f"value_target_bin{index}_count"] = float(observed[index])
+        metrics["outcome_alive"] = float(alive_aux.detach())
+        metrics["outcome_hp"] = float(hp_aux.detach())
     if "imputation_id" in batch:
         for imputation in batch["imputation_id"].unique().tolist():
             imputation = int(imputation)
@@ -225,6 +275,11 @@ def _average_metrics(weighted: list[tuple[int, dict]]) -> dict[str, float]:
             result[key] = float(
                 sum(rows * value for rows, value in values) / max(1, denominator)
             )
+    if "preview_ce" in result:
+        return result
+    if "value_rows_count" in result:
+        result["value_ece"] = sum(abs(result[f"value_pred_bin{i}_count"] -
+                                      result[f"value_target_bin{i}_count"]) for i in range(10)) / max(1, result["value_rows_count"])
     valid = result.get("belief_valid_count", 0.0)
     dropped = result.get("belief_dropped_count", 0.0)
     result["belief_dropped_rate"] = dropped / max(1.0, valid + dropped)
@@ -500,6 +555,14 @@ def _select_trainable_parameters(agent, scope: str) -> list[torch.nn.Parameter]:
         return [parameter for parameter in agent.parameters() if parameter.requires_grad]
     for parameter in agent.parameters():
         parameter.requires_grad_(False)
+    if scope == "preview":
+        modules = [agent.backbone.embeds, agent.backbone.current_state_encoder,
+                   agent.backbone.private_state_encoder, agent.backbone.preview_context,
+                   agent.preview]
+        for selected in modules:
+            for parameter in selected.parameters():
+                parameter.requires_grad_(True)
+        return [parameter for selected in modules for parameter in selected.parameters()]
     if scope == "belief":
         module = agent.belief
     elif scope == "belief_shared":
@@ -641,7 +704,7 @@ def _select_trainable_parameters(agent, scope: str) -> list[torch.nn.Parameter]:
         ]
     else:
         raise ValueError(
-            "bc.scope must be 'full', 'belief', 'belief_shared', 'belief_value_shared', "
+            "bc.scope must be 'full', 'preview', 'belief', 'belief_shared', 'belief_value_shared', "
             "'belief_structured', 'belief_value_prior_shared', "
             "'policy_belief_value_prior_shared', 'value', 'value_prior', "
             "'value_shared', 'value_structured', 'policy', 'policy_shared', "
@@ -696,7 +759,7 @@ def _split_replay_manifest(
 
 def train(cfg: dict) -> dict:
     from fog.models.agent import FogAgent
-    from fog.training.dataset import ReplayDataset, StreamingReplayDataset
+    from fog.training.dataset import PreviewDataset, ReplayDataset, StreamingReplayDataset
     from fog.training.preflight import require_preflight
 
     require_preflight(cfg)
@@ -712,7 +775,6 @@ def train(cfg: dict) -> dict:
             raise ValueError("bc.torch_threads must be positive")
         torch.set_num_threads(threads)
     selection_metric = str(bc_cfg.get("selection_metric", "loss"))
-    keep_best_value = bool(bc_cfg.get("keep_best_value", False))
     if selection_metric not in {"loss", "action_ce"}:
         raise ValueError("bc.selection_metric must be 'loss' or 'action_ce'")
     loss_cfg = cfg.get("loss", {})
@@ -739,6 +801,20 @@ def train(cfg: dict) -> dict:
             manifest, ckpt_dir.parent, holdout_fraction, seed
         )
 
+    preview_only = bool(bc_cfg.get("preview_only", False))
+    if preview_only:
+        if (bc_cfg.get("save_best_value", False) or bc_cfg.get("keep_best_value", False)
+                or bc_cfg.get("scope") != "preview"):
+            raise ValueError(
+                "preview_only requires scope=preview and save_best_value=false "
+                "(keep_best_value too)"
+            )
+        if float(loss_cfg.get("preview_coef", 0.0)) <= 0:
+            raise ValueError("preview_only requires positive loss.preview_coef")
+        if any(bc_cfg.get(k) for k in ("auxiliary_manifest", "guard_train_manifest", "guard_holdout_manifest")):
+            raise ValueError("preview_only uses a single preview training/holdout source")
+        loss_cfg = {**loss_cfg, "_preview_only": True}
+
     resume = bool(bc_cfg.get("resume", False))
     state_path = ckpt_dir / "bc_state.pt"
     resume_settings = _resume_settings(cfg, manifest, eval_manifest) if resume else None
@@ -749,10 +825,19 @@ def train(cfg: dict) -> dict:
             raise ValueError("cannot resume: unsupported bc_state.pt version")
         _check_resume_settings(resumed["settings"], resume_settings)
 
+    # Two keys ask for a separately selected value checkpoint (`bc_best_value.pt`):
+    # `bc.keep_best_value` (brief 05) keeps the checkpoint only; `bc.save_best_value` (brief 09)
+    # also adds value Brier/calibration columns and writes `value_selection.json`.
+    save_best_value = bool(bc_cfg.get("save_best_value", False))
+    track_best_value = save_best_value or bool(bc_cfg.get("keep_best_value", False))
+    if save_best_value:
+        loss_cfg = {**loss_cfg, "_value_diagnostics": True}
     streaming = bool(bc_cfg.get("streaming", False))
     shard_buffer = int(bc_cfg.get("shard_buffer", 64))
 
     def make_dataset(path, *, training: bool, force_policy_valid: bool = False):
+        if preview_only:
+            return PreviewDataset(path, limit_rows=limit if training else None)
         if streaming:  # 150k-game corpora: shard-streaming, no full concat
             return StreamingReplayDataset(
                 path,
@@ -858,7 +943,7 @@ def train(cfg: dict) -> dict:
         f"; holdout={len(eval_ds)} rows" if eval_manifest is not None else "; eval=train subset"
     )
     print(
-        f"BC dataset: train={len(ds)} decision rows{split_note}  "
+        f"BC dataset: train={len(ds)} {'preview' if preview_only else 'decision'} rows{split_note}  "
         f"(config_hash={config_hash(cfg)}, torch_threads={torch.get_num_threads()})"
     )
     agent = FogAgent.from_tables(cfg).to(device)
@@ -1120,7 +1205,7 @@ def train(cfg: dict) -> dict:
         # was committed. Restore both to the last complete epoch before replaying that epoch.
         _write_metrics(metrics_path, history)
         torch.save(resumed["best_model"], ckpt_dir / "bc_best.pt")
-        if keep_best_value:
+        if track_best_value:
             torch.save(resumed["best_value_model"], ckpt_dir / "bc_best_value.pt")
         _restore_rng_state(resumed["rng"])
         print(f"[bc] resume: completed epoch {resumed['epoch']}/{epochs}", flush=True)
@@ -1179,11 +1264,15 @@ def train(cfg: dict) -> dict:
     if resumed is None:
         history.append(baseline_row)
         _write_metrics(metrics_path, history)
-    print(
-        f"[bc] baseline  loss={baseline['loss']:.3f}  "
-        f"belief={baseline['belief']:.3f}  chain={baseline['belief_chain']:.3f}",
-        flush=True,
-    )
+    if preview_only:
+        print(f"[bc] preview baseline CE={baseline['preview_ce']:.3f} "
+              f"top1={baseline['preview_top1']:.3f}", flush=True)
+    else:
+        print(
+            f"[bc] baseline  loss={baseline['loss']:.3f}  "
+            f"belief={baseline['belief']:.3f}  chain={baseline['belief_chain']:.3f}",
+            flush=True,
+        )
     if auxiliary_baseline is not None:
         print(
             f"[bc] auxiliary baseline loss={auxiliary_baseline['loss']:.3f}  "
@@ -1216,16 +1305,20 @@ def train(cfg: dict) -> dict:
     best_eval_loss = initial_selection_loss
     best_meaningful_eval_loss = initial_selection_loss
     best_epoch = 0
-    best_value_mse = baseline["value"]
-    best_value_epoch = 0
     epochs_without_improvement = 0
     step = 0
     start_epoch = 0
+    best_value_loss = baseline["value"] if track_best_value else float("inf")
+    best_value_epoch = 0
     if resumed is None:
         torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
-        if keep_best_value:
+        if track_best_value:
             torch.save(agent.state_dict(), ckpt_dir / "bc_best_value.pt")
     else:
+        if track_best_value:
+            # State files written before the two keys were unified name this `best_value_mse`.
+            best_value_loss = resumed.get("best_value_loss", resumed.get("best_value_mse"))
+            best_value_epoch = resumed["best_value_epoch"]
         best_eval_loss = resumed["best_eval_loss"]
         best_meaningful_eval_loss = resumed["best_meaningful_eval_loss"]
         best_epoch = resumed["best_epoch"]
@@ -1233,9 +1326,6 @@ def train(cfg: dict) -> dict:
         step = resumed["step"]
         start_epoch = resumed["epoch"]
         metrics = resumed["metrics"]
-        if keep_best_value:
-            best_value_mse = resumed["best_value_mse"]
-            best_value_epoch = resumed["best_value_epoch"]
         if resumed["early_stopped"]:
             start_epoch = epochs
     for epoch in range(start_epoch, epochs):
@@ -1653,25 +1743,30 @@ def train(cfg: dict) -> dict:
             best_epoch = epoch + 1
             torch.save(agent.state_dict(), ckpt_dir / "bc_best.pt")
 
-        if keep_best_value and eval_metrics["value"] < best_value_mse:
-            best_value_mse = eval_metrics["value"]
+        if track_best_value and eval_metrics["value"] < best_value_loss:
+            best_value_loss = eval_metrics["value"]
             best_value_epoch = epoch + 1
             torch.save(agent.state_dict(), ckpt_dir / "bc_best_value.pt")
-
         if selection_loss < best_meaningful_eval_loss - early_stopping_min_delta:
             best_meaningful_eval_loss = selection_loss
             epochs_without_improvement = 0
         else:
             epochs_without_improvement += 1
-        print(
-            f"[bc] epoch {epoch+1}/{epochs}  train_loss={train_metrics['loss']:.3f}  "
-            f"eval_loss={eval_metrics['loss']:.3f}  "
-            f"belief={eval_metrics['belief']:.3f}  chain={eval_metrics['belief_chain']:.3f}  "
-            f"value={eval_metrics['value']:.3f}  "
-            f"query_p={eval_metrics.get('belief_chain_true_prob', 0.0):.3f}  "
-            f"dropped={eval_metrics['belief_chain_dropped_rate']:.3%}",
-            flush=True,
-        )
+        if preview_only:
+            print(f"[bc] preview epoch {epoch+1}/{epochs} "
+                  f"train_CE={train_metrics['preview_ce']:.3f} "
+                  f"eval_CE={eval_metrics['preview_ce']:.3f} "
+                  f"top1={eval_metrics['preview_top1']:.3f}", flush=True)
+        else:
+            print(
+                f"[bc] epoch {epoch+1}/{epochs}  train_loss={train_metrics['loss']:.3f}  "
+                f"eval_loss={eval_metrics['loss']:.3f}  "
+                f"belief={eval_metrics['belief']:.3f}  chain={eval_metrics['belief_chain']:.3f}  "
+                f"value={eval_metrics['value']:.3f}  "
+                f"query_p={eval_metrics.get('belief_chain_true_prob', 0.0):.3f}  "
+                f"dropped={eval_metrics['belief_chain_dropped_rate']:.3%}",
+                flush=True,
+            )
         if auxiliary_eval_metrics is not None:
             print(
                 f"[bc] auxiliary eval loss={auxiliary_eval_metrics['loss']:.3f}  "
@@ -1708,6 +1803,12 @@ def train(cfg: dict) -> dict:
                     "best_model": torch.load(
                         ckpt_dir / "bc_best.pt", map_location="cpu", weights_only=False
                     ),
+                    **({
+                        "best_value_model": torch.load(ckpt_dir / "bc_best_value.pt", map_location="cpu", weights_only=False),
+                        "best_value_loss": best_value_loss,
+                        "best_value_mse": best_value_loss,  # brief 05's name for the same number
+                        "best_value_epoch": best_value_epoch,
+                    } if track_best_value else {}),
                     "best_eval_loss": best_eval_loss,
                     "best_meaningful_eval_loss": best_meaningful_eval_loss,
                     "best_epoch": best_epoch,
@@ -1720,13 +1821,6 @@ def train(cfg: dict) -> dict:
                     "guard_baseline": guard_baseline,
                     "initial_digests": initial_digests,
                     "rng": _rng_state(),
-                    **({
-                        "best_value_mse": best_value_mse,
-                        "best_value_epoch": best_value_epoch,
-                        "best_value_model": torch.load(
-                            ckpt_dir / "bc_best_value.pt", map_location="cpu", weights_only=False
-                        ),
-                    } if keep_best_value else {}),
                 },
                 state_path,
             )
@@ -1740,6 +1834,11 @@ def train(cfg: dict) -> dict:
 
     final = ckpt_dir / "bc_final.pt"
     torch.save(agent.state_dict(), final)
+    if save_best_value:
+        (ckpt_dir.parent / "value_selection.json").write_text(json.dumps({
+            "best_value_epoch": best_value_epoch, "best_value_loss": best_value_loss,
+            "best_policy_epoch": best_epoch,
+        }, indent=2) + "\n", encoding="utf-8")
     best_path = ckpt_dir / "bc_best.pt"
     best_state = torch.load(best_path, map_location="cpu", weights_only=False)
     changed_names = sorted(

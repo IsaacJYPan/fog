@@ -1,0 +1,77 @@
+"""Resumable preview conversion, fixed splits, and unchanged-decision verification."""
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+from collections import Counter
+import numpy as np
+import polars as pl
+from fog.constants.tables import TABLES
+from fog.constants.schema import N_NATURES,N_EV_UNITS
+from fog.encoding.entities import L
+
+root=Path.cwd();art=root/'docs/briefs/09-artifacts'
+python=str(root/'.venv/bin/python')
+commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+records=[]
+def run(name,command):
+    start=time.monotonic()
+    with (art/(name+'.txt')).open('a') as stream:
+        result=subprocess.run(command,stdout=stream,stderr=subprocess.STDOUT,env=dict(os.environ,OMP_WAIT_POLICY='PASSIVE',KMP_BLOCKTIME='0'))
+    records.append({'smoke':True,'name':name,'commit':commit,'command':command,'seconds':time.monotonic()-start,'exit_code':result.returncode})
+    (art/'preview-data-execution.json').write_text(json.dumps(records,indent=2)+'\n')
+    if result.returncode:raise SystemExit(result.returncode)
+output=Path('data/metamon_gen9ou_r1500_preview_decisions');split=Path('runs/order_blind_model/preview_split')
+run('preview-conversion',[python,'-m','fog.scripts.convert_replay_decisions','--raw','data/metamon_gen9ou_r1500','--out',str(output),'--imputations','1','--workers','4','--resume'])
+if not (split/'train_1000.parquet').exists():
+    run('preview-split',[python,'-m','fog.scripts.split_replay_manifest','--manifest',str(output/'manifest.parquet'),'--out',str(split),'--holdout-ids','data/replay_splits/p2_holdout_2000_ids.txt','--train-sizes','1000'])
+quality=json.loads((output/'quality_report.json').read_text())
+assert quality['parsed_replays']==22000 and quality['quarantined_replays']==0
+assert quality['accepted_decision_versions']==1126792 and quality['preview_rows']==44000
+old_manifest=pl.read_parquet('data/metamon_gen9ou_r1500_terminal_decisions/manifest.parquet').sort('id')
+manifest=pl.read_parquet(output/'manifest.parquet').sort('id')
+assert old_manifest.select('id','n_rows').equals(manifest.select('id','n_rows'))
+counts={'smoke':True,'commit':commit,'ordinary_arrays_bit_identical':True,'preview_records_per_game':2,'preview_imputation_id':0,'corpus':quality,'label_reasons':{},'public_prefix_checks':True}
+reasons=Counter();positions=np.zeros(6,dtype=np.int64)
+for shard in manifest['shard']:
+    with np.load(shard) as z:
+        assert len(z['preview_label'])==2 and np.all(z['preview_imputation_id']==0)
+        assert z['preview_role'].tolist()==['p1','p2']
+        assert z['preview_entities'].shape==(2,12,140)
+        assert np.isfinite(z['preview_entities']).all() and np.isfinite(z['preview_field']).all()
+        assert not z['preview_entities'][...,L.is_active].any()
+        sizes=np.sum(z['preview_species']!='',axis=1)
+        present=np.stack([np.concatenate([np.arange(6)<sizes[i],np.arange(6)<sizes[1-i]]) for i in range(2)])
+        np.testing.assert_array_equal(z['preview_entities'][...,L.hp],present.astype(np.float32))
+        opp=z['preview_entity_ids'][:,6:]
+        assert (opp[...,1]==TABLES.n_items).all()
+        assert (opp[...,3:8]==TABLES.n_moves).all()
+        assert (opp[...,8]==N_NATURES).all() and (opp[...,9:15]==N_EV_UNITS).all()
+        valid=z['preview_valid']
+        assert np.isin(z['preview_label'][valid],range(6)).all()
+        reasons.update(z['preview_label_reason'].tolist())
+        positions+=np.bincount(z['preview_label'][valid],minlength=6)
+counts['label_reasons']=dict(reasons);counts['corpus_valid_label_share']=(positions/positions.sum()).tolist()
+assert np.max(np.abs(positions/positions.sum()-1/6)) < .025
+for name,games,rows in [('train_1000',1000,52955),('holdout_manifest',2000,103944)]:
+    original=pl.read_parquet(Path('runs/order_blind_model/terminal_split')/(name+'.parquet'))
+    current=pl.read_parquet(split/(name+'.parquet'))
+    assert original['id'].to_list()==current['id'].to_list()
+    assert len(current)==games and current['n_rows'].sum()==rows
+    valid_previews=0;rejected=Counter(); shares=np.zeros(6,dtype=np.int64)
+    for old,new in zip(original.iter_rows(named=True),current.iter_rows(named=True),strict=True):
+        with np.load(old['shard']) as left,np.load(new['shard']) as right:
+            assert all(k.startswith('preview_') for k in set(right.files)-set(left.files))
+            for key in left.files:
+                np.testing.assert_array_equal(left[key],right[key],err_msg=f'{old["id"]}: {key}')
+            valid=right['preview_valid'];valid_previews+=int(valid.sum())
+            rejected.update(right['preview_label_reason'][~valid].tolist())
+            shares+=np.bincount(right['preview_label'][valid],minlength=6)
+    counts[name]={'games':games,'ordinary_rows':rows,'preview_rows':games*2,'valid_preview_rows':valid_previews,'excluded':dict(rejected),'label_share':(shares/shares.sum()).tolist()}
+assert set(pl.read_parquet(split/'holdout_manifest.parquet')['id'])==set(Path('data/replay_splits/p2_holdout_2000_ids.txt').read_text().splitlines())
+(art/'preview-data-counts.json').write_text(json.dumps(counts,indent=2)+'\n')
+shutil.copyfile(output/'quality_report.json',art/'preview-conversion-quality.json')
+shutil.copyfile(__file__,art/'preview-data-driver.txt')
+print('Preview data complete; all old arrays identical in 3,000 fixed-split games',flush=True)

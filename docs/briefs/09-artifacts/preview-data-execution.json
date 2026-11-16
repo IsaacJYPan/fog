@@ -1,0 +1,23 @@
+[
+  {
+    "smoke": true,
+    "name": "preview-conversion",
+    "commit": "c87b5198b5b48c9c9e4b24e586e8ab174bd343fa",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.scripts.convert_replay_decisions",
+      "--raw",
+      "data/metamon_gen9ou_r1500",
+      "--out",
+      "data/metamon_gen9ou_r1500_preview_decisions",
+      "--imputations",
+      "1",
+      "--workers",
+      "4",
+      "--resume"
+    ],
+    "seconds": 0.361794579999696,
+    "exit_code": 0
+  }
+]

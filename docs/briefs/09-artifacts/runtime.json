@@ -1,0 +1,10 @@
+{
+  "smoke": true,
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "logical_cpus": 5,
+  "cpu_quota": "400000 100000",
+  "torch": "2.13.0+cu130",
+  "cuda_available": false,
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "showdown_commit": "e440c4a18385274f10c405d0b158b6a962ce6d94"
+}

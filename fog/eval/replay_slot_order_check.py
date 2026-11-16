@@ -157,10 +157,18 @@ def _policy_statistic(total: np.ndarray) -> dict:
 
 def _value_statistic(total: np.ndarray) -> dict:
     count = total[0]
-    return {
+    result = {
         "brier": float(total[1] / count) if count else None,
         "ece": float(np.abs(total[12:22] - total[22:32]).sum() / count) if count else None,
     }
+    if len(total) >= 36:
+        result.update({
+            "share_below_0_1": float(total[32] / count) if count else None,
+            "observed_win_rate_below_0_1": float(total[33] / total[32]) if total[32] else None,
+            "share_above_0_9": float(total[34] / count) if count else None,
+            "observed_win_rate_above_0_9": float(total[35] / total[34]) if total[34] else None,
+        })
+    return result
 
 
 def check(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int = 256,
@@ -184,7 +192,7 @@ def check(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
     groups = ("all", "move", "not_yet_moved")
     scores = {name: np.zeros((len(table), 5), dtype=np.float64) for name in groups}
     # rows, Brier sum, ten calibration-bin counts, prediction sums and outcome sums.
-    value_totals = np.zeros((len(table), 32), dtype=np.float64)
+    value_totals = np.zeros((len(table), 36), dtype=np.float64)
     slot_counts = [0, 0, 0, 0]
     switch_counts = [0] * 5
     data = {"rows": 0, "move_rows": 0, "not_yet_moved_rows": 0, "not_yet_moved_label_slot0": 0,
@@ -229,6 +237,9 @@ def check(cfg: dict, manifest: Path, checkpoint: Path | None, *, batch_size: int
             np.add.at(value_totals, (game, 2 + bins), 1)
             np.add.at(value_totals, (game, 12 + bins), p)
             np.add.at(value_totals, (game, 22 + bins), target)
+            for selected, column in ((p < 0.1, 32), (p > 0.9, 34)):
+                np.add.at(value_totals[:, column], game[selected], 1)
+                np.add.at(value_totals[:, column + 1], game[selected], target[selected])
             for name, chosen in (("all", valid), ("move", valid & is_move),
                                  ("not_yet_moved", valid & first)):
                 if not bool(chosen.any()):

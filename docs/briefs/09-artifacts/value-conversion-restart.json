@@ -1,0 +1,9 @@
+{
+  "smoke": true,
+  "source_commit": "699bd3f5f9038c7fc094e2a722133f76a083d586",
+  "status": "interrupted; targets rejected before training",
+  "reason": "500-game check found 84 cross-perspective terminal HP mismatches, max 1/6",
+  "old_output": "data/metamon_gen9ou_r1500_value_decisions",
+  "completed_checkpoints": 7122,
+  "training_started": false
+}

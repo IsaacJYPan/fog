@@ -1,0 +1,22 @@
+import json
+from pathlib import Path
+import subprocess
+
+import torch
+from fog.models.agent import FogAgent
+
+snapshot = torch.load('runs/order_blind_model/original.pt',weights_only=False,map_location='cpu')
+torch.set_num_threads(2)
+model = FogAgent.from_tables(snapshot['cfg']).eval()
+loaded = model.load_state_dict(snapshot['state'],strict=True)
+with torch.no_grad():
+    output = model(snapshot['batch'],need_belief=False)
+assert torch.equal(output.log_probs,snapshot['log_probs'])
+assert torch.equal(output.value,snapshot['value'])
+result = {'smoke':True,'original_commit':'70cc5eda12345edffe11a998e2c4782f4ed7b161',
+          'current_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),
+          'observations':64,'strict_load':True,'missing_keys':loaded.missing_keys,
+          'unexpected_keys':loaded.unexpected_keys,'log_probs_bit_identical':True,
+          'value_bit_identical':True,'configuration':'original config, all added keys absent or off'}
+Path('docs/briefs/09-artifacts/compatibility-final.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result,indent=2))

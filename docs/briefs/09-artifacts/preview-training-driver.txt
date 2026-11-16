@@ -1,0 +1,41 @@
+"""Two small lead-training seeds, then one whole-game holdout comparison."""
+import csv
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import time
+import torch
+
+root=Path.cwd();art=root/'docs/briefs/09-artifacts'
+python=str(root/'.venv/bin/python')
+source=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+while not (art/'preview-data-counts.json').exists():
+    time.sleep(50)
+data=json.loads((art/'preview-data-counts.json').read_text())
+assert data['commit']==source and data['ordinary_arrays_bit_identical'] and data['public_prefix_checks']
+records=[]
+def run(name,command):
+    start=time.monotonic()
+    with (art/(name+'.txt')).open('a') as stream:
+        result=subprocess.run(command,stdout=stream,stderr=subprocess.STDOUT,env=dict(os.environ,OMP_WAIT_POLICY='PASSIVE',KMP_BLOCKTIME='0'))
+    records.append({'smoke':True,'name':name,'commit':source,'command':command,'seconds':time.monotonic()-start,'exit_code':result.returncode})
+    (art/'preview-training-execution.json').write_text(json.dumps(records,indent=2)+'\n')
+    if result.returncode:raise SystemExit(result.returncode)
+for name,seed in [('R5',20261201),('R5-seed2',20261202)]:
+    output=Path('runs/order_blind_model')/name
+    run(name+'-training',[python,'-m','fog.training.bc','--config','configs/replay_preview_cpu.yaml','--set',f'seed={seed}',f'log.dir={output}'])
+    shutil.copyfile(output/'metrics.csv',art/(name+'-metrics.csv'))
+    shutil.copyfile(output/'scope_verification.json',art/(name+'-scope.json'))
+    state=torch.load(output/'checkpoints/bc_state.pt',weights_only=False,map_location='cpu')
+    rows=list(csv.DictReader((output/'metrics.csv').open()))
+    selected=min(rows,key=lambda r:float(r['eval_preview_ce']))
+    assert int(selected['epoch'])==state['best_epoch'] and state['epoch']==8
+    assert not any('value' in k or 'belief' in k for k in selected)
+    selection={'smoke':True,'commit':source,'seed':seed,'best_preview_epoch':state['best_epoch'],'selection':'full holdout preview CE, includes epoch 0','initial_checkpoint':'R4/bc_best.pt','epoch_metrics':selected,'training_games':1000,'holdout_games':2000}
+    (art/(name+'-selection.json')).write_text(json.dumps(selection,indent=2)+'\n')
+    del state
+run('preview-holdout',[python,'-m','fog.eval.replay_preview_report','--config','configs/replay_preview_cpu.yaml','--checkpoint','initial-preview=runs/order_blind_model/R4/checkpoints/bc_best.pt','--checkpoint','R5=runs/order_blind_model/R5/checkpoints/bc_best.pt','--checkpoint','R5-seed2=runs/order_blind_model/R5-seed2/checkpoints/bc_best.pt','--train-manifest','runs/order_blind_model/preview_split/train_1000.parquet','--holdout-manifest','runs/order_blind_model/preview_split/holdout_manifest.parquet','--out','docs/briefs/09-artifacts/preview-holdout.json'])
+shutil.copyfile(__file__,art/'preview-training-driver.txt')
+print('Both lead seeds and holdout diagnostics complete',flush=True)

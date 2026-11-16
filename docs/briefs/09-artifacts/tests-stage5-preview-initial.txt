@@ -1,0 +1,310 @@
+F......F                                                                 [100%]
+=================================== FAILURES ===================================
+_______ test_prefix_inputs_ignore_lead_future_and_opponent_private_sheet _______
+
+    def test_prefix_inputs_ignore_lead_future_and_opponent_private_sheet():
+        replay = _replay()
+        private = _private(replay)
+        first = preview_arrays(replay, private)
+        changed = copy.deepcopy(replay)
+        changed['log'] = replay['log'].split('|start')[0] + '''|start
+    |switch|p1a: Bird|Corviknight|100/100
+    |switch|p2a: Chomp|Garchomp|100/100
+    |-ability|p2a: Chomp|Rough Skin
+    |-damage|p1a: Bird|1/100
+    |win|Bob'''
+        later = preview_arrays(changed, private)
+        for key in ('entities', 'entity_ids', 'field'):
+            np.testing.assert_array_equal(first['preview_'+key], later['preview_'+key])
+        assert not np.array_equal(first['preview_label'], later['preview_label'])
+        private['p2'] = private['p2'].copy()
+        private['p2'][:, 3:7] = TABLES.move_index('splash')
+        other = preview_arrays(replay, private)
+        for key in ('entities', 'entity_ids', 'field'):
+            np.testing.assert_array_equal(first['preview_'+key][0], other['preview_'+key][0])
+        assert not np.array_equal(first['preview_entity_ids'][1], other['preview_entity_ids'][1])
+        assert (first['preview_entities'][..., L.hp] == 1).all()
+        assert (first['preview_entities'][..., L.is_active] == 0).all()
+        for col, unknown in [(1, TABLES.n_items), (2, TABLES.n_abilities),
+                             *[(c, TABLES.n_moves) for c in range(3, 8)]]:
+>           assert (first['preview_entity_ids'][:, 6:, col] == unknown).all()
+E           assert np.False_
+E            +  where np.False_ = <built-in method all of numpy.ndarray object at 0x7ff04b126f10>()
+E            +    where <built-in method all of numpy.ndarray object at 0x7ff04b126f10> = array([[273, 160, 165, 273, 273, 273],\n       [273, 273, 273, 165, 160, 273]]) == 273.all
+
+tests/test_replay_preview.py:72: AssertionError
+__________ test_preview_only_rejects_value_selection_and_missing_coef __________
+
+tmp_path = PosixPath('/workspace/fog/.pytest-tmp/test_preview_only_rejects_valu0')
+
+    def test_preview_only_rejects_value_selection_and_missing_coef(tmp_path):
+        cfg = load_config('configs/replay_preview_cpu.yaml')
+        cfg['log']['dir'] = str(tmp_path)
+        cfg['bc']['save_best_value'] = True
+        with pytest.raises(ValueError,match='save_best_value'):
+>           bc.train(cfg)
+
+tests/test_replay_preview.py:208: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+fog/training/bc.py:784: in train
+    resume_settings = _resume_settings(cfg, manifest, eval_manifest) if resume else None
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+fog/training/bc.py:435: in _resume_settings
+    table = pl.read_parquet(source).to_dict(as_series=False)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py:132: in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py:132: in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/polars/io/parquet/functions.py:293: in read_parquet
+    return lf.collect()
+           ^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/polars/_utils/deprecation.py:97: in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv/lib/python3.12/site-packages/polars/lazyframe/opt_flags.py:361: in wrapper
+    return function(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <LazyFrame at 0x7FF011B3A2A0>, type_coercion = True
+predicate_pushdown = True, projection_pushdown = True
+simplify_expression = True, slice_pushdown = True, comm_subplan_elim = True
+comm_subexpr_elim = True, cluster_with_columns = True, collapse_joins = True
+no_optimization = False, engine = 'auto', background = False
+optimizations = <polars.lazyframe.opt_flags.QueryOptFlags object at 0x7ff011b39c10>
+_kwargs = {}
+
+    @deprecate_streaming_parameter()
+    @forward_old_opt_flags()
+    def collect(
+        self,
+        *,
+        type_coercion: bool = True,  # noqa: ARG002
+        predicate_pushdown: bool = True,  # noqa: ARG002
+        projection_pushdown: bool = True,  # noqa: ARG002
+        simplify_expression: bool = True,  # noqa: ARG002
+        slice_pushdown: bool = True,  # noqa: ARG002
+        comm_subplan_elim: bool = True,  # noqa: ARG002
+        comm_subexpr_elim: bool = True,  # noqa: ARG002
+        cluster_with_columns: bool = True,  # noqa: ARG002
+        collapse_joins: bool = True,  # noqa: ARG002
+        no_optimization: bool = False,  # noqa: ARG002
+        engine: EngineType = "auto",
+        background: bool = False,
+        optimizations: QueryOptFlags = DEFAULT_QUERY_OPT_FLAGS,
+        **_kwargs: Any,
+    ) -> DataFrame | InProcessQuery:
+        """
+        Materialize this `LazyFrame` into a `DataFrame`.
+    
+        By default, all query optimizations are enabled. Individual optimizations may
+        be disabled by setting the corresponding parameter to `False`.
+    
+        Parameters
+        ----------
+        type_coercion
+            Do type coercion optimization.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        predicate_pushdown
+            Do predicate pushdown optimization.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        projection_pushdown
+            Do projection pushdown optimization.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        simplify_expression
+            Run simplify expressions optimization.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        slice_pushdown
+            Slice pushdown optimization.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        comm_subplan_elim
+            Will try to cache branching subplans that occur on self-joins or unions.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        comm_subexpr_elim
+            Common subexpressions will be cached and reused.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        cluster_with_columns
+            Combine sequential independent calls to with_columns
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        collapse_joins
+            Collapse a join and filters into a faster join
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        no_optimization
+            Turn off (certain) optimizations.
+    
+            .. deprecated:: 1.30.0
+                Use the `optimizations` parameters.
+        engine
+            Select the engine used to process the query (default ``"auto"``):
+    
+            * ``"auto"``: use the engine set by
+              :meth:`Config.set_engine_affinity <polars.Config.set_engine_affinity>`
+              or the ``POLARS_ENGINE_AFFINITY`` environment variable, falling
+              back to ``"in-memory"`` if unset (this default may change in
+              a future release).
+            * ``"in-memory"``: use the in-memory engine, this is the default engine.
+            * ``"streaming"``: use the streaming engine, which processes
+              queries in batches, reducing memory pressure and often
+              outperforming the in-memory engine. This will soon become
+              the default engine of Polars.
+            * ``"gpu"``: use the CUDA GPU engine (requires an Nvidia GPU and
+              ``cudf-polars``). Pass a :class:`~.GPUEngine` object for
+              fine-grained control (e.g. device selection on multi-GPU systems).
+    
+            If the selected engine cannot run the query, Polars falls back to
+            the in-memory engine.
+    
+            .. note::
+               GPU mode is considered **unstable**. Not all queries will run
+               successfully on the GPU, however, they should fall back transparently
+               to the default engine if execution is not supported.
+    
+               Running with `POLARS_VERBOSE=1` will provide information if a query
+               falls back (and why).
+        background
+            Run the query in the background and get a handle to the query.
+            This handle can be used to fetch the result or cancel the query.
+    
+            .. warning::
+                Background mode is considered **unstable**. It may be changed
+                at any point without it being considered a breaking change.
+        optimizations
+            The optimization passes done during query optimization.
+    
+            .. warning::
+                This functionality is considered **unstable**. It may be changed
+                at any point without it being considered a breaking change.
+    
+        Returns
+        -------
+        DataFrame
+    
+        See Also
+        --------
+        explain : Print the query plan that is evaluated with collect.
+        profile : Collect the LazyFrame and time each node in the computation graph.
+        polars.collect_all : Collect multiple LazyFrames at the same time.
+        polars.Config.set_streaming_chunk_size : Set the size of streaming batches.
+    
+        Examples
+        --------
+        >>> lf = pl.LazyFrame(
+        ...     {
+        ...         "a": ["a", "b", "a", "b", "b", "c"],
+        ...         "b": [1, 2, 3, 4, 5, 6],
+        ...         "c": [6, 5, 4, 3, 2, 1],
+        ...     }
+        ... )
+        >>> lf.group_by("a").agg(pl.all().sum()).collect()  # doctest: +SKIP
+        shape: (3, 3)
+        ┌─────┬─────┬─────┐
+        │ a   ┆ b   ┆ c   │
+        │ --- ┆ --- ┆ --- │
+        │ str ┆ i64 ┆ i64 │
+        ╞═════╪═════╪═════╡
+        │ a   ┆ 4   ┆ 10  │
+        │ b   ┆ 11  ┆ 10  │
+        │ c   ┆ 6   ┆ 1   │
+        └─────┴─────┴─────┘
+    
+        Collect in streaming mode
+    
+        >>> lf.group_by("a").agg(pl.all().sum()).collect(
+        ...     engine="streaming"
+        ... )  # doctest: +SKIP
+        shape: (3, 3)
+        ┌─────┬─────┬─────┐
+        │ a   ┆ b   ┆ c   │
+        │ --- ┆ --- ┆ --- │
+        │ str ┆ i64 ┆ i64 │
+        ╞═════╪═════╪═════╡
+        │ a   ┆ 4   ┆ 10  │
+        │ b   ┆ 11  ┆ 10  │
+        │ c   ┆ 6   ┆ 1   │
+        └─────┴─────┴─────┘
+    
+        Collect in GPU mode
+    
+        >>> lf.group_by("a").agg(pl.all().sum()).collect(engine="gpu")  # doctest: +SKIP
+        shape: (3, 3)
+        ┌─────┬─────┬─────┐
+        │ a   ┆ b   ┆ c   │
+        │ --- ┆ --- ┆ --- │
+        │ str ┆ i64 ┆ i64 │
+        ╞═════╪═════╪═════╡
+        │ b   ┆ 11  ┆ 10  │
+        │ a   ┆ 4   ┆ 10  │
+        │ c   ┆ 6   ┆ 1   │
+        └─────┴─────┴─────┘
+    
+        With control over the device used
+    
+        >>> lf.group_by("a").agg(pl.all().sum()).collect(
+        ...     engine=pl.GPUEngine(device=1)
+        ... )  # doctest: +SKIP
+        shape: (3, 3)
+        ┌─────┬─────┬─────┐
+        │ a   ┆ b   ┆ c   │
+        │ --- ┆ --- ┆ --- │
+        │ str ┆ i64 ┆ i64 │
+        ╞═════╪═════╪═════╡
+        │ b   ┆ 11  ┆ 10  │
+        │ a   ┆ 4   ┆ 10  │
+        │ c   ┆ 6   ┆ 1   │
+        └─────┴─────┴─────┘
+        """
+        for k in _kwargs:
+            if k not in (  # except "private" kwargs
+                "post_opt_callback",
+            ):
+                error_msg = f"collect() got an unexpected keyword argument '{k}'"
+                raise TypeError(error_msg)
+    
+        engine = _select_engine(engine)
+    
+        callback = _gpu_engine_callback(
+            engine,
+            background=background,
+            _eager=optimizations._pyoptflags.eager,
+        )
+    
+        if isinstance(engine, GPUEngine):
+            engine = "gpu"
+    
+        ldf = self._ldf.with_optimizations(optimizations._pyoptflags)
+        if background:
+            issue_unstable_warning("background mode is considered unstable.")
+            return InProcessQuery(ldf.collect_concurrently())
+    
+        # Only for testing purposes
+        callback = _kwargs.get("post_opt_callback", callback)
+>       return wrap_df(ldf.collect(engine, callback))
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: No such file or directory (os error 2): runs/order_blind_model/preview_split/train_1000.parquet
+
+.venv/lib/python3.12/site-packages/polars/lazyframe/frame.py:2624: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/test_replay_preview.py::test_prefix_inputs_ignore_lead_future_and_opponent_private_sheet
+FAILED tests/test_replay_preview.py::test_preview_only_rejects_value_selection_and_missing_coef
+2 failed, 6 passed in 17.16s
