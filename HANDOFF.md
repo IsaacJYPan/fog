@@ -10,8 +10,11 @@ code or an artifact, evidence named) or **[assumed]**. Unmeasured numbers are ne
 1. Read this file, then `AGENTS.md`, `ROADMAP.md`, `docs/briefs/QUEUE.md`, `docs/briefs/REVIEW.md`, and
    the newest sections of `docs/results-ledger.md` (from "review of brief 08" down).
 2. **What changed on 2026-11-16:** briefs 08, 09 and 11 are reviewed and merged; **gate G1
-   passed**; the search-distillation code exists and its pilot has started (section 4).
-   Workers may be running briefs 12, 13 (part A) and 16; their branches are the next reviews.
+   passed**; the search-distillation loop runs and its networks are the strongest policies
+   without search in the repository (section 4); hosted GPU training and hosted CPU
+   collection work from the planner's session (section 9). Workers are on briefs 12 and 13
+   (`work/replay-parity`, `work/p2-scale-corrected` each had a first commit at 13:07 UTC);
+   their branches are the next reviews. Brief 16 had not started.
 3. Set the git identity before any commit: `git config user.name "Isaac Pan"` and
    `git config user.email "154495180+IsaacJYPan@users.noreply.github.com"`. A fresh container has
    another identity.
@@ -79,11 +82,11 @@ checkpoints are git-ignored and will not exist in a fresh session. Rebuild (sect
 | `docs/equilibrium-training.md`, `docs/notes/kuhn_anchor.py` | Design note (section 6) and the Kuhn poker script |
 | Queue, review procedure, briefs 10 to 14 | `docs/briefs/QUEUE.md`, `REVIEW.md`, `10`..`14-*.md` |
 
-| Brief 08: GPU update speed (merged 2026-11-16) | T4, four CPU cores: PPO optimizer step 6.085 to 1.315 s, 122.8 decisions/s end to end, update still 52.3% of wall time; replay trainer 1,850 rows/s. The measured step still ran all belief passes (73% of its forward). **Hosted GPU meter: 3.69 hours left until it resets on 2026-11-21 00:00 UTC** |
+| Brief 08: GPU update speed (merged 2026-11-16) | T4, four CPU cores: PPO optimizer step 6.085 to 1.315 s, 122.8 decisions/s end to end, update still 52.3% of wall time; replay trainer 1,850 rows/s. The measured step still ran all belief passes (73% of its forward). The 3.69 GPU-hours this review read as left was wrong: the meter's total is 45 hours, and 27.5 were left on 2026-11-16 |
 | Brief 09: order-blind model (merged 2026-11-16) | Review confirmed: permutation test (all parameters perturbed, five permutations, key-off control), defaults bit-compatible (same state tensors and seeded values; three digests equal before and after on an Intel Xeon). R4 (`configs/replay_mechanical_cpu.yaml`) is the configuration brief 13 uses. Merge unified `bc.keep_best_value` and `bc.save_best_value`; a test shows the outcome auxiliary heads survive `loss.skip_unweighted_belief`. **Gap found in review:** the lead stage also trains weights the policy reads and nobody measured the effect (brief 13 does) |
 | Brief 11: gate G1 (merged 2026-11-16, run completed in review) | **G1 passed.** EngineMCTS, K = 8, 1,600 ms, validation teams: 936 of 1,008 against SimpleHeuristics (0.9286 [0.9110, 0.9429]), 981 of 1,008 against MaxDamage (0.9732 [0.9613, 0.9815]); fallbacks 0.19% and 0.17%; no rejected action. The last 504 MaxDamage games ran on a different machine (490 and 491 wins in the two halves). Budget curve: K = 8 beats K = 1 by 7 to 13 points at every budget; 200, 800 and 3,200 ms at K = 8 score 91.0, 91.75 and 90.5% (400 games each), so search time is not the limit |
 | `fog/training/search_distill.py` (planner's own work, P3.1) | The network plays on pinned Showdown, EngineMCTS labels every decision of a recorded side from that side's own view and plays its own move with probability `beta`; one file a game, resumable; soft-target training without belief passes. Tests `tests/test_search_distill.py`. Config `configs/search_distill_cpu.yaml` |
-| Briefs 15 and 16 written; brief 13 split | 15: distillation pilot (section 4). 16: EngineMCTS once on the test teams for tier T1. 13: part A (3 GPU-hours, 20,000 games) now, part B after the meter reset |
+| Briefs 15 and 16 written; brief 13 split | 15: distillation pilot (section 4). 16: EngineMCTS once on the test teams for tier T1. 13: first split in two for lack of GPU time, then made whole again (20 GPU-hours) when the meter was read correctly |
 
 ### Why brief 07's finding matters (do not lose this)
 
@@ -104,32 +107,47 @@ lean on a shortcut that does not exist in play.** Their timing, value and play n
 | Brief | Branch | What it will hand back |
 | --- | --- | --- |
 | 12 replay and live parity (CPU) | `work/replay-parity` | A parity check between replay rows and live observations, then own PP, forced replacements and the history record fixed in the converter |
-| 13 part A (GPU, at most 3.0 hours) | `work/p2-scale-corrected` | R4 keys on 20,000 corrected games with the belief skip, value at both checkpoints, the lead-stage check, 400 games on `pool_b` and 1,000-game rows on validation teams; each G2 clause |
+| 13 (GPU, 20 hours, no longer split: the meter had 27.5 hours left, not 3.7) | `work/p2-scale-corrected` | R4 keys on corrected games with the belief skip, value at both checkpoints, the lead-stage check, play rows on validation teams; each G2 clause |
 | 16 EngineMCTS on the test teams (CPU, about 8 hours) | `work/t1-search` | One run, 1,008 games an opponent; tier T1 clauses met or not |
 
 Review each with `docs/briefs/REVIEW.md` when its branch appears (`git ls-remote --heads origin`).
 
-### The distillation pilot (brief 15), run by the planner [verified; ledger "search distillation pilot"]
+### The distillation loop (brief 15 pilot, continued by the planner) [verified; ledger "search distillation pilot" and the sections after it]
 
-Three rounds were planned: round 0 the teacher plays; rounds 1 and 2 the previous network
-plays with the teacher's move one time in four; each network is trained from random weights
-on all rounds so far. Teacher: EngineMCTS, K = 8, 200 ms (0.32 s a labelled row on four cores
-including the label check).
+Round 0 the teacher plays; in every later round the previous network plays with the teacher's
+move one time in four; each network is trained from random weights on all rounds so far.
+Teacher: EngineMCTS, K = 8, 200 ms (0.35 s a labelled row on four cores including the label
+check). Play rows: the network alone, greedy, 1,008 games an opponent, validation teams.
 
-| Round | Rows | Result |
-| --- | --- | --- |
-| 0 | 60,862 from 1,211 games | Label check: the 200 ms teacher picks the 1,600 ms teacher's action on 73.8% of 542 checked decisions (late-game positions only), its own second seed's on 86.5%. Network 0 (58,160 rows, 8 epochs, 28 minutes on four cores): top-1 agreement with the teacher 49.3%; **without search 0.450 against SimpleHeuristics and 0.815 against MaxDamage** (400 games each, validation teams, smoke); the untrained network scores 0.0075 and 0.0475 |
-| 1, 2 | see the ledger section | If the ledger section stops at round 0 or 1, the session ended there |
+| Network | Training rows | SimpleHeuristics | MaxDamage |
+| --- | --- | --- | --- |
+| untrained (400 games, smoke) | 0 | 0.008 | 0.048 |
+| 0 | 58,160 | 0.448 [0.418, 0.479] | 0.815 [0.790, 0.838] |
+| 1 | 118,518 | 0.615 [0.585, 0.645] | 0.909 [0.889, 0.925] |
+| 2 | 178,317 | 0.682 [0.653, 0.710] | 0.923 [0.904, 0.937] |
+| later rounds | see the ledger | the ledger's last "search distillation" section is where the session stopped |
+
+The teacher itself scores 0.929 and 0.973 (gate G1). The 200 ms teacher picks the 1,600 ms
+teacher's action on 76% to 78% of decisions sampled over whole games.
+
+What the loop has shown [measured unless marked]:
+
+- Strength is still rising with rows, more slowly each round (16.7 then 6.7 points against
+  SimpleHeuristics).
+- The teacher's root value barely predicts the result (58.6% to 59.7% sign agreement; MSE
+  0.91 where a constant scores 1.0), and not at all before the last quarter of a game. The
+  network's value head after one epoch (0.776) is better than the teacher's value; after
+  that it memorises the 3,300 games. `value_best.pt` keeps the best epoch.
+- Not yet measured: sharper targets (`--target-power 2`), outcome-only value targets
+  (`--value-mix 0`), initial weights from a replay blueprint, any game against EngineMCTS
+  (gate G3's 30% clause). The first two were submitted as one GPU job on 2026-11-16; if the
+  ledger has no row for them, the job's result was not collected.
 
 **Data and checkpoints are not in the repository** (`runs/` is ignored and the container is
-ephemeral). The ledger records every command and seed; collection of a round costs about 80
-minutes on four cores, training 30 to 60. A session that continues the pilot regenerates
-what it needs.
-
-Open questions the pilot has raised [assumed until measured]: the teacher's visit
-distributions are flat (about 1.77 nats), so a network that fits them is diffuse, and
-sharper targets might play better; mirror games give 72% of round 0's rows; the lead is
-chosen by an untrained head.
+ephemeral). Every round and every network's `policy_best.pt` is in the owner's private hosted
+dataset (`kaggle datasets list --mine`; one `roundN.tar` a collection folder, `netN.pt` a
+network), so a new session downloads them instead of regenerating them. SHA-256 of each
+reported checkpoint is in the ledger.
 
 ## 5. Decisions made and why (do not reopen without new evidence)
 
@@ -304,18 +322,18 @@ team (reported, not fixed).
 
 ## 8. Next steps, in priority order
 
-1. **Finish the distillation pilot** if the ledger section "search distillation pilot" does
-   not report rounds 1 and 2, the 1,000-game rows for the best network, and 400 games against
-   EngineMCTS (`docs/briefs/15-distil-engine-mcts.md`, sections 5 and 6). Then write the full
-   P3 brief (one million decisions, P3.2 to P3.4, gate G3) from what the pilot showed: how
-   strength grows with rows, whether sharper targets are needed, and which initial weights
-   (the brief 13 blueprint when it exists).
-2. **Review brief 13 part A** when it appears. It decides G2's measurable clauses (65% against
-   SimpleHeuristics; value ECE below 0.05 and Brier below 0.24). Part B waits for the GPU
-   meter reset on 2026-11-21; if brief 12 is merged by then, part B uses its rows.
+1. **Keep the distillation loop going** toward one million rows (`docs/briefs/17-distil-at-scale.md`
+   has the plan and gate G3; the planner has been running it directly because the data and the
+   hosted account are in its session). One round: upload the acting network to the private
+   dataset, collect on this machine and on hosted CPU machines at once (one seed and one
+   folder a machine), train on a hosted GPU, play 1,008 games an opponent here. Then the G3
+   row: 1,008 games against EngineMCTS at K = 8 and 1,600 ms. Section 9 has the mechanics.
+2. **Review brief 13** when it reports. It decides G2's measurable clauses (65% against
+   SimpleHeuristics; value ECE below 0.05 and Brier below 0.24) and measures whether the lead
+   stage moves the policy. If brief 12 is merged first, its rows should be used.
 3. **Review brief 12**, then brief 16. Brief 16's result goes under the tier table in
    `ROADMAP.md` section 1.
-4. **Brief 14** (PPO update levers, GPU 2 hours) after the meter reset; self-play stays frozen
+4. **Brief 14** (PPO update levers, GPU 2 hours) when the GPU is free; self-play stays frozen
    until G3, so it is the lowest priority.
 5. After G3: P4 (learned parts inside search). The budget curve says the search is limited
    by what it assumes about the opponent's team, not by search time, which is what P4.1's
@@ -355,6 +373,27 @@ team (reported, not fixed).
   time on the account (brief 05 and brief 06 overlapped once and had to be re-planned).
 - The planner's harness blocks `sleep` chains; wait with an until-loop on a file or run the command in the
   background. Long jobs: detach and poll; some environments end background jobs after two hours.
+- **A cloud session's container is suspended when the session goes idle** unless a
+  harness-tracked background command is running. A job detached with `setsid nohup` does not
+  count: on 2026-11-16 the loop died minutes after the planner's turn ended. Files survive
+  the suspension; processes do not. Run long jobs as tracked background commands (two-hour
+  limit each) and make them resumable.
+- **Hosted account from the planner's session.** The CLI lives in its own virtual environment
+  (not in `.venv`); the token is an environment secret; the environment's network list needs
+  `www.kaggle.com`, `api.kaggle.com`, `storage.googleapis.com` and
+  `www.kaggleusercontent.com`. Read `kaggle quota --format json` before a GPU job (27.5 of 45
+  hours were left on 2026-11-16 13:00 UTC; reset 2026-11-21). Never print or commit the
+  account name or the dataset name.
+  - GPU training: `docs/briefs/15-artifacts/gpu_train_job.py` (a list of runs in one job). A
+    T4 trains 118,518 rows in 44 s an epoch against about 7 minutes on four cores, and
+    reproduces the CPU run's held-out numbers. A GPU job can wait in the host's queue: one
+    waited more than half an hour on 2026-11-16.
+  - CPU collection or evaluation: `docs/briefs/15-artifacts/hosted_cpu_job.py` (builds
+    Showdown and the engine, runs the listed commands, stores each output folder as a tar).
+    Output of a job that overruns is lost, hence `collect --max-seconds`. Logs are not
+    readable while a job runs.
+  - `kaggle kernels output <kernel> -p <folder>` downloads results; the session's permission
+    check refused it once and allowed a plainer form of the same command later.
 - Smogon forum pages answer 403 from cloud sandboxes; the forum team bank must be collected on the owner's
   laptop (optional now).
 - Fixed ranges worth remembering: 1,000 games a pair is the minimum for a gate row; Wilson intervals for win
@@ -369,7 +408,9 @@ team (reported, not fixed).
 | Brief 09's permutation test on replay holdout rows; its trainings and play smoke | not re-run (no replay data in the review container); the worker's claim |
 | Gate G1 rows | [verified]: `docs/briefs/11-artifacts/gate/merged.json`; MaxDamage row played on two machines |
 | `search_distill`: stored rows reproduce live log-probabilities; targets valid; resume | [verified] by `tests/test_search_distill.py` on pinned Showdown |
-| Pilot round 0 and network 0 | [verified], smoke (400 games a cell), one seed |
+| Distillation rounds 0 to 2 and networks 0 to 2 | [verified]: 1,008 games a cell, one training seed each; play JSONs in `docs/briefs/15-artifacts/` |
+| Hosted GPU training equals CPU training | [verified] once: network 1 retrained on a T4, held-out cross-entropy 1.8286 against 1.829, top-1 56.6% against 56.7% |
+| Hosted CPU collection gives labels of the same quality | see the ledger; not verified if no row compares simulations per label and label-check agreement between machines |
 | Full test suite | last run 2026-11-14 (1,017 passed, 3 skipped, 3 expected failures, 1 failed); reviews since ran covering files only |
 | Belief-loop fix and `skip_unweighted_belief` at scale or on a GPU | not verified (brief 13 uses the skip on a GPU) |
 | Replay models at scale on corrected rows | not run (brief 13) |
@@ -388,5 +429,6 @@ team (reported, not fixed).
    `python -m fog.scripts.build_public_team_splits --bank data/teams/public_gen9ou --out
    data/teams/gen9ou_public_v1`, and decide whether to track the three split packages. Tier claims should use
    them when they exist.
-4. GPU time: 3.69 hours were left on the hosted meter on 2026-11-15, reset on 2026-11-21 (brief 13 part B
-   asks for 17 hours after it); ladder account and team choices; where long CPU jobs run (`ROADMAP.md` section 8).
+4. GPU time: 27.5 of 45 hours were left on 2026-11-16 (the earlier 3.69 was a misreading), reset on
+   2026-11-21; brief 13 may use 20. Ladder account and team choices; where long CPU jobs run
+   (`ROADMAP.md` section 8).
