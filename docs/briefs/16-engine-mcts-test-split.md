@@ -14,6 +14,9 @@ nothing else.
 
 **Start only if `docs/briefs/QUEUE.md` says gate G1 passed.**
 
+**2026-11-16 22:40 UTC: the planner is running this measurement itself (results go to
+`work/roadmap`). Do not start it again: the test teams are run once.**
+
 ## 2. Rules
 
 - Branch **`work/t1-search`** from `work/roadmap`. Push after each opponent finishes.
