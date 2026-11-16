@@ -18,19 +18,21 @@ ENV={**os.environ,'OMP_NUM_THREADS':'2','MKL_NUM_THREADS':'2','OMP_WAIT_POLICY':
      'MALLOC_MMAP_THRESHOLD_':'131072','MALLOC_TRIM_THRESHOLD_':'131072'}
 
 
-def run(module, arguments, log):
+def run(module, arguments, log, threads=None):
     command=[str(PYTHON),'-u',str(WRAPPER),module,*arguments]
     print('Running:', ' '.join(command), flush=True)
     with Path(log).open('a') as stream:
-        subprocess.run(command, cwd=ROOT, env=ENV, stdout=stream, stderr=subprocess.STDOUT, check=True)
+        env=ENV if threads is None else {**ENV,'OMP_NUM_THREADS':str(threads),'MKL_NUM_THREADS':str(threads)}
+        subprocess.run(command, cwd=ROOT, env=env, stdout=stream, stderr=subprocess.STDOUT, check=True)
 
 
 def train(name):
+    threads=2 if name=='old' else 4
     run('fog.training.bc',['--config','configs/replay_mechanical_cpu.yaml','--set',
         f'bc.manifest=runs/replay-parity/split-{name}/train_1000.parquet',
         f'bc.holdout_manifest=runs/replay-parity/split-{name}/holdout_manifest.parquet',
-        'bc.torch_threads=2',f'log.dir=runs/replay-parity/train-{name}','seed=20261201'],
-        f'/tmp/parity-train-{name}.txt')
+        f'bc.torch_threads={threads}',f'log.dir=runs/replay-parity/train-{name}','seed=20261201'],
+        f'/tmp/parity-train-{name}.txt',threads=threads)
 
 
 def alive(pid):

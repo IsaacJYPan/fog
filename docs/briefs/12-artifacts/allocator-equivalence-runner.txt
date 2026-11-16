@@ -1,5 +1,6 @@
 """Check allocation-only runtime settings on recorded rows and a full BC backward pass."""
 import hashlib
+import os
 from pathlib import Path
 import sys
 sys.path.insert(0,str(Path.cwd()))
@@ -14,7 +15,7 @@ from fog.constants.tables import TABLES
 from fog.training.search_distill import build_agent
 from fog.training.bc import bc_loss
 
-torch.set_num_threads(2)
+torch.set_num_threads(int(os.environ.get("FOG_EQ_THREADS", "2")))
 cfg=load_config('configs/replay_mechanical_cpu.yaml')
 manifest=pl.read_parquet('runs/replay-parity/split-new/holdout_manifest.parquet')
 parts={k:[] for k in _ARRAYS}

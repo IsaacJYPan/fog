@@ -3565,3 +3565,14 @@ eight direct model-input captures, a 256-row full BC loss/backward pass and all 
 gradient tensors are **bit-identical** (`allocator-equivalence.json`). This is a runtime memory
 setting, not a different training recipe. Both runs remain CPU-only; trained-play results are
 still pending.
+
+Execution update (smoke): the old run used two threads while sharing the machine with data work.
+The new run now uses the four available CPU cores. Before the change, the same recorded-row
+check compared two and four threads: inputs are identical; maximum output difference is
+5.72e-6, full-BC-loss difference 2.38e-7 and gradient difference 2.24e-7, all within the existing
+1e-5 float32-equivalence tolerance (`thread-equivalence.json`). These are numerical-equivalence
+checks, not bit-identity claims. Model keys, losses, optimizer, batch order and seed are unchanged.
+The two-thread new run was intentionally stopped before its first completed epoch; no model
+result from that partial attempt is reported. The final new command uses `bc.torch_threads=4`,
+and `stage3-driver.txt` records the runtime settings. This supersedes the earlier two-thread
+execution note for the new run only.
