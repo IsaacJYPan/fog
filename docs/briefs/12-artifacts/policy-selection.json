@@ -1,0 +1,19 @@
+{
+  "kind": "smoke",
+  "seed": 20261201,
+  "epochs": 8,
+  "runs": {
+    "old": {
+      "best_policy_epoch": 7,
+      "torch_threads": 2,
+      "full_holdout_nll": 1.8052904115559587,
+      "full_holdout_top1": 0.3321591815964634
+    },
+    "new": {
+      "best_policy_epoch": 6,
+      "torch_threads": 4,
+      "full_holdout_nll": 1.6245420556914896,
+      "full_holdout_top1": 0.37598084204610394
+    }
+  }
+}

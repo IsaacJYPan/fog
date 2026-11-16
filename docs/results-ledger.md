@@ -3583,3 +3583,27 @@ resumes to the identical full report (`tests/test_replay_parity_training.py`, tw
 `ruff check fog tests` remains clean. This changes evaluation recovery only, not its rows or
 metrics. A 16-game control using the same old checkpoint in both slots also gives identical
 metrics for every input view (`scorer-control.json`, smoke).
+
+### Stage 3 training and paired holdout (smoke)
+
+Both R4 trainings completed eight epochs on the same 1,000 games and seed 20261201. The old/new policy selections are epochs 7/6 (`policy-selection.json`, both `train-*-metrics.csv`). The full-holdout NLLs are 1.8053/1.6245, but those have different row mixes and are **not** the comparison below.
+
+Old data comes from `79283c9`; corrected conversion is `9e3f579`. Model/trainer code is unchanged across training. The old run started at `a9b746f`; the new run used `2140165` with the four-thread command recorded in `97ed373`. The two/four-thread and allocator equivalence limits are recorded above. Reproduction command: `.venv/bin/python -u docs/briefs/12-artifacts/stage3-driver.txt`; training expands to `fog.training.bc --config configs/replay_mechanical_cpu.yaml --set bc.manifest=runs/replay-parity/split-{old,new}/train_1000.parquet bc.holdout_manifest=runs/replay-parity/split-{old,new}/holdout_manifest.parquet bc.torch_threads={2,4} log.dir=runs/replay-parity/train-{old,new} seed=20261201`. CPU only.
+
+The paired scorer at `6b5086c` uses the same 2,000 holdout games: **95,988 common normal decisions, zero label disagreements**, 19,514 new replacements (17,941 nontrivial). Each normal-input view uses exactly the same labels and rows. Intervals below resample whole games (both sides together), 1,000 draws, seed 12000.
+
+| Model / input view (smoke) | Rows | NLL [95% game bootstrap] | Top-1 % [95% game bootstrap] |
+| --- | ---: | --- | --- |
+| old_model_old_rows | 95,988 | 1.7803 [1.7732, 1.7872] | 34.13 [33.73, 34.51] |
+| old_model_new_rows | 95,988 | 1.7762 [1.7691, 1.7840] | 34.34 [33.95, 34.71] |
+| new_model_old_rows | 95,988 | 1.9013 [1.8920, 1.9113] | 33.05 [32.67, 33.41] |
+| new_model_new_rows | 95,988 | 1.7178 [1.7102, 1.7252] | 36.60 [36.21, 36.99] |
+| old_model_new_replacements | 19,514 | 1.2182 [1.2086, 1.2278] | 38.35 [37.64, 39.08] |
+| new_model_new_replacements | 19,514 | 1.1646 [1.1546, 1.1742] | 42.56 [41.82, 43.27] |
+| old_model_nontrivial_replacements | 17,941 | 1.3250 [1.3171, 1.3326] | 32.94 [32.27, 33.63] |
+| new_model_nontrivial_replacements | 17,941 | 1.2667 [1.2580, 1.2748] | 37.52 [36.78, 38.25] |
+
+Command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.replay_parity_training --old-manifest runs/replay-parity/split-old/holdout_manifest.parquet --new-manifest runs/replay-parity/split-new/holdout_manifest.parquet --old-metadata runs/replay-parity/old-metadata --old-checkpoint runs/replay-parity/train-old/checkpoints/bc_best.pt --new-checkpoint runs/replay-parity/train-new/checkpoints/bc_best.pt --out docs/briefs/12-artifacts/holdout-comparison.json`. The saved report retains per-game sums, exact checkpoint hashes and all four normal model/input cells. Recovery adds `--resume` with unchanged metrics.
+
+On corrected normal inputs the new model improves both metrics; on old inputs it worsens (NLL 1.7803→1.9013), so it is not input-version interchangeable. Added one-option replacements have zero policy CE; both all/nontrivial replacement aggregates are reported to avoid hiding this. These are imitation diagnostics, not strength gates. The four 400-game play rows are running; no play effect is claimed yet.
+
