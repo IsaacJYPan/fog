@@ -189,3 +189,42 @@ def test_assault_vest_blocks_status_moves_after_trick():
     replay["log"] = replay["log"].replace('|turn|1', '|-item|p1a: Garchomp|Assault Vest|[from] move: Trick\n|turn|1')
     first = parse_replay(replay, private_sets=sheets)["rows"][0]
     assert not first["mask"][[2, 3, 6, 7]].any()
+
+
+def test_tera_ogerpon_replacement_label_uses_submitted_species():
+    replay, sheets = fixture()
+    sheets["p1"][1, 0] = TABLES.species_index("ogerponwellspring")
+    replay["log"] = replay["log"].replace('|poke|p1|Dragonite, M|', '|poke|p1|Ogerpon-Wellspring, F|')
+    replay["log"] = replay["log"].replace('p1a: Dragonite', 'p1a: Ogerpon').replace('|Dragonite, M|', '|Ogerpon-Wellspring-Tera, F, tera:Water|')
+    rows = parse_replay(replay, private_sets=sheets)["rows"]
+    replacements = [r for r in rows if r["role"] == "p1" and r["obs"].decision_phase == 1]
+    assert len(replacements) == 1
+    assert replacements[0]["policy_valid"] and replacements[0]["action"] == 8
+
+
+def test_normal_struggle_phase_survives_both_dataset_loaders(tmp_path):
+    import polars as pl
+    import torch
+
+    from fog.scripts.parse_replays import rows_to_arrays
+    from fog.training.dataset import ReplayDataset, StreamingReplayDataset
+    from fog.models.shared_latent import SharedBattleLatent
+
+    rows = own_rows()[:1]
+    rows[0]["mask"][:] = False
+    rows[0]["mask"][[8, 13]] = True
+    rows[0]["action"] = 8
+    arrays = rows_to_arrays(rows)
+    shard = tmp_path / 'game.npz'
+    manifest = tmp_path / 'manifest.parquet'
+    np.savez_compressed(shard, **arrays)
+    pl.DataFrame([{'id': 'fixture', 'shard': str(shard), 'n_rows': 1}]).write_parquet(manifest)
+    for loader in (ReplayDataset, StreamingReplayDataset):
+        batch = next(loader(manifest).batches(1, shuffle=False))
+        phase = SharedBattleLatent._decision_phase(batch, batch['legality_mask']).long().argmax(-1)
+        assert phase.item() == 0  # Struggle and a voluntary switch, not a replacement.
+    # Old shards retain the model's old fallback exactly.
+    del arrays['decision_phase']
+    np.savez_compressed(shard, **arrays)
+    legacy = next(ReplayDataset(manifest).batches(1, shuffle=False))
+    assert torch.equal(legacy['decision_phase'], torch.tensor([1]))

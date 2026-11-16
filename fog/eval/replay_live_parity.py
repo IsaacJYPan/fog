@@ -130,11 +130,14 @@ def explain_difference(name, a, b, key, left, right) -> str | None:
         for index in np.flatnonzero(remaining[:, first:stop].any(axis=1)):
             turn = key[1] - DIMS.history_cap + int(index)
             prior = (key[0], turn, 0, 0)
-            if prior in left and prior not in right and turn >= key[1] - length:
+            absent_or_overridden = (prior not in right or
+                                    int(left.get(prior, {}).get("fields", {}).get("label", -1)) !=
+                                    int(right[prior]["fields"]["label"]))
+            if prior in left and absent_or_overridden and turn >= key[1] - length:
                 remaining[index, first:stop] = 0
                 unobserved = True
         if not remaining.any() and unobserved:
-            return "public-HP quantization plus a prior normal choice never disclosed in the log"
+            return "public-HP quantization plus a prior submitted choice absent from, or overridden in, the execution log"
     return None
 
 

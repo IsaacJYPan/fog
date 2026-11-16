@@ -325,12 +325,16 @@ class _PerspectiveState:
                 "accepted" if self._pending_policy_valid else "called_or_unaligned_move"
             )
         elif kind == "switch":
-            target_species = _to_id(parts[3].split(",")[0]) if len(parts) > 3 else ""
+            from fog.encoding.events import submitted_species_id
+
+            target_species = submitted_species_id(
+                _to_id(parts[3].split(",")[0]) if len(parts) > 3 else ""
+            )
             bench = team_order_minus_active(battle)
             slot = 0
             found = False
             for i, mon in enumerate(bench[:5]):
-                if _to_id(getattr(mon, "species", "")) == target_species:
+                if submitted_species_id(_to_id(getattr(mon, "species", ""))) == target_species:
                     slot = i
                     found = True
                     break
@@ -828,6 +832,7 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
             action_feature_provenance[i] = r["action_feature_provenance"]
         imputation_id[i] = int(r.get("imputation_id", -1))
     return {
+        "decision_phase": np.asarray([r["obs"].decision_phase for r in rows], dtype=np.int64),
         "row_turn": np.asarray([r["turn"] for r in rows], dtype=np.int32),
         "row_role": np.asarray([1 if r["role"] == "p1" else 2 for r in rows], dtype=np.int8),
         "entities": ent,
