@@ -38,6 +38,12 @@ def comparison_fields(fields: dict) -> dict:
     for key in ("history", "history_ids", "history_state"):
         if key in result:
             result[key] = pad_or_truncate_front(result[key], cap=DIMS.history_cap)
+    if "action_features" in result:
+        from fog.encoding.action_features import ACTION_FEATURE_NAMES
+        from fog.models.mechanical_features import MECHANICAL_ACTION_FEATURE_NAMES
+
+        columns = [ACTION_FEATURE_NAMES.index(name) for name in MECHANICAL_ACTION_FEATURE_NAMES]
+        result["action_features.mechanical"] = result["action_features"][:, columns]
     layout = list(vars(L).items())
     for index, (name, start) in enumerate(layout):
         end = layout[index + 1][1] if index + 1 < len(layout) else ENTITY_RAW_DIM
@@ -86,6 +92,52 @@ def live_history_diagnostics(rows: list[dict]) -> dict:
             "current_turn_excluded_at_replacement": forced}
 
 
+def explain_difference(name, a, b, key, left, right) -> str | None:
+    """Explain a residual only when its coordinates/values support the stated cause."""
+    if name == "opp_mask.item" and (a is None or b is None):
+        present = b if a is None else a
+        if np.asarray(present).all():
+            return "all-true item mask is explicit live and implicit in the training loader"
+    if a is None or b is None or a.shape != b.shape:
+        return None
+    delta = np.abs(a.astype(float) - b.astype(float))
+    if name == "entities.own.hp" and float(delta.max(initial=0)) <= 0.010001:
+        return "public HP percentages versus exact own HP in the private request (difference <= 0.01)"
+    if name == "action_features":
+        from fog.encoding.action_features import ACTION_FEATURE_NAMES
+        from fog.models.mechanical_features import MECHANICAL_ACTION_FEATURE_NAMES
+
+        allowed = [ACTION_FEATURE_NAMES.index(n) for n in MECHANICAL_ACTION_FEATURE_NAMES]
+        if np.array_equal(a[:, allowed], b[:, allowed]):
+            return "all differences are outside the eleven candidate columns read by R4"
+    if name == "history":
+        from fog.encoding.dims import DIMS
+        from fog.encoding.events import _OFF_RES, _R_DMG_DEALT, _R_DMG_TAKEN, _R_EXACT
+
+        remaining = delta.copy()
+        # The live per-turn snapshot and own damage use private HP; replay uses percentages.
+        for column, limit in ((2, 0.010001), (_OFF_RES + _R_DMG_DEALT, 0.020001),
+                              (_OFF_RES + _R_DMG_TAKEN, 0.020001),
+                              (_OFF_RES + _R_EXACT, 2 / 255 + 1e-6)):
+            remaining[remaining[:, column] <= limit, column] = 0
+        quantized = not remaining.any()
+        if quantized:
+            return "history HP/damage columns differ only within public-HP quantization bounds"
+        first = DIMS.hist_snapshot
+        stop = first + DIMS.hist_my_action
+        unobserved = False
+        length = int(left[key]["fields"]["history_len"])
+        for index in np.flatnonzero(remaining[:, first:stop].any(axis=1)):
+            turn = key[1] - DIMS.history_cap + int(index)
+            prior = (key[0], turn, 0, 0)
+            if prior in left and prior not in right and turn >= key[1] - length:
+                remaining[index, first:stop] = 0
+                unobserved = True
+        if not remaining.any() and unobserved:
+            return "public-HP quantization plus a prior normal choice never disclosed in the log"
+    return None
+
+
 def compare_rows(live: list[dict], replay: list[dict]) -> dict:
     left, right = keyed_rows(live), keyed_rows(replay)
     aligned = sorted(left.keys() & right.keys())
@@ -106,9 +158,18 @@ def compare_rows(live: list[dict], replay: list[dict]) -> dict:
             if delta is not None:
                 entry["max_difference"] = max(entry["max_difference"], delta)
             if not exact:
+                explanation = explain_difference(name, a, b, key, left, right)
                 mismatch[name] = {"max_difference": delta,
                                   "live_shape": None if a is None else list(a.shape),
-                                  "replay_shape": None if b is None else list(b.shape)}
+                                  "replay_shape": None if b is None else list(b.shape),
+                                  "explanation": explanation}
+                if a is not None and b is not None and a.shape == b.shape:
+                    coordinates = np.argwhere(a != b)[:12]
+                    mismatch[name]["examples"] = [
+                        {"index": coordinate.tolist(),
+                         "live": np.asarray(a[tuple(coordinate)]).item(),
+                         "replay": np.asarray(b[tuple(coordinate)]).item()}
+                        for coordinate in coordinates]
         if mismatch:
             differences.append({"decision": list(key), "fields": mismatch})
     for entry in stats.values():
@@ -233,6 +294,17 @@ def replay_rows(replay: dict) -> list:
     return out
 
 
+def compare_game(task) -> dict:
+    import torch
+
+    torch.set_num_threads(1)
+    out, game = task
+    live, replay = load_game(out / f"game_{game:05d}.npz")
+    return {"game": game, "ended": replay["ended"],
+            **compare_rows(live, replay_rows(replay)),
+            "live_history": live_history_diagnostics(live)}
+
+
 def collect_worker(task) -> None:
     from fog.config import load_config
     from fog.env.showdown_direct import ShowdownDirectClient
@@ -284,12 +356,11 @@ def main() -> None:
         else:
             with ProcessPoolExecutor(max_workers=args.workers) as pool:
                 list(pool.map(collect_worker, [(args, i) for i in range(args.workers)]))
-    reports = []
-    for game in range(args.games):
-        live, replay = load_game(args.out / f"game_{game:05d}.npz")
-        reports.append({"game": game, "ended": replay["ended"],
-                        **compare_rows(live, replay_rows(replay)),
-                        "live_history": live_history_diagnostics(live)})
+    if args.workers == 1:
+        reports = [compare_game((args.out, game)) for game in range(args.games)]
+    else:
+        with ProcessPoolExecutor(max_workers=args.workers) as pool:
+            reports = list(pool.map(compare_game, [(args.out, game) for game in range(args.games)]))
     fields = defaultdict(lambda: {"rows": 0, "exact": 0, "max_difference": 0.0})
     for report in reports:
         for name, entry in report["fields"].items():

@@ -180,7 +180,14 @@ def build_history_start(battle: Any, tables) -> tuple[np.ndarray, np.ndarray, np
 
 
 def record_history_decision(tracker, turn: int, battle: Any, tables, action_idx: int | None) -> None:
-    """Record every start-of-turn history block through one call-site-safe helper."""
+    """Record the first choice of a turn; a replacement must not replace its move.
+
+    Ordinary choice retries can still update the action, and a turn with only a forced
+    replacement records that switch. The history contract is one record per turn.
+    """
+    if (action_idx is not None and bool(getattr(battle, "force_switch", False))
+            and turn in tracker.my_actions):
+        action_idx = None
     snapshot, ids, state = build_history_start(battle, tables)
     tracker.record_decision(
         turn,
