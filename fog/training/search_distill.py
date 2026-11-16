@@ -66,15 +66,24 @@ def game_plan(game: int, seed: int, pool_size: int) -> dict[str, Any]:
     }
 
 
-def shard_games(games: int, shards: int, shard: int) -> list[int]:
-    """Game numbers a shard owns. Every game belongs to exactly one shard."""
-    if not 0 <= shard < shards:
-        raise ValueError("shard must be in [0, shards)")
-    return [game for game in range(games) if game % shards == shard]
-
-
 def game_path(out: Path, game: int) -> Path:
     return out / f"game_{game:07d}.npz"
+
+
+def claim_game(out: Path, game: int) -> bool:
+    """True if this process may play the game: it is unfinished and nobody else holds it.
+
+    Mirror games take several times longer than games against a scripted bot, so a fixed
+    split of game numbers leaves some processes idle. Processes instead take the next free
+    game. The claim is a lock file created atomically; ``collect`` clears stale ones first.
+    """
+    if game_path(out, game).exists():
+        return False
+    try:
+        os.close(os.open(out / f"game_{game:07d}.lock", os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+    except FileExistsError:
+        return False
+    return True
 
 
 # ------------------------------------------------------------------------------- teacher hook
@@ -323,13 +332,13 @@ def collect_shard(args) -> int:
     packed = [to_packed(paste) for paste in load_pool(args.pool)]
     agent = build_agent(cfg, args.checkpoint, args.seed)
     teacher_kwargs = {"k": args.teacher_k, "budget_ms": args.teacher_budget_ms, "threads": 1}
-    todo = [game for game in shard_games(args.games, args.shards, args.shard)
-            if not game_path(args.out, game).exists()]
-    rows = 0
+    rows = played = 0
     showdown_root = cfg.get("env", {}).get("showdown_root")
     client_kwargs = {"showdown_root": showdown_root} if showdown_root else {}
     with ShowdownDirectClient(**client_kwargs) as client:
-        for count, game in enumerate(todo, start=1):
+        for game in range(args.games):
+            if not claim_game(args.out, game):
+                continue
             plan = game_plan(game, args.seed, len(packed))
             arrays, meta = play_game(
                 client, agent, plan, packed, beta=args.beta, temperature=args.temperature,
@@ -339,9 +348,11 @@ def collect_shard(args) -> int:
             meta.update(seed=args.seed, checkpoint=args.checkpoint, config=args.config,
                         pool=str(args.pool))
             save_game(game_path(args.out, game), arrays, meta)
+            (args.out / f"game_{game:07d}.lock").unlink(missing_ok=True)
             rows += len(arrays["executed"])
-            if count <= 3 or count % 10 == 0 or count == len(todo):
-                print(f"[distill-collect] shard={args.shard} games={count}/{len(todo)} "
+            played += 1
+            if played <= 3 or played % 10 == 0:
+                print(f"[distill-collect] process={args.shard} played={played} game={game} "
                       f"rows={rows} last={meta['seconds']:.1f}s", flush=True)
     return rows
 
@@ -351,6 +362,9 @@ def collect(args) -> None:
     if args.shard is not None:
         collect_shard(args)
         return
+    # Claims left by an interrupted run. Do not start two parent commands on one directory.
+    for stale in args.out.glob("game_*.lock"):
+        stale.unlink()
     if args.workers <= 1:
         args.shards, args.shard = 1, 0
         collect_shard(args)
@@ -657,9 +671,9 @@ def main() -> None:
                    help="on every Nth labelled decision also search with a second seed and at "
                         "--check-budget-ms, and store both answers")
     c.add_argument("--check-budget-ms", type=int, default=1600)
-    c.add_argument("--workers", type=int, default=1, help="one process per shard")
-    c.add_argument("--shards", type=int, default=1)
-    c.add_argument("--shard", type=int, default=None, help="internal: run one shard only")
+    c.add_argument("--workers", type=int, default=1, help="processes; each takes free games")
+    c.add_argument("--shards", type=int, default=1, help="internal")
+    c.add_argument("--shard", type=int, default=None, help="internal: process number")
 
     t = commands.add_parser("train", help="fit the policy and value to stored labels")
     t.add_argument("--config", default="configs/search_distill_cpu.yaml")

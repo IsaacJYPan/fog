@@ -22,8 +22,14 @@ def test_schedule_is_a_function_of_seed_and_game_and_shards_partition_it():
     assert [plan["seats"] for plan in plans[:8]] == [
         ("p1", "p2"), ("p1", "p2"), ("p1",), ("p1",), ("p1", "p2"), ("p1", "p2"), ("p2",), ("p2",)
     ]
-    owned = [sd.shard_games(10, 4, shard) for shard in range(4)]
-    assert sorted(game for games in owned for game in games) == list(range(10))
+
+
+def test_a_game_is_claimed_once_and_never_after_it_is_stored(tmp_path):
+    assert sd.claim_game(tmp_path, 3) is True
+    assert sd.claim_game(tmp_path, 3) is False          # another process holds it
+    assert sd.claim_game(tmp_path, 4) is True
+    sd.game_path(tmp_path, 5).write_bytes(b"stored")
+    assert sd.claim_game(tmp_path, 5) is False          # finished games are never replayed
 
 
 def test_policy_gradient_is_softmax_minus_target_and_rows_without_target_add_nothing():
