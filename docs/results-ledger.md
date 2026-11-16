@@ -3435,3 +3435,52 @@ bank's test split if it is ever collected.
 
 The row is pooled from all four completed SimpleHeuristics shard rows in
 `16-artifacts/simpleheuristics-summary.json`. MaxDamage is still running.
+
+### Both opponents complete: tier T1 met on the replay-derived test pool
+
+The one prescribed run finished on 2026-11-16, at about 19:46 UTC. Both measured
+rates meet their T1 thresholds: 927/1,008 (91.9643%) against SimpleHeuristics and
+980/1,008 (97.2222%) against MaxDamage. There are zero rejected actions, failed
+games, draws or truncations in either row. These are held-out test teams, with
+four-game matched blocks, 1,008 games per opponent, on pinned Showdown.
+
+The two printed pooled rows (`16-artifacts/merged-output.txt`):
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | mcts | simpleheuristics | showdown_direct | 1008 | 0.920 [0.901, 0.935] (927-81-0) | 1.812 | 102/27956 | `79283c9` | `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4 (4 shards merged, seeds 16000, 16001, 16002, 16003)` |
+| 2026-11-16 | mcts | maxdamage | showdown_direct | 1008 | 0.972 [0.960, 0.981] (980-28-0) | 1.849 | 63/24039 | `79283c9` | `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4 (4 shards merged, seeds 16000, 16001, 16002, 16003)` |
+
+Machine: AMD EPYC 9V74, four-core quota, CPU only. Measured seconds per decision:
+1.812340 against SimpleHeuristics and 1.849241 against MaxDamage. Fallbacks:
+102/27,956 (0.3649%) and 63/24,039 (0.2621%). The existing handled Encore engine
+panic dropped 816 and 504 worlds; the all-worlds-failed path accounted for the
+102 and 63 fallbacks. These are controller counters, not failed games. No changes
+or tuning were made in response.
+
+Source remained `79283c9d780448edfc1938aa90642fb87a211bbe`: every commit during the
+run changes only documentation and artifacts. Seeds 16000–16003, K=8,
+`budget_ms=1600`, one search thread, max turns 800, no sequential stop. No other
+workload ran during the matches; the 15 preflight tests ran before them.
+Tool-session reconnections left the four original match processes running, so
+no match command was resumed or replayed. The runner did not emit `merged.json`;
+after all shards completed, only the existing merger was invoked:
+
+```sh
+.venv/bin/python -m fog.eval.merge_selection_reports   docs/briefs/16-artifacts/test/shard_0.json   docs/briefs/16-artifacts/test/shard_1.json   docs/briefs/16-artifacts/test/shard_2.json   docs/briefs/16-artifacts/test/shard_3.json   --out docs/briefs/16-artifacts/test/merged.json   --command "<exact contents of docs/briefs/16-artifacts/command.txt>" --commit 79283c9
+```
+
+`merge_reports` reproduces `test/merged.json` exactly from the four complete shard
+JSONs; its SimpleHeuristics row also equals the previously pushed opponent summary.
+Shard logs are copied verbatim to the adjacent `.txt` files. No test-team game was
+inspected to tune the agent. No application code changed; no further match run
+or full test suite was needed.
+
+Validation reference (brief 11, source `aa38e46`): SimpleHeuristics 936/1,008,
+92.86% [91.10%, 94.29%], 0.19% fallbacks, 1.801 s/decision; MaxDamage 981/1,008,
+97.32% [96.13%, 98.15%], 0.17% fallbacks, 1.814 s/decision. Both validation rows
+also have zero rejected actions, failed games or truncations.
+
+This T1 result is for the replay-derived pool with usage-sampled sets (see
+"review of brief 10"). It must be repeated on the forum bank's test split if
+that bank is ever collected. Gate thresholds are unchanged.

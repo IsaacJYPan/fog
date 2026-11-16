@@ -29,6 +29,8 @@ three tiers, in order. Do not claim a tier without the stated evidence.
 | T2 | Beats search without learning | > 55% vs the EngineMCTS anchor (task P1) at equal time per move, ≥ 2,000 matched games |
 | T3 | Human-competitive | Stable ladder rating over ≥ 300 games with fixed teams: 1500, then 1700, then 1900+ |
 
+_2026-11-16: **T1 met on the replay-derived pool (usage-sampled sets; ledger, "review of brief 10")**: EngineMCTS won 927/1,008 against SimpleHeuristics (91.96% [95% Wilson 90.12%, 93.49%]) and 980/1,008 against MaxDamage (97.22% [96.01%, 98.07%]), held-out test teams on pinned Showdown; zero rejected actions, failures or truncations. See brief 16. This claim must be repeated on the forum bank's test split if it is ever collected._
+
 T3 at 1900+ is a research outcome, not a schedule. T1 and T2 are engineering and should be
 reached by following this file.
 

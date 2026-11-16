@@ -694,3 +694,329 @@ Encore should not be active when last used move is not a move
 [showdown-selection] mcts vs maxdamage: 16/252 A=16 B=0 draws=0 failures=0
 [showdown-selection] mcts vs maxdamage: 20/252 A=20 B=0 draws=0 failures=0
 [showdown-selection] mcts vs maxdamage: 24/252 A=24 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 28/252 A=28 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 32/252 A=32 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 36/252 A=36 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 40/252 A=40 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 44/252 A=44 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 48/252 A=48 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 52/252 A=52 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 56/252 A=56 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 60/252 A=60 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 64/252 A=64 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 68/252 A=68 B=0 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 72/252 A=71 B=1 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 76/252 A=75 B=1 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 80/252 A=78 B=2 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 84/252 A=82 B=2 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 88/252 A=86 B=2 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 92/252 A=89 B=3 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 96/252 A=93 B=3 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 100/252 A=97 B=3 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 104/252 A=101 B=3 draws=0 failures=0
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+[showdown-selection] mcts vs maxdamage: 108/252 A=104 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 112/252 A=108 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 116/252 A=112 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 120/252 A=116 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 124/252 A=120 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 128/252 A=124 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 132/252 A=128 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 136/252 A=132 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 140/252 A=136 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 144/252 A=140 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 148/252 A=144 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 152/252 A=148 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 156/252 A=152 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 160/252 A=156 B=4 draws=0 failures=0
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+
+thread '<unnamed>' (1991) panicked at src/genx/generate_instructions.rs:2093:18:
+Encore should not be active when last used move is not a move
+[showdown-selection] mcts vs maxdamage: 164/252 A=160 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 168/252 A=164 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 172/252 A=168 B=4 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 176/252 A=171 B=5 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 180/252 A=175 B=5 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 184/252 A=179 B=5 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 188/252 A=182 B=6 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 192/252 A=185 B=7 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 196/252 A=189 B=7 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 200/252 A=193 B=7 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 204/252 A=196 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 208/252 A=200 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 212/252 A=204 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 216/252 A=208 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 220/252 A=212 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 224/252 A=216 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 228/252 A=220 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 232/252 A=224 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 236/252 A=228 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 240/252 A=232 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 244/252 A=236 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 248/252 A=240 B=8 draws=0 failures=0
+[showdown-selection] mcts vs maxdamage: 252/252 A=244 B=8 draws=0 failures=0
+[showdown-selection] RESULT mcts vs maxdamage: 0.968 [0.939, 0.984] (244-8, draws=0)
+[showdown-selection] FIDELITY mcts vs maxdamage (a): {"games": 252, "decisions": 6109, "fallbacks": 11, "fallback_rate": 0.0018006220330659681, "games_with_fallback": 5, "max_fallbacks_in_a_game": 3, "worlds_sampled": 48512, "worlds_dropped": 88, "world_drop_rate": 0.0018139841688654353, "rejected": 0, "order_errors": 0, "tera_entries_dropped": 0, "unmapped_visits": 0, "seconds_per_decision": 1.8480309988630013, "failure_reasons": {"PanicException: Encore should not be active when last used move is not a move": 88, "ValueError: no world with positive weight and kept visits": 11}}
+[showdown-selection] report -> docs/briefs/16-artifacts/test/shard_3.json
+| 2026-11-16 | mcts | simpleheuristics | showdown_direct | 252 | 0.905 [0.862, 0.935] (228-24-0) | 1.801 | 26/6826 | `79283c9` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4 --games 252 --seed 16003 --out docs/briefs/16-artifacts/test/shard_3.json` |
+| 2026-11-16 | mcts | maxdamage | showdown_direct | 252 | 0.968 [0.939, 0.984] (244-8-0) | 1.848 | 11/6109 | `79283c9` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4 --games 252 --seed 16003 --out docs/briefs/16-artifacts/test/shard_3.json` |
