@@ -3,6 +3,47 @@
 You are a coding agent working alone on the `fog` repository. Nobody will watch you work. A
 reviewer reads what you push and decides the next step from it.
 
+## 0. Changes made in review on 2026-11-16 (they override the text below where it differs)
+
+Briefs 08 and 09 are merged (ledger, "review of brief 08", "review of brief 09").
+
+**Model keys.** Train with `configs/replay_mechanical_cpu.yaml` as the base recipe (brief 09's
+R4: `model.order_blind_entities`, `model.mechanical_features`, `loss.value_loss=logistic`,
+`loss.outcome_aux_coef=0.1`, `bc.save_best_value`), with batch 1,024, the manifests and epochs
+of this brief, and `loss.belief_coef=0 loss.belief_chain_coef=0 loss.skip_unweighted_belief=true`.
+The dense outcome targets need rows from the merged converter (`terminal_*` arrays); convert
+with it, do not reuse brief 05's shards.
+
+**GPU budget: two parts.** The hosted meter had 3.69 hours left when brief 08 ended and
+resets on 2026-11-21 00:00 UTC (`docs/briefs/08-artifacts/gpu-budget.json`). Read the meter
+before every job and write the reading down.
+
+- **Part A, now: at most 3.0 hours on the meter.** Stage 1 for the holdout and the
+  20,000-game set only; stage 2 for 20,000 games only (one epoch to measure speed, then train
+  to the best holdout policy NLL, 12 epochs at most); all of stage 3. At brief 08's 1,850
+  rows/s an epoch of about one million rows is about nine minutes. If the meter shows less
+  than 3.0 hours, cut epochs, not data; if it shows less than 1.0 hour, run part A on four CPU
+  cores instead (about 430 rows/s with the belief skip, ledger "the policy-only training
+  step") and say so. Push the report for part A as soon as it is complete; do not wait for
+  part B.
+- **Part B, after the reset, a second session: the remaining 17 hours.** The largest nested
+  set that fits (section 4, item 1), the P2.4 decision rule, the control with belief losses,
+  and stage 3 again for the larger model. If brief 12 is merged by then, convert with its
+  converter and say so in the report; do not mix rows from two converters in one run.
+
+**Lead head.** After the policy is trained, run brief 09's lead stage on it
+(`configs/replay_preview_cpu.yaml` with `bc.init_ckpt` set to the best-policy checkpoint; a
+minute or two on the CPU). That stage also changes weights the policy reads
+(`docs/briefs/09-artifacts/R5-scope.json`, `"policy_frozen": false`), and nobody has measured
+what that does to the policy. So: score the holdout policy NLL of the checkpoint before and
+after the lead stage, and play the 400-game `pool_b` cells of stage 3 with both. Use the
+lead-trained checkpoint for the 1,000-game rows only if its policy NLL is within 0.005 of
+the original and its `pool_b` score against SimpleHeuristics is not lower by more than its
+interval; otherwise use the original and report the difference.
+
+**Play.** Every play row states which checkpoint (best policy), which lead rule and which
+temperature. The value checkpoint does not play.
+
 ## 1. Why
 
 Brief 05 trained on 20,000 and 40,955 games on a GPU, but on rows that gave away the label

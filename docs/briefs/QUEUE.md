@@ -22,15 +22,26 @@ in different rows of the "touches" column.
 | # | Brief file | Needs | Start when | Touches | Branch | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | 05 | `05-p2-gpu-scale.md` | GPU | done | training only | `work/p2-gpu-scale` | **merged 2026-11-15** (old rows; see its review) |
-| 09 | `09-order-blind-model.md` | CPU | now | model, converter | `work/order-blind-model` | not started |
 | 10 | `10-replay-team-pool.md` | CPU | done | team data, evaluation | `work/replay-team-pool` | **merged 2026-11-15** |
-| 08 | `08-update-speed-gpu.md` | GPU, 1 h | now | nothing (measures) | `work/update-speed` | not started |
-| 11 | `11-engine-mcts-gate.md` | CPU, 1 to 2 days on 4 cores (estimate) | now | search reconstruction | `work/g1` | not started |
-| 12 | `12-replay-live-parity.md` | CPU | 09 merged | converter, parser | `work/replay-parity` | waiting |
-| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | 08 and 09 merged (12 too if it is done) | training only | `work/p2-scale-corrected` | waiting |
-| 14 | `14-ppo-update-levers.md` | GPU, 2 h | review of 08 says the update is still over half the wall time | PPO update | `work/ppo-update` | conditional |
+| 08 | `08-update-speed-gpu.md` | GPU, 1 h | done | nothing (measures) | `work/update-speed` | **merged 2026-11-16** |
+| 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
+| 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | see the line under this table |
+| 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | not started |
+| 13 | `13-replay-scale-corrected.md` | GPU: part A 3 h now, part B 17 h after 2026-11-21 | **part A now**; part B after the meter reset | training only | `work/p2-scale-corrected` | not started |
+| 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | gate G1 passed (line under this table) | new training script, small trainer switch | `work/distil-g0` | waiting on G1 |
+| 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | gate G1 passed | nothing (measures) | `work/t1-search` | waiting on G1 |
+| 14 | `14-ppo-update-levers.md` | GPU, 2 h | after 2026-11-21 (GPU meter reset) | PPO update | `work/ppo-update` | waiting on GPU time |
 
-Start **09, 11 and 08 now**: 09 and 11 on CPU in parallel, 08 on the GPU.
+**Gate G1 (brief 11):** not decided yet when this table was written; the reviewer replaces
+this line with the result. Briefs 15 and 16 start only on "passed".
+
+GPU: one job at a time on the account. **The hosted meter had 3.69 hours left on 2026-11-15
+and resets on 2026-11-21 00:00 UTC** (ledger, "review of brief 08"). Until then the GPU is for
+brief 13 part A only.
+
+CPU: 12, 15 and 16 touch different files and can run at the same time on separate machines.
+12 and 13 both read the converter; 13 part A does not wait for 12, part B uses 12's rows if
+12 is merged by then.
 
 ## What each one buys
 
@@ -41,13 +52,18 @@ Start **09, 11 and 08 now**: 09 and 11 on CPU in parallel, 08 on the GPU.
   gate G1. EngineMCTS is already the strongest thing in the repository; it has never been
   gated only because there was no pool.
 - **08, 14** are about speed. They decide how much training a week of GPU buys.
+- **15** is the first step of P3: the network learns to imitate the search on positions the
+  network itself reaches. It is the shortest path to a learned policy that plays well without
+  search, and it needs no GPU.
+- **16** measures the search-only agent once on the held-out test teams (tier T1).
 
 ## After the queue
 
-When G1 and G2 have results, the roadmap continues at P3 (distil EngineMCTS into the policy).
-P3 needs a brief written from `ROADMAP.md` P3.1 to P3.4 as they stand; write it then, with the
-numbers G1 and G2 produced. If G2 fails on play strength with good offline numbers, the
-roadmap already says to go to P3 with the P2 model as initial weights.
+Brief 15 is a pilot (three rounds, about 180,000 labelled decisions, random initial weights).
+When it and brief 13 have results, write the full P3 brief from `ROADMAP.md` P3.2 to P3.4:
+one million labelled decisions, starting from the brief 13 blueprint, and gate G3. If G2 fails
+on play strength with good offline numbers, the roadmap already says to go to P3 with the P2
+model as initial weights.
 
 Self-play stays frozen until gate G3. When it opens, use the anchored form in
 `docs/equilibrium-training.md`, not plain PPO.
