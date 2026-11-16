@@ -3371,3 +3371,35 @@ Continues "search distillation pilot (P3, generation 0)" above; same machine and
 
 `docs/briefs/15-artifacts/round2-summary.json`. The three rounds (186,327 rows) are also kept
 in the owner's private hosted dataset, so later sessions need not regenerate them.
+
+### Network 2: trained on rounds 0 to 2
+
+`python -m fog.training.search_distill train --data runs/distill/round0 runs/distill/round1 runs/distill/round2 --out runs/distill/net2 --threads 4`
+(source `94cbb98`): random initial weights, 178,317 training rows, 8,010 held out by game, 8
+epochs, about 10.6 minutes an epoch on four cores. `15-artifacts/net2-metrics.json`.
+`policy_best.pt` SHA-256 `6eea4684a48c70c94b8d9e2da083ff8ea9185e9960fdfc59073069c599cede29`.
+
+| Epoch | Held-out cross-entropy | KL to the teacher | Top-1 agreement with the teacher | Value MSE to outcome |
+| --- | --- | --- | --- | --- |
+| 0 (untrained) | 2.017 | 0.355 | 8.3% | 1.056 |
+| 1 | 1.852 | 0.190 | 47.5% | 0.776 |
+| 4 | 1.806 | 0.144 | 56.2% | 0.877 |
+| 8 (best) | 1.794 | 0.132 | 58.8% | 0.874 |
+
+The value head's held-out error is lowest after the first epoch (0.776; a constant scores
+1.0) and rises to 0.874 by epoch 8, the pattern of networks 0 and 1. Nothing uses it.
+
+### Play: network 2 alone, no search
+
+Same command as the gate-size rows above (`fog.eval.run_shards --shards 4 --games 1008 --seed
+15200`, validation teams, greedy, `--checkpoint net2=runs/distill/net2/policy_best.pt`),
+source `94cbb98`. One game in each row reached the 300-turn limit and is not counted.
+
+| Date | Policy | Training rows | Opponent | Games | Win rate [95% interval] | W-L-D | File |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | Network 2 | 178,317 (rounds 0 to 2) | SimpleHeuristics | 1,008 | **0.682 [0.653, 0.710]** | 687-320-0 | `15-artifacts/net2-play-1008.json` |
+| 2026-11-16 | Network 2 | | MaxDamage | 1,008 | **0.923 [0.904, 0.937]** | 929-78-0 | |
+
+The learning curve against SimpleHeuristics is 0.448, 0.615, 0.682 at 58k, 119k and 178k
+training rows: the third round added 6.7 points, the second 16.7. Against MaxDamage: 0.815,
+0.909, 0.923. Still rising, more slowly. Rounds 3 and 4 follow the same recipe.

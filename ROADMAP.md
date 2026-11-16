@@ -393,6 +393,11 @@ before changing the architecture.
       SimpleHeuristics and 0.815 against MaxDamage without search (400 games each, validation
       teams, smoke); the 200 ms teacher agrees with the 1,600 ms teacher on 73.8% of 542
       checked decisions. Ledger, "search distillation pilot"._
+      _2026-11-16: pilot rounds 1 and 2 (the network acts, the teacher labels). Without
+      search, on validation teams, 1,008 games each: network 0 (58k rows) 0.448 against
+      SimpleHeuristics and 0.815 against MaxDamage; network 1 (119k) 0.615 and 0.909;
+      network 2 (178k) 0.682 and 0.923. The 200 ms teacher agrees with the 1,600 ms teacher
+      on 77.6% of 1,474 decisions sampled over whole games. Rounds 3 and 4 are running._
 
 **Gate G3:** the distilled policy without search beats its initial weights (> 55%) and scores
 ≥ 30% vs EngineMCTS at the default budget.
