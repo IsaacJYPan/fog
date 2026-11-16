@@ -155,7 +155,7 @@ What is running or next [state at 20:00 UTC on 2026-11-16; the ledger says what 
 
 1. `configs/search_distill_wide.yaml` (entity width 256) on network 4's rows and epochs, on
    the planner's machine: G3's "if it fails" line, third step. Output `runs/distill/net4w`.
-2. The narrow model for eight epochs on 503,000 rows, on a hosted CPU machine (`net4-e8`).
+2. The narrow model for eight epochs on about 500,000 rows, on a hosted CPU machine (`net4-e8`).
 3. `net3g` against EngineMCTS, 1,008 games on two hosted machines with one evaluation
    process a core (`--only 0,1` and `--only 2,3` of one four-shard row, seed 15400).
 4. If the wide model is flat too: the distilled policy alone will not reach G3 at this
