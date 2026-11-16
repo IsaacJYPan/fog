@@ -3569,3 +3569,49 @@ Reading, to be tested and not yet evidence about strength:
   decisions, about one game in six for a side. The network never does. Whether that is right
   play or a weakness of the engine's handling (HANDOFF section 10 lists it as unverified) is
   a question for P1, not for distillation.
+
+## 2026-11-16: search distillation, three GPU trainings and what they answer
+
+One hosted GPU job (`docs/briefs/15-artifacts/gpu_train_job.py`, trainer at `126f8be`,
+Tesla T4, 2,332 s in all; `15-artifacts/gpu-job-2026-11-16b.json`). It was submitted at 12:58
+UTC, re-submitted at 14:23 and started only at about 16:48: the host kept it queued for close
+to four hours. The quota endpoint read 18.56 hours used and 26.44 remaining of 45 afterwards.
+Each network was then played alone, greedy, with the command of the network 3 section
+(`--seed 15200`, validation teams, 1,008 games an opponent, source `d21c2eb`).
+
+| Network | Rows it was trained on | Change from the recipe | Top-1 with the teacher, held out | SimpleHeuristics [95%] | MaxDamage [95%] |
+| --- | --- | --- | --- | --- | --- |
+| 2 (earlier section) | rounds 0 to 2, 178,317 | none | 58.8% | 0.682 [0.653, 0.710] | 0.923 [0.904, 0.937] |
+| `net2-p2` | rounds 0 to 2 | `--target-power 2` | 59.7% | 0.699 [0.670, 0.727] (705-303) | 0.926 [0.908, 0.940] (933-75) |
+| `net2-vm0` | rounds 0 to 2 | `--value-mix 0` (value target: result only) | 58.7% | 0.665 [0.635, 0.693] (670-338) | 0.919 [0.900, 0.934] (926-82) |
+| 3 (earlier section) | rounds 0 to 3, 233,895 | none, trained on the CPU | 61.7% | 0.685 [0.655, 0.712] | 0.925 [0.907, 0.939] |
+| `net3g` | rounds 0 to 3 | none, trained on the GPU, same seed | 62.1% | 0.701 [0.672, 0.729] (707-301) | 0.932 [0.914, 0.946] (939-69) |
+
+SHA-256 of `policy_best.pt`: `net3g` `e44b24c853a5a0ed9bf1e215cbe64d7c368a59f779a69be270a3d9342cf746e8`,
+`net2-p2` `d056dcc367cf1c2347ffcf0364b85186a8018ce8fbecf5b0390206fcfb1aadea`,
+`net2-vm0` `c82d08ff18d7c3b3565ec68ebf831e12cf2bed09a726a66cf3aca49e055893c4`. Metrics and play
+files: `15-artifacts/{net3g,net2-p2,net2-vm0}-{metrics,play-1008}.json`.
+
+What they answer:
+
+- **Two trainings of one recipe differ by 1.6 points** against SimpleHeuristics (network 3
+  on the CPU and on the GPU, same data, same seed, same held-out cross-entropy 1.7344). A
+  difference between two networks smaller than about three points on these 1,008 games is
+  not a finding. With both, the plateau reads 0.68 to 0.70 from 178,000 rows on.
+- **Sharper targets, power 2: no gain that can be claimed** (+1.7 points, inside the above).
+  Not kept. Power 8 on rounds 0 and 1 is still training on a hosted CPU machine.
+- **The value head needs the search value in its target.** With the result alone the head is
+  worse than a constant on held-out games from the first epoch (MSE 1.03, then 1.18; training
+  error 0.07 at epoch 8). With the half-and-half target its best epoch scores 0.78 to 0.87.
+  This corrects the reading in "what the teacher's value is worth" above: the search value
+  is a weak predictor of the result, but as half of the target it is what keeps the head from
+  memorising games. `--value-mix 0.5` stays.
+
+### Round 4 on this machine (network 3 acts)
+
+`python -m fog.training.search_distill collect --pool data/teams/replay_v1/train --out runs/distill/round4 --checkpoint runs/distill/net3/policy_best.pt --games 4000 --beta 0.25 --seed 15004 --agreement-every 40 --workers 4 --max-seconds 2400`
+(source `d21c2eb`): 488 games, 28,158 rows, 118,190 simulations a label, label check 77.1%
+of 658 against 1,600 ms and 89.8% against a second seed; network 3 has the teacher's top
+choice on 60.6% of its own positions (network 2: 58.7%). `15-artifacts/round4-summary.json`.
+Two hosted machines are collecting the same round; the host refused two more (it runs five
+CPU jobs at once).

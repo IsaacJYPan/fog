@@ -1,0 +1,46 @@
+{
+  "commit": "126f8be9c291998127a531047920b21d488f3134",
+  "seconds": 2331.827442407608,
+  "torch": "2.11.0+cu130",
+  "gpu": "Tesla T4",
+  "games": 4290,
+  "runs": [
+    {
+      "name": "net",
+      "rounds": [
+        "round0",
+        "round1",
+        "round2",
+        "round3"
+      ],
+      "args": [],
+      "seconds": 1130.0329477787018
+    },
+    {
+      "name": "net2-p2",
+      "rounds": [
+        "round0",
+        "round1",
+        "round2"
+      ],
+      "args": [
+        "--target-power",
+        "2"
+      ],
+      "seconds": 593.6625468730927
+    },
+    {
+      "name": "net2-vm0",
+      "rounds": [
+        "round0",
+        "round1",
+        "round2"
+      ],
+      "args": [
+        "--value-mix",
+        "0"
+      ],
+      "seconds": 588.3745276927948
+    }
+  ]
+}
