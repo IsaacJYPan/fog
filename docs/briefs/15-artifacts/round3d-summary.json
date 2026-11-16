@@ -1,0 +1,27 @@
+{
+  "games": 303,
+  "rows": 17566,
+  "target_rows": 17039,
+  "teacher_executed_rows": 4389,
+  "truncated_games": 0,
+  "teacher_decisions": 17566,
+  "teacher_fallbacks": 49,
+  "seconds": 6046.552840529004,
+  "checked_rows": 435,
+  "check_repeat_agree": 364,
+  "check_default_agree": 344,
+  "network_agrees_with_teacher": 10060,
+  "teacher_searched": 17039,
+  "teacher_visits": 2025128000,
+  "games_by_opponent": {
+    "mirror": 152,
+    "simpleheuristics": 76,
+    "maxdamage": 75
+  },
+  "teacher_visits_per_search": 118852.51481894478,
+  "teacher_value_rows": 17039,
+  "teacher_value_outcome_mse": 0.9265532904602662,
+  "teacher_value_sign_agreement": 0.5735078349668408,
+  "top1_agreement_with_second_seed": 0.8367816091954023,
+  "top1_agreement_with_check_budget": 0.7908045977011494
+}

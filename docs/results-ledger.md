@@ -3455,3 +3455,47 @@ than a full core.
 | Label check (1,556 decisions) | second seed 87.9%, 1,600 ms **76.2%** |
 
 `docs/briefs/15-artifacts/round3-summary.json`.
+
+## 2026-11-16: search distillation, round 3 on hosted CPU machines
+
+Same collection command as round 3 (network 2 acts, `--beta 0.25`, teacher K = 8 and 200 ms,
+`--agreement-every 40`), one seed and one folder a machine, through
+`docs/briefs/15-artifacts/hosted_cpu_job.py` (sources `887bf60` to `199fc6a`). The hosted
+machine reports four CPUs, which are two cores with two threads each (Xeon 2.20 GHz). "This
+machine" is the planner's four-core Xeon 2.10 GHz, one thread a core.
+
+| Folder | Machine, processes | Seed | Games | Rows | Simulations a label | Core-s a row | Label check: second seed | Label check: 1,600 ms |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `round3` | this machine, 4 | 15003 | 1,000 | 60,938 | not counted | 0.36 | 87.9% | 76.2% of 1,556 |
+| `round3d` | this machine, 4 (25 minutes) | 18003 | 303 | 17,566 | 118,853 | 0.34 | 83.7% | 79.1% of 435 |
+| `round3b` | hosted, 4 | 16003 | 600 | 35,825 | 43,018 | 0.55 | 88.6% | 74.5% of 842 |
+| `round3c` | hosted, 4 | 17003 | 600 | 37,079 | 44,972 | 0.53 | 88.2% | 76.9% of 909 |
+| `round3e` | hosted, 2 (80 minutes) | 19003 | 369 | 22,319 | 72,206 | 0.43 | 87.8% | 74.5% of 541 |
+| `round3f` | hosted, 2 (80 minutes) | 20003 | 386 | 22,087 | 60,818 | 0.44 | 88.9% | 74.0% of 557 |
+| `round3g` | hosted, 2 (80 minutes) | 21003 | 388 | 22,980 | 75,015 | 0.42 | 88.8% | 79.3% of 547 |
+
+One game in `round3b` reached the 300-turn limit. Summaries:
+`docs/briefs/15-artifacts/round3*-summary.json`. With network 2 acting there are now 218,794
+rows; with rounds 0 to 2, 405,121.
+
+What this says:
+
+- **A hosted core is slower than a core here, and a hosted "CPU" is half a core.** With one
+  process a hosted CPU a label gets 37% of the simulations it gets here; with one process a
+  core, 51% to 63%. A hosted machine yields 7.4 rows a second with four processes and 4.7
+  with two; this machine 11.6.
+- **The label check does not see the difference.** Pooled, the 200 ms label agrees with the
+  1,600 ms label of the same machine on 76.8% here (1,991 checks), 75.7% hosted with four
+  processes (1,751) and 75.9% hosted with two (1,645). The check is relative (each machine's
+  reference is eight times its own label budget), so it shows that agreement between a budget
+  and eight times that budget is about the same from 43,000 to 119,000 simulations; it does
+  not show that a 43,000-simulation label is as good as a 119,000-simulation one.
+- Hosted collection therefore runs with two processes a machine from here on (nearer the
+  teacher that brief 11's budget curve measured), and the rows of `round3b` and `round3c`
+  are kept and used.
+- A search opponent on a hosted machine gets fewer simulations than its budget in
+  milliseconds implies, so gate and tier rows against EngineMCTS are not to be played there
+  with four processes; with two, the opponent gets about 60% of the simulations it gets here.
+
+The first hosted GPU job of the day (12:58 UTC, re-submitted 14:23) waited in the host's
+queue and had not started by 15:55; network 3 is being trained on this machine instead.
