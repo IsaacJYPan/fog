@@ -30,6 +30,7 @@ in different rows of the "touches" column.
 | 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | not started |
 | 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds: see the note under this table |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | not started |
+| 17 | `17-distil-at-scale.md` | CPU about 150 core-hours, GPU 6 h | the pilot's last round is in the ledger | trainer switches | `work/distil-scale` | waiting on the pilot |
 | 14 | `14-ppo-update-levers.md` | GPU, 2 h | when brief 13 is not using the GPU | PPO update | `work/ppo-update` | not started (lowest priority: self-play is frozen until G3) |
 
 **Gate G1 (brief 11): passed** on 2026-11-16 (ledger, "review of brief 11"): 92.9% against
@@ -61,14 +62,13 @@ rows if 12 is merged by then.
   network itself reaches. It is the shortest path to a learned policy that plays well without
   search, and it needs no GPU.
 - **16** measures the search-only agent once on the held-out test teams (tier T1).
+- **17** takes the distillation loop from the pilot's 120,000 rows towards one million and
+  measures gate G3.
 
 ## After the queue
 
-Brief 15 is a pilot (three rounds, about 180,000 labelled decisions, random initial weights).
-When it and brief 13 have results, write the full P3 brief from `ROADMAP.md` P3.2 to P3.4:
-one million labelled decisions, starting from the brief 13 blueprint, and gate G3. If G2 fails
-on play strength with good offline numbers, the roadmap already says to go to P3 with the P2
-model as initial weights.
+After G3: P4 (learned parts inside search), starting with the learned world sampler, which
+is what the budget curve points at (ledger, "review of brief 11 and gate G1").
 
 Self-play stays frozen until gate G3. When it opens, use the anchored form in
 `docs/equilibrium-training.md`, not plain PPO.
