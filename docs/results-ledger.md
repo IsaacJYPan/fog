@@ -3426,3 +3426,12 @@ Environment and the preflight result (15 tests passed) are in
 when complete. The teams are the replay-derived pool with usage-sampled sets, subject
 to the limits in "review of brief 10"; any tier claim must be repeated on the forum
 bank's test split if it is ever collected.
+
+### SimpleHeuristics complete
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | mcts | simpleheuristics | showdown_direct | 1008 | 0.920 [0.901, 0.935] (927-81-0) | 1.812 | 102/27956 | `79283c9` | `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
+
+The row is pooled from all four completed SimpleHeuristics shard rows in
+`16-artifacts/simpleheuristics-summary.json`. MaxDamage is still running.
