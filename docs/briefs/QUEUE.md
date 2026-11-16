@@ -26,24 +26,35 @@ in different rows of the "touches" column.
 | 08 | `08-update-speed-gpu.md` | GPU, 1 h | done | nothing (measures) | `work/update-speed` | **merged 2026-11-16** |
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
 | 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
-| 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | not started |
-| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | not started |
-| 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds: see the note under this table |
+| 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | worker running: stages 1 and 2 pushed, stage 3 (reconversion, paired training, play) in progress at 14:39 UTC on 2026-11-16 |
+| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | worker started; data prepared; **stopped before its first GPU job, waiting for the owner** (see the GPU note) |
+| 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds 0 to 3 done by the planner (ledger) |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | not started |
-| 17 | `17-distil-at-scale.md` | CPU about 150 core-hours, GPU 6 h | the pilot's last round is in the ledger | trainer switches | `work/distil-scale` | waiting on the pilot |
+| 17 | `17-distil-at-scale.md` | CPU about 150 core-hours, GPU 6 h | the pilot's last round is in the ledger | trainer switches | `work/distil-scale` | **not for a worker now**: the planner's session is running these rounds with `scripts/hosted.sh` (see the note) |
 | 14 | `14-ppo-update-levers.md` | GPU, 2 h | when brief 13 is not using the GPU | PPO update | `work/ppo-update` | not started (lowest priority: self-play is frozen until G3) |
 
 **Gate G1 (brief 11): passed** on 2026-11-16 (ledger, "review of brief 11"): 92.9% against
 SimpleHeuristics and 97.3% against MaxDamage over 1,008 games each.
 
-**Brief 15:** the collection and training code is merged, and the planner's session started
-round 0 on 2026-11-16. The ledger section "search distillation pilot" says which rounds are
-done. Give brief 15 to a worker only if that section is missing or says rounds remain; the
-worker continues from the first round it does not report.
+**Briefs 15 and 17:** the planner's session runs the distillation rounds itself, because the
+collected rows, the networks and the hosted account are in that session: collection on this
+machine and on hosted CPU machines, training on the hosted GPU (or here when the GPU is not
+to be had), play here. The ledger's "search distillation" sections say how far it got; rows
+and weights are in the owner's private hosted dataset. Give brief 17 to a worker only when
+that session has ended; the worker downloads the dataset and continues from the first round
+the ledger does not report, with `scripts/hosted.sh`.
 
 GPU: one job at a time on the account. **The quota endpoint read 27.69 hours remaining of 45
 on 2026-11-16, reset 2026-11-21 00:00 UTC** (ledger, "hosted GPU time, corrected"; the
 3.69 hours in the review of brief 08 was wrong). Brief 13 has first call on it.
+
+**Open, for the owner (2026-11-16):** the planner submitted a short distillation training job
+(`fog-distill-train-gpu`, about half an hour of GPU) at 12:58 UTC; the host kept it in its
+queue for more than two hours. Brief 13's worker saw it, applied the one-job rule and
+stopped to ask the owner. Nothing was cancelled or changed. The owner's choice: let short
+trainer jobs overlap a brief's job (the planner's recommendation: they are small, and both
+fit the week's quota), or keep the rule as it is, in which case the planner trains on the
+CPU while brief 13 runs.
 
 CPU: 12, 15 and 16 touch different files and can run at the same time on separate machines.
 12 and 13 both read the converter; 13 does not wait for 12, and its larger run uses 12's
