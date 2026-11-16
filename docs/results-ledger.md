@@ -3657,3 +3657,63 @@ both inside the 1.6 points two trainings of one recipe differ by; power 8, close
 on the teacher's first choice alone, is 1.6 points lower. **Sharper targets are not the
 missing strength. The switch stays off** (brief 17's first question).
 `15-artifacts/{net1-p2,net1-p8}-{metrics,play-1008}.json`.
+
+## 2026-11-16: search distillation, round 4 and network 4 (the data curve to 456,000 rows)
+
+### Round 4 on hosted machines (network 3 acts)
+
+Through `scripts/hosted.sh round-collect 4 4800 "a b d e"` (source `364c724`; the first run
+of that command end to end): two hosted machines, two processes each, 80 minutes. The host
+refused the other two (five CPU jobs at once).
+
+| Folder | Seed | Games | Rows | Simulations a label | Label check: second seed | Label check: 1,600 ms |
+| --- | --- | --- | --- | --- | --- | --- |
+| `round4a` | 16004 | 359 | 22,936 | 74,847 | 90.4% | 77.0% |
+| `round4b` | 17004 | 435 | 24,747 | 81,134 | 87.4% | 73.9% |
+
+With `round4` on this machine (28,158 rows, section above) and four 40-minute hosted folders
+with network 2 acting (`round3h` to `round3k`, seeds 22003 to 25003, 45,677 rows, 74,827 to
+78,395 simulations a label, label check 73.9% to 79.4%), 526,639 rows are stored. Summaries:
+`15-artifacts/round3[h-k]-summary.json`, `round4*-summary.json`.
+
+### Network 4: every row stored when it started, four epochs
+
+`python -m fog.training.search_distill train --data runs/distill/round0 runs/distill/round1 runs/distill/round2 runs/distill/round3 runs/distill/round3{b,c,d,e,f,g,h,i,j,k} runs/distill/round4 --out runs/distill/net4 --epochs 4 --threads 4`
+(source `29b2a9b`, on this machine; stopped after epoch 3 and resumed, because a background
+command here ends after two hours). Random initial weights, 455,501 training rows, 23,455
+held out by game (8,184 games); the hosted `round4a` and `round4b` arrived later and are not
+in it. Four epochs over these rows are 7,120 optimizer steps, network 3's eight epochs 7,312.
+`policy_best.pt` SHA-256 `54a8db675714612c3a5c89a050795f328f77d895c23806c1350e9f429d11f165`.
+`15-artifacts/net4-metrics.json`.
+
+| Epoch | Held-out cross-entropy | KL to the teacher | Top-1 agreement with the teacher | Value MSE to outcome |
+| --- | --- | --- | --- | --- |
+| 0 (untrained) | 1.990 | 0.318 | 9.9% | 1.035 |
+| 1 | 1.808 | 0.136 | 54.6% | 0.845 |
+| 2 | 1.791 | 0.120 | 58.6% | 0.893 |
+| 4 (best) | 1.778 | 0.107 | 61.5% | 0.912 |
+
+Play, the command of every network (`--seed 15200`, validation teams, source `1d58d83`):
+
+| Date | Policy | Training rows | Opponent | Games | Win rate [95% interval] | W-L-D | File |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | Network 4 | 455,501 | SimpleHeuristics | 1,008 | **0.708 [0.680, 0.736]** | 714-294-0 | `15-artifacts/net4-play-1008.json` |
+| 2026-11-16 | Network 4 | | MaxDamage | 1,008 | **0.943 [0.927, 0.956]** | 951-57-0 | |
+
+### The data curve
+
+| Training rows | SimpleHeuristics | MaxDamage | Network |
+| --- | --- | --- | --- |
+| 58,160 | 0.448 | 0.815 | 0 |
+| 118,518 | 0.615 | 0.909 | 1 |
+| 178,317 | 0.682 | 0.923 | 2 |
+| 233,895 | 0.685 and 0.701 | 0.925 and 0.932 | 3, trained twice |
+| 455,501 | 0.708 | 0.943 | 4 (four epochs) |
+
+**Strength is close to flat in data from 178,000 rows on**: 2.6 times the rows bought 2.6
+points against SimpleHeuristics and 2.0 against MaxDamage, and two trainings of one recipe
+differ by 1.6. Gate G3's "if it fails" line: label quality passes (74% to 79% everywhere),
+data volume is now plotted to 456,000 rows, so "the model is the limit; widen it" is next.
+`configs/search_distill_wide.yaml` (entity width 256, 10.1M parameters against 5.8M) is
+training on network 4's rows and epochs; an eight-epoch run of the narrow model on all rows
+is on a hosted machine, to say whether four epochs were too few.
