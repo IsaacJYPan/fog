@@ -3542,3 +3542,9 @@ nonzero PP (`new-rows-permutations.json`, `tests-new-row-permutations.txt`).
 The two eight-epoch trainings and their play comparison remain running; there is no stage-3
 strength or NLL result yet. They use identical R4 keys, seed 20261201 and two CPU threads,
 sequentially to stay within the machine's 16 GB memory limit.
+
+Metadata-check scope clarification: “every stored array” above means every main decision-row
+array returned by the pinned old `rows_to_arrays`, including inputs, targets and provenance.
+The separate preview arrays are not used by this paired decision evaluation and were not checked;
+`old-metadata-summary.json` now names this scope explicitly. The 2,000-game/103,944-row identity
+result is unchanged.

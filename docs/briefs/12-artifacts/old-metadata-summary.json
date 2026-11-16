@@ -2,6 +2,7 @@
   "kind": "smoke",
   "games": 2000,
   "rows": 103944,
-  "all_stored_arrays_identical": true,
-  "source": "79283c9"
+  "source": "79283c9",
+  "all_decision_row_arrays_identical": true,
+  "preview_arrays_checked": false
 }

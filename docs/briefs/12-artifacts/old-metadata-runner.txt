@@ -1,4 +1,4 @@
-"""Recover turn/role sidecars using the unchanged pre-brief converter; assert shard equality."""
+"""Recover turn/role sidecars using the unchanged pre-brief converter; assert decision-row equality."""
 import argparse
 import atexit
 from concurrent.futures import ProcessPoolExecutor
@@ -47,7 +47,7 @@ if __name__ == '__main__':
             if i%100==0:
                 print(f'metadata {i}/{len(rows)}',flush=True)
     summary={'kind':'smoke','games':len(results),'rows':sum(r['rows'] for r in results),
-             'all_stored_arrays_identical':True,'source':'79283c9','results':results}
+             'all_decision_row_arrays_identical':True,'preview_arrays_checked':False,'source':'79283c9','results':results}
     (args.out/'summary.json').write_text(json.dumps(summary,indent=2)+'\n')
     concurrency=sys.modules.get('poke_env.concurrency')
     if concurrency is not None:
