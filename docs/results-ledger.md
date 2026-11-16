@@ -3350,3 +3350,24 @@ endpoint, read on 2026-11-16 08:15 UTC, says otherwise: **17.31 hours used, 27.6
 remaining of 45.00, reset 2026-11-21 00:00 UTC**. The used time agrees with the artifact
 (62,327 s is 17.31 h); the total is 45 hours, not 21. Brief 13 no longer needs to be split:
 its 20 hours fit this week. Brief 14 (2 hours) fits too.
+
+## 2026-11-16: search distillation pilot, round 2
+
+Continues "search distillation pilot (P3, generation 0)" above; same machine and settings.
+
+### Round 2: network 1 plays, the teacher labels
+
+`python -m fog.training.search_distill collect --pool data/teams/replay_v1/train --out runs/distill/round2 --checkpoint runs/distill/net1/policy_best.pt --games 1300 --beta 0.25 --seed 15002 --agreement-every 40 --workers 4`
+(source `06a4615`), stopped by hand at 60,000 rows.
+
+| Quantity | Value |
+| --- | --- |
+| Games | 1,021: 510 mirror, 256 against SimpleHeuristics, 255 against MaxDamage; train teams only; none truncated |
+| Labelled decisions | 61,680 rows, 60,056 with a search distribution; teacher's move played on 15,475 (25.1%) |
+| Cost | 21,878 core-seconds, 0.35 s a row |
+| Teacher fallbacks | 140 of 61,680 (0.23%) |
+| Network 1 against the teacher on its own positions | same top choice on 55.8% of labelled rows (network 0 in round 1: 47.3%) |
+| Label check (1,474 decisions sampled over the whole game) | second seed 87.4%, 1,600 ms **77.6%** |
+
+`docs/briefs/15-artifacts/round2-summary.json`. The three rounds (186,327 rows) are also kept
+in the owner's private hosted dataset, so later sessions need not regenerate them.
