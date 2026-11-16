@@ -387,6 +387,12 @@ before changing the architecture.
       budget curve), random initial weights because neither `A3` nor a G2 blueprint exists.
       It starts when G1 passes. The run this section describes (one million decisions from
       the blueprint) follows the pilot and brief 13._
+      _2026-11-16: P3.1 code is in `fog/training/search_distill.py` (collection with a
+      teacher that labels and may act, soft-target training). Round 0 of the pilot: a network
+      trained from random weights on 58,160 teacher-labelled decisions scores 0.450 against
+      SimpleHeuristics and 0.815 against MaxDamage without search (400 games each, validation
+      teams, smoke); the 200 ms teacher agrees with the 1,600 ms teacher on 73.8% of 542
+      checked decisions. Ledger, "search distillation pilot"._
 
 **Gate G3:** the distilled policy without search beats its initial weights (> 55%) and scores
 ≥ 30% vs EngineMCTS at the default budget.

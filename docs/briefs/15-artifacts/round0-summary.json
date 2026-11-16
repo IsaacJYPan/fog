@@ -1,0 +1,21 @@
+{
+  "games": 1211,
+  "rows": 60862,
+  "target_rows": 59706,
+  "teacher_executed_rows": 60862,
+  "truncated_games": 1,
+  "teacher_decisions": 60862,
+  "teacher_fallbacks": 51,
+  "seconds": 19565.47914989401,
+  "checked_rows": 542,
+  "check_repeat_agree": 469,
+  "check_default_agree": 400,
+  "network_agrees_with_teacher": 6800,
+  "games_by_opponent": {
+    "mirror": 550,
+    "simpleheuristics": 306,
+    "maxdamage": 355
+  },
+  "top1_agreement_with_second_seed": 0.8653136531365314,
+  "top1_agreement_with_check_budget": 0.7380073800738007
+}

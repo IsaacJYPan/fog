@@ -3210,3 +3210,71 @@ listed in `docs/briefs/11-report.md`.
 What follows. P1.3 is ticked. P1.4 stays unticked (eight of nine cells; nothing waits on the
 ninth). EngineMCTS is anchor `A4`. P3 may start: brief 15 (pilot) is the next step, and brief
 16 measures the agent once on the test teams for tier T1.
+
+## 2026-11-16: search distillation pilot (P3, generation 0)
+
+Brief 15, run in the planner's session on `work/roadmap`. Intel Xeon 2.10 GHz, four cores,
+no GPU. Everything here is smoke (400 games a cell). Rounds are appended below as they
+finish; **rounds done so far: 0.**
+
+Code: `fog/training/search_distill.py` (`e68f22a`, `5cf0780`, `e6ef687`), tests
+`tests/test_search_distill.py` (a stored row replayed through the network reproduces the
+log-probabilities recorded in play to 5e-7; targets sum to one, are zero on illegal actions,
+and peak at the action the teacher plays). Model: `configs/search_distill_cpu.yaml` (brief
+09's R4 keys, random initial weights, seed 20261201). Teacher: EngineMCTS, K = 8, 200 ms.
+
+### Round 0: the teacher plays
+
+`python -m fog.training.search_distill collect --pool data/teams/replay_v1/train --out runs/distill/round0 --games 1100 --beta 1 --seed 15000 --agreement-every 40 --workers 4`
+(source `5cf0780`; started as `--games 1600` at `e68f22a` and restarted when two of four
+processes turned out to hold all the long mirror games; finished games were kept, which is
+why 111 games numbered above 1,099 are in the set).
+
+| Quantity | Value |
+| --- | --- |
+| Games | 1,211: 550 teacher against teacher (both sides recorded), 306 against SimpleHeuristics, 355 against MaxDamage; train teams only; 1 truncated at 300 turns |
+| Labelled decisions | 60,862 rows, 59,706 with a search distribution (the rest had one legal action or a fallback); 44,001 rows from mirror games |
+| Cost | 19,565 core-seconds, 0.32 s a row including the label check |
+| Teacher fallbacks | 51 of 60,862 decisions |
+| Teacher results while collecting (train teams, not matched blocks, diagnostic only) | 267 of 306 against SimpleHeuristics, 347 of 355 against MaxDamage |
+| Stored size | 40 MB, about 600 bytes a row |
+
+**Label check** (roadmap G3, "if it fails": agreement of the reduced-budget teacher with
+the default budget should exceed 70%). On 542 decisions the search was repeated at the same
+budget with another seed and at 1,600 ms: the 200 ms teacher's chosen action equals the
+second-seed choice on 86.5% and the 1,600 ms choice on **73.8%**. Limit: in this round the
+checked decisions were the 40th and 80th of a side in a game (turn 29 at the earliest, median
+turn 38), so they are late-game positions; from `e6ef687` on the check samples decisions at
+random. `docs/briefs/15-artifacts/round0-summary.json`.
+
+### Network 0: trained on round 0 only
+
+`python -m fog.training.search_distill train --data runs/distill/round0 --out runs/distill/net0 --threads 4`
+(source `5cf0780`): 58,160 training rows, 2,702 held out by game (61 games), 8 epochs, batch
+256, 3e-4 to 3e-5, 285 rows/s, 28 minutes. `15-artifacts/net0-metrics.json`.
+
+| Epoch | Held-out cross-entropy | KL to the teacher | Top-1 agreement with the teacher | Value MSE to outcome |
+| --- | --- | --- | --- | --- |
+| 0 (untrained) | 2.170 | 0.403 | 6.4% | 1.085 |
+| 1 | 1.969 | 0.202 | 45.3% | 0.666 |
+| 4 | 1.942 | 0.175 | 47.6% | 0.699 |
+| 8 (best) | 1.935 | 0.168 | 49.3% | 0.750 |
+
+The teacher's distributions are flat (cross-entropy minus KL is about 1.77 nats), and the
+teacher agrees with its own second seed on 86.5% of choices, so 49% leaves a lot of room.
+
+Play: the network alone, greedy, no search, lead from the untrained lead head, validation
+teams, matched blocks, 400 games a cell (smoke), seed 15100:
+`python -m fog.eval.run_shards --shards 4 --games 400 --seed 15100 --out-dir runs/distill/eval/net0 -- --pool data/teams/replay_v1/validation --device cpu --config configs/search_distill_cpu.yaml --checkpoint net0=runs/distill/net0/policy_best.pt --opponent simpleheuristics --opponent maxdamage --max-turns 300 --progress-every 20`
+
+| Network | Against SimpleHeuristics | Against MaxDamage | File |
+| --- | --- | --- | --- |
+| Untrained (same seed) | 0.0075 [0.003, 0.022] (3-397) | 0.0475 [0.031, 0.073] (19-381) | `15-artifacts/untrained-play.json` |
+| Network 0 (58,160 rows) | **0.450 [0.402, 0.499] (180-220)** | **0.815 [0.774, 0.850] (326-74)** | `15-artifacts/net0-play.json` |
+
+No draws, truncations or failed games. For orientation only, because the team pools differ:
+brief 09's R4, trained on 52,955 human replay rows, scored 0.385 and 0.770 on `pool_b`; brief
+05's models on 20,000 and 40,955 replay games (old rows) scored 0.52 and 0.86 on `pool_b`.
+Checkpoint `runs/distill/net0/policy_best.pt` is not in the repository (SHA-256
+`5ed3c3ae8c326495cfaede9e1c0b92a275df278e5939c639d789324045a8d4ad`); the commands above
+regenerate it.
