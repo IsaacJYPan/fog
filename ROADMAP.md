@@ -370,6 +370,11 @@ before changing the architecture.
       distribution.
 - [ ] **P3.4 Evaluate** the distilled policy with no search against `A2`, `A3`, the P2 blueprint
       and EngineMCTS.
+      _2026-11-16: `docs/briefs/15-distil-engine-mcts.md` is a pilot of P3.1 to P3.4: three
+      rounds, about 180,000 labelled decisions, teacher at 200 ms and eight worlds (brief 11's
+      budget curve), random initial weights because neither `A3` nor a G2 blueprint exists.
+      It starts when G1 passes. The run this section describes (one million decisions from
+      the blueprint) follows the pilot and brief 13._
 
 **Gate G3:** the distilled policy without search beats its initial weights (> 55%) and scores
 ≥ 30% vs EngineMCTS at the default budget.
