@@ -112,42 +112,63 @@ lean on a shortcut that does not exist in play.** Their timing, value and play n
 
 Review each with `docs/briefs/REVIEW.md` when its branch appears (`git ls-remote --heads origin`).
 
-### The distillation loop (brief 15 pilot, continued by the planner) [verified; ledger "search distillation pilot" and the sections after it]
+### The distillation loop (briefs 15 and 17, run by the planner) [verified; the ledger's "search distillation" sections of 2026-11-16]
 
-Round 0 the teacher plays; in every later round the previous network plays with the teacher's
-move one time in four; each network is trained from random weights on all rounds so far.
-Teacher: EngineMCTS, K = 8, 200 ms (0.35 s a labelled row on four cores including the label
-check). Play rows: the network alone, greedy, 1,008 games an opponent, validation teams.
+Round 0 the teacher plays; in every later round the newest network plays with the teacher's
+move one time in four; a network is trained from random weights on the rounds named in its
+ledger section. Teacher: EngineMCTS, K = 8, 200 ms. Play rows: the network alone, greedy,
+1,008 games an opponent, validation teams, one seed (15200) for all networks.
 
 | Network | Training rows | SimpleHeuristics | MaxDamage |
 | --- | --- | --- | --- |
 | untrained (400 games, smoke) | 0 | 0.008 | 0.048 |
-| 0 | 58,160 | 0.448 [0.418, 0.479] | 0.815 [0.790, 0.838] |
-| 1 | 118,518 | 0.615 [0.585, 0.645] | 0.909 [0.889, 0.925] |
-| 2 | 178,317 | 0.682 [0.653, 0.710] | 0.923 [0.904, 0.937] |
-| later rounds | see the ledger | the ledger's last "search distillation" section is where the session stopped |
+| 0 | 58,160 | 0.448 | 0.815 |
+| 1 | 118,518 | 0.615 | 0.909 |
+| 2 | 178,317 | 0.682 | 0.923 |
+| 3, trained twice (CPU, GPU) | 233,895 | 0.685 and 0.701 | 0.925 and 0.932 |
+| 4 (four epochs) | 455,501 | **0.708 [0.680, 0.736]** | **0.943 [0.927, 0.956]** |
+| EngineMCTS, the teacher (gate G1) | | 0.929 | 0.973 |
 
-The teacher itself scores 0.929 and 0.973 (gate G1). The 200 ms teacher picks the 1,600 ms
-teacher's action on 76% to 78% of decisions sampled over whole games.
+**Network 2 against EngineMCTS: 0.128 [0.109, 0.150] over 1,008 games** (the opponent ran
+below its budget on a hosted machine; not a gate row). Gate G3 asks for 0.30.
 
-What the loop has shown [measured unless marked]:
+What is settled [measured]:
 
-- Strength is still rising with rows, more slowly each round (16.7 then 6.7 points against
-  SimpleHeuristics).
-- The teacher's root value barely predicts the result (58.6% to 59.7% sign agreement; MSE
-  0.91 where a constant scores 1.0), and not at all before the last quarter of a game. The
-  network's value head after one epoch (0.776) is better than the teacher's value; after
-  that it memorises the 3,300 games. `value_best.pt` keeps the best epoch.
-- Not yet measured: sharper targets (`--target-power 2`), outcome-only value targets
-  (`--value-mix 0`), initial weights from a replay blueprint, any game against EngineMCTS
-  (gate G3's 30% clause). The first two were submitted as one GPU job on 2026-11-16; if the
-  ledger has no row for them, the job's result was not collected.
+- **Strength is close to flat in data from 178,000 rows on.** 2.6 times the rows bought 2.6
+  points. Two trainings of one recipe differ by 1.6 points, so smaller differences are not
+  findings.
+- **Sharper targets do not help**: `--target-power 2` is +1.1 and +1.7 points on two data
+  sizes (inside the noise), power 8 is 1.6 lower. The switch stays off.
+- **The value head needs the search value in its target**: with the result alone
+  (`--value-mix 0`) it is worse than a constant on held-out games. With the half-and-half
+  target its best epoch scores 0.78 to 0.87 where a constant scores 1.0 and the teacher's own
+  root value 0.91; `value_best.pt` keeps that epoch. The teacher's value says almost nothing
+  about who wins before the last quarter of a game.
+- **Label quality passes G3's bar everywhere** (74% to 79% agreement between the 200 ms and
+  1,600 ms teachers), on this machine and on hosted ones.
+- Where the network and the teacher differ (ledger, "where network 2 and the teacher
+  differ"): the teacher's visit distribution is nearly flat (top share 0.40), the network
+  follows its switches only 40% of the time, and neither terastallizes much (the search's
+  first choice is a Tera move on 0.4% of decisions).
+
+What is running or next [state at 20:00 UTC on 2026-11-16; the ledger says what finished]:
+
+1. `configs/search_distill_wide.yaml` (entity width 256) on network 4's rows and epochs, on
+   the planner's machine: G3's "if it fails" line, third step. Output `runs/distill/net4w`.
+2. The narrow model for eight epochs on 503,000 rows, on a hosted CPU machine (`net4-e8`).
+3. `net3g` against EngineMCTS, 1,008 games on two hosted machines with one evaluation
+   process a core (`--only 0,1` and `--only 2,3` of one four-shard row, seed 15400).
+4. If the wide model is flat too: the distilled policy alone will not reach G3 at this
+   teacher and this architecture family. Record that under G3; the question for the owner is
+   then whether P4 (the network inside the search) may start from G1 and a policy that is
+   strong enough to be a prior but not to pass G3. Do not start P4 before that is decided.
 
 **Data and checkpoints are not in the repository** (`runs/` is ignored and the container is
-ephemeral). Every round and every network's `policy_best.pt` is in the owner's private hosted
-dataset (`kaggle datasets list --mine`; one `roundN.tar` a collection folder, `netN.pt` a
-network), so a new session downloads them instead of regenerating them. SHA-256 of each
-reported checkpoint is in the ledger.
+ephemeral). Every round (`<folder>.tar`) and the acting networks (`net2.pt`, `net3.pt`,
+`net3g.pt`) are in the owner's private hosted dataset (`kaggle datasets list --mine`); a new
+session downloads them instead of regenerating them. SHA-256 of each reported checkpoint is
+in the ledger. `scripts/hosted.sh` (settings from the environment, see its header) runs
+collection, training and evaluation on the hosted machines.
 
 ## 5. Decisions made and why (do not reopen without new evidence)
 
@@ -322,12 +343,10 @@ team (reported, not fixed).
 
 ## 8. Next steps, in priority order
 
-1. **Keep the distillation loop going** toward one million rows (`docs/briefs/17-distil-at-scale.md`
-   has the plan and gate G3; the planner has been running it directly because the data and the
-   hosted account are in its session). One round: upload the acting network to the private
-   dataset, collect on this machine and on hosted CPU machines at once (one seed and one
-   folder a machine), train on a hosted GPU, play 1,008 games an opponent here. Then the G3
-   row: 1,008 games against EngineMCTS at K = 8 and 1,600 ms. Section 9 has the mechanics.
+1. **Finish the distillation experiments in flight** (section 4, "What is running or next")
+   and record each as a ledger row. More rows of the same kind are not the lever: the data
+   curve is flat. The G3 row proper is 1,008 games against EngineMCTS at K = 8 and 1,600 ms
+   with one evaluation process a real core.
 2. **Review brief 13** when it reports. It decides G2's measurable clauses (65% against
    SimpleHeuristics; value ECE below 0.05 and Brier below 0.24) and measures whether the lead
    stage moves the policy. If brief 12 is merged first, its rows should be used.
