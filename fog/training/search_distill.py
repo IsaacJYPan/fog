@@ -104,7 +104,8 @@ class TeacherSeat:
         self.rng = random.Random(seed)
         self.teacher = ShowdownEngineMCTSController(**{**teacher_kwargs, "seed": seed & 0x7FFFFFFF})
         self.agreement_every = int(agreement_every)
-        self._labelled = 0
+        # Its own stream: which decisions are checked must not change which are played.
+        self._check_rng = random.Random(seed ^ 0x5EED5EED)
         self._checks: dict[str, Any] = {}
         if self.agreement_every > 0:
             self._checks = {
@@ -140,11 +141,9 @@ class TeacherSeat:
         by_teacher = self.rng.random() < self.beta
         executed = teacher_action if by_teacher else int(network_action)
         check_repeat = check_default = -1
-        if searched and self._checks:
-            self._labelled += 1
-            if self._labelled % self.agreement_every == 0:
-                check_repeat = self._search(self._checks["repeat"], battle)[0]
-                check_default = self._search(self._checks["default"], battle)[0]
+        if searched and self._checks and self._check_rng.random() < 1.0 / self.agreement_every:
+            check_repeat = self._search(self._checks["repeat"], battle)[0]
+            check_default = self._search(self._checks["default"], battle)[0]
         self._pending = {
             "teacher_policy": (np.asarray(policy, dtype=np.float32) if searched
                                else np.zeros(N_ACTIONS, dtype=np.float32)),
@@ -668,8 +667,8 @@ def main() -> None:
     c.add_argument("--teacher-budget-ms", type=int, default=200)
     c.add_argument("--max-turns", type=int, default=300)
     c.add_argument("--agreement-every", type=int, default=0,
-                   help="on every Nth labelled decision also search with a second seed and at "
-                        "--check-budget-ms, and store both answers")
+                   help="on one labelled decision in N, at random, also search with a second "
+                        "seed and at --check-budget-ms, and store both answers")
     c.add_argument("--check-budget-ms", type=int, default=1600)
     c.add_argument("--workers", type=int, default=1, help="processes; each takes free games")
     c.add_argument("--shards", type=int, default=1, help="internal")
