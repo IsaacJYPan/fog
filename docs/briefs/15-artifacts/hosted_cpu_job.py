@@ -13,6 +13,11 @@ evaluation to finish, and submit with a timeout above the expected run time
 
 Collection on several machines: give every machine its own `--seed` and its own `--out`
 folder; `python -m fog.training.search_distill train --data` takes all the folders.
+
+The hosted machine reports four CPUs that are two cores with two threads each. The search
+budget is wall-clock, so use one process a core (`--workers 2`, `--shards 2`): with four
+collection processes a label got 43,000 simulations where a four-core machine gives
+117,000 (ledger, 2026-11-16).
 """
 import json
 import os
@@ -29,7 +34,7 @@ STEPS = [
     {"name": "round3b", "command": [
         "-m", "fog.training.search_distill", "collect", "--pool", "data/teams/replay_v1/train",
         "--out", "{out}/round3b", "--checkpoint", "{input:net2.pt}", "--games", "600",
-        "--beta", "0.25", "--seed", "16003", "--agreement-every", "40", "--workers", "4",
+        "--beta", "0.25", "--seed", "16003", "--agreement-every", "40", "--workers", "2",
         "--max-seconds", "7200"]},
 ]
 NODE = "v22.11.0"
