@@ -3615,3 +3615,25 @@ of 658 against 1,600 ms and 89.8% against a second seed; network 3 has the teach
 choice on 60.6% of its own positions (network 2: 58.7%). `15-artifacts/round4-summary.json`.
 Two hosted machines are collecting the same round; the host refused two more (it runs five
 CPU jobs at once).
+
+## 2026-11-16: network 2 against EngineMCTS (first reading on gate G3; the opponent ran below its budget)
+
+`python -m fog.eval.run_shards --shards 4 --games 1008 --seed 15300 --out-dir net2-vs-mcts -- --pool data/teams/replay_v1/validation --device cpu --config configs/search_distill_cpu.yaml --checkpoint net2=net2.pt --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent mcts --max-turns 300 --progress-every 40`
+on one hosted CPU machine through `docs/briefs/15-artifacts/hosted_cpu_job.py` (source
+`2aa8dce`), 17,800 s.
+
+| Date | Policy (no search) | Opponent | Games | Win rate [95% interval] | W-L | Opponent fallbacks | File |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | Network 2 (`6eea4684...`) | EngineMCTS, K = 8, 1,600 ms | 1,008 | **0.128 [0.109, 0.150]** | 129-879 | 53 of 34,984 decisions (0.15%); 0 rejected | `15-artifacts/net2-vs-mcts-1008.json` |
+
+**Not a gate row.** The four shards shared two cores (the hosted machine's four CPUs are two
+cores with two threads), so EngineMCTS had about 37% of the simulations it gets on a
+four-core machine in 1,600 ms (ledger, "round 3 on hosted CPU machines"). The budget curve
+is flat from 200 to 3,200 ms on a four-core machine, which makes this opponent about as
+strong as the gated one, but that is an inference.
+
+Reading: gate G3 asks for 30% against EngineMCTS at the default budget. A network that beats
+SimpleHeuristics 68% of the time wins 13% against a search that was, if anything,
+handicapped. The networks of rounds 2 and 3 score 0.68 to 0.70 against SimpleHeuristics, so
+none of them is near 30% here. A proper row for the best of them (`net3g`, one evaluation
+process a core, two hosted machines) is running.

@@ -408,6 +408,13 @@ before changing the architecture.
 **If it fails:** check label quality first (top-1 agreement between the teacher at the reduced
 and default budgets should exceed 70%), then data volume (plot strength at 250k, 500k, 1M
 decisions). If strength is flat in data, the model is the limit; widen it.
+_2026-11-16, not yet a gate result: network 2 (178k rows, 0.682 against SimpleHeuristics) wins
+0.128 [0.109, 0.150] of 1,008 games against EngineMCTS, which ran below its budget on a hosted
+machine. Label quality is above the bar (76% to 78%). Strength against SimpleHeuristics is
+0.68 to 0.70 at 178k and 234k rows, two trainings of one recipe differ by 1.6 points, and
+`--target-power 2` did not help. The 479k-row network is the next point of the data curve;
+if it is flat too, this line's third step (a wider model) is what remains. Ledger, the
+"search distillation" sections of 2026-11-16._
 
 ### P4. Learned components inside search
 
