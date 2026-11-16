@@ -14,7 +14,8 @@ OUT=ROOT/'runs/replay-parity'
 ART=ROOT/'docs/briefs/12-artifacts'
 WRAPPER=ART/'runtime-wrapper.txt'
 PYTHON=ROOT/'.venv/bin/python'
-ENV={**os.environ,'OMP_NUM_THREADS':'2','MKL_NUM_THREADS':'2','OMP_WAIT_POLICY':'PASSIVE'}
+ENV={**os.environ,'OMP_NUM_THREADS':'2','MKL_NUM_THREADS':'2','OMP_WAIT_POLICY':'PASSIVE',
+     'MALLOC_MMAP_THRESHOLD_':'131072','MALLOC_TRIM_THRESHOLD_':'131072'}
 
 
 def run(module, arguments, log):

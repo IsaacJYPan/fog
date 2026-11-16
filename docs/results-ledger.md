@@ -3548,3 +3548,20 @@ array returned by the pinned old `rows_to_arrays`, including inputs, targets and
 The separate preview arrays are not used by this paired decision evaluation and were not checked;
 `old-metadata-summary.json` now names this scope explicitly. The 2,000-game/103,944-row identity
 result is unchanged.
+
+### Training progress and allocation check (smoke)
+
+The old-data R4 run completed all eight epochs; epoch 7 selected the policy checkpoint
+(`train-old-metrics.csv`). The new-data startup was intentionally stopped before any completed
+epoch: dataset-loading buffers remained resident, and cgroup use reached 17,095,970,816 bytes
+against a 17,179,869,184-byte limit. There was no OOM kill and no new-model result from that
+interrupted attempt.
+
+The run restarts with `MALLOC_MMAP_THRESHOLD_=131072` and `MALLOC_TRIM_THRESHOLD_=131072`,
+which release temporary allocation buffers. Model keys, losses, optimizer, batch order, seed,
+thread count and resume settings are unchanged. Allocation-only equivalence was checked with
+`allocator-equivalence-runner.txt` under both environments: predictions on 1,024 recorded rows,
+eight direct model-input captures, a 256-row full BC loss/backward pass and all 247 resulting
+gradient tensors are **bit-identical** (`allocator-equivalence.json`). This is a runtime memory
+setting, not a different training recipe. Both runs remain CPU-only; trained-play results are
+still pending.

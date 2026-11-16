@@ -1,0 +1,24 @@
+{
+  "kind": "smoke",
+  "prediction_rows": 1024,
+  "backward_rows": 256,
+  "captured_model_input_rows": 8,
+  "gradient_tensors": 247,
+  "compared_arrays": 480,
+  "all_arrays_bit_identical": true,
+  "log_probabilities_bit_identical": true,
+  "values_bit_identical": true,
+  "bc_loss_bit_identical": true,
+  "all_gradients_bit_identical": true,
+  "cpu_threads": 2,
+  "allocator_environment": {
+    "MALLOC_MMAP_THRESHOLD_": "131072",
+    "MALLOC_TRIM_THRESHOLD_": "131072"
+  },
+  "reason": "dataset loading retained temporary buffers near the 16 GiB cgroup limit; no model/recipe/seed change",
+  "observed_cgroup_bytes": 17095970816,
+  "cgroup_limit_bytes": 17179869184,
+  "observed_oom_kills": 0,
+  "completed_new_epochs_before_restart": 0,
+  "startup_intentionally_interrupted": true
+}
