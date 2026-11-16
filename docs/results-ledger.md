@@ -3500,3 +3500,18 @@ The owner has been asked whether to leave that GPU job queued or cancel it to gi
 brief 13 priority. No cancellation or GPU submission has occurred; usage remains
 **0 h**. This is a partial brief awaiting that scheduling decision, not a completed
 training or gate result.
+
+### Source-test process shutdown limitation (no application change)
+
+The final process check found that the original source test command had printed
+**24 passed / 4 skipped** but had not exited. It was terminated at cleanup, so
+that row describes the assertion summary, **not a successful process exit**.
+With the corrected holdout supplied through `FOG_ORDER_BLIND_HOLDOUT`, the same
+four test files report **28 passed, no skips**, and `pytest.main` returns zero.
+Interpreter shutdown then hangs in the installed `poke_env` dependency:
+`__clear_loop -> __stop_loop -> shutdown.result()` (line 23). The 60-second
+watchdog dumped that stack and exited with code 1. Literal output and lifecycle
+results are in `source-tests-holdout.txt` and `source-tests-lifecycle.json`.
+The three split tests exit normally; Ruff is clean. No source or dependency was
+changed to mask the shutdown issue. Clean source-suite process exit and later
+acting-CLI shutdown remain unverified; training and play have not run.

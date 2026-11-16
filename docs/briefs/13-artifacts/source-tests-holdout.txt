@@ -1,0 +1,19 @@
+............................                                             [100%]
+28 passed in 19.49s
+pytest_return_code: 0
+poke_loop_running: True thread_alive: True
+Timeout (0:01:00)!
+Thread 0x00007f68ed1ff6c0 (most recent call first):
+  File "<python-runtime>/lib/python3.12/selectors.py", line 468 in select
+  File "<python-runtime>/lib/python3.12/asyncio/base_events.py", line 1961 in _run_once
+  File "<python-runtime>/lib/python3.12/asyncio/base_events.py", line 645 in run_forever
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/poke_env/concurrency.py", line 11 in __run_loop
+  File "<python-runtime>/lib/python3.12/threading.py", line 1012 in run
+  File "<python-runtime>/lib/python3.12/threading.py", line 1075 in _bootstrap_inner
+  File "<python-runtime>/lib/python3.12/threading.py", line 1032 in _bootstrap
+
+Thread 0x00007f69fa941740 (most recent call first):
+  File "<python-runtime>/lib/python3.12/threading.py", line 355 in wait
+  File "<python-runtime>/lib/python3.12/concurrent/futures/_base.py", line 451 in result
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/poke_env/concurrency.py", line 23 in __stop_loop
+  File "/workspace/fog/.venv/lib/python3.12/site-packages/poke_env/concurrency.py", line 37 in __clear_loop

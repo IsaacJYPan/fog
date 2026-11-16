@@ -38,5 +38,8 @@ No checkpoints exist for this brief yet. Model, loss and trainer code are unchan
 
 **Not verified:** GPU training/throughput, best-policy/value metrics and intervals,
 lead-stage retention, checkpoint persistence, larger data, learning curve or play.
-Checks: 24 source tests passed, four missing-fixture skips; three split tests
-passed; Ruff passed. No P2 box or gate is claimed.
+Checks: with the real holdout, 28 source tests report passing and `pytest.main`
+returns zero, but interpreter shutdown hangs in installed `poke_env`'s
+`__stop_loop`; a 60 s watchdog exits 1 with its stack preserved. The original
+24-pass/four-skip run also hung after its summary. Three split tests exit
+normally; Ruff passes. No source/dependency patch, P2 tick or gate claim.

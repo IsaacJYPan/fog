@@ -1,0 +1,22 @@
+{
+  "original_run": {
+    "summary": {
+      "passed": 24,
+      "skipped": 4
+    },
+    "process_exit": "hung after summary; terminated with SIGTERM during final cleanup check"
+  },
+  "holdout_rerun": {
+    "command": "FOG_ORDER_BLIND_HOLDOUT=runs/brief13/split/holdout_manifest.parquet OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 python -X faulthandler (pytest.main on the four files in preparation.json; faulthandler.dump_traceback_later(60, exit=True))",
+    "summary": {
+      "passed": 28,
+      "skipped": 0
+    },
+    "pytest_main_return_code": 0,
+    "process_exit_code": 1,
+    "watchdog_seconds": 60,
+    "shutdown_stack": "poke_env/concurrency.py __clear_loop -> __stop_loop line 23 -> shutdown.result()",
+    "scope": "Assertions passed, including the real holdout; interpreter shutdown did not complete. No dependency or application source patched."
+  },
+  "traceback_redaction": "Python runtime installation prefix replaced with <python-runtime> to follow repository naming rules; stack frames, functions and line numbers retained."
+}
