@@ -3717,3 +3717,51 @@ data volume is now plotted to 456,000 rows, so "the model is the limit; widen it
 `configs/search_distill_wide.yaml` (entity width 256, 10.1M parameters against 5.8M) is
 training on network 4's rows and epochs; an eight-epoch run of the narrow model on all rows
 is on a hosted machine, to say whether four epochs were too few.
+
+## 2026-11-16: search distillation, the network at twice the width
+
+`python -m fog.training.search_distill train --config configs/search_distill_wide.yaml --data <network 4's fifteen folders> --out runs/distill/net4w --epochs 4 --threads 4`
+(source `549baea`, this machine, stopped after epoch 2 and resumed): entity width 256
+instead of 128, 10.1M parameters instead of 5.8M, the rows, held-out games, seed and epochs of
+network 4. 38 to 42 minutes an epoch (the narrow model: 27).
+`policy_best.pt` SHA-256 `7a93b21f9289aded9b0c55dfca38ce72aafe946271c7fa6c3db23a3d53c7e5a4`.
+
+| Epoch | Held-out cross-entropy, wide (narrow) | Top-1 with the teacher, wide (narrow) | Value MSE to outcome, wide (narrow) |
+| --- | --- | --- | --- |
+| 1 | 1.815 (1.808) | 52.9% (54.6%) | 0.846 (0.845) |
+| 2 | 1.792 (1.791) | 58.1% (58.6%) | 0.860 (0.893) |
+| 3 | 1.781 (1.782) | 60.5% (60.4%) | 0.862 (0.901) |
+| 4 | 1.776 (1.778) | 61.9% (61.5%) | 0.876 (0.912) |
+
+Play (`--seed 15200`, validation teams, `--config configs/search_distill_wide.yaml`, source
+`62900c8`):
+
+| Date | Policy | Training rows | Opponent | Games | Win rate [95% interval] | W-L-D | File |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | Network 4, wide | 455,501 | SimpleHeuristics | 1,008 | 0.695 [0.666, 0.723] | 701-307-0 | `15-artifacts/net4w-play-1008.json` |
+| 2026-11-16 | Network 4, wide | | MaxDamage | 1,008 | 0.939 [0.923, 0.953] | 947-61-0 | |
+| 2026-11-16 | Network 4 (narrow, section above) | 455,501 | SimpleHeuristics / MaxDamage | 1,008 each | 0.708 / 0.943 | | |
+
+**Width does not help**: the wide network fits the teacher exactly as well as the narrow one
+and plays the same (1.3 points lower, inside the 1.6 points two trainings differ by).
+
+### Where this leaves gate G3
+
+The three steps of G3's "if it fails" line have now each been taken once:
+
+| Step | Result |
+| --- | --- |
+| Label quality: the 200 ms and 1,600 ms teachers agree on more than 70% | 74% to 80% in every folder |
+| Data volume | 0.682 at 178,000 rows, 0.708 at 456,000 |
+| Widen the model | 0.695 at twice the width |
+| Also tried: sharper targets | no gain at power 2, lower at power 8 |
+
+The policy without search sits at about 0.70 against SimpleHeuristics and 0.94 against
+MaxDamage whatever is changed, agrees with the teacher's first choice on 62% of held-out
+decisions, and network 2 won 13% against EngineMCTS where G3 asks for 30%. G3 is not passed
+and nothing measured here points to a way of passing it with this teacher's visit
+distributions as the only target. The gate row for `net3g` against EngineMCTS (two hosted
+machines, one process a core) and two further trainings (eight epochs; twice the depth) are
+still running and will be recorded, but none of them is expected to change this. What to do
+about P4, which the roadmap opens only after G2 or G3, is the owner's decision
+(`HANDOFF.md` section 4).

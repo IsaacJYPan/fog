@@ -415,6 +415,10 @@ machine. Label quality is above the bar (76% to 78%). Strength against SimpleHeu
 `--target-power 2` did not help. The 479k-row network is the next point of the data curve;
 if it is flat too, this line's third step (a wider model) is what remains. Ledger, the
 "search distillation" sections of 2026-11-16._
+_2026-11-16, later: the 456k-row network scores 0.708 and the same rows at twice the width
+0.695. All three steps of this line are taken and the policy without search stays near 0.70
+against SimpleHeuristics. **G3 is not passed.** Whether P4 may start from G1 and this policy
+is an owner decision (section 8); until then P4 stays closed._
 
 ### P4. Learned components inside search
 
