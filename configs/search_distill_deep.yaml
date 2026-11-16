@@ -1,0 +1,9 @@
+# The search-distillation network with a contextual stack twice as deep (eight layers instead
+# of four) at the narrow width: the other way to add capacity, to be compared with
+# search_distill_wide.yaml on the same rows (ROADMAP gate G3, "if it fails").
+extends: search_distill_cpu.yaml
+
+experiment: search_distill_deep
+
+model:
+  shared_contextual_layers: 8
