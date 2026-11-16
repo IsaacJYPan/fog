@@ -1,0 +1,72 @@
+{
+  "status": "partial_at_40_core_hours",
+  "source_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
+  "budget_core_seconds": 144000.00298725202,
+  "command": "/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k32 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":32,\"budget_ms\":3200,\"threads\":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4",
+  "raw_shards": [
+    "docs/briefs/11-artifacts/budget-3200-k32/shard_0.json",
+    "docs/briefs/11-artifacts/budget-3200-k32/shard_1.json",
+    "docs/briefs/11-artifacts/budget-3200-k32/shard_2.json",
+    "docs/briefs/11-artifacts/budget-3200-k32/shard_3.json"
+  ],
+  "row": {
+    "label": "mcts vs simpleheuristics",
+    "a": "mcts",
+    "b": "simpleheuristics",
+    "requested_games": 400,
+    "completed_games": 96,
+    "a_wins": 89,
+    "b_wins": 7,
+    "draws": 0,
+    "truncated": 0,
+    "failures": 0,
+    "turns": 2057,
+    "wall_s": 8101.654252599998,
+    "sequential": null,
+    "decisive_games": 96,
+    "a_win_rate_decisive": 0.9270833333333334,
+    "wilson_95_low": 0.8570696833485983,
+    "wilson_95_high": 0.9642324186896375,
+    "finished_games": 96,
+    "true_draws": 0,
+    "a_score": 0.9270833333333334,
+    "mean_turns": 21.427083333333332,
+    "games_per_second": 0.011849431857597664,
+    "a_counter_totals": {
+      "decisions": 2283,
+      "searched": 2251,
+      "single_option": 21,
+      "worlds_sampled": 72384,
+      "worlds_dropped": 352,
+      "fallbacks": 11,
+      "unmapped_visits": 0,
+      "tera_entries_dropped": 0,
+      "search_seconds": 7694.1588840617405,
+      "rejected": 0,
+      "decision_seconds": 8087.660389912067,
+      "order_errors": 0
+    },
+    "b_counter_totals": {},
+    "a_fidelity": {
+      "games": 96,
+      "decisions": 2283,
+      "fallbacks": 11,
+      "fallback_rate": 0.004818221638195357,
+      "games_with_fallback": 3,
+      "max_fallbacks_in_a_game": 6,
+      "worlds_sampled": 72384,
+      "worlds_dropped": 352,
+      "world_drop_rate": 0.004862953138815208,
+      "rejected": 0,
+      "order_errors": 0,
+      "tera_entries_dropped": 0,
+      "unmapped_visits": 0,
+      "seconds_per_decision": 3.5425582084590745,
+      "failure_reasons": {
+        "PanicException: Encore should not be active when last used move is not a move": 352,
+        "ValueError: no world with positive weight and kept visits": 11
+      }
+    },
+    "b_fidelity": null
+  }
+}

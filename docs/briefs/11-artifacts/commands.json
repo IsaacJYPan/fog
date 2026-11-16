@@ -1,0 +1,19 @@
+{
+  "before_commit": "f36bc11d2b5390419f5b4fc805cdaa8487adea12",
+  "source_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
+  "fuzz_showdown_before": "uv run --no-sync python -m fog.scripts.fuzz_recon_showdown --pool data/teams/replay_v1/validation --games 200 --max-turns 80 --seed 0 --out docs/briefs/11-artifacts/fuzz-showdown-before.json",
+  "fuzz_showdown_final": "uv run --no-sync python -m fog.scripts.fuzz_recon_showdown --pool data/teams/replay_v1/validation --games 200 --max-turns 80 --seed 0 --out docs/briefs/11-artifacts/fuzz-showdown-final.json",
+  "fuzz_engine_before": "uv run --no-sync python -m fog.scripts.fuzz_recon --pool data/teams/replay_v1/validation --games 2000 --max-turns 40 --extended --seed 0",
+  "tests_focused": "uv run --no-sync python -m pytest -q tests/test_fuzz_recon_showdown.py tests/test_state_recon_fixes.py tests/test_engine_mcts.py tests/test_showdown_engine_mcts.py tests/test_merge_selection_reports.py",
+  "tests_integration": "uv run --no-sync python -m pytest -q tests/test_engine_battle.py tests/test_engine_runner.py tests/test_engine_search.py tests/test_env_actions.py tests/test_showdown_direct_selection.py tests/test_search_gauntlet.py tests/test_step_branches.py tests/test_shared_latent_reconstruction.py",
+  "lint": ".venv/bin/ruff check fog tests",
+  "fidelity_smoke": "python -m fog.eval.run_shards --shards 2 --games 200 --seed 11000 --out-dir docs/briefs/11-artifacts/fidelity-smoke -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":8,\"budget_ms\":1600,\"threads\":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4",
+  "environment_variables": {
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "fuzz_engine_final": "uv run --no-sync python -m fog.scripts.fuzz_recon --pool data/teams/replay_v1/validation --games 2000 --max-turns 40 --extended --seed 0",
+  "fuzz_engine_final_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
+  "timing_context": "The final engine fuzzer briefly used a spare core during the two-shard fidelity smoke; the quota is four cores. Budget and gate shards run without another simulator job."
+}

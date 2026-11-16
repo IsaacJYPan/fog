@@ -1,0 +1,60 @@
+{
+  "status": "gate complete",
+  "completed_by": "reviewer, 2026-11-16, by re-running the recorded gate command so each shard resumed from its last complete block",
+  "source_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
+  "branch_head_at_resume": "1bfdef6",
+  "machines": {
+    "simpleheuristics, and the first 504 maxdamage games": "AMD EPYC 9V74, four-core quota, Python 3.12.14 (docs/briefs/11-artifacts/environment.json)",
+    "last 504 maxdamage games": "Intel Xeon 2.10 GHz, four cores, Python 3.13.18, torch 2.13.0, poke-engine 0.0.48, Showdown e440c4a"
+  },
+  "concurrent_load_during_second_half": "review test runs and three rollout-digest probes at lowest priority (nice 19) for a few minutes; they can only have slowed the search",
+  "simpleheuristics": {
+    "games": 1008,
+    "wins": 936,
+    "score": 0.9285714285714286,
+    "wilson_95": [
+      0.9109926721570183,
+      0.9428960398226192
+    ],
+    "fallbacks": 53,
+    "decisions": 28020,
+    "rejected": 0,
+    "failures": 0,
+    "truncated": 0,
+    "seconds_per_decision": 1.80071247979143
+  },
+  "maxdamage": {
+    "games": 1008,
+    "wins": 981,
+    "score": 0.9732142857142857,
+    "wilson_95": [
+      0.9613085341592538,
+      0.981526918651596
+    ],
+    "fallbacks": 41,
+    "decisions": 24112,
+    "rejected": 0,
+    "failures": 0,
+    "truncated": 0,
+    "seconds_per_decision": 1.8139492162989255
+  },
+  "maxdamage_by_machine": {
+    "first_504_games": {
+      "wins": 490,
+      "score": 0.9722222222222222,
+      "seconds_per_decision": 1.829961561932573
+    },
+    "last_504_games": {
+      "wins": 491,
+      "score": 0.9742063492063492,
+      "seconds_per_decision": 1.7967352557433727,
+      "decisions": 11620
+    }
+  },
+  "gate": {
+    "simpleheuristics_at_least_0.85": true,
+    "maxdamage_at_least_0.95": true,
+    "fallbacks_under_5_percent": true,
+    "zero_rejected": true
+  }
+}

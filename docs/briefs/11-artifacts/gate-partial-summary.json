@@ -1,0 +1,68 @@
+{
+  "status": "partial_gate_checkpoint_run_continues",
+  "source_commit": "aa38e468f03f4aa9fa78d1569984043c058240db",
+  "command": "/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={\"k\":8,\"budget_ms\":1600,\"threads\":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4",
+  "gate_wall_seconds_at_observation": 8050.664949238999,
+  "rows": [
+    {
+      "label": "mcts vs simpleheuristics",
+      "a": "mcts",
+      "b": "simpleheuristics",
+      "requested_games": 1008,
+      "completed_games": 604,
+      "a_wins": 565,
+      "b_wins": 39,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "turns": 15835,
+      "wall_s": 31695.69063883899,
+      "sequential": null,
+      "decisive_games": 604,
+      "a_win_rate_decisive": 0.9354304635761589,
+      "wilson_95_low": 0.9129481101557523,
+      "wilson_95_high": 0.9524091180605013,
+      "finished_games": 604,
+      "true_draws": 0,
+      "a_score": 0.9354304635761589,
+      "mean_turns": 26.216887417218544,
+      "games_per_second": 0.01905621830053691,
+      "a_counter_totals": {
+        "decisions": 17443,
+        "searched": 17325,
+        "single_option": 87,
+        "worlds_sampled": 138848,
+        "worlds_dropped": 248,
+        "fallbacks": 31,
+        "unmapped_visits": 0,
+        "tera_entries_dropped": 0,
+        "search_seconds": 30819.9327767746,
+        "rejected": 0,
+        "decision_seconds": 31627.429299079937,
+        "order_errors": 0
+      },
+      "b_counter_totals": {},
+      "a_fidelity": {
+        "games": 604,
+        "decisions": 17443,
+        "fallbacks": 31,
+        "fallback_rate": 0.0017772172218081751,
+        "games_with_fallback": 10,
+        "max_fallbacks_in_a_game": 7,
+        "worlds_sampled": 138848,
+        "worlds_dropped": 248,
+        "world_drop_rate": 0.0017861258354459552,
+        "rejected": 0,
+        "order_errors": 0,
+        "tera_entries_dropped": 0,
+        "unmapped_visits": 0,
+        "seconds_per_decision": 1.8131874848982363,
+        "failure_reasons": {
+          "PanicException: Encore should not be active when last used move is not a move": 248,
+          "ValueError: no world with positive weight and kept visits": 31
+        }
+      },
+      "b_fidelity": null
+    }
+  ]
+}

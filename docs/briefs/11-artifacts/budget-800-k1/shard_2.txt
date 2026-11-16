@@ -1,0 +1,29 @@
+[showdown-selection] mcts vs simpleheuristics: 4/100 A=2 B=2 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 8/100 A=6 B=2 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 12/100 A=7 B=5 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 16/100 A=11 B=5 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 20/100 A=13 B=7 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 24/100 A=16 B=8 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 28/100 A=20 B=8 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 32/100 A=24 B=8 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 36/100 A=27 B=9 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 40/100 A=29 B=11 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 44/100 A=32 B=12 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 48/100 A=35 B=13 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 52/100 A=39 B=13 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 56/100 A=43 B=13 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 60/100 A=47 B=13 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 64/100 A=51 B=13 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 68/100 A=55 B=13 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 72/100 A=58 B=14 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 76/100 A=61 B=15 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 80/100 A=62 B=18 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 84/100 A=64 B=20 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 88/100 A=67 B=21 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 92/100 A=68 B=24 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 96/100 A=71 B=25 draws=0 failures=0
+[showdown-selection] mcts vs simpleheuristics: 100/100 A=75 B=25 draws=0 failures=0
+[showdown-selection] RESULT mcts vs simpleheuristics: 0.750 [0.657, 0.825] (75-25, draws=0)
+[showdown-selection] FIDELITY mcts vs simpleheuristics (a): {"games": 100, "decisions": 2841, "fallbacks": 3, "fallback_rate": 0.0010559662090813093, "games_with_fallback": 2, "max_fallbacks_in_a_game": 2, "worlds_sampled": 2793, "worlds_dropped": 3, "world_drop_rate": 0.0010741138560687433, "rejected": 0, "order_errors": 0, "tera_entries_dropped": 0, "unmapped_visits": 0, "seconds_per_decision": 0.9008659201443774, "failure_reasons": {"ValueError: no world with positive weight and kept visits": 3}}
+[showdown-selection] report -> docs/briefs/11-artifacts/budget-800-k1/shard_2.json
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 100 | 0.750 [0.657, 0.825] (75-25-0) | 0.901 | 3/2841 | `4822512+dirty` | `python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4 --games 100 --seed 12002 --out docs/briefs/11-artifacts/budget-800-k1/shard_2.json` |

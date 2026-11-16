@@ -1,0 +1,34 @@
+positions checked : 3526
+with any mismatch : 11 (0.3%)
+mismatch fields (positions affected):
+  opp.missing_mon      11
+  opp.active           3
+extended mismatch : 2229 (63.2%)
+  me.last_used_move                  1659
+  opp.last_used_move                 1659
+  me.move_disabled                   193
+  me.toxic_count                     191
+  opp.toxic_count                    191
+  opp.future_sight                   122
+  me.future_sight                    122
+  weather_turns_remaining            58
+  me.wish                            56
+  opp.wish                           56
+  terrain_turns_remaining            50
+  me.protect                         41
+  opp.protect                        41
+  opp.volatile_missing.healblock     36
+  me.volatile_missing.healblock      36
+  me.volatile_extra.substitute       25
+  opp.volatile_extra.substitute      25
+  opp.duration.encore                22
+  me.duration.encore                 22
+  opp.volatile_missing.typechange    10
+  opp.types                          10
+  me.volatile_missing.typechange     10
+  me.types                           10
+  opp.duration.taunt                 10
+  me.duration.taunt                  10
+  trick_room_turns_remaining         8
+  opp.duration.lockedmove            8
+  me.duration.lockedmove             8

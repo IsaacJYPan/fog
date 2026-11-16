@@ -2895,6 +2895,141 @@ Frequency uses the most-led training species present with alphabetical ties; no 
 
 All stages complete; only P2.2a acceptance is closed. P2.3 and every phase gate stay open. No search, PPO or belief source was changed; no playing-strength gate claimed.
 
+## 2026-11-14: EngineMCTS fidelity, budget curve and gate G1
+
+Brief 11, branch `work/g1`, based on `f36bc11`. CPU only: four-core quota on AMD EPYC 9V74,
+Python 3.12.14, locked environment, pinned Showdown `e440c4a`. Validation split only;
+no test-split files read. Exact commands are in `docs/briefs/11-artifacts/commands.json`.
+
+Fidelity baseline (`f36bc11`): `python -m fog.scripts.fuzz_recon_showdown --pool
+ data/teams/replay_v1/validation --games 200 --max-turns 80 --seed 0 --out
+ docs/briefs/11-artifacts/fuzz-showdown-before.json` checked 14,362 positions; 1,214
+with any mismatch, zero reconstruction exceptions. `python -m fog.scripts.fuzz_recon
+--pool data/teams/replay_v1/validation --games 2000 --max-turns 40 --extended --seed 0`
+checked 3,526 engine positions; 11 with core differences, 2,234 with extended differences.
+Before files and the environment are retained in `11-artifacts/`.
+
+Reconstruction fixes at `aa38e46`: map Ogerpon-Teal-Tera back to Ogerpon for matching a
+submitted-world slot; read pending charge moves from public events, including completion by
+Power Herb / immediate animation. Regressions cover both player views, HP/active/used-Tera
+across re-entry, all four Ogerpon forms, charge-only engine root options and charge completion.
+The same Showdown command with `--out docs/briefs/11-artifacts/fuzz-showdown-final.json`
+has 1,043 mismatching positions and zero exceptions. Opponent HP (96), Tera (56), active
+identity (10), and missing Phantom Force (52) / Meteor Beam (34) differences are gone.
+Fields overlap. Most remaining positions are hidden benched Regenerator healing (821).
+The remaining exact labels/counts are in the JSON; they are not fallback rates.
+
+Checks: 45 focused tests, 84 integration tests, `ruff check fog tests` clean (commands and
+captured results retained). A 200-game default-budget validation smoke is now running in two
+100-game matched-block shards, seeds 11000/11001, K=8, 1600 ms, one search thread, no SPRT,
+max turns 800. No match result yet. P1.3/P1.4 remain unchecked, G1 open; budget curve and
+1,000-game/opponent gate rows have not started. See `docs/briefs/11-report.md`.
+
+### Partial smoke checkpoint (run continues)
+
+At the saved 80/56-game blocks: 136 games, 127 wins, 3,516 decisions, zero fallbacks,
+rejected actions, failed games or truncations; 1.7555 / 1.7516 seconds per decision in the
+individual shards. **Partial smoke, not a gate or completed Stage 1.** The per-game JSON
+checkpoints and captured shard progress are pushed so another runtime can resume the same
+`fidelity_smoke` command. Source remains `aa38e46`; no measurement code changed.
+
+The engine round-trip was also repeated at `aa38e46` using the command in
+`11-artifacts/commands.json`: 3,526 positions, 11 core mismatches and 2,229 extended mismatches
+(`fuzz-engine-final.txt`). This briefly used a spare core during the two-shard smoke on the
+four-core quota; budget/gate jobs will run without another simulator job.
+
+### 2026-11-14: fidelity smoke complete
+
+Stage 1 passes: default-budget 200-game smoke, fallbacks below 5%, no rejected actions. P1.3 complete. This is smoke, not G1.
+
+| 2026-11-14 | mcts | simpleheuristics | showdown_direct | 200 | 0.935 [0.892, 0.962] (187-13-0) | 1.776 | 2/5341 | `aa38e46` | `python -m fog.eval.run_shards --shards 2 --games 200 --seed 11000 --out-dir docs/briefs/11-artifacts/fidelity-smoke -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-14: budget 800 ms K=8
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-14 | mcts | simpleheuristics | showdown_direct | 400 | 0.917 [0.886, 0.941] (367-33-0) | 0.896 | 27/10674 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-14: budget 200 ms K=8
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-14 | mcts | simpleheuristics | showdown_direct | 400 | 0.910 [0.878, 0.934] (364-36-0) | 0.261 | 28/10738 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-200-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### Partial 3,200 ms / K=8 checkpoint (run continues)
+
+Observed saved blocks: 200 games, 182 wins, 5487 decisions, 13 fallbacks, 0 rejected actions, 0 failed games and 0 truncations. **Partial smoke, not a completed curve cell or gate.** The curve allocation at observation is 9.354326 core-hours. Raw matched-block reports and the allocation checkpoint are pushed for recovery. Source remains `aa38e46`; the exact command and launch commit remain in `11-artifacts/measurement-progress.json`.
+
+### 2026-11-15: budget 3200 ms K=8
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.905 [0.872, 0.930] (362-38-0) | 3.636 | 21/10875 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k8 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget 800 ms K=1
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.782 [0.739, 0.820] (313-87-0) | 0.904 | 13/12388 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget 800 ms K=32
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.915 [0.884, 0.939] (366-34-0) | 1.027 | 13/10785 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-800-k32 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":32,"budget_ms":800,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget 200 ms K=1
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.840 [0.801, 0.873] (336-64-0) | 0.225 | 23/11550 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-200-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget 200 ms K=32
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.865 [0.828, 0.895] (346-54-0) | 0.405 | 14/11268 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-200-k32 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":32,"budget_ms":200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### Partial 3,200 ms / K=1 checkpoint (run continues)
+
+Observed saved blocks: 176 games, 140 wins, 5618 decisions, 9 fallbacks, 0 rejected actions, 0 failed games and 0 truncations. **Partial smoke, not a completed curve cell or gate.** The curve allocation at observation is 30.282541 core-hours. Raw matched-block reports and the allocation checkpoint are pushed for recovery. Source remains `aa38e46`; the command and launch commit are in `11-artifacts/measurement-progress.json`.
+
+### 2026-11-15: budget 3200 ms K=1
+
+400-game smoke; same seed blocks across cells.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 400 | 0.775 [0.732, 0.813] (310-90-0) | 3.419 | 28/12836 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k1 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":1,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### 2026-11-15: budget curve stage complete
+
+Budget charged 40.0000 allocated core-hours. Complete cells: ['800 ms K=8', '200 ms K=8', '3200 ms K=8', '800 ms K=1', '800 ms K=32', '200 ms K=1', '200 ms K=32', '3200 ms K=1']. Unfinished/not run: ['3200 ms K=32']. The 40-core-hour cap stops further cells.
+
+
+
+### Capped final budget cell: 3,200 ms / K=32
+
+Stopped at 40.0000 allocated core-hours as required by brief 11. This is a partial smoke, not a completed 400-game curve cell or a gate. The saved whole matched blocks contain 96 games; unfinished games at the cap are excluded. Derived totals are in `11-artifacts/budget-capped-summary.json`; the literal shard checkpoints remain available for inspection. There are eight complete cells, one partial cell, and no never-started cells. P1.4 stays unchecked because all nine full cells were not measured.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct (partial/capped) | 96 | 0.927 [0.857, 0.964] (89-7-0) | 3.543 | 11/2283 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 400 --seed 12000 --out-dir docs/briefs/11-artifacts/budget-3200-k32 -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":32,"budget_ms":3200,"threads":1}' --opponent simpleheuristics --max-turns 800 --progress-every 4` |
+
+### Partial default-budget gate checkpoint (run continues)
+
+Saved whole matched blocks only; these rows are partial and do not establish G1. The literal shard reports and allocation state are committed for recovery; `gate-partial-summary.json` holds derived totals from the staged checkpoint. Native evaluations continue to the fixed 1,008 games per opponent; no sequential stopping.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct (partial) | 604 | 0.935 [0.913, 0.952] (565-39-0) | 1.813 | 31/17443 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
+
+### Default-budget SimpleHeuristics gate opponent complete
+
+All four shards completed 252 games against SimpleHeuristics, for 1,008 matched games. This opponent meets its G1 rate and fidelity requirements. MaxDamage is still running, so G1 is not yet established. `gate-simpleheuristics-summary.json` contains derived totals from the committed shard rows.
+
+| 2026-11-15 | mcts | simpleheuristics | showdown_direct | 1008 | 0.929 [0.911, 0.943] (936-72-0) | 1.801 | 53/28020 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
+
+### Partial MaxDamage gate checkpoint (run continues)
+
+SimpleHeuristics is complete; MaxDamage is only halfway. This partial row does not establish G1. The staged whole matched blocks and state are pushed for recovery, with derived totals in `gate-maxdamage-half-summary.json`. The fixed 1,008-game MaxDamage run continues without sequential stopping.
+
+| 2026-11-15 | mcts | maxdamage | showdown_direct (partial) | 504 | 0.972 [0.954, 0.983] (490-14-0) | 1.830 | 7/12492 | `aa38e46` | `/workspace/fog/.venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 13000 --out-dir docs/briefs/11-artifacts/gate -- --pool data/teams/replay_v1/validation --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
+
 ## 2026-11-16: review of brief 08
 
 The branch `work/update-speed` (head `d0efe84`) was reviewed and merged into `work/roadmap`

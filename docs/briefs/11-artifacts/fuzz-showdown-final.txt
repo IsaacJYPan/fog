@@ -1,0 +1,22 @@
+positions checked    : 14362
+with any mismatch    : 1043 (7.3%)
+reconstruction errors: 0
+mismatch fields (positions affected; first example):
+  opp.hp_hidden_regenerator                      821  game 1 (5 vs 139) turn 13 as p2
+  me.move_unavailable                             53  game 1 (5 vs 139) turn 7 as p1
+  opp.volatile_missing.metronome                  33  game 11 (18 vs 33) turn 1 as p2
+  me.volatile_missing.metronome                   30  game 11 (18 vs 33) turn 1 as p1
+  me.reflect_turns                                19  game 54 (119 vs 111) turn 17 as p1
+  opp.reflect_turns                               18  game 54 (119 vs 111) turn 17 as p2
+  opp.volatile_missing.flashfire                  16  game 115 (88 vs 129) turn 12 as p1
+  me.volatile_missing.chillyreception             14  game 65 (7 vs 91) turn 36 as p2
+  me.volatile_missing.flashfire                   13  game 115 (88 vs 129) turn 12 as p2
+  opp.volatile_missing.unburden                   12  game 124 (137 vs 2) turn 12 as p2
+  me.volatile_missing.unburden                    10  game 124 (137 vs 2) turn 12 as p1
+  opp.volatile_missing.lockedmove                  9  game 27 (96 vs 37) turn 11 as p1
+  me.volatile_missing.lockedmove                   7  game 27 (96 vs 37) turn 11 as p2
+  opp.light_screen_turns                           3  game 10 (40 vs 85) turn 22 as p1
+  me.light_screen_turns                            3  game 45 (81 vs 29) turn 59 as p2
+  opp.volatile_missing.furycutter                  2  game 166 (114 vs 125) turn 19 as p1
+  weather_turns_remaining                          1  game 117 (95 vs 118) turn 40 as p1
+  me.volatile_missing.furycutter                   1  game 166 (114 vs 125) turn 20 as p2

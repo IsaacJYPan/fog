@@ -223,7 +223,7 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
       four turns, which makes the engine panic (all fallbacks so far); and the search still
       proposes Tera after our side has used it, so the used-Tera state is not carried into the
       rebuilt state. Fix each with a test, then re-run the ledger's smoke commands.
-- [ ] **P1.3 Fidelity counters.** Per-game counters are in every evaluation report and each
+- [x] **P1.3 Fidelity counters.** Per-game counters are in every evaluation report and each
       row prints a fidelity summary (`fog` commit `8b3cdb2`). `fog/scripts/fuzz_recon_showdown.py`
       compares rebuilt states with Showdown's own state; its first run on `pool_b` found and fixed
       ignored Stealth Rock and Sticky Web, missing rain, sun and snow, and stale field timers
@@ -235,6 +235,8 @@ Build the search-only anchor. It is also the first teacher and the base that P4 
 - [ ] **P1.4 Budget curve.** Win rate vs `A2` at `budget_ms` 200, 800, 3200 and `K` 1, 8, 32
       (nine cells, 400 games each is enough to see the shape). Record it; it sizes every later
       equal-time comparison.
+      _Brief 11: eight cells complete; 3,200 ms / K=32 stopped after 96 games at the
+      prescribed 40 core-hour cap. See the ledger and `docs/briefs/11-report.md`._
 
 **Gate G1:** EngineMCTS at the default budget scores ≥ 85% vs SimpleHeuristics and ≥ 95% vs
 MaxDamage on pinned Showdown over ≥ 1,000 matched games each, with fallbacks on < 5% of
