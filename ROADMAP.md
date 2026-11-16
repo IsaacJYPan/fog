@@ -366,13 +366,17 @@ before changing the architecture.
 
 ### P3. Distil search into the policy (expert iteration, generation 0)
 
-- [ ] **P3.1 Soft-target relabelling.** `fog/training/dagger_heuristic_distill.py` already runs
+- [x] **P3.1 Soft-target relabelling.** `fog/training/dagger_heuristic_distill.py` already runs
       the learner in the simulator and asks a teacher for a label at each visited state. Extend
       the teacher interface from one integer label to `(visit distribution over legal actions,
       scalar search value in [-1, 1])` and add EngineMCTS as a teacher. Loss: cross-entropy to
       the visit distribution plus value regression to `0.5 * outcome + 0.5 * search value`.
       Generate on the `showdown_direct` backend so states are authoritative; the teacher uses its
       own reconstruction as in play.
+      _2026-11-16: done as a new module, `fog/training/search_distill.py`, instead of an
+      extension of the heuristic-distillation script (that script trains while it plays; here
+      collection and training are separate, so rows can come from several machines and be
+      reused). Stored rows reproduce the network's live inputs; `tests/test_search_distill.py`._
 - [ ] **P3.2 Generate** ≥ 1,000,000 labelled decisions with the learner acting (mix 25% teacher
       actions so strong lines are visited). Use a reduced teacher budget (`K = 4`,
       `budget_ms = 400`) chosen from the P1.4 curve to keep labelling under 0.5 s per decision.
