@@ -117,7 +117,8 @@ def _collect_args(out: Path, **changes) -> Namespace:
     values = dict(config="configs/search_distill_cpu.yaml", checkpoint=None,
                   pool=Path("data/teams/replay_v1/train"), out=out, games=3, beta=1.0,
                   temperature=1.0, seed=5, teacher_k=2, teacher_budget_ms=20, max_turns=300,
-                  agreement_every=0, check_budget_ms=40, workers=1, shards=1, shard=0)
+                  agreement_every=0, check_budget_ms=40, workers=1, shards=1, shard=0,
+                  max_seconds=0.0)
     values.update(changes)
     return Namespace(**values)
 
@@ -177,6 +178,14 @@ def test_live_collection_labels_every_decision_and_resumes(tmp_path):
         assert arrays["teacher_target"].any() and meta["beta"] == 0.0
         summary = sd.summarize(own)
         assert summary["games"] == 1 and summary["teacher_executed_rows"] == 0
+        assert 0 < summary["teacher_value_rows"] <= summary["rows"]
+        assert 0.0 <= summary["teacher_value_outcome_mse"] <= 4.0
+        assert summary["teacher_visits_per_search"] > 0
+
+        # A time limit that has already passed starts no game and leaves no claim behind.
+        late = tmp_path / "late"
+        assert sd.collect_shard(_collect_args(late, max_seconds=1e-9)) == 0
+        assert not list(late.iterdir())
     finally:
         torch.set_grad_enabled(grad_enabled)
         torch.set_num_threads(threads)

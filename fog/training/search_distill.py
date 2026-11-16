@@ -122,6 +122,7 @@ class TeacherSeat:
         self.player.action_override = self._override
         self.player.decision_observer = self._observe
         self._pending: dict[str, Any] | None = None
+        self._visits = 0          # engine simulations spent on this seat's labels
 
     @staticmethod
     def _search(controller, battle) -> tuple[int, np.ndarray | None, float | None, bool]:
@@ -137,6 +138,9 @@ class TeacherSeat:
         from fog.env.player import _sample_action
 
         teacher_action, policy, value, searched = self._search(self.teacher, battle)
+        if searched:
+            self._visits += sum(int(world.total_visits)
+                                for world in self.teacher.search.last_root.worlds)
         network_action = _sample_action(out.log_probs[0], temperature=self.temperature)
         by_teacher = self.rng.random() < self.beta
         executed = teacher_action if by_teacher else int(network_action)
@@ -175,7 +179,8 @@ class TeacherSeat:
             raise RuntimeError("the recorded game was not finalised")
         frags, actions, outcome = list(game.frags), list(game.actions), float(game.outcome)
         self.buffer.clear()
-        counters = self.teacher.take_game_counters()
+        counters = {**self.teacher.take_game_counters(), "visits": self._visits}
+        self._visits = 0
         for check in self._checks.values():
             check.take_game_counters()
         return frags, actions, outcome, counters
@@ -327,15 +332,21 @@ def collect_shard(args) -> int:
     from fog.env.teams import load_pool, to_packed
 
     torch.set_num_threads(1)
+    args.out.mkdir(parents=True, exist_ok=True)
     cfg = load_config(args.config)
     packed = [to_packed(paste) for paste in load_pool(args.pool)]
     agent = build_agent(cfg, args.checkpoint, args.seed)
     teacher_kwargs = {"k": args.teacher_k, "budget_ms": args.teacher_budget_ms, "threads": 1}
     rows = played = 0
+    deadline = time.monotonic() + args.max_seconds if args.max_seconds else None
     showdown_root = cfg.get("env", {}).get("showdown_root")
     client_kwargs = {"showdown_root": showdown_root} if showdown_root else {}
     with ShowdownDirectClient(**client_kwargs) as client:
         for game in range(args.games):
+            if deadline is not None and time.monotonic() > deadline:
+                print(f"[distill-collect] process={args.shard} stopped at the time limit",
+                      flush=True)
+                break
             if not claim_game(args.out, game):
                 continue
             plan = game_plan(game, args.seed, len(packed))
@@ -392,8 +403,10 @@ def summarize(directory: Path) -> dict:
     total = {"games": 0, "rows": 0, "target_rows": 0, "teacher_executed_rows": 0,
              "truncated_games": 0, "teacher_decisions": 0, "teacher_fallbacks": 0,
              "seconds": 0.0, "checked_rows": 0, "check_repeat_agree": 0,
-             "check_default_agree": 0, "network_agrees_with_teacher": 0}
+             "check_default_agree": 0, "network_agrees_with_teacher": 0,
+             "teacher_searched": 0, "teacher_visits": 0}
     by_opponent: dict[str, int] = {}
+    values, outcomes = [], []
     for path in sorted(directory.glob("game_*.npz")):
         arrays, meta = load_game(path)
         target = arrays["teacher_target"].astype(bool)
@@ -408,6 +421,9 @@ def summarize(directory: Path) -> dict:
         for counters in meta["teacher_counters"].values():
             total["teacher_decisions"] += int(counters.get("decisions", 0))
             total["teacher_fallbacks"] += int(counters.get("fallbacks", 0))
+            if "visits" in counters:      # absent from games stored before it was counted
+                total["teacher_searched"] += int(counters.get("searched", 0))
+                total["teacher_visits"] += int(counters["visits"])
         checked = arrays["check_default_action"] >= 0
         total["checked_rows"] += int(checked.sum())
         total["check_repeat_agree"] += int(
@@ -415,7 +431,21 @@ def summarize(directory: Path) -> dict:
         total["check_default_agree"] += int(
             (arrays["check_default_action"] == arrays["teacher_action"])[checked].sum())
         by_opponent[meta["opponent"]] = by_opponent.get(meta["opponent"], 0) + 1
+        has_value = np.isfinite(arrays["teacher_value"])
+        values.append(arrays["teacher_value"][has_value].astype(np.float64))
+        outcomes.append(arrays["outcome"][has_value].astype(np.float64))
     total["games_by_opponent"] = by_opponent
+    if total["teacher_searched"]:
+        # Simulations a label got: the search budget is wall-clock, so this is what differs
+        # between machines and between a busy and an idle one.
+        total["teacher_visits_per_search"] = total["teacher_visits"] / total["teacher_searched"]
+    if values and sum(len(part) for part in values):
+        # How well the search's own root value predicts the result, on the [-1, 1] scale:
+        # a constant 0 scores 1.0. The yardstick for a value head trained on these rows.
+        value, outcome = np.concatenate(values), np.concatenate(outcomes)
+        total["teacher_value_rows"] = int(len(value))
+        total["teacher_value_outcome_mse"] = float(((value - outcome) ** 2).mean())
+        total["teacher_value_sign_agreement"] = float((np.sign(value) == outcome).mean())
     if total["checked_rows"]:
         total["top1_agreement_with_second_seed"] = (
             total["check_repeat_agree"] / total["checked_rows"])
@@ -703,6 +733,8 @@ def main() -> None:
                         "seed and at --check-budget-ms, and store both answers")
     c.add_argument("--check-budget-ms", type=int, default=1600)
     c.add_argument("--workers", type=int, default=1, help="processes; each takes free games")
+    c.add_argument("--max-seconds", type=float, default=0.0,
+                   help="start no new game after this long; 0 for no limit (re-run to resume)")
     c.add_argument("--shards", type=int, default=1, help="internal")
     c.add_argument("--shard", type=int, default=None, help="internal: process number")
 
