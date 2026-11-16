@@ -63,6 +63,7 @@ if __name__=='__main__':
             '--old-metadata','runs/replay-parity/old-metadata',
             '--old-checkpoint','runs/replay-parity/train-old/checkpoints/bc_best.pt',
             '--new-checkpoint','runs/replay-parity/train-new/checkpoints/bc_best.pt',
+            '--resume',
             '--out','docs/briefs/12-artifacts/holdout-comparison.json'], '/tmp/parity-holdout.txt')
     run('fog.eval.showdown_direct_selection',[
         '--pool','data/teams/pool_b','--device','cpu','--config','configs/replay_mechanical_cpu.yaml',

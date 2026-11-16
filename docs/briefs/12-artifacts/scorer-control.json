@@ -1,0 +1,10 @@
+{
+  "kind": "smoke",
+  "games": 16,
+  "same_checkpoint_in_both_model_slots": true,
+  "all_metrics_identical_for_each_input_view": true,
+  "common_normal_rows": 664,
+  "new_replacement_rows": 158,
+  "label_disagreements": 0,
+  "purpose": "exercise the complete scorer before evaluating the two trained models; no new-model result"
+}

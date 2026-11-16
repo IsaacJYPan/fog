@@ -3576,3 +3576,10 @@ The two-thread new run was intentionally stopped before its first completed epoc
 result from that partial attempt is reported. The final new command uses `bc.torch_threads=4`,
 and `stage3-driver.txt` records the runtime settings. This supersedes the earlier two-thread
 execution note for the new run only.
+
+The paired holdout scorer now checkpoints completed 100-game blocks and resumes only with
+the same model checkpoints, configuration and game IDs. An interruption-after-100-games test
+resumes to the identical full report (`tests/test_replay_parity_training.py`, two tests pass);
+`ruff check fog tests` remains clean. This changes evaluation recovery only, not its rows or
+metrics. A 16-game control using the same old checkpoint in both slots also gives identical
+metrics for every input view (`scorer-control.json`, smoke).

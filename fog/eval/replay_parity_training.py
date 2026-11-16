@@ -104,6 +104,7 @@ def main() -> None:
     parser.add_argument("--config", type=Path, default=Path("configs/replay_mechanical_cpu.yaml"))
     parser.add_argument("--threads", type=int, default=2)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     torch.set_num_threads(args.threads)
     cfg = load_config(args.config)
@@ -113,11 +114,25 @@ def main() -> None:
     new = {r["id"]: r for r in pl.read_parquet(args.new_manifest).to_dicts()}
     if old.keys() != new.keys():
         raise ValueError("paired holdouts must contain exactly the same games")
+    checkpoint_hashes = {name: hashlib.sha256(path.read_bytes()).hexdigest()
+                         for name, path in (("old", args.old_checkpoint),
+                                            ("new", args.new_checkpoint))}
+    progress_path = args.out.with_suffix(".progress.json")
     results = {f"{model}_model_{view}_rows": [] for model in agents for view in agents}
     results.update({f"{model}_model_new_replacements": [] for model in agents})
     results.update({f"{model}_model_nontrivial_replacements": [] for model in agents})
     per_game = []
+    if args.resume and progress_path.exists():
+        saved = json.loads(progress_path.read_text())
+        if (saved["checkpoint_sha256"] != checkpoint_hashes
+                or saved["game_ids"] != sorted(old)
+                or saved["config"] != cfg):
+            raise ValueError("holdout resume settings changed")
+        results, per_game = saved["game_sums"], saved["per_game"]
+        print(f"Resuming paired holdout after {len(per_game)} games", flush=True)
     for game, replay_id in enumerate(sorted(old), 1):
+        if game <= len(per_game):
+            continue
         first, second = load_arrays(old[replay_id]["shard"]), load_arrays(new[replay_id]["shard"])
         meta = load_arrays(args.old_metadata / f"{replay_id}.npz")
         left, right, forced, disagreements = common_indices(first, second, meta)
@@ -132,14 +147,19 @@ def main() -> None:
                          "new_replacement_rows": len(forced), "label_disagreements": disagreements})
         if game % 100 == 0:
             print(f"paired holdout {game}/{len(old)}", flush=True)
+            args.out.parent.mkdir(parents=True, exist_ok=True)
+            temporary = progress_path.with_suffix(".tmp")
+            temporary.write_text(json.dumps({"checkpoint_sha256": checkpoint_hashes,
+                                            "game_ids": sorted(old), "config": cfg,
+                                            "game_sums": results, "per_game": per_game}))
+            temporary.replace(progress_path)
     report = {"kind": "smoke", "model_config": str(args.config), "seed": 20261201,
               "games": len(old), "results": {key: interval(value) for key, value in results.items()},
               "per_game": per_game, "game_sums": results,
-              "checkpoint_sha256": {name: hashlib.sha256(path.read_bytes()).hexdigest()
-                                    for name, path in (("old", args.old_checkpoint),
-                                                       ("new", args.new_checkpoint))}}
+              "checkpoint_sha256": checkpoint_hashes}
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(report, indent=2) + "\n")
+    progress_path.unlink(missing_ok=True)
     print(json.dumps(report["results"], indent=2))
 
 
