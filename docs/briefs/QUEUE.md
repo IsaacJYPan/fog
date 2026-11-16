@@ -27,10 +27,10 @@ in different rows of the "touches" column.
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
 | 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
 | 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | not started |
-| 13 | `13-replay-scale-corrected.md` | GPU: part A 3 h now, part B 17 h after 2026-11-21 | **part A now**; part B after the meter reset | training only | `work/p2-scale-corrected` | not started |
+| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | not started |
 | 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds: see the note under this table |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | not started |
-| 14 | `14-ppo-update-levers.md` | GPU, 2 h | after 2026-11-21 (GPU meter reset) | PPO update | `work/ppo-update` | waiting on GPU time |
+| 14 | `14-ppo-update-levers.md` | GPU, 2 h | when brief 13 is not using the GPU | PPO update | `work/ppo-update` | not started (lowest priority: self-play is frozen until G3) |
 
 **Gate G1 (brief 11): passed** on 2026-11-16 (ledger, "review of brief 11"): 92.9% against
 SimpleHeuristics and 97.3% against MaxDamage over 1,008 games each.
@@ -40,13 +40,13 @@ round 0 on 2026-11-16. The ledger section "search distillation pilot" says which
 done. Give brief 15 to a worker only if that section is missing or says rounds remain; the
 worker continues from the first round it does not report.
 
-GPU: one job at a time on the account. **The hosted meter had 3.69 hours left on 2026-11-15
-and resets on 2026-11-21 00:00 UTC** (ledger, "review of brief 08"). Until then the GPU is for
-brief 13 part A only.
+GPU: one job at a time on the account. **The quota endpoint read 27.69 hours remaining of 45
+on 2026-11-16, reset 2026-11-21 00:00 UTC** (ledger, "hosted GPU time, corrected"; the
+3.69 hours in the review of brief 08 was wrong). Brief 13 has first call on it.
 
 CPU: 12, 15 and 16 touch different files and can run at the same time on separate machines.
-12 and 13 both read the converter; 13 part A does not wait for 12, part B uses 12's rows if
-12 is merged by then.
+12 and 13 both read the converter; 13 does not wait for 12, and its larger run uses 12's
+rows if 12 is merged by then.
 
 ## What each one buys
 

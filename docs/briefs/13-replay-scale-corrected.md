@@ -14,22 +14,14 @@ of this brief, and `loss.belief_coef=0 loss.belief_chain_coef=0 loss.skip_unweig
 The dense outcome targets need rows from the merged converter (`terminal_*` arrays); convert
 with it, do not reuse brief 05's shards.
 
-**GPU budget: two parts.** The hosted meter had 3.69 hours left when brief 08 ended and
-resets on 2026-11-21 00:00 UTC (`docs/briefs/08-artifacts/gpu-budget.json`). Read the meter
-before every job and write the reading down.
-
-- **Part A, now: at most 3.0 hours on the meter.** Stage 1 for the holdout and the
-  20,000-game set only; stage 2 for 20,000 games only (one epoch to measure speed, then train
-  to the best holdout policy NLL, 12 epochs at most); all of stage 3. At brief 08's 1,850
-  rows/s an epoch of about one million rows is about nine minutes. If the meter shows less
-  than 3.0 hours, cut epochs, not data; if it shows less than 1.0 hour, run part A on four CPU
-  cores instead (about 430 rows/s with the belief skip, ledger "the policy-only training
-  step") and say so. Push the report for part A as soon as it is complete; do not wait for
-  part B.
-- **Part B, after the reset, a second session: the remaining 17 hours.** The largest nested
-  set that fits (section 4, item 1), the P2.4 decision rule, the control with belief losses,
-  and stage 3 again for the larger model. If brief 12 is merged by then, convert with its
-  converter and say so in the report; do not mix rows from two converters in one run.
+**GPU budget: 20 hours, as written below; no split.** An earlier version of this section
+split the brief because the meter seemed to have 3.69 hours left. The quota endpoint read
+27.69 hours remaining of 45 on 2026-11-16, reset 2026-11-21 00:00 UTC (ledger, "hosted GPU
+time, corrected"). Read the quota before every job and write the reading down
+(`kaggle quota --format json`); stop with two hours spare. Run the 20,000-game stage and its
+play first and push that report before starting the larger set. If brief 12 is merged
+before the larger set is converted, convert with its converter and say so; do not mix rows
+from two converters in one run.
 
 **Lead head.** After the policy is trained, run brief 09's lead stage on it
 (`configs/replay_preview_cpu.yaml` with `bc.init_ckpt` set to the best-policy checkpoint; a
