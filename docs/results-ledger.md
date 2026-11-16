@@ -3637,3 +3637,23 @@ SimpleHeuristics 68% of the time wins 13% against a search that was, if anything
 handicapped. The networks of rounds 2 and 3 score 0.68 to 0.70 against SimpleHeuristics, so
 none of them is near 30% here. A proper row for the best of them (`net3g`, one evaluation
 process a core, two hosted machines) is running.
+
+## 2026-11-16: sharper targets on rounds 0 and 1 (trained on hosted CPU machines)
+
+`python -m fog.training.search_distill train --data round0 round1 --out <name> --threads 4 --target-power P`
+through `docs/briefs/15-artifacts/hosted_cpu_job.py` (source `364c724`), random initial
+weights, 118,518 training rows, the rows and held-out games of network 1. A hosted machine
+trains 165 rows a second (this machine 282). Play as for every network (`--seed 15200`,
+1,008 games an opponent, source `4d6aebc`).
+
+| Network | Power | Top-1 with the teacher, held out | SimpleHeuristics [95%] | MaxDamage [95%] |
+| --- | --- | --- | --- | --- |
+| 1 (earlier section) | 1 | 56.7% | 0.615 [0.585, 0.645] | 0.909 [0.889, 0.925] |
+| `net1-p2` (`2358365e...`) | 2 | not comparable (sharpened targets) | 0.626 [0.596, 0.655] (631-377) | 0.920 [0.901, 0.935] (927-81) |
+| `net1-p8` (`bf46c701...`) | 8 | 54.9% | 0.599 [0.569, 0.629] (604-404) | 0.889 [0.868, 0.907] (896-112) |
+
+With the rounds 0 to 2 pair above (0.682 against 0.699): power 2 is +1.1 and +1.7 points,
+both inside the 1.6 points two trainings of one recipe differ by; power 8, close to training
+on the teacher's first choice alone, is 1.6 points lower. **Sharper targets are not the
+missing strength. The switch stays off** (brief 17's first question).
+`15-artifacts/{net1-p2,net1-p8}-{metrics,play-1008}.json`.
