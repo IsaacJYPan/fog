@@ -1,0 +1,19 @@
+# ROADMAP P3 (brief 15): the network is trained on EngineMCTS visit distributions for
+# positions reached in play. Model as in brief 09's R4 (order-blind entities, mechanical move
+# features, logistic value); the replay-only dense outcome targets are off because rows
+# collected in play do not carry them.
+#
+#   python -m fog.training.search_distill collect --pool data/teams/replay_v1/train \
+#       --out runs/distill/round0 --games 2400 --beta 1 --workers 4
+#   python -m fog.training.search_distill train --data runs/distill/round0 --out runs/distill/net0
+extends: replay_mechanical_cpu.yaml
+
+experiment: search_distill_cpu
+
+loss:
+  outcome_aux_coef: 0.0
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+
+log:
+  dir: runs/distill

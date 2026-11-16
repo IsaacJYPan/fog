@@ -23,6 +23,22 @@ this and brief 13 report.
 
 **Start only if `docs/briefs/QUEUE.md` says gate G1 passed.**
 
+## 0. What already exists (added 2026-11-16)
+
+Stages 1 and 2 are written and merged: `fog/training/search_distill.py` (`collect`, `train`,
+`agreement`), `configs/search_distill_cpu.yaml`, `tests/test_search_distill.py` (schedule,
+storage, loss gradient, and a live collection that checks sections 3's four tests except the
+"same game with and without the teacher" case). Read them, run the tests, and start at the
+label check. The label check is done live, because a stored row cannot be searched again:
+`collect --agreement-every N` searches every Nth labelled decision twice more (second seed,
+and `--check-budget-ms`, default 1,600) and stores both answers; `agreement --data DIR`
+prints the two agreement rates. Change that code only where a stage below needs it, with a
+test.
+
+If the ledger already has a section "search distillation pilot" with rounds in it, continue
+from the first round it does not report; the data and checkpoints of earlier rounds are not
+in the repository, so regenerate what you need with the commands recorded there.
+
 ## 2. Rules
 
 - Branch **`work/distil-g0`** from `work/roadmap`. Push after every stage.
