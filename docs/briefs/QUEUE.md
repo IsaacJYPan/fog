@@ -55,6 +55,9 @@ stopped to ask the owner. Nothing was cancelled or changed. The owner's choice: 
 trainer jobs overlap a brief's job (the planner's recommendation: they are small, and both
 fit the week's quota), or keep the rule as it is, in which case the planner trains on the
 CPU while brief 13 runs.
+**17:27 UTC: that job ran and finished; nothing of the planner's is in the GPU queue, and the
+planner submits no GPU job until the owner has answered.** Brief 13's worker can go on as its
+brief says. Quota after it: 26.44 of 45 hours remaining.
 
 CPU: 12, 15 and 16 touch different files and can run at the same time on separate machines.
 12 and 13 both read the converter; 13 does not wait for 12, and its larger run uses 12's
