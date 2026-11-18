@@ -4364,3 +4364,23 @@ The three reports in `10-artifacts/A3-*.json` complete the six-pair round-robin
 with the original three scripted rows. P0.6 and P0.7 are complete and the
 post-batching throughput was recorded in brief 08. G0 passes on the
 replay-derived pool. Brief 13 can now measure the actual A3 comparison.
+
+
+## 2026-11-17: calibration of the selected distillation network
+
+On CPU, reconstructed the eight-epoch training split from its original round
+directories and seed 20261201 (`0aaf980`). The same 449 held-out games contain
+27,680 decisions. Recreating the seeded initial weights reproduced the
+original epoch-zero policy CE and Brier score within 0.000001. Evaluated the
+two selected checkpoints using `fog.eval.replay_holdout_report.value_calibration`
+on the same rows. The ten-bin counts and reliability tables are in
+`17-artifacts/net4-e8-calibration.json`.
+
+| Weights | Selected epoch | Outcome Brier | Ten-bin ECE |
+| --- | ---: | ---: | ---: |
+| Best policy | 8 | 0.22739 | 0.09954 |
+| Best value | 1 | 0.20372 | 0.02375 |
+
+The policy checkpoint plays the matches. The value checkpoint is retained for
+value prediction. The reconstructed initial policy is being compared directly
+to the eight-epoch policy in 1,008 matched games on validation teams.

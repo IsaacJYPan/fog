@@ -44,4 +44,4 @@ returns zero, but interpreter shutdown hangs in installed `poke_env`'s
 24-pass/four-skip run also hung after its summary. Three split tests exit
 normally; Ruff passes. No source/dependency patch, P2 tick or gate claim.
 
-**November 17 follow-up.** The prepared archive was recovered from private storage. Its SHA-256 and all three manifest counts match the recorded inputs. The account inventory found zero active jobs and 26.44 GPU-hours available. One private one-epoch calibration was submitted with a 3,600-second platform limit. Its results are pending.
+**November 17 follow-up.** The prepared archive was recovered from private storage. Its SHA-256 and all three manifest counts match the recorded inputs. The account inventory found zero active jobs and 26.44 GPU-hours available. The completed calibration used 0.16 GPU-hours and processed 2,948 rows/s. The 17 remaining epochs resumed from the saved optimizer state with a 2.25 h cap. See G20-calibration.json.
