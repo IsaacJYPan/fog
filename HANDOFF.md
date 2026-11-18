@@ -446,10 +446,10 @@ team (reported, not fixed).
 | Distillation rounds 0 to 2 and networks 0 to 2 | [verified]: 1,008 games a cell, one training seed each; play JSONs in `docs/briefs/15-artifacts/` |
 | Hosted GPU training equals CPU training | [verified] once: network 1 retrained on a T4, held-out cross-entropy 1.8286 against 1.829, top-1 56.6% against 56.7% |
 | Hosted CPU collection gives labels of the same quality | see the ledger; not verified if no row compares simulations per label and label-check agreement between machines |
-| Full test suite | last run 2026-11-14 (1,017 passed, 3 skipped, 3 expected failures, 1 failed); reviews since ran covering files only |
+| Full test suite | At 5ae77d6, 1,157 passed, nine skipped, three expected failures, and the historical league test failed because three checkpoint files were unavailable. |
 | Belief-loop fix and `skip_unweighted_belief` at scale or on a GPU | not verified (brief 13 uses the skip on a GPU) |
-| Replay models at scale on corrected rows | not run (brief 13) |
-| Whether lead training damages the policy | not measured (brief 13) |
+| Replay models at scale on corrected rows | G20 completed 18 epochs and its six validation cells. G2 passed. See the brief 13 report. |
+| Lead-stage retention at 20k games | The eight-epoch preview stage raised policy NLL by 0.02160. The original checkpoint played validation. |
 | Rust engine vs Showdown on terastallized Pokémon; Tera Stellar (not modelled); engine averaged damage roll; the Encore panic | not verified or not fixed; worlds that panic are dropped (0.17% of sampled worlds in the gate) |
 | Truncated-game scoring in PPO; information-isolation tests of the design doc | not verified |
 | The roadmap's gate thresholds | estimates [assumed] |

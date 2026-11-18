@@ -4473,3 +4473,22 @@ Including the 0.16-hour calibration, the replay brief has consumed 1.97 of 20 ho
 The median continuation epoch took 368.1 s at 2,935 training rows/s. Full epoch
 measurements, checkpoint digests and selections are in `13-artifacts/G20-metrics.csv`
 and `13-artifacts/G20-training.json`. Stage 3 runs on CPU.
+
+## 2026-11-18: G20 replay policy validation (P2.5)
+
+**Gate G2 passed for G20.** The greedy policy won 730/1,000 against SimpleHeuristics (passed, threshold 65%) and 921/1,000 against A3 (passed, threshold above 55%). The separately selected value checkpoint achieved ECE 0.00832 (passed, threshold below 0.05) and Brier 0.21286 (passed, threshold below 0.24).
+
+| Opponent | Greedy | Temperature 0.5 |
+| --- | --- | --- |
+| SimpleHeuristics | 730/1,000 (73.0%, 70.2–75.7%) | 637/1,000 (63.7%, 60.7–66.6%) |
+| MaxDamage | 918/1,000 (91.8%, 89.9–93.3%) | 892/1,000 (89.2%, 87.1–91.0%) |
+| Retained imitation policy (A3) | 921/1,000 (92.1%, 90.3–93.6%) | 900/1,000 (90.0%, 88.0–91.7%) |
+
+Each cell used the same 1,000 four-way team-and-side-matched games across 141 held-out teams, seed 0, with a 200-turn limit. The table gives wins per scheduled game, decisive win rates and 95% Wilson intervals. Across the six cells, 0 games reached the limit and no simulator failures occurred.
+
+The short lead-training stage raised holdout action NLL by 0.02160, exceeding the 0.005 retention threshold. It raised the 400-game SimpleHeuristics score by 7.5 percentage points (paired 95% interval 2.5 to 12.8). All six validation rows used the original policy checkpoint. On the fixed holdout, shuffling move slots changed policy NLL by less than 0.000001 and preserved top-1 accuracy. The three pairs of holdout reports include the move and first-move subsets, game-resampled intervals and ten reliability bins.
+
+- Original policy on `pool_b` (smoke), 287/400 against SimpleHeuristics and 377/400 against MaxDamage.
+- Lead policy on `pool_b` (smoke), 317/400 against SimpleHeuristics and 384/400 against MaxDamage.
+
+Run with `docs/briefs/13-artifacts/cpu_stage.py --run G20 --play-only --validation-workers 4 --anchor-checkpoint artifacts/checkpoints/typed_dagger_2048.pt` at `2e96d6af`, using the G20 manifest, holdout and checkpoint directory from the training entry. The policy and value digests are in `G20-training.json`. The lead rules and per-game scores are in the [stage results](briefs/13-artifacts/G20-stage.json) and associated play files.

@@ -1,0 +1,12 @@
+{
+  "policy_nll_delta_lead_minus_original": 0.021599295589229017,
+  "simpleheuristics_score_delta": 0.075,
+  "paired_block_bootstrap_interval95": [
+    0.025,
+    0.1275
+  ],
+  "bootstrap_samples": 20000,
+  "rule": "absolute NLL change <= 0.005 and no significant paired-block score decrease",
+  "selected": "original",
+  "checkpoint": "runs/replay-g20/checkpoints/bc_best.pt"
+}

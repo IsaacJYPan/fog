@@ -308,7 +308,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       exact own HP and undisclosed choices are explained per row. Both eight-epoch trainings,
       paired holdout and four 400-game play rows are complete (smoke); no strength gate is
       claimed. See `docs/briefs/12-report.md` and the ledger._
-- [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
+- [x] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
       (start `lr 3e-4` cosine, batch ≥ 1,024, until holdout loss stops improving), not the PPO
@@ -366,7 +366,7 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-15: brief 05 NLL B 1.579018 → G20 1.278605 → 40,955-game fallback 1.263437; full reliability/value tables retained. The exact 20k-to-100k decision and strict 100k value reading remain unverified. Obtain that exact point before choosing the prescribed branch; no threshold changed._
       _2026-11-16: brief 13 has no trained point; its P2.4 decision is not measurable._
 
-- [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
+- [x] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
       _2026-11-12, smoke only (400 games, `pool_b`, 3k model): 0.258 vs SimpleHeuristics, 0.623 vs
       MaxDamage greedy; see the ledger section
@@ -375,6 +375,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       _2026-11-15: brief 05 CPU smoke (400 games/opponent, pool_b, greedy): G20 0.520/0.8675 and G100 0.5225/0.8575 vs SimpleHeuristics/MaxDamage, no failures/truncations; intervals overlap. See `docs/briefs/05-report.md`; no gate claimed._
       _2026-11-16: brief 13 play and lead-retention comparison await training. All G2
       clauses are not measurable for this partial run; no new gate result claimed._
+
+_2026-11-18. The original G20 policy completed all six 1,000-game rows against A1–A3 at both temperatures. See the brief 13 play table._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 **and Brier score
@@ -385,6 +387,8 @@ imputed own-team sheets and teacher-forced states. Go to P3 (on-policy relabelli
 this) and use the P2 model as its initial weights. **If value calibration fails:** check for
 leaked privileged inputs with `fog/eval/leakage_metrics.py` and for outcome-sign errors per side
 before changing the architecture.
+
+_2026-11-18. **Gate G2 passed for G20.** The greedy policy won 730/1,000 against SimpleHeuristics (passed, threshold 65%) and 921/1,000 against A3 (passed, threshold above 55%). The separately selected value checkpoint achieved ECE 0.00832 (passed, threshold below 0.05) and Brier 0.21286 (passed, threshold below 0.24). The larger training set remains a P2.4 comparison._
 
 ### P3. Distil search into the policy (expert iteration, generation 0)
 

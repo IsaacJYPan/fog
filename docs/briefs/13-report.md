@@ -11,4 +11,14 @@ The 989,494 training rows come from 20,000 games. The fixed 2,000-game holdout h
 
 Training finished all 18 scheduled epochs. Calibration and continuation consumed **1.97 Kaggle GPU-hours** together. The account showed **24.47 hours remaining** afterward. Both exported checkpoints match their copies in the final optimizer archive tensor for tensor. Their SHA-256 values and the 19 metric rows, including initialization, are in [the training summary](13-artifacts/G20-training.json) and [the epoch measurements](13-artifacts/G20-metrics.csv).
 
-The G2 play clauses await the lead comparison and validation matches against SimpleHeuristics and A3. The larger training set and the 20k-to-100k data comparison follow publication of the G20 play results. The larger set uses the converter with the replay/live parity fixes.
+**Gate G2 passed for G20.** The greedy policy won 730/1,000 against SimpleHeuristics (passed, threshold 65%) and 921/1,000 against A3 (passed, threshold above 55%). The separately selected value checkpoint achieved ECE 0.00832 (passed, threshold below 0.05) and Brier 0.21286 (passed, threshold below 0.24).
+
+| Opponent | Greedy | Temperature 0.5 |
+| --- | --- | --- |
+| SimpleHeuristics | 730/1,000 (73.0%, 70.2–75.7%) | 637/1,000 (63.7%, 60.7–66.6%) |
+| MaxDamage | 918/1,000 (91.8%, 89.9–93.3%) | 892/1,000 (89.2%, 87.1–91.0%) |
+| Retained imitation policy (A3) | 921/1,000 (92.1%, 90.3–93.6%) | 900/1,000 (90.0%, 88.0–91.7%) |
+
+The short lead-training stage raised holdout action NLL by 0.02160, exceeding the 0.005 retention threshold. It raised the 400-game SimpleHeuristics score by 7.5 percentage points (paired 95% interval 2.5 to 12.8). All six validation rows used the original policy checkpoint. Each cell used the same 1,000 four-way team-and-side-matched games across 141 held-out teams, seed 0, with a 200-turn limit. The table gives wins per scheduled game, decisive win rates and 95% Wilson intervals. Across the six cells, 0 games reached the limit and no simulator failures occurred.
+
+The larger training set uses the converter with the replay/live parity fixes. The 20k-to-100k data comparison is pending. [Full stage results](13-artifacts/G20-stage.json)
