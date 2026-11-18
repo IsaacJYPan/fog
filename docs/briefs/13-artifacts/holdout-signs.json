@@ -1,0 +1,15 @@
+{
+  "scope": "public protocol signs; mirror compositions explicitly excluded from per-row signs",
+  "counts": {
+    "games_with_fewer_than_six_members": 2,
+    "games": 2000,
+    "p1_outcome_1": 26450,
+    "sign_checked_rows": 103944,
+    "p2_outcome_-1": 25948,
+    "p1_outcome_-1": 25470,
+    "p2_outcome_1": 26076
+  },
+  "checkpoint": null,
+  "label_perturbation": null,
+  "leakage_metrics_module": "fog.eval.leakage_metrics supplies readability summaries; no standalone privileged-input check"
+}

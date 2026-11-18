@@ -1,0 +1,70 @@
+[
+  {
+    "name": "split",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "docs/briefs/13-artifacts/prepare_split.py",
+      "--manifest",
+      "runs/brief13/decisions/manifest.parquet",
+      "--out",
+      "runs/brief13/split"
+    ],
+    "wall_seconds": 123.30400548400007,
+    "exit_code": 0
+  },
+  {
+    "name": "holdout-rows",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "-m",
+      "fog.eval.replay_slot_order_check",
+      "--config",
+      "configs/replay_mechanical_cpu.yaml",
+      "--manifest",
+      "runs/brief13/split/holdout_manifest.parquet",
+      "--out",
+      "docs/briefs/13-artifacts/holdout-rows.json"
+    ],
+    "wall_seconds": 18.379023483000083,
+    "exit_code": 0
+  },
+  {
+    "name": "holdout-signs",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "docs/briefs/13-artifacts/check_labels.py",
+      "--manifest",
+      "runs/brief13/split/holdout_manifest.parquet",
+      "--raw",
+      "runs/brief13/raw",
+      "--out",
+      "docs/briefs/13-artifacts/holdout-signs.json"
+    ],
+    "wall_seconds": 1.8940370249999887,
+    "exit_code": 1
+  },
+  {
+    "name": "holdout-signs-retry",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "docs/briefs/13-artifacts/check_labels.py",
+      "--manifest",
+      "runs/brief13/split/holdout_manifest.parquet",
+      "--raw",
+      "runs/brief13/raw",
+      "--out",
+      "docs/briefs/13-artifacts/holdout-signs.json"
+    ],
+    "wall_seconds": 7.994019495999964,
+    "exit_code": 0
+  },
+  {
+    "name": "package",
+    "command": [
+      "/workspace/fog/.venv/bin/python",
+      "runs/brief13/prepare_package.py"
+    ],
+    "wall_seconds": 20.80682367700001,
+    "exit_code": 0
+  }
+]

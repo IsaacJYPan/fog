@@ -1,0 +1,19 @@
+{
+  "command": [
+    "/workspace/fog/.venv/bin/python",
+    "docs/briefs/13-artifacts/prepare_split.py",
+    "--manifest",
+    "runs/brief13/decisions/manifest.parquet",
+    "--out",
+    "runs/brief13/split"
+  ],
+  "exit_code": 0,
+  "wall_seconds": 4.156721242999993,
+  "manifests_and_counts_byte_identical": true,
+  "files": [
+    "counts.json",
+    "holdout_manifest.parquet",
+    "train_20000.parquet",
+    "train_manifest.parquet"
+  ]
+}

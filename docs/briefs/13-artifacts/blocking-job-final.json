@@ -1,0 +1,13 @@
+{
+  "checked_at_utc": "2026-11-16T13:32:56Z",
+  "jobs": [
+    {
+      "job_slug": "fog-distill-collect-a",
+      "status": "RUNNING"
+    },
+    {
+      "job_slug": "fog-distill-train-gpu",
+      "status": "QUEUED"
+    }
+  ]
+}

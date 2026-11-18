@@ -1,0 +1,17 @@
+{
+  "model": {
+    "order_blind_entities": true,
+    "mechanical_features": true
+  },
+  "loss": {
+    "value_loss": "logistic",
+    "outcome_aux_coef": 0.1,
+    "belief_coef": 0,
+    "belief_chain_coef": 0,
+    "skip_unweighted_belief": true
+  },
+  "bc": {
+    "batch_size": 1024,
+    "save_best_value": true
+  }
+}

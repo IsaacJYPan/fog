@@ -1,0 +1,9 @@
+{
+  "filename": "replay-work.bin",
+  "bytes": 535989932,
+  "sha256": "b99e4d5a2e047632f202c6bb3703fa2e05b11e2fb24eee4512881dd4d62709d9",
+  "wall_seconds": 20.742318349000016,
+  "source_commit": "7d17e1a",
+  "contents": "fresh corrected decisions and filtered split, no raw logs or checkpoints",
+  "command": "python runs/brief13/prepare_package.py"
+}

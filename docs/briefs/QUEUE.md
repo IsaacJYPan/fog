@@ -27,7 +27,7 @@ in different rows of the "touches" column.
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
 | 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
 | 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | worker running: stages 1 and 2 pushed, stage 3 (reconversion, paired training, play) in progress at 14:39 UTC on 2026-11-16 |
-| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | worker started; data prepared; **stopped before its first GPU job, waiting for the owner** (see the GPU note) |
+| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | prepared split verified; one-epoch G20 calibration submitted with a one-hour cap |
 | 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds 0 to 3 done by the planner (ledger) |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | **reviewed; T1 passed on the replay-derived test teams** (first completed run, 1,008 games per opponent) |
 | 17 | `17-distil-at-scale.md` | CPU about 150 core-hours, GPU 6 h | the pilot's last round is in the ledger | trainer switches | `work/distil-scale` | **not for a worker now**: the planner's session is running these rounds with `scripts/hosted.sh` (see the note) |

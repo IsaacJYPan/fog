@@ -1,0 +1,16 @@
+{
+  "brief_gpu_hour_limit": 20,
+  "reserve_hours": 2,
+  "gpu_hours_consumed_by_this_brief": 0,
+  "jobs_submitted": 0,
+  "initial_quota_command": "kaggle quota --format json",
+  "initial_quota_file": "quota-initial.json",
+  "forecast_status": "awaiting one-epoch 20000-game measurement; no larger run authorised by a forecast yet",
+  "execution_order": [
+    "CPU corrected conversion and composition filtering",
+    "G20 epoch 1 calibration with resumable 18-epoch schedule",
+    "G20 continuation, offline metrics, lead comparison and play, then push",
+    "check brief 12 merge status; larger corrected conversion and budgeted run"
+  ],
+  "status": "blocked before first GPU submission by an existing queued GPU job"
+}

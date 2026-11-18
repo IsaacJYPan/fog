@@ -3866,3 +3866,131 @@ The 15 tests in `test_engine_mcts.py` and `test_showdown_engine_mcts.py`
 passed, and Ruff passed. The installed battle-client dependency hung on
 interpreter exit after the bare pytest run. Repeating with the brief 12
 launcher workaround (unregistering its exit callback) returned zero.
+
+## 2026-11-16: replay blueprint at scale on corrected rows
+
+Brief 13, branch `work/p2-scale-corrected`, source `79283c9`. **In progress;
+no training or strength result.** Briefs 08 and 09 are merged. Model, loss and
+trainer source are unchanged. Preparation uses the merged terminal-target converter.
+
+| Measurement | Result | Command/evidence |
+| --- | --- | --- |
+| Initial GPU quota | 17.48 h used, 27.52 h remaining of 45.00; reset 2026-11-21 00:00 UTC | `kaggle quota --format json`; `13-artifacts/quota-initial.json` |
+| First CPU import | 24,000 games, rating ≥1500, after 2024-02-01, pinned source | Full command in `13-artifacts/preparation.json`; `first-import.json` |
+| Source checks | 24 passed, 4 skipped for absent replay fixtures; Ruff passed | `13-artifacts/source-tests.txt`, `ruff.txt` |
+| Composition-filter checks | 2 passed: acting side only, multiset/order invariance, aligned arrays, preview masking, no-exclusion equality | `13-artifacts/test_prepare_split.py`, `split-tests.txt` |
+
+The resumable CPU split helper writes separate filtered shards. It compares the
+acting submitted species multiset against `replay_v1/validation`; matching preview
+records are masked while retaining the two-slot format the existing lead loader
+requires. Holdout rows are unchanged. The first GPU job template reuses brief 05's
+resume/export logic, selects R4, batch 1,024 and the required zero-belief overrides.
+It stops after one trained epoch of an 18-epoch schedule to measure throughput.
+Checkpoint scoring is kept off the metered GPU session. No job submitted yet;
+the 20-hour budget, two-hour reserve and first-stage-before-larger ordering hold.
+
+Conversion/split totals, slot diagnostics, GPU throughput, the larger-set forecast,
+training, lead retention, checkpoint export and play are pending. No P2 box ticked;
+P2.4 and all G2 clauses are not measurable from this preparation checkpoint.
+
+### CPU stage complete; first GPU submission blocked
+
+Application bytes remain `79283c9` / pushed `7d17e1a` (no changes under `fog`,
+`configs` or `tests`). Conversion completed with `--resume` on four CPU cores.
+No GPU job was submitted; brief usage is **0 h**, with its 20 h cap and 2 h reserve intact.
+
+| Measurement | Result | Evidence / command |
+| --- | --- | --- |
+| Corrected conversion | 24,000 games; 1,229,877 decision rows; zero quarantines; 48,000 preview records | `13-artifacts/first-conversion.json`; preparation command above |
+| Fixed holdout | Exact 2,000 IDs; 103,944 stored rows; 103,933 policy-eligible rows | `first-split.json`, `holdout-rows.json`; `data-commands.json` |
+| Composition exclusion, before nested selection | 36,563 acting rows removed across 1,120 games; 28 whole games removed; 141 forbidden validation compositions | `first-split.json`; `prepare_split.py` |
+| Remaining eligible training | 21,769 games / 1,078,795 rows; 203 newer games excluded before filtering | `first-split.json` |
+| First nested subset | 20,000 games / 989,494 rows | `first-split.json` |
+| Holdout move-slot labels | 25.0945 / 24.8340 / 24.8180 / 25.2535%; unmoved slot 0: 24.6984% | `holdout-rows.json`; `fog.eval.replay_slot_order_check`, full command in `data-commands.json` |
+| Per-side outcome signs | All 103,944 holdout rows agree with protocol winners | `holdout-signs.json`; full command in `data-commands.json` |
+| CPU archive | 535,989,932 bytes; SHA-256 in file; no raw logs or checkpoints | `first-package.json`; reproducible `prepare_package.py` |
+| Split helper tests | 3 passed, including real G20-prefix preservation when the import grows | `split-tests.txt`, `test_prepare_split.py` |
+| Account-wide scheduling check | 99 jobs: 1 RUNNING, 1 QUEUED, 65 COMPLETE, 29 ERROR, 2 CANCEL_ACKNOWLEDGED, 1 version-zero draft with no session | `initial-job-status.json`; `account_guard.py` |
+
+The sign check first rejected a valid five-member-team preview. The diagnostic was
+corrected to retain absent slots as -1; its retry passes all 2,000 games, including
+two with fewer than six members. No converter, model, loss or trainer change was
+needed. The failed command and traceback remain in `data-commands.json` and
+`holdout-signs-initial-error.txt`. No threshold or row comparison was relaxed.
+
+The account's **`fog-distill-train-gpu` is QUEUED and GPU-enabled**;
+**`fog-distill-collect-a` is RUNNING and CPU-only** (`active-jobs.json`, with a later
+status recheck). The GPU quota is still **27.52 h remaining of 45 h**, reset
+2026-11-21 00:00 UTC. Neither existing job was changed. The one-GPU-job rule prevents
+a second submission while the separate GPU job is queued. Calibration is concretely
+prepared in `calibration-plan.json`: R4, 1,024 batch, zero belief weights/skip, one
+trained epoch of an 18-epoch resumable schedule, estimated 0.35 h from brief 08's
+different-recipe rate, hard cap 1 h. This is a forecast, not a throughput result.
+
+Continue by resolving that occupied GPU slot, reading fresh quota, and submitting
+the first calibration job. The larger set must retain these G20 IDs as its prefix
+(`prepare_split.py --prefix-manifest`), and must await completed G20 training, lead
+retention, play and a pushed report. No checkpoints exist yet. Training, lead
+retention, larger-set choice, P2.4 and every G2 clause remain **not measurable**.
+
+### Prepared inputs retained off the runtime; GPU decision still pending
+
+The 535,989,932-byte archive is now **ready in private Kaggle storage, version 1**.
+A separate authenticated download verified its full SHA-256 against
+`first-package.json`; `input-retention.json` is the sanitized receipt. No account
+or private dataset name is committed. On a configured official-client environment:
+
+```sh
+python docs/briefs/13-artifacts/download_inputs.py --out runs/brief13/recovered
+```
+
+The helper finds the owned private archive by file size and SHA-256 rather than
+publishing a dataset name, and retains its reference only under the ignored output
+directory. Dataset totals include service metadata, so matching uses the individual
+file's byte count. The recovered archive needs no CPU reconversion.
+
+The first upload attempt was rejected by automatic approval review as insufficiently
+authorized external export from a supposedly private repository. Before retrying,
+GitHub's API confirmed `private=false`; all 24,000 converted shards were checked
+to contain only numeric tensors and public species/static-label strings, with no
+source code, credentials or checkpoints in the archive. Brief 13 explicitly reuses
+brief 05, whose stage 0 requires a private upload. With that evidence the same upload
+passed review and completed. No alternative destination or bypass was used.
+
+The final job-status recheck still finds the separate GPU job QUEUED and its CPU
+collector RUNNING (`blocking-job-final.json`). Fresh quota is in `quota-final.json`.
+The owner has been asked whether to leave that GPU job queued or cancel it to give
+brief 13 priority. No cancellation or GPU submission has occurred; usage remains
+**0 h**. This is a partial brief awaiting that scheduling decision, not a completed
+training or gate result.
+
+### Source-test process shutdown limitation (no application change)
+
+The final process check found that the original source test command had printed
+**24 passed / 4 skipped** but had not exited. It was terminated at cleanup, so
+that row describes the assertion summary, **not a successful process exit**.
+With the corrected holdout supplied through `FOG_ORDER_BLIND_HOLDOUT`, the same
+four test files report **28 passed, no skips**, and `pytest.main` returns zero.
+Interpreter shutdown then hangs in the installed `poke_env` dependency:
+`__clear_loop -> __stop_loop -> shutdown.result()` (line 23). The 60-second
+watchdog dumped that stack and exited with code 1. Literal output and lifecycle
+results are in `source-tests-holdout.txt` and `source-tests-lifecycle.json`.
+The three split tests exit normally; Ruff is clean. No source or dependency was
+changed to mask the shutdown issue. Clean source-suite process exit and later
+acting-CLI shutdown remain unverified; training and play have not run.
+
+## 2026-11-17: review of brief 13 data preparation
+
+Recovered the 535,989,932-byte input archive with
+`python docs/briefs/13-artifacts/download_inputs.py --out <private-folder>`.
+Its SHA-256 matches `first-package.json`. After relocating manifests, all three
+game and row counts match `first-split.json`. Every shard path resolves, and
+the 2,000 holdout IDs match the fixed split. The 20,000 selected games contain
+989,494 training decisions. The split-filter tests passed (3 cases). Conversion
+was not repeated. Source for these data is `7d17e1a`.
+
+The inventory of 105 owned notebooks found no active session. The GPU quota
+before calibration was 26.44 h of 45 h. Submitted one private job using
+`13-artifacts/gpu_job.py` with the recorded source, stopping after the first
+epoch of the 18-epoch schedule. Platform timeout is one hour, including setup
+and export. See `13-artifacts/calibration-preflight.json`. G2 remains open.
