@@ -1,0 +1,229 @@
+[
+  {
+    "network": "net0",
+    "device": "cpu",
+    "new_collection_folders": [
+      "round0"
+    ],
+    "train_rows": 58160,
+    "holdout_rows": 2702,
+    "epochs": 8,
+    "policy_epoch": 8,
+    "holdout_teacher_top1": 0.49303726825581307,
+    "teacher_second_seed_agree": 469,
+    "teacher_second_seed_checked": 542,
+    "simpleheuristics": {
+      "completed_games": 1008,
+      "a_wins": 452,
+      "b_wins": 556,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.44841269841269843,
+      "wilson_95_low": 0.4179644542461016,
+      "wilson_95_high": 0.47925264523783084
+    },
+    "maxdamage": {
+      "completed_games": 1008,
+      "a_wins": 822,
+      "b_wins": 186,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.8154761904761905,
+      "wilson_95_low": 0.7903470743324614,
+      "wilson_95_high": 0.8382098942081051
+    }
+  },
+  {
+    "network": "net1",
+    "device": "cpu",
+    "new_collection_folders": [
+      "round1"
+    ],
+    "train_rows": 118518,
+    "holdout_rows": 6129,
+    "epochs": 8,
+    "policy_epoch": 8,
+    "holdout_teacher_top1": 0.5669002335818163,
+    "teacher_second_seed_agree": 1362,
+    "teacher_second_seed_checked": 1552,
+    "simpleheuristics": {
+      "completed_games": 1008,
+      "a_wins": 620,
+      "b_wins": 388,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.6150793650793651,
+      "wilson_95_low": 0.5846584955725018,
+      "wilson_95_high": 0.6446264363479564
+    },
+    "maxdamage": {
+      "completed_games": 1008,
+      "a_wins": 916,
+      "b_wins": 92,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.9087301587301587,
+      "wilson_95_low": 0.8893658184532298,
+      "wilson_95_high": 0.9249910087125355
+    }
+  },
+  {
+    "network": "net2",
+    "device": "cpu",
+    "new_collection_folders": [
+      "round2"
+    ],
+    "train_rows": 178317,
+    "holdout_rows": 8010,
+    "epochs": 8,
+    "policy_epoch": 8,
+    "holdout_teacher_top1": 0.587506390761586,
+    "teacher_second_seed_agree": 1289,
+    "teacher_second_seed_checked": 1474,
+    "simpleheuristics": {
+      "completed_games": 1008,
+      "a_wins": 687,
+      "b_wins": 320,
+      "draws": 1,
+      "truncated": 1,
+      "failures": 0,
+      "a_win_rate_decisive": 0.6822244289970208,
+      "wilson_95_low": 0.6528203674500961,
+      "wilson_95_high": 0.7102434906826751
+    },
+    "maxdamage": {
+      "completed_games": 1008,
+      "a_wins": 929,
+      "b_wins": 78,
+      "draws": 1,
+      "truncated": 1,
+      "failures": 0,
+      "a_win_rate_decisive": 0.9225422045680238,
+      "wilson_95_low": 0.9043793310463031,
+      "wilson_95_high": 0.9374935389018939
+    }
+  },
+  {
+    "network": "net3",
+    "device": "cpu",
+    "new_collection_folders": [
+      "round3"
+    ],
+    "train_rows": 233895,
+    "holdout_rows": 13370,
+    "epochs": 8,
+    "policy_epoch": 8,
+    "holdout_teacher_top1": 0.6167499054545308,
+    "teacher_second_seed_agree": 1367,
+    "teacher_second_seed_checked": 1556,
+    "simpleheuristics": {
+      "completed_games": 1008,
+      "a_wins": 690,
+      "b_wins": 318,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.6845238095238095,
+      "wilson_95_low": 0.6551815259901601,
+      "wilson_95_high": 0.7124650027788506
+    },
+    "maxdamage": {
+      "completed_games": 1008,
+      "a_wins": 931,
+      "b_wins": 76,
+      "draws": 1,
+      "truncated": 1,
+      "failures": 0,
+      "a_win_rate_decisive": 0.9245283018867925,
+      "wilson_95_low": 0.9065513490930975,
+      "wilson_95_high": 0.9392786201263014
+    }
+  },
+  {
+    "network": "net4",
+    "device": "cpu",
+    "new_collection_folders": [
+      "round3b",
+      "round3c",
+      "round3d",
+      "round3e",
+      "round3f",
+      "round3g",
+      "round3h",
+      "round3i",
+      "round3j",
+      "round3k",
+      "round4"
+    ],
+    "train_rows": 455501,
+    "holdout_rows": 23455,
+    "epochs": 4,
+    "policy_epoch": 4,
+    "holdout_teacher_top1": 0.614460990261637,
+    "teacher_second_seed_agree": 4956,
+    "teacher_second_seed_checked": 5613,
+    "simpleheuristics": {
+      "completed_games": 1008,
+      "a_wins": 714,
+      "b_wins": 294,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.7083333333333334,
+      "wilson_95_low": 0.6795250347080626,
+      "wilson_95_high": 0.7355597558375946
+    },
+    "maxdamage": {
+      "completed_games": 1008,
+      "a_wins": 951,
+      "b_wins": 57,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.9434523809523809,
+      "wilson_95_low": 0.9274378056263245,
+      "wilson_95_high": 0.9560998199637171
+    }
+  },
+  {
+    "network": "net4-e8",
+    "device": "cpu",
+    "new_collection_folders": [
+      "round4a",
+      "round4b"
+    ],
+    "train_rows": 498959,
+    "holdout_rows": 27680,
+    "epochs": 8,
+    "policy_epoch": 8,
+    "holdout_teacher_top1": 0.6627212360897717,
+    "teacher_second_seed_agree": 985,
+    "teacher_second_seed_checked": 1109,
+    "simpleheuristics": {
+      "completed_games": 1008,
+      "a_wins": 754,
+      "b_wins": 254,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.748015873015873,
+      "wilson_95_low": 0.7203070935050718,
+      "wilson_95_high": 0.7738414666683294
+    },
+    "maxdamage": {
+      "completed_games": 1008,
+      "a_wins": 946,
+      "b_wins": 62,
+      "draws": 0,
+      "truncated": 0,
+      "failures": 0,
+      "a_win_rate_decisive": 0.9384920634920635,
+      "wilson_95_low": 0.9219302347008087,
+      "wilson_95_high": 0.9517244196857648
+    }
+  }
+]

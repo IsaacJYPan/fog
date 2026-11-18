@@ -1,0 +1,127 @@
+{
+  "cpu_collection_budget_core_hours": 150,
+  "recorded_collection_rows": 641875,
+  "recorded_game_worker_hours": 71.22436782634527,
+  "collection_accounting": "Sum of completed per-game worker times across 22 collection summaries, including pilot rounds. Excludes job setup and any unfinished games.",
+  "collection_rounds": {
+    "round0": {
+      "games": 1211,
+      "rows": 60862,
+      "worker_seconds": 19565.47914989401
+    },
+    "round1": {
+      "games": 1058,
+      "rows": 63785,
+      "worker_seconds": 22442.943827728956
+    },
+    "round2": {
+      "games": 1021,
+      "rows": 61680,
+      "worker_seconds": 21877.525545828008
+    },
+    "round3": {
+      "games": 1000,
+      "rows": 60938,
+      "worker_seconds": 21873.867049856995
+    },
+    "round3b": {
+      "games": 600,
+      "rows": 35825,
+      "worker_seconds": 19685.033867013983
+    },
+    "round3c": {
+      "games": 600,
+      "rows": 37079,
+      "worker_seconds": 19511.672861548017
+    },
+    "round3d": {
+      "games": 303,
+      "rows": 17566,
+      "worker_seconds": 6046.552840529004
+    },
+    "round3e": {
+      "games": 369,
+      "rows": 22319,
+      "worker_seconds": 9693.680738406001
+    },
+    "round3f": {
+      "games": 386,
+      "rows": 22087,
+      "worker_seconds": 9681.462962333004
+    },
+    "round3g": {
+      "games": 388,
+      "rows": 22980,
+      "worker_seconds": 9603.95432134199
+    },
+    "round3h": {
+      "games": 189,
+      "rows": 11305,
+      "worker_seconds": 4825.900452939004
+    },
+    "round3i": {
+      "games": 186,
+      "rows": 11314,
+      "worker_seconds": 4845.242537092005
+    },
+    "round3j": {
+      "games": 200,
+      "rows": 11527,
+      "worker_seconds": 4823.1603653309985
+    },
+    "round3k": {
+      "games": 185,
+      "rows": 11531,
+      "worker_seconds": 4838.042230849003
+    },
+    "round4": {
+      "games": 488,
+      "rows": 28158,
+      "worker_seconds": 9648.746282981992
+    },
+    "round4a": {
+      "games": 359,
+      "rows": 22936,
+      "worker_seconds": 9607.903391833002
+    },
+    "round4b": {
+      "games": 435,
+      "rows": 24747,
+      "worker_seconds": 9627.949709859004
+    },
+    "round4c": {
+      "games": 358,
+      "rows": 22097,
+      "worker_seconds": 9624.892072604005
+    },
+    "round4d": {
+      "games": 401,
+      "rows": 23564,
+      "worker_seconds": 9680.735521643997
+    },
+    "round5d": {
+      "games": 354,
+      "rows": 21343,
+      "worker_seconds": 9600.197376324002
+    },
+    "round5e": {
+      "games": 388,
+      "rows": 22169,
+      "worker_seconds": 9610.577562407007
+    },
+    "round5f": {
+      "games": 430,
+      "rows": 26063,
+      "worker_seconds": 9692.203506499
+    }
+  },
+  "gpu_budget_hours": 6,
+  "inherited_training_job_seconds": [
+    597.9457297325134,
+    1524.6233916282654,
+    2331.827442407608
+  ],
+  "inherited_training_elapsed_hours": 1.2373323788245518,
+  "gpu_accounting": "Elapsed times from three archived pilot training jobs. Provider setup, queueing and billing increments are not present in these records.",
+  "additional_distillation_gpu_jobs_submitted": 0
+}

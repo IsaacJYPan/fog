@@ -4414,3 +4414,39 @@ data/teams/replay_v1/validation --config configs/search_distill_cpu.yaml
 --seed <seed> --max-turns 300 --out <shard>`. A3 uses the original typed
 self-play config and `--compatible-checkpoint A3`. The other opponents use the
 distillation config. Pooled results are in `17-artifacts/net4-e8-vs-*.json`.
+
+## 2026-11-17: search distillation at scale (P3)
+
+Validation used the greedy policy alone on the replay-derived teams, 1,008 games per opponent.
+Intervals are Wilson 95% intervals on decisive games. The second-seed check measures the
+teacher's repeatability on newly added collection folders. Teacher top-1 measures the policy
+checkpoint on its held-out games. The commands and source commits for each run appear in
+the preceding pilot, round 3, network 4 and eight-epoch entries.
+
+| Training rows | Epochs | Teacher repeat | Holdout top-1 | SimpleHeuristics | MaxDamage |
+| ---: | ---: | ---: | ---: | --- | --- |
+| 58,160 | 8 | 86.5% | 49.3% | .448 [.418, .479] | .815 [.790, .838] |
+| 118,518 | 8 | 87.8% | 56.7% | .615 [.585, .645] | .909 [.889, .925] |
+| 178,317 | 8 | 87.4% | 58.8% | .682 [.653, .710] | .923 [.904, .937] |
+| 233,895 | 8 | 87.9% | 61.7% | .685 [.655, .712] | .925 [.907, .939] |
+| 455,501 | 4 | 88.3% | 61.4% | .708 [.680, .736] | .943 [.927, .956] |
+| 498,959 | 8 | 88.8% | 66.3% | .748 [.720, .774] | .938 [.922, .952] |
+
+The SimpleHeuristics gains in the last three steps were 0.3, 2.4 and 4.0 percentage
+points. Each was smaller than the width of that result's interval, meeting the brief's
+collection stopping rule on the observed scores. Epoch count also changed in the last
+two steps, so these points cannot isolate the benefit of more rows at eight epochs.
+Collection stopped below one million. The 22 saved summaries account for 641,875
+decisions and 71.22 hours summed over completed games. That time excludes startup and
+unfinished games. The three archived pilot GPU runs totalled 1.24 elapsed hours.
+Per-round counts, checkpoint selection and complete cell results are in
+`docs/briefs/17-artifacts/{budget,learning-curve}.json`.
+
+### Repository validation
+
+The 164 test modules at `5ae77d6` produced 1,157 passes, nine skips, three expected
+failures and one failure after rerunning the replay interruption test with local sockets
+available. The rerun of the replay runner and search-distillation tests passed all 30
+tests. The outstanding league test requires historical 64-, 512- and 1,024-game
+checkpoint files absent from this checkout. The 2,048-game checkpoint is present and
+passed the A3 evaluation above.
