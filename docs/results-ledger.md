@@ -4464,3 +4464,14 @@ Source `1e678f6`. Reproduce with `pytest -q tests/test_showdown_batch_runner.py
 two epochs and four optimizer steps. Its batch, weights, Adam state, metrics and random
 state are in `docs/briefs/14-artifacts/update-before.json`; reproduce from the repository
 root with `PYTHONPATH=. python docs/briefs/14-artifacts/update_digest.py --out before.json`.
+
+The eight-decision reference produced identical parameter, optimizer, metric and RNG
+digests after enabling the explicit default values for the three new keys.
+`update-after.json` matches `update-before.json` byte for byte. With fractional belief
+training, unselected rows contribute the count of scoreable targets under inference.
+Only sampled rows contribute cross-entropy and gradients. Enumerating all 15 samples of
+two rows from six reproduced both the full marginal and route losses and their gradients
+with uneven label availability. A KL-stop regression with populated AdamW moments
+confirmed that only the value head changes on the remaining minibatches. The pinned
+simulator, update and resume tests passed (29 tests). GPU speed and fixed-team learning
+still require measurement.

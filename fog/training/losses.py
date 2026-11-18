@@ -10,11 +10,11 @@ import torch
 import torch.nn.functional as F
 
 
-def _masked_cross_entropy_sum(
+def _scorable_targets(
     logits: torch.Tensor, target: torch.Tensor, valid: torch.Tensor,
     stats: dict | None = None,
-) -> tuple[torch.Tensor, int]:
-    """Return the summed finite CE and its entry count for one vocabulary family."""
+) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Flatten a family's rows and identify labels with a finite allowed logit."""
     c = logits.shape[-1]
     logits = logits.reshape(-1, c)
     target = target.reshape(-1)
@@ -38,6 +38,13 @@ def _masked_cross_entropy_sum(
                     for index in indices
                 )
         valid = valid & finite
+    return logits, target, valid
+
+
+def _masked_cross_entropy_sum(
+    logits: torch.Tensor, target: torch.Tensor, valid: torch.Tensor, stats: dict | None = None,
+) -> tuple[torch.Tensor, int]:
+    logits, target, valid = _scorable_targets(logits, target, valid, stats)
     count = int(valid.sum())
     if stats is not None:
         stats["valid"] = stats.get("valid", 0) + count
@@ -47,7 +54,10 @@ def _masked_cross_entropy_sum(
         # the otherwise valid no-op update crash at backward(). Summing an empty view is finite
         # even when masked logits contain -inf and gives every upstream parameter a zero gradient.
         return logits.reshape(-1)[:0].sum(), 0
-    return F.cross_entropy(logits[valid], target[valid], reduction="sum"), count
+    selected = logits[valid]
+    if selected.dtype in (torch.float16, torch.bfloat16):
+        selected = selected.float()
+    return F.cross_entropy(selected, target[valid], reduction="sum"), count
 
 
 def masked_cross_entropy(
@@ -71,17 +81,36 @@ def masked_cross_entropy(
     return total / count if count else total
 
 
+def belief_score_counts(output, attr_targets: dict, attr_valid: dict) -> dict[str, int]:
+    """Count scoreable labels without computing a loss or retaining an autograd graph."""
+    targets = output.loss_targets if output.loss_targets is not None else attr_targets
+    result = {}
+    for name, logits in output.logits.items():
+        mask = attr_valid[name]
+        if output.loss_valid is not None:
+            mask = mask & output.loss_valid[name]
+        _, _, valid = _scorable_targets(logits, targets[name], mask)
+        result[name] = int(valid.sum())
+    return result
+
+
 def belief_loss(
-    attr_logits: dict, attr_targets: dict, attr_valid: dict, stats: dict | None = None
+    attr_logits: dict, attr_targets: dict, attr_valid: dict, stats: dict | None = None,
+    *, excluded_counts: dict | None = None, sampling_weight: float = 1.0,
 ) -> torch.Tensor:
     """Sum of masked CEs across all belief attributes. `attr_valid` carries the censoring;
     `stats` threads through to masked_cross_entropy's dropped-entry counter."""
     total = None
     for name, logits in attr_logits.items():
         family_stats: dict | None = {} if stats is not None else None
-        term = masked_cross_entropy(
+        term, count = _masked_cross_entropy_sum(
             logits, attr_targets[name], attr_valid[name], stats=family_stats
         )
+        if excluded_counts:
+            count += excluded_counts[name]
+            term = term * sampling_weight
+        if count:
+            term = term / count
         if stats is not None and family_stats is not None:
             stats["valid"] = stats.get("valid", 0) + family_stats.get("valid", 0)
             stats["dropped_nonfinite"] = (
@@ -94,7 +123,8 @@ def belief_loss(
 
 
 def belief_output_loss(
-    output, attr_targets: dict, attr_valid: dict, stats: dict | None = None
+    output, attr_targets: dict, attr_valid: dict, stats: dict | None = None,
+    *, excluded_counts: dict | None = None, sampling_weight: float = 1.0,
 ) -> torch.Tensor:
     """Loss for either a marginal ``BeliefOutput`` or a set-AR route-step output.
 
@@ -110,7 +140,8 @@ def belief_output_loss(
     the intended matched autoregressive objective back into an inconsistent pseudo-likelihood.
     """
     if output.loss_valid is None:
-        return belief_loss(output.logits, attr_targets, attr_valid, stats=stats)
+        return belief_loss(output.logits, attr_targets, attr_valid, stats=stats,
+                           excluded_counts=excluded_counts, sampling_weight=sampling_weight)
 
     targets = output.loss_targets if output.loss_targets is not None else attr_targets
     total = None
@@ -126,6 +157,9 @@ def belief_output_loss(
     # A random route and uniform cut select every hidden field with probability 1/L. Averaging all
     # selected rows therefore estimates per-hidden-field route NLL without changing that
     # distribution through family-dependent reduction weights.
+    if excluded_counts:
+        count += sum(excluded_counts.values())
+        total = total * sampling_weight
     return total / count if count else total
 
 

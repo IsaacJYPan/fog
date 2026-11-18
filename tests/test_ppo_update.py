@@ -291,3 +291,80 @@ def test_watchdogs():
         "stale_phi_exploitation": True,
         "stalling": True,
     }
+
+
+def test_value_after_kl_stop_updates_only_value_weights_and_keeps_policy_moments():
+    from types import SimpleNamespace
+
+    class Agent(TinyPolicyAgent):
+        def __init__(self):
+            super().__init__()
+            self.policy_value = SimpleNamespace(value=self.v, structured_value=None)
+            self.belief_requests = []
+
+        def forward(self, batch, *, need_belief=True):
+            self.belief_requests.append(need_belief)
+            return super().forward(batch)
+
+    torch.manual_seed(6)
+    agent = Agent()
+    optimizer = torch.optim.AdamW(agent.parameters(), lr=0.003)
+    batch = make_ppo_batch(n=8)
+    config = {"ppo": {"minibatch_size": 4, "epochs": 2, "belief_row_fraction": 0,
+                      "value_after_kl_stop": True}}
+    ppo_update(agent, optimizer, batch, config)
+    before = {k: p.detach().clone() for k, p in agent.named_parameters()}
+    policy_steps = optimizer.state[agent.pi.weight]["step"].item()
+    config["ppo"]["target_kl"] = 0.001
+    config["loss"] = {"require_belief_labels": True}
+    batch["old_log_probs"].fill_(-9)
+    metrics = ppo_update(agent, optimizer, batch, config)
+    assert metrics["stopped_for_kl"] == 1 and metrics["value_only_steps"] == 4
+    assert metrics["optimizer_steps"] == 0
+    assert not any(agent.belief_requests)
+    assert optimizer.state[agent.pi.weight]["step"].item() == policy_steps
+    for name, param in agent.named_parameters():
+        assert torch.equal(before[name], param) == name.startswith("pi.")
+
+
+def test_subsampled_marginal_and_chain_losses_average_to_the_full_loss(monkeypatch):
+    from itertools import combinations
+
+    from fog.models.agent import AgentOutput
+    from fog.models.belief_types import BeliefOutput
+    from fog.training.losses import belief_output_loss
+    from fog.training.ppo import _sample_belief_rows
+
+    torch.manual_seed(10)
+    count = 6
+    raw = torch.randn(count, 3, 4, requires_grad=True)
+    labels = torch.randint(0, 4, (count, 3))
+    valid = torch.arange(3) < (torch.arange(count) % 4).unsqueeze(1)
+    rows = {"actions": torch.arange(count), "belief_targets": {"move": labels},
+            "belief_valid": {"move": valid}}
+
+    def forward(batch):
+        idx = batch["actions"]
+        logits = {"move": raw[idx]}
+        marginal = BeliefOutput(logits)
+        route = torch.arange(3) == (idx % 3).unsqueeze(1)
+        chain = BeliefOutput(logits, loss_valid={"move": route})
+        return AgentOutput(log_probs=raw[idx, 0], value=raw[idx, 0, 0],
+                           belief=marginal, belief_chain=chain)
+
+    def score(out, batch, norm):
+        return sum(belief_output_loss(getattr(out, key), batch["belief_targets"],
+                                      batch["belief_valid"], **norm.get(key, {}))
+                   for key in ("belief", "belief_chain"))
+
+    expected = score(forward(rows), rows, {})
+    samples = []
+    for first in combinations(range(count), 2):
+        order = torch.tensor([*first, *(i for i in range(count) if i not in first)])
+        monkeypatch.setattr(torch, "randperm", lambda *args, **kw: order)
+        out, sampled, norm = _sample_belief_rows(forward, rows, 1 / 3)
+        samples.append(score(out, sampled, norm))
+    average = torch.stack(samples).mean()
+    assert torch.allclose(expected, average, atol=1e-6)
+    assert torch.allclose(torch.autograd.grad(expected, raw)[0],
+                          torch.autograd.grad(average, raw)[0], atol=1e-6)

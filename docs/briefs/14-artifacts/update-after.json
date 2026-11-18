@@ -1,0 +1,10 @@
+{
+  "torch": "2.13.0+cu130",
+  "recorded_rows": 8,
+  "batch": "83c45255e814cd066a923da80eea337bf7ebaaa4bad3bf7c8791c242915a8e29",
+  "parameters": "8ba5e7e0282d12d27f30598959243edc50a6b440f90dab8bc9f3929ff921d86e",
+  "optimizer": "b0eea1b61d25146b9349028968aee958e0036bed261153beab68d824aa2b8a69",
+  "metrics": "3a8c93cda61f7a329691cd251e00caf41b927383f4b9897d21f44248d6cf6be5",
+  "rng": "95b3d9d4df02597df596ba3768decb3be96493b7016bac81df5ac57f2ded1603",
+  "optimizer_steps": 4.0
+}

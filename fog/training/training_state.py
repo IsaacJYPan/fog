@@ -71,6 +71,8 @@ def build_training_state(setup: Any) -> dict[str, Any]:
         },
         "replay_regularizer": setup.replay_regularizer.state_dict(),
     }
+    if getattr(setup, "scaler", None) is not None:
+        state["scaler"] = setup.scaler.state_dict()
     if setup.fresh_probe is not None:
         state["fresh_probe"] = setup.fresh_probe.state_dict()
     if setup.fresh_opt is not None:
@@ -105,6 +107,8 @@ def restore_training_state(setup: Any, state_path: str | Path) -> None:
 
     setup.agent.load_state_dict(payload["agent"])
     setup.opt.load_state_dict(payload["optimizer"])
+    if "scaler" in payload and getattr(setup, "scaler", None) is not None:
+        setup.scaler.load_state_dict(payload["scaler"])
     progress = payload["progress"]
     setup.decisions_seen = int(progress["decisions_seen"])
     setup.next_snapshot = int(progress["next_snapshot"])

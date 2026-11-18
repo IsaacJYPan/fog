@@ -35,7 +35,7 @@ def _index_nested(x, idx: torch.Tensor):
     return x
 
 
-def _checkpointed_forward(agent, batch):
+def _checkpointed_forward(agent, batch, **kwargs):
     """Recompute large encoder/head blocks during backward without changing state-dict keys.
 
     Checkpointing the entire agent retains too many recomputed activations at once. Separate
@@ -54,7 +54,7 @@ def _checkpointed_forward(agent, batch):
                 original = module.forward
                 originals.append((module, original))
                 module.forward = partial(checkpoint, original, use_reentrant=False)
-        return agent(batch)
+        return agent(batch, **kwargs)
     finally:
         for module, original in originals:
             module.forward = original
@@ -80,6 +80,40 @@ def _masked_kl(log_p: torch.Tensor, log_q: torch.Tensor) -> torch.Tensor:
     lq = log_q.clamp(min=_LOG_ZERO)
     p = lp.exp()
     return (p * (lp - lq)).sum(dim=-1)
+
+
+def _sample_belief_rows(forward, rows, fraction):
+    """Sample rows for backprop while retaining full denominators for censored targets.
+
+    Dividing by the sampled count would overweight rows with few hidden labels. The
+    other rows supply counts only, in bounded inference batches with no backward pass.
+    """
+    from fog.training.losses import belief_score_counts
+
+    size = len(rows["actions"])
+    count = max(1, round(fraction * size))
+    if count == size:
+        return forward(rows), rows, {}
+    indices = torch.randperm(size, device=rows["actions"].device)
+    counts = {}
+    with torch.no_grad():
+        for group in indices[count:].split(256):
+            other = _index_nested(rows, group)
+            output = forward(other)
+            for key in ("belief", "belief_chain", "self_belief", "self_belief_chain"):
+                prediction = getattr(output, key)
+                prefix = key.removesuffix("_chain")
+                targets = other.get(prefix + "_targets")
+                if prediction is None or targets is None:
+                    continue
+                labels = belief_score_counts(prediction, targets, other[prefix + "_valid"])
+                totals = counts.setdefault(key, {})
+                for family, value in labels.items():
+                    totals[family] = totals.get(family, 0) + value
+    sampled = _index_nested(rows, indices[:count])
+    normalization = {key: {"excluded_counts": totals, "sampling_weight": size / count}
+                     for key, totals in counts.items()}
+    return forward(sampled), sampled, normalization
 
 
 def _chain_probability_metrics(output, attr_valid: dict) -> dict[str, float]:
@@ -147,7 +181,8 @@ def _deterministic_policy_update(fn):
 
 
 @_deterministic_policy_update
-def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None) -> dict:
+def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None, *,
+               scaler=None) -> dict:
     """Update a collected batch with PPO or explicit public-teacher cloning.
 
     Loss = -clip_surrogate + value_coef * value_MSE - entropy_coef * entropy
@@ -176,6 +211,9 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     minibatch_size = ppo_cfg.get("minibatch_size", 2048)
     entropy_coef = ppo_cfg.get("entropy_coef", 0.01)
     value_coef = loss_cfg.get("value_coef", 0.5)
+    fraction = float(ppo_cfg.get("belief_row_fraction", 1.0))
+    if not 0 <= fraction <= 1:
+        raise ValueError("ppo.belief_row_fraction must be in [0, 1]")
     belief_coef = loss_cfg.get("belief_coef", 1.0)
     self_belief_coef = loss_cfg.get("self_belief_coef", 1.0)
     # The belief-chain CE has its own coefficient, initially equal to the marginal's.
@@ -196,7 +234,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             raise ValueError("outcome value targets require one completed-game outcome per decision")
         if not bool(torch.isfinite(outcomes).all()) or bool((outcomes.abs() > 1).any()):
             raise ValueError("completed-game outcomes must be finite and in [-1, 1]")
-    if loss_cfg.get("require_belief_labels", False):
+    if fraction > 0 and loss_cfg.get("require_belief_labels", False):
         for name in ("belief_targets", "belief_valid", "self_belief_targets", "self_belief_valid"):
             if not batch.get(name):
                 raise ValueError(f"required belief supervision is missing: {name}")
@@ -323,6 +361,50 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 )
             print(f"[ppo-drop-debug] {key} {decoded}", flush=True)
 
+    amp = bool(ppo_cfg.get("mixed_precision", False)) and device.type == "cuda"
+    if amp and scaler is None:
+        scaler = torch.amp.GradScaler("cuda")
+    value_after_stop = bool(ppo_cfg.get("value_after_kl_stop", False)) and value_coef > 0
+    value_parameters = []
+    if value_after_stop:
+        for head in (agent.policy_value.value, agent.policy_value.structured_value):
+            if head is not None:
+                value_parameters.extend(p for p in head.parameters() if p.requires_grad)
+
+    def forward(rows, **kwargs):
+        with torch.amp.autocast("cuda", enabled=amp):
+            if ppo_cfg.get("activation_checkpointing", False):
+                return _checkpointed_forward(agent, rows, **kwargs)
+            return agent(rows, **kwargs)
+
+    def optimize(objective, parameters=None):
+        optimizer.zero_grad(set_to_none=True)
+        if not torch.isfinite(objective):
+            raise FloatingPointError("nonfinite PPO loss; optimizer step refused")
+        if amp:
+            scaler.scale(objective).backward(inputs=parameters)
+            scaler.unscale_(optimizer)
+        else:
+            objective.backward(inputs=parameters)
+        grad_norm = torch.nn.utils.clip_grad_norm_(
+            agent.parameters() if parameters is None else parameters,
+            max_grad_norm, error_if_nonfinite=not amp,
+        )
+        if amp:
+            scaler.step(optimizer)
+            scaler.update()
+        else:
+            optimizer.step()
+        return grad_norm
+
+    def update_value(output, rows):
+        objective = value_loss(output.value.float(), rows[value_key])
+        norm = optimize(value_coef * objective, value_parameters)
+        log("value_only_loss", objective)
+        log("value_only_grad_norm", norm)
+
+    value_key = "game_outcomes" if value_target == "outcome" else "returns"
+    value_only_steps = 0
     stopped_for_kl = False
     optimizer_steps = 0
     optimizer_rows = 0
@@ -331,14 +413,19 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
         for start in range(0, n, minibatch_size):
             idx = perm[start : start + minibatch_size]
             mb = _index_nested(batch, idx)
+            if stopped_for_kl:
+                if value_parameters:
+                    update_value(forward(mb, need_belief=False), mb)
+                    value_only_steps += 1
+                continue
             # Evaluation mode is the behavior policy. Chain supervision remains explicit.
-            mb["compute_belief_chain"] = True
+            mb["compute_belief_chain"] = fraction == 1
             mb_adv = adv[idx]
 
-            if ppo_cfg.get("activation_checkpointing", False):
-                out = _checkpointed_forward(agent, mb)
-            else:
-                out = agent(mb)
+            out = forward(mb) if fraction == 1 else forward(mb, need_belief=False)
+            if amp:
+                out.log_probs = out.log_probs.float()
+                out.value = out.value.float()
             behavior_log_probs = _behavior_log_probs(
                 out.log_probs,
                 temperature=rollout_temperature,
@@ -367,6 +454,10 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             log("sampled_kl", sampled_kl)
             if target_kl is not None and float(policy_kl.detach()) > float(target_kl):
                 stopped_for_kl = True
+                if value_parameters:
+                    update_value(out, mb)
+                    value_only_steps += 1
+                    continue
                 break
             teacher_loss = None
             if mb.get("supervised_label") is not None:
@@ -393,18 +484,22 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             if teacher_loss is not None and heuristic_coef > 0:
                 loss = loss + heuristic_coef * teacher_loss
 
-            if loss_cfg.get("require_belief_labels", False) and (
-                out.belief is None or out.belief_chain is None
-                or out.self_belief is None or out.self_belief_chain is None
-            ):
-                raise ValueError("required belief supervision needs both marginal and chain outputs")
-
             if kl_anchor_coef > 0 and mb.get("bc_log_probs") is not None:
                 kl_bc = _masked_kl(out.log_probs, mb["bc_log_probs"]).mean()
                 loss = loss + kl_anchor_coef * kl_bc
                 log("kl_bc", kl_bc)
 
-            if out.belief is not None and mb.get("belief_targets") is not None:
+            belief_out, belief_mb, normalization = out, mb, {}
+            if 0 < fraction < 1:
+                mb["compute_belief_chain"] = True
+                belief_out, belief_mb, normalization = _sample_belief_rows(forward, mb, fraction)
+            if fraction > 0 and loss_cfg.get("require_belief_labels", False) and (
+                belief_out.belief is None or belief_out.belief_chain is None
+                or belief_out.self_belief is None or belief_out.self_belief_chain is None
+            ):
+                raise ValueError("required belief supervision needs both marginal and chain outputs")
+
+            if belief_out.belief is not None and belief_mb.get("belief_targets") is not None:
                 b_stats: dict = {}
                 # Marginal CE: the policy no longer reads this
                 # (b_vec is gone) — it keeps the on-demand canonical marginal forward calibrated for
@@ -413,7 +508,8 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 # pure-chain ablation. Like the chain term it conditions on belief_context, so with
                 # aux_into_trunk it also shapes the shared trunk.
                 b_loss = belief_loss(
-                    out.belief.logits, mb["belief_targets"], mb["belief_valid"], stats=b_stats
+                    belief_out.belief.logits, belief_mb["belief_targets"], belief_mb["belief_valid"], stats=b_stats,
+                    **normalization.get("belief", {}),
                 )
                 loss = loss + belief_coef * b_loss
                 log("belief_loss", b_loss)
@@ -422,7 +518,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 # losses.masked_cross_entropy).
                 b_total = b_stats.get("valid", 0) + b_stats.get("dropped_nonfinite", 0)
                 log("belief_dropped_rate", b_stats.get("dropped_nonfinite", 0) / max(1, b_total))
-                log_drop_examples("belief", b_stats, mb.get("opp_revealed"))
+                log_drop_examples("belief", b_stats, belief_mb.get("opp_revealed"))
                 for family, family_stats in b_stats.get("by_family", {}).items():
                     family_total = (
                         family_stats.get("valid", 0)
@@ -435,23 +531,24 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 # Chain CE: the primary belief auxiliary loss — the input pattern sampling/scoring
                 # query, and (with aux_into_trunk) the gradient that makes the contexts informative
                 # for the policy. Separate coefficient + metric.
-                if out.belief_chain is not None:
+                if belief_out.belief_chain is not None:
                     bc_loss = belief_output_loss(
-                        out.belief_chain, mb["belief_targets"], mb["belief_valid"]
+                        belief_out.belief_chain, belief_mb["belief_targets"], belief_mb["belief_valid"],
+                        **normalization.get("belief_chain", {}),
                     )
                     loss = loss + belief_chain_coef * bc_loss
                     log("belief_ce_chain", bc_loss)
                     for metric_name, metric_value in _chain_probability_metrics(
-                        out.belief_chain, mb["belief_valid"]
+                        belief_out.belief_chain, belief_mb["belief_valid"]
                     ).items():
                         log(metric_name, metric_value)
-            if out.self_belief is not None and mb.get("self_belief_targets") is not None:
+            if belief_out.self_belief is not None and belief_mb.get("self_belief_targets") is not None:
                 sb_stats: dict = {}
                 # Marginal self-belief CE — keeps the leakage probe's marginal forward calibrated
                 # (used by leakage shaping). self_belief_coef=0 for a pure-chain ablation.
                 sb_loss = belief_loss(
-                    out.self_belief.logits, mb["self_belief_targets"], mb["self_belief_valid"],
-                    stats=sb_stats,
+                    belief_out.self_belief.logits, belief_mb["self_belief_targets"], belief_mb["self_belief_valid"],
+                    stats=sb_stats, **normalization.get("self_belief", {}),
                 )
                 loss = loss + self_belief_coef * sb_loss
                 log("self_belief_loss", sb_loss)
@@ -460,7 +557,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 log("self_belief_dropped_rate",
                     sb_stats.get("dropped_nonfinite", 0) / max(1, sb_total))
                 log_drop_examples(
-                    "self_belief", sb_stats, (mb.get("opp_view") or {}).get("my_view")
+                    "self_belief", sb_stats, (belief_mb.get("opp_view") or {}).get("my_view")
                 )
                 for family, family_stats in sb_stats.get("by_family", {}).items():
                     family_total = (
@@ -471,10 +568,10 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                         f"self_belief_dropped_rate_{family}",
                         family_stats.get("dropped_nonfinite", 0) / max(1, family_total),
                     )
-                if out.self_belief_chain is not None:
+                if belief_out.self_belief_chain is not None:
                     sbc_loss = belief_output_loss(
-                        out.self_belief_chain, mb["self_belief_targets"],
-                        mb["self_belief_valid"],
+                        belief_out.self_belief_chain, belief_mb["self_belief_targets"],
+                        belief_mb["self_belief_valid"], **normalization.get("self_belief_chain", {}),
                     )
                     loss = loss + self_belief_chain_coef * sbc_loss
                     log("self_belief_ce_chain", sbc_loss)
@@ -497,15 +594,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                                 log(key, value)
                     replay_regularizer.last_policy_loss = None
 
-            optimizer.zero_grad(set_to_none=True)
-            if not torch.isfinite(loss):
-                raise FloatingPointError("nonfinite PPO loss; optimizer step refused")
-            loss.backward()
-            grad_norm = torch.nn.utils.clip_grad_norm_(
-                agent.parameters(), max_grad_norm, error_if_nonfinite=True
-            )
-            log("grad_norm", grad_norm)
-            optimizer.step()
+            log("grad_norm", optimize(loss))
             optimizer_steps += 1
             optimizer_rows += len(idx)
 
@@ -518,11 +607,16 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 log("clip_frac", ((ratio - 1.0).abs() > clip).float().mean())
 
         if stopped_for_kl:
+            if value_parameters:
+                continue
             break
         # team-preview bandit: one clipped-surrogate step per epoch over all preview rows.
         # Reward = game outcome; baseline = batch mean outcome (variance reduction).
         if preview is not None and preview_coef > 0:
-            logits = agent.preview_logits(preview)                                # [G, 6]
+            with torch.amp.autocast("cuda", enabled=amp):
+                logits = agent.preview_logits(preview)
+            if amp:
+                logits = logits.float()
             preview_log_probs = _temperature_log_probs(
                 torch.log_softmax(logits, dim=-1), temperature=rollout_temperature
             )
@@ -536,14 +630,11 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             pv_loss = -torch.min(pv_s1, pv_s2).mean() * preview_coef
             if not torch.isfinite(pv_loss):
                 raise FloatingPointError("nonfinite PPO preview loss")
-            optimizer.zero_grad(set_to_none=True)
-            pv_loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                agent.parameters(), max_grad_norm, error_if_nonfinite=True
-            )
-            optimizer.step()
+            optimize(pv_loss)
             log("preview_loss", pv_loss)
 
+    if value_after_stop:
+        log("value_only_steps", value_only_steps)
     log("stopped_for_kl", float(stopped_for_kl))
     log("optimizer_steps", optimizer_steps)
     log("optimizer_rows", optimizer_rows)
@@ -603,6 +694,8 @@ class _TrainSetup:
         )
 
         self.ppo_cfg = cfg.get("ppo", {})
+        self.scaler = (torch.amp.GradScaler("cuda") if self.device.type == "cuda"
+                       and self.ppo_cfg.get("mixed_precision", False) else None)
         self.env_cfg = cfg.get("env", {})
         self.fmt = self.env_cfg.get("battle_format", "gen9ou")
         team_pool_path = self.env_cfg.get("team_pool")
@@ -628,7 +721,8 @@ class _TrainSetup:
         from fog.training.heuristic_guidance import validate_guidance
 
         validate_guidance(cfg)
-        if cfg.get("loss", {}).get("require_belief_labels", False):
+        if (float(self.ppo_cfg.get("belief_row_fraction", 1.0)) > 0
+                and cfg.get("loss", {}).get("require_belief_labels", False)):
             if self.env_cfg.get("belief_supervision", "full_truth") != "full_truth":
                 raise ValueError("required exact belief labels need env.belief_supervision=full_truth")
             if not cfg.get("model", {}).get("aux_into_trunk", True):
@@ -910,7 +1004,8 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     )
     if s.bc_anchor is not None and step_ppo["kl_anchor_coef"] > 0:
         with torch.no_grad():
-            batch["bc_log_probs"] = s.bc_anchor(batch).log_probs
+            anchor_args = {"need_belief": False} if step_ppo.get("belief_row_fraction", 1.0) == 0 else {}
+            batch["bc_log_probs"] = s.bc_anchor(batch, **anchor_args).log_probs
     n = int(batch["actions"].shape[0])
 
     # Fresh probe: fit the independent reader on this batch's mirror views, then measure
@@ -927,6 +1022,7 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         batch,
         step_cfg,
         replay_regularizer=s.replay_regularizer,
+        **({"scaler": s.scaler} if getattr(s, "scaler", None) is not None else {}),
     )
     optimization_seconds = time.monotonic() - optimization_t0
     metrics["optimization_seconds"] = optimization_seconds
@@ -934,7 +1030,8 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
         metrics["optimizer_rows"] / max(1e-6, optimization_seconds)
     )
     metrics.update(probe_metrics)
-    metrics.update(_belief_accuracy_vs_turn(s.agent, batch))
+    if float(step_ppo.get("belief_row_fraction", 1.0)) > 0:
+        metrics.update(_belief_accuracy_vs_turn(s.agent, batch))
     update_seconds = time.monotonic() - update_t0
     s.buf.clear()
     s.decisions_seen += n
