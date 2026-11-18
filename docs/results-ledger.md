@@ -4384,3 +4384,33 @@ on the same rows. The ten-bin counts and reliability tables are in
 The policy checkpoint plays the matches. The value checkpoint is retained for
 value prediction. The reconstructed initial policy is being compared directly
 to the eight-epoch policy in 1,008 matched games on validation teams.
+
+
+## 2026-11-17: eight-epoch policy against learned anchors
+
+Played the eight-epoch narrow policy against the regenerated initial weights,
+the retained A3 checkpoint, and the archived T4 replication of pilot network 1.
+Every match used the replay-derived validation pool, greedy selection, four
+crossed shards at seeds 15200–15203 and a 300-turn limit. Evaluation source:
+`55d8dc5`. The initial weights reproduced the original training run's
+epoch-zero policy CE and value Brier on the full held-out set.
+
+| Opponent | Scheduled | Wins–losses | Turn limits | Win rate (decisive games, Wilson 95%) |
+| --- | ---: | ---: | ---: | --- |
+| Initial weights | 1,008 | 1,004–4 | 0 | 99.60% [98.98%, 99.85%] |
+| A3 | 1,008 | 951–57 | 0 | 94.35% [92.74%, 95.61%] |
+| Pilot network 1, T4 replication | 1,008 | 663–344 | 1 | 65.84% [62.85%, 68.70%] |
+
+All three comparisons had zero failures. The G3 initial-weights clause
+(>55%) passed. The pilot opponent is the archived eight-epoch, 118,518-row
+replication (holdout CE 1.8286), SHA-256
+`d9977d3c595d8686d851e5ad0bdaac97ea8a5a729201297caf992d24ee79b992`.
+The original CPU pilot and the replication have distinct weights.
+
+Command per shard: `python -m fog.eval.showdown_direct_selection --pool
+data/teams/replay_v1/validation --config configs/search_distill_cpu.yaml
+--device cpu --checkpoint net4-e8=<policy> --checkpoint <opponent>=<weights>
+--checkpoint-config <opponent>=<config> --head-to-head --games 252
+--seed <seed> --max-turns 300 --out <shard>`. A3 uses the original typed
+self-play config and `--compatible-checkpoint A3`. The other opponents use the
+distillation config. Pooled results are in `17-artifacts/net4-e8-vs-*.json`.

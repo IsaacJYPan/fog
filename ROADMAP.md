@@ -428,6 +428,8 @@ before changing the architecture.
 
 _2026-11-17. Network 3g won 138 of 1,006 decisive games in 1,008 scheduled against EngineMCTS (13.72%, Wilson 95% interval 11.73–15.98%). Two hit the turn limit. EngineMCTS averaged 1.880 s per decision at K=8 and a 1,600 ms search budget. The 30% clause failed._
 
+_2026-11-17. The eight-epoch network beat its reconstructed initial weights in 1,004/1,008 validation games. Its teacher comparison is pending._
+
 **If it fails:** check label quality first (top-1 agreement between the teacher at the reduced
 and default budgets should exceed 70%), then data volume (plot strength at 250k, 500k, 1M
 decisions). If strength is flat in data, the model is the limit; widen it.
