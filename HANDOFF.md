@@ -5,6 +5,17 @@ It replaces the earlier 2026-11-16 handoff (`824a5f5`); sections 5 to 7 and 9 ar
 unchanged because they still hold. Facts are marked **[verified]** (measured, or read in the
 code or an artifact, evidence named) or **[assumed]**. Unmeasured numbers are never filled in.
 
+## November 17 update
+
+The ledger entries dated November 17 supersede the earlier status below.
+G0 and T1 passed on the replay-derived pools. A3 was recovered and evaluated;
+see the ledger for its filename, SHA-256 and private recovery instructions.
+Brief 12 is integrated. Brief 13 completed calibration at 2,948 training
+rows/s and resumed G20 for the remaining 17 epochs, with a 2.25 h hard cap.
+The last pre-submission account balance was 26.28 GPU-hours. Network 3g won
+13.72% against full-budget search. The eight-epoch narrow policy won 74.80%
+against SimpleHeuristics; its G3 teacher comparison is running on CPU.
+
 ## 0. Start here
 
 1. Read this file, then `AGENTS.md`, `ROADMAP.md`, `docs/briefs/QUEUE.md`, `docs/briefs/REVIEW.md`, and

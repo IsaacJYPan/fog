@@ -173,6 +173,8 @@ cites the `fog` commit that produced the result.
 **Gate G0:** P0.6 and P0.7 done; `A0–A3` round-robin recorded with ≥ 1,000 games per pair;
 measured `showdown_direct` throughput recorded after P0.2–P0.5.
 
+_2026-11-17. G0 passed on the replay-derived validation pool. The recovered A3 checkpoint completed the remaining three 1,000-game pairs: 92.4% against Random, 53.2% against MaxDamage and 17.3% against SimpleHeuristics. See the retained imitation anchor ledger entry._
+
 ### P1. EngineMCTS: a strong agent with no learning
 
 Build the search-only anchor. It is also the first teacher and the base that P4 improves.

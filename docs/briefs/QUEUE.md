@@ -97,8 +97,7 @@ Things only the owner can do, most useful first:
    `python -m fog.scripts.collect_team_bank --target 150 --min-quality 70` and
    `python -m fog.scripts.build_public_team_splits --bank data/teams/public_gen9ou --out data/teams/gen9ou_public_v1`,
    then commit the three split packages. Tier claims should use these when they exist.
-3. Find the retained imitation checkpoint `A3`, or say it is lost. Gate G2's head-to-head
-   clause cannot be measured without it.
+3. A3 was recovered on November 17. Its hash, recovery path and three validation matches are in the ledger.
 4. Delete finished remote branches (workers cannot): every `work/*` branch that the ledger
    says is merged, and the `dev/*` branches.
 5. Decisions in `ROADMAP.md` section 8 (ladder account, teams, compute).

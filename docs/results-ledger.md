@@ -4329,3 +4329,38 @@ the validation pool with the Network 3g protocol (CPU only, four shards).
 The completed round 5f collection contributed 26,063 decisions from 430 games,
 no truncations; 499/634 sampled labels agreed with the default-budget teacher.
 See `17-artifacts/round5f-summary.json`. Its rows were not used in either model.
+
+
+## 2026-11-17: retained imitation anchor and completion of G0
+
+Recovered the original learner named by
+`configs/automated_gen9ou_typed_league.yaml`. Two separately archived project
+inputs contained the same 23,144,427-byte checkpoint at
+`fog/artifacts/checkpoints/typed_dagger_2048.pt`, SHA-256
+`17de023acd346c8ac3490aa3a8a75b4139cc9c58b691723d4a8e0d30322664bf`.
+It is the A3 anchor used here. Recovery on another machine requires an owned
+private input containing that member. Download the file with the official
+client, verify its hash and place it at the recipe's `initial_checkpoint` path.
+The weights stay outside Git.
+
+At `917249a`, the native compatibility loader loaded all 350 stored tensors.
+All shapes matched. The 26 additional tensors belong exclusively to the
+opponent/self belief EV heads; the actor skips those heads when playing.
+
+| A3 against | W–L | Win rate (95% Wilson) |
+| --- | --- | --- |
+| A0 Random | 924–76 | 92.4% [90.59%, 93.89%] |
+| A1 MaxDamage | 532–468 | 53.2% [50.10%, 56.27%] |
+| A2 SimpleHeuristics | 173–827 | 17.3% [15.08%, 19.77%] |
+
+Each row used 250 matched four-game blocks on the 141 validation teams.
+There were zero draws, turn limits or failures. Command, once per opponent:
+`python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation
+--device cpu --config configs/gen9ou_typed_token_selfplay.yaml --checkpoint
+A3=artifacts/checkpoints/typed_dagger_2048.pt --checkpoint-config
+A3=configs/gen9ou_typed_token_selfplay.yaml --compatible-checkpoint A3
+--opponent <opponent> --games 1000 --seed 0 --max-turns 800 --out <report>`.
+The three reports in `10-artifacts/A3-*.json` complete the six-pair round-robin
+with the original three scripted rows. P0.6 and P0.7 are complete and the
+post-batching throughput was recorded in brief 08. G0 passes on the
+replay-derived pool. Brief 13 can now measure the actual A3 comparison.
