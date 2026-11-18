@@ -4450,3 +4450,5 @@ available. The rerun of the replay runner and search-distillation tests passed a
 tests. The outstanding league test requires historical 64-, 512- and 1,024-game
 checkpoint files absent from this checkout. The 2,048-game checkpoint is present and
 passed the A3 evaluation above.
+
+The [validation learning curve](briefs/17-artifacts/validation-learning-curve.png) shows both opponents with 95% Wilson intervals. Hollow markers identify the four-epoch run. Each point uses 1,008 validation games per opponent.
