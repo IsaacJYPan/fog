@@ -4293,3 +4293,39 @@ the 0.16 h calibration, 2.25 h continuation cap and two hours of reserve leaves
 4.87 h of the 20 h brief for overhead or a lower throughput. Recompute the
 larger forecast using its actual row count and first epoch. The G20 report
 and play evaluation come first. Measurement: `13-artifacts/G20-calibration.json`.
+
+
+## 2026-11-17: final depth and epoch comparisons on validation teams
+
+Recovered both selected checkpoints and their completed training histories from
+the private CPU runs. Played them on the same validation seeds used for network
+4, using the evaluation code and encodings at `55d8dc5`. Each cell contains
+1,008 games in four crossed team/side shards. Intervals are 95% Wilson on
+decisive games. There were no failures.
+
+| Network | Train rows | Epochs | Teacher top-1 at last epoch | SimpleHeuristics | MaxDamage |
+| --- | ---: | ---: | ---: | --- | --- |
+| Deep | 455,501 | 4 | 60.73% | 674–334, 66.87% [63.90%, 69.70%] | 941–66, 93.45% [91.75%, 94.82%]; one turn limit |
+| Narrow | 498,959 | 8 | 66.27% | 754–254, 74.80% [72.03%, 77.38%] | 946–62, 93.85% [92.19%, 95.17%] |
+
+The four-epoch narrow baseline scored 70.8% against SimpleHeuristics and
+94.3% against MaxDamage. The deeper model used the same rows. The eight-epoch
+model also used two additional collection folders, so the improvement cannot
+be assigned to the number of epochs alone. Its 74.80% SimpleHeuristics result
+is the best recorded on this split for a policy playing without search.
+
+Training commits were `c3a3795` (deep, four epochs) and `0aaf980` (narrow,
+eight epochs). Checkpoint SHA-256 values are
+`ca66133567d6bbda1533c04327b9ce48523074ef595888ec72235a17528d6042`
+and `571612a5e0a5c6e771a6c973217680811e83ca84d6811865726b1d46c509dc4a`,
+respectively. Evaluation used `fog.eval.showdown_direct_selection` with
+`--pool data/teams/replay_v1/validation --device cpu --games 252
+--opponent simpleheuristics --opponent maxdamage --max-turns 300`,
+four seeds 15200–15203, and the matching deep or narrow training config.
+Per-game scores and metrics are in `17-artifacts/net4{d,-e8}-*.json`.
+
+The selected eight-epoch network is now playing full-budget EngineMCTS on
+the validation pool with the Network 3g protocol (CPU only, four shards).
+The completed round 5f collection contributed 26,063 decisions from 430 games,
+no truncations; 499/634 sampled labels agreed with the default-budget teacher.
+See `17-artifacts/round5f-summary.json`. Its rows were not used in either model.
