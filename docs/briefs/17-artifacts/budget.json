@@ -123,5 +123,28 @@
   ],
   "inherited_training_elapsed_hours": 1.2373323788245518,
   "gpu_accounting": "Elapsed times from three archived pilot training jobs. Provider setup, queueing and billing increments are not present in these records.",
-  "additional_distillation_gpu_jobs_submitted": 0
+  "additional_distillation_gpu_jobs_submitted": 1,
+  "matched_trials": {
+    "status": "submitted",
+    "quota_before_hours": 24.47,
+    "checked_at_utc": "2026-11-18T07:51:03.025968+00:00",
+    "other_active_gpu_jobs": 0,
+    "platform_cap_seconds": 10600,
+    "training_rows": 498959,
+    "holdout_rows": 27680,
+    "epochs_per_cell": 8,
+    "cells": [
+      "seeded random, ordinary targets",
+      "seeded random, target power 2",
+      "replay policy, ordinary targets"
+    ],
+    "replay_policy_sha256": "4beafe0244842f27c4329998ec97a45645297c5fa61e6698fb898d5a25a9757d",
+    "initial_weights_removed": [
+      "outcome_alive.weight",
+      "outcome_alive.bias",
+      "outcome_hp.weight",
+      "outcome_hp.bias"
+    ],
+    "forecast_basis": "The 233,895-row GPU trial took 1,130 s. Linear scaling to 498,959 rows gives about 2,411 s per cell, 2.01 h for three cells before setup."
+  }
 }

@@ -10,11 +10,16 @@ code or an artifact, evidence named) or **[assumed]**. Unmeasured numbers are ne
 The ledger entries dated November 17 supersede the earlier status below.
 G0 and T1 passed on the replay-derived pools. A3 was recovered and evaluated;
 see the ledger for its filename, SHA-256 and private recovery instructions.
-Brief 12 is integrated. Brief 13 completed calibration at 2,948 training
-rows/s and resumed G20 for the remaining 17 epochs, with a 2.25 h hard cap.
-The last pre-submission account balance was 26.28 GPU-hours. Network 3g won
-13.72% against full-budget search. The eight-epoch narrow policy won 74.80%
-against SimpleHeuristics; its G3 teacher comparison is running on CPU.
+Brief 12 is integrated. G20 completed all 18 epochs in 1.97 metered GPU-hours.
+Its best policy was epoch 14 (holdout NLL 1.4578). Its best value was epoch 3
+(Brier 0.2129, ECE 0.0083). The CPU stage compares the original and lead-trained
+policies before validation play. The account showed 24.47 GPU-hours available
+before the matched distillation job. The three cells use the same 498,959 rows.
+
+Network 3g won 13.72% against full-budget search. The eight-epoch narrow policy
+won 74.80% against SimpleHeuristics and 951/1,008 against A3. Its G3 teacher
+comparison is running on CPU. The fixed-team PPO learning check is also CPU-only.
+The queue and numbered reports identify the relevant branch and artifacts.
 
 ## 0. Start here
 

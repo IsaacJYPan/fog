@@ -561,10 +561,11 @@ their tests; do not delete them.
 - The public team bank (P0.7): collecting it needs a machine where the forum pages open to the
   collector. The split is git-ignored (`data/teams/gen9ou_public_v*/`), so a cloud sandbox
   cannot see it; either track the three split packages in this repository or keep evaluation
-  on a machine that has them. Until one of these happens, gates G0 and G1 cannot be closed.
+  on a machine that has them. G0 and G1 have passed on brief 10’s replay-derived pools.
+  The public bank would provide a second evaluation population.
 - Un-freezing anything in section 7 ahead of its gate.
-- Where the retained imitation checkpoint `A3` is. It is not in a fresh clone. Until it is
-  found, the head-to-head clause of G2 is recorded as not measurable, not as passed.
+- The retained imitation checkpoint `A3` was recovered on November 17. The ledger records
+  the private recovery instructions, checksum and completed validation round-robin.
 
 ## 9. Parking lot
 
