@@ -202,10 +202,12 @@ def main():
             "job_wall_seconds_before_export": elapsed,
             "note": "Add export and platform session overhead from the returned session status."
         }, indent=2))
-        if WORK.exists():
+        # Continuations already attach the same immutable replay dataset. Only the run's
+        # optimizer, checkpoints and logs change between jobs.
+        training = WORK / SPEC["run"]
+        if training.is_dir():
             with tarfile.open("/kaggle/working/replay-resume.tar.gz", "w:gz") as archive:
-                for path in WORK.iterdir():
-                    archive.add(path, arcname=path.name)
+                archive.add(training, arcname=SPEC["run"])
             for name in ("bc_best.pt", "bc_best_value.pt"):
                 checkpoint = WORK / SPEC["run"] / "checkpoints" / name
                 if checkpoint.is_file():
