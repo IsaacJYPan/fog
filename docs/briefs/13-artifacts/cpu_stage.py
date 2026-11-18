@@ -6,6 +6,7 @@ Run from the repository root, with the locked Python environment and PYTHONPATH=
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import json
 import os
@@ -18,14 +19,15 @@ import numpy as np
 import polars as pl
 
 
-def run(command, destination):
+def run(command, destination, *, threads=4):
     started = time.monotonic()
     with destination.with_suffix(".txt").open("a") as stream:
         result = subprocess.run(command, stdout=stream, stderr=subprocess.STDOUT,
-                                env={**os.environ, "OMP_NUM_THREADS": "4", "MKL_NUM_THREADS": "4"})
+                                env={**os.environ, "OMP_NUM_THREADS": str(threads), "MKL_NUM_THREADS": str(threads)})
     record = {"command": command, "source_commit": subprocess.check_output(
         ["git", "rev-parse", "HEAD"], text=True).strip(),
-        "wall_seconds": time.monotonic() - started, "exit_code": result.returncode}
+        "math_threads": threads, "wall_seconds": time.monotonic() - started,
+        "exit_code": result.returncode}
     destination.with_name(destination.stem + "-command.json").write_text(
         json.dumps(record, indent=2) + "\n")
     result.check_returncode()
@@ -35,6 +37,10 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", required=True)
     parser.add_argument("--checkpoint-dir", type=Path, required=True)
+    parser.add_argument("--play-only", action="store_true",
+                        help="resume play after completing the three checkpoint scoring stages")
+    parser.add_argument("--validation-workers", type=int, default=1, choices=range(1, 5),
+                        help="parallel validation cells, with one math thread per process")
     parser.add_argument("--anchor-checkpoint", type=Path,
                         help="recovered retained imitation checkpoint for the G2 head-to-head")
     parser.add_argument("--train-manifest", type=Path, required=True)
@@ -68,21 +74,28 @@ def main():
                  "--manifest", str(args.holdout_manifest), "--checkpoint", str(checkpoint),
                  "--batch-size", "256", "--out", str(output)], output)
 
-    report("original", checkpoints["original"], configs["original"])
-    report("value", checkpoints["value"], configs["original"])
-    # Match brief 09's short lead stage: the nested 1,000-game prefix, eight epochs.
-    preview_manifest = args.work / "lead_train_1000.parquet"
-    pl.read_parquet(args.train_manifest).head(1000).write_parquet(preview_manifest)
-    run([sys.executable, "-m", "fog.training.bc", "--config", configs["lead"], "--set",
-         f"bc.init_ckpt={checkpoints['original']}", f"bc.manifest={preview_manifest}",
-         f"bc.holdout_manifest={args.holdout_manifest}", "bc.epochs=8", "bc.resume=true",
-         "loss.belief_coef=0", "loss.belief_chain_coef=0", "loss.skip_unweighted_belief=true",
-         f"log.dir={args.work / 'lead'}"], args.out / f"{args.run}-lead-training.json")
-    for name in ("metrics.csv", "scope_verification.json"):
-        (args.out / f"{args.run}-lead-{name}").write_bytes((args.work / "lead" / name).read_bytes())
-    report("lead", checkpoints["lead"], configs["lead"])
+    if args.play_only:
+        for label in ("original", "value", "lead"):
+            for suffix in ("slot", "holdout"):
+                saved = json.loads((args.out / f"{args.run}-{label}-{suffix}.json").read_text())
+                if Path(saved["checkpoint"]).resolve() != checkpoints[label].resolve():
+                    raise ValueError(f"{label} report belongs to another checkpoint")
+    else:
+        report("original", checkpoints["original"], configs["original"])
+        report("value", checkpoints["value"], configs["original"])
+        # Match brief 09's short lead stage: the nested 1,000-game prefix, eight epochs.
+        preview_manifest = args.work / "lead_train_1000.parquet"
+        pl.read_parquet(args.train_manifest).head(1000).write_parquet(preview_manifest)
+        run([sys.executable, "-m", "fog.training.bc", "--config", configs["lead"], "--set",
+             f"bc.init_ckpt={checkpoints['original']}", f"bc.manifest={preview_manifest}",
+             f"bc.holdout_manifest={args.holdout_manifest}", "bc.epochs=8", "bc.resume=true",
+             "loss.belief_coef=0", "loss.belief_chain_coef=0", "loss.skip_unweighted_belief=true",
+             f"log.dir={args.work / 'lead'}"], args.out / f"{args.run}-lead-training.json")
+        for name in ("metrics.csv", "scope_verification.json"):
+            (args.out / f"{args.run}-lead-{name}").write_bytes((args.work / "lead" / name).read_bytes())
+        report("lead", checkpoints["lead"], configs["lead"])
 
-    def play(pool, games, temperature, labels, suffix, *, against_anchor=False):
+    def play(pool, games, temperature, labels, suffix, *, against_anchor=False, threads=4):
         output = args.out / f"{args.run}-{suffix}.json"
         command = [sys.executable, "-m", "fog.eval.showdown_direct_selection", "--config",
                    configs["original"], "--device", "cpu", "--pool", pool, "--games", str(games),
@@ -94,7 +107,7 @@ def main():
         for label in labels:
             command += ["--checkpoint", f"{label}={checkpoints[label]}",
                         "--checkpoint-config", f"{label}={configs[label]}"]
-        run(command, output)
+        run(command, output, threads=threads)
         data = json.loads(output.read_text())
         assert data["status"] == "complete"
         for row in data["rows"]:
@@ -127,12 +140,20 @@ def main():
                 "selected": selected, "checkpoint": str(checkpoints[selected])}
     (args.out / f"{args.run}-lead-decision.json").write_text(json.dumps(decision, indent=2) + "\n")
     if Path("data/teams/replay_v1/validation").exists():
-        for temperature in (0, 0.5):
-            play("data/teams/replay_v1/validation", 1000, temperature,
-                 [selected], f"validation-t{temperature}-play")
-            if args.anchor_checkpoint:
-                play("data/teams/replay_v1/validation", 1000, temperature,
-                     [selected, "A3"], f"validation-t{temperature}-A3", against_anchor=True)
+        # Each cell has its own simulator, seeded schedule and resumable report. Keep
+        # independent cells on separate cores without changing team or side assignments.
+        threads = 4 if args.validation_workers == 1 else 1
+        tasks = []
+        with ThreadPoolExecutor(max_workers=args.validation_workers) as pool:
+            for temperature in (0, 0.5):
+                tasks.append(pool.submit(play, "data/teams/replay_v1/validation", 1000, temperature,
+                                         [selected], f"validation-t{temperature}-play", threads=threads))
+                if args.anchor_checkpoint:
+                    tasks.append(pool.submit(play, "data/teams/replay_v1/validation", 1000, temperature,
+                                             [selected, "A3"], f"validation-t{temperature}-A3",
+                                             against_anchor=True, threads=threads))
+            for task in tasks:
+                task.result()
 
 
 if __name__ == "__main__":
