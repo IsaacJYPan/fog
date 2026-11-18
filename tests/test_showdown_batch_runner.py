@@ -129,7 +129,7 @@ def test_per_battle_state_does_not_leak_between_battles():
         assert not player._game_ids and not player._announced_battles
 
 
-def test_both_seats_learner_share_one_forward():
+def test_both_seats_share_one_forward_and_score_turn_limit_as_a_draw():
     import torch
 
     from fog.config import load_config
@@ -168,3 +168,11 @@ def test_both_seats_learner_share_one_forward():
     assert len(results) == 2
     assert runner.stats["forwards"] < runner.stats["forward_rows"]
     assert len(buf._games) == 4  # one rollout game per seat per battle
+    assert all(result.truncated and result.p1_won is None for result in results)
+    batch = buf.to_batch("cpu")
+    assert batch["game_outcomes"].eq(0).all()
+    for game_id, game in buf._games.items():
+        final = (batch["game_id"] == game_id).nonzero()[-1].item()
+        assert batch["step_rewards"][final].item() == 0
+        assert batch["returns"][final].item() == pytest.approx(0, abs=1e-7)
+        assert batch["advantages"][final].item() == pytest.approx(-game.values[-1])

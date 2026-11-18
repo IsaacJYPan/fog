@@ -4450,3 +4450,17 @@ available. The rerun of the replay runner and search-distillation tests passed a
 tests. The outstanding league test requires historical 64-, 512- and 1,024-game
 checkpoint files absent from this checkout. The 2,048-game checkpoint is present and
 passed the A3 evaluation above.
+
+## 2026-11-17: PPO update levers (smoke)
+
+On two pinned Showdown battles cut off at turn six, both seats received a zero outcome,
+zero terminal reward and zero terminal return with shaping disabled. The terminal
+advantage equalled the negative of the stored value prediction. The runner closes each
+seat with its unfinished battle view, the player stores a draw, and the rollout buffer
+sets the terminal bootstrap to zero. The current draw rule needs no config switch.
+
+Source `1e678f6`. Reproduce with `pytest -q tests/test_showdown_batch_runner.py
+-k score_turn_limit`. The pre-change reference for the update uses eight actual decisions,
+two epochs and four optimizer steps. Its batch, weights, Adam state, metrics and random
+state are in `docs/briefs/14-artifacts/update-before.json`; reproduce from the repository
+root with `PYTHONPATH=. python docs/briefs/14-artifacts/update_digest.py --out before.json`.
