@@ -35,6 +35,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--run", required=True)
     parser.add_argument("--checkpoint-dir", type=Path, required=True)
+    parser.add_argument("--anchor-checkpoint", type=Path,
+                        help="recovered retained imitation checkpoint for the G2 head-to-head")
     parser.add_argument("--train-manifest", type=Path, required=True)
     parser.add_argument("--holdout-manifest", type=Path, required=True)
     parser.add_argument("--work", type=Path, required=True)
@@ -47,6 +49,13 @@ def main():
     checkpoints = {"original": args.checkpoint_dir / "bc_best.pt",
                    "value": args.checkpoint_dir / "bc_best_value.pt",
                    "lead": args.work / "lead/checkpoints/bc_best.pt"}
+
+    if args.anchor_checkpoint:
+        anchor_digest = hashlib.sha256(args.anchor_checkpoint.read_bytes()).hexdigest()
+        if anchor_digest != "17de023acd346c8ac3490aa3a8a75b4139cc9c58b691723d4a8e0d30322664bf":
+            raise ValueError("the selected checkpoint does not match the retained A3 anchor")
+        configs["A3"] = "configs/gen9ou_typed_token_selfplay.yaml"
+        checkpoints["A3"] = args.anchor_checkpoint
 
     def report(label, checkpoint, config):
         for module, suffix in (("replay_slot_order_check", "slot"),
@@ -73,12 +82,15 @@ def main():
         (args.out / f"{args.run}-lead-{name}").write_bytes((args.work / "lead" / name).read_bytes())
     report("lead", checkpoints["lead"], configs["lead"])
 
-    def play(pool, games, temperature, labels, suffix):
+    def play(pool, games, temperature, labels, suffix, *, against_anchor=False):
         output = args.out / f"{args.run}-{suffix}.json"
         command = [sys.executable, "-m", "fog.eval.showdown_direct_selection", "--config",
                    configs["original"], "--device", "cpu", "--pool", pool, "--games", str(games),
-                   "--temperature", str(temperature), "--opponent", "simpleheuristics",
-                   "--opponent", "maxdamage", "--action-stats", "--resume", "--out", str(output)]
+                   "--temperature", str(temperature), "--action-stats", "--resume", "--out", str(output)]
+        if against_anchor:
+            command += ["--head-to-head", "--compatible-checkpoint", "A3"]
+        else:
+            command += ["--opponent", "simpleheuristics", "--opponent", "maxdamage"]
         for label in labels:
             command += ["--checkpoint", f"{label}={checkpoints[label]}",
                         "--checkpoint-config", f"{label}={configs[label]}"]
@@ -118,6 +130,9 @@ def main():
         for temperature in (0, 0.5):
             play("data/teams/replay_v1/validation", 1000, temperature,
                  [selected], f"validation-t{temperature}-play")
+            if args.anchor_checkpoint:
+                play("data/teams/replay_v1/validation", 1000, temperature,
+                     [selected, "A3"], f"validation-t{temperature}-A3", against_anchor=True)
 
 
 if __name__ == "__main__":
