@@ -1,4 +1,4 @@
-"""Convert replay JSON into per-turn decision rows.
+"""Convert replay JSON into normal and replacement decision rows.
 
 Each row contains the acting player's observation, action, censored belief and
 self-belief labels from later public reveals, and game outcome. Two poke-env
@@ -31,7 +31,7 @@ from fog.env.actions import team_order, team_order_minus_active
 _LOG = logging.getLogger("fog.parse")
 _LOG.disabled = True
 
-HIST_STORE_CAP = 24   # front-padded window; causal history encoder consumes any T up to its cap
+HIST_STORE_CAP = DIMS.history_cap   # front-padded window; causal history encoder consumes any T up to its cap
 
 
 def _to_id(s: object) -> str:
@@ -68,6 +68,7 @@ class _PerspectiveState:
         )
         if self.private_set is not None:
             self.tracker.record_exact_private_truth(self.private_set)
+        self._private_by_mon: dict[int, np.ndarray] = {}
         self._preview_slot = 0
         self._preview_species: list[str] = []
         self.move_order: dict[str, list[str]] = {}   # mon-key -> discovered move ids (slot order)
@@ -99,6 +100,14 @@ class _PerspectiveState:
             from fog.training.replay_policy_data import apply_private_set
 
             apply_private_set(mon, self.private_set[self._preview_slot])
+            self._private_by_mon[id(mon)] = self.private_set[self._preview_slot].copy()
+            # Public preview objects start at zero HP; an unused own team member is full.
+            mon._current_hp = 100
+            mon._max_hp = 100
+            # Live request parsing does not install Pokemon.tera_type before activation.
+            # Keep that representation; request legality below still knows our sheet's Tera.
+            mon._terastallized_type = None
+            self.tracker.record_private_team(self.battle)
         self._preview_slot += 1
 
     def feed_tracker(self, turn: int, events: list[list[str]]) -> None:
@@ -107,15 +116,30 @@ class _PerspectiveState:
         except Exception:  # noqa: BLE001, S110 - tracker fidelity is intentionally best-effort
             pass  # fidelity fields degrade to zeros; never quarantine a replay over them
 
-    def _prepare_inferred_request(self) -> None:
+    def _prepare_inferred_request(self, *, force_switch: bool = False) -> None:
         """Build a request-like action list from one sampled own team."""
         active = getattr(self.battle, "active_pokemon", None)
-        forced = active is None or bool(getattr(active, "fainted", False))
+        forced = force_switch or active is None or bool(getattr(active, "fainted", False))
         self.battle._force_switch = forced
+        self.battle._last_request = {"forceSwitch": [forced]}
         self.battle._trapped = False
-        self.battle._available_moves = (
-            [] if forced else list((getattr(active, "moves", None) or {}).values())
-        )
+        moves = list((getattr(active, "moves", None) or {}).values())
+        offered = [move for move in moves if getattr(move, "current_pp", 0) > 0]
+        last = getattr(active, "last_move", None)
+        effects = {_to_id(getattr(effect, "name", effect))
+                   for effect in (getattr(active, "effects", None) or {})}
+        item = _to_id(getattr(active, "item", "") or "")
+        if last is not None and (item in {"choiceband", "choicescarf", "choicespecs"}
+                                 or "encore" in effects):
+            offered = [move for move in offered if move.id == last.id]
+        if "taunt" in effects or item == "assaultvest":
+            offered = [move for move in offered
+                       if _to_id(getattr(getattr(move, "category", None), "name", "")) != "status"]
+        if not forced and not offered:
+            from poke_env.battle import Move
+
+            offered = [Move("struggle", gen=9)]
+        self.battle._available_moves = [] if forced else offered
         self.battle._available_switches = [
             mon
             for mon in team_order_minus_active(self.battle)[:5]
@@ -125,8 +149,13 @@ class _PerspectiveState:
             bool(getattr(mon, "is_terastallized", getattr(mon, "terastallized", False)))
             for mon in team_order(self.battle)
         )
+        active_slot = next((i for i, mon in enumerate(team_order(self.battle)[:6])
+                            if mon is active), None)
+        from fog.constants.schema import SET_TERA_COL
+
         self.battle._can_tera = bool(
-            not forced and not used_tera and getattr(active, "tera_type", None) is not None
+            not forced and not used_tera and active_slot is not None
+            and self.private_set[active_slot, SET_TERA_COL] >= 0
         )
 
     def _action_provenance(self) -> np.ndarray:
@@ -155,18 +184,36 @@ class _PerspectiveState:
         self,
         own_revealed: dict | None = None,
         opponent_submitted: dict | None = None,
+        *,
+        force_switch: bool = False,
     ) -> None:
-        """Capture start-of-turn observation + a state-reconstructed legality mask; flush prior."""
+        """Capture this decision prefix and inferred request, flushing the previous choice."""
         self._flush()
         try:
             if self.private_set is not None:
-                self._prepare_inferred_request()
+                # poke-env replaces species-keyed preview aliases with the actual nickname.
+                # Carry our original private facts to that key, even after an item is consumed.
+                for key, mon in self.battle.team.items():
+                    sheet = self._private_by_mon.get(id(mon))
+                    if sheet is None:
+                        continue
+                    if 0 <= sheet[1] < TABLES.n_items:
+                        item = str(TABLES.items["ids"][int(sheet[1])])
+                        if item != "<NO_ITEM>":
+                            self.tracker.original_item.setdefault(str(key), item)
+                    if 0 <= sheet[2] < TABLES.n_abilities:
+                        ability = str(TABLES.abilities["ids"][int(sheet[2])])
+                        self.tracker.original_ability.setdefault(str(key), ability)
+                self._prepare_inferred_request(force_switch=force_switch)
             self._pending_obs = Observation.from_battle(
                 self.battle,
                 tracker=self.tracker,
-                own_revealed=(self.private_set if self.private_set is not None else own_revealed),
+                # A completed own sheet is the acting player's private knowledge. The public
+                # mirror downgrade clears PP, last-used and original ids even when every token
+                # is present; it belongs only to the no-private-sheet diagnostic pass.
+                own_revealed=(own_revealed if self.private_set is None else None),
             )
-            if opponent_submitted is not None:
+            if opponent_submitted is not None and self.private_set is None:
                 self._pending_obs.opp_revealed = opponent_submitted
             self._pending_mask = (
                 np.asarray(self._pending_obs.legality_mask, dtype=bool)
@@ -180,7 +227,7 @@ class _PerspectiveState:
             active = getattr(self.battle, "active_pokemon", None)
             if self.private_set is None:
                 self._pending_filter_reason = "awaiting_action"
-            elif active is None or bool(getattr(active, "fainted", False)):
+            elif force_switch or active is None or bool(getattr(active, "fainted", False)):
                 self._pending_filter_reason = "forced_switch"
             elif int(self._pending_mask.sum()) < 2:
                 self._pending_filter_reason = "forced_single_choice"
@@ -230,9 +277,9 @@ class _PerspectiveState:
         self._pending_turn = None
 
     def record_action(self, parts: list[str]) -> None:
-        """parts = a |move| or |switch| line initiated by THIS player. Only the first per turn."""
+        """Record the first action following this decision's snapshot, before parsing its line."""
         if self._pending_obs is None or self._pending_action is not None:
-            return  # no snapshot yet, or already recorded this player's decision this turn
+            return  # no snapshot yet, or already recorded this pending decision
         kind = parts[1]
         actor = parts[2]
         role, _ = _mon_species_key(actor)
@@ -278,12 +325,16 @@ class _PerspectiveState:
                 "accepted" if self._pending_policy_valid else "called_or_unaligned_move"
             )
         elif kind == "switch":
-            target_species = _to_id(parts[3].split(",")[0]) if len(parts) > 3 else ""
+            from fog.encoding.events import submitted_species_id
+
+            target_species = submitted_species_id(
+                _to_id(parts[3].split(",")[0]) if len(parts) > 3 else ""
+            )
             bench = team_order_minus_active(battle)
             slot = 0
             found = False
             for i, mon in enumerate(bench[:5]):
-                if _to_id(getattr(mon, "species", "")) == target_species:
+                if submitted_species_id(_to_id(getattr(mon, "species", ""))) == target_species:
                     slot = i
                     found = True
                     break
@@ -297,7 +348,7 @@ class _PerspectiveState:
             self._pending_policy_valid = bool(
                 found
                 and aligned
-                and self._pending_filter_reason == "awaiting_action"
+                and self._pending_filter_reason in ("awaiting_action", "forced_switch", "forced_single_choice")
                 and self._pending_mask is not None
                 and self._pending_mask[self._pending_action]
             )
@@ -307,7 +358,9 @@ class _PerspectiveState:
         if self._pending_action is not None and (self.private_set is None or aligned):
             # Let public identity history handle a replaced actor; do not preserve a slot
             # number that was just found to name a different encoded move or switch target.
-            self.tracker.my_actions[int(getattr(battle, "turn", 0) or 0)] = self._pending_action
+            turn = int(getattr(battle, "turn", 0) or 0)
+            if self._pending_obs.decision_phase != 1 or turn not in self.tracker.my_actions:
+                self.tracker.my_actions[turn] = self._pending_action
 
     def record_tera(self, parts: list[str]) -> None:
         if len(parts) >= 3:
@@ -511,6 +564,28 @@ def parse_replay(
             p2.snapshot(p2_public, _submitted_reveal_input(p2.battle))
             continue
 
+        if tag == "switch" and int(getattr(p1.battle, "turn", 0) or 0) > 0:
+            # A second send-out after a chosen action is a new request (pivot, faint or
+            # item-driven replacement). Snapshot the public prefix BEFORE parsing that send-out.
+            role, _ = _mon_species_key(parts[2])
+            actor = p1 if role == "p1" else p2
+            active = getattr(actor.battle, "active_pokemon", None)
+            if bool(getattr(active, "fainted", False)) or actor._pending_action is not None:
+                from fog.encoding.reveals import build_belief_input, opponent_views_from_battle
+
+                for st, other in ((p1, p2), (p2, p1)):
+                    mon = getattr(st.battle, "active_pokemon", None)
+                    if st is not actor and not bool(getattr(mon, "fainted", False)):
+                        continue
+                    # Simultaneous faint replacements share the same prefix. Do not resnapshot
+                    # the second side after the first side's new Pokemon has been disclosed.
+                    if (st._pending_obs is not None and st._pending_action is None
+                            and st._pending_obs.decision_phase == 1):
+                        continue
+                    st.feed_tracker(int(st.battle.turn), turn_events)
+                    public = build_belief_input(opponent_views_from_battle(other.battle, TABLES), TABLES)
+                    st.snapshot(public, _submitted_reveal_input(st.battle), force_switch=True)
+
         turn_events.append(parts)
         if tag == "poke" and len(parts) >= 4:
             for st in (p1, p2):
@@ -531,6 +606,12 @@ def parse_replay(
                 st.battle.parse_message(parts)
             except Exception:  # noqa: BLE001, S110 - retain a best-effort public replay
                 pass  # tolerate unknown/edge messages; state stays best-effort
+            if (tag == "-item" and len(parts) >= 4 and st.private_set is not None
+                    and _mon_species_key(parts[2])[0] == st.role):
+                # Trick/Switcheroo item lines are ignored by poke-env because a live private
+                # request refreshes the own item. Replays have no such request; the line itself
+                # is exact chronological public evidence of the now-held item.
+                st.battle.get_pokemon(parts[2]).item = _to_id(parts[3])
 
     final_turn = int(getattr(p1.battle, "turn", 0) or 0)
     for st in (p1, p2):
@@ -583,6 +664,17 @@ def parse_replay(
                 }
             )
     return {"rows": out_rows, "p1_win": p1_win}
+
+
+def policy_filter_reason(row: dict) -> str:
+    """Use the same retained-decision contract in training and exact-sheet diagnostics."""
+    if not row.get("policy_valid", False):
+        return str(row.get("filter_reason", "unresolved"))
+    # Retain every forced replacement, including its outcome/value target when only one
+    # switch remains. Its policy cross-entropy is correctly zero on that one-choice mask.
+    if int(np.asarray(row["mask"], dtype=bool).sum()) < 2 and row["obs"].decision_phase != 1:
+        return "forced_single_choice"
+    return "accepted"
 
 
 def parse_replay_policy_versions(
@@ -661,13 +753,9 @@ def parse_replay_policy_versions(
 
             previews = preview_arrays(replay_json, private_sets)
         for row in version["rows"]:
-            reason = str(row.get("filter_reason", "unresolved"))
-            if not row.get("policy_valid", False):
+            reason = policy_filter_reason(row)
+            if reason != "accepted":
                 filters[reason] += 1
-                continue
-            # A legal list containing only the demonstrated action conveys no preference.
-            if int(np.asarray(row["mask"], dtype=bool).sum()) < 2:
-                filters["forced_single_choice"] += 1
                 continue
             row["imputation_id"] = imputation
             row["replay_id"] = replay_id
@@ -751,6 +839,9 @@ def rows_to_arrays(rows: list[dict]) -> dict[str, np.ndarray]:
             action_feature_provenance[i] = r["action_feature_provenance"]
         imputation_id[i] = int(r.get("imputation_id", -1))
     return {
+        "decision_phase": np.asarray([r["obs"].decision_phase for r in rows], dtype=np.int64),
+        "row_turn": np.asarray([r["turn"] for r in rows], dtype=np.int32),
+        "row_role": np.asarray([1 if r["role"] == "p1" else 2 for r in rows], dtype=np.int8),
         "entities": ent,
         "entity_ids": eid,
         "field": fld,

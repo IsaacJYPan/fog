@@ -26,7 +26,7 @@ in different rows of the "touches" column.
 | 08 | `08-update-speed-gpu.md` | GPU, 1 h | done | nothing (measures) | `work/update-speed` | **merged 2026-11-16** |
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
 | 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
-| 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | worker running: stages 1 and 2 pushed, stage 3 (reconversion, paired training, play) in progress at 14:39 UTC on 2026-11-16 |
+| 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | completed and reviewed; corrected replay conversion and paired smoke results integrated |
 | 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | prepared split verified; one-epoch G20 calibration submitted with a one-hour cap |
 | 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds 0 to 3 done by the planner (ledger) |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | **reviewed; T1 passed on the replay-derived test teams** (first completed run, 1,008 games per opponent) |

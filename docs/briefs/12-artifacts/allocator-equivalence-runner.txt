@@ -1,0 +1,54 @@
+"""Check allocation-only runtime settings on recorded rows and a full BC backward pass."""
+import hashlib
+import os
+from pathlib import Path
+import sys
+sys.path.insert(0,str(Path.cwd()))
+import atexit
+import numpy as np
+import polars as pl
+import torch
+from fog.config import load_config
+from fog.eval.replay_live_parity import model_fields
+from fog.training.dataset import _ARRAYS,_build_batch
+from fog.constants.tables import TABLES
+from fog.training.search_distill import build_agent
+from fog.training.bc import bc_loss
+
+torch.set_num_threads(int(os.environ.get("FOG_EQ_THREADS", "2")))
+cfg=load_config('configs/replay_mechanical_cpu.yaml')
+manifest=pl.read_parquet('runs/replay-parity/split-new/holdout_manifest.parquet')
+parts={k:[] for k in _ARRAYS}
+count=0
+for path in manifest['shard']:
+    with np.load(path,allow_pickle=False) as z:
+        n=min(len(z['action']),1024-count)
+        for k in _ARRAYS:
+            parts[k].append(z[k][:n])
+    count+=n
+    if count==1024:break
+arrays={k:np.concatenate(v) for k,v in parts.items()}
+agent=build_agent(cfg,'runs/replay-parity/train-old/checkpoints/bc_best.pt',20261201)
+stored={}
+for start in range(0,count,128):
+    batch=_build_batch(arrays,np.arange(start,min(start+128,count)),TABLES,'cpu')
+    fields=model_fields(batch)
+    for k,v in fields.items():
+        stored[f'b{start}.{k}']=v
+    with torch.no_grad():
+        result=agent(batch,need_belief=False)
+    stored[f'b{start}.log_probs']=result.log_probs.numpy()
+    stored[f'b{start}.value']=result.value.numpy()
+agent.train()
+torch.manual_seed(20261201)
+batch=_build_batch(arrays,np.arange(256),TABLES,'cpu')
+loss,metrics=bc_loss(agent,batch,cfg['loss'])
+loss.backward()
+stored['loss']=np.asarray(float(loss.detach()))
+for name,parameter in agent.named_parameters():
+    if parameter.grad is not None:
+        stored['grad.'+name]=parameter.grad.detach().numpy()
+np.savez_compressed(sys.argv[1],**stored)
+print('recorded rows',count,'backward rows',256,'gradient tensors',sum(k.startswith('grad.') for k in stored),flush=True)
+concurrency=sys.modules.get('poke_env.concurrency')
+if concurrency is not None:atexit.unregister(concurrency.__clear_loop)

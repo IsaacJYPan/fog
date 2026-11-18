@@ -26,7 +26,7 @@ from fog.encoding.reveals import align_truth_to_views, labels_from_truth, masks_
 
 _ARRAYS = (
     "entities", "entity_ids", "field", "history", "history_ids", "history_state", "history_len",
-    "active_idx", "legality_mask", "opp_tokens", "action", "belief_targets",
+    "active_idx", "decision_phase", "legality_mask", "opp_tokens", "action", "belief_targets",
     "self_belief_targets", "outcome",
     "action_features", "policy_valid",
     "own_set_provenance", "opponent_set_provenance", "legal_provenance",
@@ -77,6 +77,8 @@ def _build_batch(d: dict[str, np.ndarray], idx: np.ndarray, tables, device=None)
         if key in d:
             dtype = torch.bool if key in {"terminal_valid", "terminal_alive_mask"} else torch.float32
             batch[key] = _t(d[key][idx], dtype, device)
+    if "decision_phase" in d:
+        batch["decision_phase"] = _t(d["decision_phase"][idx], torch.long, device)
     # Belief targets are stored in paste order; the chain input (opp_tokens) packs revealed moves
     # into the earliest subslots, so align per row before splitting into label dicts.
     aligned, _ = align_truth_to_views(d["belief_targets"][idx], opp_tokens)
@@ -113,7 +115,9 @@ class ReplayDataset:
             z = np.load(shard)
             n = len(z["action"])
             for k in _ARRAYS:
-                if k == "history_len" and k not in z:
+                if k == "decision_phase" and k not in z:
+                    buf[k].append(_legacy_decision_phases(z["legality_mask"]))
+                elif k == "history_len" and k not in z:
                     buf[k].append(_infer_history_lengths(z["history"]))
                 elif k == "history_ids" and k not in z:
                     buf[k].append(np.zeros(
@@ -207,7 +211,9 @@ class StreamingReplayDataset:
             for shard in group:
                 z = np.load(shard)
                 for k in _ARRAYS:
-                    if k == "history_len" and k not in z:
+                    if k == "decision_phase" and k not in z:
+                        buf[k].append(_legacy_decision_phases(z["legality_mask"]))
+                    elif k == "history_len" and k not in z:
                         buf[k].append(_infer_history_lengths(z["history"]))
                     elif k == "history_ids" and k not in z:
                         buf[k].append(np.zeros(
@@ -254,6 +260,11 @@ class StreamingReplayDataset:
 def _t(arr: np.ndarray, dtype, device):
     t = torch.as_tensor(np.ascontiguousarray(arr), dtype=dtype)
     return t.to(device) if device is not None else t
+
+
+def _legacy_decision_phases(mask: np.ndarray) -> np.ndarray:
+    """Keep the model's historical fallback for shards predating explicit request phases."""
+    return np.where(~mask[:, :8].any(axis=1) & mask[:, 8:13].any(axis=1), 1, 0).astype(np.int64)
 
 
 def _infer_history_lengths(history: np.ndarray) -> np.ndarray:

@@ -298,10 +298,14 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       Brief 09 stage 2 completes the model side: every parameter perturbed, all four required
       permutations on 64 holdout and 64 live rows, key-off negative controls; R2 stored/shuffled
       metrics match to four decimals. See the ledger and `docs/briefs/09-report.md`.
-- [ ] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
+- [x] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
       parity check between a converted log and the observations recorded while the same game
       was played, then own PP, forced replacement decisions and the history record brought
       into line.
+      _2026-11-16: brief 12 stages 1–2 meet the parity criterion on 200 games (smoke);
+      exact own HP and undisclosed choices are explained per row. Both eight-epoch trainings,
+      paired holdout and four 400-game play rows are complete (smoke); no strength gate is
+      claimed. See `docs/briefs/12-report.md` and the ledger._
 - [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule

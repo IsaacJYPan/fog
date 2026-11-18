@@ -1,0 +1,52 @@
+[
+  {
+    "source": "holdout",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "acting moves",
+    "max_logit_error": 3.427267074584961e-07,
+    "max_log_probability_error": 7.152557373046875e-07,
+    "max_value_error": 1.7136335372924805e-07
+  },
+  {
+    "source": "holdout",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "other own moves",
+    "max_logit_error": 3.8743019104003906e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.6391277313232422e-07
+  },
+  {
+    "source": "holdout",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "other opponent moves",
+    "max_logit_error": 3.427267074584961e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.4901161193847656e-07
+  },
+  {
+    "source": "holdout",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "own team",
+    "max_logit_error": 3.2782554626464844e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.4156103134155273e-07
+  },
+  {
+    "source": "holdout",
+    "observations": 64,
+    "all_parameters_perturbed": true,
+    "key_on": true,
+    "permutation": "opponent team",
+    "max_logit_error": 2.980232238769531e-07,
+    "max_log_probability_error": 4.76837158203125e-07,
+    "max_value_error": 1.6391277313232422e-07
+  }
+]

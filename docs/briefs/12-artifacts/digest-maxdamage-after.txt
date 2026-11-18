@@ -1,0 +1,2 @@
+games=96 decisions=3151 seconds=26.01 decisions/s=121.16 games/s=3.691 p1_wins=7 learner_decisions=3151 digest=d3c6b556c8a03d0b
+forwards=139 rows/forward=22.7 seconds: start=1.70 prepare=4.49 forward=8.08 choose=3.63 step=7.94 finish=0.13

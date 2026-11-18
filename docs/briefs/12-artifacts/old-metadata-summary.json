@@ -1,0 +1,8 @@
+{
+  "kind": "smoke",
+  "games": 2000,
+  "rows": 103944,
+  "source": "79283c9",
+  "all_decision_row_arrays_identical": true,
+  "preview_arrays_checked": false
+}
