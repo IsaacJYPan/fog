@@ -4452,3 +4452,24 @@ checkpoint files absent from this checkout. The 2,048-game checkpoint is present
 passed the A3 evaluation above.
 
 The [validation learning curve](briefs/17-artifacts/validation-learning-curve.png) shows both opponents with 95% Wilson intervals. Hollow markers identify the four-epoch run. Each point uses 1,008 validation games per opponent.
+
+## 2026-11-17: replay blueprint at scale on corrected rows
+
+G20 finished its 18-epoch schedule on 989,494 rows from 20,000 games. Both private
+checkpoint exports match the independently loaded tensors inside the final optimizer
+archive. Its step and Adam state survived the job boundary. The first two metric rows
+are identical to the original calibration export. Validation uses the fixed 2,000-game,
+103,944-row holdout.
+
+| Checkpoint | Selection epoch | Action NLL | Top-1 | Value Brier | Value ECE |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Best policy | 14 | 1.45776 | 47.32% | .24482 | .13360 |
+| Best value (minimum logistic value loss) | 3 | 1.58710 | 42.32% | .21286 | .00832 |
+
+Source `7d17e1a`, `docs/briefs/13-artifacts/gpu_job.py`, run G20, 18 epochs,
+batch 1,024, configuration `configs/replay_mechanical_cpu.yaml`, resume and separate
+value selection enabled. The continuation used 1.81 metered hours (26.28 to 24.47).
+Including the 0.16-hour calibration, the replay brief has consumed 1.97 of 20 hours.
+The median continuation epoch took 368.1 s at 2,935 training rows/s. Full epoch
+measurements, checkpoint digests and selections are in `13-artifacts/G20-metrics.csv`
+and `13-artifacts/G20-training.json`. Stage 3 runs on CPU.

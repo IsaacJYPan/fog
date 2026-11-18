@@ -27,11 +27,11 @@ in different rows of the "touches" column.
 | 09 | `09-order-blind-model.md` | CPU | done | model, converter | `work/order-blind-model` | **merged 2026-11-16** |
 | 11 | `11-engine-mcts-gate.md` | CPU | done | search reconstruction | `work/g1` | **merged 2026-11-16; gate G1 passed** |
 | 12 | `12-replay-live-parity.md` | CPU | **now** | converter, parser | `work/replay-parity` | completed and reviewed; corrected replay conversion and paired smoke results integrated |
-| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | G20 calibration complete; resume through epoch 18, then lead comparison and validation play |
+| 13 | `13-replay-scale-corrected.md` | GPU, 20 h | **now** | training only | `work/p2-scale-corrected` | G20 trained for 18 epochs; lead comparison and validation play running on CPU |
 | 15 | `15-distil-engine-mcts.md` | CPU, about a day on 4 cores | see the note under this table | new training script | `work/distil-g0` | code merged; rounds 0 to 3 done by the planner (ledger) |
 | 16 | `16-engine-mcts-test-split.md` | CPU, about 8 h on 4 cores | **now** | nothing (measures) | `work/t1-search` | **reviewed; T1 passed on the replay-derived test teams** (first completed run, 1,008 games per opponent) |
 | 17 | `17-distil-at-scale.md` | CPU about 150 core-hours, GPU 6 h | the pilot's last round is in the ledger | trainer switches | `work/distil-scale` | eight-epoch model selected; value calibration complete, final head-to-head evaluations in progress |
-| 14 | `14-ppo-update-levers.md` | GPU, 2 h | when brief 13 is not using the GPU | PPO update | `work/ppo-update` | not started (lowest priority: self-play is frozen until G3) |
+| 14 | `14-ppo-update-levers.md` | GPU, 2 h | when brief 13 is not using the GPU | PPO update | `work/ppo-update` | turn-limit test and opt-in controls on the assigned branch; fixed-team CPU learning comparison running |
 
 **Gate G1 (brief 11): passed** on 2026-11-16 (ledger, "review of brief 11"): 92.9% against
 SimpleHeuristics and 97.3% against MaxDamage over 1,008 games each.
@@ -44,11 +44,10 @@ and weights are in the owner's private hosted dataset. Give brief 17 to a worker
 that session has ended; the worker downloads the dataset and continues from the first round
 the ledger does not report, with `scripts/hosted.sh`.
 
-GPU: one job at a time. G20 calibration consumed 0.16 h. Before the
-continuation the account had 26.28 h of 45 h available. Brief 13 has first
-call. Its remaining 17 epochs are capped at 2.25 h. The two full-budget
-teacher evaluation jobs use CPU only. Read the live quota before any new
-accelerator job.
+GPU: one job at a time. G20 used 1.97 h through epoch 18. The account had
+24.47 h of 45 h available afterward. The next replay training is the larger
+corrected set after G20 play and CPU conversion. Matched distillation trials
+can use the intervening window. Read the live quota before every accelerator job.
 
 ## What each one buys
 

@@ -346,6 +346,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       and supervised-lead paths have smoke measurements and default-off compatibility checks.
       See `docs/briefs/09-report.md` and the ledger. Value still fails the constant reference;
       P2.3 and G2 remain open._
+      _2026-11-17: corrected G20 completed 18 epochs. The best-value checkpoint (epoch 3) reached Brier 0.21286 and ECE 0.00832 on the fixed 2,000-game holdout. The best policy (epoch 14) reached NLL 1.45776 and 47.32% top-1. The larger dataset and matched play are pending._
+
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before

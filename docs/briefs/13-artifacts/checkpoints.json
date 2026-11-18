@@ -1,4 +1,27 @@
 {
-  "checkpoints": [],
-  "reason": "No GPU job submitted or model trained in this brief yet."
+  "G20": {
+    "policy": {
+      "checkpoint": "G20-bc_best.pt",
+      "epoch": 14,
+      "sha256": "4beafe0244842f27c4329998ec97a45645297c5fa61e6698fb898d5a25a9757d",
+      "bytes": 23396101,
+      "holdout_nll": 1.4577551341943118,
+      "holdout_top1": 0.47321955731900817,
+      "holdout_brier": 0.2448182702158645,
+      "holdout_ece": 0.13360072012646898,
+      "holdout_value_loss": 0.7335201335697735
+    },
+    "value": {
+      "checkpoint": "G20-bc_best_value.pt",
+      "epoch": 3,
+      "sha256": "760e791dcec30fbbf9b272b62f92b6aa278a11256eb4ee2f486343d98304ffe5",
+      "bytes": 23398807,
+      "holdout_nll": 1.5871014887825277,
+      "holdout_top1": 0.4231876723513031,
+      "holdout_brier": 0.2128634070678402,
+      "holdout_ece": 0.008317670313848415,
+      "holdout_value_loss": 0.6122556882153861
+    }
+  },
+  "retention": "Private training output and verified local download."
 }
