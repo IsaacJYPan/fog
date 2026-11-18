@@ -4274,3 +4274,22 @@ uses its frozen training input from before the parity change.
 The brief 13 checks on the prepared real holdout also finished: 28 source
 tests passed, in addition to the three split-filter tests. Both commands
 returned zero using the same exit-callback workaround.
+
+
+## 2026-11-17: replay calibration and training budget
+
+The first private T4 job completed epoch 1 at source `7d17e1a`. It processed
+989,494 training rows at 2,948 rows/s. The epoch took 366.6 s including 30.9 s
+of validation. Holdout policy NLL was 1.7276, top-1 accuracy 36.60%, value
+Brier 0.2206 and ECE 0.0330. These first-epoch metrics are diagnostics. The
+returned archive contains the optimizer state and both selected checkpoints.
+The account meter moved from 26.44 to 26.28 hours available.
+
+Budget before continuation: 17 × 366.6 s is 1.73 h of training. Allow 2.25 h
+including startup and export. For the target of 100,000 nested games, an
+estimate of 62 corrected decisions per game gives 6.2M rows. At the measured
+rate, 18 epochs including 40 s validation each would take 10.72 h. Including
+the 0.16 h calibration, 2.25 h continuation cap and two hours of reserve leaves
+4.87 h of the 20 h brief for overhead or a lower throughput. Recompute the
+larger forecast using its actual row count and first epoch. The G20 report
+and play evaluation come first. Measurement: `13-artifacts/G20-calibration.json`.

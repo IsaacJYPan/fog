@@ -1,0 +1,26 @@
+{
+  "source": "7d17e1ab9311ce3e0171ce465d28b44e1bece662",
+  "epoch": 1,
+  "gpu": "Tesla T4",
+  "training_rows": 989494,
+  "training_rows_per_second": 2948.248703801865,
+  "seconds_per_epoch": 366.57600465,
+  "validation_seconds": [
+    34.18535116700002,
+    30.92159069799993
+  ],
+  "holdout_nll": 1.7276216338814465,
+  "holdout_top1": 0.36603426315417364,
+  "holdout_brier": 0.22055859413014722,
+  "holdout_ece": 0.03301001341728788,
+  "quota_before_hours": 26.44,
+  "quota_after_hours": 26.28,
+  "remaining_training_epochs": 17,
+  "continuation_platform_cap_seconds": 8100,
+  "next_size_target_games": 100000,
+  "next_size_target_epochs": 18,
+  "forecast_rows_per_game": 62,
+  "forecast_rows_per_second": 2948.248703801865,
+  "large_job_estimated_total_hours": 10.714716740153051,
+  "reserve_hours": 2
+}
