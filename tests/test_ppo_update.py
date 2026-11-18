@@ -320,7 +320,8 @@ def test_value_after_kl_stop_updates_only_value_weights_and_keeps_policy_moments
     batch["old_log_probs"].fill_(-9)
     metrics = ppo_update(agent, optimizer, batch, config)
     assert metrics["stopped_for_kl"] == 1 and metrics["value_only_steps"] == 4
-    assert metrics["optimizer_steps"] == 0
+    assert metrics["policy_optimizer_steps"] == 0 and metrics["optimizer_steps"] == 4
+    assert metrics["optimizer_rows"] == metrics["value_only_rows"] == 16
     assert not any(agent.belief_requests)
     assert optimizer.state[agent.pi.weight]["step"].item() == policy_steps
     for name, param in agent.named_parameters():

@@ -405,6 +405,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
     value_key = "game_outcomes" if value_target == "outcome" else "returns"
     value_only_steps = 0
+    value_only_rows = 0
     stopped_for_kl = False
     optimizer_steps = 0
     optimizer_rows = 0
@@ -417,6 +418,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 if value_parameters:
                     update_value(forward(mb, need_belief=False), mb)
                     value_only_steps += 1
+                    value_only_rows += len(idx)
                 continue
             # Evaluation mode is the behavior policy. Chain supervision remains explicit.
             mb["compute_belief_chain"] = fraction == 1
@@ -457,6 +459,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                 if value_parameters:
                     update_value(out, mb)
                     value_only_steps += 1
+                    value_only_rows += len(idx)
                     continue
                 break
             teacher_loss = None
@@ -635,6 +638,11 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
 
     if value_after_stop:
         log("value_only_steps", value_only_steps)
+        log("value_only_rows", value_only_rows)
+        log("policy_optimizer_steps", optimizer_steps)
+        log("policy_effective_epochs", optimizer_rows / n)
+        optimizer_steps += value_only_steps
+        optimizer_rows += value_only_rows
     log("stopped_for_kl", float(stopped_for_kl))
     log("optimizer_steps", optimizer_steps)
     log("optimizer_rows", optimizer_rows)
@@ -1081,8 +1089,10 @@ def _maybe_chunk_update(s: _TrainSetup, phi_owner, recent_results: dict) -> str 
     s.dash.log(s.decisions_seen, metrics)
     print(
         f"[{s.ppo_cfg.get('policy_objective', 'ppo')}] decisions={s.decisions_seen}  win_rate={win_rate:.3f}  "
-        f"loss={metrics['loss']:.4f}  entropy={metrics['entropy']:.3f}  "
-        f"kl={metrics['approx_kl']:.4f}  clip={metrics['clip_frac']:.3f}"
+        f"loss={metrics.get('loss', metrics.get('value_only_loss', float('nan'))):.4f}  "
+        f"entropy={metrics.get('entropy', float('nan')):.3f}  "
+        f"kl={metrics.get('approx_kl', metrics.get('policy_kl', float('nan'))):.4f}  "
+        f"clip={metrics.get('clip_frac', float('nan')):.3f}"
         + (f"  belief={metrics.get('belief_loss', 0):.3f}" if 'belief_loss' in metrics else "")
         + (f"  self_belief={metrics.get('self_belief_loss', 0):.3f}"
            if 'self_belief_loss' in metrics else ""),
