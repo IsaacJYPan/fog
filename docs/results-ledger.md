@@ -3994,3 +3994,31 @@ before calibration was 26.44 h of 45 h. Submitted one private job using
 `13-artifacts/gpu_job.py` with the recorded source, stopping after the first
 epoch of the 18-epoch schedule. Platform timeout is one hour, including setup
 and export. See `13-artifacts/calibration-preflight.json`. G2 remains open.
+
+
+## 2026-11-17: distilled policy against full-budget search (G3)
+
+Recovered both completed CPU jobs at source `1b9a9ed`. The four reports used
+the same network, validation pool and controller, with seeds 15400 through
+15403. The configured search budget was K=8, 1,600 ms and one search thread.
+Each job ran two shards. No matches were replayed in review.
+
+| Policy | Opponent | Scheduled | W–L | Turn-limit games | Win rate, decisive games (95% Wilson) | Opponent seconds/decision |
+| --- | --- | ---: | ---: | ---: | --- | ---: |
+| Network 3g, greedy | EngineMCTS | 1,008 | 138–868 | 2 | 13.72% (11.73–15.98%) | 1.880 |
+
+Even counting both unfinished games as wins gives 140/1,008 (13.89%).
+The G3 teacher clause requires 30%. There were zero rejected actions and
+12 fallbacks across 36,589 teacher decisions. This run did not compare the
+policy with its initial weights. P4 remains gated by the roadmap.
+
+Command: `python -m fog.eval.run_shards --shards 4 --games 1008 --seed 15400
+--out-dir net3g-vs-mcts -- --pool data/teams/replay_v1/validation --device cpu
+--config configs/search_distill_cpu.yaml --checkpoint net3g=net3g.pt
+--controller mcts=fog.search.engine_mcts:showdown_controller
+--controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}'
+--opponent mcts --max-turns 300 --progress-every 40` (two shard pairs, `--only 0,1` and `--only 2,3`).
+The four files were pooled with `fog.eval.merge_selection_reports`.
+`docs/briefs/17-artifacts/net3g-vs-search.json` preserves the protocol,
+per-game scores and controller counters. The private checkpoint path was
+shortened to its filename.

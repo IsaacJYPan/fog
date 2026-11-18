@@ -419,6 +419,9 @@ before changing the architecture.
 
 **Gate G3:** the distilled policy without search beats its initial weights (> 55%) and scores
 ≥ 30% vs EngineMCTS at the default budget.
+
+_2026-11-17. Network 3g won 138 of 1,006 decisive games in 1,008 scheduled against EngineMCTS (13.72%, Wilson 95% interval 11.73–15.98%). Two hit the turn limit. EngineMCTS averaged 1.880 s per decision at K=8 and a 1,600 ms search budget. The 30% clause failed._
+
 **If it fails:** check label quality first (top-1 agreement between the teacher at the reduced
 and default budgets should exceed 70%), then data volume (plot strength at 250k, 500k, 1M
 decisions). If strength is flat in data, the model is the limit; widen it.
