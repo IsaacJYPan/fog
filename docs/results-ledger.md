@@ -4492,3 +4492,14 @@ The short lead-training stage raised holdout action NLL by 0.02160, exceeding th
 - Lead policy on `pool_b` (smoke), 317/400 against SimpleHeuristics and 384/400 against MaxDamage.
 
 Run with `docs/briefs/13-artifacts/cpu_stage.py --run G20 --play-only --validation-workers 4 --anchor-checkpoint artifacts/checkpoints/typed_dagger_2048.pt` at `2e96d6af`, using the G20 manifest, holdout and checkpoint directory from the training entry. The policy and value digests are in `G20-training.json`. The lead rules and per-game scores are in the [stage results](briefs/13-artifacts/G20-stage.json) and associated play files.
+
+## 2026-11-17: note on a duplicate run of brief 16 (not a result)
+
+The planner's session started its own run of brief 16 on the test teams at 22:36 UTC on
+2026-11-16 (command of the brief, seed 16000, same four shards) without having seen that a
+worker had already completed it on 2026-11-16 (`47b3901`). The platform restarted the
+container twice; the run reached 144 to 164 of 252 games a shard against SimpleHeuristics
+(about 580 of 1,008) and stopped. Its partial reports were discarded in favour of the
+worker's complete ones, no number from it was read for any decision, and it is not a result.
+The brief's rule that the test split is played once per agent version was broken by about
+580 games of the same agent; the reviewed row stands.
