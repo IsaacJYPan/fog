@@ -1,0 +1,352 @@
+{
+  "kind": "smoke",
+  "games": 200,
+  "commit": "a9b746fa9981ac3882cb16f57a0606b63f6b723e",
+  "aligned": 26215,
+  "missing_replay": 1129,
+  "missing_live": 0,
+  "fields": {
+    "action_features": {
+      "rows": 26215,
+      "exact": 0,
+      "max_difference": 2.0,
+      "exact_share": 0.0
+    },
+    "active_idx": {
+      "rows": 26215,
+      "exact": 26165,
+      "max_difference": 4.0,
+      "exact_share": 0.998092695021934
+    },
+    "decision_phase": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.base_stats": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.booster": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 1.0,
+      "exact_share": 0.9999618539004387
+    },
+    "entities.opponent.boosts": {
+      "rows": 26215,
+      "exact": 26210,
+      "max_difference": 0.3333333432674408,
+      "exact_share": 0.9998092695021934
+    },
+    "entities.opponent.counters": {
+      "rows": 26215,
+      "exact": 26213,
+      "max_difference": 0.125,
+      "exact_share": 0.9999237078008774
+    },
+    "entities.opponent.epistemic": {
+      "rows": 26215,
+      "exact": 26132,
+      "max_difference": 1.0,
+      "exact_share": 0.9968338737364104
+    },
+    "entities.opponent.fainted": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 1.0,
+      "exact_share": 0.9999618539004387
+    },
+    "entities.opponent.fallen": {
+      "rows": 26215,
+      "exact": 26198,
+      "max_difference": 0.6000000089406967,
+      "exact_share": 0.9993515163074576
+    },
+    "entities.opponent.hp": {
+      "rows": 26215,
+      "exact": 26194,
+      "max_difference": 0.33000004291534424,
+      "exact_share": 0.9991989319092123
+    },
+    "entities.opponent.is_active": {
+      "rows": 26215,
+      "exact": 26166,
+      "max_difference": 1.0,
+      "exact_share": 0.9981308411214953
+    },
+    "entities.opponent.is_mine": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.move_pp": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.paradox": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 1.0,
+      "exact_share": 0.9999618539004387
+    },
+    "entities.opponent.party_slot": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.status": {
+      "rows": 26215,
+      "exact": 26212,
+      "max_difference": 1.0,
+      "exact_share": 0.999885561701316
+    },
+    "entities.opponent.tera_type": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.tera_used": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.typing": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.vol_counters": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.volatiles": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.opponent.weight": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.base_stats": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.booster": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.boosts": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.counters": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.epistemic": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.fainted": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 1.0,
+      "exact_share": 0.9999618539004387
+    },
+    "entities.own.fallen": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 0.6000000238418579,
+      "exact_share": 0.9999618539004387
+    },
+    "entities.own.hp": {
+      "rows": 26215,
+      "exact": 1046,
+      "max_difference": 1.0,
+      "exact_share": 0.03990082014114057
+    },
+    "entities.own.is_active": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 1.0,
+      "exact_share": 0.9999618539004387
+    },
+    "entities.own.is_mine": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.move_pp": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.paradox": {
+      "rows": 26215,
+      "exact": 26210,
+      "max_difference": 1.0,
+      "exact_share": 0.9998092695021934
+    },
+    "entities.own.party_slot": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.status": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.tera_type": {
+      "rows": 26215,
+      "exact": 0,
+      "max_difference": 1.0,
+      "exact_share": 0.0
+    },
+    "entities.own.tera_used": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.typing": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.vol_counters": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.volatiles": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entities.own.weight": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "entity_ids": {
+      "rows": 26215,
+      "exact": 22452,
+      "max_difference": 598.0,
+      "exact_share": 0.8564562273507534
+    },
+    "field": {
+      "rows": 26215,
+      "exact": 26203,
+      "max_difference": 1.0,
+      "exact_share": 0.9995422468052642
+    },
+    "history": {
+      "rows": 26215,
+      "exact": 1384,
+      "max_difference": 1.0,
+      "exact_share": 0.05279420179286668
+    },
+    "history_ids": {
+      "rows": 26215,
+      "exact": 10638,
+      "max_difference": 912.0,
+      "exact_share": 0.4057982071333206
+    },
+    "history_len": {
+      "rows": 26215,
+      "exact": 10638,
+      "max_difference": 36.0,
+      "exact_share": 0.4057982071333206
+    },
+    "history_state": {
+      "rows": 26215,
+      "exact": 11975,
+      "max_difference": 1.0,
+      "exact_share": 0.45679954224680525
+    },
+    "label": {
+      "rows": 26215,
+      "exact": 26214,
+      "max_difference": 2.0,
+      "exact_share": 0.9999618539004387
+    },
+    "legality_mask": {
+      "rows": 26215,
+      "exact": 24865,
+      "max_difference": 1.0,
+      "exact_share": 0.9485027655922182
+    },
+    "opp_mask.ability": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "opp_mask.item": {
+      "rows": 26215,
+      "exact": 0,
+      "max_difference": 0.0,
+      "exact_share": 0.0
+    },
+    "opp_mask.move": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "opp_mask.species": {
+      "rows": 26215,
+      "exact": 26215,
+      "max_difference": 0.0,
+      "exact_share": 1.0
+    },
+    "opp_tokens": {
+      "rows": 26215,
+      "exact": 2469,
+      "max_difference": 663.0,
+      "exact_share": 0.09418271981689873
+    }
+  },
+  "live_history": {
+    "forced_decisions": 2566,
+    "turns_with_multiple_decisions": 2503,
+    "rows_with_overwritten_first_action": 21107,
+    "current_turn_excluded_at_replacement": 2566
+  }
+}

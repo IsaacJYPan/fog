@@ -1,0 +1,26 @@
+{
+  "input_training_games": 21797,
+  "input_training_rows": 1115358,
+  "newer_games_excluded": 203,
+  "validation_compositions": 141,
+  "games_affected": 1120,
+  "games_removed": 28,
+  "rows_removed": 36563,
+  "splits": {
+    "train_manifest": {
+      "games": 21769,
+      "rows": 1078795
+    },
+    "holdout_manifest": {
+      "games": 2000,
+      "rows": 103944
+    },
+    "train_20000": {
+      "games": 20000,
+      "rows": 989494
+    }
+  },
+  "skipped_oversized_subsets": [
+    100000
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "checked_at_utc": "2026-11-16T13:07:23.049736+00:00",
+  "command": "kaggle quota --format json; official client list/status of every owned job",
+  "owned_jobs": 99,
+  "status_counts": {
+    "RUNNING": 1,
+    "QUEUED": 1,
+    "COMPLETE": 65,
+    "ERROR": 29,
+    "CANCEL_ACKNOWLEDGED": 2,
+    "VERSION_ZERO_NO_SESSION": 1
+  },
+  "active_or_unknown_jobs": 2,
+  "quota": [
+    {
+      "resource": "GPU",
+      "used": "17.48h",
+      "remaining": "27.52h",
+      "total": "45.00h",
+      "refreshAt": "2026-11-21T00:00:00+00:00"
+    },
+    {
+      "resource": "TPU",
+      "used": "0.00h",
+      "remaining": "20.00h",
+      "total": "20.00h",
+      "refreshAt": "2026-11-21T00:00:00+00:00"
+    }
+  ]
+}

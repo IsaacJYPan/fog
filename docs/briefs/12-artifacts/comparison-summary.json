@@ -1,0 +1,129 @@
+{
+  "kind": "smoke",
+  "samples": 1000,
+  "seed": 12000,
+  "holdout_new_minus_old": {
+    "old_rows": {
+      "nll": {
+        "difference": 0.12102824697674536,
+        "interval95": [
+          0.11439194088923772,
+          0.1276673158619587
+        ]
+      },
+      "top1": {
+        "difference": -0.010803433762553653,
+        "interval95": [
+          -0.013814968771341161,
+          -0.007833399902542617
+        ]
+      }
+    },
+    "new_rows": {
+      "nll": {
+        "difference": -0.05846525178967245,
+        "interval95": [
+          -0.062360642627040046,
+          -0.05451759538503347
+        ]
+      },
+      "top1": {
+        "difference": 0.02260699254073426,
+        "interval95": [
+          0.019641015180154254,
+          0.02528220357062427
+        ]
+      }
+    },
+    "new_replacements": {
+      "nll": {
+        "difference": -0.053583801409694105,
+        "interval95": [
+          -0.060501671181810567,
+          -0.0472857001151342
+        ]
+      },
+      "top1": {
+        "difference": 0.04212360356667008,
+        "interval95": [
+          0.034331469230580315,
+          0.05079539575410132
+        ]
+      }
+    },
+    "nontrivial_replacements": {
+      "nll": {
+        "difference": -0.058281831468642006,
+        "interval95": [
+          -0.06571642186804952,
+          -0.05152150168354216
+        ]
+      },
+      "top1": {
+        "difference": 0.045816844100105905,
+        "interval95": [
+          0.03736833373641088,
+          0.055335689259591606
+        ]
+      }
+    }
+  },
+  "play": {
+    "old vs simpleheuristics": {
+      "score": 0.39,
+      "interval95": [
+        0.345,
+        0.4375
+      ],
+      "wins": 156,
+      "losses": 244,
+      "draws": 0
+    },
+    "old vs maxdamage": {
+      "score": 0.7575,
+      "interval95": [
+        0.7075,
+        0.8075
+      ],
+      "wins": 303,
+      "losses": 97,
+      "draws": 0
+    },
+    "new vs simpleheuristics": {
+      "score": 0.45,
+      "interval95": [
+        0.41,
+        0.49256249999999996
+      ],
+      "wins": 180,
+      "losses": 220,
+      "draws": 0
+    },
+    "new vs maxdamage": {
+      "score": 0.795,
+      "interval95": [
+        0.7525,
+        0.835
+      ],
+      "wins": 318,
+      "losses": 82,
+      "draws": 0
+    }
+  },
+  "play_new_minus_old": {
+    "simpleheuristics": {
+      "difference": 0.06,
+      "interval95": [
+        0.007437499999999956,
+        0.11249999999999999
+      ]
+    },
+    "maxdamage": {
+      "difference": 0.03750000000000009,
+      "interval95": [
+        -0.020000000000000018,
+        0.09756249999999997
+      ]
+    }
+  }
+}

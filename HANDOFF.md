@@ -5,6 +5,22 @@ It replaces the earlier 2026-11-16 handoff (`824a5f5`); sections 5 to 7 and 9 ar
 unchanged because they still hold. Facts are marked **[verified]** (measured, or read in the
 code or an artifact, evidence named) or **[assumed]**. Unmeasured numbers are never filled in.
 
+## November 17 update
+
+The ledger entries dated November 17 supersede the earlier status below.
+G0 and T1 passed on the replay-derived pools. A3 was recovered and evaluated;
+see the ledger for its filename, SHA-256 and private recovery instructions.
+Brief 12 is integrated. G20 completed all 18 epochs in 1.97 metered GPU-hours.
+Its best policy was epoch 14 (holdout NLL 1.4578). Its best value was epoch 3
+(Brier 0.2129, ECE 0.0083). The CPU stage compares the original and lead-trained
+policies before validation play. The account showed 24.47 GPU-hours available
+before the matched distillation job. The three cells use the same 498,959 rows.
+
+Network 3g won 13.72% against full-budget search. The eight-epoch narrow policy
+won 74.80% against SimpleHeuristics and 951/1,008 against A3. Its G3 teacher
+comparison is running on CPU. The fixed-team PPO learning check is also CPU-only.
+The queue and numbered reports identify the relevant branch and artifacts.
+
 ## 0. Start here
 
 1. Read this file, then `AGENTS.md`, `ROADMAP.md`, `docs/briefs/QUEUE.md`, `docs/briefs/REVIEW.md`, and
@@ -430,10 +446,10 @@ team (reported, not fixed).
 | Distillation rounds 0 to 2 and networks 0 to 2 | [verified]: 1,008 games a cell, one training seed each; play JSONs in `docs/briefs/15-artifacts/` |
 | Hosted GPU training equals CPU training | [verified] once: network 1 retrained on a T4, held-out cross-entropy 1.8286 against 1.829, top-1 56.6% against 56.7% |
 | Hosted CPU collection gives labels of the same quality | see the ledger; not verified if no row compares simulations per label and label-check agreement between machines |
-| Full test suite | last run 2026-11-14 (1,017 passed, 3 skipped, 3 expected failures, 1 failed); reviews since ran covering files only |
+| Full test suite | At 5ae77d6, 1,157 passed, nine skipped, three expected failures, and the historical league test failed because three checkpoint files were unavailable. |
 | Belief-loop fix and `skip_unweighted_belief` at scale or on a GPU | not verified (brief 13 uses the skip on a GPU) |
-| Replay models at scale on corrected rows | not run (brief 13) |
-| Whether lead training damages the policy | not measured (brief 13) |
+| Replay models at scale on corrected rows | G20 completed 18 epochs and its six validation cells. G2 passed. See the brief 13 report. |
+| Lead-stage retention at 20k games | The eight-epoch preview stage raised policy NLL by 0.02160. The original checkpoint played validation. |
 | Rust engine vs Showdown on terastallized Pokémon; Tera Stellar (not modelled); engine averaged damage roll; the Encore panic | not verified or not fixed; worlds that panic are dropped (0.17% of sampled worlds in the gate) |
 | Truncated-game scoring in PPO; information-isolation tests of the design doc | not verified |
 | The roadmap's gate thresholds | estimates [assumed] |

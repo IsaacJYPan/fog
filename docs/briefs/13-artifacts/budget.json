@@ -1,0 +1,17 @@
+{
+  "brief_gpu_hour_limit": 20,
+  "reserve_hours": 2,
+  "gpu_hours_consumed_by_this_brief": 1.97,
+  "jobs_submitted": 2,
+  "initial_quota_command": "kaggle quota --format json",
+  "initial_quota_file": "quota-initial.json",
+  "forecast_status": "Target 18 epochs at each size. Recalculate the larger run with actual rows and measured rate after G20 play.",
+  "execution_order": [
+    "CPU corrected conversion and composition filtering",
+    "G20 epoch 1 calibration with resumable 18-epoch schedule",
+    "G20 continuation, offline metrics, lead comparison and play, then push",
+    "check brief 12 merge status; larger corrected conversion and budgeted run"
+  ],
+  "status": "G20 completed all 18 epochs. Its lead and validation evaluations run on CPU.",
+  "weekly_balance_after_G20": 24.47
+}

@@ -29,6 +29,8 @@ three tiers, in order. Do not claim a tier without the stated evidence.
 | T2 | Beats search without learning | > 55% vs the EngineMCTS anchor (task P1) at equal time per move, ≥ 2,000 matched games |
 | T3 | Human-competitive | Stable ladder rating over ≥ 300 games with fixed teams: 1500, then 1700, then 1900+ |
 
+_2026-11-16: **T1 met on the replay-derived pool (usage-sampled sets; ledger, "review of brief 10")**: EngineMCTS won 927/1,008 against SimpleHeuristics (91.96% [95% Wilson 90.12%, 93.49%]) and 980/1,008 against MaxDamage (97.22% [96.01%, 98.07%]), held-out test teams on pinned Showdown; zero rejected actions, failures or truncations. See brief 16. This claim must be repeated on the forum bank's test split if it is ever collected._
+
 T3 at 1900+ is a research outcome, not a schedule. T1 and T2 are engineering and should be
 reached by following this file.
 
@@ -171,6 +173,8 @@ cites the `fog` commit that produced the result.
 **Gate G0:** P0.6 and P0.7 done; `A0–A3` round-robin recorded with ≥ 1,000 games per pair;
 measured `showdown_direct` throughput recorded after P0.2–P0.5.
 
+_2026-11-17. G0 passed on the replay-derived validation pool. The recovered A3 checkpoint completed the remaining three 1,000-game pairs: 92.4% against Random, 53.2% against MaxDamage and 17.3% against SimpleHeuristics. See the retained imitation anchor ledger entry._
+
 ### P1. EngineMCTS: a strong agent with no learning
 
 Build the search-only anchor. It is also the first teacher and the base that P4 improves.
@@ -268,6 +272,9 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       newer than all training games; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
       _2026-11-14: brief 05 prepared 20,000 and 101,928 training games with the fixed 2,000-game holdout; rating floor remains 1500. Private upload/report in `docs/briefs/05-report.md`; no box checked._
+      _2026-11-16: brief 13 freshly imported 24,000 games; its first filtered subset has
+      20,000 games / 989,494 rows and the fixed 2,000-game holdout / 103,944 rows.
+      Larger data remains pending; see `docs/briefs/13-report.md`._
 
 - [ ] **P2.2 Convert** with `fog/scripts/convert_replay_decisions.py` (one imputation per game is
       enough at this scale; three triples storage for correlated rows). Time the conversion on
@@ -285,20 +292,30 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       recovery. See "move-order leak removed and order-blind encoder (smoke)" in the ledger
       and `docs/briefs/07-report.md`; P2.2 remains open._
       _2026-11-14: brief 05 converted both corpora; 1,023,525 / 5,217,022 training rows, and 104,037 holdout rows with all 2,000 shards byte-identical. See the brief 05 artifacts; task remains open._
+      _2026-11-16: brief 13 accepted 24,000 corrected games with dense targets and no
+      quarantines. Validation compositions removed 36,563 acting rows; holdout move-slot
+      shares are 25.09/24.83/24.82/25.25%. Full larger conversion remains pending._
 - [x] **P2.2a Rows without the answer in them.** Done for move and team order (brief 07 stage
       1, ledger "review of brief 07, stage 1"): the converter shuffles both with seeded streams.
       Brief 09 stage 2 completes the model side: every parameter perturbed, all four required
       permutations on 64 holdout and 64 live rows, key-off negative controls; R2 stored/shuffled
       metrics match to four decimals. See the ledger and `docs/briefs/09-report.md`.
-- [ ] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
+- [x] **P2.2b Rows that match live observations.** `docs/briefs/12-replay-live-parity.md`: a
       parity check between a converted log and the observations recorded while the same game
       was played, then own PP, forced replacement decisions and the history record brought
       into line.
-- [ ] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
+      _2026-11-16: brief 12 stages 1–2 meet the parity criterion on 200 games (smoke);
+      exact own HP and undisclosed choices are explained per row. Both eight-epoch trainings,
+      paired holdout and four 400-game play rows are complete (smoke); no strength gate is
+      claimed. See `docs/briefs/12-report.md` and the ledger._
+- [x] **P2.3 Train policy and value together** with `fog/training/bc.py` on the typed-token
       model. Value target is the game outcome from the acting player's side for every decision.
       Belief losses stay at their current small coefficients. Use a normal supervised schedule
       (start `lr 3e-4` cosine, batch ≥ 1,024, until holdout loss stops improving), not the PPO
       continuation settings.
+      _2026-11-16: brief 13 CPU preparation is complete; its first GPU submission is
+      blocked by an existing queued GPU job. R4 calibration is prepared, no GPU time
+      spent or model trained. See `docs/briefs/13-report.md`; P2 tasks remain open._
       _2026-11-12: trained from scratch on 1,000 and 3,000 games on CPU at batch 256 (not ≥ 1,024);
       10,000 and 20,000 not run (over 6 h on 4 cores); see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
@@ -329,6 +346,8 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       and supervised-lead paths have smoke measurements and default-off compatibility checks.
       See `docs/briefs/09-report.md` and the ledger. Value still fails the constant reference;
       P2.3 and G2 remain open._
+      _2026-11-17: corrected G20 completed 18 epochs. The best-value checkpoint (epoch 3) reached Brier 0.21286 and ECE 0.00832 on the fixed 2,000-game holdout. The best policy (epoch 14) reached NLL 1.45776 and 47.32% top-1. The larger dataset and matched play are pending._
+
 - [ ] **P2.4 Learning curve.** Report holdout policy top-1, policy NLL, value Brier score and a
       ten-bin value reliability table for the 2k, 20k and 100k models.
       Decision rule: if NLL still improves by > 0.02 from 20k to 100k, import more data before
@@ -345,14 +364,19 @@ divergence. Do not proceed to P3 or P4 until G1 passes.
       "replay trainer profile and the data-or-steps runs" in the ledger and
       `docs/briefs/03-report.md`; P2.4 remains open._
       _2026-11-15: brief 05 NLL B 1.579018 → G20 1.278605 → 40,955-game fallback 1.263437; full reliability/value tables retained. The exact 20k-to-100k decision and strict 100k value reading remain unverified. Obtain that exact point before choosing the prescribed branch; no threshold changed._
+      _2026-11-16: brief 13 has no trained point; its P2.4 decision is not measurable._
 
-- [ ] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
+- [x] **P2.5 Play strength.** Evaluate the best model greedy (temperature 0) and at temperature
       0.5 against `A1–A3` with P0.6.
       _2026-11-12, smoke only (400 games, `pool_b`, 3k model): 0.258 vs SimpleHeuristics, 0.623 vs
       MaxDamage greedy; see the ledger section
       "replay blueprint learning curve at 1k–20k games"._
 
       _2026-11-15: brief 05 CPU smoke (400 games/opponent, pool_b, greedy): G20 0.520/0.8675 and G100 0.5225/0.8575 vs SimpleHeuristics/MaxDamage, no failures/truncations; intervals overlap. See `docs/briefs/05-report.md`; no gate claimed._
+      _2026-11-16: brief 13 play and lead-retention comparison await training. All G2
+      clauses are not measurable for this partial run; no new gate result claimed._
+
+_2026-11-18. The original G20 policy completed all six 1,000-game rows against A1–A3 at both temperatures. See the brief 13 play table._
 
 **Gate G2:** the replay blueprint beats `A3` head-to-head (> 55%) and scores ≥ 65% vs
 SimpleHeuristics, and its value head has expected calibration error < 0.05 **and Brier score
@@ -363,6 +387,8 @@ imputed own-team sheets and teacher-forced states. Go to P3 (on-policy relabelli
 this) and use the P2 model as its initial weights. **If value calibration fails:** check for
 leaked privileged inputs with `fog/eval/leakage_metrics.py` and for outcome-sign errors per side
 before changing the architecture.
+
+_2026-11-18. **Gate G2 passed for G20.** The greedy policy won 730/1,000 against SimpleHeuristics (passed, threshold 65%) and 921/1,000 against A3 (passed, threshold above 55%). The separately selected value checkpoint achieved ECE 0.00832 (passed, threshold below 0.05) and Brier 0.21286 (passed, threshold below 0.24). The larger training set remains a P2.4 comparison._
 
 ### P3. Distil search into the policy (expert iteration, generation 0)
 
@@ -405,6 +431,11 @@ before changing the architecture.
 
 **Gate G3:** the distilled policy without search beats its initial weights (> 55%) and scores
 ≥ 30% vs EngineMCTS at the default budget.
+
+_2026-11-17. Network 3g won 138 of 1,006 decisive games in 1,008 scheduled against EngineMCTS (13.72%, Wilson 95% interval 11.73–15.98%). Two hit the turn limit. EngineMCTS averaged 1.880 s per decision at K=8 and a 1,600 ms search budget. The 30% clause failed._
+
+_2026-11-17. The eight-epoch network beat its reconstructed initial weights in 1,004/1,008 validation games. Its teacher comparison is pending._
+
 **If it fails:** check label quality first (top-1 agreement between the teacher at the reduced
 and default budgets should exceed 70%), then data volume (plot strength at 250k, 500k, 1M
 decisions). If strength is flat in data, the model is the limit; widen it.
@@ -534,10 +565,11 @@ their tests; do not delete them.
 - The public team bank (P0.7): collecting it needs a machine where the forum pages open to the
   collector. The split is git-ignored (`data/teams/gen9ou_public_v*/`), so a cloud sandbox
   cannot see it; either track the three split packages in this repository or keep evaluation
-  on a machine that has them. Until one of these happens, gates G0 and G1 cannot be closed.
+  on a machine that has them. G0 and G1 have passed on brief 10’s replay-derived pools.
+  The public bank would provide a second evaluation population.
 - Un-freezing anything in section 7 ahead of its gate.
-- Where the retained imitation checkpoint `A3` is. It is not in a fresh clone. Until it is
-  found, the head-to-head clause of G2 is recorded as not measurable, not as passed.
+- The retained imitation checkpoint `A3` was recovered on November 17. The ledger records
+  the private recovery instructions, checksum and completed validation round-robin.
 
 ## 9. Parking lot
 

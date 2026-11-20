@@ -1,0 +1,8 @@
+{
+  "kind": "smoke",
+  "games": 2000,
+  "common_normal_rows": 95988,
+  "new_replacement_rows": 19514,
+  "nontrivial_replacement_rows": 17941,
+  "label_disagreements": 0
+}

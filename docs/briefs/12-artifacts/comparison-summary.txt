@@ -1,0 +1,49 @@
+"""Summarize paired diagnostic differences; run after stage3-driver.txt completes."""
+import json
+from pathlib import Path
+
+import numpy as np
+
+art = Path('docs/briefs/12-artifacts')
+holdout = json.loads((art / 'holdout-comparison.json').read_text())
+play = json.loads((art / 'play.json').read_text())
+assert play['status'] == 'complete' and len(play['rows']) == 4
+assert sum(g['label_disagreements'] for g in holdout['per_game']) == 0
+summary = {'kind': 'smoke', 'samples': 1000, 'seed': 12000,
+           'holdout_new_minus_old': {}, 'play': {}, 'play_new_minus_old': {}}
+rng = np.random.default_rng(12000)
+draws = rng.integers(0, holdout['games'], (1000, holdout['games']))
+for view in ('old_rows', 'new_rows', 'new_replacements', 'nontrivial_replacements'):
+    old = np.asarray(holdout['game_sums'][f'old_model_{view}'])
+    new = np.asarray(holdout['game_sums'][f'new_model_{view}'])
+    assert np.array_equal(old[:, 0], new[:, 0])
+    estimates = {}
+    for column, metric in ((1, 'nll'), (2, 'top1')):
+        point = (new[:, column].sum() - old[:, column].sum()) / old[:, 0].sum()
+        samples = ((new[draws, column].sum(1) - old[draws, column].sum(1))
+                   / old[draws, 0].sum(1))
+        estimates[metric] = {'difference': float(point),
+                             'interval95': np.quantile(samples, [.025, .975]).tolist()}
+    summary['holdout_new_minus_old'][view] = estimates
+
+# Keep each four-game team/side block intact, sharing draws across both policies.
+draws = rng.integers(0, 100, (1000, 100))
+resampled = {}
+for row in play['rows']:
+    assert row['completed_games'] == 400 and row['failures'] == 0
+    assert row['truncated'] == 0 and len(row['game_scores']) == 400
+    blocks = np.asarray(row['game_scores'], dtype=float).reshape(100, 4).mean(1)
+    assert np.isfinite(blocks).all()
+    samples = blocks[draws].mean(1)
+    resampled[row['label']] = samples
+    summary['play'][row['label']] = {
+        'score': float(blocks.mean()),
+        'interval95': np.quantile(samples, [.025, .975]).tolist(),
+        'wins': row['a_wins'], 'losses': row['b_wins'], 'draws': row['true_draws']}
+for opponent in ('simpleheuristics', 'maxdamage'):
+    old, new = f'old vs {opponent}', f'new vs {opponent}'
+    summary['play_new_minus_old'][opponent] = {
+        'difference': summary['play'][new]['score'] - summary['play'][old]['score'],
+        'interval95': np.quantile(resampled[new] - resampled[old], [.025, .975]).tolist()}
+(art / 'comparison-summary.json').write_text(json.dumps(summary, indent=2) + '\n')
+print(json.dumps(summary, indent=2))

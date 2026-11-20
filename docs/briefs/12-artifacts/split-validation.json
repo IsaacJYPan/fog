@@ -1,0 +1,11 @@
+{
+  "kind": "smoke",
+  "games": 22000,
+  "rows": 1244604,
+  "canonical_train_order_matches": true,
+  "fixed_holdout_ids_match": true,
+  "train_games": 1000,
+  "holdout_games": 2000,
+  "training_conversion_version": 12,
+  "source": "87e85e6"
+}

@@ -1,0 +1,32 @@
+{
+  "kind": "smoke",
+  "prediction_rows": 1024,
+  "backward_rows": 256,
+  "threads_compared": [
+    2,
+    4
+  ],
+  "absolute_tolerance": 1e-05,
+  "all_arrays_equivalent": true,
+  "inputs_bit_identical": true,
+  "errors": {
+    "predictions": {
+      "arrays": 16,
+      "max_absolute_difference": 5.7220458984375e-06
+    },
+    "gradients": {
+      "arrays": 247,
+      "max_absolute_difference": 2.2351741790771484e-07
+    },
+    "loss": {
+      "arrays": 1,
+      "max_absolute_difference": 2.384185791015625e-07
+    },
+    "inputs": {
+      "arrays": 216,
+      "max_absolute_difference": 0.0
+    }
+  },
+  "model_keys_optimizer_batch_order_seed_unchanged": true,
+  "reason": "use all four available CPU cores for new training; no completed new epoch discarded"
+}

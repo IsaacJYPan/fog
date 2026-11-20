@@ -3765,3 +3765,730 @@ machines, one process a core) and two further trainings (eight epochs; twice the
 still running and will be recorded, but none of them is expected to change this. What to do
 about P4, which the roadmap opens only after G2 or G3, is the owner's decision
 (`HANDOFF.md` section 4).
+
+
+## 2026-11-16: EngineMCTS on the test teams (tier T1)
+
+Brief 16, branch `work/t1-search`, source `79283c9d780448edfc1938aa90642fb87a211bbe`.
+CPU only, AMD EPYC 9V74 with a four-core quota, Python 3.12.14, locked dependencies,
+pinned Showdown `e440c4a18385274f10c405d0b158b6a962ce6d94`. No code changes.
+The prescribed one-attempt measurement started at about 12:52 UTC and is still running.
+The first checkpoint is partial smoke, not a T1 result; no opponent has completed.
+Shard JSONs save complete four-game blocks; re-run the exact command to resume, never
+restart with different settings. No other workload runs during the matches.
+
+Command:
+
+```sh
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4
+```
+
+Environment and the preflight result (15 tests passed) are in
+`docs/briefs/16-artifacts/environment.json`. Per-opponent results will be appended below
+when complete. The teams are the replay-derived pool with usage-sampled sets, subject
+to the limits in "review of brief 10"; any tier claim must be repeated on the forum
+bank's test split if it is ever collected.
+
+### SimpleHeuristics complete
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | mcts | simpleheuristics | showdown_direct | 1008 | 0.920 [0.901, 0.935] (927-81-0) | 1.812 | 102/27956 | `79283c9` | `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4` |
+
+The row is pooled from all four completed SimpleHeuristics shard rows in
+`16-artifacts/simpleheuristics-summary.json`. MaxDamage is still running.
+
+### Both opponents complete: tier T1 met on the replay-derived test pool
+
+The one prescribed run finished on 2026-11-16, at about 19:46 UTC. Both measured
+rates meet their T1 thresholds: 927/1,008 (91.9643%) against SimpleHeuristics and
+980/1,008 (97.2222%) against MaxDamage. There are zero rejected actions, failed
+games, draws or truncations in either row. These are held-out test teams, with
+four-game matched blocks, 1,008 games per opponent, on pinned Showdown.
+
+The two printed pooled rows (`16-artifacts/merged-output.txt`):
+
+| Date | Candidate | Opponent | Backend | Games | Win rate [95%] | s/decision | Fallbacks | Commit | Command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-16 | mcts | simpleheuristics | showdown_direct | 1008 | 0.920 [0.901, 0.935] (927-81-0) | 1.812 | 102/27956 | `79283c9` | `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4 (4 shards merged, seeds 16000, 16001, 16002, 16003)` |
+| 2026-11-16 | mcts | maxdamage | showdown_direct | 1008 | 0.972 [0.960, 0.981] (980-28-0) | 1.849 | 63/24039 | `79283c9` | `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 .venv/bin/python -m fog.eval.run_shards --shards 4 --games 1008 --seed 16000 --out-dir docs/briefs/16-artifacts/test -- --pool data/teams/replay_v1/test --device cpu --controller mcts=fog.search.engine_mcts:showdown_controller --controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}' --opponent simpleheuristics --opponent maxdamage --max-turns 800 --progress-every 4 (4 shards merged, seeds 16000, 16001, 16002, 16003)` |
+
+Machine: AMD EPYC 9V74, four-core quota, CPU only. Measured seconds per decision:
+1.812340 against SimpleHeuristics and 1.849241 against MaxDamage. Fallbacks:
+102/27,956 (0.3649%) and 63/24,039 (0.2621%). The existing handled Encore engine
+panic dropped 816 and 504 worlds; the all-worlds-failed path accounted for the
+102 and 63 fallbacks. These are controller counters, not failed games. No changes
+or tuning were made in response.
+
+Source remained `79283c9d780448edfc1938aa90642fb87a211bbe`: every commit during the
+run changes only documentation and artifacts. Seeds 16000–16003, K=8,
+`budget_ms=1600`, one search thread, max turns 800, no sequential stop. No other
+workload ran during the matches; the 15 preflight tests ran before them.
+Tool-session reconnections left the four original match processes running, so
+no match command was resumed or replayed. The runner did not emit `merged.json`;
+after all shards completed, only the existing merger was invoked:
+
+```sh
+.venv/bin/python -m fog.eval.merge_selection_reports   docs/briefs/16-artifacts/test/shard_0.json   docs/briefs/16-artifacts/test/shard_1.json   docs/briefs/16-artifacts/test/shard_2.json   docs/briefs/16-artifacts/test/shard_3.json   --out docs/briefs/16-artifacts/test/merged.json   --command "<exact contents of docs/briefs/16-artifacts/command.txt>" --commit 79283c9
+```
+
+`merge_reports` reproduces `test/merged.json` exactly from the four complete shard
+JSONs; its SimpleHeuristics row also equals the previously pushed opponent summary.
+Shard logs are copied verbatim to the adjacent `.txt` files. No test-team game was
+inspected to tune the agent. No application code changed; no further match run
+or full test suite was needed.
+
+Validation reference (brief 11, source `aa38e46`): SimpleHeuristics 936/1,008,
+92.86% [91.10%, 94.29%], 0.19% fallbacks, 1.801 s/decision; MaxDamage 981/1,008,
+97.32% [96.13%, 98.15%], 0.17% fallbacks, 1.814 s/decision. Both validation rows
+also have zero rejected actions, failed games or truncations.
+
+This T1 result is for the replay-derived pool with usage-sampled sets (see
+"review of brief 10"). It must be repeated on the forum bank's test split if
+that bank is ever collected. Gate thresholds are unchanged.
+
+## 2026-11-17: review of brief 16
+
+The original held-out run finished on `work/t1-search` before a second machine
+started the same seeds. The later checkpoint (`0165430`) has 20, 24, 28 and
+32 games in progress in its four shards. Only the first run contributes to T1.
+No test games were played during review.
+
+At source `79283c9`, the first run won 927/1,008 against SimpleHeuristics
+and 980/1,008 against MaxDamage. Pinned Showdown, pool, seed, time budget and
+four-game block design match brief 16. Rerunning
+`python -m fog.eval.merge_selection_reports docs/briefs/16-artifacts/test/shard_{0,1,2,3}.json --out /tmp/t1.json`
+reproduced the stored protocol and both complete rows exactly. Concatenating
+the four sets of scores and controller counters also reproduced every stored
+game in order. The result applies to the 62 replay-derived test teams.
+
+The 15 tests in `test_engine_mcts.py` and `test_showdown_engine_mcts.py`
+passed, and Ruff passed. The installed battle-client dependency hung on
+interpreter exit after the bare pytest run. Repeating with the brief 12
+launcher workaround (unregistering its exit callback) returned zero.
+
+## 2026-11-16: replay blueprint at scale on corrected rows
+
+Brief 13, branch `work/p2-scale-corrected`, source `79283c9`. **In progress;
+no training or strength result.** Briefs 08 and 09 are merged. Model, loss and
+trainer source are unchanged. Preparation uses the merged terminal-target converter.
+
+| Measurement | Result | Command/evidence |
+| --- | --- | --- |
+| Initial GPU quota | 17.48 h used, 27.52 h remaining of 45.00; reset 2026-11-21 00:00 UTC | `kaggle quota --format json`; `13-artifacts/quota-initial.json` |
+| First CPU import | 24,000 games, rating ≥1500, after 2024-02-01, pinned source | Full command in `13-artifacts/preparation.json`; `first-import.json` |
+| Source checks | 24 passed, 4 skipped for absent replay fixtures; Ruff passed | `13-artifacts/source-tests.txt`, `ruff.txt` |
+| Composition-filter checks | 2 passed: acting side only, multiset/order invariance, aligned arrays, preview masking, no-exclusion equality | `13-artifacts/test_prepare_split.py`, `split-tests.txt` |
+
+The resumable CPU split helper writes separate filtered shards. It compares the
+acting submitted species multiset against `replay_v1/validation`; matching preview
+records are masked while retaining the two-slot format the existing lead loader
+requires. Holdout rows are unchanged. The first GPU job template reuses brief 05's
+resume/export logic, selects R4, batch 1,024 and the required zero-belief overrides.
+It stops after one trained epoch of an 18-epoch schedule to measure throughput.
+Checkpoint scoring is kept off the metered GPU session. No job submitted yet;
+the 20-hour budget, two-hour reserve and first-stage-before-larger ordering hold.
+
+Conversion/split totals, slot diagnostics, GPU throughput, the larger-set forecast,
+training, lead retention, checkpoint export and play are pending. No P2 box ticked;
+P2.4 and all G2 clauses are not measurable from this preparation checkpoint.
+
+### CPU stage complete; first GPU submission blocked
+
+Application bytes remain `79283c9` / pushed `7d17e1a` (no changes under `fog`,
+`configs` or `tests`). Conversion completed with `--resume` on four CPU cores.
+No GPU job was submitted; brief usage is **0 h**, with its 20 h cap and 2 h reserve intact.
+
+| Measurement | Result | Evidence / command |
+| --- | --- | --- |
+| Corrected conversion | 24,000 games; 1,229,877 decision rows; zero quarantines; 48,000 preview records | `13-artifacts/first-conversion.json`; preparation command above |
+| Fixed holdout | Exact 2,000 IDs; 103,944 stored rows; 103,933 policy-eligible rows | `first-split.json`, `holdout-rows.json`; `data-commands.json` |
+| Composition exclusion, before nested selection | 36,563 acting rows removed across 1,120 games; 28 whole games removed; 141 forbidden validation compositions | `first-split.json`; `prepare_split.py` |
+| Remaining eligible training | 21,769 games / 1,078,795 rows; 203 newer games excluded before filtering | `first-split.json` |
+| First nested subset | 20,000 games / 989,494 rows | `first-split.json` |
+| Holdout move-slot labels | 25.0945 / 24.8340 / 24.8180 / 25.2535%; unmoved slot 0: 24.6984% | `holdout-rows.json`; `fog.eval.replay_slot_order_check`, full command in `data-commands.json` |
+| Per-side outcome signs | All 103,944 holdout rows agree with protocol winners | `holdout-signs.json`; full command in `data-commands.json` |
+| CPU archive | 535,989,932 bytes; SHA-256 in file; no raw logs or checkpoints | `first-package.json`; reproducible `prepare_package.py` |
+| Split helper tests | 3 passed, including real G20-prefix preservation when the import grows | `split-tests.txt`, `test_prepare_split.py` |
+| Account-wide scheduling check | 99 jobs: 1 RUNNING, 1 QUEUED, 65 COMPLETE, 29 ERROR, 2 CANCEL_ACKNOWLEDGED, 1 version-zero draft with no session | `initial-job-status.json`; `account_guard.py` |
+
+The sign check first rejected a valid five-member-team preview. The diagnostic was
+corrected to retain absent slots as -1; its retry passes all 2,000 games, including
+two with fewer than six members. No converter, model, loss or trainer change was
+needed. The failed command and traceback remain in `data-commands.json` and
+`holdout-signs-initial-error.txt`. No threshold or row comparison was relaxed.
+
+The account's **`fog-distill-train-gpu` is QUEUED and GPU-enabled**;
+**`fog-distill-collect-a` is RUNNING and CPU-only** (`active-jobs.json`, with a later
+status recheck). The GPU quota is still **27.52 h remaining of 45 h**, reset
+2026-11-21 00:00 UTC. Neither existing job was changed. The one-GPU-job rule prevents
+a second submission while the separate GPU job is queued. Calibration is concretely
+prepared in `calibration-plan.json`: R4, 1,024 batch, zero belief weights/skip, one
+trained epoch of an 18-epoch resumable schedule, estimated 0.35 h from brief 08's
+different-recipe rate, hard cap 1 h. This is a forecast, not a throughput result.
+
+Continue by resolving that occupied GPU slot, reading fresh quota, and submitting
+the first calibration job. The larger set must retain these G20 IDs as its prefix
+(`prepare_split.py --prefix-manifest`), and must await completed G20 training, lead
+retention, play and a pushed report. No checkpoints exist yet. Training, lead
+retention, larger-set choice, P2.4 and every G2 clause remain **not measurable**.
+
+### Prepared inputs retained off the runtime; GPU decision still pending
+
+The 535,989,932-byte archive is now **ready in private Kaggle storage, version 1**.
+A separate authenticated download verified its full SHA-256 against
+`first-package.json`; `input-retention.json` is the sanitized receipt. No account
+or private dataset name is committed. On a configured official-client environment:
+
+```sh
+python docs/briefs/13-artifacts/download_inputs.py --out runs/brief13/recovered
+```
+
+The helper finds the owned private archive by file size and SHA-256 rather than
+publishing a dataset name, and retains its reference only under the ignored output
+directory. Dataset totals include service metadata, so matching uses the individual
+file's byte count. The recovered archive needs no CPU reconversion.
+
+The first upload attempt was rejected by automatic approval review as insufficiently
+authorized external export from a supposedly private repository. Before retrying,
+GitHub's API confirmed `private=false`; all 24,000 converted shards were checked
+to contain only numeric tensors and public species/static-label strings, with no
+source code, credentials or checkpoints in the archive. Brief 13 explicitly reuses
+brief 05, whose stage 0 requires a private upload. With that evidence the same upload
+passed review and completed. No alternative destination or bypass was used.
+
+The final job-status recheck still finds the separate GPU job QUEUED and its CPU
+collector RUNNING (`blocking-job-final.json`). Fresh quota is in `quota-final.json`.
+The owner has been asked whether to leave that GPU job queued or cancel it to give
+brief 13 priority. No cancellation or GPU submission has occurred; usage remains
+**0 h**. This is a partial brief awaiting that scheduling decision, not a completed
+training or gate result.
+
+### Source-test process shutdown limitation (no application change)
+
+The final process check found that the original source test command had printed
+**24 passed / 4 skipped** but had not exited. It was terminated at cleanup, so
+that row describes the assertion summary, **not a successful process exit**.
+With the corrected holdout supplied through `FOG_ORDER_BLIND_HOLDOUT`, the same
+four test files report **28 passed, no skips**, and `pytest.main` returns zero.
+Interpreter shutdown then hangs in the installed `poke_env` dependency:
+`__clear_loop -> __stop_loop -> shutdown.result()` (line 23). The 60-second
+watchdog dumped that stack and exited with code 1. Literal output and lifecycle
+results are in `source-tests-holdout.txt` and `source-tests-lifecycle.json`.
+The three split tests exit normally; Ruff is clean. No source or dependency was
+changed to mask the shutdown issue. Clean source-suite process exit and later
+acting-CLI shutdown remain unverified; training and play have not run.
+
+## 2026-11-17: review of brief 13 data preparation
+
+Recovered the 535,989,932-byte input archive with
+`python docs/briefs/13-artifacts/download_inputs.py --out <private-folder>`.
+Its SHA-256 matches `first-package.json`. After relocating manifests, all three
+game and row counts match `first-split.json`. Every shard path resolves, and
+the 2,000 holdout IDs match the fixed split. The 20,000 selected games contain
+989,494 training decisions. The split-filter tests passed (3 cases). Conversion
+was not repeated. Source for these data is `7d17e1a`.
+
+The inventory of 105 owned notebooks found no active session. The GPU quota
+before calibration was 26.44 h of 45 h. Submitted one private job using
+`13-artifacts/gpu_job.py` with the recorded source, stopping after the first
+epoch of the 18-epoch schedule. Platform timeout is one hour, including setup
+and export. See `13-artifacts/calibration-preflight.json`. G2 remains open.
+
+
+## 2026-11-17: distilled policy against full-budget search (G3)
+
+Recovered both completed CPU jobs at source `1b9a9ed`. The four reports used
+the same network, validation pool and controller, with seeds 15400 through
+15403. The configured search budget was K=8, 1,600 ms and one search thread.
+Each job ran two shards. No matches were replayed in review.
+
+| Policy | Opponent | Scheduled | W–L | Turn-limit games | Win rate, decisive games (95% Wilson) | Opponent seconds/decision |
+| --- | --- | ---: | ---: | ---: | --- | ---: |
+| Network 3g, greedy | EngineMCTS | 1,008 | 138–868 | 2 | 13.72% (11.73–15.98%) | 1.880 |
+
+Even counting both unfinished games as wins gives 140/1,008 (13.89%).
+The G3 teacher clause requires 30%. There were zero rejected actions and
+12 fallbacks across 36,589 teacher decisions. This run did not compare the
+policy with its initial weights. P4 remains gated by the roadmap.
+
+Command: `python -m fog.eval.run_shards --shards 4 --games 1008 --seed 15400
+--out-dir net3g-vs-mcts -- --pool data/teams/replay_v1/validation --device cpu
+--config configs/search_distill_cpu.yaml --checkpoint net3g=net3g.pt
+--controller mcts=fog.search.engine_mcts:showdown_controller
+--controller-kwargs 'mcts={"k":8,"budget_ms":1600,"threads":1}'
+--opponent mcts --max-turns 300 --progress-every 40` (two shard pairs, `--only 0,1` and `--only 2,3`).
+The four files were pooled with `fog.eval.merge_selection_reports`.
+`docs/briefs/17-artifacts/net3g-vs-search.json` preserves the protocol,
+per-game scores and controller counters. The private checkpoint path was
+shortened to its filename.
+
+## 2026-11-16: replay rows against live observations (smoke)
+
+Brief 12, stage 1, source `79283c9`. CPU only, pinned Showdown `e440c4a`; random R4 weights, seed 12000, `data/teams/pool_b`. All numbers in this section are smoke.
+
+Command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.replay_live_parity --games 200 --out runs/replay-parity/baseline --report docs/briefs/12-artifacts/parity-before.json`. The wrapper avoids a local poke-env exit-callback hang; it changes no model input or action. Completed games resume individually.
+
+The tool captures actual forward-call tensors, reconstructs with true own sheets in played order, then uses `rows_to_arrays` and the training batch loader. Alignment uses side, turn, request phase and decision ordinal; histories are front-padded to a common window for comparison, without restoring records truncated by training. True sheets are confined to this diagnostic.
+
+Baseline: 24,149 aligned rows, 3,195 live decisions without a replay row, no reverse omissions; all 200 games completed. 2,566 live replacement requests; 21,107 live rows contain a first action overwritten by a later replacement. Both paths exclude current-turn history at replacements; preserving that live rule is deliberate.
+
+| Field (smoke) | Exact row share before | Largest difference |
+| --- | ---: | ---: |
+| `action_features` | 0.000000 | 2 |
+| `entities.opponent.epistemic` | 0.996936 | 1 |
+| `entities.own.hp` | 0.037641 | 1 |
+| `entities.own.move_pp` | 0.000000 | 1 |
+| `entities.own.tera_type` | 0.000000 | 1 |
+| `entity_ids` | 0.000000 | 674 |
+| `history` | 0.047662 | 1 |
+| `history_ids` | 0.408920 | 912 |
+| `history_len` | 0.408920 | 36 |
+| `history_state` | 0.458942 | 1 |
+| `label` | 0.979419 | 12 |
+| `legality_mask` | 0.943683 | 1 |
+| `opp_mask.item` | 0.000000 | 0 |
+| `opp_tokens` | 0.095780 | 663 |
+
+All other named entity blocks, field vector, active index and decision phase match on every aligned row. Item masks are all-true live and omitted by the loader; the zero numerical difference is a representation difference. Detailed per-game/per-row mismatches are in `12-artifacts/parity-before.json`.
+
+Checks: `12-artifacts/tests-stage1.txt` (three tests pass), `ruff-stage1.txt` (clean). Same-machine baseline digests are in `digest-*-before.txt`. Stages 2 and 3 remain open.
+
+### Stage 2: parity fixes (smoke)
+
+Code source `9e3f579` (the substantive converter/history changes are `1d8a7fc`, `76af82e` and `87e85e6`). Fresh live reference recordings use the corrected first-action history helper; random R4 weights, seed 12000 and the same 200-game schedule. All 200 games completed.
+
+Commands: the stage-1 command with `--out runs/replay-parity/after --report docs/briefs/12-artifacts/parity-after.json`, then `python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.replay_live_parity --games 200 --workers 2 --compare-only --out runs/replay-parity/after --report docs/briefs/12-artifacts/parity-final.json`.
+
+Own PP is retained from chronological poke-env move bookkeeping, including revealed Pressure; sampled own state is no longer passed through a public-mirror downgrade. Unused own Pokemon start full, original items follow nickname aliases, public Trick item reveals refresh current items, and the pre-activation Tera representation matches live requests. Request inference handles PP exhaustion, choice locks, Encore, Taunt and Assault Vest. Every replacement is retained, including one-legal-switch rows (zero policy CE, valid outcome target). Tera Ogerpon send-outs use submitted species identity.
+
+The only live behavior change is `record_history_decision`: a later forced switch preserves the first submitted action, while normal unavailable-choice retries can still update it. Replay and live both retain one history record per turn and exclude the current turn at replacements. Serialized history now keeps the live 60-turn window; explicit request phase survives both loaders, including normal Struggle requests that also offer switches. The conversion resume version is 12.
+
+Final: 26,143 aligned rows, 1,201 live normal decisions without an accepted public replay label, no reverse omissions; all 2,566 replacement requests align. Overwritten-history rows fall from 21,107 to zero. Every requested field exceeds 99.5% exact matches except own HP and history, whose differences are explained per row. Raw action-feature and explicit/implicit item-mask differences are also explained per row. The eleven R4 candidate columns match on 99.904372% of rows.
+
+| Field (smoke) | Exact before (24,149 aligned) | Exact after (26,143 aligned) | Max difference after |
+| --- | ---: | ---: | ---: |
+| `action_features` | 0.000000 | 0.000000 | 1.3 |
+| `action_features.mechanical` | not measured | 0.999044 | 1 |
+| `active_idx` | 1.000000 | 0.998126 | 4 |
+| `decision_phase` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.base_stats` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.booster` | 1.000000 | 0.999962 | 1 |
+| `entities.opponent.boosts` | 1.000000 | 0.999809 | 0.333333 |
+| `entities.opponent.counters` | 1.000000 | 0.999923 | 0.125 |
+| `entities.opponent.epistemic` | 0.996936 | 0.999962 | 1 |
+| `entities.opponent.fainted` | 1.000000 | 0.999962 | 1 |
+| `entities.opponent.fallen` | 1.000000 | 0.999350 | 0.6 |
+| `entities.opponent.hp` | 1.000000 | 0.999197 | 0.33 |
+| `entities.opponent.is_active` | 1.000000 | 0.998126 | 1 |
+| `entities.opponent.is_mine` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.move_pp` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.paradox` | 1.000000 | 0.999962 | 1 |
+| `entities.opponent.party_slot` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.status` | 1.000000 | 0.999885 | 1 |
+| `entities.opponent.tera_type` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.tera_used` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.typing` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.vol_counters` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.volatiles` | 1.000000 | 1.000000 | 0 |
+| `entities.opponent.weight` | 1.000000 | 1.000000 | 0 |
+| `entities.own.base_stats` | 1.000000 | 1.000000 | 0 |
+| `entities.own.booster` | 1.000000 | 1.000000 | 0 |
+| `entities.own.boosts` | 1.000000 | 1.000000 | 0 |
+| `entities.own.counters` | 1.000000 | 1.000000 | 0 |
+| `entities.own.epistemic` | 1.000000 | 1.000000 | 0 |
+| `entities.own.fainted` | 1.000000 | 1.000000 | 0 |
+| `entities.own.fallen` | 1.000000 | 1.000000 | 0 |
+| `entities.own.hp` | 0.037641 | 0.109207 | 0.00997543 |
+| `entities.own.is_active` | 1.000000 | 1.000000 | 0 |
+| `entities.own.is_mine` | 1.000000 | 1.000000 | 0 |
+| `entities.own.move_pp` | 0.000000 | 1.000000 | 0 |
+| `entities.own.paradox` | 1.000000 | 0.999809 | 1 |
+| `entities.own.party_slot` | 1.000000 | 1.000000 | 0 |
+| `entities.own.status` | 1.000000 | 1.000000 | 0 |
+| `entities.own.tera_type` | 0.000000 | 1.000000 | 0 |
+| `entities.own.tera_used` | 1.000000 | 1.000000 | 0 |
+| `entities.own.typing` | 1.000000 | 1.000000 | 0 |
+| `entities.own.vol_counters` | 1.000000 | 1.000000 | 0 |
+| `entities.own.volatiles` | 1.000000 | 1.000000 | 0 |
+| `entities.own.weight` | 1.000000 | 1.000000 | 0 |
+| `entity_ids` | 0.000000 | 0.998126 | 598 |
+| `field` | 1.000000 | 0.999541 | 1 |
+| `history` | 0.047662 | 0.051333 | 1 |
+| `history_ids` | 0.408920 | 1.000000 | 0 |
+| `history_len` | 0.408920 | 1.000000 | 0 |
+| `history_state` | 0.458942 | 1.000000 | 0 |
+| `label` | 0.979419 | 0.999962 | 2 |
+| `legality_mask` | 0.943683 | 0.996366 | 1 |
+| `opp_mask.ability` | 1.000000 | 1.000000 | 0 |
+| `opp_mask.item` | 0.000000 | 0.000000 | 0 |
+| `opp_mask.move` | 1.000000 | 1.000000 | 0 |
+| `opp_mask.species` | 1.000000 | 1.000000 | 0 |
+| `opp_tokens` | 0.095780 | 0.999962 | 251 |
+
+Residuals. Public percentages cannot recover exact own HP (largest difference below 0.01); the same quantization affects snapshots/damage history. Some requested actions never execute (sleep, pre-emption) or execute a different move after faster Encore. `unrecoverable-choices.txt` gives actual live/log examples from game 107. Small replacement-prefix/request-inference differences remain within the 99.5% allowance, with coordinates and values in `parity-final.json`. Missing request stats at large offensive drops explain a few candidate-stat-ratio fallbacks. No opponent truth is added to training inputs.
+
+Intermediate tables: `parity-own-private.json`, `parity-replacements.json`, `parity-after.json`; these are parser decision diagnostics before the final shared retention filter. Baseline and final tables use the complete retained-decision contract. The initial v10/v11 reconversions were interrupted and superseded when further label/phase/one-switch retention fixes were found; no result is attributed to those incomplete conversions. `conversion-migration.json` records an intermediate schema migration, superseded by the clean v12 reconversion.
+
+Validation: 52 covering tests pass (`tests-stage2.txt`), `ruff check fog tests` is clean (`ruff-stage2.txt`). Baseline and final same-machine rollout digests (smoke) change solely because forced replacements no longer overwrite the turn's chosen move:
+
+| Probe | Before | After |
+| --- | --- | --- |
+| Sequential, 6 games | `0d026fed7728c0c4` | `9b4306f80e4ba17c` |
+| Batched, 64 games | `ef414aee0fe96bad` | `96e90a93f89931f5` |
+| MaxDamage, 96 games | `40644081cca71ebe` | `d3c6b556c8a03d0b` |
+
+P2.2b is complete under its parity criterion. Stage 3 remains running: clean v12 conversion of 22,000 games, old/new eight-epoch R4 training at seed 20261201, paired holdout and greedy play. The old-data split reproduces 52,955 training and 103,944 holdout rows; independently reparsing all 2,000 old holdout games reproduces every stored array exactly (`old-metadata-summary.json`). No trained-play effect is claimed yet.
+
+### Stage 3 preparation (smoke)
+
+The clean v12 reconversion completed: **22,000 games, 1,244,604 rows, zero quarantines**
+(`12-artifacts/conversion-quality.json`, converter tree `87e85e6`). Command:
+`FOG_REPLAY_PRIORITY=/tmp/parity-priority.json python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.scripts.convert_replay_decisions --raw data/metamon_gen9ou_r1500 --out data/parity-new-decisions --imputations 1 --workers 2 --resume`.
+The optional priority list changes visitation order only; omitting it produces the same shards.
+The canonical splitter reproduces the selected training order and fixed holdout IDs exactly
+(`split-validation.json`). Old/new row counts for the same 1,000 training games are
+52,955/58,396; for the same 2,000 holdout games, 103,944/115,599 (`training-split.json`).
+
+Before model scoring, the paired holdout join was checked on every game: **95,988 common
+normal rows, zero label disagreements**, and **19,514 new replacement rows**, of which 17,941
+have multiple legal switches (`alignment-preflight.json`, all smoke). The remaining 1,573
+one-option replacements will be reported separately through the all/nontrivial aggregates.
+Metadata for the old rows was independently rebuilt with every stored array asserted identical.
+The existing noisy-weight permutation test also passes on 64 corrected holdout rows, including
+nonzero PP (`new-rows-permutations.json`, `tests-new-row-permutations.txt`).
+
+The two eight-epoch trainings and their play comparison remain running; there is no stage-3
+strength or NLL result yet. They use identical R4 keys, seed 20261201 and two CPU threads,
+sequentially to stay within the machine's 16 GB memory limit.
+
+Metadata-check scope clarification: “every stored array” above means every main decision-row
+array returned by the pinned old `rows_to_arrays`, including inputs, targets and provenance.
+The separate preview arrays are not used by this paired decision evaluation and were not checked;
+`old-metadata-summary.json` now names this scope explicitly. The 2,000-game/103,944-row identity
+result is unchanged.
+
+### Training progress and allocation check (smoke)
+
+The old-data R4 run completed all eight epochs; epoch 7 selected the policy checkpoint
+(`train-old-metrics.csv`). The new-data startup was intentionally stopped before any completed
+epoch: dataset-loading buffers remained resident, and cgroup use reached 17,095,970,816 bytes
+against a 17,179,869,184-byte limit. There was no OOM kill and no new-model result from that
+interrupted attempt.
+
+The run restarts with `MALLOC_MMAP_THRESHOLD_=131072` and `MALLOC_TRIM_THRESHOLD_=131072`,
+which release temporary allocation buffers. Model keys, losses, optimizer, batch order, seed,
+thread count and resume settings are unchanged. Allocation-only equivalence was checked with
+`allocator-equivalence-runner.txt` under both environments: predictions on 1,024 recorded rows,
+eight direct model-input captures, a 256-row full BC loss/backward pass and all 247 resulting
+gradient tensors are **bit-identical** (`allocator-equivalence.json`). This is a runtime memory
+setting, not a different training recipe. Both runs remain CPU-only; trained-play results are
+still pending.
+
+Execution update (smoke): the old run used two threads while sharing the machine with data work.
+The new run now uses the four available CPU cores. Before the change, the same recorded-row
+check compared two and four threads: inputs are identical; maximum output difference is
+5.72e-6, full-BC-loss difference 2.38e-7 and gradient difference 2.24e-7, all within the existing
+1e-5 float32-equivalence tolerance (`thread-equivalence.json`). These are numerical-equivalence
+checks, not bit-identity claims. Model keys, losses, optimizer, batch order and seed are unchanged.
+The two-thread new run was intentionally stopped before its first completed epoch; no model
+result from that partial attempt is reported. The final new command uses `bc.torch_threads=4`,
+and `stage3-driver.txt` records the runtime settings. This supersedes the earlier two-thread
+execution note for the new run only.
+
+The paired holdout scorer now checkpoints completed 100-game blocks and resumes only with
+the same model checkpoints, configuration and game IDs. An interruption-after-100-games test
+resumes to the identical full report (`tests/test_replay_parity_training.py`, two tests pass);
+`ruff check fog tests` remains clean. This changes evaluation recovery only, not its rows or
+metrics. A 16-game control using the same old checkpoint in both slots also gives identical
+metrics for every input view (`scorer-control.json`, smoke).
+
+### Stage 3 training and paired holdout (smoke)
+
+Both R4 trainings completed eight epochs on the same 1,000 games and seed 20261201. The old/new policy selections are epochs 7/6 (`policy-selection.json`, both `train-*-metrics.csv`). The full-holdout NLLs are 1.8053/1.6245, but those have different row mixes and are **not** the comparison below.
+
+Old data comes from `79283c9`; corrected conversion is `9e3f579`. Model/trainer code is unchanged across training. The old run started at `a9b746f`; the new run used `2140165` with the four-thread command recorded in `97ed373`. The two/four-thread and allocator equivalence limits are recorded above. Reproduction command: `.venv/bin/python -u docs/briefs/12-artifacts/stage3-driver.txt`; training expands to `fog.training.bc --config configs/replay_mechanical_cpu.yaml --set bc.manifest=runs/replay-parity/split-{old,new}/train_1000.parquet bc.holdout_manifest=runs/replay-parity/split-{old,new}/holdout_manifest.parquet bc.torch_threads={2,4} log.dir=runs/replay-parity/train-{old,new} seed=20261201`. CPU only.
+
+The paired scorer at `6b5086c` uses the same 2,000 holdout games: **95,988 common normal decisions, zero label disagreements**, 19,514 new replacements (17,941 nontrivial). Each normal-input view uses exactly the same labels and rows. Intervals below resample whole games (both sides together), 1,000 draws, seed 12000.
+
+| Model / input view (smoke) | Rows | NLL [95% game bootstrap] | Top-1 % [95% game bootstrap] |
+| --- | ---: | --- | --- |
+| old_model_old_rows | 95,988 | 1.7803 [1.7732, 1.7872] | 34.13 [33.73, 34.51] |
+| old_model_new_rows | 95,988 | 1.7762 [1.7691, 1.7840] | 34.34 [33.95, 34.71] |
+| new_model_old_rows | 95,988 | 1.9013 [1.8920, 1.9113] | 33.05 [32.67, 33.41] |
+| new_model_new_rows | 95,988 | 1.7178 [1.7102, 1.7252] | 36.60 [36.21, 36.99] |
+| old_model_new_replacements | 19,514 | 1.2182 [1.2086, 1.2278] | 38.35 [37.64, 39.08] |
+| new_model_new_replacements | 19,514 | 1.1646 [1.1546, 1.1742] | 42.56 [41.82, 43.27] |
+| old_model_nontrivial_replacements | 17,941 | 1.3250 [1.3171, 1.3326] | 32.94 [32.27, 33.63] |
+| new_model_nontrivial_replacements | 17,941 | 1.2667 [1.2580, 1.2748] | 37.52 [36.78, 38.25] |
+
+Command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.replay_parity_training --old-manifest runs/replay-parity/split-old/holdout_manifest.parquet --new-manifest runs/replay-parity/split-new/holdout_manifest.parquet --old-metadata runs/replay-parity/old-metadata --old-checkpoint runs/replay-parity/train-old/checkpoints/bc_best.pt --new-checkpoint runs/replay-parity/train-new/checkpoints/bc_best.pt --out docs/briefs/12-artifacts/holdout-comparison.json`. The saved report retains per-game sums, exact checkpoint hashes and all four normal model/input cells. Recovery adds `--resume` with unchanged metrics.
+
+On corrected normal inputs the new model improves both metrics; on old inputs it worsens (NLL 1.7803→1.9013), so it is not input-version interchangeable. Added one-option replacements have zero policy CE; both all/nontrivial replacement aggregates are reported to avoid hiding this. These are imitation diagnostics, not strength gates. The four 400-game play rows are running; no play effect is claimed yet.
+
+
+### Stage 3 greedy play and completion (smoke)
+
+All four rows completed, **400 games each / 1,600 total**, with zero draws, truncations or failures. Both policies use the corrected live history implementation, the same `pool_b`, seed-0 greedy schedule, and both team assignments crossed with both player positions. The producing play commit is `6b5086c`; the policy hashes are in `holdout-comparison.json`. This tests training-row changes under the same actor, not an old/new actor intervention.
+
+| Policy / opponent (smoke) | W–L | Score % [95% matched-block bootstrap] |
+| --- | --- | --- |
+| old vs simpleheuristics | 156–244 | 39.00 [34.50, 43.75] |
+| old vs maxdamage | 303–97 | 75.75 [70.75, 80.75] |
+| new vs simpleheuristics | 180–220 | 45.00 [41.00, 49.26] |
+| new vs maxdamage | 318–82 | 79.50 [75.25, 83.50] |
+
+Paired new-minus-old score differences: SimpleHeuristics **+6.00 percentage points [0.74, 11.25]**; MaxDamage **+3.75 [−2.00, 9.76]**. The MaxDamage interval includes zero. Intervals resample 100 matched four-game blocks together across policies, 1,000 draws, seed 12000.
+
+On the same corrected normal inputs, paired new-minus-old holdout differences are NLL **−0.0585 [−0.0624, −0.0545]**, top-1 **+2.26 points [1.96, 2.53]**. Nontrivial replacement differences are NLL **−0.0583 [−0.0657, −0.0515]**, top-1 **+4.58 points [3.74, 5.53]**. Full old-input/all-replacement differences are retained in `comparison-summary.json`. Holdout intervals resample entire games, separately from play blocks.
+
+Play command: `.venv/bin/python -u docs/briefs/12-artifacts/runtime-wrapper.txt fog.eval.showdown_direct_selection --pool data/teams/pool_b --device cpu --config configs/replay_mechanical_cpu.yaml --checkpoint old=runs/replay-parity/train-old/checkpoints/bc_best.pt --checkpoint new=runs/replay-parity/train-new/checkpoints/bc_best.pt --checkpoint-config old=configs/replay_mechanical_cpu.yaml --checkpoint-config new=configs/replay_mechanical_cpu.yaml --opponent simpleheuristics --opponent maxdamage --games 400 --seed 0 --max-turns 300 --progress-every 40 --resume --out docs/briefs/12-artifacts/play.json`. Analysis: `.venv/bin/python docs/briefs/12-artifacts/comparison-summary.txt`; evidence: `play.json`, `comparison-summary.{txt,json}`, `stage3-complete.json`.
+
+Brief 12 is complete, pending review: parity tool/fixes/tests, full reconversion, both eight-epoch trainings, matched holdout and all requested play rows. The report is 481 words. P2.2b remains checked; no other gate or threshold changes. The prior “running” notes are superseded by these completed measurements. Additional seeds, imputation accuracy and held-out strength remain unverified; pool B and all these results are smoke.
+
+## 2026-11-17: review of brief 12
+
+Reviewed replay/live parity at `e92a565`. The diagnostic captures the
+policy's forward inputs. True own sheets are supplied to the diagnostic, while
+the production converter retains its inferred-sheet provenance. Replacement
+choices are reconstructed from the public prefix, before the switch reveal.
+
+Recomputed all eight holdout cells from the per-game counts and sums in
+`12-artifacts/holdout-comparison.json`. On the same 95,988 corrected normal
+decisions the old/new models scored 1.7762/1.7178 NLL and 34.34/36.60% top-1.
+The four 400-game play totals agree with their individual scores. Against
+SimpleHeuristics the old/new models won 156/180 games, and against MaxDamage
+they won 303/318. These paired results are smoke. No G2 clause was evaluated.
+The original 22,000-game conversion and model training were not repeated.
+
+The 52 covering tests passed with the brief 12 exit-callback workaround;
+`ruff check fog tests` passed. Repeated the three rollout probes on the same
+CPU before and after integration. The sequential, batched and MaxDamage
+digests changed from `0d026fed7728c0c4`, `ef414aee0fe96bad`,
+`40644081cca71ebe` to `9b4306f80e4ba17c`, `96e90a93f89931f5`,
+`d3c6b556c8a03d0b`. All six match the brief's saved outputs. The live-history
+change retains the first choice when a later replacement occurs in that turn.
+Future replay conversions use version 12. The current G20 calibration still
+uses its frozen training input from before the parity change.
+
+The brief 13 checks on the prepared real holdout also finished: 28 source
+tests passed, in addition to the three split-filter tests. Both commands
+returned zero using the same exit-callback workaround.
+
+
+## 2026-11-17: replay calibration and training budget
+
+The first private T4 job completed epoch 1 at source `7d17e1a`. It processed
+989,494 training rows at 2,948 rows/s. The epoch took 366.6 s including 30.9 s
+of validation. Holdout policy NLL was 1.7276, top-1 accuracy 36.60%, value
+Brier 0.2206 and ECE 0.0330. These first-epoch metrics are diagnostics. The
+returned archive contains the optimizer state and both selected checkpoints.
+The account meter moved from 26.44 to 26.28 hours available.
+
+Budget before continuation: 17 × 366.6 s is 1.73 h of training. Allow 2.25 h
+including startup and export. For the target of 100,000 nested games, an
+estimate of 62 corrected decisions per game gives 6.2M rows. At the measured
+rate, 18 epochs including 40 s validation each would take 10.72 h. Including
+the 0.16 h calibration, 2.25 h continuation cap and two hours of reserve leaves
+4.87 h of the 20 h brief for overhead or a lower throughput. Recompute the
+larger forecast using its actual row count and first epoch. The G20 report
+and play evaluation come first. Measurement: `13-artifacts/G20-calibration.json`.
+
+
+## 2026-11-17: final depth and epoch comparisons on validation teams
+
+Recovered both selected checkpoints and their completed training histories from
+the private CPU runs. Played them on the same validation seeds used for network
+4, using the evaluation code and encodings at `55d8dc5`. Each cell contains
+1,008 games in four crossed team/side shards. Intervals are 95% Wilson on
+decisive games. There were no failures.
+
+| Network | Train rows | Epochs | Teacher top-1 at last epoch | SimpleHeuristics | MaxDamage |
+| --- | ---: | ---: | ---: | --- | --- |
+| Deep | 455,501 | 4 | 60.73% | 674–334, 66.87% [63.90%, 69.70%] | 941–66, 93.45% [91.75%, 94.82%]; one turn limit |
+| Narrow | 498,959 | 8 | 66.27% | 754–254, 74.80% [72.03%, 77.38%] | 946–62, 93.85% [92.19%, 95.17%] |
+
+The four-epoch narrow baseline scored 70.8% against SimpleHeuristics and
+94.3% against MaxDamage. The deeper model used the same rows. The eight-epoch
+model also used two additional collection folders, so the improvement cannot
+be assigned to the number of epochs alone. Its 74.80% SimpleHeuristics result
+is the best recorded on this split for a policy playing without search.
+
+Training commits were `c3a3795` (deep, four epochs) and `0aaf980` (narrow,
+eight epochs). Checkpoint SHA-256 values are
+`ca66133567d6bbda1533c04327b9ce48523074ef595888ec72235a17528d6042`
+and `571612a5e0a5c6e771a6c973217680811e83ca84d6811865726b1d46c509dc4a`,
+respectively. Evaluation used `fog.eval.showdown_direct_selection` with
+`--pool data/teams/replay_v1/validation --device cpu --games 252
+--opponent simpleheuristics --opponent maxdamage --max-turns 300`,
+four seeds 15200–15203, and the matching deep or narrow training config.
+Per-game scores and metrics are in `17-artifacts/net4{d,-e8}-*.json`.
+
+The selected eight-epoch network is now playing full-budget EngineMCTS on
+the validation pool with the Network 3g protocol (CPU only, four shards).
+The completed round 5f collection contributed 26,063 decisions from 430 games,
+no truncations; 499/634 sampled labels agreed with the default-budget teacher.
+See `17-artifacts/round5f-summary.json`. Its rows were not used in either model.
+
+
+## 2026-11-17: retained imitation anchor and completion of G0
+
+Recovered the original learner named by
+`configs/automated_gen9ou_typed_league.yaml`. Two separately archived project
+inputs contained the same 23,144,427-byte checkpoint at
+`fog/artifacts/checkpoints/typed_dagger_2048.pt`, SHA-256
+`17de023acd346c8ac3490aa3a8a75b4139cc9c58b691723d4a8e0d30322664bf`.
+It is the A3 anchor used here. Recovery on another machine requires an owned
+private input containing that member. Download the file with the official
+client, verify its hash and place it at the recipe's `initial_checkpoint` path.
+The weights stay outside Git.
+
+At `917249a`, the native compatibility loader loaded all 350 stored tensors.
+All shapes matched. The 26 additional tensors belong exclusively to the
+opponent/self belief EV heads; the actor skips those heads when playing.
+
+| A3 against | W–L | Win rate (95% Wilson) |
+| --- | --- | --- |
+| A0 Random | 924–76 | 92.4% [90.59%, 93.89%] |
+| A1 MaxDamage | 532–468 | 53.2% [50.10%, 56.27%] |
+| A2 SimpleHeuristics | 173–827 | 17.3% [15.08%, 19.77%] |
+
+Each row used 250 matched four-game blocks on the 141 validation teams.
+There were zero draws, turn limits or failures. Command, once per opponent:
+`python -m fog.eval.showdown_direct_selection --pool data/teams/replay_v1/validation
+--device cpu --config configs/gen9ou_typed_token_selfplay.yaml --checkpoint
+A3=artifacts/checkpoints/typed_dagger_2048.pt --checkpoint-config
+A3=configs/gen9ou_typed_token_selfplay.yaml --compatible-checkpoint A3
+--opponent <opponent> --games 1000 --seed 0 --max-turns 800 --out <report>`.
+The three reports in `10-artifacts/A3-*.json` complete the six-pair round-robin
+with the original three scripted rows. P0.6 and P0.7 are complete and the
+post-batching throughput was recorded in brief 08. G0 passes on the
+replay-derived pool. Brief 13 can now measure the actual A3 comparison.
+
+
+## 2026-11-17: calibration of the selected distillation network
+
+On CPU, reconstructed the eight-epoch training split from its original round
+directories and seed 20261201 (`0aaf980`). The same 449 held-out games contain
+27,680 decisions. Recreating the seeded initial weights reproduced the
+original epoch-zero policy CE and Brier score within 0.000001. Evaluated the
+two selected checkpoints using `fog.eval.replay_holdout_report.value_calibration`
+on the same rows. The ten-bin counts and reliability tables are in
+`17-artifacts/net4-e8-calibration.json`.
+
+| Weights | Selected epoch | Outcome Brier | Ten-bin ECE |
+| --- | ---: | ---: | ---: |
+| Best policy | 8 | 0.22739 | 0.09954 |
+| Best value | 1 | 0.20372 | 0.02375 |
+
+The policy checkpoint plays the matches. The value checkpoint is retained for
+value prediction. The reconstructed initial policy is being compared directly
+to the eight-epoch policy in 1,008 matched games on validation teams.
+
+
+## 2026-11-17: eight-epoch policy against learned anchors
+
+Played the eight-epoch narrow policy against the regenerated initial weights,
+the retained A3 checkpoint, and the archived T4 replication of pilot network 1.
+Every match used the replay-derived validation pool, greedy selection, four
+crossed shards at seeds 15200–15203 and a 300-turn limit. Evaluation source:
+`55d8dc5`. The initial weights reproduced the original training run's
+epoch-zero policy CE and value Brier on the full held-out set.
+
+| Opponent | Scheduled | Wins–losses | Turn limits | Win rate (decisive games, Wilson 95%) |
+| --- | ---: | ---: | ---: | --- |
+| Initial weights | 1,008 | 1,004–4 | 0 | 99.60% [98.98%, 99.85%] |
+| A3 | 1,008 | 951–57 | 0 | 94.35% [92.74%, 95.61%] |
+| Pilot network 1, T4 replication | 1,008 | 663–344 | 1 | 65.84% [62.85%, 68.70%] |
+
+All three comparisons had zero failures. The G3 initial-weights clause
+(>55%) passed. The pilot opponent is the archived eight-epoch, 118,518-row
+replication (holdout CE 1.8286), SHA-256
+`d9977d3c595d8686d851e5ad0bdaac97ea8a5a729201297caf992d24ee79b992`.
+The original CPU pilot and the replication have distinct weights.
+
+Command per shard: `python -m fog.eval.showdown_direct_selection --pool
+data/teams/replay_v1/validation --config configs/search_distill_cpu.yaml
+--device cpu --checkpoint net4-e8=<policy> --checkpoint <opponent>=<weights>
+--checkpoint-config <opponent>=<config> --head-to-head --games 252
+--seed <seed> --max-turns 300 --out <shard>`. A3 uses the original typed
+self-play config and `--compatible-checkpoint A3`. The other opponents use the
+distillation config. Pooled results are in `17-artifacts/net4-e8-vs-*.json`.
+
+## 2026-11-17: search distillation at scale (P3)
+
+Validation used the greedy policy alone on the replay-derived teams, 1,008 games per opponent.
+Intervals are Wilson 95% intervals on decisive games. The second-seed check measures the
+teacher's repeatability on newly added collection folders. Teacher top-1 measures the policy
+checkpoint on its held-out games. The commands and source commits for each run appear in
+the preceding pilot, round 3, network 4 and eight-epoch entries.
+
+| Training rows | Epochs | Teacher repeat | Holdout top-1 | SimpleHeuristics | MaxDamage |
+| ---: | ---: | ---: | ---: | --- | --- |
+| 58,160 | 8 | 86.5% | 49.3% | .448 [.418, .479] | .815 [.790, .838] |
+| 118,518 | 8 | 87.8% | 56.7% | .615 [.585, .645] | .909 [.889, .925] |
+| 178,317 | 8 | 87.4% | 58.8% | .682 [.653, .710] | .923 [.904, .937] |
+| 233,895 | 8 | 87.9% | 61.7% | .685 [.655, .712] | .925 [.907, .939] |
+| 455,501 | 4 | 88.3% | 61.4% | .708 [.680, .736] | .943 [.927, .956] |
+| 498,959 | 8 | 88.8% | 66.3% | .748 [.720, .774] | .938 [.922, .952] |
+
+The SimpleHeuristics gains in the last three steps were 0.3, 2.4 and 4.0 percentage
+points. Each was smaller than the width of that result's interval, meeting the brief's
+collection stopping rule on the observed scores. Epoch count also changed in the last
+two steps, so these points cannot isolate the benefit of more rows at eight epochs.
+Collection stopped below one million. The 22 saved summaries account for 641,875
+decisions and 71.22 hours summed over completed games. That time excludes startup and
+unfinished games. The three archived pilot GPU runs totalled 1.24 elapsed hours.
+Per-round counts, checkpoint selection and complete cell results are in
+`docs/briefs/17-artifacts/{budget,learning-curve}.json`.
+
+### Repository validation
+
+The 164 test modules at `5ae77d6` produced 1,157 passes, nine skips, three expected
+failures and one failure after rerunning the replay interruption test with local sockets
+available. The rerun of the replay runner and search-distillation tests passed all 30
+tests. The outstanding league test requires historical 64-, 512- and 1,024-game
+checkpoint files absent from this checkout. The 2,048-game checkpoint is present and
+passed the A3 evaluation above.
+
+The [validation learning curve](briefs/17-artifacts/validation-learning-curve.png) shows both opponents with 95% Wilson intervals. Hollow markers identify the four-epoch run. Each point uses 1,008 validation games per opponent.
+
+## 2026-11-17: replay blueprint at scale on corrected rows
+
+G20 finished its 18-epoch schedule on 989,494 rows from 20,000 games. Both private
+checkpoint exports match the independently loaded tensors inside the final optimizer
+archive. Its step and Adam state survived the job boundary. The first two metric rows
+are identical to the original calibration export. Validation uses the fixed 2,000-game,
+103,944-row holdout.
+
+| Checkpoint | Selection epoch | Action NLL | Top-1 | Value Brier | Value ECE |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Best policy | 14 | 1.45776 | 47.32% | .24482 | .13360 |
+| Best value (minimum logistic value loss) | 3 | 1.58710 | 42.32% | .21286 | .00832 |
+
+Source `7d17e1a`, `docs/briefs/13-artifacts/gpu_job.py`, run G20, 18 epochs,
+batch 1,024, configuration `configs/replay_mechanical_cpu.yaml`, resume and separate
+value selection enabled. The continuation used 1.81 metered hours (26.28 to 24.47).
+Including the 0.16-hour calibration, the replay brief has consumed 1.97 of 20 hours.
+The median continuation epoch took 368.1 s at 2,935 training rows/s. Full epoch
+measurements, checkpoint digests and selections are in `13-artifacts/G20-metrics.csv`
+and `13-artifacts/G20-training.json`. Stage 3 runs on CPU.
+
+## 2026-11-18: G20 replay policy validation (P2.5)
+
+**Gate G2 passed for G20.** The greedy policy won 730/1,000 against SimpleHeuristics (passed, threshold 65%) and 921/1,000 against A3 (passed, threshold above 55%). The separately selected value checkpoint achieved ECE 0.00832 (passed, threshold below 0.05) and Brier 0.21286 (passed, threshold below 0.24).
+
+| Opponent | Greedy | Temperature 0.5 |
+| --- | --- | --- |
+| SimpleHeuristics | 730/1,000 (73.0%, 70.2–75.7%) | 637/1,000 (63.7%, 60.7–66.6%) |
+| MaxDamage | 918/1,000 (91.8%, 89.9–93.3%) | 892/1,000 (89.2%, 87.1–91.0%) |
+| Retained imitation policy (A3) | 921/1,000 (92.1%, 90.3–93.6%) | 900/1,000 (90.0%, 88.0–91.7%) |
+
+Each cell used the same 1,000 four-way team-and-side-matched games across 141 held-out teams, seed 0, with a 200-turn limit. The table gives wins per scheduled game, decisive win rates and 95% Wilson intervals. Across the six cells, 0 games reached the limit and no simulator failures occurred.
+
+The short lead-training stage raised holdout action NLL by 0.02160, exceeding the 0.005 retention threshold. It raised the 400-game SimpleHeuristics score by 7.5 percentage points (paired 95% interval 2.5 to 12.8). All six validation rows used the original policy checkpoint. On the fixed holdout, shuffling move slots changed policy NLL by less than 0.000001 and preserved top-1 accuracy. The three pairs of holdout reports include the move and first-move subsets, game-resampled intervals and ten reliability bins.
+
+- Original policy on `pool_b` (smoke), 287/400 against SimpleHeuristics and 377/400 against MaxDamage.
+- Lead policy on `pool_b` (smoke), 317/400 against SimpleHeuristics and 384/400 against MaxDamage.
+
+Run with `docs/briefs/13-artifacts/cpu_stage.py --run G20 --play-only --validation-workers 4 --anchor-checkpoint artifacts/checkpoints/typed_dagger_2048.pt` at `2e96d6af`, using the G20 manifest, holdout and checkpoint directory from the training entry. The policy and value digests are in `G20-training.json`. The lead rules and per-game scores are in the [stage results](briefs/13-artifacts/G20-stage.json) and associated play files.

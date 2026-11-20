@@ -14,8 +14,7 @@ nothing else.
 
 **Start only if `docs/briefs/QUEUE.md` says gate G1 passed.**
 
-**2026-11-16 22:40 UTC: the planner is running this measurement itself (results go to
-`work/roadmap`). Do not start it again: the test teams are run once.**
+**The first completed run is recorded in 16-report.md. The later, incomplete attempt on the same seeds is retained in commit 0165430 and is excluded from the result.**
 
 ## 2. Rules
 

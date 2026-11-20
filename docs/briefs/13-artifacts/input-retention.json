@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "bytes": 535989932,
+  "sha256": "b99e4d5a2e047632f202c6bb3703fa2e05b11e2fb24eee4512881dd4d62709d9",
+  "download_verified": true,
+  "checked_at_utc": "2026-11-16T13:33:34Z",
+  "status": "ready",
+  "version": 1,
+  "upload_command": "official Kaggle client dataset_create_new(public=False, convert_to_csv=False)",
+  "recovery_command": "python docs/briefs/13-artifacts/download_inputs.py --out runs/brief13/recovered",
+  "account_and_dataset_name": "omitted as required by brief 13",
+  "initial_automatic_approval_rejection": "Resolved after verifying the repository is public, the payload contains only public replay tensors and brief 05 explicitly authorizes private uploads."
+}

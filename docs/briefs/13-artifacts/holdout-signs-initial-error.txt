@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/workspace/fog/docs/briefs/13-artifacts/check_labels.py", line 94, in <module>
+    main()
+  File "/workspace/fog/docs/briefs/13-artifacts/check_labels.py", line 41, in main
+    raise ValueError("missing complete public preview")
+ValueError: missing complete public preview

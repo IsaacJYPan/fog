@@ -1,0 +1,30 @@
+{
+  "status": "prepared, not submitted; another GPU job is queued",
+  "run": "G20",
+  "source_commit": "7d17e1a",
+  "training_games": 20000,
+  "training_rows": 989494,
+  "holdout_games": 2000,
+  "holdout_rows": 103944,
+  "config": "configs/replay_mechanical_cpu.yaml",
+  "batch_size": 1024,
+  "schedule_epochs": 18,
+  "stop_after_epoch": 1,
+  "belief_overrides": [
+    "loss.belief_coef=0",
+    "loss.belief_chain_coef=0",
+    "loss.skip_unweighted_belief=true"
+  ],
+  "initial_speed_basis": "brief 08 replay smoke, 1850.26 rows/s, different recipe; estimate only, not a new measurement",
+  "initial_speed_rows_per_second": 1850.26,
+  "projected_train_seconds": 534.7864624431161,
+  "projected_validation_seconds": 120,
+  "setup_restore_export_allowance_seconds": 600,
+  "projected_total_seconds": 1254.786462443116,
+  "hard_platform_cap_seconds": 3600,
+  "internal_export_deadline_seconds": 3300,
+  "brief_hours_spent": 0,
+  "brief_hour_limit": 20,
+  "reserve_hours": 2,
+  "larger_run_plan": "not selected until measured throughput; first finish G20 training, lead retention and play, then push"
+}
