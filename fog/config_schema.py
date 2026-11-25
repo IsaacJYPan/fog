@@ -26,7 +26,7 @@ _SECTION_KEYS = {
         "min_team_pool_size", "no_security", "node_binary", "num_workers",
         "opponent_cache_size", "rollout_batch", "rollout_worker_mode", "rollout_worker_timeout",
         "independent_opponent_rng",
-        "rollout_workers", "server_url", "showdown_root", "team_pool",
+        "rollout_max_turns", "rollout_workers", "server_url", "showdown_root", "team_pool",
     },
     "encoding": {
         "current_dim", "dyn_dim", "entity_hidden", "history_cap", "history_dim",
@@ -61,7 +61,7 @@ _SECTION_KEYS = {
     },
     "log": {"checkpoint_every_decisions", "dir", "halt_on_regression_sigma", "tensorboard"},
     "ppo": {
-        "activation_checkpointing",
+        "activation_checkpointing", "belief_row_fraction", "mixed_precision", "value_after_kl_stop",
         "target_kl",
         "batch_decisions", "bc_anchor_ckpt", "bc_anchor_rule_prior_strength", "clip",
         "entropy_coef", "entropy_coef_final", "epochs", "games_per_chunk", "gamma",
@@ -69,7 +69,7 @@ _SECTION_KEYS = {
         "max_grad_norm", "minibatch_size", "resume_ckpt", "rollout_temperature",
         "rollout_tera_logit_bonus", "total_decisions", "trainable_prefixes",
         "rollout_tera_logit_bonus_initial", "rollout_tera_logit_bonus_final",
-        "rollout_tera_logit_bonus_decay_decisions", "gradient_diagnostics",
+        "rollout_tera_logit_bonus_decay_decisions", "gradient_diagnostics", "trunk_grad_every",
         "trainable_lr_scales",
         "heuristic_teacher", "heuristic_coef", "heuristic_coef_final", "heuristic_decay_decisions",
         "policy_objective", "value_target", "heuristic_voluntary_switch_weight",

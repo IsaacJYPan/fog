@@ -1,0 +1,34 @@
+# Self-play PPO from the RL continuation net with the retrained value head; all heads train the trunk.
+extends: net4_outcome_ppo_cpu.yaml
+experiment: selfplay_rl
+seed: 25600
+ppo:
+  init_ckpt: runs/init/start.pt
+  lr: 0.00004
+  epochs: 2
+  entropy_coef: 0.003
+  target_kl: 0.02
+  value_after_kl_stop: true
+  belief_row_fraction: 0.25
+  trunk_grad_every: 8
+loss:
+  # Weights chosen so each head's gradient on the shared trunk is of the same order
+  # (measured with ppo.trunk_grad_every; policy ~3, value ~3, belief and self-belief ~1 each).
+  value_coef: 1.0
+  belief_coef: 2.0
+  belief_chain_coef: 2.0
+  self_belief_coef: 2.0
+  self_belief_chain_coef: 2.0
+league:
+  latest_frac: 0.6
+  past_frac: 0.3
+  scripted_frac: 0.1
+  scripted: [SimpleHeuristics, MaxDamage]
+  snapshot_every_decisions: 65536
+  # Self-play from the first game: the start net (last = "latest") and an older distilled net.
+  past_ckpts: [runs/init/net4e8.pt, runs/init/start.pt]
+log:
+  dir: runs/selfplay_rl
+  checkpoint_every_decisions: 131072
+env:
+  rollout_max_turns: 300

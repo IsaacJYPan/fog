@@ -404,6 +404,13 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
         log("value_only_grad_norm", norm)
 
     value_key = "game_outcomes" if value_target == "outcome" else "returns"
+    # Optional diagnostic: each head's weighted loss gradient norm on the shared trunk, so no
+    # head silently dominates (or is starved of) the representation.
+    trunk_grad_every = int(ppo_cfg.get("trunk_grad_every", 0))
+    trunk_parameters = [
+        p for name in ("backbone", "shared_latent") if getattr(agent, name, None) is not None
+        for p in getattr(agent, name).parameters() if p.requires_grad
+    ]
     value_only_steps = 0
     value_only_rows = 0
     stopped_for_kl = False
@@ -483,6 +490,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
             entropy = _masked_entropy(behavior_log_probs).mean()
 
             loss = policy_loss + value_coef * v_loss - entropy_coef * entropy
+            head_terms = {"policy": policy_loss - entropy_coef * entropy, "value": value_coef * v_loss}
 
             if teacher_loss is not None and heuristic_coef > 0:
                 loss = loss + heuristic_coef * teacher_loss
@@ -515,6 +523,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                     **normalization.get("belief", {}),
                 )
                 loss = loss + belief_coef * b_loss
+                head_terms["belief"] = belief_coef * b_loss
                 log("belief_loss", b_loss)
                 log("belief_ce_marginal", b_loss)
                 # dropped-target rate: ~0 post-alignment; systematic > 0 = convention bug (see
@@ -540,6 +549,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                         **normalization.get("belief_chain", {}),
                     )
                     loss = loss + belief_chain_coef * bc_loss
+                    head_terms["belief"] = head_terms["belief"] + belief_chain_coef * bc_loss
                     log("belief_ce_chain", bc_loss)
                     for metric_name, metric_value in _chain_probability_metrics(
                         belief_out.belief_chain, belief_mb["belief_valid"]
@@ -554,6 +564,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                     stats=sb_stats, **normalization.get("self_belief", {}),
                 )
                 loss = loss + self_belief_coef * sb_loss
+                head_terms["self_belief"] = self_belief_coef * sb_loss
                 log("self_belief_loss", sb_loss)
                 log("self_belief_ce_marginal", sb_loss)
                 sb_total = sb_stats.get("valid", 0) + sb_stats.get("dropped_nonfinite", 0)
@@ -577,6 +588,7 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                         belief_mb["self_belief_valid"], **normalization.get("self_belief_chain", {}),
                     )
                     loss = loss + self_belief_chain_coef * sbc_loss
+                    head_terms["self_belief"] = head_terms["self_belief"] + self_belief_chain_coef * sbc_loss
                     log("self_belief_ce_chain", sbc_loss)
 
             if replay_regularizer is not None:
@@ -597,6 +609,15 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                                 log(key, value)
                     replay_regularizer.last_policy_loss = None
 
+            if trunk_grad_every > 0 and trunk_parameters and optimizer_steps % trunk_grad_every == 0:
+                for head, term in head_terms.items():
+                    if not term.requires_grad:
+                        continue
+                    grads = torch.autograd.grad(
+                        term.float(), trunk_parameters, retain_graph=True, allow_unused=True
+                    )
+                    sq = sum(float(g.float().pow(2).sum()) for g in grads if g is not None)
+                    log(f"trunk_grad_{head}", sq ** 0.5)
             log("grad_norm", optimize(loss))
             optimizer_steps += 1
             optimizer_rows += len(idx)
@@ -1476,6 +1497,9 @@ class _ShowdownRolloutWorker:
 
         env_cfg = cfg.get("env", {})
         self.rollout_batch = int(env_cfg.get("rollout_batch", 1))
+        # Optional turn cap for batched rollouts; capped games end unresolved and score 0.
+        max_turns = env_cfg.get("rollout_max_turns")
+        self.rollout_max_turns = None if max_turns is None else int(max_turns)
         if self.rollout_batch < 1:
             raise ValueError("env.rollout_batch must be >= 1")
         self.actor_device = torch.device(str(env_cfg.get("actor_device", "cpu")))
@@ -1640,7 +1664,8 @@ class _ShowdownRolloutWorker:
             self.current_private_state, self.current_opponent = spec.context
 
         runner = BatchedShowdownRunner(
-            self.client, self.adapter, controller, batch_size=self.rollout_batch, enter=enter
+            self.client, self.adapter, controller, batch_size=self.rollout_batch, enter=enter,
+            max_turns=self.rollout_max_turns,
         )
         results = runner.play(specs)
         return sum(int(result.p1_won is True) for result in results), runner.stats

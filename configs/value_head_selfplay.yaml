@@ -1,0 +1,31 @@
+# Value-readout training on fresh games with the policy and trunk frozen.
+# Measures whether more outcome data alone lifts the value head above a material count.
+extends: net4_outcome_ppo_cpu.yaml
+experiment: value_head_selfplay
+seed: 25500
+
+ppo:
+  trainable_prefixes: [shared_to_value, policy_value.value]
+  lr: 0.0001
+  epochs: 2
+  entropy_coef: 0.0
+  entropy_coef_final: 0.0
+  target_kl: null
+  rollout_temperature: 1.0
+
+loss:
+  value_coef: 1.0
+
+league:
+  latest_frac: 0.6
+  past_frac: 0.0
+  scripted_frac: 0.4
+  scripted: [SimpleHeuristics, MaxDamage]
+  snapshot_every_decisions: 131072
+
+log:
+  dir: runs/value_head_selfplay
+  checkpoint_every_decisions: 131072
+
+env:
+  rollout_max_turns: 300   # mirror self-play can stall; capped games score as draws

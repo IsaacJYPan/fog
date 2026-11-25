@@ -1,0 +1,47 @@
+# CPU outcome-learning experiment from net4 against a fixed opponent.
+# Set ppo.init_ckpt to the local net4 weights when they live outside runs/distill.
+extends: search_distill_cpu.yaml
+experiment: net4_outcome_ppo_cpu
+seed: 24371
+device: cpu
+
+env:
+  backend: showdown_direct
+  team_pool: data/teams/replay_v1/train
+  rollout_workers: 2
+  rollout_worker_mode: process
+  rollout_batch: 8
+  actor_threads: 1
+
+ppo:
+  init_ckpt: runs/distill/net4/policy_best.pt
+  total_decisions: 16384
+  batch_decisions: 1024
+  minibatch_size: 128
+  games_per_chunk: 16
+  epochs: 2
+  lr: 0.00004
+  clip: 0.15
+  target_kl: 0.02
+  rollout_temperature: 1.0
+  entropy_coef: 0.003
+  value_target: outcome
+  belief_row_fraction: 0.0
+
+loss:
+  belief_coef: 0.0
+  belief_chain_coef: 0.0
+  self_belief_coef: 0.0
+  self_belief_chain_coef: 0.0
+  preview_coef: 0.0
+
+league:
+  latest_frac: 0.0
+  past_frac: 0.0
+  scripted_frac: 1.0
+  scripted: [SimpleHeuristics]
+  snapshot_every_decisions: 4096
+
+log:
+  dir: runs/net4_outcome_ppo_cpu
+  tensorboard: false

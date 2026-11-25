@@ -19,7 +19,7 @@ from fog.env.showdown_direct import (
 )
 
 # Transport-level messages poke-env's Player normally removes before calling Battle.parse_message.
-_TRANSPORT_MESSAGES = {"t:", "expire", "uhtmlchange"}
+_TRANSPORT_MESSAGES = {"t:", "expire", "uhtmlchange", "bigerror"}
 
 
 def _parse_protocol_line(line: str) -> list[str]:
