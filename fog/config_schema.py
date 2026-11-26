@@ -33,7 +33,7 @@ _SECTION_KEYS = {
         "history_encoder", "species_embed_dim", "state_dim", "dropout",
     },
     "model": {
-        "aux_into_trunk", "belief_decoder_layers", "belief_dim",
+        "aux_into_trunk", "trunk_grad_scale_value", "trunk_grad_scale_belief", "belief_decoder_layers", "belief_dim",
         "belief_last_context_probability", "blind_reactive", "exact_action_context",
         "history_gru_hidden", "history_heads", "history_transformer_layers", "history_ff_dim", "oracle",
         "public_action_features_only", "shared_entity_dim", "shared_field_dim",
@@ -75,7 +75,7 @@ _SECTION_KEYS = {
         "policy_objective", "value_target", "heuristic_voluntary_switch_weight",
     },
     "league": {
-        "freeze_history",
+        "anchor_ckpts", "anchor_frac", "freeze_history",
         "latest_frac", "past_ckpts", "past_frac", "scripted", "scripted_frac",
         "snapshot_every_decisions", "warmup_decisions", "warmup_opponent",
     },

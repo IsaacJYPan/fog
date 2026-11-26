@@ -411,6 +411,11 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
         p for name in ("backbone", "shared_latent") if getattr(agent, name, None) is not None
         for p in getattr(agent, name).parameters() if p.requires_grad
     ]
+    # Running sums of each head's trunk gradient over the sampled minibatches of this update.
+    # A minibatch norm mixes signal with sampling noise (policy-gradient noise is large and
+    # cancels across minibatches); the norm of the MEAN is the head's consistent push.
+    trunk_grad_sums: dict[str, list[torch.Tensor]] = {}
+    trunk_grad_counts: dict[str, int] = {}
     value_only_steps = 0
     value_only_rows = 0
     stopped_for_kl = False
@@ -618,6 +623,14 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
                     )
                     sq = sum(float(g.float().pow(2).sum()) for g in grads if g is not None)
                     log(f"trunk_grad_{head}", sq ** 0.5)
+                    flat = [torch.zeros_like(p, dtype=torch.float32) if g is None else g.float()
+                            for g, p in zip(grads, trunk_parameters)]
+                    if head in trunk_grad_sums:
+                        for total, g in zip(trunk_grad_sums[head], flat):
+                            total.add_(g)
+                    else:
+                        trunk_grad_sums[head] = flat
+                    trunk_grad_counts[head] = trunk_grad_counts.get(head, 0) + 1
             log("grad_norm", optimize(loss))
             optimizer_steps += 1
             optimizer_rows += len(idx)
@@ -668,6 +681,10 @@ def ppo_update(agent, optimizer, batch: dict, cfg: dict, replay_regularizer=None
     log("optimizer_steps", optimizer_steps)
     log("optimizer_rows", optimizer_rows)
     log("effective_epochs", optimizer_rows / n)
+    for head, totals in trunk_grad_sums.items():
+        count = trunk_grad_counts[head]
+        log(f"trunk_signal_{head}", sum(float(t.pow(2).sum()) for t in totals) ** 0.5 / count)
+        log(f"trunk_signal_samples_{head}", count)
     return {k: sum(v) / len(v) for k, v in metrics.items()}
 
 
@@ -859,6 +876,8 @@ class _TrainSetup:
             latest_frac=float(league_cfg.get("latest_frac", 0.50)),
             past_frac=float(league_cfg.get("past_frac", 0.35)),
             scripted_frac=float(league_cfg.get("scripted_frac", 0.15)),
+            anchor_frac=float(league_cfg.get("anchor_frac", 0.0)),
+            anchor_ckpts=[Path(c) for c in league_cfg.get("anchor_ckpts", [])],
             snapshot_every_decisions=self.snap_every,
             warmup_opponent=league_cfg.get("warmup_opponent"),
             warmup_decisions=int(league_cfg.get("warmup_decisions", 0)),

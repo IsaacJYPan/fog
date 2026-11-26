@@ -1,0 +1,38 @@
+# Self-play PPO, second version: network-only opponents, large low-noise updates, and balanced
+# trunk gradients.
+#   - Opponents: latest snapshot 50%, past snapshots 30%, the starting network 20% (fixed
+#     anchor). No scripted bots: games against weak opponents taught habits that did not
+#     transfer to strong ones.
+#   - Updates: 32k decisions per PPO batch, 1024-row minibatches. A 256-row policy gradient is
+#     nearly orthogonal to the next one (cosine ~0.05); four times the rows halves that noise.
+#   - Trunk balance: averaged over an update, the value loss pushed the shared layers ~3x harder
+#     than the policy (2.1 vs ~0.7), so its trunk gradient is scaled to 0.3. Belief losses come
+#     back at 0.25 (they were 2.0 and overwrote the policy's features); at that weight their
+#     trunk push is already below the policy's. Each head still learns from its full loss.
+extends: selfplay_rl.yaml
+experiment: selfplay_rl_v2
+seed: 25700
+model:
+  trunk_grad_scale_value: 0.3
+  trunk_grad_scale_belief: 1.0
+ppo:
+  init_ckpt: runs/init/init.pt
+  lr: 0.00006
+  batch_decisions: 32768
+  minibatch_size: 1024
+  belief_row_fraction: 0.25
+  trunk_grad_every: 4
+loss:
+  belief_coef: 0.25
+  belief_chain_coef: 0.25
+  self_belief_coef: 0.25
+  self_belief_chain_coef: 0.25
+league:
+  latest_frac: 0.5
+  past_frac: 0.3
+  scripted_frac: 0.0
+  anchor_frac: 0.2
+  anchor_ckpts: [runs/init/start.pt]
+  past_ckpts: [runs/init/start.pt, runs/init/init.pt]
+log:
+  dir: runs/selfplay_rl_v2

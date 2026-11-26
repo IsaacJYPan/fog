@@ -36,6 +36,22 @@ from fog.models.structured_memory import StructuredMemoryEncoder, StructuredMemo
 PARAM_BUDGET = 50_000_000
 
 
+class _ScaleGrad(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x, scale):
+        ctx.scale = scale
+        return x.view_as(x)
+
+    @staticmethod
+    def backward(ctx, grad):
+        return grad * ctx.scale, None
+
+
+def scale_grad(x: torch.Tensor, scale: float) -> torch.Tensor:
+    """Identity whose backward multiplies the gradient by ``scale`` (1.0 returns ``x`` itself)."""
+    return x if scale == 1.0 else _ScaleGrad.apply(x, scale)
+
+
 @dataclass
 class AgentOutput:
     log_probs: torch.Tensor
@@ -126,6 +142,11 @@ class FogAgent(nn.Module):
         if cfg.get("loss", {}).get("value_loss", "mse") not in {"mse", "logistic"}:
             raise ValueError("loss.value_loss must be mse or logistic")
         self.aux_into_trunk = model_cfg.get("aux_into_trunk", True)
+        # Scale only the gradient each head sends back into the shared trunk (identity forward).
+        # The head's own parameters still see their full loss; under Adam their step size is
+        # unchanged, so this balances how much each head shapes the shared representation.
+        self.trunk_grad_scale_value = float(model_cfg.get("trunk_grad_scale_value", 1.0))
+        self.trunk_grad_scale_belief = float(model_cfg.get("trunk_grad_scale_belief", 1.0))
         self.oracle = model_cfg.get("oracle", "none")  # {none, set, action} evaluation ceilings
         # blind_reactive baseline: force history to 0 and zero the belief conditioning,
         # so the agent reacts only to the current board with no memory/belief. Same weights.
@@ -655,7 +676,7 @@ class FogAgent(nn.Module):
             else None
         )
         value_shared_context = (
-            self.shared_to_value(shared_state)
+            self.shared_to_value(scale_grad(shared_state, self.trunk_grad_scale_value))
             if self.shared_to_value is not None and shared_state is not None
             else None
         )
@@ -692,7 +713,8 @@ class FogAgent(nn.Module):
                 contexts, belief_structured_context, shared_state
             )
             belief_context_aux = (
-                belief_context if self.aux_into_trunk else belief_context.detach()
+                scale_grad(belief_context, self.trunk_grad_scale_belief)
+                if self.aux_into_trunk else belief_context.detach()
             )
             belief_out = self.belief(
                 belief_context_aux, opp_revealed
@@ -776,6 +798,8 @@ class FogAgent(nn.Module):
             )
             if not self.aux_into_trunk:
                 self_belief_context = self_belief_context.detach()
+            else:
+                self_belief_context = scale_grad(self_belief_context, self.trunk_grad_scale_belief)
             self_belief_out = self.self_belief(
                 self_belief_context, opp_view["my_view"]
             )                                                               # marginals

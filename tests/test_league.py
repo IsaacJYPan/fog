@@ -68,3 +68,22 @@ def test_warmup_opponent_precedes_configured_mixture():
 def test_warmup_requires_an_opponent():
     with pytest.raises(ValueError, match="warmup_opponent"):
         League(warmup_decisions=1)
+
+
+def test_anchor_opponents_get_their_share():
+    import random
+    from pathlib import Path
+
+    from fog.training.league import League
+
+    league = League(latest_frac=0.5, past_frac=0.3, scripted_frac=0.0, anchor_frac=0.2,
+                    anchor_ckpts=[Path("start.pt")], latest_ckpt=Path("latest.pt"),
+                    past_ckpts=[Path("old.pt")])
+    rng = random.Random(0)
+    picks = [league.sample_opponent(rng) for _ in range(20000)]
+    share = {name: sum(p == Path(name) for p in picks) / len(picks)
+             for name in ("start.pt", "old.pt", "latest.pt")}
+    assert abs(share["start.pt"] - 0.2) < 0.02
+    assert abs(share["old.pt"] - 0.3) < 0.02
+    assert abs(share["latest.pt"] - 0.5) < 0.02
+    assert not any(isinstance(p, str) for p in picks)  # no scripted bots at scripted_frac=0
